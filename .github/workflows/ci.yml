@@ -1,0 +1,32 @@
+name: Protótipo
+on:
+  pull_request:
+    paths-ignore: ["docs/**", "README.md"]
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**", "README.md"]
+permissions:
+  contents: read
+jobs:
+  prototype:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
+      - run: npm run gate
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prototipo-${{ github.sha }}
+          path: dist
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-evidence
+          path: test-results

@@ -32,8 +32,11 @@ export function sameSheetDocument(left: Sheet, right: Sheet): boolean {
   // Arrays retain their order; this does not change the saved wire document.
   const comparable = (document: Sheet) =>
     JSON.stringify(document, (_key, value: unknown) => {
-      if (value === null || typeof value !== "object" || Array.isArray(value)) return value;
-      return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
+      if (value === null || typeof value !== "object" || Array.isArray(value))
+        return value;
+      return Object.fromEntries(
+        Object.entries(value).sort(([a], [b]) => a.localeCompare(b)),
+      );
     });
   return comparable(left) === comparable(right);
 }
@@ -58,7 +61,8 @@ export function parseFoul(code: string, target: string): Foul | null {
   )
     return null;
   // B2 is a bench disqualification penalty, not a second technical.
-  if ((kind === "T" || kind === "C") && !["1", "C"].includes(suffix)) return null;
+  if ((kind === "T" || kind === "C") && !["1", "C"].includes(suffix))
+    return null;
   if (kind === "B" && !["1", "2", "C"].includes(suffix)) return null;
   return {
     kind,
@@ -130,26 +134,40 @@ export function aggregate(sheet: Sheet) {
       roster.length > 12 ||
       new Set(roster.map((s) => s.jersey)).size !== roster.length
     )
-      errors.push(`Revise as camisas e os relacionados da equipe ${side === "home" ? "A" : "B"}.`);
+      errors.push(
+        `Revise as camisas e os relacionados da equipe ${side === "home" ? "A" : "B"}.`,
+      );
     if (
       sheet.coachPlayer[side] !== null &&
       !roster.some((s) => s.rosterEntryId === sheet.coachPlayer[side])
     )
       errors.push("O atleta-treinador deve estar relacionado.");
   }
-  if (new Set(sheet.roster.map((s) => s.rosterEntryId)).size !== sheet.roster.length)
+  if (
+    new Set(sheet.roster.map((s) => s.rosterEntryId)).size !==
+    sheet.roster.length
+  )
     errors.push("Atleta duplicado.");
   if (new Set(sheet.events.map((e) => e.id)).size !== sheet.events.length)
     errors.push("Lançamento duplicado.");
   for (const event of [...sheet.events].sort((a, b) => a.period - b.period)) {
-    const player = players.find((p) => p.side === event.side && p.jersey === event.target);
+    const player = players.find(
+      (p) => p.side === event.side && p.jersey === event.target,
+    );
     const own = teams[event.side];
     const opponent = teams[event.side === "home" ? "away" : "home"];
-    if (event.period > sheet.periods || (!player && !["B", "C"].includes(event.target))) {
+    if (
+      event.period > sheet.periods ||
+      (!player && !["B", "C"].includes(event.target))
+    ) {
       errors.push("Camisa ou período inválido.");
       continue;
     }
-    if (player && !sheet.roster.find((s) => s.rosterEntryId === player.rosterEntryId)?.played)
+    if (
+      player &&
+      !sheet.roster.find((s) => s.rosterEntryId === player.rosterEntryId)
+        ?.played
+    )
       errors.push(
         `Marque a participação de #${player.jersey} da equipe ${event.side === "home" ? "A" : "B"} antes de lançar pontos ou faltas.`,
       );
@@ -169,7 +187,8 @@ export function aggregate(sheet: Sheet) {
       if (points === 3) player.three++;
       player.points += points;
       own.points += points;
-      own.periods[event.period - 1] = (own.periods[event.period - 1] ?? 0) + points;
+      own.periods[event.period - 1] =
+        (own.periods[event.period - 1] ?? 0) + points;
       continue;
     }
     const foul = parseFoul(event.code, event.target);
@@ -189,7 +208,8 @@ export function aggregate(sheet: Sheet) {
     opponent.freeTaken += foul.freeThrows;
     if (player) {
       player.fouls++;
-      own.foulsByPeriod[event.period - 1] = (own.foulsByPeriod[event.period - 1] ?? 0) + 1;
+      own.foulsByPeriod[event.period - 1] =
+        (own.foulsByPeriod[event.period - 1] ?? 0) + 1;
       if (foul.kind === "T") player.technical++;
       if (foul.kind === "U") player.unsportsmanlike++;
       player.status =
@@ -205,7 +225,9 @@ export function aggregate(sheet: Sheet) {
       if (foul.kind === "B" && event.code !== "B2") own.coachB++;
       if (foul.kind === "D") own.coachStatus = "D";
     }
-    const coach = players.find((p) => p.rosterEntryId === sheet.coachPlayer[event.side]);
+    const coach = players.find(
+      (p) => p.rosterEntryId === sheet.coachPlayer[event.side],
+    );
     if (coach?.status === "D") own.coachStatus = "D";
     if (
       own.coachStatus !== "D" &&
@@ -214,7 +236,8 @@ export function aggregate(sheet: Sheet) {
         (coach &&
           (coach.status === "GD" ||
             coach.status === "D" ||
-            (coach.technical + coach.unsportsmanlike > 0 && (own.coachC > 0 || own.coachB >= 2)))))
+            (coach.technical + coach.unsportsmanlike > 0 &&
+              (own.coachC > 0 || own.coachB >= 2)))))
     )
       own.coachStatus = "GD";
     if (coach && own.coachStatus !== "eligible") coach.status = own.coachStatus;
@@ -229,7 +252,9 @@ export function validateSheet(input: unknown, final = false): Sheet {
   if (final) {
     for (const team of Object.values(result.teams))
       if (team.freeMade > team.freeTaken)
-        throw new Error("LL convertidos excedem LL cobrados. Revise as faltas adversárias.");
+        throw new Error(
+          "LL convertidos excedem LL cobrados. Revise as faltas adversárias.",
+        );
     if (result.teams.home.points === result.teams.away.points)
       throw new Error("O placar final está empatado.");
     for (let p = 4; p < sheet.periods; p++) {
