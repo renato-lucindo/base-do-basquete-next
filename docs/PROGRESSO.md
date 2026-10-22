@@ -1,5 +1,11 @@
 # Checkpoint — 22/10/2026
 
+## Atualização — 18:22 America/Araguaina
+
+O responsável informa acesso por outra máquina via Codex Remote. Repositório agora **público**, confirmado pela API GitHub. As referências abaixo a repositório privado descrevem o estado anterior. A API Cloudflare voltou a funcionar: GET `/accounts` e GET de metadados dos Workers retornaram **HTTP 200/success**, sem erro OAuth. Nenhum serviço criado/alterado nem código de Worker existente consultado. Permissões de escrita/deploy ainda não foram exercidas. O bloqueio anterior de reconexão deixou de ser reproduzível; não solicitar troca de token neste momento.
+
+Os links localhost dependem da máquina de execução; a apresentação em outra máquina exige encaminhamento de porta ou preview remoto protegido. Próximo passo de apresentação: disponibilizar acesso remoto aos protótipos sem aprofundar a integração de banco antes do aceite. CI ainda só mostra as falhas históricas anteriores à mudança de visibilidade; não foi declarado desbloqueado nem reexecutado nesta verificação. Cota real às 18:22: **19% restante/5h**, **87% restante/semanal**; reset/5h permanece 19:08:57 UTC-03. Gatilho <=15% não atingido. Evidências técnicas inalteradas continuam válidas.
+
 ## Objetivo e unidade
 
 Nova Base do Basquete exclusivamente pelo ZIP fornecido. U1–U4 do marco 1 implementadas: campeonato/elencos, revisão PDF em lote, súmula e correção. U5: gate local e apresentação prontos; **aguarda avaliação humana e CI desbloqueado**. Não aprofundar integração antes do aceite dos três percursos.
