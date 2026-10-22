@@ -2,6 +2,8 @@
 
 ## Versão atual — teclado contínuo e atalhos publicados
 
+Esclarecimento posterior do responsável: cadastro/tabela de treinador no banco novo, ligado à identidade da pessoa e aos vínculos equipe/inscrição, com atleta-treinador sem duplicar pessoa e histórico por jogo preservado. Registrado em `docs/AJUSTES-DE-EXPERIENCIA.md`, seção “Treinador no banco novo”. Implementação futura nas migrations/fluxos reais; nenhuma alteração de banco ou do preview por este esclarecimento. Evidências técnicas abaixo continuam válidas.
+
 Solicitações adicionais implementadas: `camisa → Enter → ação → Enter`; Enter na camisa avança sem lançar, Enter no código lança e retorna à camisa selecionada para substituir ou repetir. `Alt+A/B` escolhe equipe; `Alt+1–4` escolhe quarto; `Alt+Q` foca período, setas escolhem e Enter retorna à camisa. Trocar contexto não lança ações. Valores são mantidos em erro e o foco permite corrigir sem duplicação. Atalhos, 0/00, atletas diferentes e repetidos e a sequência exata enviada pelo responsável foram testados sem mouse após preparar os relacionados.
 
 Aplicação/capturas atuais **`971eab0ad2254150e4713e4ae498073dae7be4f8`**, transporte **`22468bb88b8156dbee017c383bea0ecfe8c4c4e4`**, mesma branch/repositório/PR registrados abaixo. Gate consolidado PASS com 46 testes unitários/três de transporte e **24 cenários Playwright PASS** desktop/celular; quatro novas execuções para ciclo e atalhos. Insumos originais imutáveis não foram retestados; seis composições reaproveitadas e duas da súmula atualizadas/inspecionadas. Regras de ordenação, edição/exclusão e republicação da atualização anterior continuam verificadas.

@@ -24,3 +24,9 @@ Solicitação adicional do responsável em 22/10: operar o lançamento por `cami
 - Informar o ciclo e os atalhos na própria área de lançamento. Manter seletores, botões e navegação por Tab para acesso convencional.
 
 Os testes reproduzem integralmente o exemplo `12/P2, 77/3, 23/2, 23/3, 77/1, 77/1, 34/U2` somente com teclado após preparar os relacionados. São verificados também atalhos, 0/00 e retomada após erros em desktop/celular.
+
+## Treinador no banco novo — implementação futura
+
+Esclarecimento do responsável em 22/10: prever cadastro persistente de treinador como entidade, com tabela própria no modelo novo, ligada à identidade da pessoa e aos vínculos com equipe/inscrição. O pacote define regras da súmula para treinador e atleta-treinador, mas não prescreve uma tabela física de treinadores; este esclarecimento complementa a modelagem.
+
+Uma mesma pessoa pode ser atleta e treinador, sem duplicar sua identidade. A identificação na súmula deve permitir associar o treinador ao jogo e conservar o histórico quando seus vínculos mudarem. Nomes físicos, campos e constraints serão definidos na modelagem das migrations, respeitando os contratos existentes. Nenhuma tabela ou integração é criada nesta atualização documental; o protótipo atual ainda representa apenas os alvos B/C e a seleção de atleta-treinador.
