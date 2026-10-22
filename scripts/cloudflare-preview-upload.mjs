@@ -1,78 +1,30 @@
 // Executado no sandbox do plugin Cloudflare. Nenhuma credencial de conta sai dele.
-export async function uploadPreview(payload) {
+export async function uploadPreview(payload, handlerSource) {
   const account = "16b4a5e0a99a031d28051ebadb4811cc";
   const name = "base-do-basquete-prototipo";
   const appId = "6f0540c1-e616-49e1-b6d9-2be806b5a9ee";
   if (payload.accountId !== account || payload.workerName !== name)
     throw new Error("Destino inesperado.");
   const base = `/accounts/${account}`;
-  const app = (
-    await cloudflare.request({
-      method: "GET",
-      path: `${base}/access/apps/${appId}`,
-    })
-  ).result;
+  const protection = await cloudflare.request({
+    method: "GET",
+    path: `${base}/access/apps/${appId}`,
+  });
+  const app = protection.result;
   if (
+    !protection.success ||
     app.domain !== `${name}.renato-lucindo-jr.workers.dev` ||
     app.policies?.length !== 1 ||
     app.policies[0].decision !== "allow" ||
     app.policies[0].include?.length !== 1 ||
     app.policies[0].include[0].email?.email !== "renato.lucindo.jr@gmail.com"
-  ) {
+  )
     throw new Error(
       "A proteção Access esperada não foi confirmada. Upload cancelado.",
     );
-  }
-  const session = await cloudflare.request({
-    method: "POST",
-    path: `${base}/workers/scripts/${name}/assets-upload-session`,
-    body: { manifest: payload.manifest },
-  });
-  if (
-    !session.success ||
-    !session.result.jwt ||
-    !Array.isArray(session.result.buckets)
-  )
-    throw new Error("Sessão de upload inválida.");
-  const uploadJwt = session.result.jwt;
-  let completionJwt = session.result.buckets.length ? null : uploadJwt;
-  let uploadedBuckets = 0;
-  for (const bucket of session.result.buckets) {
-    const form = new FormData();
-    for (const hash of bucket) {
-      const file = payload.files[hash];
-      if (!file)
-        throw new Error("Asset solicitado não está no manifesto local.");
-      form.append(hash, new Blob([file.base64], { type: file.mime }), hash);
-    }
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4${base}/workers/assets/upload?base64=true`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${uploadJwt}` },
-        body: form,
-      },
-    );
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error(
-        `Upload de assets rejeitado: HTTP ${response.status}; códigos ${(result.errors ?? []).map((e) => e.code).join(",")}.`,
-      );
-    }
-    if (result.result?.jwt) completionJwt = result.result.jwt;
-    uploadedBuckets++;
-  }
-  if (!completionJwt) throw new Error("Upload não produziu confirmação.");
   const metadata = {
+    main_module: "index.mjs",
     compatibility_date: "2026-10-22",
-    assets: {
-      jwt: completionJwt,
-      config: {
-        html_handling: "auto-trailing-slash",
-        not_found_handling: "single-page-application",
-        _headers: `/*\n  X-Robots-Tag: noindex, nofollow\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: same-origin\n  X-Prototype-Source: ${payload.applicationCommit}\n  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'\n`,
-      },
-    },
     annotations: {
       "workers/message": `Protótipo ${payload.applicationCommit.slice(0, 7)}; transporte ${payload.sourceCommit.slice(0, 7)}`,
       "workers/tag": `prototype-${payload.sourceCommit.slice(0, 12)}`,
@@ -85,6 +37,18 @@ export async function uploadPreview(payload) {
     new Blob([JSON.stringify(metadata)], { type: "application/json" }),
     "metadata.json",
   );
+  const modules = {
+    "index.mjs":
+      'import bundle from "./assets.mjs"; import {createPreviewHandler} from "./preview-worker.mjs"; export default {fetch:createPreviewHandler(bundle)};',
+    "assets.mjs": `export default ${JSON.stringify(payload)};`,
+    "preview-worker.mjs": handlerSource,
+  };
+  for (const [filename, source] of Object.entries(modules))
+    form.append(
+      filename,
+      new Blob([source], { type: "application/javascript+module" }),
+      filename,
+    );
   const body = new Request("https://api.cloudflare.com", {
     method: "PUT",
     body: form,
@@ -96,8 +60,10 @@ export async function uploadPreview(payload) {
     contentType: body.headers.get("content-type"),
     body: await body.text(),
   });
+  if (!deployed.success)
+    return { success: false, status: deployed.status, errors: deployed.errors };
   return {
-    success: deployed.success,
+    success: true,
     status: deployed.status,
     worker: {
       id: deployed.result.id,
@@ -106,7 +72,6 @@ export async function uploadPreview(payload) {
       modified_on: deployed.result.modified_on,
     },
     files: Object.keys(payload.manifest).length,
-    uploadedBuckets,
     applicationCommit: payload.applicationCommit,
     sourceCommit: payload.sourceCommit,
   };
