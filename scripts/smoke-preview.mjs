@@ -162,12 +162,30 @@ try {
         .waitFor();
       if (process.argv.includes("--scoresheet-review")) {
         stage = `revisão de ações ${viewport.width}`;
+        await page.keyboard.press("Alt+b");
+        assert.equal(
+          await page.getByLabel("Equipe", { exact: true }).inputValue(),
+          "away",
+        );
+        await page.keyboard.press("Alt+a");
+        assert.equal(
+          await page.getByLabel("Equipe", { exact: true }).inputValue(),
+          "home",
+        );
         for (const period of ["2", "1"]) {
-          await page
-            .getByLabel("Período", { exact: true })
-            .selectOption(period);
-          await page.getByLabel("Código", { exact: true }).fill("2");
-          await page.getByLabel("Código", { exact: true }).press("Enter");
+          await page.keyboard.press("Alt+" + period);
+          await page.keyboard.type("7");
+          await page.keyboard.press("Enter");
+          assert.equal(
+            await page.evaluate(() => document.activeElement?.id),
+            "entry-code",
+          );
+          await page.keyboard.type("2");
+          await page.keyboard.press("Enter");
+          assert.equal(
+            await page.evaluate(() => document.activeElement?.id),
+            "entry-target",
+          );
         }
         await page.getByLabel("Ordem das ações").selectOption("period");
         await page
@@ -214,6 +232,7 @@ try {
       flows: 3,
       gallery: true,
       scoresheetReview: process.argv.includes("--scoresheet-review"),
+      keyboardCycle: process.argv.includes("--scoresheet-review"),
       applicationCommit: manifest.applicationCommit,
       sourceCommit: manifest.sourceCommit,
     }),

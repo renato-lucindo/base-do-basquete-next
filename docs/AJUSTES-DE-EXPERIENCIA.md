@@ -12,3 +12,15 @@
 - Em resultado publicado, alterar o rascunho da revisão e exigir motivo, prévia e republicação para produzir outra versão; manter a anterior.
 
 Implementação no protótipo, com dados fictícios e persistência local. Segurança de escrita, auditoria e persistência de servidor continuam nos próximos marcos. Validação humana dos ajustes ainda pendente.
+
+## Súmula: ciclo de teclado e atalhos
+
+Solicitação adicional do responsável em 22/10: operar o lançamento por `camisa → Enter → ação → Enter`, com atletas diferentes e repetidos, e trocar equipe/quarto por atalhos.
+
+- Enter na camisa valida o alvo e avança ao código sem registrar ação. Enter no código registra uma única ação válida e retorna à camisa com o valor selecionado; digitar substitui a camisa anterior, Enter permite repeti-la. Não confundir 0 e 00.
+- Erro mantém camisa/código para correção e não avança nem cria ação. Eventos repetidos de Enter mantido pressionado não registram novos lançamentos no ciclo de entrada. Códigos B/C continuam possíveis.
+- `Alt+A` e `Alt+B`: selecionar equipe A/B e focar a camisa. `Alt+1` até `Alt+4`: selecionar quarto e focar a camisa. `Alt+Q`: focar o seletor de período; setas escolhem também prorrogações existentes e Enter retorna à camisa.
+- Trocar equipe/quarto não registra ação e mantém os campos ainda não lançados; a camisa precisa pertencer à equipe selecionada antes de prosseguir. Atalhos com Ctrl/Meta/Shift ou durante composição de texto não são interceptados.
+- Informar o ciclo e os atalhos na própria área de lançamento. Manter seletores, botões e navegação por Tab para acesso convencional.
+
+Os testes reproduzem integralmente o exemplo `12/P2, 77/3, 23/2, 23/3, 77/1, 77/1, 34/U2` somente com teclado após preparar os relacionados. São verificados também atalhos, 0/00 e retomada após erros em desktop/celular.

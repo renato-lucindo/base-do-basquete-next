@@ -54,4 +54,6 @@ Publicado no mesmo preview protegido: aplicação `f8b6663`, transporte `7e8d4f5
 
 Responsável, data e decisão: pendentes.
 
+Solicitação adicional de teclado aplicada: `camisa → Enter → ação → Enter`, retorno à camisa selecionada, Alt+A/B para equipe, Alt+1–4 para quarto e Alt+Q para selecionar período/OT. Conferir a sequência enviada pelo responsável, sem mouse depois de preparar os relacionados; erros devem manter valores e foco para correção, sem lançar ações. Gate atualizado aprovado com 46 testes unitários/três de transporte e **24 cenários de navegador**, incluindo quatro novas execuções desktop/celular do ciclo e dos atalhos. O mesmo teste cobre 0/00 e repetição de camisa. Detalhes em `docs/AJUSTES-DE-EXPERIENCIA.md`.
+
 Registrar ajustes de composição/interação e aprovação individual dos três percursos no issue e PR deste marco. Depois do aceite, o próximo plano é a fundação full-stack, com novo projeto Supabase, acesso por senha e preview protegido conforme o pacote.

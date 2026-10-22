@@ -50,7 +50,39 @@ export function ScoresheetWorkspace({
     jersey: "",
   });
   const codeRef = useRef<HTMLInputElement>(null);
+  const targetRef = useRef<HTMLInputElement>(null);
+  const periodRef = useRef<HTMLSelectElement>(null);
   const deleteConfirmRef = useRef<HTMLHeadingElement>(null);
+  const focusTarget = () => {
+    targetRef.current?.focus();
+    targetRef.current?.select();
+  };
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      if (
+        !event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        event.isComposing
+      )
+        return;
+      const key = event.key.toLowerCase();
+      if (!["a", "b", "q", "1", "2", "3", "4"].includes(key)) return;
+      event.preventDefault();
+      if (event.repeat) return;
+      if (key === "q") {
+        periodRef.current?.focus();
+        return;
+      }
+      if (key === "a" || key === "b") setSide(key === "a" ? "home" : "away");
+      else setPeriod(Number(key));
+      targetRef.current?.focus();
+      targetRef.current?.select();
+    };
+    window.addEventListener("keydown", shortcut);
+    return () => window.removeEventListener("keydown", shortcut);
+  }, []);
   useEffect(() => {
     deleteConfirmRef.current?.focus();
   }, [deletingId]);
@@ -65,36 +97,74 @@ export function ScoresheetWorkspace({
       return false;
     }
   };
+  const checkedTarget = () => {
+    const value = target.trim().toUpperCase();
+    if (
+      !["B", "C"].includes(value) &&
+      !sheet.roster.some((slot) => slot.side === side && slot.jersey === value)
+    ) {
+      setError(
+        "Camisa não relacionada à equipe selecionada. Confira a camisa ou use B/C.",
+      );
+      focusTarget();
+      return null;
+    }
+    setTarget(value);
+    return value;
+  };
+  const advanceToCode = () => {
+    if (checkedTarget() === null) return;
+    setError("");
+    codeRef.current?.focus();
+    codeRef.current?.select();
+  };
   const addEntry = () => {
+    const entryTarget = checkedTarget();
+    if (entryTarget === null) return;
     if (editingId) {
       try {
         if (
-          mutate(editAction(sheet, editingId, { side, period, target, code }))
+          mutate(
+            editAction(sheet, editingId, {
+              side,
+              period,
+              target: entryTarget,
+              code,
+            }),
+          )
         ) {
           setEditingId(null);
           setCode("");
+          focusTarget();
+        } else {
           codeRef.current?.focus();
+          codeRef.current?.select();
         }
       } catch (e) {
         setError((e as Error).message);
+        codeRef.current?.focus();
+        codeRef.current?.select();
       }
       return;
     }
     const next = structuredClone(sheet);
     const slot = next.roster.find(
-      (r) => r.side === side && r.jersey === target,
+      (r) => r.side === side && r.jersey === entryTarget,
     );
     if (slot) slot.played = true;
     next.events.push({
       id: crypto.randomUUID(),
       side,
       period,
-      target,
+      target: entryTarget,
       code: code.trim().toUpperCase(),
     });
     if (mutate(next)) {
       setCode("");
+      focusTarget();
+    } else {
       codeRef.current?.focus();
+      codeRef.current?.select();
     }
   };
   const createGame = () => {
@@ -630,8 +700,16 @@ export function ScoresheetWorkspace({
           <Field id="entry-period" label="Período">
             <select
               id="entry-period"
+              ref={periodRef}
+              aria-keyshortcuts="Alt+1 Alt+2 Alt+3 Alt+4 Alt+Q"
               value={period}
               onChange={(e) => setPeriod(Number(e.target.value))}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  if (!event.repeat) focusTarget();
+                }
+              }}
             >
               {Array.from({ length: sheet.periods }, (_, i) => (
                 <option key={i} value={i + 1}>
@@ -643,6 +721,7 @@ export function ScoresheetWorkspace({
           <Field id="entry-side" label="Equipe">
             <select
               id="entry-side"
+              aria-keyshortcuts="Alt+A Alt+B"
               value={side}
               onChange={(e) => {
                 const next = e.target.value as Side;
@@ -659,9 +738,19 @@ export function ScoresheetWorkspace({
           <Field id="entry-target" label="Camisa / alvo">
             <input
               id="entry-target"
+              ref={targetRef}
               list="entry-targets"
+              enterKeyHint="next"
+              autoComplete="off"
+              aria-describedby="entry-keyboard"
               value={target}
               onChange={(e) => setTarget(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                  event.preventDefault();
+                  if (!event.repeat) advanceToCode();
+                }
+              }}
               placeholder="7, 00, B ou C"
             />
           </Field>
@@ -678,11 +767,18 @@ export function ScoresheetWorkspace({
             <input
               id="entry-code"
               ref={codeRef}
+              enterKeyHint="done"
               value={code}
               maxLength={3}
               aria-invalid={!!error}
               aria-describedby={error ? "sheet-error" : "entry-help"}
               onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                  event.preventDefault();
+                  if (!event.repeat) addEntry();
+                }
+              }}
               autoComplete="off"
               placeholder="2, 3, P2…"
             />
@@ -704,6 +800,12 @@ export function ScoresheetWorkspace({
             </button>
           )}
         </form>
+        <p id="entry-keyboard" className="muted">
+          Camisa → Enter → ação → Enter. Após lançar, a camisa fica selecionada
+          para digitar a próxima ou repetir com Enter. Alt+A / Alt+B: equipe ·
+          Alt+1 a Alt+4: quarto · Alt+Q: selecionar período, incluindo
+          prorrogações.
+        </p>
         <p id="entry-help" className="muted">
           Pontos: 1, 2, 3 · Faltas: P, P1–P3, Pc, T1, Tc, U, U1–U3, Uc, D,
           D1–D3, Dc · Banco: B1, B2, Bc · Técnico: C1, Cc, D. Sem cronômetro ou
