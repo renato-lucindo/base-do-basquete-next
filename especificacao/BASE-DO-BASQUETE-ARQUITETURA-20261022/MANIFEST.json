@@ -1,0 +1,340 @@
+{
+  "edition": "software-architecture-2026-10-22",
+  "files": [
+    {
+      "path": "docs/ARQUITETURA.md",
+      "bytes": 8119,
+      "sha256": "3136ec3e7df55608815c0084db8893510cb448542c439d1041e61b8c4c53a7cc"
+    },
+    {
+      "path": "docs/CONTRATOS.md",
+      "bytes": 24531,
+      "sha256": "4562ea47fe75d12f6d9b54177d84fe41dae123af73ddcffef9db57bd2c1c970e"
+    },
+    {
+      "path": "docs/ESCOPO.md",
+      "bytes": 17073,
+      "sha256": "88c517f67b3e4d8fb78bff21191cbf6ef609b01b59701eec00a2cb875c1492de"
+    },
+    {
+      "path": "docs/EXPERIENCIA.md",
+      "bytes": 10914,
+      "sha256": "3fcd90fe7a2ca890c0774f140506b0ab02fc194c28b289735cc450b8eb4c75df"
+    },
+    {
+      "path": "docs/VALIDACAO.md",
+      "bytes": 9303,
+      "sha256": "313b99405e7ee84b98c2241f116cd2d56ab9a0f2cf293bfe1b626c616833b808"
+    },
+    {
+      "path": "modulos/package-lock.json",
+      "bytes": 60661,
+      "sha256": "cbff78c71e5d2105e6448b74b7da38920824cf4b49b1beb92de34d59c1d12d19"
+    },
+    {
+      "path": "modulos/package.json",
+      "bytes": 801,
+      "sha256": "bfc3c2118af11e83aa0d819f42f9ce5b81d1b2f03d4b69668f221b69dd773809"
+    },
+    {
+      "path": "modulos/source/app/assets.d.ts",
+      "bytes": 24,
+      "sha256": "35d26ea66c86da9701e4f4b467913481ffeae910761cea34c775c5dacb7f8eaa"
+    },
+    {
+      "path": "modulos/source/app/components/boxscore-statistics-explorer.tsx",
+      "bytes": 38836,
+      "sha256": "5b5a640ce8ad96326f90d591b4d0e7a2d9ef44f04f76b1c9ccab3ea759e260f0"
+    },
+    {
+      "path": "modulos/source/app/components/boxscore-statistics.css",
+      "bytes": 17918,
+      "sha256": "502c5ce7b7c113314002aa0959b2e747bb622154771f45b42c70aef3c111df35"
+    },
+    {
+      "path": "modulos/source/app/components/player-profile.test.tsx",
+      "bytes": 10472,
+      "sha256": "df3ffe2ac69009a27e560ee6819521e8b04fd572038a79969dcd4b14d77bf5a9"
+    },
+    {
+      "path": "modulos/source/app/components/player-profile.tsx",
+      "bytes": 30301,
+      "sha256": "0d47ecae972d16f4adbee25316572b7eed26bdffa558f66db41105afa4c55999"
+    },
+    {
+      "path": "modulos/source/app/components/resource-state.tsx",
+      "bytes": 1150,
+      "sha256": "ad59e84d44c77537705dea1ce0750f7a384183a4dbaa3221d7502278923b04ed"
+    },
+    {
+      "path": "modulos/source/app/components/scrollable-table.tsx",
+      "bytes": 2219,
+      "sha256": "7f17fe0c649a2bcb36dafcb5c91eca4bd6f439d0a3159d11a689571e7ef3bce2"
+    },
+    {
+      "path": "modulos/source/app/components/statistics-explorer.test.tsx",
+      "bytes": 3160,
+      "sha256": "43aec34f03458755f305f04c670269ae3f1d6f3e5678c61a63bbc245f34f2b96"
+    },
+    {
+      "path": "modulos/source/app/components/statistics-explorer.tsx",
+      "bytes": 46023,
+      "sha256": "e1bc2aa5900307e7587781eb6c6808db33d76333456034afd4498298a4651cdd"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/extract.server.test.ts",
+      "bytes": 1874,
+      "sha256": "0db0968f1d0d83670d2e18e174d2055be64b68ed5e13b491d3186297e7b66aa5"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/extract.server.ts",
+      "bytes": 2945,
+      "sha256": "cf8aa726a3c4b6b74cd577dad0cef17e3b7e5b830aa8743b7e764b0982921ac5"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/matching.test.ts",
+      "bytes": 3800,
+      "sha256": "52173ac5c596fe6ddb3337d76e4dc3949fea36775e435d1bb98c8a4f1d8dd776"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/matching.ts",
+      "bytes": 5514,
+      "sha256": "c579f35706a5aba6d0361111d9921dbec0019bddf9a3cec1b37a67b176d80316"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/parser.test.ts",
+      "bytes": 12042,
+      "sha256": "11ecb6da871a0da009f4ea4425dd9a622e5216b7e30d70ef0e522d685178739a"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/parser.ts",
+      "bytes": 24148,
+      "sha256": "accab302e02b2927edcd46f273917452a3802367d0af294d006086f1e223b094"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/site-parser.ts",
+      "bytes": 7174,
+      "sha256": "7073ec837e978dab45a17961916a593bde0c41bd9c861b60dccf72bed2750312"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/team-registration-resolution.test.ts",
+      "bytes": 1296,
+      "sha256": "d324315ba901d67aae74ab4e8ee30333b56d54dd8e4dc0fdefebb901e8325235"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/team-registration-resolution.ts",
+      "bytes": 1459,
+      "sha256": "0fc92f9c861b0d591fc6b7c49cc709c650d79f779cb65614c952edcf435a4be2"
+    },
+    {
+      "path": "modulos/source/app/modules/boxscore/types.ts",
+      "bytes": 2017,
+      "sha256": "b9735de6a9eb726217db76785f9e0533e25048eb00dfa4db749cb079b42d0f3b"
+    },
+    {
+      "path": "modulos/source/app/modules/competition/context.ts",
+      "bytes": 10895,
+      "sha256": "b0047faca25ec2ed7878dcf3fb6c71a7b51f04738bbcec64466e16e1cf374a32"
+    },
+    {
+      "path": "modulos/source/app/modules/competition/public-data.server.d.ts",
+      "bytes": 515,
+      "sha256": "b8bb7cd07170c348390d19aa292dba3bc7702366db6f02adbdd6b214b4a31f10"
+    },
+    {
+      "path": "modulos/source/app/modules/ingestion/comparator.test.ts",
+      "bytes": 2580,
+      "sha256": "9865d90e26e60ef69d67e15a46dcfc568ef1985cb219c9d8c5415f210ee5decf"
+    },
+    {
+      "path": "modulos/source/app/modules/ingestion/comparator.ts",
+      "bytes": 6586,
+      "sha256": "a3c5d753c16b3c1289dfbcce0a4e92f5689b8259d6112f987bbe6dd8e89278db"
+    },
+    {
+      "path": "modulos/source/app/modules/keyboard-scoresheet/domain.test.ts",
+      "bytes": 9519,
+      "sha256": "cbe56429adacf0096bcf069827e99fb4e15ebbb044e0c381b21b880cf6db4623"
+    },
+    {
+      "path": "modulos/source/app/modules/keyboard-scoresheet/domain.ts",
+      "bytes": 9283,
+      "sha256": "78de1ee8b41fa912e7921f3f003b6e37cd69872f8ebe0ed1aa7c6b9c573ed940"
+    },
+    {
+      "path": "modulos/source/app/modules/keyboard-scoresheet/server.ts",
+      "bytes": 651,
+      "sha256": "a16de411b0c8172f9c8d953749d3797ce1b6e176aca8df7db0e4ac4d94cb8657"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-metrics.ts",
+      "bytes": 2964,
+      "sha256": "f32ae4b51a2efe95ef9c181b65b2b6f09039241665be77b131563c05d489f5d2"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics-contract.test.ts",
+      "bytes": 2492,
+      "sha256": "20e3cca569212501a09015b7dff77ebcb6addc1ca955c7dc459cf98cc1e2c890"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics-contract.ts",
+      "bytes": 2041,
+      "sha256": "5e90c7167e659e9aa80da6c6b78065fdaed6696b330dd9bf77264cd5857317ca"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics-domain.test.ts",
+      "bytes": 7144,
+      "sha256": "e83cd9050d7de2d5b3a1ffcbc217a4e7c2153a07a172ad5ec819de060b165435"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics-domain.ts",
+      "bytes": 14625,
+      "sha256": "f4c45fac429c9c955025f66401c6a2dd28835cf7230fb2ac1b5022fd226b7c37"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics.server.test.ts",
+      "bytes": 4121,
+      "sha256": "066ee0518d7bbd059506098e5ab53b527bc3bd91d02adeb19edc06d5c05dba3b"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/boxscore-statistics.server.ts",
+      "bytes": 2202,
+      "sha256": "65ae4d04d154f04cf80379fb9b48486c6cf768c381b7680ee51489390d9b79ce"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/domain.test.ts",
+      "bytes": 4450,
+      "sha256": "f42c3fab697ad691933198a18bbcf3f9fa1277023306f7577090a9f363be95a4"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/domain.ts",
+      "bytes": 6638,
+      "sha256": "b5e4f38619e9865be21ab4939335e6fca7b9df050b6b7f29f473dc9e861cc2ce"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/game-detail-domain.test.ts",
+      "bytes": 1133,
+      "sha256": "f2688366da402ab503521f8282ea47cf6045e8b1b22c8642a48f933bf12a8a67"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/game-detail-domain.ts",
+      "bytes": 1776,
+      "sha256": "df9713c617a1942893f8eaf802158d4c4a47931650f16755817034acbb107196"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/player-profile-domain.test.ts",
+      "bytes": 4343,
+      "sha256": "441d5381f71836e3e906e269a09839a96ff8c9ad752e503501bfe8ce6ba2ddc7"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/player-profile-domain.ts",
+      "bytes": 4924,
+      "sha256": "7a6b0c8a8e1e5c46173654b6d4f7d4de6b4f962c1ee76b7234ef7cc0482e8b57"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/player-profile-registration.test.ts",
+      "bytes": 6692,
+      "sha256": "e8d23b6c35d2101856867f3497c70471006111664c516750bdf5cea0ef304da8"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/player-profile.server.ts",
+      "bytes": 23632,
+      "sha256": "e4f2f4aade390d426fffe13b0dac3a923c076ac505dacf6a6d5452a53e06ea0a"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/public-statistics-compat.test.ts",
+      "bytes": 5985,
+      "sha256": "ebef5224c1e8f67928e073cfbe5ec09b0f87d1ff3d226c558d45079727b22ea9"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/public-statistics.server.ts",
+      "bytes": 19612,
+      "sha256": "6cb98a80d854d7191ccdb6605b0dcf88f681fa366d0c111ae1e488cb73c8bc4f"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/table-controls.test.ts",
+      "bytes": 2847,
+      "sha256": "492e0d05fd99be87ab739beea3fa11fa822f587a99d29b146553cad5d4a135d3"
+    },
+    {
+      "path": "modulos/source/app/modules/statistics/table-controls.ts",
+      "bytes": 5048,
+      "sha256": "94b429a7dc7e28037c706659e26d9207edc3a360fc189a8f7cffc93a38ce83c2"
+    },
+    {
+      "path": "modulos/source/app/types/database.generated.ts",
+      "bytes": 189890,
+      "sha256": "51625143d383891556330dc10a6887de2f8399bf1e2570b0869d3b2f589caec7"
+    },
+    {
+      "path": "modulos/source/docs/plan/referencias/modelos-boxscore/Box Score FIBA ALC vs AVA 09 maio.pdf",
+      "bytes": 105166,
+      "sha256": "7f6754d0ab0f72d197bfafaec93173a0c15387a5b4b5293fdb2a31df85bedeb8"
+    },
+    {
+      "path": "modulos/source/docs/plan/referencias/modelos-boxscore/Box Score FIBA IVV vs CAC 06 maio.pdf",
+      "bytes": 104676,
+      "sha256": "9bfbed04f86fd787ed8f200960e3016ada280bd6180399f1c080dcac237f4f32"
+    },
+    {
+      "path": "modulos/source/docs/plan/referencias/modelos-boxscore/Box Score FIBA SAL vs SAN 09 maio.pdf",
+      "bytes": 106213,
+      "sha256": "825fbdd5973ed997f2a24feb921775f3573d29f941b374b2e3089e9de66df5d6"
+    },
+    {
+      "path": "modulos/source/docs/plan/referencias/modelos-boxscore/Boxscore-site.pdf",
+      "bytes": 516382,
+      "sha256": "5ea8a6cdc45eadac388d88a291db89125d662f857df1efad4dcdef0f187f78a8"
+    },
+    {
+      "path": "modulos/verification/tsconfig.json",
+      "bytes": 367,
+      "sha256": "505d267813af1327691e362fdf1c1bfe607918b4c23cc95c3a27a6dcca562815"
+    },
+    {
+      "path": "modulos/verification/vitest.config.ts",
+      "bytes": 233,
+      "sha256": "d6898a43ede94a2c659cf0122651e7afead3c216fc863ebe647b450754451037"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3417,
+      "sha256": "34a1b54a49eddaf48fc3ec4d4b04c892984b45cbbbd7cca6c24bfa531638b027"
+    },
+    {
+      "path": "referencias/estatisticas/casos.json",
+      "bytes": 4350,
+      "sha256": "9433684aed8aa7514441a5c5c3c71347627fd45e46202f85cfd24482cf1d0d07"
+    },
+    {
+      "path": "referencias/exemplos/equipes-e-elencos.txt",
+      "bytes": 108,
+      "sha256": "4d0ff9bfc6a86f7acd1f9d57a63729b63553bfc0497ae653686e60f60d701fbe"
+    },
+    {
+      "path": "referencias/exemplos/equipes.txt",
+      "bytes": 26,
+      "sha256": "0e8857532d107833cfc4fb7fcdbc754b66824848f63a4fe1ac3f076ce1f68ddb"
+    },
+    {
+      "path": "referencias/exemplos/pendencias.txt",
+      "bytes": 89,
+      "sha256": "a4b7c270b857f21960cc79d85655963f2924c7f2686b6e905599bf7eb9791045"
+    },
+    {
+      "path": "referencias/identidade-visual.html",
+      "bytes": 4559,
+      "sha256": "054e5b6851490a836bece93273794834cd254c36fda56aa3070e12638fb136ca"
+    },
+    {
+      "path": "verificacao.json",
+      "bytes": 2303,
+      "sha256": "5151ff5bc863adb8e2b3918330ba630b738416eaac7c7d9375976bdb0231202f"
+    },
+    {
+      "path": "verificar-pacote.py",
+      "bytes": 1279,
+      "sha256": "00d3e08cf215be4094b86c09651b11fb1a2e9e5e1fb188522d79c182f6bd9bcc"
+    }
+  ]
+}

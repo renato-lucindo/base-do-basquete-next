@@ -1,0 +1,161 @@
+{
+  "contractVersion": 1,
+  "description": "Synthetic independent arithmetic and semantic cases; not production data or schema-specific fixtures",
+  "arithmetic": [
+    {
+      "id": "weighted-percentage",
+      "metric": "fieldGoalPercentage",
+      "input": {
+        "games": [
+          {
+            "made": 5,
+            "attempted": 10
+          },
+          {
+            "made": 1,
+            "attempted": 4
+          }
+        ]
+      },
+      "expected": 42.9
+    },
+    {
+      "id": "percentage-zero-denominator",
+      "metric": "fieldGoalPercentage",
+      "input": {
+        "made": 0,
+        "attempted": 0
+      },
+      "expected": null
+    },
+    {
+      "id": "per-game",
+      "metric": "pointsPerGame",
+      "input": {
+        "points": 15,
+        "scoringGamesCovered": 2
+      },
+      "expected": 7.5
+    },
+    {
+      "id": "per-30",
+      "metric": "pointsPer30",
+      "input": {
+        "coveredPoints": 12,
+        "secondsCovered": 1200,
+        "minimumSeconds": 600
+      },
+      "expected": {
+        "status": "available",
+        "value": 18
+      }
+    },
+    {
+      "id": "per-30-below-minimum",
+      "metric": "pointsPer30",
+      "input": {
+        "coveredPoints": 10,
+        "secondsCovered": 599,
+        "minimumSeconds": 600
+      },
+      "expected": {
+        "status": "insufficient-sample",
+        "value": null
+      }
+    },
+    {
+      "id": "per-30-minimum",
+      "metric": "pointsPer30",
+      "input": {
+        "coveredPoints": 10,
+        "secondsCovered": 600,
+        "minimumSeconds": 600
+      },
+      "expected": {
+        "status": "available",
+        "value": 30
+      }
+    },
+    {
+      "id": "rebounds",
+      "metric": "rebounds",
+      "input": {
+        "offensive": 3,
+        "defensive": 7
+      },
+      "expected": 10
+    },
+    {
+      "id": "efficiency",
+      "metric": "efficiency",
+      "input": {
+        "points": 12,
+        "offensiveRebounds": 2,
+        "defensiveRebounds": 3,
+        "assists": 4,
+        "steals": 1,
+        "blocks": 1,
+        "twoPointMade": 3,
+        "twoPointAttempted": 6,
+        "threePointMade": 1,
+        "threePointAttempted": 3,
+        "freeThrowMade": 3,
+        "freeThrowAttempted": 4,
+        "turnovers": 2
+      },
+      "expected": 15
+    },
+    {
+      "id": "negative-rounding",
+      "metric": "plusMinusPerGame",
+      "input": {
+        "plusMinus": -5,
+        "advancedGamesCovered": 4
+      },
+      "expected": -1.2,
+      "rounding": "Match Math.round(value * 10) / 10 from supplied domain, including negative half values"
+    }
+  ],
+  "semantic": [
+    {
+      "id": "zero-is-not-missing",
+      "given": "A source explicitly reports zero points for a player who played",
+      "expect": "Available zero; covered game contributes to the appropriate denominator"
+    },
+    {
+      "id": "unknown-attempts",
+      "given": "Manual scoresheet has points and made shots but no attempts",
+      "expect": "No shooting percentages from fabricated zero attempts"
+    },
+    {
+      "id": "dnp",
+      "given": "Player is listed but explicitly did not play",
+      "expect": "Does not increment games played"
+    },
+    {
+      "id": "played-without-actions",
+      "given": "Player explicitly played without points or fouls",
+      "expect": "Participation counts; covered recorded metrics can be zero"
+    },
+    {
+      "id": "missing-plus-minus",
+      "given": "One selected covered game has no plus/minus",
+      "expect": "Do not present a partial sum as a fully covered plus/minus"
+    },
+    {
+      "id": "phase-scope",
+      "given": "round_robin, knockout and unclassified games",
+      "expect": "regular includes round_robin; playoffs includes knockout; all includes all three"
+    },
+    {
+      "id": "transfer-history",
+      "given": "Same athlete played for two registrations in one dispute",
+      "expect": "Correct historical registration per game; no first-row selection or duplicate counting"
+    },
+    {
+      "id": "publication",
+      "given": "A draft, an active published revision and a superseded revision",
+      "expect": "Only the active authoritative published facts enter the public result"
+    }
+  ]
+}

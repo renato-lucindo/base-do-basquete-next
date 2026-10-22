@@ -1,0 +1,62 @@
+{
+  "edition": "software-architecture-2026-10-22",
+  "checkedAtUtc": "2026-10-22T18:25:52.756223+00:00",
+  "documentation": {
+    "markdownFiles": 6,
+    "agentSpecificInstructionFiles": 0,
+    "databaseCatalogs": 0,
+    "target": "New independent Supabase project with empty database and Storage"
+  },
+  "modules": {
+    "byteIdenticalFiles": 50,
+    "testFiles": 17,
+    "pdfFixtures": 4,
+    "codeChanged": false,
+    "knownIntegrationWork": "Schema-dependent queries/types are reference adapters and must be adapted to the new model; not a certified domain-isolated application"
+  },
+  "reusedEvidence": {
+    "unitTests": {
+      "result": "PASS",
+      "passed": 126,
+      "failed": 0,
+      "testFiles": 17,
+      "note": "Vitest reports 37 suites including nested describe blocks; there are 17 executable test files"
+    },
+    "typecheck": {
+      "result": "PASS",
+      "command": "npm run typecheck"
+    },
+    "installation": {
+      "result": "PASS",
+      "commands": [
+        "npm install --ignore-scripts --no-audit --no-fund",
+        "npm ci --ignore-scripts --no-audit --no-fund"
+      ],
+      "scope": "Fresh export directory with its own dependency tree; no workspace node_modules reused"
+    },
+    "date": "2026-10-22T17:37:29.460059+00:00",
+    "reason": "Source, dependencies, lockfile and test configuration are byte-identical; documentation and synthetic contract examples only changed"
+  },
+  "notExecuted": [
+    "New application implementation",
+    "New database creation or DDL",
+    "Prototype approval",
+    "New application SQL/RLS tests",
+    "Validation of every synthetic semantic case against a new implementation"
+  ],
+  "remoteMutations": 0,
+  "packageChecks": {
+    "documentationPaths": "PASS",
+    "moduleAndHarnessHashes": "PASS unchanged",
+    "secretScan": "PASS heuristic scan of all package file bytes including PDFs",
+    "arithmeticCases": {
+      "passed": 9,
+      "method": "Independent direct calculation from documented formulas; does not certify a new SQL implementation"
+    },
+    "semanticCases": {
+      "count": 8,
+      "status": "Requirements supplied; future implementation tests required"
+    },
+    "archive": "All members compared by SHA-256 and ZIP CRC checked"
+  }
+}
