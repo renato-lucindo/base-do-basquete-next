@@ -32,6 +32,7 @@ Não repetir gate completo por este checkpoint documental. Protótipo não prova
 - [Issue #1](https://github.com/renato-lucindo/base-do-basquete-next/issues/1): roteiro/feedback e aceite pendente.
 - [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2): anexado à conversa, aberto, sem merge.
 - [CI 39846964430](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39846964430), check `prototype` ID `120062675583`, SHA material acima: failure **antes de executar etapas**. Anotação oficial informa pagamentos recentes falhos ou limite de gastos insuficiente da conta. Nenhuma alteração financeira realizada. Não repetir tentativas até resolução humana; não há CI/Linux aprovado.
+- O evento de sincronização do PR também tentou a execução `39847483155` no commit documental `aaec1b6`, sem etapas executadas. Ajustado o workflow para um único evento `push` com exclusão de docs/README, cujo filtro considera o diff daquele push. Isso evita reaplicar gates a commits só documentais; não houve mudança na aplicação verificada.
 - Vite em http://127.0.0.1:5173/, HTTP 200 confirmado; sessão de processo `32934` (reconferir ao retomar). Reiniciar com `npm run dev -- --port 5173` se necessário. Galeria: http://127.0.0.1:5173/docs/evidencias/index.html. Abertura do painel Codex solicitada e retornou queued. Sem deploy remoto.
 - GitHub: autenticação, criação, push e issue/PR confirmados. Identidade de commit configurada somente neste repositório com noreply.
 - Supabase: organização `renato-lucindo` (`susztsuwjauudvirutdr`) e plano **Free** confirmados. Capacidade/custo do novo projeto ainda não aferidos; confirmar organização e consultar antes de criar. Nenhum banco/Auth/Storage criado; nenhuma tabela ou dado do ambiente existente consultado/alterado.
@@ -47,6 +48,6 @@ Ao retomar, primeiro consultar cota; depois ler este checkpoint, executar `git s
 
 ## Cota e retomada
 
-Consulta real em 22/10/2026, cerca de **17:13 America/Sao_Paulo**: **31% restante/5h** (69% consumo), **89% restante/semanal** (11% consumo). Reset/5h: **22/10/2026 19:08:57 America/Sao_Paulo, 22:08:57 UTC**. Reset semanal: **29/10/2026 14:08:57 America/Sao_Paulo**. Conferir novamente antes de usar.
+Consulta real em 22/10/2026, após o envio do checkpoint: **27% restante/5h** (73% consumo), **89% restante/semanal** (11% consumo). Reset/5h: **22/10/2026 19:08:57 America/Sao_Paulo, 22:08:57 UTC**. Reset semanal: **29/10/2026 14:08:57 America/Sao_Paulo**. Conferir novamente antes de usar.
 
 Gatilho <=15% restante não atingido; não foi necessário criar agendamento. A pendência atual é avaliação humana, não reset. Se atingir o gatilho em trabalho futuro, fazer checkpoint, salvar WIP remoto seguro e usar a ferramenta oficial para retomar **nesta conversa em reset efetivo +2 minutos**, atualizando agendamento existente e confirmando sucesso. Verificar janela semanal; não comprar créditos, mudar plano ou usar reset manual.
