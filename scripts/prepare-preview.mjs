@@ -11,12 +11,12 @@ import { extname, join } from "node:path";
 import { gzipSync } from "node:zlib";
 
 const sha256 = (data) => createHash("sha256").update(data).digest("hex");
-const applicationCommit = "8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23";
+const applicationCommit = "f8b6663f15b03a8c9443f9d5d8490f800553ae22";
 const required = {
-  "assets/index-CB3QIs5k.js":
-    "6d149540f16f60f83999c68c7a92b3329970822c7e849f978545dfb486b79810",
-  "assets/index-BVSMIK4d.css":
-    "3162ca8132ebed1c1bdfd9b00f3d532c966025d963acdaae918698f9f6aa1614",
+  "assets/index-BtFrNwKi.js":
+    "991e17767e8299d4e074a307c5d81c01eca6f5b40ed34d95d43e696581a18e65",
+  "assets/index-CS72YXoI.css":
+    "ede51a05662c5600b8ebc1721d0f874d0cbbcf15510ebe9a9d92ccccaf9fb5de",
 };
 for (const [path, hash] of Object.entries(required)) {
   if (

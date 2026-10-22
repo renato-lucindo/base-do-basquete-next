@@ -160,6 +160,35 @@ try {
       await page
         .getByRole("heading", { name: "Súmula por teclado", exact: true })
         .waitFor();
+      if (process.argv.includes("--scoresheet-review")) {
+        stage = `revisão de ações ${viewport.width}`;
+        for (const period of ["2", "1"]) {
+          await page
+            .getByLabel("Período", { exact: true })
+            .selectOption(period);
+          await page.getByLabel("Código", { exact: true }).fill("2");
+          await page.getByLabel("Código", { exact: true }).press("Enter");
+        }
+        await page.getByLabel("Ordem das ações").selectOption("period");
+        await page
+          .getByRole("button", { name: "Editar ação 1", exact: true })
+          .click();
+        await page.getByLabel("Código", { exact: true }).fill("3");
+        await page
+          .getByRole("button", { name: "Salvar alteração", exact: true })
+          .click();
+        await page
+          .getByRole("button", { name: "Excluir ação 2", exact: true })
+          .click();
+        await page
+          .getByRole("button", { name: "Confirmar exclusão", exact: true })
+          .click();
+        assert.equal(await page.locator(".score").textContent(), "3×0");
+        assert.equal(
+          await page.locator(".entry-workspace tbody tr").count(),
+          1,
+        );
+      }
       stage = `galeria ${viewport.width}`;
       await page.goto(base + "/docs/evidencias/");
       await page.locator("img").first().waitFor();
@@ -184,6 +213,7 @@ try {
       viewports: 2,
       flows: 3,
       gallery: true,
+      scoresheetReview: process.argv.includes("--scoresheet-review"),
       applicationCommit: manifest.applicationCommit,
       sourceCommit: manifest.sourceCommit,
     }),
