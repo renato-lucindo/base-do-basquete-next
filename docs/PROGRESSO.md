@@ -1,6 +1,20 @@
-# Checkpoint — 22/10/2026, 20:16 America/Araguaina (UTC-03)
+# Checkpoint — 22/10/2026, 20:24 America/Araguaina (UTC-03)
 
-## Atualização atual — feedback da súmula implementado e publicado
+## Versão atual — teclado contínuo e atalhos publicados
+
+Solicitações adicionais implementadas: `camisa → Enter → ação → Enter`; Enter na camisa avança sem lançar, Enter no código lança e retorna à camisa selecionada para substituir ou repetir. `Alt+A/B` escolhe equipe; `Alt+1–4` escolhe quarto; `Alt+Q` foca período, setas escolhem e Enter retorna à camisa. Trocar contexto não lança ações. Valores são mantidos em erro e o foco permite corrigir sem duplicação. Atalhos, 0/00, atletas diferentes e repetidos e a sequência exata enviada pelo responsável foram testados sem mouse após preparar os relacionados.
+
+Aplicação/capturas atuais **`971eab0ad2254150e4713e4ae498073dae7be4f8`**, transporte **`22468bb88b8156dbee017c383bea0ecfe8c4c4e4`**, mesma branch/repositório/PR registrados abaixo. Gate consolidado PASS com 46 testes unitários/três de transporte e **24 cenários Playwright PASS** desktop/celular; quatro novas execuções para ciclo e atalhos. Insumos originais imutáveis não foram retestados; seis composições reaproveitadas e duas da súmula atualizadas/inspecionadas. Regras de ordenação, edição/exclusão e republicação da atualização anterior continuam verificadas.
+
+JS atual `dist/assets/index-B5oSVS5A.js`, SHA-256 **`4654d9cfba029e8e6ce608f2cae53efc9e3eaace4f6f6df452a1bee4529d60b4`**; CSS sem mudança (`index-CS72YXoI.css`, hash abaixo). **13 arquivos/1.259.446 bytes remotos conferidos por hash**, smoke autenticado dos três fluxos, galeria, revisão de ações e ciclo/atalhos PASS em dois tamanhos. Deployment **`c24dda7540f649f6a3b1aaa0b29b889d`**, publicado em **22/10 23:23:52 UTC (20:23:52 UTC-03)** pelo plugin Cloudflare. Mesma URL protegida; não houve mudança de banco ou de serviços anteriores.
+
+Após o smoke, token e política transitórios revogados com sucesso; única regra permanente por e-mail reconfirmada, previews de versão desabilitados. Seis consultas anônimas finais retornaram 302 para Access, sem app. Nenhum segredo persistido/exposto. Arquivos importantes enviados ao Git remoto; árvore limpa antes deste checkpoint documental, sem mudanças alheias. Main preservada, automação PAUSED e nenhum deploy/gate em andamento.
+
+CI atual: aplicação [39871431609](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39871431609), job `120146543136`, e transporte [39871462417](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39871462417), job `120146644160`: ambos `prototype` concluídos **SUCCESS**, incluindo gate e 24 cenários Linux. Não executar rerun por documentação. Próximo passo exato: atualizar [a súmula no preview](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/#/sumula), escolher equipe por atalho, transcrever uma sequência de camisas/ações e trocar quartos por atalho; registrar aceite/ajustes restantes. Não presumir aceite final nem iniciar banco/API integrada. Formato de rascunhos salvos preservado.
+
+Cota real às 20:24 UTC-03: **58% restante/5h**, **80% restante semanal**, resets **23/10 00:11:28 UTC-03** e **29/10 14:08:57 UTC-03**. Gatilho não atingido. Ao retomar, conferir cota primeiro e reconciliar Git/CI/feedback/serviços antes de alterar. As seções seguintes são evidências das versões anteriores; esta abertura identifica a versão atual.
+
+## Atualização anterior — feedback da súmula implementado e publicado às 20:16
 
 Solicitação do responsável registrada em `docs/AJUSTES-DE-EXPERIENCIA.md`: Q1/Q3 vermelho suave, Q2/Q4 azul suave; alternância entre sequência de lançamento e ordem por quarto; editar/excluir ação específica. Implementado com validação completa, recálculo, confirmação de exclusão, desfazer/refazer e preservação da participação. Todas as ações estão acessíveis, inclusive além das últimas trinta. Correções de resultado publicado ainda exigem motivo e republicação, com versão anterior preservada. Não foi presumido aceite final nem iniciada integração.
 
