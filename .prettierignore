@@ -1,0 +1,5 @@
+especificacao/
+dist/
+node_modules/
+docs/evidencias/
+package-lock.json
