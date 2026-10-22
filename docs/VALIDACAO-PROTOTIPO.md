@@ -4,7 +4,9 @@ Estado: pronto para avaliação do responsável; nenhum aceite humano foi presum
 
 ## Abrir
 
-Com `npm run dev`, acessar http://127.0.0.1:5173/. Composições desktop/celular em http://127.0.0.1:5173/docs/evidencias/index.html; arquivos correspondentes neste diretório. Sem o servidor, seguir o README para iniciá-lo. As oito capturas são geradas por `node scripts/capture-prototype.mjs` a partir da mesma UI.
+Remoto: [protótipo protegido](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/) e [composições desktop/celular](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/docs/evidencias/). Usar `renato.lucindo.jr@gmail.com` no Cloudflare Access e o código recebido por e-mail. Só essa identidade é autorizada; login humano ainda precisa de conferência pelo responsável. Rascunhos ficam neste navegador, sem sincronização entre máquinas.
+
+Local: com `npm run dev`, acessar http://127.0.0.1:5173/. Composições em http://127.0.0.1:5173/docs/evidencias/index.html. As oito capturas são geradas por `node scripts/capture-prototype.mjs` a partir da mesma UI.
 
 ## Percursos a avaliar
 
@@ -20,7 +22,9 @@ Com `npm run dev`, acessar http://127.0.0.1:5173/. Composições desktop/celular
 
 O pacote preservado passou em `python verificar-pacote.py` (67 arquivos), 126 testes e TypeScript no harness. Esses arquivos não mudaram; a evidência original é reaproveitada, sem executar novamente sua suíte inteira. O CI verifica integridade e a aplicação nova em Linux. O checkpoint registra o commit e a execução aplicáveis.
 
-CI remoto configurado, mas **não executado**: a execução [39846964430](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39846964430) no SHA `8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23` foi bloqueada antes do primeiro passo. A anotação do GitHub informa falha de pagamentos recentes ou necessidade de aumentar o limite de gastos. Nenhuma configuração financeira foi alterada. Não confundir gate local aprovado com CI remoto aprovado. A repetição só faz sentido após resolver esse bloqueio; alterações apenas documentais não disparam novamente a suíte.
+CI remoto **aprovado** após o responsável tornar o repositório público. A execução [39864863368](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39864863368), no transporte `f6073be`, terminou com sucesso em 22/10/2026. Inclui gate, integridade dos insumos, três testes do transporte e 16 cenários de navegador em Linux. Nenhuma configuração financeira foi alterada. Evidências de aplicação e capturas inalteradas são reaproveitadas; alterações apenas documentais não disparam a suíte.
+
+Preview publicado pelo plugin Cloudflare com Access configurado antes de habilitar o hostname. Comparados os hashes SHA-256 dos 13 arquivos remotos com o pacote local: todos iguais. Smoke autenticado de abertura/interação dos três fluxos em desktop (1440 px) e celular (390 px), galeria e ausência de erros de página: PASS. Esse smoke verifica transporte; não repete nem substitui o aceite dos percursos completos. Sete consultas finais anônimas/com cabeçalhos de identidade falsificados: HTTP 302 para Access, sem conteúdo da aplicação. Tokens de teste e políticas temporárias foram removidos; permanece somente a regra individual por e-mail. URLs de versões alternativas desabilitadas.
 
 Feedback: [issue #1](https://github.com/renato-lucindo/base-do-basquete-next/issues/1). Código em revisão: [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2).
 
@@ -36,7 +40,7 @@ O upload selecionado verifica metadados/assinatura e informa que a extração n�
 
 Acessibilidade já verificada: HTML/labels, foco inicial/atalho para conteúdo e Enter no lançamento, reflow e teclado nos cenários automatizados, além de inspeção visual das composições. Leitor de tela, zoom real de navegador a 200%, contraste de todas as combinações e percursos inteiramente por teclado continuam na avaliação manual; não há declaração de conformidade WCAG completa.
 
-Supabase: organização conectada e plano Free confirmados; capacidade/custo de um projeto novo ainda não aferidos. O custo será consultado para a organização escolhida antes de criar o projeto, sem contratar plano pago automaticamente. Cloudflare: identidade conectada respondeu, mas a consulta efetiva de API falhou com OAuth `invalid_client: Client not found`; reconexão necessária antes da integração/deploy. Nenhum banco/Storage foi criado ou alterado, nem repositório anterior consultado.
+Supabase: organização conectada e plano Free confirmados; capacidade/custo de um projeto novo ainda não aferidos. Consultar antes de criar, sem contratar plano pago automaticamente. Cloudflare: leitura e escrita pelo plugin funcionam; Billing retorna 403 por falta de escopo OAuth, sem inferência de custos ou alteração de assinatura. O upload de Static Assets recebeu HTTP 401 no envio com JWT transitório do conector; o preview usa módulos estáticos do Worker conforme decisão 002. Nenhum banco/Storage ou serviço anterior foi alterado, nem repositório anterior consultado.
 
 `PROTOTIPO-E-APROVACAO.md`, citado em EXPERIENCIA, não existe no ZIP. Foi usada a seção explícita “Primeira entrega: protótipo navegável”; essa lacuna não impediu a apresentação.
 
