@@ -20,6 +20,10 @@ Com `npm run dev`, acessar http://127.0.0.1:5173/. Composições desktop/celular
 
 O pacote preservado passou em `python verificar-pacote.py` (67 arquivos), 126 testes e TypeScript no harness. Esses arquivos não mudaram; a evidência original é reaproveitada, sem executar novamente sua suíte inteira. O CI verifica integridade e a aplicação nova em Linux. O checkpoint registra o commit e a execução aplicáveis.
 
+CI remoto configurado, mas **não executado**: a execução [39846964430](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39846964430) no SHA `8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23` foi bloqueada antes do primeiro passo. A anotação do GitHub informa falha de pagamentos recentes ou necessidade de aumentar o limite de gastos. Nenhuma configuração financeira foi alterada. Não confundir gate local aprovado com CI remoto aprovado. A repetição só faz sentido após resolver esse bloqueio; alterações apenas documentais não disparam novamente a suíte.
+
+Feedback: [issue #1](https://github.com/renato-lucindo/base-do-basquete-next/issues/1). Código em revisão: [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2).
+
 As falhas encontradas durante a iteração foram corrigidas: largura indevida por elementos ocultos e mínimo automático de coluna de elenco, acionamento móvel, link de pular conteúdo alterando a rota, preservação de filtros/rascunho de jogo e alinhamento da mensagem de revisão. O gate e os percursos finais passaram após as correções.
 
 Foi feita revisão pelo próprio autor, com o roteiro da skill de revisão. Não há ferramenta de subagentes/revisor independente nesta sessão; não declarar revisão externa aprovada. Nenhum merge para main foi realizado. A revisão humana do PR continua pendente.
