@@ -1,4 +1,22 @@
-# Checkpoint — 22/10/2026, 19:34 America/Sao_Paulo (UTC-03)
+# Checkpoint — 22/10/2026, 20:16 America/Araguaina (UTC-03)
+
+## Atualização atual — feedback da súmula implementado e publicado
+
+Solicitação do responsável registrada em `docs/AJUSTES-DE-EXPERIENCIA.md`: Q1/Q3 vermelho suave, Q2/Q4 azul suave; alternância entre sequência de lançamento e ordem por quarto; editar/excluir ação específica. Implementado com validação completa, recálculo, confirmação de exclusão, desfazer/refazer e preservação da participação. Todas as ações estão acessíveis, inclusive além das últimas trinta. Correções de resultado publicado ainda exigem motivo e republicação, com versão anterior preservada. Não foi presumido aceite final nem iniciada integração.
+
+Versão atual: aplicação/capturas da súmula `f8b6663f15b03a8c9443f9d5d8490f800553ae22`; transporte `7e8d4f56906537ed164c083b01b8b766ba9ea727`. Mesma branch `feat/prototipos-fluxos`, PR draft #2 e novo repositório público. Árvores de terceiros preservadas; somente alterações do agente nesta unidade, todas enviadas ao remoto. Main permanece intacta. Este checkpoint documental é posterior; obter HEAD completo com Git. Seis capturas dos outros percursos reaproveitadas, duas da súmula renovadas e inspecionadas.
+
+Gate consolidado PASS: lint, formatação, TypeScript, **46 testes unitários**, três de transporte, build e segredos. **20 cenários Playwright PASS**, incluindo quatro novas execuções desktop/celular de cores/ordenação, edição inválida, edição/exclusão específica, cancelamento, desfazer/refazer, salvamento/recarga, republicação e acesso a ações antigas. Teste de recarga aguarda a confirmação da gravação assíncrona antes de recarregar. Harness original inalterado: evidências de 126 testes/integridade reutilizadas, sem nova execução. Configuração Playwright agora seleciona somente arquivos `.spec.ts`, evitando executar novamente testes Node de transporte.
+
+Build atual: `dist/assets/index-BtFrNwKi.js`, SHA-256 `991e17767e8299d4e074a307c5d81c01eca6f5b40ed34d95d43e696581a18e65`; `dist/assets/index-CS72YXoI.css`, `ede51a05662c5600b8ebc1721d0f874d0cbbcf15510ebe9a9d92ccccaf9fb5de`. Empacotador atualizado para esses hashes. **13 arquivos/1.246.024 bytes remotos conferidos por hash**, smoke autenticado PASS dos três fluxos, galeria e ajustes da súmula em dois tamanhos. Worker novo já existente nesta conversa atualizado pelo plugin Cloudflare: deployment **`e0e164acee6b4ca6953388faf9bfc074`**, publicado em **22/10/2026 23:15:19 UTC (20:15:19 UTC-03)**.
+
+Após o smoke, token transitório e política de teste removidos com sucesso; única regra permanente permite `renato.lucindo.jr@gmail.com`. Hostname habilitado, previews de versão desabilitados. Seis smokes anônimos finais (raiz, JS/CSS atuais, galeria, PNG atualizado e versão) retornaram 302 para Access, sem conteúdo do app. Nenhum segredo persistido ou exposto. Recursos de Access e Worker permanecem os IDs registrados abaixo; nenhum serviço anterior ou banco alterado. Automação continua PAUSED, sem processo de deploy/gate em andamento.
+
+CI da aplicação `f8b6663`: [39870460144](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39870460144) SUCCESS. Transporte `7e8d4f5`: [39870512378](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39870512378), job `prototype` ID `120143474360` concluído SUCCESS em todas as etapas aplicáveis, incluindo gate e 20 cenários Linux. Não executar rerun por documentação. Próximo passo exato: reabrir/atualizar [a súmula no preview](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/#/sumula), conferir os três ajustes e registrar aceite ou ajustes restantes. O endereço e a proteção são os mesmos; rascunhos salvos anteriores usam o mesmo formato e continuam neste navegador. Não avançar ao banco/API integrada sem avaliação final.
+
+Cota real às 20:16 UTC-03: **64% restante/5h**, **81% restante semanal**; resets permanecem **23/10 00:11:28 UTC-03** e **29/10 14:08:57 UTC-03**. Gatilho de 15% não atingido. Conferir a ferramenta ao retomar, depois Git/CI/feedback e serviços; reutilizar evidências dos arquivos inalterados.
+
+As seções abaixo registram a apresentação inicial e suas evidências históricas; a atualização acima identifica o artefato e o próximo passo atuais.
 
 ## Objetivo, unidade e próximo passo
 

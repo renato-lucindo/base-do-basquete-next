@@ -50,6 +50,8 @@ Feedback de 22/10 aplicado à súmula conforme `docs/AJUSTES-DE-EXPERIENCIA.md`:
 
 Verificação desta unidade: gate consolidado PASS (46 testes unitários, três de transporte, lint, formatação, TypeScript, build e segredos); navegador PASS 20/20, incluindo as quatro novas execuções desktop/celular para correção individual e acesso a ações antigas. Duas capturas da súmula renovadas; seis composições dos fluxos inalterados reutilizadas. Não foi repetido o harness dos insumos imutáveis.
 
+Publicado no mesmo preview protegido: aplicação `f8b6663`, transporte `7e8d4f5`, com 13 hashes remotos conferidos e smoke dos ajustes em desktop/celular aprovado. Credencial/política temporária revogadas e seis consultas anônimas finais bloqueadas pelo Access. CI [39870512378](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39870512378), job `prototype`, aprovado com gate e 20 cenários Linux. A apresentação inicial acima conserva a identificação da evidência anterior; esta atualização é a versão atual.
+
 Responsável, data e decisão: pendentes.
 
 Registrar ajustes de composição/interação e aprovação individual dos três percursos no issue e PR deste marco. Depois do aceite, o próximo plano é a fundação full-stack, com novo projeto Supabase, acesso por senha e preview protegido conforme o pacote.
