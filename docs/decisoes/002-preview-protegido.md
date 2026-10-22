@@ -1,0 +1,15 @@
+# 002 — apresentação remota protegida pelo Cloudflare Access
+
+Estado: preparação autorizada pelo responsável em 22/10/2026; validação de produto ainda pendente.
+
+Contexto: o responsável avalia de outra máquina via Codex Remote. O protótipo local já tem evidências válidas; o novo ambiente deve preservar os três Workers existentes. O plugin Cloudflare voltou a responder e a conta já possui organização Access e provedor de código de e-mail.
+
+Decisão: usar o plugin Cloudflare e a API oficial de Workers Static Assets para publicar o build já verificado e a galeria no Worker novo `base-do-basquete-prototipo`. Configurar Access para o hostname exato antes de habilitá-lo, com regra de e-mail individual e OTP existente. Não criar domínio próprio, banco ou assinatura; não alterar Workers ou políticas globais existentes. URLs de versão alternativas permanecem desabilitadas. Sessão de apresentação de oito horas.
+
+O Access é a proteção externa desta apresentação fictícia; não substitui o futuro login por senha nem autoriza exceção de acesso no produto integrado. Nenhum segredo vai para arquivos, commits ou logs. Tokens transitórios do protocolo de upload permanecem apenas no processamento da API. O conector OAuth não tem escopo de Billing: custos/assinaturas não foram inferidos ou alterados; o upload de assets não contrata planos.
+
+O empacotador exige os hashes do JS e CSS já testados, inclui apenas `dist`, a galeria, oito PNGs e identificação da versão. Não publica o ZIP, os documentos de especificação ou o código-fonte. A API de assets usa o manifesto/hash descrito em [Direct Uploads](https://developers.cloudflare.com/workers/static-assets/direct-upload/). A política segue [Cloudflare Access para Workers](https://developers.cloudflare.com/workers/configuration/cloudflare-access/).
+
+Validação: conferir configuração e política no servidor, resposta anônima de raiz/assets/galeria, resposta autenticada e hashes do artefato, fluxos proporcionais ao transporte e ausência de acesso alternativo. Se for necessário um token de teste, criá-lo com escopo só nesta aplicação, utilizá-lo em memória e revogá-lo após o smoke. O responsável completa o teste do login humano e o aceite dos percursos.
+
+Rollback: desabilitar o hostname do Worker novo antes de remover sua aplicação Access; nunca remover proteção com conteúdo ainda exposto. Remover apenas recursos novos identificados neste marco. Evidências dos módulos e fluxos inalterados são reaproveitadas, sem nova suíte completa por retomada de sessão.
