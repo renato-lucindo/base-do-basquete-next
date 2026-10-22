@@ -959,6 +959,28 @@
     font-size: 13px;
     margin: 12px 0;
   }
+  .entry-form.period-red,
+  .entry-workspace tr.period-red {
+    background: #fff1f1;
+  }
+  .entry-form.period-blue,
+  .entry-workspace tr.period-blue {
+    background: #eef6ff;
+  }
+  .entry-workspace tr.period-red td:nth-child(2) {
+    color: #982d36;
+    font-weight: 700;
+  }
+  .entry-workspace tr.period-blue td:nth-child(2) {
+    color: #0753ac;
+    font-weight: 700;
+  }
+  .action-order {
+    margin-top: 24px;
+  }
+  .action-order select {
+    max-width: 100%;
+  }
   .entry-workspace .table-scroll {
     margin-top: 20px;
     max-height: 450px;

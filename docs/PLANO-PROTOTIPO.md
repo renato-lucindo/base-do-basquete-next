@@ -12,7 +12,7 @@ Objetivo: apresentar os três percursos completos com dados fictícios e estados
 - [x] U4 — jogo/súmula, relacionados, participação sem ações, códigos e períodos usando motor do pacote; desfazer/refazer, rascunho, conflito persistente até recarga, publicar/corrigir com motivo e prévia. Arquivos: `src/scoresheet/`, `src/domain/`. Testar conflito duas vezes e preservação da publicação anterior.
 - [ ] U5 — gate consolidado, revisão, percursos desktop/celular/teclado e composições; issue e PR de apresentação, checkpoint e espera pela validação humana. Arquivos: `tests/`, `docs/VALIDACAO-PROTOTIPO.md`, `.github/workflows/`.
 
-U5: gate local e 16 cenários de navegador aprovados; oito composições capturadas e revisadas. Issue #1 e PR draft #2 criados. CI remoto não iniciou por bloqueio de cobrança/limite da conta GitHub. Avaliação humana continua pendente; não avançar à integração completa sem ela.
+U5: preview remoto protegido e CI aprovados; issue #1 e PR draft #2 criados. Feedback de 22/10 da súmula aplicado conforme `docs/AJUSTES-DE-EXPERIENCIA.md`, com gate e 20 cenários de navegador aprovados. Capturas da súmula atualizadas e demais composições reutilizadas. Avaliação humana final continua pendente; não avançar à integração completa sem ela.
 
 Antes de cada unidade e operação longa: consultar cota real. Gatilho do responsável: <=15% restante na janela de 5h. Checkpoint em `docs/PROGRESSO.md` e retomada oficial nesta conversa em reset +2 minutos; janela semanal também respeitada. Não criar agendamento enquanto não houver razão real de retomada.
 

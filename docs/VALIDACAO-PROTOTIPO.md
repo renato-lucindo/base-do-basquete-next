@@ -46,6 +46,10 @@ Supabase: organização conectada e plano Free confirmados; capacidade/custo de 
 
 ## Feedback e aceite
 
+Feedback de 22/10 aplicado à súmula conforme `docs/AJUSTES-DE-EXPERIENCIA.md`: cores suaves por quarto, ordenação alternativa e edição/exclusão individual. Conferir: lançar fora de ordem → selecionar “Por quarto” → editar uma ação anterior → conferir recálculo → excluir outra com confirmação → desfazer/refazer → salvar e recarregar. Em resultado publicado, conferir motivo e preservação da versão anterior. As ações anteriores às últimas trinta também ficam acessíveis.
+
+Verificação desta unidade: gate consolidado PASS (46 testes unitários, três de transporte, lint, formatação, TypeScript, build e segredos); navegador PASS 20/20, incluindo as quatro novas execuções desktop/celular para correção individual e acesso a ações antigas. Duas capturas da súmula renovadas; seis composições dos fluxos inalterados reutilizadas. Não foi repetido o harness dos insumos imutáveis.
+
 Responsável, data e decisão: pendentes.
 
 Registrar ajustes de composição/interação e aprovação individual dos três percursos no issue e PR deste marco. Depois do aceite, o próximo plano é a fundação full-stack, com novo projeto Supabase, acesso por senha e preview protegido conforme o pacote.

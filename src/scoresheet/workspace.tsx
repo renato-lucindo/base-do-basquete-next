@@ -1,16 +1,18 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   aggregate,
   change,
   undo,
   redo,
   periodLabel,
+  periodColor,
   validateSheet,
   type Sheet,
   type Side,
 } from "../domain/scoresheet";
 import { Badge, Field, Heading, disputeLabel, type ScreenProps } from "../ui";
 import { preparePublication } from "./publication";
+import { orderedActions, editAction, deleteAction } from "./actions";
 
 export function ScoresheetWorkspace({
   data,
@@ -33,6 +35,12 @@ export function ScoresheetWorkspace({
     sheet.roster.find((r) => r.side === "home")?.jersey ?? "",
   );
   const [code, setCode] = useState("");
+  const [order, setOrder] = useState<"entry" | "period">("entry");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const editing = sheet.events.find((event) => event.id === editingId);
+  const deleting = sheet.events.find((event) => event.id === deletingId);
+  const visibleActions = orderedActions(sheet, order);
   const [error, setError] = useState("");
   const [reason, setReason] = useState("");
   const [review, setReview] = useState(false);
@@ -42,6 +50,10 @@ export function ScoresheetWorkspace({
     jersey: "",
   });
   const codeRef = useRef<HTMLInputElement>(null);
+  const deleteConfirmRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    deleteConfirmRef.current?.focus();
+  }, [deletingId]);
   const mutate = (next: Sheet) => {
     try {
       update({ ...data, sheet: change(data.sheet, next) });
@@ -54,6 +66,20 @@ export function ScoresheetWorkspace({
     }
   };
   const addEntry = () => {
+    if (editingId) {
+      try {
+        if (
+          mutate(editAction(sheet, editingId, { side, period, target, code }))
+        ) {
+          setEditingId(null);
+          setCode("");
+          codeRef.current?.focus();
+        }
+      } catch (e) {
+        setError((e as Error).message);
+      }
+      return;
+    }
     const next = structuredClone(sheet);
     const slot = next.roster.find(
       (r) => r.side === side && r.jersey === target,
@@ -564,6 +590,9 @@ export function ScoresheetWorkspace({
               disabled={!data.sheet.past.length}
               onClick={() => {
                 update({ ...data, sheet: undo(data.sheet) });
+                setEditingId(null);
+                setDeletingId(null);
+                setCode("");
                 setReview(false);
               }}
             >
@@ -573,6 +602,9 @@ export function ScoresheetWorkspace({
               disabled={!data.sheet.future.length}
               onClick={() => {
                 update({ ...data, sheet: redo(data.sheet) });
+                setEditingId(null);
+                setDeletingId(null);
+                setCode("");
                 setReview(false);
               }}
             >
@@ -580,8 +612,16 @@ export function ScoresheetWorkspace({
             </button>
           </div>
         </div>
+        {editing && (
+          <p className="note" role="status">
+            Editando ação{" "}
+            {sheet.events.findIndex((event) => event.id === editing.id) + 1} ·{" "}
+            {periodLabel(editing.period)} · {editing.target} · {editing.code}.
+            Altere os campos e salve.
+          </p>
+        )}
         <form
-          className="entry-form"
+          className={`entry-form period-${periodColor(period)}`}
           onSubmit={(e) => {
             e.preventDefault();
             addEntry();
@@ -648,8 +688,21 @@ export function ScoresheetWorkspace({
             />
           </Field>
           <button type="submit" className="primary">
-            Lançar ação ↵
+            {editingId ? "Salvar alteração" : "Lançar ação ↵"}
           </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setCode("");
+                setError("");
+                codeRef.current?.focus();
+              }}
+            >
+              Cancelar edição
+            </button>
+          )}
         </form>
         <p id="entry-help" className="muted">
           Pontos: 1, 2, 3 · Faltas: P, P1–P3, Pc, T1, Tc, U, U1–U3, Uc, D,
@@ -673,6 +726,71 @@ export function ScoresheetWorkspace({
             {error}
           </p>
         )}
+        <div className="action-order">
+          <Field id="actions-order" label="Ordem das ações">
+            <select
+              id="actions-order"
+              value={order}
+              onChange={(event) =>
+                setOrder(event.target.value as "entry" | "period")
+              }
+            >
+              <option value="entry">Ordem de lançamento</option>
+              <option value="period">
+                Por quarto: Q1 → Q2 → Q3 → Q4 → prorrogações
+              </option>
+            </select>
+          </Field>
+          <p className="muted">
+            Q1 e Q3: vermelho suave · Q2 e Q4: azul suave. O número identifica a
+            ordem original de lançamento.
+          </p>
+        </div>
+        {deleting && (
+          <section
+            className="confirmation"
+            aria-label="Excluir ação selecionada"
+          >
+            <h3 ref={deleteConfirmRef} tabIndex={-1}>
+              Excluir ação{" "}
+              {sheet.events.findIndex((event) => event.id === deleting.id) + 1}?
+            </h3>
+            <p>
+              {periodLabel(deleting.period)} ·{" "}
+              {deleting.side === "home" ? data.game.home : data.game.away} ·{" "}
+              {deleting.target} · {deleting.code}. O placar e as faltas serão
+              recalculados. A participação será mantida e você poderá desfazer.
+            </p>
+            <div className="actions">
+              <button
+                onClick={() => {
+                  try {
+                    if (mutate(deleteAction(sheet, deleting.id))) {
+                      if (editingId === deleting.id) {
+                        setEditingId(null);
+                        setCode("");
+                      }
+                      setDeletingId(null);
+                      codeRef.current?.focus();
+                    }
+                  } catch (e) {
+                    setError((e as Error).message);
+                  }
+                }}
+              >
+                Confirmar exclusão
+              </button>
+              <button
+                onClick={() => {
+                  setDeletingId(null);
+                  codeRef.current?.focus();
+                }}
+              >
+                Cancelar exclusão
+              </button>
+            </div>
+          </section>
+        )}
         <div
           className="table-scroll"
           role="region"
@@ -688,28 +806,56 @@ export function ScoresheetWorkspace({
                 <th>Equipe</th>
                 <th>Camisa / alvo</th>
                 <th>Ação</th>
+                <th>Alterar</th>
               </tr>
             </thead>
             <tbody>
               {sheet.events.length ? (
-                sheet.events
-                  .map((e, i) => (
-                    <tr key={e.id}>
-                      <td>{i + 1}</td>
-                      <td>{periodLabel(e.period)}</td>
-                      <td>
-                        {e.side === "home" ? data.game.home : data.game.away}
-                      </td>
-                      <td>{e.target}</td>
-                      <td>
-                        <strong>{e.code}</strong>
-                      </td>
-                    </tr>
-                  ))
-                  .slice(-30)
+                visibleActions.map(({ event: e, sequence }) => (
+                  <tr key={e.id} className={`period-${periodColor(e.period)}`}>
+                    <td>{sequence}</td>
+                    <td>{periodLabel(e.period)}</td>
+                    <td>
+                      {e.side === "home" ? data.game.home : data.game.away}
+                    </td>
+                    <td>{e.target}</td>
+                    <td>
+                      <strong>{e.code}</strong>
+                    </td>
+                    <td>
+                      <div className="actions">
+                        <button
+                          aria-label={`Editar ação ${sequence}`}
+                          onClick={() => {
+                            setEditingId(e.id);
+                            setDeletingId(null);
+                            setPeriod(e.period);
+                            setSide(e.side);
+                            setTarget(e.target);
+                            setCode(e.code);
+                            setError("");
+                            setReview(false);
+                            codeRef.current?.focus();
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          aria-label={`Excluir ação ${sequence}`}
+                          onClick={() => {
+                            setDeletingId(e.id);
+                            setError("");
+                          }}
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="muted">
+                  <td colSpan={6} className="muted">
                     Nenhuma ação. Digite um código e pressione Enter para
                     começar.
                   </td>
@@ -748,9 +894,16 @@ export function ScoresheetWorkspace({
             {previous ? "Revisar e republicar" : "Conferir e publicar"}
           </strong>
           <p>Minutos e tentativas não são inferidos da súmula.</p>
+          {editingId && (
+            <p role="status">
+              Salve ou cancele a edição da ação antes de salvar o rascunho ou
+              revisar o resultado.
+            </p>
+          )}
         </div>
         <div className="actions">
           <button
+            disabled={!!editingId}
             onClick={() => {
               try {
                 validateSheet(sheet);
@@ -762,7 +915,7 @@ export function ScoresheetWorkspace({
           >
             Salvar rascunho da súmula
           </button>
-          <button className="primary" onClick={preview}>
+          <button className="primary" disabled={!!editingId} onClick={preview}>
             Revisar resultado
           </button>
         </div>
