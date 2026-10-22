@@ -11,10 +11,10 @@ import { extname, join } from "node:path";
 import { gzipSync } from "node:zlib";
 
 const sha256 = (data) => createHash("sha256").update(data).digest("hex");
-const applicationCommit = "f8b6663f15b03a8c9443f9d5d8490f800553ae22";
+const applicationCommit = "971eab0ad2254150e4713e4ae498073dae7be4f8";
 const required = {
-  "assets/index-BtFrNwKi.js":
-    "991e17767e8299d4e074a307c5d81c01eca6f5b40ed34d95d43e696581a18e65",
+  "assets/index-B5oSVS5A.js":
+    "4654d9cfba029e8e6ce608f2cae53efc9e3eaace4f6f6df452a1bee4529d60b4",
   "assets/index-CS72YXoI.css":
     "ede51a05662c5600b8ebc1721d0f874d0cbbcf15510ebe9a9d92ccccaf9fb5de",
 };
