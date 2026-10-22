@@ -46,6 +46,8 @@ Supabase: organização conectada e plano Free confirmados; capacidade/custo de 
 
 ## Feedback e aceite
 
+Solicitação de capitão/comissão aplicada: selecionar capitão por equipe, marcar “Sem técnico: capitão assume” e conferir “Técnico” preenchido automaticamente, sem “Ass. Técnico”. Desmarcar permite técnico próprio/assistente, mantendo o capitão separado. Conferir recuperação do rascunho e desfazer da troca; faltas de atleta/técnico combinam somente quando o capitão assume. Alteração incompatível com ações posteriores deve ser recusada sem perda. Gate desta unidade PASS: 51 testes unitários/três de transporte; navegador PASS **28 cenários**, incluindo quatro novas execuções desktop/celular. Dois screenshots da súmula atualizados; demais composições e evidência do harness imutável reaproveitadas.
+
 Feedback de 22/10 aplicado à súmula conforme `docs/AJUSTES-DE-EXPERIENCIA.md`: cores suaves por quarto, ordenação alternativa e edição/exclusão individual. Conferir: lançar fora de ordem → selecionar “Por quarto” → editar uma ação anterior → conferir recálculo → excluir outra com confirmação → desfazer/refazer → salvar e recarregar. Em resultado publicado, conferir motivo e preservação da versão anterior. As ações anteriores às últimas trinta também ficam acessíveis.
 
 Verificação desta unidade: gate consolidado PASS (46 testes unitários, três de transporte, lint, formatação, TypeScript, build e segredos); navegador PASS 20/20, incluindo as quatro novas execuções desktop/celular para correção individual e acesso a ações antigas. Duas capturas da súmula renovadas; seis composições dos fluxos inalterados reutilizadas. Não foi repetido o harness dos insumos imutáveis.

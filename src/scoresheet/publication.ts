@@ -1,5 +1,6 @@
 import type { Prototype } from "../prototype/model";
 import { aggregate, validateSheet, type Sheet } from "../domain/scoresheet";
+import { assertStaffReady } from "./staff";
 
 export function preparePublication(data: Prototype, reason: string): Prototype {
   if (
@@ -12,6 +13,7 @@ export function preparePublication(data: Prototype, reason: string): Prototype {
       "Resolva a divergência de fontes e informe a justificativa do fallback (10 a 500 caracteres).",
     );
   const sheet = validateSheet(data.sheet.present, true);
+  assertStaffReady(sheet);
   const previous = data.publications
     .filter((p) => p.id === data.game.id && p.source === "sheet")
     .at(-1);

@@ -19,11 +19,19 @@ export const eventSchema = z.object({
   code: z.string().max(3),
 });
 export type Entry = z.infer<typeof eventSchema>;
+export const teamStaffSchema = z.object({
+  captainId: id.nullable(),
+  captainIsCoach: z.boolean(),
+  coachName: z.string().max(120),
+  assistantName: z.string().max(120),
+});
+export type TeamStaff = z.infer<typeof teamStaffSchema>;
 export const documentSchema = z.object({
   rulesVersion: z.literal("FIBA_2024"),
   periods: z.number().int().min(4).max(12),
   roster: z.array(rosterSchema).min(2).max(24),
   coachPlayer: z.object({ home: id.nullable(), away: id.nullable() }),
+  staff: z.object({ home: teamStaffSchema, away: teamStaffSchema }).optional(),
   events: z.array(eventSchema).max(2000),
 });
 export type Sheet = z.infer<typeof documentSchema>;
@@ -129,6 +137,25 @@ export function aggregate(sheet: Sheet) {
   const errors: string[] = [];
   for (const side of ["home", "away"] as const) {
     const roster = sheet.roster.filter((s) => s.side === side);
+    const staff = sheet.staff?.[side];
+    if (staff) {
+      if (
+        staff.captainId !== null &&
+        !roster.some((slot) => slot.rosterEntryId === staff.captainId)
+      )
+        errors.push("O capitão deve estar relacionado à própria equipe.");
+      if (staff.captainIsCoach && (staff.coachName || staff.assistantName))
+        errors.push(
+          "Capitão como técnico não admite técnico próprio ou assistente.",
+        );
+      if (
+        sheet.coachPlayer[side] !==
+        (staff.captainIsCoach ? staff.captainId : null)
+      )
+        errors.push(
+          "Sem técnico próprio, somente o capitão pode assumir como técnico.",
+        );
+    }
     if (
       !roster.length ||
       roster.length > 12 ||

@@ -108,7 +108,21 @@ export function initialState(): Prototype {
         played: false,
       },
     ],
-    coachPlayer: { home: null, away: null },
+    coachPlayer: { home: 1, away: 4 },
+    staff: {
+      home: {
+        captainId: 1,
+        captainIsCoach: true,
+        coachName: "",
+        assistantName: "",
+      },
+      away: {
+        captainId: 4,
+        captainIsCoach: true,
+        coachName: "",
+        assistantName: "",
+      },
+    },
     events: [],
   };
   const competition: Competition = {

@@ -13,6 +13,7 @@ import {
 import { Badge, Field, Heading, disputeLabel, type ScreenProps } from "../ui";
 import { preparePublication } from "./publication";
 import { orderedActions, editAction, deleteAction } from "./actions";
+import { StaffEditor } from "./staff-editor";
 
 export function ScoresheetWorkspace({
   data,
@@ -208,6 +209,20 @@ export function ScoresheetWorkspace({
       periods: 4,
       roster,
       coachPlayer: { home: null, away: null },
+      staff: {
+        home: {
+          captainId: null,
+          captainIsCoach: true,
+          coachName: "",
+          assistantName: "",
+        },
+        away: {
+          captainId: null,
+          captainIsCoach: true,
+          coachName: "",
+          assistantName: "",
+        },
+      },
       events: [],
     };
     update({
@@ -577,31 +592,14 @@ export function ScoresheetWorkspace({
                   </tbody>
                 </table>
               </div>
-              <Field id={`coach-${side}`} label="Atleta-treinador">
-                <select
-                  id={`coach-${side}`}
-                  disabled={!!previous}
-                  value={sheet.coachPlayer[side] ?? ""}
-                  onChange={(e) =>
-                    mutate({
-                      ...sheet,
-                      coachPlayer: {
-                        ...sheet.coachPlayer,
-                        [side]: e.target.value ? Number(e.target.value) : null,
-                      },
-                    })
-                  }
-                >
-                  <option value="">Nenhum relacionado</option>
-                  {sheet.roster
-                    .filter((r) => r.side === side)
-                    .map((r) => (
-                      <option key={r.rosterEntryId} value={r.rosterEntryId}>
-                        #{r.jersey} · {playerName(r.rosterEntryId)}
-                      </option>
-                    ))}
-                </select>
-              </Field>
+              <StaffEditor
+                sheet={sheet}
+                side={side}
+                team={side === "home" ? data.game.home : data.game.away}
+                playerName={playerName}
+                onChange={mutate}
+                onError={setError}
+              />
             </section>
           ))}
         </div>

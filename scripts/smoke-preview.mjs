@@ -160,6 +160,46 @@ try {
       await page
         .getByRole("heading", { name: "Súmula por teclado", exact: true })
         .waitFor();
+      if (process.argv.includes("--scoresheet-staff")) {
+        stage = `comissão técnica ${viewport.width}`;
+        const staff = page.getByRole("group", {
+          name: "Comissão técnica de Lobos",
+          exact: true,
+        });
+        assert.equal(
+          await staff.getByLabel("Técnico", { exact: true }).inputValue(),
+          "Ana da Silva",
+        );
+        assert.equal(
+          await staff.getByLabel("Ass. Técnico", { exact: true }).count(),
+          0,
+        );
+        await staff.getByLabel("Capitão", { exact: true }).selectOption("2");
+        assert.equal(
+          await staff.getByLabel("Técnico", { exact: true }).inputValue(),
+          "Beatriz Costa",
+        );
+        await staff
+          .getByLabel("Sem técnico: capitão assume", { exact: true })
+          .uncheck();
+        await staff
+          .getByLabel("Técnico", { exact: true })
+          .fill("Patrícia Lima");
+        await staff
+          .getByLabel("Ass. Técnico", { exact: true })
+          .fill("Joana Silva");
+        assert.equal(
+          await staff.getByLabel("Ass. Técnico", { exact: true }).inputValue(),
+          "Joana Silva",
+        );
+        await staff
+          .getByLabel("Sem técnico: capitão assume", { exact: true })
+          .check();
+        assert.equal(
+          await staff.getByLabel("Ass. Técnico", { exact: true }).count(),
+          0,
+        );
+      }
       if (process.argv.includes("--scoresheet-review")) {
         stage = `revisão de ações ${viewport.width}`;
         await page.keyboard.press("Alt+b");
@@ -233,6 +273,7 @@ try {
       gallery: true,
       scoresheetReview: process.argv.includes("--scoresheet-review"),
       keyboardCycle: process.argv.includes("--scoresheet-review"),
+      scoresheetStaff: process.argv.includes("--scoresheet-staff"),
       applicationCommit: manifest.applicationCommit,
       sourceCommit: manifest.sourceCommit,
     }),

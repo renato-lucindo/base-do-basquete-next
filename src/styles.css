@@ -947,6 +947,29 @@
   .entry-workspace {
     margin-top: 28px;
   }
+  .staff-editor {
+    min-width: 0;
+    margin: 20px 0 0;
+    padding: 16px 0 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 12px;
+  }
+  .staff-editor legend {
+    font-weight: 700;
+  }
+  .staff-fallback {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .staff-fallback input {
+    width: auto;
+  }
+  .staff-editor input[readonly] {
+    background: var(--surface);
+  }
   .entry-form {
     display: grid;
     grid-template-columns: 100px 1.4fr 1fr 1fr auto;
