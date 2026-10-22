@@ -8,6 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { extname, join } from "node:path";
+import { gzipSync } from "node:zlib";
 
 const sha256 = (data) => createHash("sha256").update(data).digest("hex");
 const applicationCommit = "8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23";
@@ -91,6 +92,10 @@ const payload = {
 };
 mkdirSync(".preview-artifacts", { recursive: true });
 writeFileSync(".preview-artifacts/payload.json", JSON.stringify(payload));
+writeFileSync(
+  ".preview-artifacts/transport.gz.b64",
+  gzipSync(JSON.stringify(payload)).toString("base64"),
+);
 writeFileSync(
   ".preview-artifacts/manifest.json",
   JSON.stringify({ applicationCommit, sourceCommit, files: evidence }, null, 2),
