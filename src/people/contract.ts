@@ -49,7 +49,31 @@ export const personSnapshotSchema = personSchema.extend({
 });
 export const personListingSchema = z
   .object({
-    items: z.array(personSnapshotSchema).max(20),
+    items: z
+      .array(
+        publicPersonSchema
+          .pick({ id: true, name: true, nickname: true, publicBirthYear: true })
+          .extend({
+            athlete: z.boolean(),
+            coach: z.boolean(),
+            contexts: z
+              .array(
+                z
+                  .object({
+                    registrationId: z.uuid(),
+                    teamName: z.string(),
+                    year: z.number().int(),
+                    gender: z.enum(["masculino", "feminino"]),
+                    category: z.string(),
+                    division: z.string().nullable(),
+                    active: z.boolean(),
+                  })
+                  .strict(),
+              )
+              .max(10),
+          }),
+      )
+      .max(20),
     hasMore: z.boolean(),
   })
   .strict();

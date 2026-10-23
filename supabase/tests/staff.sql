@@ -34,6 +34,8 @@ create temp table s_before as select saved_at,version from public.championships 
 select public.save_person(jsonb_build_object('commandId',pg_temp.s_id(80),'expectedVersion',1,'disputeId',null,'confirmHomonym',false,'person',(public.get_person(pg_temp.s_id(50))-'version'-'savedAt')||'{"nickname":"Aninha"}'::jsonb));
 select pg_temp.s_assert((select c.saved_at>b.saved_at and c.version=b.version from public.championships c cross join s_before b where c.id=pg_temp.s_id(90)),'global person edit updates linked competition Recentes');
 select pg_temp.s_assert((select count(*)=1 from private.athletes where person_id=pg_temp.s_id(50)),'athlete and coach share one person');
+select pg_temp.s_assert(public.list_persons('Ana')->'items'->0->'contexts' @> jsonb_build_array(jsonb_build_object('registrationId',pg_temp.s_id(95),'teamName','A','year',2026,'active',true)),'search presents contextual team and year');
+select pg_temp.s_assert(jsonb_typeof(public.list_persons('Ana')->'items'->0->'athlete')='boolean' and not ((public.list_persons('Ana')->'items'->0) ? 'birthDate'),'search does not transport private athlete details');
 select public.save_staff_entry(jsonb_set(jsonb_set(jsonb_set(pg_temp.s_command(),'{commandId}',to_jsonb(pg_temp.s_id(62))),'{expectedVersion}','1'),'{entry,active}','false'));
 select public.save_staff_entry(jsonb_set(pg_temp.s_command(20),'{entry,personId}',to_jsonb(pg_temp.s_id(52))));
 select pg_temp.s_assert(jsonb_array_length(public.list_staff(pg_temp.s_id(95),false)->'items')=3,'previous coach remains historical');
