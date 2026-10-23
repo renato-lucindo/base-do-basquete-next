@@ -26,6 +26,8 @@ import {
   type StaffSnapshot,
 } from "./staff-contract";
 import { PersonFields } from "./person-fields";
+import { TextImportWorkspace } from "../text-import/workspace";
+import type { RegistrationSnapshot } from "../teams/contract";
 import "./workspace.css";
 type Target = "athlete" | "head" | "assistant" | "none";
 type Summary = RosterSnapshot["person"];
@@ -40,7 +42,7 @@ type Editor =
   | { kind: "roster"; command: SaveRoster; person: Summary; wasActive: boolean }
   | { kind: "staff"; command: SaveStaff; person: Summary; wasActive: boolean };
 type Props = {
-  registration: { id: string; name: string; disputeId: string };
+  registration: RegistrationSnapshot;
   gender: "masculino" | "feminino";
   enabled: boolean;
   canEdit: boolean;
@@ -63,6 +65,8 @@ export function MembersWorkspace({
   onSessionLost,
   onSaved,
 }: Props) {
+  const [importing, setImporting] = useState(false);
+  const importGuard = useRef<() => boolean>(() => true);
   const [roster, setRoster] = useState<z.infer<typeof rosterListingSchema>>({
     items: [],
     hasMore: false,
@@ -98,11 +102,12 @@ export function MembersWorkspace({
   const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
   function mayLeave() {
     return (
-      !(busy || dirty || uncertain) ||
-      (!busy &&
-        window.confirm(
-          "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
-        ))
+      importGuard.current() &&
+      (!(busy || dirty || uncertain) ||
+        (!busy &&
+          window.confirm(
+            "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
+          )))
     );
   }
   useEffect(() => {
@@ -130,7 +135,7 @@ export function MembersWorkspace({
         ?.focus();
     else if (target) search.current?.focus();
     else heading.current?.focus();
-  }, [editor?.command.commandId, target, enabled]);
+  }, [editor?.command.commandId, target, enabled, importing]);
   useEffect(() => {
     if (error && enabled) alert.current?.focus();
   }, [error, enabled]);
@@ -501,6 +506,23 @@ export function MembersWorkspace({
     }
   }
   const disabled = busy || !canEdit;
+  if (importing)
+    return (
+      <TextImportWorkspace
+        disputeId={registration.disputeId}
+        gender={gender}
+        registration={registration}
+        enabled={enabled}
+        canEdit={canEdit}
+        guard={importGuard}
+        onSessionLost={onSessionLost}
+        onSaved={() => {
+          setRefresh((v) => v + 1);
+          onSaved();
+        }}
+        onClose={() => setImporting(false)}
+      />
+    );
   return (
     <section className="members-workspace">
       <div className="competition-title">
@@ -509,6 +531,20 @@ export function MembersWorkspace({
         </h4>
         <button disabled={disabled} onClick={() => chooseTarget("athlete")}>
           Adicionar atleta
+        </button>
+        <button
+          disabled={disabled}
+          onClick={() => {
+            if (!mayLeave()) return;
+            setEditor(null);
+            setTarget(null);
+            setError("");
+            setUncertain(false);
+            setConflict(false);
+            setImporting(true);
+          }}
+        >
+          Importar elenco
         </button>
       </div>
       {error && (

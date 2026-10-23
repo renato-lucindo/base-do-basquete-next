@@ -12,7 +12,9 @@ import {
   type TextRow,
 } from "./contract";
 import { parsePositions, tokenize } from "./tokens";
-const dateSchema = z.iso.date();
+const dateSchema = z.iso
+  .date()
+  .refine((value) => Number(value.slice(0, 4)) >= 1);
 function parsePlayer(
   source: string,
   line: number,
@@ -95,7 +97,14 @@ function parsePlayer(
       set("nickname", token.slice(1, -1), token);
     else if (/^[0-9]{6}$/u.test(token))
       set("federationRegistration", token, token);
-    else if (/^[0-9]{4}$/u.test(token)) {
+    else if (/^[0-9]{5,}$/u.test(token)) {
+      set("federationRegistration", token, token);
+      issue(
+        "federationRegistration",
+        token,
+        "Registro federativo deve conter seis dígitos.",
+      );
+    } else if (/^[0-9]{4}$/u.test(token)) {
       const year = Number(token);
       if (year >= 1) set("birthYear", year, token);
       else {

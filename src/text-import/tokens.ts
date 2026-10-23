@@ -53,6 +53,7 @@ export function tokenize(value: string): {
     const separator =
       !quoted &&
       (c === ";" ||
+        c === "\t" ||
         c === "|" ||
         (/[-–—]/u.test(c) &&
           /\s/u.test(value[i - 1] ?? "") &&

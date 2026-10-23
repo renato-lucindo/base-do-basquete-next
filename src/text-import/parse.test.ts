@@ -3,6 +3,24 @@ import { parseRoster } from "./parse";
 import { reviewIssues } from "./review";
 const id = () => crypto.randomUUID();
 describe("single roster text interpretation", () => {
+  it("accepts tab-separated fields and signals invalid federation IDs and year zero dates", () => {
+    const result = parseRoster(
+      "4\tAna\t1,80\t001234\nBia - 12345\nCarla - 0000-02-01",
+      id,
+    );
+    expect(result.rows[0].data).toMatchObject({
+      name: "Ana",
+      jersey: "4",
+      heightCm: 180,
+      federationRegistration: "001234",
+    });
+    expect(
+      result.rows[1].issues.some((i) => i.field === "federationRegistration"),
+    ).toBe(true);
+    expect(result.rows[2].issues.some((i) => i.field === "birthDate")).toBe(
+      true,
+    );
+  });
   it("interprets the complete supplied scope, headers and optional shirts", () => {
     const result = parseRoster(
       'Equipe: Lobos\n\nNº - NOME - NASC. - ALT. - POS.\n4 - João Silva\n12 - Ricardo Souza - 193 - 1999\n23 - Mike Santos - "MJ" - 2000 - SG\n77 - Lucas Oliveira - 1,80 - 75kg\n88 - John Pereira - 2/7/2001 - 117kg - Pivô\nPato Ganso - "PH" - Canhoto\n- Henrique Simões',

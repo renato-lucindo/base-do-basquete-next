@@ -55,7 +55,10 @@ export const readyPlayerSchema = playerDraftSchema
       .regex(/^(00|0|[1-9][0-9]?)$/u)
       .nullable(),
     nickname: z.string().max(120).nullable(),
-    birthDate: z.iso.date().nullable(),
+    birthDate: z.iso
+      .date()
+      .refine((value) => Number(value.slice(0, 4)) >= 1)
+      .nullable(),
     birthYear: z.number().int().min(1).max(9999).nullable(),
     positions: z.array(z.enum(positions)).max(2),
     heightCm: z.number().positive().max(1000).nullable(),
