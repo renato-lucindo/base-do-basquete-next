@@ -10,7 +10,7 @@ A primeira entrega é um protótipo navegável com dados fictícios para avaliar
 
 O Access protege esta apresentação fictícia. Os rascunhos são próprios de cada navegador e não sincronizam entre máquinas. Roteiro em `docs/VALIDACAO-PROTOTIPO.md`.
 
-A [fundação com acesso por senha](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios, também protegidos pelo Access. Banco/RLS e sessão no servidor estão implementados; cadastro humano da conta e validação do login correto continuam pendentes. Procedimento em [docs/ACESSO-ADMINISTRATIVO.md](docs/ACESSO-ADMINISTRATIVO.md). Ainda não há cadastros de negócio integrados.
+A [fundação com acesso por senha](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios, também protegidos pelo Access. Banco/RLS e sessão no servidor estão implementados; conta administrativa criada pelo responsável e habilitada. Falta validar o percurso de senha correta, recarga e saída. Procedimento em [docs/ACESSO-ADMINISTRATIVO.md](docs/ACESSO-ADMINISTRATIVO.md). Ainda não há cadastros de negócio integrados.
 
 ## Executar
 
