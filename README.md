@@ -2,7 +2,7 @@
 
 Projeto novo, especificado exclusivamente pelo pacote de 22/10/2026 em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/`. Nenhum repositório ou banco anterior foi consultado.
 
-A primeira entrega é um protótipo navegável com dados fictícios para avaliar os três percursos de `docs/EXPERIENCIA.md` do pacote. A integração real depende dessa avaliação.
+A primeira entrega é um protótipo navegável com dados fictícios para avaliar os três percursos de `docs/EXPERIENCIA.md` do pacote. Após avaliação e feedback incremental, o responsável autorizou a fundação real; o preview fictício permanece disponível.
 
 ## Avaliar de outra máquina
 
@@ -24,3 +24,9 @@ Node 24 ou superior. `npm ci --ignore-scripts` e `npm run dev` (http://localhost
 - `docs/decisoes/001-prototipo-local.md`: limites e evolução para o monólito full-stack.
 
 Os documentos originais mantêm sua autoridade de especificação. Documentos deste repositório registram execução e decisões, sem substituir contratos do pacote.
+
+## Fundação do banco
+
+Projeto independente de desenvolvimento: `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`), organização `base-do-basquete`, São Paulo. Migrations em `supabase/migrations`; tipos gerados do schema real em `src/server/database.types.ts`. Nenhum cadastro de negócio ou conta administrativa é criado por seed.
+
+`npm run test:db` cria PostgreSQL descartável em memória com PGlite e verifica criação do zero, upgrade e contrato SQL de acesso. O mesmo contrato em `supabase/tests/admin_access.sql` foi verificado no Supabase real com rollback; não executar contra outro projeto por conveniência. O gate inclui esses testes. Migrations novas: consultar `npx --yes supabase@2.121.0 migration new --help` e gerar pelo CLI. Configuração local não altera automaticamente o Auth remoto. Decisão e limites em `docs/decisoes/003-autorizacao-e-migrations.md`.
