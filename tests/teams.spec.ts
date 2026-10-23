@@ -17,6 +17,9 @@ async function fixture(page: Page) {
   let expireOnWrite = false;
   let mode: "normal" | "uncertain" | "conflict" = "normal";
   const attempts: string[] = [];
+  await page.route(/\/api\/(roster|staff)(\?|$)/, (route) =>
+    route.fulfill({ json: { items: [], hasMore: false } }),
+  );
   await page.route("**/api/session", (route) => {
     const method = route.request().method();
     if (method === "POST") authenticated = true;

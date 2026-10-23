@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
+import { MembersWorkspace } from "../people/workspace";
 import {
   teamListingSchema,
   registrationListingSchema,
@@ -20,6 +21,7 @@ type Edit =
   | { kind: "registration"; command: SaveRegistration; team: TeamSnapshot };
 type Props = {
   disputeId: string;
+  gender: "masculino" | "feminino";
   enabled: boolean;
   guard: { current: () => boolean };
   onSessionLost: () => void;
@@ -27,6 +29,7 @@ type Props = {
 };
 export function TeamsWorkspace({
   disputeId,
+  gender,
   enabled,
   guard,
   onSessionLost,
@@ -51,6 +54,8 @@ export function TeamsWorkspace({
     [expanded, setExpanded] = useState("");
   const [editor, setEditor] = useState<Edit | null>(null),
     [baseline, setBaseline] = useState("");
+  const membersGuard = useRef<() => boolean>(() => true);
+  const [membersEpoch, setMembersEpoch] = useState(0);
   const [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
     [conflict, setConflict] = useState(false);
@@ -62,11 +67,12 @@ export function TeamsWorkspace({
   const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
   function mayLeave() {
     return (
-      !(dirty || uncertain || busy) ||
-      (!busy &&
-        window.confirm(
-          "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
-        ))
+      membersGuard.current() &&
+      (!(dirty || uncertain || busy) ||
+        (!busy &&
+          window.confirm(
+            "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
+          )))
     );
   }
   useEffect(() => {
@@ -158,6 +164,7 @@ export function TeamsWorkspace({
       );
   }
   function edit(value: Edit) {
+    setMembersEpoch((v) => v + 1);
     setEditor(value);
     setBaseline(JSON.stringify(value.command));
     setUncertain(false);
@@ -167,6 +174,7 @@ export function TeamsWorkspace({
   }
   function add() {
     if (!mayLeave()) return;
+    setMembersEpoch((v) => v + 1);
     setEditor(null);
     setFinding(true);
     setGlobalQuery("");
@@ -540,15 +548,15 @@ export function TeamsWorkspace({
           value={query}
           maxLength={120}
           onChange={(e) => {
+            if (!membersGuard.current()) return;
             setQuery(e.target.value);
             setOffset(0);
             setExpanded("");
           }}
         />
       </label>
-      {loading ? (
-        <p role="status">Carregando inscrições…</p>
-      ) : (
+      {loading && <p role="status">Carregando inscrições…</p>}
+      {
         <>
           <ul className="competition-list">
             {list.items.map((r) => (
@@ -558,7 +566,10 @@ export function TeamsWorkspace({
                   aria-expanded={expanded === r.id}
                   aria-controls={`registration-${r.id}`}
                   aria-label={`${expanded === r.id ? "Recolher" : "Expandir"} ${r.name}`}
-                  onClick={() => setExpanded((v) => (v === r.id ? "" : r.id))}
+                  onClick={() => {
+                    if (membersGuard.current())
+                      setExpanded((v) => (v === r.id ? "" : r.id));
+                  }}
                 >
                   {r.name}
                 </button>
@@ -617,11 +628,26 @@ export function TeamsWorkspace({
                       Editar equipe global
                     </button>
                   </div>
+                  {expanded === r.id && (
+                    <MembersWorkspace
+                      key={`${r.id}:${membersEpoch}`}
+                      registration={r}
+                      gender={gender}
+                      enabled={enabled}
+                      canEdit={!editor && !finding && !busy}
+                      guard={membersGuard}
+                      onSessionLost={onSessionLost}
+                      onSaved={() => {
+                        setRefresh((v) => v + 1);
+                        onSaved();
+                      }}
+                    />
+                  )}
                 </div>
               </li>
             ))}
           </ul>
-          {!list.items.length && (
+          {!loading && !list.items.length && (
             <p>
               {query
                 ? "Nenhuma inscrição encontrada."
@@ -631,10 +657,15 @@ export function TeamsWorkspace({
           <Pagination
             offset={offset}
             hasMore={list.hasMore}
-            setOffset={setOffset}
+            setOffset={(n) => {
+              if (membersGuard.current()) {
+                setExpanded("");
+                setOffset(n);
+              }
+            }}
           />
         </>
-      )}
+      }
       {error && !uncertain && !conflict && (
         <button
           className="secondary"

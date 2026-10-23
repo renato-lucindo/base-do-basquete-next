@@ -24,6 +24,7 @@
   "exclude": [
     "src/server/worker.ts",
     "src/access/durable.ts",
-    "src/teams/routes.ts"
+    "src/teams/routes.ts",
+    "src/people/routes.ts"
   ]
 }
