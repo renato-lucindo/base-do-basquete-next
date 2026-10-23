@@ -8,13 +8,15 @@ A primeira entrega é um protótipo navegável com dados fictícios para avaliar
 
 [Abrir o protótipo protegido](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/) e [ver as composições](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/docs/evidencias/). No Cloudflare Access, usar `renato.lucindo.jr@gmail.com` e o código recebido por e-mail. Apenas essa identidade está autorizada. Login humano e aceite dos percursos ainda dependem da avaliação do responsável.
 
-O Access protege esta apresentação fictícia; o login por senha e a API integrada pertencem ao próximo marco. Os rascunhos são próprios de cada navegador e não sincronizam entre máquinas. Roteiro em `docs/VALIDACAO-PROTOTIPO.md`.
+O Access protege esta apresentação fictícia. Os rascunhos são próprios de cada navegador e não sincronizam entre máquinas. Roteiro em `docs/VALIDACAO-PROTOTIPO.md`.
+
+A [fundação com acesso por senha](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios, também protegidos pelo Access. Banco/RLS e sessão no servidor estão implementados; cadastro humano da conta e validação do login correto continuam pendentes. Procedimento em [docs/ACESSO-ADMINISTRATIVO.md](docs/ACESSO-ADMINISTRATIVO.md). Ainda não há cadastros de negócio integrados.
 
 ## Executar
 
 Node 24 ou superior. `npm ci --ignore-scripts` e `npm run dev` (http://localhost:5173). O protótipo salva somente neste navegador. Não informe dados reais nem senhas. Não há autenticação interna ou publicação real de resultados nesta etapa.
 
-`npm run gate` verifica lint, formatação, TypeScript, testes, build e segredos. `npm run test:e2e` percorre o protótipo em navegador; requer Chromium do Playwright (`npx playwright install chromium`). O harness original tem instalação e comandos independentes, descritos no README do pacote; não altere seus insumos.
+`npm run dev:foundation` abre a tela independente da fundação; integrações de servidor exigem o Worker configurado, não o servidor Vite isolado. `npm run gate` verifica lint, formatação, tipos, testes de banco/Worker, builds e segredos. `npm run test:e2e` percorre protótipo e tela de acesso em navegador; requer Chromium do Playwright (`npx playwright install chromium`). O harness original tem instalação e comandos independentes, descritos no README do pacote; não altere seus insumos.
 
 ## Acompanhar
 

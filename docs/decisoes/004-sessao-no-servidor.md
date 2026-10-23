@@ -1,6 +1,6 @@
 # 004 — sessão por senha mantida no servidor
 
-Estado: implementada localmente; validação remota e bootstrap humano pendentes.
+Estado: implementada e publicada em preview protegido; bootstrap humano e percurso real da conta administrativa pendentes.
 
 O browser chama somente `/api/session` no Worker: POST entra, GET verifica e DELETE sai. Recebe apenas estado de autenticação e um cookie opaco `__Host-bdb-session`, Secure/HttpOnly/SameSite=Strict, sem Domain. Não recebe JWT, refresh token, SDK Supabase ou chave de banco. Cookies têm nonce de 256 bits e HMAC derivado por HKDF; assinatura inválida é recusada antes de acessar armazenamento.
 
@@ -10,6 +10,10 @@ O adaptador REST é exclusivo do servidor, com chave publicável e JWT do usuár
 
 Origem e host canônicos, método, JSON/UTF-8/schema e tamanho são verificados no servidor. Login tem limites por IP e conta com chaves de hash; não se registram IP/e-mail/senha/token no log da aplicação. Respostas sem cache, CSP, nosniff e bloqueio de frame. Outra identidade autenticada continua sem acesso, mesmo que um cliente chame diretamente o Supabase.
 
-Frontend da fundação tem build independente do protótipo; não promove fixtures nem publicações fictícias para o banco real. Worker novo `base-do-basquete-next-preview` terá proteção Access aplicada antes do tráfego. O preview de protótipos permanece no seu Worker anterior desta conversa. Código de e-mail do Access é proteção do preview; não substitui a senha interna.
+Frontend da fundação tem build independente do protótipo; não promove fixtures nem publicações fictícias para o banco real. Worker novo `base-do-basquete-next-preview` recebeu proteção Access restrita ao responsável antes do tráfego; previews de versão estão desabilitados. O preview de protótipos permanece no seu Worker anterior desta conversa. Código de e-mail do Access é proteção do preview; não substitui a senha interna.
 
 Evidência local: 12 testes de adaptador/sessão; três cenários workerd/Miniflare (Auth e asset binding substituídos por fixtures), incluindo renovação concorrente; quatro cenários de UI desktop/celular com API simulada. Esses testes não são evidência de login real do administrador. Correções encontradas: chamada indireta de fetch precisava preservar o binding global do runtime; foco após login foi movido para efeito posterior ao commit do React. Migrations/RLS reais têm evidência separada na decisão 003.
+
+Smoke remoto de 23/10: os três arquivos do cliente conferem por SHA-256; tela em desktop/celular sem erros; health 200, sessão ausente 401 e senha inválida recusada pelo Auth real sem cookie da aplicação. Anônimo e identidade forjada bloqueados pelo Access. Tokens/políticas temporários revogados. O teste de navegador aguarda a tela renderizada, pois conexões de fundo impediam `networkidle` apesar da tela pronta. Login correto, recarga e saída do responsável aguardam criação humana da conta, conforme `docs/ACESSO-ADMINISTRATIVO.md`.
+
+Transporte usa o adaptador reversível de módulos estáticos da decisão 002, mantendo a fronteira ASSETS no código. Somente o manifesto do cliente é servido; `/worker.js` é 404 mesmo após Access. Cofre contém `SUPABASE_PUBLISHABLE_KEY` e `SESSION_ENCRYPTION_KEY`; nunca regenerar a chave de cifragem em um redeploy normal. Identificadores, hashes e rollback estão no checkpoint.
