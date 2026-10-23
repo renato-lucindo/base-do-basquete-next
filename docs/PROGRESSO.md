@@ -1,15 +1,17 @@
-# Checkpoint — 22/10/2026, 21:20 America/Araguaina (UTC-03)
+# Checkpoint — 22/10/2026, 21:25 America/Araguaina (UTC-03)
 
 ## Objetivo, unidade e próximo passo
 
 Nova Base do Basquete exclusivamente pelo ZIP fornecido, sem consultar/clonar o repositório anterior. Marco de protótipos U1–U4 implementado e avaliado com feedback incremental. O responsável autorizou seguir às próximas etapas (“Ótimo, siga com as próximas etapas”); os últimos refinamentos não revogam essa autorização. Última unidade de UI concluída: **opções auxiliares no final, atletas por camisa e cinco titulares por equipe**, publicada no preview protegido. Fundação real autorizada, ainda não integrada.
 
-Próximo passo exato: preparar a fundação local em unidade separada e aguardar autorização do conector Supabase para a nova organização **base-do-basquete**, ID `jniqbaccwwhabzokjvfu`. Criada pelo agente no navegador autenticado em plano Free ($0/mês), vazia, e escolhida novamente pelo responsável após ele também criar `base-do-basquete-v1`. Não criar duplicata nem alterar/excluir a organização v1. Conector só lista a organização antiga; `get_cost` e `get_organization` na nova retornam falta de permissão. Responsável orientado a reconectar Supabase incluindo a organização nova. Quando acessível, conferir custo/capacidade antes do projeto independente. [Súmula protegida](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/#/sumula), [galeria](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/docs/evidencias/), [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2).
+Próximo passo exato: conferir primeiro a cota e o acesso Supabase à organização **base-do-basquete**, ID `jniqbaccwwhabzokjvfu`; depois consultar custo/capacidade e criar somente o projeto novo dessa organização, se permitido. A organização foi criada pelo agente no navegador autenticado em plano Free ($0/mês), vazia, e escolhida novamente pelo responsável após ele também criar `base-do-basquete-v1`. Não criar duplicata nem alterar/excluir a organização v1. O responsável informou duas autorizações do plugin; as consultas posteriores ainda só listaram a organização antiga e `get_cost`/`get_organization` na nova retornaram falta de permissão. Não pedir repetidamente a mesma autorização; revalidar em sessão atualizada e informar o erro real se persistir. Nenhum segredo extraído para contornar o conector. Fundação F1 local concluída e enviada; F2 depende desse acesso. Plano em `docs/superpowers/plans/2026-10-22-fundacao.md`.
+
+Apresentação existente: [súmula protegida](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/#/sumula), [galeria](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/docs/evidencias/), [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2). Fundação em [PR draft #3](https://github.com/renato-lucindo/base-do-basquete-next/pull/3), empilhado sobre #2.
 
 ## Git, ambiente e autoria
 
 - Novo repositório público: https://github.com/renato-lucindo/base-do-basquete-next. Workspace `C:/Users/12405304716/Documents/Codex/Base do Basquete-v1`; Windows/PowerShell, Node 24.18.0, npm 11.16.0, Python 3.12.3.
-- Branch `feat/prototipos-fluxos`; main/base `161a5b007833b0af6a0788353205bdba99b286b5`, sem merge. PR #2 aberto/draft e anexado à conversa. Revisão pelo autor; revisão independente pendente.
+- Branch atual `feat/fundacao-acesso`, base `702efc9e21e751a40b578ae54b92028227b363b1` de `feat/prototipos-fluxos`; material **`63bbac0fcf6b0bb269ab797356f9adec63af3790`**, já no remoto. Main `161a5b007833b0af6a0788353205bdba99b286b5` preservada, sem merge. PRs #2 e #3 abertos/draft e anexados. Revisão pelo autor; revisão independente pendente.
 - Aplicação e capturas da súmula **`169c2debcc6625804ef73367b70b9c6d3284b582`**; transporte congelado **`397e12ffc6403ae495327ce3cbaeaefcaf811fab`**. Código enviado ao remoto; este checkpoint documental é posterior, obter HEAD real com Git. Capturas dos demais fluxos continuam no SHA inicial `8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23`.
 - Todo código/documentação novos são do agente desta conversa; ZIP original do usuário preservado/ignorado. Nenhuma alteração alheia encontrada. Árvore limpa antes deste checkpoint; após commit/push documental, verificar novamente. Nenhum WIP integrado à principal.
 
@@ -27,6 +29,12 @@ Solicitações posteriores em `docs/AJUSTES-DE-EXPERIENCIA.md`:
 - Futuro banco: tabela própria de treinadores ligada à identidade da pessoa e aos vínculos equipe/inscrição, sem duplicar atleta-treinador. Nenhuma tabela criada neste marco; nomes no protótipo são campos locais e não integração de cadastro.
 
 Leitor de tela, zoom real de 200% e auditoria completa de contraste/teclado continuam manuais; não declarar WCAG plena. Amostras textuais reais continuam necessárias para validar importação produtiva. `PROTOTIPO-E-APROVACAO.md` é citado, mas ausente do ZIP; usada a definição explícita da primeira entrega.
+
+## Fundação F1 — unidade concluída
+
+`src/server/http.ts` lê JSON de mutações de forma incremental e limitada por bytes, exige origem configurada no servidor e método/media type válidos, valida schema e retorna erros públicos sem ecoar conteúdo. Cancela stream acima do teto mesmo com Content-Length falso; UTF-8 inválido é rejeitado. Respostas JSON sem cache e sem sniffing. Ainda não há endpoints de sessão, SDK, nova publicação ou banco integrado.
+
+13 testes focais PASS após vermelho inicial; gate consolidado PASS com **67 unitários/8 arquivos**, três de transporte, lint/formatação/typecheck/build/segredos. Um erro de tipagem no fixture de headers foi corrigido antes do gate. Build JS/CSS idêntico pelos SHA-256 abaixo: 30 cenários de navegador e smoke remoto do protótipo continuam válidos, sem repetição local. CI da branch [39877797571](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39877797571) em andamento na última consulta; conferir conclusão antes de declarar aprovado. Não há processos de gate/deploy locais pendentes.
 
 ## Evidências e artefato atual
 
@@ -53,6 +61,6 @@ Supabase: organização escolhida `base-do-basquete` (`jniqbaccwwhabzokjvfu`), F
 
 ## Cota e retomada
 
-Última consulta real, 22/10/2026 21:15 UTC-03: **29% restante/5h** (71% usado), **75% restante semanal** (25% usado). Reset/5h **23/10/2026 00:11:28 America/Araguaina (03:11:28 UTC)**; semanal **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Outras conversas compartilham a cota; conferir ferramenta ao retomar. Não comprar créditos, mudar plano ou usar reset manual.
+Última consulta real, 22/10/2026 21:23 UTC-03: **21% restante/5h** (79% usado), **74% restante semanal** (26% usado). Reset/5h **23/10/2026 00:11:28 America/Araguaina (03:11:28 UTC)**; semanal **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Outras conversas compartilham a cota; conferir ferramenta ao retomar. Não comprar créditos, mudar plano ou usar reset manual.
 
 Gatilho <=15% restante não atingido. Automação oficial `retomar-preview-base-do-basquete` continua **PAUSED**, conforme confirmação da publicação inicial; não há retomada pendente. Ao retomar: conferir cota primeiro, ler esta abertura, reconciliar Git/PR/CI/feedback/serviços e seguir o próximo passo exato da abertura. Preservar evidências de arquivos inalterados e mudanças alheias.
