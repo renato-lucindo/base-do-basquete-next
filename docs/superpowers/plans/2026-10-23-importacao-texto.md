@@ -1,5 +1,7 @@
 # C4 — importar equipes e elencos por texto
 
+**Revisão de direção, 23/10 13:55 UTC-03:** responsável não gostou do fluxo e forneceu `IMPORTADOR-DE-EQUIPES-20261023.zip` para análise. Ler primeiro `docs/ANALISE-IMPORTADOR-DE-EQUIPES.md`. C4.1 abaixo tem sete testes/tipos/ESLint PASS, mas está sem integração/publicação. Incorporar atributos opcionais/sugestões e compor a revisão em tabela antes de executar a DDL/UI deste plano. Não tratar o fluxo anterior como aprovado.
+
 > Executar com superpowers:executing-plans e test-driven-development, na mesma conversa. Decisões reversíveis delegadas; branch `codex/importacao-texto` sobre C3 `0d34242`. Sem subagente/revisão independente disponível.
 
 **Objetivo:** colar lista/blocos, revisar e resolver identidades no contexto, confirmar itens válidos e manter texto/pendências/sucessos para retomada.

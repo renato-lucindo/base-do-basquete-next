@@ -32,4 +32,6 @@ Token efêmero `65e87f77-42ea-4f04-888a-ac72c53b8b1a` e política `361afc39-9f0b
 
 Contagens reais reconfirmadas às 13:47 UTC-03: C1 1/1/2, C2 2/2, pessoas/elenco/comissão 0, Auth 1. Não houve gravação de fixture permanente. Rollback de código conserva Access/cofre/namespace e dados/migrations; versão C2 anterior registrada em VALIDACAO-EQUIPES.md.
 
+Feedback posterior do responsável em 23/10: **não gostou do fluxo** e forneceu módulo complementar de importação para análise. Isso exige revisão da experiência; não registrar aceite humano C3/importador com base nos testes. Análise e recomendação em ANALISE-IMPORTADOR-DE-EQUIPES.md, sem alteração do preview neste pedido.
+
 Revisão pelo autor; revisão independente, corrida real multi-conexão, escala e auditoria completa de acessibilidade continuam pendentes. Reutilizar evidências dos 126 testes do harness, ZIP e protótipo inalterados.

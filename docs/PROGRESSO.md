@@ -1,4 +1,14 @@
-# Retomada ativa — C3 publicado, próximo C4, 23/10/2026 13:47 America/Sao_Paulo (UTC-03)
+# Direção atual — análise do módulo complementar, 23/10/2026 13:57 America/Sao_Paulo (UTC-03)
+
+Responsável **não gostou do fluxo** e pediu analisar `IMPORTADOR-DE-EQUIPES-20261023.zip`. Análise concluída em `docs/ANALISE-IMPORTADOR-DE-EQUIPES.md`: SHA-256 e 11 fontes conferidos, sete testes fornecidos PASS e probes adicionais reproduzem perdas de camisa/nome corrigido, defaults de criação, hífen/data/altura e persistência sem atomicidade. Não consultar repositório/serviços antigos; este novo ZIP é referência complementar explicitamente fornecida. Original preservado/ignorado, cópia de análise em `.preview-artifacts`.
+
+Branch agora **codex/importacao-texto**, base C3 **0d34242**; plano C4 em **6f3d3ab**. Parser/schemas/readiness preliminares em `src/text-import` (sem imports de runtime/UI), sete testes focais/tipos/ESLint PASS, preservados como WIP próprio. Nenhuma mudança alheia. Não há migration/DDL/gate/deploy/smoke/processo em andamento. Preview continua **81f5f41**, deployment/Access/cofre preservados. Evidências C3 válidas; feedback de fluxo não é aceite humano.
+
+Próximo passo técnico: revisar plano C4 com a análise e compor o fluxo **colar → tabela editável com atributos/sugestões → confirmar válidos → resultado por linha**, contextual à inscrição aberta. Evitar salvar pessoa/camisa separadamente por atleta; resolver exceções na linha, sem fusão por nome ou criação por decisão incompleta. Demonstrar a composição revisada antes de aprofundar integração. O pedido atual priorizou esta análise; a nova composição ainda precisa ser construída/verificada, sem pedir novamente autorização geral já concedida. Não executar a DDL/UI antiga automaticamente. Amostra real de texto solicitada, ainda não recebida.
+
+Última cota consultada nesta análise: 37% usado/5h, 58% semanal; resets 23/10 18:11:18 e 29/10 14:08:57 America/Sao_Paulo. Sem gatilho de cota; nenhuma retomada futura necessária para esta análise concluída. A automação existente deve ficar pausada com referência a este checkpoint, sem duplicata nem continuação do plano desatualizado.
+
+# Histórico da entrega C3, 23/10/2026 13:47 UTC-03
 
 Reset confirmado pela ferramenta: 0% usado/5h (100% restante), 52% semanal (48% restante); novo reset 5h Unix `1792789878` = 23/10 18:11:18 UTC-03. Git limpo/local=remoto no checkpoint `bb97268`, PR #6 draft correto, ambas CIs anteriores SUCCESS. Supabase/migrations/contagens e Cloudflare deployment/Access/cofre/namespace reconciliados, sem divergência. Retomada continua no mesmo branch, sem repetir gates de artefatos inalterados.
 
