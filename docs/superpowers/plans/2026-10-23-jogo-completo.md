@@ -8,10 +8,10 @@
 
 ## G1 — cadastro direto de partidas
 
-- [ ] Contrato TS/SQL RED para duas inscrições distintas da mesma disputa (mesma equipe global pode ter inscrições diferentes), data/hora/local/número opcionais, reabertura, isolamento, versão/idempotência/RLS/grants e Recentes somente ao salvar. PostgreSQL real descartável e preservação C1–C4 antes de DDL.
-- [ ] Migration própria CLI, public.games administrativa e recibos privados, leitores invoker e writer privado fixo, autorização fresca antes de replay/dados. FK composta de inscrições/contexto. Banco revalida pais e não aceita transferência de jogo para outra disputa. Não criar placar0–0 ou publicar agenda implicitamente.
-- [ ] Modelo de agenda preserva data sem hora: date ISO nullable/time HH:mm nullable; hora exige data. Fuso fixo America/Sao_Paulo nesta versão; scheduledAt somente quando ambos existem, convertido no backend. Local/número opcionais, nenhum número único presumido. Situação inicial programado; ocorrências/regulamento entram na etapa5.
-- [ ] Aplicar apenas projeto novo depois dos contratos locais; contrato real com rollback, tipos gerados/advisors e commit. Atualizar evidências sem inventar corrida multi-conexão/escala.
+- [x] Contrato TS/SQL RED para duas inscrições distintas da mesma disputa (mesma equipe global pode ter inscrições diferentes), data/hora/local/número opcionais, reabertura, isolamento, versão/idempotência/RLS/grants e Recentes somente ao salvar. PostgreSQL real descartável e preservação C1–C4 antes de DDL.
+- [x] Migration própria CLI, public.games administrativa e recibos privados, leitores invoker e writer privado fixo, autorização fresca antes de replay/dados. FK composta de inscrições/contexto. Banco revalida pais e não aceita transferência de jogo para outra disputa. Não criar placar0–0 ou publicar agenda implicitamente.
+- [x] Modelo de agenda preserva data sem hora: date ISO nullable/time HH:mm nullable; hora exige data. Fuso fixo America/Sao_Paulo nesta versão; scheduledAt somente quando ambos existem, convertido no backend. Local/número opcionais, nenhum número único presumido. Situação inicial programado; ocorrências/regulamento entram na etapa5.
+- [x] Aplicar apenas projeto novo depois dos contratos locais; contrato real com rollback, tipos gerados/advisors e commit. Atualizar evidências sem inventar corrida multi-conexão/escala.
 - [ ] Provider/SessionStore/rotas específicos com testes de fronteira; UI aba Jogos/lista/filtros/cadastro na mesma área, seleção e criação contextual de inscrições, rascunho/reautenticação/conflito. Gate quando unidade vertical estável; CI e preview protegido com smokes dos novos artefatos, preservar cofre/namespace/Access.
 
 ## G2 — participantes e súmula persistida
@@ -33,3 +33,7 @@
 ## Continuidade
 
 Consultar cota real no início/entre unidades/antes de longas. Aos85%usados5h, menor operação segura, checkpoint em PROGRESSO.md com evidência/branch/SHA/pendências/próximo exato/reset real, push seguro e atualizar a mesma automação para reset+2; semanal também, sem compras/resets manuais. Nunca segredos em Git/log/agendamento. Mudanças alheias preservadas. Revisão independente indisponível não é evidência de aprovação.
+
+## Checkpoint G1, cota85%
+
+DB ab6e80b e API17d9fb2 salvos remotamente, PRdraft#8. UI em WIP e seis browsers focais PASS; faltam cadastro auxiliar, regressoes da composicao, inspecao visual, gate/CI/deploy. Migration real20261023192926, contratos/tipos/seguranca verificados. Retomar pelo proximo exato de PROGRESSO.md, sem repetir SQL/harness inalterados.
