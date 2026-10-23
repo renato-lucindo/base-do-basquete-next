@@ -25,8 +25,8 @@
 
 ## M2 — parser rico e revisão
 
-- [ ] Substituir WIP não integrado por DTO de uma equipe e atletas com origem, campos normalizados, campos efetivamente informados, pendências e decisão/versionamento. RED antes de código.
-- [ ] Casos do escopo: separadores - ; | / espaço, nomes/apelidos hifenizados, cabeçalhos, sem camisa, 0/00, datas reais, metros/cm, duas posições PG/SF e1-2, desconhecidos/ambiguidade, zeros de registro e limites. Preservar tokens não reconhecidos para correção. Focais/tipos/commit.
+- [x] Substituir WIP não integrado por DTO de uma equipe e atletas com origem, campos normalizados, campos efetivamente informados, pendências e decisão/versionamento. RED antes de código.
+- [x] Casos do escopo: separadores - ; | / espaço, nomes/apelidos hifenizados, cabeçalhos, sem camisa, 0/00, datas reais, metros/cm, duas posições PG/SF e1-2, desconhecidos/ambiguidade, zeros de registro e limites. Preservar tokens não reconhecidos para correção. Nove testes focais, tipos/ESLint PASS. Campo ano segue privado e ausência de mão é distinguida do padrão direito.
 
 ## M3 — revisão durável, matching e confirmação
 

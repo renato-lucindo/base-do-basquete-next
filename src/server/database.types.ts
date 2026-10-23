@@ -352,11 +352,20 @@ export type Database = {
     };
     Functions: {
       get_competition: { Args: { p_id: string }; Returns: Json };
+      get_import_person: {
+        Args: {
+          p_dispute_id: string;
+          p_id: string;
+          p_registration_id?: string;
+        };
+        Returns: Json;
+      };
       get_person: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
       get_roster_entry: { Args: { p_id: string }; Returns: Json };
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
+      get_text_review: { Args: { p_id: string }; Returns: Json };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
@@ -389,12 +398,25 @@ export type Database = {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_text_reviews: {
+        Args: { p_dispute_id: string; p_offset?: number };
+        Returns: Json;
+      };
+      match_import_players: {
+        Args: {
+          p_dispute_id: string;
+          p_players: Json;
+          p_registration_id: string;
+        };
+        Returns: Json;
+      };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };
       save_staff_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
+      save_text_review: { Args: { p_command: Json }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;
