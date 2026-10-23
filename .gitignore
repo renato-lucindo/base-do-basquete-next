@@ -1,5 +1,7 @@
 node_modules/
 dist/
+dist-foundation/
+.worker-artifacts/
 .preview-artifacts/
 .env
 .env.*

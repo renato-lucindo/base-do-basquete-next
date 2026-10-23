@@ -21,9 +21,16 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: "npm run dev -- --port 5173",
-    url: "http://127.0.0.1:5173",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: "npm run dev -- --port 5173",
+      url: "http://127.0.0.1:5173",
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: "npm run dev:foundation",
+      url: "http://127.0.0.1:5174/foundation.html",
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
 });

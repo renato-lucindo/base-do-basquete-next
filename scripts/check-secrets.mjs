@@ -13,7 +13,11 @@ const walk = (path) =>
   readdirSync(path, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? walk(join(path, e.name)) : [join(path, e.name)],
   );
-files.push(...walk("dist"));
+files.push(
+  ...walk("dist"),
+  ...walk("dist-foundation"),
+  ...walk(".worker-artifacts"),
+);
 const patterns = [
   [
     "private-key",
