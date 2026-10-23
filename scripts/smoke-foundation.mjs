@@ -103,6 +103,12 @@ try {
     `/api/teams/${randomUUID()}`,
     `/api/registrations?disputeId=${randomUUID()}`,
     `/api/registrations/${randomUUID()}`,
+    "/api/people",
+    `/api/people/${randomUUID()}`,
+    `/api/roster?registrationId=${randomUUID()}`,
+    `/api/roster/${randomUUID()}`,
+    `/api/staff?registrationId=${randomUUID()}`,
+    `/api/staff/${randomUUID()}`,
   ]) {
     stage = `private application route ${path}`;
     const denied = await fetch(`${origin}${path}`, { headers });

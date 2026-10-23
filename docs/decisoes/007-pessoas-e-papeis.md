@@ -8,4 +8,8 @@ Escrita contextual de novo atleta valida sexo contra o naipe no servidor. Sexo d
 
 Leitor `get_person` é **administrativo**, com RLS/grants atuais e projeção de detalhes privados para administração. Não reutilizar essa resposta na consulta pública futura; `publicPersonSchema` exclui completamente os dados privados e não calcula ano/idade a partir do nascimento completo. Nenhum endpoint público de pessoas foi antecipado.
 
+Busca administrativa devolve candidatos limitados a nome/apelido/ano público, papéis e contexto público de participação. Atleta e técnico na mesma inscrição compartilham um contexto; histórico é identificado como tal. Abrir uma identidade é uma operação separada, sem assumir que nomes iguais correspondem à mesma pessoa. A UI usa o naipe **salvo** para novo atleta, mesmo quando há um rascunho de Informações ainda não salvo.
+
+Elenco e comissão são vínculos temporais próprios: encerrar conserva o registro, trocar técnico exige encerrar o anterior e criar vínculo novo. A UI não oferece transferência automática nem reutiliza o capitão do jogo como comissão global. A preparação da súmula aplicará a regra do capitão-técnico e do assistente.
+
 Padrão de autorização, recibos e invoker/definer delimitado segue decisões 005/006. C3.1 tem contrato real Supabase com rollback e tipos gerados. Dados reais anteriores preservados. Não criar fixtures no ambiente permanente; nenhuma migração de serviços antigos.

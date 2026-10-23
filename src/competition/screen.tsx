@@ -312,7 +312,11 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     }
   }
 
-  const context = editor?.draft.seasons
+  const savedCompetition = editor
+    ? (JSON.parse(editor.baseline) as Competition)
+    : undefined;
+  const contextSource = tab === "teams" ? savedCompetition : editor?.draft;
+  const context = contextSource?.seasons
     .flatMap((s) =>
       s.disputes.map((d) => ({
         id: d.id,
@@ -445,7 +449,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
                   setRoute(editor.draft.id, event.target.value, tab);
                 }}
               >
-                {editor.draft.seasons.flatMap((s) =>
+                {contextSource?.seasons.flatMap((s) =>
                   s.disputes.map((d) => (
                     <option
                       key={d.id}
@@ -705,6 +709,11 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
               <TeamsWorkspace
                 key={context.id}
                 disputeId={context.id}
+                gender={
+                  savedCompetition?.seasons
+                    .flatMap((s) => s.disputes)
+                    .find((d) => d.id === context.id)?.gender ?? "masculino"
+                }
                 enabled={enabled && tab === "teams"}
                 guard={teamsGuard}
                 onSessionLost={onSessionLost}
