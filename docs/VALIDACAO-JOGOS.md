@@ -42,3 +42,5 @@ Limitações: sem publicação/imutabilidade confirmada/fallback nesta unidade (
 ## Correção da CI G2
 
 CI40038527019/source56a8701: gate completo PASS,90/92 browsers PASS; dois desktops expiraram no início da seleção de relacionados. Rastros baixados pelo plugin GitHub mostram helper usando locator.all antes da conclusão do GET da súmula (zero summaries), deixando detalhes fechados. Falha reproduzida localmente com120ms de latência, sem alterar comportamento da aplicação. Helper agora aguarda os dois seletores antes de enumerá-los;10 browsers focais G2 PASS com a mesma latência. Sem aumentar timeout, remover cenários ou repetir gate SQL/código inalterado. Nova CI deve confirmar o ajuste.
+
+CI da correção **40039451161/job120706809738 SUCCESS** em b31639473311fbd51ee2c41c1a4801d6757d9aa9, incluindo gate e browsers Linux. Conferida pelo plugin GitHub. Não repetir suítes por documentação/sessão; novo runtime/dependências G3 terá evidências próprias.
