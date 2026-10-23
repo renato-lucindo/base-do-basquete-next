@@ -88,6 +88,48 @@ export type Database = {
           },
         ];
       };
+      registrations: {
+        Row: {
+          dispute_id: string;
+          id: string;
+          name: string;
+          saved_at: string;
+          team_id: string;
+          version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          id: string;
+          name: string;
+          saved_at?: string;
+          team_id: string;
+          version?: number;
+        };
+        Update: {
+          dispute_id?: string;
+          id?: string;
+          name?: string;
+          saved_at?: string;
+          team_id?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "registrations_dispute_id_fkey";
+            columns: ["dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "disputes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "registrations_team_id_fkey";
+            columns: ["team_id"];
+            isOneToOne: false;
+            referencedRelation: "teams";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       seasons: {
         Row: {
           championship_id: string;
@@ -114,17 +156,53 @@ export type Database = {
           },
         ];
       };
+      teams: {
+        Row: {
+          abbreviation: string | null;
+          id: string;
+          name: string;
+          saved_at: string;
+          version: number;
+        };
+        Insert: {
+          abbreviation?: string | null;
+          id: string;
+          name: string;
+          saved_at?: string;
+          version?: number;
+        };
+        Update: {
+          abbreviation?: string | null;
+          id?: string;
+          name?: string;
+          saved_at?: string;
+          version?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
       get_competition: { Args: { p_id: string }; Returns: Json };
+      get_registration: { Args: { p_id: string }; Returns: Json };
+      get_team: { Args: { p_id: string }; Returns: Json };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_registrations: {
+        Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      list_teams: {
+        Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
       save_competition: { Args: { p_command: Json }; Returns: Json };
+      save_registration: { Args: { p_command: Json }; Returns: Json };
+      save_team: { Args: { p_command: Json }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;

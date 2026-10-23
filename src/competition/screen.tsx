@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { z } from "zod";
+import { api, ApiFailure, isSessionFailure } from "./api";
+import { TeamsWorkspace } from "../teams/screen";
 import {
   competitionSchema,
   listingSchema,
@@ -58,6 +59,8 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selected, setSelected] = useState("");
+  const [tab, setTab] = useState<"info" | "teams">("info");
+  const teamsGuard = useRef<() => boolean>(() => true);
   const [opening, setOpening] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -79,10 +82,11 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
 
   function mayLeave() {
     return (
-      !(dirty || uncertain) ||
-      window.confirm(
-        "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
-      )
+      teamsGuard.current() &&
+      (!(dirty || uncertain) ||
+        window.confirm(
+          "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
+        ))
     );
   }
   useEffect(() => {
@@ -147,10 +151,12 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   useEffect(() => {
     if (!enabled || restored.current) return;
     restored.current = true;
-    const match = /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?$/i.exec(
-      location.hash,
-    );
-    if (match) void openCompetition(match[1], match[2]);
+    const match =
+      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/equipes)?$/i.exec(
+        location.hash,
+      );
+    if (match)
+      void openCompetition(match[1], match[2], match[3] ? "teams" : "info");
   }, [enabled]);
 
   function change(edit: (draft: Competition) => void) {
@@ -162,7 +168,11 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
       return { ...value, draft };
     });
   }
-  function accept(snapshot: CompetitionSnapshot, wanted?: string) {
+  function accept(
+    snapshot: CompetitionSnapshot,
+    wanted?: string,
+    targetTab = tab,
+  ) {
     const draft = competitionSchema.parse(snapshotWithoutMetadata(snapshot));
     setEditor({
       draft,
@@ -174,18 +184,27 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     const ids = draft.seasons.flatMap((s) => s.disputes.map((d) => d.id));
     const target = wanted && ids.includes(wanted) ? wanted : ids[0];
     setSelected(target);
-    setRoute(draft.id, target);
+    setTab(targetTab);
+    setRoute(draft.id, target, targetTab);
     pending.current = null;
     setUncertain(false);
     setConflict(false);
     setError("");
   }
-  async function openCompetition(id: string, wanted?: string) {
+  async function openCompetition(
+    id: string,
+    wanted?: string,
+    targetTab: "info" | "teams" = "info",
+  ) {
     if (!mayLeave()) return;
     setOpening(true);
     setError("");
     try {
-      accept(await api(`/api/competitions/${id}`, snapshotSchema), wanted);
+      accept(
+        await api(`/api/competitions/${id}`, snapshotSchema),
+        wanted,
+        targetTab,
+      );
     } catch (failure) {
       if (isSessionFailure(failure)) onSessionLost();
       else
@@ -215,6 +234,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
       savedIds: new Set(),
     });
     setSelected(dispute.id);
+    setTab("info");
     setError("");
     setUncertain(false);
     setConflict(false);
@@ -413,217 +433,285 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
               {!editor.savedIds.has(context.id) && " · ainda não salva"}
             </p>
           )}
-          <p role="status" data-testid="competition-save-state">
-            {saving
-              ? "Salvando…"
-              : uncertain
-                ? "Envio não confirmado"
-                : conflict
-                  ? "Conflito de versão"
-                  : dirty || !editor.version
-                    ? "Não salvo"
-                    : `Salvo${editor.savedAt ? ` em ${formatDate(editor.savedAt)}` : ""}`}
-          </p>
-          <form onSubmit={(event) => void save(event)}>
-            <fieldset
-              disabled={saving || uncertain || opening}
-              className="competition-form"
+          {editor.version > 0 && (
+            <label className="competition-destination">
+              Disputa de trabalho
+              <select
+                aria-label="Disputa de trabalho"
+                value={selected}
+                onChange={(event) => {
+                  if (!teamsGuard.current()) return;
+                  setSelected(event.target.value);
+                  setRoute(editor.draft.id, event.target.value, tab);
+                }}
+              >
+                {editor.draft.seasons.flatMap((s) =>
+                  s.disputes.map((d) => (
+                    <option
+                      key={d.id}
+                      value={d.id}
+                      disabled={!editor.savedIds.has(d.id)}
+                    >
+                      {s.year} ·{" "}
+                      {d.gender === "feminino" ? "Feminino" : "Masculino"} ·{" "}
+                      {d.category}
+                      {d.division ? ` · ${d.division}` : ""}
+                      {!editor.savedIds.has(d.id) ? " · ainda não salva" : ""}
+                    </option>
+                  )),
+                )}
+              </select>
+            </label>
+          )}
+          <nav className="competition-tabs" aria-label="Áreas do campeonato">
+            <button
+              className="secondary"
+              aria-current={tab === "info" ? "page" : undefined}
+              onClick={() => {
+                setTab("info");
+                if (editor.version) setRoute(editor.draft.id, selected, "info");
+              }}
             >
-              <legend>Informações do campeonato</legend>
-              <label>
-                Nome do campeonato
-                <input
-                  ref={nameRef}
-                  required
-                  maxLength={120}
-                  value={editor.draft.name}
-                  onChange={(event) =>
-                    change((d) => {
-                      d.name = event.target.value;
-                    })
-                  }
-                />
-              </label>
-              {editor.draft.seasons.map((season, si) => (
-                <fieldset key={season.id} className="competition-season">
-                  <legend>Temporada {season.year || si + 1}</legend>
-                  <div className="competition-title">
-                    <label>
-                      Ano
-                      <input
-                        aria-label={`Ano da temporada ${si + 1}`}
-                        type="number"
-                        min={1}
-                        max={9999}
-                        required
-                        value={season.year || ""}
-                        onChange={(event) =>
-                          change((d) => {
-                            d.seasons[si].year = Number(event.target.value);
-                          })
-                        }
-                      />
-                    </label>
-                    {!editor.savedIds.has(season.id) &&
-                      editor.draft.seasons.length > 1 && (
-                        <button
-                          type="button"
-                          className="secondary"
-                          onClick={() =>
+              Informações
+            </button>
+            <button
+              className="secondary"
+              disabled={!context || !editor.savedIds.has(context.id)}
+              aria-current={tab === "teams" ? "page" : undefined}
+              onClick={() => {
+                setTab("teams");
+                setRoute(editor.draft.id, selected, "teams");
+              }}
+            >
+              Equipes e elencos
+            </button>
+          </nav>
+          <div hidden={tab !== "info"}>
+            <p role="status" data-testid="competition-save-state">
+              {saving
+                ? "Salvando…"
+                : uncertain
+                  ? "Envio não confirmado"
+                  : conflict
+                    ? "Conflito de versão"
+                    : dirty || !editor.version
+                      ? "Não salvo"
+                      : `Salvo${editor.savedAt ? ` em ${formatDate(editor.savedAt)}` : ""}`}
+            </p>
+            <form onSubmit={(event) => void save(event)}>
+              <fieldset
+                disabled={saving || uncertain || opening}
+                className="competition-form"
+              >
+                <legend>Informações do campeonato</legend>
+                <label>
+                  Nome do campeonato
+                  <input
+                    ref={nameRef}
+                    required
+                    maxLength={120}
+                    value={editor.draft.name}
+                    onChange={(event) =>
+                      change((d) => {
+                        d.name = event.target.value;
+                      })
+                    }
+                  />
+                </label>
+                {editor.draft.seasons.map((season, si) => (
+                  <fieldset key={season.id} className="competition-season">
+                    <legend>Temporada {season.year || si + 1}</legend>
+                    <div className="competition-title">
+                      <label>
+                        Ano
+                        <input
+                          aria-label={`Ano da temporada ${si + 1}`}
+                          type="number"
+                          min={1}
+                          max={9999}
+                          required
+                          value={season.year || ""}
+                          onChange={(event) =>
                             change((d) => {
-                              d.seasons.splice(si, 1);
+                              d.seasons[si].year = Number(event.target.value);
                             })
                           }
-                        >
-                          Remover temporada {si + 1}
-                        </button>
-                      )}
-                  </div>
-                  {season.disputes.map((dispute, di) => (
-                    <fieldset
-                      key={dispute.id}
-                      className={`competition-dispute${selected === dispute.id ? " selected" : ""}`}
-                    >
-                      <legend>
-                        Disputa {si + 1}.{di + 1}
-                      </legend>
-                      <div className="competition-fields">
-                        <label>
-                          Naipe
-                          <select
-                            aria-label={`Naipe da disputa ${si + 1}.${di + 1}`}
-                            value={dispute.gender}
-                            onChange={(event) =>
+                        />
+                      </label>
+                      {!editor.savedIds.has(season.id) &&
+                        editor.draft.seasons.length > 1 && (
+                          <button
+                            type="button"
+                            className="secondary"
+                            onClick={() =>
                               change((d) => {
-                                d.seasons[si].disputes[di].gender = event.target
-                                  .value as "masculino" | "feminino";
+                                d.seasons.splice(si, 1);
                               })
                             }
                           >
-                            <option value="masculino">Masculino</option>
-                            <option value="feminino">Feminino</option>
-                          </select>
-                        </label>
-                        <label>
-                          Categoria
-                          <input
-                            aria-label={`Categoria da disputa ${si + 1}.${di + 1}`}
-                            required
-                            maxLength={80}
-                            value={dispute.category}
-                            onChange={(event) =>
-                              change((d) => {
-                                d.seasons[si].disputes[di].category =
-                                  event.target.value;
-                              })
-                            }
-                          />
-                        </label>
-                        <label>
-                          Divisão (opcional)
-                          <input
-                            aria-label={`Divisão da disputa ${si + 1}.${di + 1}`}
-                            maxLength={80}
-                            value={dispute.division ?? ""}
-                            onChange={(event) =>
-                              change((d) => {
-                                d.seasons[si].disputes[di].division =
-                                  event.target.value;
-                              })
-                            }
-                          />
-                        </label>
-                      </div>
-                      <div className="competition-actions">
-                        <label className="competition-radio">
-                          <input
-                            type="radio"
-                            name="working-dispute"
-                            checked={selected === dispute.id}
-                            onChange={() => {
-                              setSelected(dispute.id);
-                              if (
-                                editor.version &&
-                                editor.savedIds.has(dispute.id)
-                              )
-                                setRoute(editor.draft.id, dispute.id);
-                            }}
-                          />
-                          Usar esta disputa
-                        </label>
-                        {!editor.savedIds.has(dispute.id) &&
-                          season.disputes.length > 1 && (
-                            <button
-                              type="button"
-                              className="secondary"
-                              onClick={() =>
+                            Remover temporada {si + 1}
+                          </button>
+                        )}
+                    </div>
+                    {season.disputes.map((dispute, di) => (
+                      <fieldset
+                        key={dispute.id}
+                        className={`competition-dispute${selected === dispute.id ? " selected" : ""}`}
+                      >
+                        <legend>
+                          Disputa {si + 1}.{di + 1}
+                        </legend>
+                        <div className="competition-fields">
+                          <label>
+                            Naipe
+                            <select
+                              aria-label={`Naipe da disputa ${si + 1}.${di + 1}`}
+                              value={dispute.gender}
+                              onChange={(event) =>
                                 change((d) => {
-                                  d.seasons[si].disputes.splice(di, 1);
+                                  d.seasons[si].disputes[di].gender = event
+                                    .target.value as "masculino" | "feminino";
                                 })
                               }
                             >
-                              Remover disputa {si + 1}.{di + 1}
-                            </button>
-                          )}
-                      </div>
-                    </fieldset>
-                  ))}
-                  <button
-                    type="button"
-                    className="secondary"
-                    disabled={season.disputes.length >= 64}
-                    onClick={() =>
-                      change((d) => {
-                        d.seasons[si].disputes.push(newDispute());
-                      })
-                    }
-                  >
-                    Adicionar disputa à temporada {si + 1}
-                  </button>
-                </fieldset>
-              ))}
-              <button
-                type="button"
-                className="secondary"
-                disabled={editor.draft.seasons.length >= 32}
-                onClick={() =>
-                  change((d) => {
-                    let year = currentYear();
-                    while (d.seasons.some((s) => s.year === year))
-                      year = (year % 9999) + 1;
-                    d.seasons.push({
-                      id: crypto.randomUUID(),
-                      year,
-                      disputes: [newDispute()],
-                    });
-                  })
-                }
-              >
-                Adicionar temporada
-              </button>
-            </fieldset>
-            <div className="competition-actions competition-save">
-              <button type="submit" disabled={saving || opening || conflict}>
-                {saving
-                  ? "Salvando…"
-                  : uncertain
-                    ? "Repetir envio"
-                    : "Salvar campeonato"}
-              </button>
-              {(conflict || uncertain) && (
+                              <option value="masculino">Masculino</option>
+                              <option value="feminino">Feminino</option>
+                            </select>
+                          </label>
+                          <label>
+                            Categoria
+                            <input
+                              aria-label={`Categoria da disputa ${si + 1}.${di + 1}`}
+                              required
+                              maxLength={80}
+                              value={dispute.category}
+                              onChange={(event) =>
+                                change((d) => {
+                                  d.seasons[si].disputes[di].category =
+                                    event.target.value;
+                                })
+                              }
+                            />
+                          </label>
+                          <label>
+                            Divisão (opcional)
+                            <input
+                              aria-label={`Divisão da disputa ${si + 1}.${di + 1}`}
+                              maxLength={80}
+                              value={dispute.division ?? ""}
+                              onChange={(event) =>
+                                change((d) => {
+                                  d.seasons[si].disputes[di].division =
+                                    event.target.value;
+                                })
+                              }
+                            />
+                          </label>
+                        </div>
+                        <div className="competition-actions">
+                          <label className="competition-radio">
+                            <input
+                              type="radio"
+                              name="working-dispute"
+                              checked={selected === dispute.id}
+                              onChange={() => {
+                                if (!teamsGuard.current()) return;
+                                setSelected(dispute.id);
+                                if (
+                                  editor.version &&
+                                  editor.savedIds.has(dispute.id)
+                                )
+                                  setRoute(editor.draft.id, dispute.id, tab);
+                              }}
+                            />
+                            Usar esta disputa
+                          </label>
+                          {!editor.savedIds.has(dispute.id) &&
+                            season.disputes.length > 1 && (
+                              <button
+                                type="button"
+                                className="secondary"
+                                onClick={() =>
+                                  change((d) => {
+                                    d.seasons[si].disputes.splice(di, 1);
+                                  })
+                                }
+                              >
+                                Remover disputa {si + 1}.{di + 1}
+                              </button>
+                            )}
+                        </div>
+                      </fieldset>
+                    ))}
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={season.disputes.length >= 64}
+                      onClick={() =>
+                        change((d) => {
+                          d.seasons[si].disputes.push(newDispute());
+                        })
+                      }
+                    >
+                      Adicionar disputa à temporada {si + 1}
+                    </button>
+                  </fieldset>
+                ))}
                 <button
                   type="button"
                   className="secondary"
-                  disabled={saving || opening}
+                  disabled={editor.draft.seasons.length >= 32}
                   onClick={() =>
-                    void openCompetition(editor.draft.id, selected)
+                    change((d) => {
+                      let year = currentYear();
+                      while (d.seasons.some((s) => s.year === year))
+                        year = (year % 9999) + 1;
+                      d.seasons.push({
+                        id: crypto.randomUUID(),
+                        year,
+                        disputes: [newDispute()],
+                      });
+                    })
                   }
                 >
-                  Recarregar versão salva
+                  Adicionar temporada
                 </button>
-              )}
+              </fieldset>
+              <div className="competition-actions competition-save">
+                <button type="submit" disabled={saving || opening || conflict}>
+                  {saving
+                    ? "Salvando…"
+                    : uncertain
+                      ? "Repetir envio"
+                      : "Salvar campeonato"}
+                </button>
+                {(conflict || uncertain) && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    disabled={saving || opening}
+                    onClick={() =>
+                      void openCompetition(editor.draft.id, selected)
+                    }
+                  >
+                    Recarregar versão salva
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+          {context && editor.savedIds.has(context.id) && (
+            <div hidden={tab !== "teams"}>
+              <TeamsWorkspace
+                key={context.id}
+                disputeId={context.id}
+                enabled={enabled && tab === "teams"}
+                guard={teamsGuard}
+                onSessionLost={onSessionLost}
+                onSaved={() => setRefresh((v) => v + 1)}
+              />
             </div>
-          </form>
+          )}
         </>
       )}
     </section>
@@ -675,74 +763,10 @@ function formatDate(value: string) {
 function snapshotWithoutMetadata(value: CompetitionSnapshot): Competition {
   return { id: value.id, name: value.name, seasons: value.seasons };
 }
-function setRoute(id: string, dispute: string) {
+function setRoute(id: string, dispute: string, tab: "info" | "teams" = "info") {
   history.replaceState(
     null,
     "",
-    `${location.pathname}${location.search}#campeonato/${id}/${dispute}`,
+    `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "teams" ? "/equipes" : ""}`,
   );
-}
-class ApiFailure extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
-function isSessionFailure(error: unknown) {
-  return (
-    error instanceof ApiFailure &&
-    (error.status === 401 || error.status === 403)
-  );
-}
-async function api<T>(
-  path: string,
-  schema: z.ZodType<T>,
-  command?: SaveCompetition,
-  signal?: AbortSignal,
-): Promise<T> {
-  const response = await fetch(path, {
-    method: command ? "POST" : "GET",
-    credentials: "same-origin",
-    cache: "no-store",
-    signal: signal
-      ? AbortSignal.any([signal, AbortSignal.timeout(45000)])
-      : AbortSignal.timeout(45000),
-    ...(command
-      ? {
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(command),
-        }
-      : {}),
-  });
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch {
-    throw new ApiFailure(
-      503,
-      "Não foi possível confirmar a resposta. Tente novamente.",
-    );
-  }
-  if (!response.ok) {
-    const message =
-      body &&
-      typeof body === "object" &&
-      "error" in body &&
-      body.error &&
-      typeof body.error === "object" &&
-      "message" in body.error &&
-      typeof body.error.message === "string"
-        ? body.error.message.slice(0, 500)
-        : "Não foi possível concluir a operação. Tente novamente.";
-    throw new ApiFailure(response.status, message);
-  }
-  const parsed = schema.safeParse(body);
-  if (!parsed.success)
-    throw new ApiFailure(
-      503,
-      "Não foi possível confirmar a resposta. Tente novamente.",
-    );
-  return parsed.data;
 }

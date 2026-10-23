@@ -3,6 +3,13 @@ import { HttpError } from "../server/http";
 import { SupabaseAccess, type Credentials } from "./provider";
 import { PersistentSession, type SessionRecord } from "./session";
 import { SupabaseCompetitions } from "../competition/provider";
+import { SupabaseTeams } from "../teams/provider";
+import {
+  saveTeamSchema,
+  saveRegistrationSchema,
+  type SaveTeam,
+  type SaveRegistration,
+} from "../teams/contract";
 import {
   saveCompetitionSchema,
   type SaveCompetition,
@@ -15,8 +22,13 @@ type RpcResult<T> =
 export class SessionStore extends DurableObject<Env> {
   private readonly session: PersistentSession;
   private readonly competitions: SupabaseCompetitions;
+  private readonly teams: SupabaseTeams;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.teams = new SupabaseTeams({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.competitions = new SupabaseCompetitions({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -80,6 +92,52 @@ export class SessionStore extends DurableObject<Env> {
     if (record && record.expiresAt > Date.now())
       await this.ctx.storage.setAlarm(record.expiresAt);
     else await this.session.close();
+  }
+
+  listTeams(query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.teams(accessToken, query, offset),
+      ),
+    );
+  }
+  listRegistrations(disputeId: string, query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.registrations(accessToken, disputeId, query, offset),
+      ),
+    );
+  }
+  getTeam(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.getTeam(accessToken, id),
+      ),
+    );
+  }
+  getRegistration(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.getRegistration(accessToken, id),
+      ),
+    );
+  }
+  saveTeam(command: SaveTeam) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.saveTeam(accessToken, saveTeamSchema.parse(command)),
+      ),
+    );
+  }
+  saveRegistration(command: SaveRegistration) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.saveRegistration(
+          accessToken,
+          saveRegistrationSchema.parse(command),
+        ),
+      ),
+    );
   }
 }
 

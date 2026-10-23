@@ -21,5 +21,9 @@
     "playwright.config.ts",
     "vite.foundation.config.ts"
   ],
-  "exclude": ["src/server/worker.ts", "src/access/durable.ts"]
+  "exclude": [
+    "src/server/worker.ts",
+    "src/access/durable.ts",
+    "src/teams/routes.ts"
+  ]
 }

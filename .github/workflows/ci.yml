@@ -1,7 +1,7 @@
 name: Protótipo
 on:
   push:
-    branches: [main, "feat/**", "fix/**"]
+    branches: [main, "feat/**", "fix/**", "codex/**"]
     paths-ignore: ["docs/**", "README.md"]
 permissions:
   contents: read

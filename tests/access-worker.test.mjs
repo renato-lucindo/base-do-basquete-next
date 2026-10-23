@@ -65,6 +65,39 @@ async function fixture(options = {}) {
           );
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (
+          [
+            "/rest/v1/rpc/list_teams",
+            "/rest/v1/rpc/list_registrations",
+          ].includes(url.pathname)
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          return Response.json({ items: [], hasMore: false });
+        }
+        if (
+          ["/rest/v1/rpc/save_team", "/rest/v1/rpc/save_registration"].includes(
+            url.pathname,
+          )
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const { p_command: command } = await request.json();
+          return Response.json({
+            id: (command.team ?? command.registration).id,
+            version: 1,
+          });
+        }
+        if (
+          ["/rest/v1/rpc/get_team", "/rest/v1/rpc/get_registration"].includes(
+            url.pathname,
+          )
+        )
+          return Response.json(null);
         if (url.pathname === "/rest/v1/rpc/list_competitions") {
           assert.equal(
             request.headers.get("authorization"),
@@ -106,6 +139,82 @@ async function fixture(options = {}) {
     });
   return { mf, send, login, calls };
 }
+
+test("team and registration routes enforce session, context, origin and strict commands", async () => {
+  const f = await fixture();
+  try {
+    for (const path of ["/api/teams", `/api/registrations?disputeId=${id}`])
+      assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, path, body, headers = {}) =>
+      f.mf.dispatchFetch(`${origin}${path}`, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...headers,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    for (const path of [
+      "/api/teams?q=Lobos&offset=20",
+      `/api/registrations?disputeId=${id}`,
+    ]) {
+      const r = await send("GET", path);
+      assert.equal(r.status, 200);
+      assert.deepEqual(await r.json(), { items: [], hasMore: false });
+    }
+    const team = {
+      commandId: id,
+      expectedVersion: 0,
+      team: { id, name: "Lobos", abbreviation: null },
+    };
+    const registration = {
+      commandId: id,
+      expectedVersion: 0,
+      registration: { id, teamId: id, disputeId: id, name: "Lobos B" },
+    };
+    for (const [path, command] of [
+      ["/api/teams", team],
+      ["/api/registrations", registration],
+    ]) {
+      const r = await send("POST", path, command);
+      assert.equal(r.status, 200);
+      assert.deepEqual(await r.json(), { id, version: 1 });
+      assert.equal(
+        (await send("POST", path, command, { origin: "https://evil.test" }))
+          .status,
+        403,
+      );
+      assert.equal(
+        (await send("POST", path, { ...command, actorId: id })).status,
+        400,
+      );
+      assert.equal((await send("GET", `${path}/${id}`)).status, 404);
+      assert.equal((await send("GET", `${path}/invalid`)).status, 400);
+    }
+    for (const path of [
+      "/api/registrations",
+      "/api/registrations?disputeId=invalid",
+      `/api/registrations?disputeId=${id}&disputeId=${id}`,
+      "/api/teams?offset=-1",
+      "/api/teams?q=a&q=b",
+      "/api/teams?unknown=x",
+    ])
+      assert.equal((await send("GET", path)).status, 400, path);
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/save_team").length,
+      1,
+    );
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/save_registration").length,
+      1,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("competition HTTP operations require session and origin, use fixed RPCs and return no token", async () => {
   const f = await fixture();

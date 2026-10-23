@@ -1,4 +1,18 @@
-# Checkpoint — 23/10/2026, 08:54 America/Sao_Paulo (UTC-03)
+# Unidade atual — C2 equipes/inscrições, 23/10/2026
+
+Responsável autorizou seguir os próximos blocos e confirmou que a experiência do primeiro protótipo continua referência. Branch **`codex/equipes-inscricoes`**, base C1 **`929b1938429eddb89428467a1225544d0dd5c3c3`**. C2.1 banco em **`c9ea717`**, C2.2 API em **`6378169`**, aplicação **`22fbf9c82aa194ab5560ec2077a5ec08d27aff4c`**, todos publicados no remoto. PR draft #5 sobre C1/#4, anexado à conversa. Somente documentação posterior de autoria do agente; sem mudanças alheias.
+
+Plano `docs/superpowers/plans/2026-10-23-equipes-inscricoes.md`, decisão 006. Migration **`20261023120105_teams_registrations`** aplicada somente no projeto novo `nizmasjddyrhmevvfviz`. Tipos regenerados. Contrato TS 4 testes PASS; SQL compartilhado PASS do zero/upgrade e com dados C1 existentes; contrato C2 também PASS no Supabase real com rollback. Contagens após rollback campeonato/edição/disputas 1/1/2, equipes/inscrições/recibos C2 0/0/0, usuário/admin 1/1. Nenhuma fixture promovida. Advisor somente WARN conhecido de senha vazada/Pro.
+
+Rotas específicas de equipes/inscrições verificadas com sessão/origem/query/body e provider, cinco cenários workerd totais PASS. UI implementada em aba funcional, com busca, expansão, escolha/criação global, nomes públicos independentes, guardas e retomada por URL. Seis cenários novos Playwright PASS desktop/celular; composição inspecionada inclusive 320px. Extração do helper HTTP de C1 conserva semântica. Workflow agora inclui branches `codex/**`.
+
+**Gate C2 PASS:** lint/formatação/tipos, 90 unitários/14 arquivos, cinco transportes, três cenários SQL, cinco workerd/DO, builds/fronteira/segredos. Ajuste posterior somente de foco da UI: typecheck/ESLint/build e teste RED→GREEN de foco aprovados; CI final deve consolidar o source publicado. Dez cenários C1/acesso e cinco de seis C2 passaram na regressão conjunta; a expiração do sexto tinha corrida na fixture (leitura em background expirava antes do clique). Fixture agora expira explicitamente na próxima escrita; seis repetições desktop/celular PASS, sem aumentar timeout ou mascarar erro de produto.
+
+**C2 publicado:** deployment `3cca73ae-3307-42e5-a132-ad222e5bad60`, versão `535f1105-b1ea-452b-8754-50c79a36a142`, 23/10 09:13:26 UTC-03. Worker/URL/conta/Access/cofre/namespace mesmos do histórico abaixo, somente artefato mudou. Smokes remotos por hash/transporte/negação PASS; token/policy temporários revogados. IDs/hashes/roteiro em `docs/VALIDACAO-EQUIPES.md`. Nenhum upload, processo de smoke ou credencial em andamento. Avaliação humana C2 solicitada e pendente, não bloqueia modelagem independente C3.
+
+**Próximo passo exato:** observar resultado final da CI C2 `39951616663`/job `120407174609` (gate já PASS, navegador em preparação na consulta 09:15), atualizar PR/evidência sem repetir gate local. Em paralelo iniciar plano C3 (identidade de pessoa, atletas e treinadores próprios ligados à mesma pessoa, elencos por inscrição), conforme pacote e feedback, branch própria sobre C2. Preservar dados reais; não inferir capitão/titulares no cadastro de elenco, são escolhas do jogo. Última cota 23/10 09:15:13 UTC-03: 68% usado/5h (32% restante), 49% semanal (51% restante); mesmo reset 23/10 13:09:01 UTC-03. Sem gatilho de retomada; automação permanece PAUSED.
+
+# Histórico de fechamento C1 — 23/10/2026, 08:54 America/Sao_Paulo (UTC-03)
 
 ## Objetivo, unidade e próximo passo
 

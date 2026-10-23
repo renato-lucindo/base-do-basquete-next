@@ -33,6 +33,7 @@ const competitionContract = await readFile(
   "supabase/tests/competition.sql",
   "utf8",
 );
+const teamsContract = await readFile("supabase/tests/teams.sql", "utf8");
 
 test("migrations from zero enforce the shared SQL access contract", async () => {
   const db = await PGlite.create();
@@ -42,6 +43,7 @@ test("migrations from zero enforce the shared SQL access contract", async () => 
       await db.exec(`begin;\n${migration}\ncommit;`);
     await db.exec(contract);
     await db.exec(competitionContract);
+    await db.exec(teamsContract);
     const { rows } = await db.query(
       "select count(*)::int as count from auth.users",
     );
@@ -70,6 +72,33 @@ test("upgrade preserves an existing administrator and enforces new defaults", as
     await db.exec("delete from public.admin_access; delete from auth.users;");
     await db.exec(contract);
     await db.exec(competitionContract);
+    await db.exec(teamsContract);
+  } finally {
+    await db.close();
+  }
+});
+
+test("C2 upgrade and rolled-back fixtures preserve saved C1 data", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations.slice(0, 4)) await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('40000000-0000-4000-8000-000000000001','Existing');
+      insert into public.seasons(id,championship_id,year) values('40000000-0000-4000-8000-000000000002','40000000-0000-4000-8000-000000000001',2026);
+      insert into public.disputes(id,season_id,gender,category) values('40000000-0000-4000-8000-000000000003','40000000-0000-4000-8000-000000000002','feminino','Adulto');`);
+    const before = await db.query(
+      "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
+    );
+    for (const migration of migrations.slice(4)) await db.exec(migration);
+    await db.exec(teamsContract);
+    const after = await db.query(
+      "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
+    );
+    assert.deepEqual(after.rows, before.rows);
+    assert.deepEqual(
+      (await db.query("select count(*)::int as count from public.teams")).rows,
+      [{ count: 0 }],
+    );
   } finally {
     await db.close();
   }
