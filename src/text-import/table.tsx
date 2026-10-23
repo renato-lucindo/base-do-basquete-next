@@ -39,12 +39,12 @@ export function ImportTable({
         <caption>Conferência do elenco</caption>
         <thead>
           <tr>
-            <th scope="col">Selecionar e situação</th>
             {Object.values(labels).map((label) => (
               <th scope="col" key={label}>
                 {label}
               </th>
             ))}
+            <th scope="col">Selecionar e situação</th>
             <th scope="col">Identidade e alterações</th>
           </tr>
         </thead>

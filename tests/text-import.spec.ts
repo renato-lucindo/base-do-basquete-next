@@ -16,6 +16,8 @@ test("importa dados ricos, conserva existentes/ausentes e retoma conferência sa
   await expect(
     page.getByRole("table", { name: "Conferência do elenco" }),
   ).toBeVisible();
+  await expect(page.getByRole("columnheader").first()).toHaveText("Nome");
+  await expect(page.getByRole("columnheader").nth(1)).toHaveText("Camisa");
   await page
     .getByTestId(`candidate-${tid(10)}`)
     .getByRole("button", { name: /Usar/ })
