@@ -20,10 +20,17 @@ export async function uploadFoundation(payload, client = cloudflare) {
     app.policies[0].include[0].email?.email !== "renato.lucindo.jr@gmail.com"
   )
     throw new Error("Expected owner-only Access protection not confirmed");
-  const settings = await client.request({
-    method: "GET",
-    path: `${base}/workers/scripts/${name}/settings`,
-  });
+  let settings;
+  try {
+    settings = await client.request({
+      method: "GET",
+      path: `${base}/workers/scripts/${name}/settings`,
+    });
+  } catch (error) {
+    // The connector throws for non-2xx responses, including an absent new Worker.
+    if (!/HTTP 404:\s*10007:/.test(String(error))) throw error;
+    settings = { success: false, status: 404 };
+  }
   const existing = settings.success;
   if (!existing && settings.status !== 404)
     throw new Error("Could not inspect Worker");
