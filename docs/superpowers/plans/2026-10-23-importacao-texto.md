@@ -30,9 +30,9 @@
 
 ## M3 — revisão durável, matching e confirmação
 
-- [ ] SQL RED: draft privado, shapes/limites/origem, matching administrativo, identidade única, contextos, mudanças explícitas, versão/idempotência, atomicidade, sucessos entre falhas, sem apagar ausentes.
-- [ ] Migrations/readers invoker/writers privados delimitados. Autorização fresca antes de dados/recibos; ordem atleta → campeonato, nada de service-role. Aplicar apenas projeto novo, contrato real isolado rollback, tipos/advisors e commit.
-- [ ] Provider/SessionStore/rotas fixas com sessão/origem/query/schema/limites e erros sanitizados; testes focais/workerd. Sem segredos/SQL nos erros.
+- [x] SQL RED: draft privado, shapes/limites/origem, matching administrativo, identidade única, contextos, mudanças explícitas, versão/idempotência, atomicidade, sucessos entre falhas, sem apagar ausentes.
+- [x] Migrations/readers invoker/writers privados delimitados. Autorização fresca antes de dados/recibos; ordem atleta → campeonato, nada de service-role. Aplicar apenas projeto novo, contrato real isolado rollback, tipos/advisors e commit.
+- [x] Provider/SessionStore/rotas fixas com sessão/origem/query/schema/limites e erros sanitizados; testes focais/workerd. Sem segredos/SQL nos erros.
 
 ## M4 — fluxo em tabela e entrega
 
