@@ -2,6 +2,8 @@ especificacao/
 dist/
 node_modules/
 docs/evidencias/
+# User-provided specification: preserve its original contents and formatting.
+docs/ESCOPO-IMPORTADOR-DE-EQUIPES.md
 package-lock.json
 
 # Reproducible generated bindings, checked by Wrangler.
