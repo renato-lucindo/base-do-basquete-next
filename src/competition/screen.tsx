@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import { TeamsWorkspace } from "../teams/screen";
+import { GamesWorkspace } from "../games/workspace";
 import {
   competitionSchema,
   listingSchema,
@@ -59,8 +60,9 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selected, setSelected] = useState("");
-  const [tab, setTab] = useState<"info" | "teams">("info");
+  const [tab, setTab] = useState<"info" | "teams" | "games">("info");
   const teamsGuard = useRef<() => boolean>(() => true);
+  const gamesGuard = useRef<() => boolean>(() => true);
   const [opening, setOpening] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -83,6 +85,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   function mayLeave() {
     return (
       teamsGuard.current() &&
+      gamesGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
           "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
@@ -152,11 +155,15 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     if (!enabled || restored.current) return;
     restored.current = true;
     const match =
-      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/equipes)?$/i.exec(
+      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/(?:equipes|jogos))?$/i.exec(
         location.hash,
       );
     if (match)
-      void openCompetition(match[1], match[2], match[3] ? "teams" : "info");
+      void openCompetition(
+        match[1],
+        match[2],
+        match[3] === "/jogos" ? "games" : match[3] ? "teams" : "info",
+      );
   }, [enabled]);
 
   function change(edit: (draft: Competition) => void) {
@@ -194,7 +201,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   async function openCompetition(
     id: string,
     wanted?: string,
-    targetTab: "info" | "teams" = "info",
+    targetTab: "info" | "teams" | "games" = "info",
   ) {
     if (!mayLeave()) return;
     setOpening(true);
@@ -315,7 +322,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   const savedCompetition = editor
     ? (JSON.parse(editor.baseline) as Competition)
     : undefined;
-  const contextSource = tab === "teams" ? savedCompetition : editor?.draft;
+  const contextSource = tab !== "info" ? savedCompetition : editor?.draft;
   const context = contextSource?.seasons
     .flatMap((s) =>
       s.disputes.map((d) => ({
@@ -488,6 +495,17 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
               }}
             >
               Equipes e elencos
+            </button>
+            <button
+              className="secondary"
+              disabled={!context || !editor.savedIds.has(context.id)}
+              aria-current={tab === "games" ? "page" : undefined}
+              onClick={() => {
+                setTab("games");
+                setRoute(editor.draft.id, selected, "games");
+              }}
+            >
+              Jogos
             </button>
           </nav>
           <div hidden={tab !== "info"}>
@@ -721,6 +739,23 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
               />
             </div>
           )}
+          {context && editor.savedIds.has(context.id) && (
+            <div hidden={tab !== "games"}>
+              <GamesWorkspace
+                key={context.id}
+                disputeId={context.id}
+                gender={
+                  savedCompetition?.seasons
+                    .flatMap((s) => s.disputes)
+                    .find((d) => d.id === context.id)?.gender ?? "masculino"
+                }
+                enabled={enabled && tab === "games"}
+                guard={gamesGuard}
+                onSessionLost={onSessionLost}
+                onSaved={() => setRefresh((v) => v + 1)}
+              />
+            </div>
+          )}
         </>
       )}
     </section>
@@ -772,10 +807,14 @@ function formatDate(value: string) {
 function snapshotWithoutMetadata(value: CompetitionSnapshot): Competition {
   return { id: value.id, name: value.name, seasons: value.seasons };
 }
-function setRoute(id: string, dispute: string, tab: "info" | "teams" = "info") {
+function setRoute(
+  id: string,
+  dispute: string,
+  tab: "info" | "teams" | "games" = "info",
+) {
   history.replaceState(
     null,
     "",
-    `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "teams" ? "/equipes" : ""}`,
+    `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "games" ? "/jogos" : tab === "teams" ? "/equipes" : ""}`,
   );
 }

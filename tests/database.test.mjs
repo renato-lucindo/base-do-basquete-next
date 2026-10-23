@@ -51,6 +51,23 @@ const textConfirmContract = await readFile(
   "supabase/tests/text_confirm.sql",
   "utf8",
 );
+const gamesContract = await readFile("supabase/tests/games.sql", "utf8");
+test("G1 games enforce contextual registration, schedule, versions and access", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations) await db.exec(migration);
+    await db.exec(gamesContract);
+    assert.equal(
+      (await db.query("select count(*)::int as count from public.games"))
+        .rows[0].count,
+      0,
+      "fixtures rolled back",
+    );
+  } finally {
+    await db.close();
+  }
+});
 
 test("C4 upgrade preserves existing C3 people, private details and numbered rosters", async () => {
   const db = await PGlite.create();

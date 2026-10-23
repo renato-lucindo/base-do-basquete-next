@@ -21,6 +21,8 @@ import { SupabaseAccess, type Credentials } from "./provider";
 import { PersistentSession, type SessionRecord } from "./session";
 import { SupabaseCompetitions } from "../competition/provider";
 import { SupabaseTeams } from "../teams/provider";
+import { SupabaseGames } from "../games/provider";
+import { saveGameSchema, type SaveGame } from "../games/contract";
 import {
   saveTeamSchema,
   saveRegistrationSchema,
@@ -40,10 +42,15 @@ export class SessionStore extends DurableObject<Env> {
   private readonly session: PersistentSession;
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
+  private readonly games: SupabaseGames;
   private readonly people: SupabasePeople;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.games = new SupabaseGames({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.textImport = new SupabaseTextImport({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -253,6 +260,27 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.teams.teams(accessToken, query, offset),
+      ),
+    );
+  }
+  listGames(disputeId: string, query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.list(accessToken, disputeId, query, offset),
+      ),
+    );
+  }
+  getGame(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.get(accessToken, id),
+      ),
+    );
+  }
+  saveGame(command: SaveGame) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.save(accessToken, saveGameSchema.parse(command)),
       ),
     );
   }

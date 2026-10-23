@@ -103,6 +103,8 @@ try {
     `/api/teams/${randomUUID()}`,
     `/api/registrations?disputeId=${randomUUID()}`,
     `/api/registrations/${randomUUID()}`,
+    `/api/games?disputeId=${randomUUID()}`,
+    `/api/games/${randomUUID()}`,
     "/api/people",
     `/api/people/${randomUUID()}`,
     `/api/roster?registrationId=${randomUUID()}`,

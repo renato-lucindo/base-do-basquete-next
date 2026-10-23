@@ -108,6 +108,70 @@ export type Database = {
           },
         ];
       };
+      games: {
+        Row: {
+          away_registration_id: string;
+          dispute_id: string;
+          game_number: string | null;
+          home_registration_id: string;
+          id: string;
+          saved_at: string;
+          scheduled_date: string | null;
+          scheduled_time: string | null;
+          state: string;
+          venue: string | null;
+          version: number;
+        };
+        Insert: {
+          away_registration_id: string;
+          dispute_id: string;
+          game_number?: string | null;
+          home_registration_id: string;
+          id: string;
+          saved_at?: string;
+          scheduled_date?: string | null;
+          scheduled_time?: string | null;
+          state?: string;
+          venue?: string | null;
+          version?: number;
+        };
+        Update: {
+          away_registration_id?: string;
+          dispute_id?: string;
+          game_number?: string | null;
+          home_registration_id?: string;
+          id?: string;
+          saved_at?: string;
+          scheduled_date?: string | null;
+          scheduled_time?: string | null;
+          state?: string;
+          venue?: string | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "games_away_registration_id_dispute_id_fkey";
+            columns: ["away_registration_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id", "dispute_id"];
+          },
+          {
+            foreignKeyName: "games_dispute_id_fkey";
+            columns: ["dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "disputes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "games_home_registration_id_dispute_id_fkey";
+            columns: ["home_registration_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id", "dispute_id"];
+          },
+        ];
+      };
       persons: {
         Row: {
           biography: string | null;
@@ -353,6 +417,7 @@ export type Database = {
     Functions: {
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       get_competition: { Args: { p_id: string }; Returns: Json };
+      get_game: { Args: { p_id: string }; Returns: Json };
       get_import_person: {
         Args: {
           p_dispute_id: string;
@@ -369,6 +434,10 @@ export type Database = {
       get_text_review: { Args: { p_id: string }; Returns: Json };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      list_games: {
+        Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;
       };
       list_persons: {
@@ -417,6 +486,7 @@ export type Database = {
       };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
+      save_game: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };
