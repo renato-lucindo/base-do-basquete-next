@@ -5,23 +5,7 @@ import { PGlite } from "@electric-sql/pglite";
 
 // Platform fixture only. The same SQL contract also runs on Supabase's real
 // auth.uid(), auth.users and API roles before this unit is considered integrated.
-const platform = `
-create role anon;
-create role authenticated;
-create role service_role bypassrls;
-create schema auth;
-create table auth.users (id uuid primary key);
-create function auth.uid() returns uuid language sql stable as $$
-  select coalesce(nullif(current_setting('request.jwt.claim.sub',true),''),
-    (nullif(current_setting('request.jwt.claims',true),'')::jsonb ->> 'sub'))::uuid
-$$;
-grant usage on schema auth, public to anon, authenticated, service_role;
-grant execute on function auth.uid() to anon, authenticated, service_role;
--- Match observed defaults in the newly provisioned Supabase project.
-alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
-alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;
-`;
+import { platform } from "./fixtures/database-platform.ts";
 const migrations = await Promise.all(
   (await readdir("supabase/migrations"))
     .filter((name) => name.endsWith(".sql"))
@@ -52,6 +36,57 @@ const textConfirmContract = await readFile(
   "utf8",
 );
 const gamesContract = await readFile("supabase/tests/games.sql", "utf8");
+test("G2 upgrade preserves G1 schedules and does not fabricate sheets or results", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((sql) =>
+      sql.includes("-- G2: private draft sheet"),
+    );
+    assert.ok(boundary > 0);
+    for (const migration of migrations.slice(0, boundary))
+      await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('f4000000-0000-4000-8000-000000000001','Existing G1');
+      insert into public.seasons(id,championship_id,year) values('f4000000-0000-4000-8000-000000000002','f4000000-0000-4000-8000-000000000001',2026);
+      insert into public.disputes(id,season_id,gender,category) values('f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000002','masculino','Adulto');
+      insert into public.teams(id,name) values('f4000000-0000-4000-8000-000000000004','Existing');
+      insert into public.registrations(id,dispute_id,team_id,name) values('f4000000-0000-4000-8000-000000000005','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000004','Home'),('f4000000-0000-4000-8000-000000000006','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000004','Away');
+      insert into public.games(id,dispute_id,home_registration_id,away_registration_id,scheduled_date,venue) values('f4000000-0000-4000-8000-000000000007','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000005','f4000000-0000-4000-8000-000000000006','2026-10-23','Preserved');`);
+    const q =
+      "select public.get_game('f4000000-0000-4000-8000-000000000007') as game";
+    const before = (await db.query(q)).rows;
+    for (const migration of migrations.slice(boundary))
+      await db.exec(migration);
+    assert.deepEqual((await db.query(q)).rows, before);
+    assert.equal(
+      (
+        await db.query(
+          "select public.get_game_sheet('f4000000-0000-4000-8000-000000000007') as sheet",
+        )
+      ).rows[0].sheet,
+      null,
+    );
+    await db.exec(await readFile("supabase/tests/game_sheet.sql", "utf8"));
+    assert.deepEqual((await db.query(q)).rows, before);
+  } finally {
+    await db.close();
+  }
+});
+test("G2 persisted sheet preserves identities, occasion jerseys, drafts and authorization", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations) await db.exec(migration);
+    await db.exec(await readFile("supabase/tests/game_sheet.sql", "utf8"));
+    assert.equal(
+      (await db.query("select count(*)::int as count from public.game_sheets"))
+        .rows[0].count,
+      0,
+    );
+  } finally {
+    await db.close();
+  }
+});
 test("G1 games enforce contextual registration, schedule, versions and access", async () => {
   const db = await PGlite.create();
   try {

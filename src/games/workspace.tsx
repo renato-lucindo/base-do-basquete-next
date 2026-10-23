@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
+import { GameSheetWorkspace } from "./sheet-workspace";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -60,15 +61,19 @@ export function GamesWorkspace(props: Props) {
     [findOffset, setFindOffset] = useState(0),
     [auxiliary, setAuxiliary] = useState(false);
   const pending = useRef<SaveGame | null>(null),
+    sheetGuard = useRef<() => boolean>(() => true),
     auxGuard = useRef<() => boolean>(() => true),
     auxiliaryTrigger = useRef<HTMLButtonElement>(null),
     returningFromAuxiliary = useRef(false),
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null);
+  const [savedGame, setSavedGame] = useState<GameSnapshot | null>(null),
+    [sheetVisible, setSheetVisible] = useState(false);
   const dirty = !!editor && JSON.stringify(editor.game) !== baseline;
   function mayLeave() {
     return (
       !busy &&
+      sheetGuard.current() &&
       auxGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
@@ -174,6 +179,7 @@ export function GamesWorkspace(props: Props) {
     if (s.disputeId !== props.disputeId)
       throw Error("Este jogo pertence a outra disputa.");
     const g = document(s);
+    setSavedGame(s);
     setEditor({ game: g, version: s.version });
     setChosen([s.home, s.away]);
     setBaseline(JSON.stringify(g));
@@ -249,7 +255,7 @@ export function GamesWorkspace(props: Props) {
           Jogos
         </h3>
         <button
-          disabled={busy || auxiliary}
+          disabled={busy || auxiliary || sheetVisible}
           onClick={() => {
             if (!mayLeave()) return;
             setEditor({
@@ -266,6 +272,7 @@ export function GamesWorkspace(props: Props) {
               },
             });
             setBaseline("");
+            setSavedGame(null);
             setChosen([]);
             setError("");
             setStatus("");
@@ -319,6 +326,17 @@ export function GamesWorkspace(props: Props) {
             }}
           />
         </>
+      ) : sheetVisible && savedGame ? (
+        <GameSheetWorkspace
+          key={savedGame.id}
+          game={savedGame}
+          gender={props.gender}
+          enabled={props.enabled}
+          guard={sheetGuard}
+          onSessionLost={props.onSessionLost}
+          onSaved={props.onSaved}
+          onBack={() => setSheetVisible(false)}
+        />
       ) : editor ? (
         <div className="teams-inline">
           <h4>{editor.version ? "Editar jogo" : "Novo jogo"}</h4>
@@ -428,6 +446,12 @@ export function GamesWorkspace(props: Props) {
             </label>
           </fieldset>
           <div className="competition-actions">
+            <button
+              disabled={busy || uncertain || conflict || dirty || !savedGame}
+              onClick={() => setSheetVisible(true)}
+            >
+              Preparar súmula
+            </button>
             <button disabled={busy || conflict} onClick={() => void save()}>
               {uncertain ? "Repetir o mesmo envio" : "Salvar jogo"}
             </button>

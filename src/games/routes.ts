@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveGameSchema } from "./contract";
+import { saveSheetSchema } from "./sheet-contract";
 export async function gamesRoute(request: Request, env: Env, url: URL) {
   const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
   if (!name)
@@ -12,6 +13,26 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     );
   const session = env.SESSIONS.getByName(name),
     root = url.pathname === "/api/games";
+  const sheet = /^\/api\/games\/([^/]+)\/sheet$/u.exec(url.pathname);
+  if (sheet && !url.search) {
+    const id = z.uuid().safeParse(sheet[1]);
+    if (!id.success) throw badInput();
+    if (request.method === "GET") {
+      const r = await session.getGameSheet(id.data);
+      if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+      return jsonResponse(r.value);
+    }
+    if (request.method === "POST") {
+      const command = await readMutationJson(request, saveSheetSchema, {
+        origin: env.APP_ORIGIN,
+        maxBytes: 524288,
+      });
+      if (command.gameId !== id.data) throw badInput();
+      const r = await session.saveGameSheet(command);
+      if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+      return jsonResponse(r.value);
+    }
+  }
   if (root && request.method === "GET") {
     if (
       [...url.searchParams.keys()].some(
@@ -47,7 +68,7 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }
-  if (!root && request.method === "GET" && !url.search) {
+  if (!root && !sheet && request.method === "GET" && !url.search) {
     const id = z.uuid().safeParse(url.pathname.slice("/api/games/".length));
     if (!id.success) throw badInput();
     const r = await session.getGame(id.data);

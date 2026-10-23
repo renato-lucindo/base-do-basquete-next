@@ -9,6 +9,13 @@ import {
   gameSnapshotSchema,
   type SaveGame,
 } from "./contract";
+import {
+  saveSheetSchema,
+  sheetSaveResultSchema,
+  sheetSnapshotSchema,
+  validatePersistedSheet,
+  type SaveSheet,
+} from "./sheet-contract";
 type Functions = Database["public"]["Functions"];
 export class SupabaseGames {
   constructor(
@@ -49,6 +56,50 @@ export class SupabaseGames {
       throw unavailable();
     return r;
   }
+  async getSheet(token: string, gameId: string) {
+    const r = await this.checked(
+      sheetSnapshotSchema.nullable(),
+      "get_game_sheet",
+      { p_game_id: gameId },
+      token,
+    );
+    if (r && r.gameId !== gameId) throw unavailable();
+    if (r) {
+      try {
+        validatePersistedSheet(r.document);
+      } catch {
+        throw unavailable();
+      }
+    }
+    return r;
+  }
+  async saveSheet(token: string, input: SaveSheet) {
+    const parsed = saveSheetSchema.safeParse(input);
+    if (!parsed.success)
+      throw new HttpError(400, "invalid_input", "Dados inválidos da súmula.");
+    const command = parsed.data;
+    try {
+      validatePersistedSheet(command.document);
+    } catch {
+      throw new HttpError(
+        400,
+        "invalid_input",
+        "Revise as camisas, a participação, a comissão e a sequência de ações.",
+      );
+    }
+    const r = await this.checked(
+      sheetSaveResultSchema,
+      "save_game_sheet",
+      { p_command: command },
+      token,
+    );
+    if (
+      r.requestId !== command.requestId ||
+      r.version !== command.baseVersion + 1
+    )
+      throw unavailable();
+    return r;
+  }
   private async checked<T, N extends keyof Functions>(
     schema: z.ZodType<T>,
     name: N,
@@ -72,7 +123,7 @@ export class SupabaseGames {
     }
     if (response.ok) {
       const body = await providerJson(response, 1048576);
-      if (body === null)
+      if (body === null && name !== "get_game_sheet")
         throw new HttpError(404, "context_not_found", "Jogo não encontrado.");
       const r = schema.safeParse(body);
       if (!r.success) throw unavailable();

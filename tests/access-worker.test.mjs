@@ -74,6 +74,20 @@ async function fixture(options = {}) {
         }
         if (url.pathname === "/rest/v1/rpc/get_game")
           return Response.json(null);
+        if (url.pathname === "/rest/v1/rpc/get_game_sheet")
+          return Response.json(null);
+        if (url.pathname === "/rest/v1/rpc/save_game_sheet") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const { p_command } = await request.json();
+          return Response.json({
+            requestId: p_command.requestId,
+            version: p_command.baseVersion + 1,
+            confirmed: false,
+          });
+        }
         if (url.pathname === "/rest/v1/rpc/save_game") {
           assert.equal(
             request.headers.get("authorization"),
@@ -246,6 +260,111 @@ async function fixture(options = {}) {
     });
   return { mf, send, login, calls };
 }
+
+test("sheet routes authorize and validate domain, path correlation, origin and limits before RPC", async () => {
+  const f = await fixture();
+  try {
+    const path = `/api/games/${id}/sheet`;
+    assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, body, extra = {}, suffix = "") =>
+      f.mf.dispatchFetch(`${origin}${path}${suffix}`, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    const r = await send("GET");
+    assert.equal(r.status, 200);
+    assert.equal(await r.json(), null);
+    const command = {
+      requestId: id,
+      gameId: id,
+      gameVersion: 1,
+      baseVersion: 0,
+      confirm: false,
+      reason: "",
+      document: {
+        rulesVersion: "FIBA_2024",
+        periods: 4,
+        participants: [],
+        staff: {
+          home: {
+            captainRosterEntryId: null,
+            coachStaffEntryId: null,
+            assistantStaffEntryId: null,
+          },
+          away: {
+            captainRosterEntryId: null,
+            coachStaffEntryId: null,
+            assistantStaffEntryId: null,
+          },
+        },
+        events: [],
+      },
+    };
+    const save = await send("POST", command);
+    assert.equal(save.status, 200);
+    assert.deepEqual(await save.json(), {
+      requestId: id,
+      version: 1,
+      confirmed: false,
+    });
+    assert.equal(
+      (
+        await send("POST", {
+          ...command,
+          gameId: "10000000-0000-4000-8000-000000000002",
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (await send("POST", { ...command, confirm: true })).status,
+      400,
+    );
+    assert.equal(
+      (await send("POST", command, { origin: "https://evil.test" })).status,
+      403,
+    );
+    assert.equal((await send("GET", undefined, {}, "?unknown=x")).status, 405);
+    assert.equal(
+      (await send("POST", { ...command, padding: "x".repeat(524288) })).status,
+      413,
+    );
+    const invalid = structuredClone(command);
+    invalid.document.participants = [
+      {
+        rosterEntryId: id,
+        side: "home",
+        jersey: "12",
+        played: false,
+        starter: false,
+      },
+      {
+        rosterEntryId: "10000000-0000-4000-8000-000000000002",
+        side: "away",
+        jersey: "77",
+        played: true,
+        starter: false,
+      },
+    ];
+    invalid.document.events = [
+      { id, side: "home", period: 1, target: "12", code: "2" },
+    ];
+    assert.equal((await send("POST", invalid)).status, 400);
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/save_game_sheet").length,
+      1,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("game routes enforce session, fixed RPCs, origin and contextual commands", async () => {
   const f = await fixture();

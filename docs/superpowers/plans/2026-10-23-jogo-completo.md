@@ -16,8 +16,9 @@
 
 ## G2 — participantes e súmula persistida
 
-- [ ] Relacionados/camisa da ocasião/participação por jogo, snapshots e comissão ligados às identidades existentes. Capitão sempre explícito; sem técnico próprio capitão assume, assistente só com técnico próprio. Cinco titulares por equipe para publicar; não inferir do elenco. Alterar elenco global não reatribui histórico.
-- [ ] Integrar motor fornecido por contrato de domínio, mesmas entradas por teclado e feedback já aprovados. Backend valida documento, regras, naipe, participantes e versões; não confiar no browser. Persistir rascunhos, desfazer/refazer e recuperação; imutabilidade de relacionados/camisas confirmados e motivos de revisão/fallback.
+- [x] Relacionados/camisa da ocasião/participação por jogo, snapshots e comissão ligados às identidades existentes. Capitão sempre explícito; sem técnico próprio capitão assume, assistente só com técnico próprio. Cinco titulares por equipe para publicar; não inferir do elenco. Alterar elenco global não reatribui histórico.
+- [x] Motor fornecido integrado por adaptador de UUID/slots, entradas por teclado e feedback aprovado; backend/SQL validam documento, regras, naipe, participantes e versões. Rascunhos/desfazer/refazer/recuperação, gate128/8SQL/9workerd e58 browsers aprovados. API/UI G2 aguardam publicação por OAuth Cloudflare; CI será registrada após commit estável.
+- [ ] Imutabilidade dos relacionados/camisas confirmados e motivos de revisão/fallback entram com confirmação/publicação G4, sem declarar etapa4 completa antes do percurso inteiro.
 
 ## G3 — PDFs e fontes
 
