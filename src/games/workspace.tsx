@@ -61,6 +61,8 @@ export function GamesWorkspace(props: Props) {
     [auxiliary, setAuxiliary] = useState(false);
   const pending = useRef<SaveGame | null>(null),
     auxGuard = useRef<() => boolean>(() => true),
+    auxiliaryTrigger = useRef<HTMLButtonElement>(null),
+    returningFromAuxiliary = useRef(false),
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null);
   const dirty = !!editor && JSON.stringify(editor.game) !== baseline;
@@ -90,7 +92,11 @@ export function GamesWorkspace(props: Props) {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, uncertain]);
   useEffect(() => {
-    if (props.enabled) heading.current?.focus();
+    if (!props.enabled) return;
+    if (!auxiliary && returningFromAuxiliary.current) {
+      returningFromAuxiliary.current = false;
+      auxiliaryTrigger.current?.focus();
+    } else heading.current?.focus();
   }, [props.enabled, editor?.game.id, auxiliary]);
   useEffect(() => {
     if (error && props.enabled) alert.current?.focus();
@@ -293,6 +299,7 @@ export function GamesWorkspace(props: Props) {
             className="secondary"
             onClick={() => {
               if (auxGuard.current()) {
+                returningFromAuxiliary.current = true;
                 setAuxiliary(false);
                 setEpoch((v) => v + 1);
               }
@@ -379,7 +386,11 @@ export function GamesWorkspace(props: Props) {
               >
                 Mais inscrições
               </button>
-              <button type="button" onClick={() => setAuxiliary(true)}>
+              <button
+                ref={auxiliaryTrigger}
+                type="button"
+                onClick={() => setAuxiliary(true)}
+              >
                 Criar ou editar inscrição aqui
               </button>
             </div>

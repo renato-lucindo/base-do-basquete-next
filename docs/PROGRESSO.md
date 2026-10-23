@@ -1,3 +1,19 @@
+# Retomada G1 — 23/10/2026 19:51 America/Sao_Paulo (UTC-03)
+
+**Objetivo/unidade:** etapa4 autorizada, G1 cadastro direto de jogos. Branch codex/jogos, PR draft#8 sobre codex/importacao-texto/#7; remoto https://github.com/renato-lucindo/base-do-basquete-next. Base017db15, DBab6e80b,API17d9fb2,WIPc64a9cb; obter SHA final de G1 no Git. Workspace Windows habitual. Git local/remoto e PR reconciliados; mudanças atuais são exclusivamente do agente, nenhum dado/mudança humana alterado.
+
+**Concluído nesta retomada:** cenário de criar inscrição na própria área do jogo e retornar com agenda/seleção preservadas; foco devolvido ao botão de origem após RED do teste; paginação/busca preservam IDs escolhidos. Capturas desktop e320px inspecionadas, sem corte horizontal. Dez browsers G1 PASS, mais38 regressões C1/C2/C3/C4 PASS. Gate consolidado PASS:118 unitários/24 arquivos,5 transportes,6 cenários PostgreSQL do zero/upgrade,8 workerd, tipos/lint/formatação/builds/fronteira/segredos. SQL real G1 e harness126 inalterados reutilizados. Smoke remoto preparado com duas rotas GET Jogos, ainda NÃO executado. Sem revisão independente/escala/corrida multi-conexão/WCAG completa comprovadas.
+
+**Bloqueio de publicação:** os dois acessos oficiais Cloudflare retornaram falha de reautenticação OAuth (oauth_token_endpoint_unauthorized; refresh invalid_client). Solicitada reconexão do plugin ao responsável nesta conversa; sem tokens/senhas no chat, sem extração de segredos e sem tentar contornar a autorização. Nenhum deploy em andamento. Preview continua importador source22529ea/deployment5df3122d-f1ed-4097-9c3d-a84a5cf2780d; Jogos ainda não está disponível nele. Access/cofre/namespace preservados, sem política/token temporário aberto. CI de G1 deve ser disparada pelo commit estável após este registro.
+
+**Serviços/dados:** Supabase vínculo autorizado/projeto nizmasjddyrhmevvfviz conferido, jogos/recibosG1 zero,pessoas1,inscrições2,conferências6. Migration20261023192926 permanece aplicada; nenhuma DDL nesta retomada. Preservar dados humanos e demais contagens registradas abaixo. Não consultar serviços/repositório anterior.
+
+**Próximo exato:** commit/push G1 estável, atualizar PR8 e conferir CI correspondente. Assim que Cloudflare reconectado, reconciliar Access/Worker, preparar upload dos builds já verificados, publicar preservando proteção/cofre/namespace, smoke completo de transporte/novas rotas/assets com credencial efêmera criptografada e revogação imediata; pedir avaliação humana do cadastro. Enquanto aguarda reconexão, avançar somente partes independentes G2 (contrato/adaptação do motor e testes de participantes/súmula) em unidade separada, sem declarar G1 publicada nem etapa4 completa. G3 PDF/fontes eG4 publicação continuam pendentes.
+
+**Cota real:** retomada0%usado5h/14%semanal; consulta posterior6%/15%. Reset5h Unix1792813525, semanal1793382169; conferir ferramenta novamente antes de longas/entre unidades, ao85%usados checkpoint/push e mesma automação reset+2. Nenhuma compra/reset manual/mudança de plano. Automação existente retomar-preview-base-do-basquete ativa; manter instruções coerentes no próximo checkpoint.
+
+---
+
 # Checkpoint de cota — G1 Jogos, 23/10/2026 16:37 America/Sao_Paulo (UTC-03)
 
 **Objetivo/unidade:** continuar as próximas etapas autorizadas pelo responsável após ajustes básicos do importador (“ok, siga com as próximas etapas”). Etapa4 jogo completo, unidadeG1 cadastro direto/agenda. Plano ativo docs/superpowers/plans/2026-10-23-jogo-completo.md. Banco/API concluídos; tela implementada e testes focais aprovados, ainda WIP sem gate consolidado/CI/deploy. G2 participantes/súmula, G3 PDF/fontes e G4 publicação permanecem pendentes. Não alegar etapa4 concluída.
