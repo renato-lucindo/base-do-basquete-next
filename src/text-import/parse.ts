@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { birthYearFromDate } from "./birth-date";
 import {
   emptyImportPlayer,
   LINE_LIMIT,
@@ -12,9 +12,6 @@ import {
   type TextRow,
 } from "./contract";
 import { parsePositions, tokenize } from "./tokens";
-const dateSchema = z.iso
-  .date()
-  .refine((value) => Number(value.slice(0, 4)) >= 1);
 function parsePlayer(
   source: string,
   line: number,
@@ -83,13 +80,20 @@ function parsePlayer(
       continue;
     }
     const normal = normalizeName(token);
-    const date = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/u.exec(token);
+    const date = /^(\d{1,2})\/(\d{1,2})\/(\d{4}|\d{2})$/u.exec(token);
     if (date || /^\d{4}-\d{2}-\d{2}$/u.test(token)) {
+      const year =
+        date && date[3].length === 2
+          ? (Number(date[3]) <= 29 ? "20" : "19") + date[3]
+          : date?.[3];
       const iso = date
-        ? `${date[3]}-${date[2].padStart(2, "0")}-${date[1].padStart(2, "0")}`
+        ? `${year}-${date[2].padStart(2, "0")}-${date[1].padStart(2, "0")}`
         : token;
-      if (dateSchema.safeParse(iso).success) set("birthDate", iso, token);
-      else {
+      const birthYear = birthYearFromDate(iso);
+      if (birthYear !== null) {
+        set("birthDate", iso, token);
+        set("birthYear", birthYear, token);
+      } else {
         provided("birthDate");
         issue("birthDate", token, "Data de nascimento inválida.");
       }
@@ -148,11 +152,14 @@ function parsePlayer(
           const meters =
             height[2] === "m" ||
             (!height[2] && /[,.]/u.test(height[1]) && numeric < 3);
-          set(
-            "heightCm",
-            meters ? Math.round(numeric * 1000) / 10 : numeric,
-            token,
-          );
+          if (!height[2] && !meters && numeric >= 10 && numeric <= 150)
+            set("weightKg", numeric, token);
+          else
+            set(
+              "heightCm",
+              meters ? Math.round(numeric * 1000) / 10 : numeric,
+              token,
+            );
         } else
           issue(
             null,

@@ -1,5 +1,75 @@
 import { test, expect } from "@playwright/test";
 import { textImportFixture, openTextImport, tid } from "./fixtures/text-import";
+test("interpreta a amostra do MVP e sincroniza ano ao editar a data completa", async ({
+  page,
+}) => {
+  const f = await textImportFixture(page);
+  await openTextImport(page);
+  await page
+    .getByLabel("Texto do elenco", { exact: true })
+    .fill(
+      'João - Esquerda - 74,9\n12- Ricardo - 193 - 1999\n23- Mike - "MJ" - 2000 - SG\n77- Luke Silva - 180 - 75kg\n88- John - 20/07/2001 - 117kg - Pivô\n91- Pato Ganso - "PH" - Canhoto\nRenato - 01/01/97 - 127 - 151',
+    );
+  await page
+    .getByRole("button", { name: "Interpretar texto", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Peso (kg), linha 1", { exact: true }),
+  ).toHaveValue("74.9");
+  await expect(
+    page.getByLabel("Altura (cm), linha 1", { exact: true }),
+  ).toHaveValue("");
+  await expect(
+    page.getByLabel("Nascimento, linha 5", { exact: true }),
+  ).toHaveValue("2001-07-20");
+  await expect(
+    page.getByLabel("Ano de nascimento, linha 5", { exact: true }),
+  ).toHaveValue("2001");
+  await expect(
+    page.getByLabel("Nascimento, linha 7", { exact: true }),
+  ).toHaveValue("1997-01-01");
+  await expect(
+    page.getByLabel("Ano de nascimento, linha 7", { exact: true }),
+  ).toHaveValue("1997");
+  await expect(
+    page.getByLabel("Peso (kg), linha 7", { exact: true }),
+  ).toHaveValue("127");
+  await expect(
+    page.getByLabel("Altura (cm), linha 7", { exact: true }),
+  ).toHaveValue("151");
+  await page
+    .getByLabel("Nascimento, linha 7", { exact: true })
+    .fill("1998-03-02");
+  await expect(
+    page.getByLabel("Ano de nascimento, linha 7", { exact: true }),
+  ).toHaveValue("1998");
+  await page
+    .getByRole("button", { name: "Salvar conferência", exact: true })
+    .click();
+  // Previously saved drafts can have a complete date without a separate year.
+  const saved = [...f.reviews.values()][0];
+  saved.rows[6].data.birthYear = null;
+  saved.rows[6].provided = saved.rows[6].provided.filter(
+    (key) => key !== "birthYear",
+  );
+  await page.reload();
+  await page
+    .getByRole("button", { name: "Expandir Lobos", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Importar elenco", exact: true })
+    .click();
+  await page
+    .getByText("Retomar uma conferência salva", { exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: /Retomar conferência/ })
+    .first()
+    .click();
+  await expect(
+    page.getByLabel("Ano de nascimento, linha 7", { exact: true }),
+  ).toHaveValue("1998");
+});
 test("importa dados ricos, conserva existentes/ausentes e retoma conferência salva", async ({
   page,
 }, info) => {

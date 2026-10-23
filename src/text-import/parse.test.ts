@@ -3,6 +3,68 @@ import { parseRoster } from "./parse";
 import { reviewIssues } from "./review";
 const id = () => crypto.randomUUID();
 describe("single roster text interpretation", () => {
+  it("interprets the MVP feedback sample with short dates, derived years and unitless weights", () => {
+    const result = parseRoster(
+      'João - Esquerda - 74,9\n12- Ricardo - 193 - 1999\n23- Mike - "MJ" - 2000 - SG\n77- Luke Silva - 180 - 75kg\n88- John - 20/07/2001 - 117kg - Pivô\n91- Pato Ganso - "PH" - Canhoto\nRenato - 01/01/97 - 127 - 151',
+      id,
+    );
+    expect(result.rows[0].data).toMatchObject({
+      name: "João",
+      dominantHand: "left",
+      weightKg: 74.9,
+      heightCm: null,
+    });
+    expect(result.rows[1].data).toMatchObject({
+      name: "Ricardo",
+      jersey: "12",
+      heightCm: 193,
+      birthYear: 1999,
+    });
+    expect(result.rows[4].data).toMatchObject({
+      birthDate: "2001-07-20",
+      birthYear: 2001,
+      weightKg: 117,
+    });
+    expect(result.rows[6].data).toMatchObject({
+      name: "Renato",
+      birthDate: "1997-01-01",
+      birthYear: 1997,
+      weightKg: 127,
+      heightCm: 151,
+    });
+    expect(result.rows[6].provided).toEqual(
+      expect.arrayContaining([
+        "birthDate",
+        "birthYear",
+        "weightKg",
+        "heightCm",
+      ]),
+    );
+    expect(result.rows.flatMap((r) => r.issues)).toEqual([]);
+  });
+  it("keeps explicit units authoritative and short-year rules stable", () => {
+    const result = parseRoster(
+      "Ana - 127cm - 74,9kg - 01/02/05\nBia - 151kg - 1,93m - 31/02/97\nCarla - 31/12/29\nDani - 01/01/30",
+      id,
+    );
+    expect(result.rows[0].data).toMatchObject({
+      heightCm: 127,
+      weightKg: 74.9,
+      birthDate: "2005-02-01",
+      birthYear: 2005,
+    });
+    expect(result.rows[1].data).toMatchObject({
+      heightCm: 193,
+      weightKg: 151,
+      birthDate: null,
+      birthYear: null,
+    });
+    expect(result.rows[1].issues.some((i) => i.field === "birthDate")).toBe(
+      true,
+    );
+    expect(result.rows[2].data.birthYear).toBe(2029);
+    expect(result.rows[3].data.birthYear).toBe(1930);
+  });
   it("accepts tab-separated fields and signals invalid federation IDs and year zero dates", () => {
     const result = parseRoster(
       "4\tAna\t1,80\t001234\nBia - 12345\nCarla - 0000-02-01",
@@ -43,7 +105,7 @@ describe("single roster text interpretation", () => {
     expect(result.rows[3].data).toMatchObject({ heightCm: 180, weightKg: 75 });
     expect(result.rows[4].data).toMatchObject({
       birthDate: "2001-07-02",
-      birthYear: null,
+      birthYear: 2001,
       weightKg: 117,
       positions: ["Pivô"],
     });
@@ -108,7 +170,7 @@ describe("single roster text interpretation", () => {
     expect(r.rows[0].data).toMatchObject({
       birthDate: "2000-02-29",
       federationRegistration: "001234",
-      birthYear: null,
+      birthYear: 2000,
     });
     expect(r.rows[0].data).not.toHaveProperty("publicBirthYear");
     expect(r.rows[1].issues.some((i) => i.field === "birthDate")).toBe(true);

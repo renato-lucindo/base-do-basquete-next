@@ -209,6 +209,12 @@ export function TextImportWorkspace(props: Props) {
             Aceita altura em metros ou centímetros, nascimento completo ou ano,
             até duas posições e registro federativo de seis dígitos.
           </p>
+          <p>
+            Sem unidade: números de 10 a 150 sugerem peso em kg; acima de 150,
+            altura em cm. Para evitar ambiguidade, use kg, cm ou m. Em datas com
+            ano de dois dígitos, 00–29 significa 2000–2029 e 30–99 significa
+            1930–1999.
+          </p>
           <button
             type="button"
             disabled={disabled || !model.text.trim()}

@@ -1,5 +1,13 @@
 # C4 — importador de elenco por texto
 
+## Ajuste básico do MVP — 23/10, amostra João/Renato
+
+Pedido posterior do responsável: reconhecer `01/01/97`, preencher ano a partir da data completa e distinguir pesos sem unidade. Regra reversível do MVP: números sem unidade de10 a150 sugerem kg; acima de150 sugerem cm; decimais em metros e unidades explícitas kg/cm/m conservam prioridade. Assim João74,9 fica com peso74,9 e Renato127/151 com peso127/altura151. A tabela continua editável e a regra aparece antes da interpretação. Não equivale a inferência universal de medidas; alturas menores ou pesos maiores usam unidade explícita ou correção na tabela.
+
+Datas dd/mm/aa usam corte fixo00–29→2000–2029 e30–99→1930–1999, explicitado na tela; datas impossíveis continuam pendentes. Data completa preenche ano privado na interpretação/edição, e conferências anteriores exibem o ano derivado sem reescrever seu documento. Nenhum ano público é inferido. Data e ano divergentes continuam bloqueados; banco/schema/contratos HTTP inalterados.
+
+RED observado nos dois casos unitários novos. Parser/provider/contratos15 testes PASS; gate consolidado113 unitários/22arquivos,5 transportes,5 SQL,7 workerd e demais checks PASS.16 browsers do importador PASS; dois focais adicionais verificam a amostra e retomada de documento anterior com data completa/ano separado ausente. Evidências do SQL/serviços/harness inalterados reutilizadas. Source/CI/deployment deste ajuste serão registrados no checkpoint de entrega.
+
 Implementado conforme ESCOPO-IMPORTADOR-DE-EQUIPES.md fornecido pelo responsável e preservado literalmente. Branch `codex/importacao-texto`, PR draft [#7](https://github.com/renato-lucindo/base-do-basquete-next/pull/7) sobre C3/#6. Sem merge na principal. A avaliação humana com texto real foi solicitada e permanece pendente.
 
 ## Fluxo entregue

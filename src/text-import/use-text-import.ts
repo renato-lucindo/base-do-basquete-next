@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { parseRoster } from "./parse";
+import { birthYearFromDate } from "./birth-date";
 import { reviewIssues } from "./review";
 import {
   textReviewSnapshotSchema,
@@ -386,12 +387,25 @@ export function useTextImport(props: Props) {
     key: K,
     value: ImportPlayer[K],
   ) {
-    patchRow(id, (row) => ({
-      ...row,
-      data: { ...row.data, [key]: value },
-      provided: [...new Set([...row.provided, key])],
-      issues: row.issues.filter((i) => i.field !== key),
-    }));
+    patchRow(id, (row) => {
+      const year =
+        key === "birthDate" && typeof value === "string"
+          ? birthYearFromDate(value)
+          : null;
+      const updated: PlayerField[] = year === null ? [key] : [key, "birthYear"];
+      return {
+        ...row,
+        data: {
+          ...row.data,
+          [key]: value,
+          ...(year === null ? {} : { birthYear: year }),
+        },
+        provided: [...new Set([...row.provided, ...updated])],
+        issues: row.issues.filter(
+          (i) => i.field === null || !updated.includes(i.field),
+        ),
+      };
+    });
   }
   function choose(id: string, c: ImportCandidate) {
     setCandidates({ ...candidatesRef.current, [c.id]: c });

@@ -1,6 +1,7 @@
 import { positions, type ImportPlayer, type PlayerField } from "./contract";
 import type { TextImportModel } from "./use-text-import";
 import type { ImportCandidate } from "./matching-contract";
+import { birthYearFromDate } from "./birth-date";
 const labels: Record<PlayerField, string> = {
   name: "Nome",
   jersey: "Camisa",
@@ -56,9 +57,22 @@ export function ImportTable({
             function value<K extends PlayerField>(
               key: K,
             ): ImportCandidate["data"][K] {
-              if (row.provided.includes(key) || !current) return row.data[key];
+              const imported = {
+                ...row.data,
+                birthYear:
+                  row.data.birthYear ?? birthYearFromDate(row.data.birthDate),
+              };
+              if (
+                row.provided.includes(key) ||
+                !current ||
+                (key === "birthYear" && row.provided.includes("birthDate"))
+              )
+                return imported[key];
               const displayed = {
                 ...current.data,
+                birthYear:
+                  current.data.birthYear ??
+                  birthYearFromDate(current.data.birthDate),
                 jersey: current.roster?.jersey ?? null,
               };
               return displayed[key];
