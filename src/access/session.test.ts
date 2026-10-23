@@ -49,6 +49,34 @@ function fixture() {
 }
 
 describe("persistent administrative session", () => {
+  it("runs data operations with rotated authority inside the queue and closes before the next operation", async () => {
+    const f = fixture();
+    const session = f.create();
+    await session.create(credentials);
+    f.tick(900000);
+    const operation = vi.fn(
+      async ({
+        actor: identity,
+        accessToken,
+      }: {
+        actor: { id: string };
+        accessToken: string;
+      }) => {
+        expect(identity).toEqual(actor);
+        expect(accessToken).toBe("fixture-rotated-access");
+        return { saved: true };
+      },
+    );
+    const results = await Promise.allSettled([
+      session.runAuthorized(operation),
+      session.close(),
+      session.runAuthorized(operation),
+    ]);
+    expect(results[0]).toEqual({ status: "fulfilled", value: { saved: true } });
+    expect(results[2].status).toBe("rejected");
+    expect(operation).toHaveBeenCalledTimes(1);
+    expect(f.provider.refresh).toHaveBeenCalledTimes(1);
+  });
   it("stores encrypted tokens, never credentials, and recovers after a new instance", async () => {
     const f = fixture();
     expect(await f.create().create(credentials)).toEqual(actor);

@@ -1,0 +1,171 @@
+.competition-workspace {
+  margin-top: 28px;
+  background: #fff;
+  padding: 24px;
+  border-top: 2px solid #d9e2ee;
+}
+.competition-workspace h2 {
+  font-size: 24px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.competition-workspace h3 {
+  font-size: 18px;
+  margin-top: 28px;
+}
+.competition-title,
+.competition-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.competition-actions {
+  justify-content: flex-start;
+}
+.competition-title {
+  margin-bottom: 20px;
+}
+.competition-title > label {
+  max-width: 200px;
+}
+.competition-workspace label {
+  display: grid;
+  gap: 6px;
+  font-size: 16px;
+  min-width: 0;
+}
+.competition-workspace input,
+.competition-workspace select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 10px;
+  border: 1px solid #74839b;
+  background: #fff;
+  color: inherit;
+  border-radius: 3px;
+  font: inherit;
+}
+.competition-workspace fieldset {
+  min-width: 0;
+}
+.competition-form {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.competition-form > legend {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.competition-season {
+  border: 1px solid #9caac0;
+  margin: 24px 0;
+  padding: 16px;
+}
+.competition-season > legend {
+  font-weight: 700;
+  padding: 0 8px;
+}
+.competition-dispute {
+  border: 1px solid #d9e2ee;
+  border-left: 3px solid #9caac0;
+  padding: 16px;
+  margin: 16px 0;
+}
+.competition-dispute.selected {
+  border-left-color: #075fca;
+}
+.competition-dispute > legend {
+  padding: 0 6px;
+}
+.competition-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.competition-fields label > span {
+  font-size: 14px;
+  color: #42526b;
+}
+.competition-radio {
+  display: flex !important;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+}
+.competition-radio input {
+  width: 20px;
+  min-height: 20px;
+  height: 20px;
+}
+.competition-save {
+  padding-top: 20px;
+  border-top: 1px solid #d9e2ee;
+}
+.competition-context {
+  border-left: 3px solid #075fca;
+  background: #eef6ff;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.competition-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.competition-list li {
+  padding: 16px 0;
+  border-bottom: 1px solid #d9e2ee;
+  overflow-wrap: anywhere;
+}
+.competition-list p {
+  margin: 4px 0;
+}
+.competition-list small {
+  color: #42526b;
+  font-size: 14px;
+}
+.competition-open {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  color: #075fca;
+  padding: 6px 0;
+  text-align: left;
+  font-weight: 650;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.competition-search {
+  margin: 16px 0 24px;
+}
+.competition-workspace .secondary {
+  background: #fff;
+  color: #172033;
+  border-color: #74839b;
+}
+@media (max-width: 650px) {
+  .competition-workspace {
+    padding: 16px 0;
+  }
+  .competition-fields {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .competition-season,
+  .competition-dispute {
+    padding: 12px;
+  }
+  .competition-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .competition-actions > button {
+    max-width: 100%;
+  }
+}

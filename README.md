@@ -10,7 +10,7 @@ A primeira entrega é um protótipo navegável com dados fictícios para avaliar
 
 O Access protege esta apresentação fictícia. Os rascunhos são próprios de cada navegador e não sincronizam entre máquinas. Roteiro em `docs/VALIDACAO-PROTOTIPO.md`.
 
-A [fundação com acesso por senha](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios, também protegidos pelo Access. Banco/RLS e sessão no servidor estão implementados; conta administrativa criada pelo responsável e habilitada. Em 23/10/2026, o responsável confirmou entrada, permanência após recarregar e saída no preview real. Procedimento e evidências em [docs/ACESSO-ADMINISTRATIVO.md](docs/ACESSO-ADMINISTRATIVO.md). Ainda não há cadastros de negócio integrados.
+O [preview com persistência real](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios, protegidos pelo Access e pelo login interno por senha. Permite criar/editar campeonato, temporadas e disputas na mesma página, buscar e retomar o trabalho; Recentes muda após salvar, não ao visitar. Versões e comandos idempotentes protegem a gravação. Em 23/10/2026, o responsável confirmou login/recarga/saída e depois cadastro/salvamento/retomada do contexto real. Evidências em [docs/VALIDACAO-CONTEXTO.md](docs/VALIDACAO-CONTEXTO.md) e [docs/ACESSO-ADMINISTRATIVO.md](docs/ACESSO-ADMINISTRATIVO.md). Equipes, pessoas, treinadores e elencos serão entregues nas próximas unidades.
 
 ## Executar
 

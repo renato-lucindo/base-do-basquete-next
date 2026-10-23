@@ -5,6 +5,9 @@ test("password form supports keyboard, errors, restore and logout without browse
 }) => {
   let signedIn = false;
   let reject = true;
+  await page.route("**/api/competitions**", (route) =>
+    route.fulfill({ json: { items: [], recents: [], hasMore: false } }),
+  );
   await page.route("**/api/session", async (route) => {
     const method = route.request().method();
     if (method === "POST") {

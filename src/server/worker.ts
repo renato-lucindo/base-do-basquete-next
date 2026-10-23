@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { HttpError, jsonResponse, readMutationJson } from "./http";
+import { saveCompetitionSchema } from "../competition/contract";
 import {
   cookieHeader,
   clearCookieHeader,
@@ -25,6 +26,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/competitions" ||
+        url.pathname.startsWith("/api/competitions/")
+      )
+        response = await competitionRoute(request, env, url);
       else if (!["GET", "HEAD"].includes(request.method))
         throw new HttpError(405, "invalid_method", "Método não permitido.");
       else if (!url.pathname.startsWith("/api/")) {
@@ -64,6 +70,73 @@ export default {
     return response;
   },
 } satisfies ExportedHandler<Env>;
+
+async function competitionRoute(
+  request: Request,
+  env: Env,
+  url: URL,
+): Promise<Response> {
+  const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
+  if (!name)
+    throw new HttpError(
+      401,
+      "invalid_session",
+      "Entre para acessar a área administrativa.",
+    );
+  const session = env.SESSIONS.getByName(name);
+  const root = url.pathname === "/api/competitions";
+  if (root && request.method === "GET") {
+    const allowed = ["q", "offset"];
+    if (
+      [...url.searchParams.keys()].some(
+        (k) => !allowed.includes(k) || url.searchParams.getAll(k).length !== 1,
+      )
+    )
+      throw badContext();
+    const query = url.searchParams.get("q") ?? "";
+    const offsetText = url.searchParams.get("offset") ?? "0";
+    const offset = Number(offsetText);
+    if (
+      query.length > 120 ||
+      !/^\d+$/.test(offsetText) ||
+      !Number.isSafeInteger(offset) ||
+      offset > 100000
+    )
+      throw badContext();
+    const result = await session.listCompetitions(query, offset);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
+  if (root && request.method === "POST" && !url.search) {
+    const command = await readMutationJson(request, saveCompetitionSchema, {
+      origin: env.APP_ORIGIN,
+      maxBytes: 262144,
+    });
+    const result = await session.saveCompetition(command);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
+  if (!root && request.method === "GET" && !url.search) {
+    const id = z
+      .uuid()
+      .safeParse(url.pathname.slice("/api/competitions/".length));
+    if (!id.success) throw badContext();
+    const result = await session.getCompetition(id.data);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
+  throw new HttpError(405, "invalid_method", "Método não permitido.");
+}
+function badContext() {
+  return new HttpError(
+    400,
+    "invalid_input",
+    "Contexto inválido. Revise os dados.",
+  );
+}
 
 async function sessionRoute(request: Request, env: Env): Promise<Response> {
   if (request.method === "POST") {

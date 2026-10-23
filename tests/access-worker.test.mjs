@@ -65,6 +65,26 @@ async function fixture(options = {}) {
           );
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (url.pathname === "/rest/v1/rpc/list_competitions") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          return Response.json({ items: [], recents: [], hasMore: false });
+        }
+        if (url.pathname === "/rest/v1/rpc/save_competition") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const body = await request.json();
+          return Response.json({
+            id: body.p_command.competition.id,
+            version: 1,
+          });
+        }
+        if (url.pathname === "/rest/v1/rpc/get_competition")
+          return Response.json(null);
         throw new Error("Unexpected outbound endpoint");
       },
     }),
@@ -86,6 +106,95 @@ async function fixture(options = {}) {
     });
   return { mf, send, login, calls };
 }
+
+test("competition HTTP operations require session and origin, use fixed RPCs and return no token", async () => {
+  const f = await fixture();
+  const command = {
+    commandId: "20000000-0000-4000-8000-000000000001",
+    expectedVersion: 0,
+    competition: {
+      id: "20000000-0000-4000-8000-000000000002",
+      name: "Liga",
+      seasons: [
+        {
+          id: "20000000-0000-4000-8000-000000000003",
+          year: 2026,
+          disputes: [
+            {
+              id: "20000000-0000-4000-8000-000000000004",
+              gender: "feminino",
+              category: "Adulto",
+              division: null,
+            },
+          ],
+        },
+      ],
+    },
+  };
+  try {
+    assert.equal(
+      (await f.mf.dispatchFetch(`${origin}/api/competitions`)).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, path, body, extra = {}) =>
+      f.mf.dispatchFetch(`${origin}${path}`, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    const list = await send("GET", "/api/competitions?q=Adulto&offset=20");
+    assert.equal(list.status, 200);
+    assert.deepEqual(await list.json(), {
+      items: [],
+      recents: [],
+      hasMore: false,
+    });
+    const saved = await send("POST", "/api/competitions", command);
+    assert.equal(saved.status, 200);
+    assert.deepEqual(await saved.json(), {
+      id: command.competition.id,
+      version: 1,
+    });
+    assert.equal(
+      (
+        await send("POST", "/api/competitions", command, {
+          origin: "https://evil.example",
+        })
+      ).status,
+      403,
+    );
+    assert.equal(
+      (await send("POST", "/api/competitions", { ...command, actorId: id }))
+        .status,
+      400,
+    );
+    assert.equal(
+      (await send("GET", "/api/competitions/not-an-id")).status,
+      400,
+    );
+    assert.equal(
+      (await send("GET", `/api/competitions/${command.competition.id}`)).status,
+      404,
+    );
+    assert.equal(
+      (await send("GET", "/api/competitions?offset=-1")).status,
+      400,
+    );
+    assert.equal((await send("GET", "/api/competitions?q=a&q=b")).status, 400);
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/save_competition").length,
+      1,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("Worker and Durable Object implement private login, session, logout and cookie integrity", async () => {
   const f = await fixture({ forceRefresh: true });
