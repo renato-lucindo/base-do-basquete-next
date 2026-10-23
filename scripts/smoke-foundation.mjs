@@ -57,6 +57,8 @@ const manifest = JSON.parse(
 let stage = "Access propagation";
 let status;
 let browser;
+let currentPage;
+const browserFailures = [];
 try {
   for (let attempt = 0; attempt < 10; attempt++) {
     const response = await fetch(`${origin}/?ready=${randomUUID()}`, {
@@ -110,8 +112,10 @@ try {
   status = invalid.status;
   assert.equal(status, 401);
   const rejection = await invalid.json();
+  stage = "Auth error contract";
   assert.equal(rejection.error.code, "invalid_session");
   // Access can set its own cookies; failed password login must not mint an app session.
+  stage = "no application cookie on invalid password";
   assert.ok(
     !invalid.headers
       .getSetCookie()
@@ -128,12 +132,24 @@ try {
       extraHTTPHeaders: headers,
     });
     const page = await context.newPage();
+    currentPage = page;
     const errors = [];
     page.on("pageerror", () => errors.push("pageerror"));
-    await page.goto(origin, { waitUntil: "networkidle" });
+    page.on("requestfailed", (request) => {
+      const url = new URL(request.url());
+      browserFailures.push({
+        path: url.origin + url.pathname,
+        failure: request.failure()?.errorText,
+      });
+    });
+    const document = await page.goto(origin, { waitUntil: "domcontentloaded" });
+    status = document?.status();
+    assert.equal(status, 200);
+    stage = `browser ${name} ready`;
     await page
       .getByRole("heading", { name: "Acesso administrativo" })
       .waitFor();
+    stage = `browser ${name} screenshot`;
     await page.screenshot({
       path: `.preview-artifacts/access-${name}.png`,
       fullPage: true,
@@ -159,7 +175,21 @@ try {
     }),
   );
 } catch {
-  console.error(JSON.stringify({ success: false, stage, status }));
+  const diagnostic = currentPage
+    ? {
+        title: await currentPage.title(),
+        text: (await currentPage.locator("body").innerText()).slice(0, 500),
+        requests: browserFailures,
+      }
+    : undefined;
+  if (currentPage)
+    await currentPage
+      .screenshot({
+        path: ".preview-artifacts/access-remote-failure.png",
+        fullPage: true,
+      })
+      .catch(() => undefined);
+  console.error(JSON.stringify({ success: false, stage, status, diagnostic }));
   process.exitCode = 1;
 } finally {
   if (browser) await browser.close();
