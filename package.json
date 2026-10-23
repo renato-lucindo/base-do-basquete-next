@@ -12,7 +12,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:transport": "node --test tests/preview-transport.test.mjs",
+    "test:transport": "node --test tests/preview-transport.test.mjs tests/foundation-transport.test.mjs",
     "test:db": "node --test tests/database.test.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "lint": "eslint src tests scripts",
