@@ -14,3 +14,13 @@ G1 permite cadastrar partidas diretamente entre duas inscrições distintas da d
 Jogos ainda não publicado: conexão oficial Cloudflare requer reautenticação humana. Preview protegido continua no importador22529ea. Smoke preparado inclui GET/api/games e GET/api/games/:id, mas ainda não executado no ambiente remoto. Não atribuir a G1 os smokes/CI do importador. CI de G1 será registrada após commit estável. Nenhuma revisão independente, carga, corrida PostgreSQL multi-conexão ou auditoria WCAG completa comprovada.
 
 G2 participantes/súmula, G3 PDFs/fontes e G4 confirmar/publicar ainda pendentes. Não declarar etapa4 concluída por este cadastro de agenda. Nenhum dado humano foi criado/editado pelos testes.
+
+## G2a — persistência de relacionados e documento
+
+Branch codex/sumula-persistida sobre G1e43246e. Migration20261023225837_game_sheet_drafts aplicada somente no projeto novo; CLI gerou225403 e arquivo foi reconciliado com versão real225837. Contrato real game_sheet.sql com rollback PASS, dados humanos preservados: jogos/súmulas/participantes/recibosG2 zero,pessoas1,inscrições2,conferências6,Auth1. Tipos gerados. Advisor apenas aviso conhecido de senha vazada/Pro.
+
+Oito testes focais TS PASS, incluindo comparação de335 sequências de ações entre motor e PostgreSQL (7 sequências de exclusão/propagação,208 combinações código/alvo/lado,120 sequências determinísticas). Dois cenários PostgreSQL G2 de contrato e upgradeG1 PASS; seis cenários anteriores PASS no mesmo código de migrations, sem repetir após ajuste exclusivo da expectativa do teste de naipe (a guarda anterior também pode rejeitar antes da nova). Typecheck/lint/formatação/segredos focais PASS. Sem API/UI G2 ou gate consolidado G2 ainda.
+
+Rascunho incompleto permitido, ações exigem relacionados e participação válida. Capitão/técnico/assistente por identidade e contexto, camisas0/00 distintas e da ocasião, nomes/snapshots resolvidos pelo servidor. Troca de oponentes/naipe após súmula bloqueada; manutenção do vínculo histórico não transforma vínculo inativo em elegível para nova inclusão. Nenhuma publicação implementada por esta migration; confirm=true rejeitado. Backend Worker ainda deve integrar o adaptador e API.
+
+CI G1 **40036191186 SUCCESS** em e43246ed541fe5ea35e621f21d4aae4e575aff01. Publicação G1 continua bloqueada por reconexão Cloudflare pendente.

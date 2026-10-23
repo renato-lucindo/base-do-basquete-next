@@ -1,0 +1,73 @@
+-- G2 scoped fixtures: all mutations, including administrator replacement, roll back.
+begin;
+create function pg_temp.sh_id(n integer) returns uuid language sql immutable as $$select ('f2000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid$$;
+create function pg_temp.sh_assert(ok boolean,label text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAIL: %',label;end if;end$$;
+create function pg_temp.sh_error(statement text,state text) returns void language plpgsql as $$begin begin execute statement;exception when others then if sqlstate=state then return;end if;raise;end;raise exception 'Expected SQLSTATE %',state;end$$;
+create function pg_temp.sh_doc() returns jsonb language sql as $$select jsonb_build_object('rulesVersion','FIBA_2024','periods',4,'participants',jsonb_build_array(
+jsonb_build_object('rosterEntryId',pg_temp.sh_id(21),'side','home','jersey','00','played',false,'starter',false),
+jsonb_build_object('rosterEntryId',pg_temp.sh_id(22),'side','away','jersey','0','played',false,'starter',false)),
+'staff',jsonb_build_object('home',jsonb_build_object('captainRosterEntryId',pg_temp.sh_id(21),'coachStaffEntryId',null,'assistantStaffEntryId',null),'away',jsonb_build_object('captainRosterEntryId',null,'coachStaffEntryId',null,'assistantStaffEntryId',null)),'events','[]'::jsonb)$$;
+create function pg_temp.sh_command(n integer default 1) returns jsonb language sql as $$select jsonb_build_object('requestId',pg_temp.sh_id(100+n),'gameId',pg_temp.sh_id(9),'gameVersion',1,'baseVersion',0,'confirm',false,'reason','','document',pg_temp.sh_doc())$$;
+grant execute on function pg_temp.sh_id(integer),pg_temp.sh_assert(boolean,text),pg_temp.sh_error(text,text),pg_temp.sh_doc(),pg_temp.sh_command(integer) to anon,authenticated,service_role;
+delete from public.admin_access;
+insert into auth.users(id) values(pg_temp.sh_id(98)),(pg_temp.sh_id(99));
+insert into public.admin_access(user_id) values(pg_temp.sh_id(98));
+insert into public.championships(id,name) values(pg_temp.sh_id(1),'G2 fixture');
+insert into public.seasons(id,championship_id,year) values(pg_temp.sh_id(2),pg_temp.sh_id(1),2026);
+insert into public.disputes(id,season_id,gender,category) values(pg_temp.sh_id(3),pg_temp.sh_id(2),'masculino','Adulto');
+insert into public.teams(id,name) values(pg_temp.sh_id(4),'Shared global team');
+insert into public.registrations(id,dispute_id,team_id,name) values(pg_temp.sh_id(5),pg_temp.sh_id(3),pg_temp.sh_id(4),'Home'),(pg_temp.sh_id(6),pg_temp.sh_id(3),pg_temp.sh_id(4),'Away'),(pg_temp.sh_id(7),pg_temp.sh_id(3),pg_temp.sh_id(4),'Other');
+insert into public.games(id,dispute_id,home_registration_id,away_registration_id) values(pg_temp.sh_id(9),pg_temp.sh_id(3),pg_temp.sh_id(5),pg_temp.sh_id(6));
+insert into public.persons(id,name) values(pg_temp.sh_id(11),'Player A'),(pg_temp.sh_id(12),'Player B'),(pg_temp.sh_id(13),'Outside'),(pg_temp.sh_id(14),'Coach'),(pg_temp.sh_id(15),'Assistant');
+insert into private.athletes(person_id,sex) values(pg_temp.sh_id(11),'male'),(pg_temp.sh_id(12),'male'),(pg_temp.sh_id(13),'male');
+insert into public.coaches(person_id) values(pg_temp.sh_id(14)),(pg_temp.sh_id(15));
+insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey) values(pg_temp.sh_id(21),pg_temp.sh_id(5),pg_temp.sh_id(3),pg_temp.sh_id(11),'12'),(pg_temp.sh_id(22),pg_temp.sh_id(6),pg_temp.sh_id(3),pg_temp.sh_id(12),'77'),(pg_temp.sh_id(23),pg_temp.sh_id(7),pg_temp.sh_id(3),pg_temp.sh_id(13),'23');
+insert into public.staff_entries(id,registration_id,dispute_id,person_id,role) values(pg_temp.sh_id(31),pg_temp.sh_id(5),pg_temp.sh_id(3),pg_temp.sh_id(14),'head'),(pg_temp.sh_id(32),pg_temp.sh_id(5),pg_temp.sh_id(3),pg_temp.sh_id(15),'assistant');
+set local role anon;
+select pg_temp.sh_error('select public.get_game_sheet(pg_temp.sh_id(9))','42501');
+select pg_temp.sh_error('select public.save_game_sheet(pg_temp.sh_command())','42501');
+set local role authenticated;
+set local request.jwt.claim.sub='f2000000-0000-4000-8000-000000000099';
+select pg_temp.sh_error('select public.save_game_sheet(pg_temp.sh_command())','PT403');
+set local request.jwt.claim.sub='f2000000-0000-4000-8000-000000000098';
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9)) is null,'no invented sheet');
+select pg_temp.sh_assert((public.save_game_sheet(pg_temp.sh_command())->>'version')::int=1,'save draft');
+select pg_temp.sh_assert((public.save_game_sheet(pg_temp.sh_command())->>'version')::int=1,'replay');
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'confirmed'='false','save never publishes');
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'document'->'participants'->0->>'jersey'='00','occasion shirt kept separate');
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'participants'->0->'person'->>'id'=pg_temp.sh_id(11)::text,'stable person identity');
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'staff'->'home'->'captain'->>'id'=pg_temp.sh_id(11)::text and public.get_game_sheet(pg_temp.sh_id(9))->'staff'->'home'->'coach'='null','captain fallback is not own coach');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(pg_temp.sh_command(),'{reason}','"changed intent"'))$q$,'PT409');
+select pg_temp.sh_error($q$select public.save_game_sheet(pg_temp.sh_command(2))$q$,'PT409');
+-- Versions, context, publication flag, identity and assistant rules are independently enforced by SQL.
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(3),'{baseVersion}','1'),'{gameVersion}','2'))$q$,'PT409');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(4),'{baseVersion}','1'),'{confirm}','true'))$q$,'PT400');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(5),'{baseVersion}','1'),'{document,participants,0,rosterEntryId}',to_jsonb(pg_temp.sh_id(23))))$q$,'PT400');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(6),'{baseVersion}','1'),'{document,staff,home,assistantStaffEntryId}',to_jsonb(pg_temp.sh_id(32))))$q$,'PT400');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(7),'{baseVersion}','1'),'{document,staff,away,captainRosterEntryId}',to_jsonb(pg_temp.sh_id(21))))$q$,'PT400');
+select pg_temp.sh_error($q$select public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(8),'{baseVersion}','1'),'{document,events}',jsonb_build_array(jsonb_build_object('id',pg_temp.sh_id(80),'side','home','period',1,'target','00','code','2'))))$q$,'PT400');
+select pg_temp.sh_assert((public.get_game_sheet(pg_temp.sh_id(9))->>'version')::int=1,'failed writes remain atomic');
+select public.save_game_sheet(jsonb_set(jsonb_set(jsonb_set(pg_temp.sh_command(9),'{baseVersion}','1'),'{document,staff,home,coachStaffEntryId}',to_jsonb(pg_temp.sh_id(31))),'{document,staff,home,assistantStaffEntryId}',to_jsonb(pg_temp.sh_id(32))));
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'staff'->'home'->'coach'->>'name'='Coach','coach snapshot from server');
+select pg_temp.sh_error('insert into public.game_sheets(game_id) values(pg_temp.sh_id(9))','42501');
+select pg_temp.sh_error('select * from private.game_sheet_commands','42501');
+reset role;
+-- Global changes/inactive membership must not silently reassign a saved historical participant.
+update public.roster_entries set ended_at=clock_timestamp(),jersey='99' where id=pg_temp.sh_id(21);
+update public.persons set name='Renamed globally' where id=pg_temp.sh_id(11);
+set local role authenticated;
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'participants'->0->'person'->>'name'='Player A','name snapshot survives global edit');
+select pg_temp.sh_assert((public.save_game_sheet(jsonb_set(jsonb_set(pg_temp.sh_command(10),'{baseVersion}','2'),'{document,participants,0,played}','true'))->>'version')::int=3,'previous related membership retained after ending');
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9))->'participants'->0->'person'->>'name'='Player A','snapshot not replaced on draft save');
+reset role;
+select pg_temp.sh_error($q$update public.games set away_registration_id=pg_temp.sh_id(7) where id=pg_temp.sh_id(9)$q$,'PT409');
+update public.roster_entries set ended_at=coalesce(ended_at,clock_timestamp()) where dispute_id=pg_temp.sh_id(3);
+select pg_temp.sh_error($q$update public.disputes set gender='feminino' where id=pg_temp.sh_id(3)$q$,'PT409');
+update public.admin_access set enabled=false;
+set local role authenticated;
+select pg_temp.sh_assert(public.get_game_sheet(pg_temp.sh_id(9)) is null,'revoked reader denied');
+select pg_temp.sh_error('select public.save_game_sheet(pg_temp.sh_command())','PT403');
+set local role service_role;
+select pg_temp.sh_error('select public.get_game_sheet(pg_temp.sh_id(9))','42501');
+reset role;
+rollback;

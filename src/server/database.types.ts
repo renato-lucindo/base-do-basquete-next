@@ -108,6 +108,103 @@ export type Database = {
           },
         ];
       };
+      game_sheet_entries: {
+        Row: {
+          game_id: string;
+          jersey: string;
+          ordinal: number;
+          person_id: string;
+          person_snapshot: Json;
+          registration_id: string;
+          roster_entry_id: string;
+          side: string;
+        };
+        Insert: {
+          game_id: string;
+          jersey: string;
+          ordinal: number;
+          person_id: string;
+          person_snapshot: Json;
+          registration_id: string;
+          roster_entry_id: string;
+          side: string;
+        };
+        Update: {
+          game_id?: string;
+          jersey?: string;
+          ordinal?: number;
+          person_id?: string;
+          person_snapshot?: Json;
+          registration_id?: string;
+          roster_entry_id?: string;
+          side?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "game_sheet_entries_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: false;
+            referencedRelation: "game_sheets";
+            referencedColumns: ["game_id"];
+          },
+          {
+            foreignKeyName: "game_sheet_entries_person_id_fkey";
+            columns: ["person_id"];
+            isOneToOne: false;
+            referencedRelation: "persons";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_sheet_entries_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_sheet_entries_roster_entry_id_fkey";
+            columns: ["roster_entry_id"];
+            isOneToOne: false;
+            referencedRelation: "roster_entries";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      game_sheets: {
+        Row: {
+          confirmed: boolean;
+          document: Json;
+          game_id: string;
+          saved_at: string;
+          staff_snapshot: Json;
+          version: number;
+        };
+        Insert: {
+          confirmed?: boolean;
+          document: Json;
+          game_id: string;
+          saved_at?: string;
+          staff_snapshot: Json;
+          version?: number;
+        };
+        Update: {
+          confirmed?: boolean;
+          document?: Json;
+          game_id?: string;
+          saved_at?: string;
+          staff_snapshot?: Json;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "game_sheets_game_id_fkey";
+            columns: ["game_id"];
+            isOneToOne: true;
+            referencedRelation: "games";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       games: {
         Row: {
           away_registration_id: string;
@@ -418,6 +515,7 @@ export type Database = {
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
+      get_game_sheet: { Args: { p_game_id: string }; Returns: Json };
       get_import_person: {
         Args: {
           p_dispute_id: string;
@@ -487,6 +585,7 @@ export type Database = {
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
+      save_game_sheet: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };

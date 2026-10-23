@@ -1,0 +1,13 @@
+# 009 — súmula persistida e identidade contextual
+
+O motor da especificação, já exercitado no protótipo, continua responsável pelas regras da súmula. Seus identificadores numéricos são apenas chaves locais: um adaptador transforma relacionados com UUID em slots1–24 e capitão em slot da mesma equipe. Nenhum UUID é truncado/convertido em número ou confundido com identidade global. Persistência mantém UUID do vínculo, inscrição/pessoa e camisa da ocasião; nomes vêm do servidor, nunca do comando do browser.
+
+Um documento por jogo guarda relacionados, participação/titulares explícitos, comissão e ações. Comissão referencia vínculos existentes: técnico próprio da inscrição ou capitão escolhido; assistente só com técnico próprio. Não cadastrar o capitão como comissão global por inferência. Rascunho pode ser incompleto e não publica nada; ações exigem relacionados válidos. Cinco titulares, capitão e fechamento são obrigatórios para confirmar/publicar na unidadeG4. Histórico confirmado conserva relacionados/camisas; snapshots públicos futuros não conterão dados privados.
+
+Comandos usam requestId/baseVersion/document/confirm/reason do contrato fornecido, mais gameId/gameVersion para correlacionar agenda/contexto. A gravação G2 aceita apenas confirm=false; G4 substituirá a confirmação por uma transação explícita de publicação. Retry usa o mesmo comando, conflito exige recarga explícita; reautenticação conserva rascunho em memória. Nenhum JWT/segredo no browser ou armazenamento local de dados privados.
+
+Banco aplica autorização fresca, RLS/grants, IDs/pais/naipe, comissão, limites e versão/idempotência; Worker revalida documento no motor antes do escritor específico. Bloquear troca de adversários depois de existir súmula evita reatribuir relacionados. Locks respeitam campeonato→jogo e não acrescentam locks de atleta depois do campeonato. Vínculos previamente salvos podem permanecer como históricos quando inativados; novo relacionado exige vínculo ativo. Regras de transferências retroativas ficam na etapa5.
+
+Execução G2: contrato/adaptador e testes; SQL próprio e contratos reais de identidade/acesso/versão/upgrade; API específica e testes de fronteira; editor persistido e recuperação/teclado; gate quando unidade estável. Cloudflare requer reconexão humana; desenvolver G2 não autoriza alegar G1 publicada.
+
+As regras de ações/exclusão também são verificadas no escritor SQL, para não depender exclusivamente do adaptador Worker. Testes cruzam o motor fornecido e PostgreSQL em335 sequências/casos; não equivalem a prova exaustiva ou teste de concorrência. Confirmação/fechamento/publicação continuam na unidadeG4. Naipe da disputa também fica protegido contra reatribuição depois de existir documento.
