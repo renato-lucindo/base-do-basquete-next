@@ -24,8 +24,9 @@
 - [x] Elenco na expansão da inscrição, ordem de camisa 0 antes de 00, identidade pública contextual, localizar/criar atleta/técnico/assistente, mesmo cadastro nos dois papéis e edição global explícita. Dados privados separados dos públicos opcionais.
 - [x] Rascunho/foco, envio incerto com mesmo comando, conflito até recarga explícita, reautenticação em memória e confirmação de saída/troca de inscrição. Contexto usa o naipe salvo, mesmo com rascunho diferente em Informações.
 - [x] Oito cenários novos de navegador desktop/celular e dezesseis regressões de acesso/C1/C2 PASS. Fechamento temporal/histórico e resolução do conflito de camisa verificados. Reflow 320px com rolagem da tabela contida e operável por teclado. Capturas com fixtures inspecionadas; não são dados remotos.
-- [ ] Gate consolidado estável, PR draft #6 sobre C2, CI do source exato.
-- [ ] Preview protegido, smoke por hash/transporte/negação, revogação dos acessos temporários e avaliação humana C3.
+- [x] Gate consolidado estável, PR draft #6 sobre C2, CI `39989303613` SUCCESS do source `81f5f41`, 54 cenários Linux.
+- [x] Preview protegido do source exato, smoke por hash/transporte/negação e revogação dos acessos temporários. IDs/hashes em VALIDACAO-PESSOAS.md.
+- [ ] Avaliação humana C3 solicitada; não bloqueia desenvolvimento independente C4.
 - [ ] Checkpoint e próximo bloco C4 texto com revisão/pendências/parcial; ao gatilho real, salvar remoto e atualizar a mesma automação oficial para reset+2.
 
 Reutilizar evidências do ZIP/harness/protótipo inalterados. Nenhuma prova de corrida multi-conexão real, escala ou auditoria completa de acessibilidade foi produzida. Transferências/regulamento avançado e preparação da súmula não são antecipados.
