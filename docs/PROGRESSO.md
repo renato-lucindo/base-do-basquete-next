@@ -1,4 +1,16 @@
-# Unidade atual — C2 equipes/inscrições, 23/10/2026
+# Unidade atual — C3 pessoas/elencos, 23/10/2026
+
+Responsável autorizou continuar os próximos blocos. **C2 validado por ele (“Funcionou”) e CI `39951616663` SUCCESS**, código protegido `22fbf9c` preservado no Worker. Dados reais agora: campeonato/edição/disputas 1/1/2, equipes/inscrições 2/2, Auth/admin 1/1; não apagar nem usar como fixtures.
+
+Branch **`codex/pessoas-elencos`**, base **`22b9f39`** de C2, C3.1 commit **`4e485c9`** salvo no remoto. PR draft **#6** sobre C2/#5, anexado. Main preservada. CI automática de C3.1 iniciada após push; verificar resultado sem repetir gate por documentação. Nenhuma mudança alheia encontrada; novas alterações somente do agente.
+
+**C3.1 concluído:** migration **`20261023122129_person_identity`** aplicada somente no projeto novo. `persons` global, `private.athletes` com sexo/nascimento/registro privados e `coaches` própria compartilhando pessoa; papéis compatíveis, sem remover/fundir silenciosamente. Escrita versionada/idempotente/autorizada, homônimo exige confirmação serializada, sexo contextual de novo atleta validado e de existente preservado. Dois testes de contrato TS, quatro cenários SQL do zero/upgrade/preservação C1/C2, ESLint/typecheck PASS. Contrato C3.1 no Supabase real PASS com rollback, novos cadastros/recibos zerados e todos os dados reais acima preservados. Tipos regenerados; advisors só WARN conhecido de senha vazada/Pro. Não há API/interface de pessoas publicada ainda.
+
+**Próximo passo exato:** C3.2, testes e migration próprios de vínculos por inscrição: camisa textual 0/00/1–99, identidade de atleta, FK do destino, somente um vínculo ativo por pessoa/disputa e camisa ativa única por inscrição; comissão com técnico/assistente referenciando coaches. Não inferir capitão/titulares de jogo nem implementar transferência agora. Contratos/SQL RED→GREEN antes da DDL real, fixtures isoladas/rollback; depois API específica e UI dentro da expansão da inscrição conforme plano `docs/superpowers/plans/2026-10-23-pessoas-elencos.md`. Decisão 007. Não repetir bootstrap/gates/harness inalterados.
+
+Cota mais recente: 75% usado/5h (25% restante), 50% semanal (50% restante), reset 23/10 13:09:01 America/Sao_Paulo UTC-03; conferir novamente entre unidades. Sem gatilho ainda. Automação oficial permanece PAUSED. Nenhuma migration/upload/processo de credencial em andamento. Smokes C2 temporários revogados; Access/cofre/namespace preservados. Evidências remotas C2 em VALIDACAO-EQUIPES.md, não repetir por troca de sessão.
+
+# Histórico C2 equipes/inscrições, 23/10/2026
 
 Responsável autorizou seguir os próximos blocos e confirmou que a experiência do primeiro protótipo continua referência. Branch **`codex/equipes-inscricoes`**, base C1 **`929b1938429eddb89428467a1225544d0dd5c3c3`**. C2.1 banco em **`c9ea717`**, C2.2 API em **`6378169`**, aplicação **`22fbf9c82aa194ab5560ec2077a5ec08d27aff4c`**, todos publicados no remoto. PR draft #5 sobre C1/#4, anexado à conversa. Somente documentação posterior de autoria do agente; sem mudanças alheias.
 
