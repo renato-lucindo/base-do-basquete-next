@@ -65,6 +65,26 @@ async function fixture(options = {}) {
           );
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (url.pathname === "/rest/v1/rpc/list_games") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          return Response.json({ items: [], hasMore: false });
+        }
+        if (url.pathname === "/rest/v1/rpc/get_game")
+          return Response.json(null);
+        if (url.pathname === "/rest/v1/rpc/save_game") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const { p_command } = await request.json();
+          return Response.json({
+            id: p_command.game.id,
+            version: p_command.expectedVersion + 1,
+          });
+        }
         if (
           [
             "list_text_reviews",
@@ -226,6 +246,92 @@ async function fixture(options = {}) {
     });
   return { mf, send, login, calls };
 }
+
+test("game routes enforce session, fixed RPCs, origin and contextual commands", async () => {
+  const f = await fixture();
+  try {
+    for (const path of [`/api/games?disputeId=${id}`, `/api/games/${id}`])
+      assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, path, body, headers = {}) =>
+      f.mf.dispatchFetch(`${origin}${path}`, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...headers,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal(
+      (await send("GET", `/api/games?disputeId=${id}&q=Team&offset=20`)).status,
+      200,
+    );
+    assert.equal((await send("GET", `/api/games/${id}`)).status, 404);
+    const command = {
+      commandId: id,
+      expectedVersion: 0,
+      game: {
+        id,
+        disputeId: id,
+        homeRegistrationId: id,
+        awayRegistrationId: "10000000-0000-4000-8000-000000000002",
+        date: null,
+        time: null,
+        venue: null,
+        number: null,
+      },
+    };
+    const result = await send("POST", "/api/games", command);
+    assert.equal(result.status, 200);
+    assert.deepEqual(await result.json(), { id, version: 1 });
+    assert.equal(
+      (
+        await send("POST", "/api/games", command, {
+          origin: "https://evil.test",
+        })
+      ).status,
+      403,
+    );
+    assert.equal(
+      (await send("POST", "/api/games", { ...command, actorId: id })).status,
+      400,
+    );
+    assert.equal(
+      (
+        await send("POST", "/api/games", {
+          ...command,
+          game: { ...command.game, awayRegistrationId: id },
+        })
+      ).status,
+      400,
+    );
+    for (const path of [
+      "/api/games",
+      `/api/games?disputeId=${id}&disputeId=${id}`,
+      `/api/games?disputeId=${id}&offset=-1`,
+      `/api/games?disputeId=${id}&unknown=x`,
+      `/api/games/invalid`,
+    ])
+      assert.equal((await send("GET", path)).status, 400, path);
+    assert.equal(
+      (
+        await send("POST", "/api/games", {
+          ...command,
+          padding: "x".repeat(8192),
+        })
+      ).status,
+      413,
+    );
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/save_game").length,
+      1,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("text import routes enforce session, origin, bounds and fixed private operations", async () => {
   const f = await fixture();
