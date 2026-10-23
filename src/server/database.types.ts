@@ -269,6 +269,58 @@ export type Database = {
           },
         ];
       };
+      pdf_reviews: {
+        Row: {
+          dispute_id: string;
+          document: Json;
+          game_id: string | null;
+          saved_at: string;
+          saved_by: string;
+          source_id: string;
+          version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          document: Json;
+          game_id?: string | null;
+          saved_at?: string;
+          saved_by: string;
+          source_id: string;
+          version?: number;
+        };
+        Update: {
+          dispute_id?: string;
+          document?: Json;
+          game_id?: string | null;
+          saved_at?: string;
+          saved_by?: string;
+          source_id?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pdf_reviews_dispute_id_fkey";
+            columns: ["dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "disputes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pdf_reviews_game_id_dispute_id_fkey";
+            columns: ["game_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id", "dispute_id"];
+          },
+          {
+            foreignKeyName: "pdf_reviews_source_id_fkey";
+            columns: ["source_id"];
+            isOneToOne: true;
+            referencedRelation: "pdf_sources";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       pdf_sources: {
         Row: {
           byte_size: number;
@@ -578,6 +630,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
@@ -646,6 +699,7 @@ export type Database = {
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
       save_game_sheet: { Args: { p_command: Json }; Returns: Json };
+      save_pdf_review: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };

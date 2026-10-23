@@ -206,6 +206,8 @@ export const pdfReviewDocumentSchema = z
     (d) =>
       new Set(d.mappings.map((r) => `${r.sourceSide}:${r.sourceIndex}`))
         .size === d.mappings.length &&
+      new Set(d.mappings.map((r) => `${r.sourceSide}:${r.jersey}`)).size ===
+        d.mappings.length &&
       (d.gameId !== null ||
         d.mappings.every((m) => m.rosterEntryId === null)) &&
       new Set(

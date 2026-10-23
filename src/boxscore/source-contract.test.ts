@@ -75,4 +75,10 @@ it("requires stable source row keys, scoped target and independent review versio
   expect(savePdfReviewSchema.safeParse({ ...c, actorId: id }).success).toBe(
     false,
   );
+  expect(
+    savePdfReviewSchema.safeParse({
+      ...c,
+      document: { ...c.document, mappings: [row, { ...row, sourceIndex: 1 }] },
+    }).success,
+  ).toBe(false);
 });

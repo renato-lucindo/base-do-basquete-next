@@ -17,3 +17,13 @@ Tipos gerados/typecheck/lint/formatação/segredos focais PASS. Advisor apenas a
 ## Estado da entrega
 
 Cloudflare OAuth requer reconexão humana já solicitada; preview segue importador22529ea, Access/cofre/namespace preservados. G2CI40039451161/job120706809738 SUCCESS no sourceb316394, com gate e browsers Linux. G3 não publicado e sem CI nova até estabilizar unidade vertical. Sem revisão independente, carga, concorrência real multi-conexão ou auditoria WCAG completa comprovadas.
+
+## Revisão durável G3b2
+
+Migration20261023234404_pdf_reviews aplicada/reconciliada no projeto novo após RED; CLI gerou234220 e histórico real234404. Documento por fonte pronta, versão/receipt próprios e destino alterável sem reupload; sourceSide/index define a linha de origem e UUID define vínculo/pessoa. Mapeamento revalida inscrição, naipe, atividade/histórico e identidade; inversão de lados é decisão explícita. Listagem retoma no contexto atual da revisão, conservando origem/hash do arquivo. Reader projeta versão0 inicial sem criar entidades. Contexto do jogo/naipe é protegido enquanto referenciado; não há publicação implícita.
+
+Dez cenários PostgreSQL criação/upgrade/políticas PASS. Contrato **pdf_review.sql real Supabase com rollback PASS**, incluindo retarget para outro campeonato, replay/conflito, ator revogado, função de leitura sem escrita, vínculo/equipe/naipe e arquivo/hash inalterados. Tipos gerados/typecheck PASS. Guardas usam locks de recurso→raízes ordenadas→jogo, e leem naipe após adquirir roots. Isto não equivale a corrida real multi-conexão. Camisa duplicada por lado barrada também no DTO após RED→GREEN.
+
+Pós-rollback: jogos/fontes/revisõesPDF/recibosPDF/objetos0; pessoas1,inscrições2,revisõesTexto6,Auth1 preservados. Advisor só WARN conhecido senha vazada/Pro. Nenhum arquivo humano ou byte de Storage foi criado pelos testes SQL. Transporte HTTP/binary, matching/UI de PDFs e publicaçãoG4 ainda pendentes.
+
+Gate consolidado da fundação G3 PASS:138 unitários/31arquivos,5 transportes,10 cenários PostgreSQL,9 workerd da aplicação e1 prova workerd/DO com4PDFs, tipos/lint/formatação/builds/fronteira/segredos. CI será disparada pelo commit estável, ainda sem resultado correspondente. Primeiro início parou no lint de bundle local gerado em caminho antigo, sem executar suítes. Limpeza desse bundle foi rejeitada automaticamente; arquivos preservados e exclusão consistente de .preview-artifacts adicionada a ESLint/Prettier, sem ocultar código-fonte.
