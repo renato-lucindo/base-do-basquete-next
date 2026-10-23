@@ -167,6 +167,7 @@ async function fixture(page: Page) {
                 r.active &&
                 (r.personId === entry.personId ||
                   (r.registrationId === entry.registrationId &&
+                    entry.jersey !== null &&
                     r.jersey === entry.jersey)),
             )
           )
@@ -250,8 +251,12 @@ async function fixture(page: Page) {
       )
       .sort((a, b) =>
         "jersey" in a && "jersey" in b
-          ? Number(a.jersey) - Number(b.jersey) ||
-            a.jersey.length - b.jersey.length
+          ? a.jersey === null
+            ? 1
+            : b.jersey === null
+              ? -1
+              : Number(a.jersey) - Number(b.jersey) ||
+                a.jersey.length - b.jersey.length
           : 0,
       )
       .map((r) => snapshot(r, r.version));
@@ -444,6 +449,20 @@ test("homônimos exigem nova identidade explícita sem renomear", async ({
     "Ana Silva",
   ]);
   expect(new Set([...f.roster.values()].map((r) => r.personId)).size).toBe(2);
+});
+
+test("vários atletas podem ficar sem camisa e números informados vêm primeiro", async ({
+  page,
+}) => {
+  await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana sem número", "");
+  await newAthlete(page, "Bia sem número", "");
+  await newAthlete(page, "Carla com zero", "0");
+  const rows = page.getByTestId("roster-row");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.first()).toContainText("Carla com zero");
+  await expect(rows.filter({ hasText: "Sem camisa" })).toHaveCount(2);
 });
 test("envio incerto e conflito mantêm edição e comandos corretos", async ({
   page,

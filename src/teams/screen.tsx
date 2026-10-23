@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
+import { TextImportWorkspace } from "../text-import/workspace";
 import {
   teamListingSchema,
   registrationListingSchema,
@@ -35,6 +36,8 @@ export function TeamsWorkspace({
   onSessionLost,
   onSaved,
 }: Props) {
+  const [importing, setImporting] = useState(false);
+  const importGuard = useRef<() => boolean>(() => true);
   const [list, setList] = useState({
     items: [] as RegistrationSnapshot[],
     hasMore: false,
@@ -67,6 +70,7 @@ export function TeamsWorkspace({
   const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
   function mayLeave() {
     return (
+      importGuard.current() &&
       membersGuard.current() &&
       (!(dirty || uncertain || busy) ||
         (!busy &&
@@ -94,7 +98,7 @@ export function TeamsWorkspace({
     if (!enabled) return;
     if (editor) input.current?.focus();
     else heading.current?.focus();
-  }, [editor?.kind, editor?.command.commandId, enabled]);
+  }, [editor?.kind, editor?.command.commandId, enabled, importing]);
   useEffect(() => {
     if (error && enabled) alert.current?.focus();
   }, [error, enabled]);
@@ -341,6 +345,21 @@ export function TeamsWorkspace({
       setBusy(false);
     }
   }
+  if (importing)
+    return (
+      <TextImportWorkspace
+        disputeId={disputeId}
+        gender={gender}
+        enabled={enabled}
+        guard={importGuard}
+        onSessionLost={onSessionLost}
+        onSaved={() => {
+          setRefresh((v) => v + 1);
+          onSaved();
+        }}
+        onClose={() => setImporting(false)}
+      />
+    );
   return (
     <section className="teams-workspace" aria-busy={busy}>
       <div className="competition-title">
@@ -349,6 +368,21 @@ export function TeamsWorkspace({
         </h3>
         <button onClick={add} disabled={busy}>
           Adicionar inscrição
+        </button>
+        <button
+          disabled={busy}
+          onClick={() => {
+            if (!mayLeave()) return;
+            setEditor(null);
+            setFinding(false);
+            setExpanded("");
+            setError("");
+            setUncertain(false);
+            setConflict(false);
+            setImporting(true);
+          }}
+        >
+          Importar equipe e elenco
         </button>
       </div>
       <p>

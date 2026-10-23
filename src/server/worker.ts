@@ -3,6 +3,7 @@ import { HttpError, jsonResponse, readMutationJson } from "./http";
 import { saveCompetitionSchema } from "../competition/contract";
 import { teamsRoute } from "../teams/routes";
 import { peopleRoute } from "../people/routes";
+import { textImportRoute } from "../text-import/routes";
 import {
   cookieHeader,
   clearCookieHeader,
@@ -28,6 +29,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/text-import" ||
+        url.pathname.startsWith("/api/text-import/")
+      )
+        response = await textImportRoute(request, env, url);
       else if (
         ["/api/people", "/api/roster", "/api/staff"].some(
           (p) => url.pathname === p || url.pathname.startsWith(`${p}/`),

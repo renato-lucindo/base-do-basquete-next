@@ -46,7 +46,7 @@ describe("pessoas sem fusão e especializações", () => {
       athlete: {
         sex: "male",
         birthDate: "2000-02-29",
-        federationRegistration: "privado",
+        federationRegistration: "001234",
       },
     };
     const c = {
@@ -57,6 +57,16 @@ describe("pessoas sem fusão e especializações", () => {
       person,
     };
     expect(savePersonSchema.safeParse(c).success).toBe(true);
+    for (const federationRegistration of ["12345", "1234567", "ABC123"])
+      expect(
+        savePersonSchema.safeParse({
+          ...c,
+          person: {
+            ...person,
+            athlete: { ...person.athlete, federationRegistration },
+          },
+        }).success,
+      ).toBe(false);
     expect(
       savePersonSchema.safeParse({
         ...c,
