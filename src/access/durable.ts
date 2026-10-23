@@ -23,6 +23,7 @@ import { SupabaseCompetitions } from "../competition/provider";
 import { SupabaseTeams } from "../teams/provider";
 import { SupabaseGames } from "../games/provider";
 import { saveGameSchema, type SaveGame } from "../games/contract";
+import { saveSheetSchema, type SaveSheet } from "../games/sheet-contract";
 import {
   saveTeamSchema,
   saveRegistrationSchema,
@@ -281,6 +282,20 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.save(accessToken, saveGameSchema.parse(command)),
+      ),
+    );
+  }
+  getGameSheet(gameId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.getSheet(accessToken, gameId),
+      ),
+    );
+  }
+  saveGameSheet(command: SaveSheet) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.saveSheet(accessToken, saveSheetSchema.parse(command)),
       ),
     );
   }

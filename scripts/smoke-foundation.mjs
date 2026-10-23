@@ -105,6 +105,7 @@ try {
     `/api/registrations/${randomUUID()}`,
     `/api/games?disputeId=${randomUUID()}`,
     `/api/games/${randomUUID()}`,
+    `/api/games/${randomUUID()}/sheet`,
     "/api/people",
     `/api/people/${randomUUID()}`,
     `/api/roster?registrationId=${randomUUID()}`,

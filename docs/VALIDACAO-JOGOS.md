@@ -24,3 +24,7 @@ Oito testes focais TS PASS, incluindo comparação de335 sequências de ações 
 Rascunho incompleto permitido, ações exigem relacionados e participação válida. Capitão/técnico/assistente por identidade e contexto, camisas0/00 distintas e da ocasião, nomes/snapshots resolvidos pelo servidor. Troca de oponentes/naipe após súmula bloqueada; manutenção do vínculo histórico não transforma vínculo inativo em elegível para nova inclusão. Nenhuma publicação implementada por esta migration; confirm=true rejeitado. Backend Worker ainda deve integrar o adaptador e API.
 
 CI G1 **40036191186 SUCCESS** em e43246ed541fe5ea35e621f21d4aae4e575aff01. Publicação G1 continua bloqueada por reconexão Cloudflare pendente.
+
+## G2b — API administrativa
+
+Provider e SessionStore validam novamente o comando/documento e executam apenas RPCs fixos. GET sem documento retorna null; POST aceita rascunho, correlaciona path/gameId e ACK/requestId/version, limite512KiB, origem de configuração. Dois testes provider RED→GREEN e dois anteriores PASS; nove workerd/DO PASS após RED da rota, com participação inválida barrada no servidor antes do RPC, sessão/origem/query/path/limites e nenhuma credencial na resposta. Typecheck/lint/format/segredos focais PASS. SQL/contrato real inalterados reutilizados, gate vertical G2 aguardando UI. Nenhuma publicação G2.
