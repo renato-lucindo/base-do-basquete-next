@@ -99,8 +99,12 @@ try {
   for (const path of [
     "/api/competitions",
     `/api/competitions/${randomUUID()}`,
+    "/api/teams",
+    `/api/teams/${randomUUID()}`,
+    `/api/registrations?disputeId=${randomUUID()}`,
+    `/api/registrations/${randomUUID()}`,
   ]) {
-    stage = `private competition route ${path}`;
+    stage = `private application route ${path}`;
     const denied = await fetch(`${origin}${path}`, { headers });
     status = denied.status;
     assert.equal(status, 401);

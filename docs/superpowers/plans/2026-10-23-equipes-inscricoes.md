@@ -22,22 +22,22 @@
 
 Concluído: migration remota/local `20261023120105_teams_registrations`; dois testes de contrato TS e três cenários SQL PASS (do zero, upgrade de acesso, upgrade C1 com dados preservados). Contrato C2 também PASS no Supabase real com rollback; contagens finais campeonato/edição/disputas 1/1/2, equipes/inscrições/recibos C2 0/0/0, Auth/admin 1/1. Tipos regenerados. Advisor somente WARN já conhecido de senha vazada/Pro; nenhuma contratação. Leitura da documentação atual de grants/RLS confirmada; changelog markdown indisponível pelo leitor web, sem inferir mudança de plataforma. Sem teste multi-conexão/escala real.
 
-- [ ] Criar `src/teams/contract.test.ts` antes de `contract.ts`; comandos estritos `SaveTeam` e `SaveRegistration`, snapshots/listagens limitados.
-- [ ] Criar `supabase/tests/teams.sql`, anexar ao runner; observar falha por funções ausentes.
-- [ ] Gerar migration pelo CLI: tabelas, índices de FKs, RLS/SELECT admin, recibos privados com deny, leitores invoker e dois escritores privados delimitados. Testar do zero e upgrade com dados C1 preservados; comandos versionados, pais, revogação e rollback.
-- [ ] Inspecionar somente projeto novo; aplicar migration estável via plugin, executar contrato com fixtures isoladas/rollback, comparar contagens reais, gerar tipos e advisors. Não repetir contratos antigos contra dados reais.
-- [ ] Commit da unidade de banco após verificações focais.
+- [x] Criar `src/teams/contract.test.ts` antes de `contract.ts`; comandos estritos `SaveTeam` e `SaveRegistration`, snapshots/listagens limitados.
+- [x] Criar `supabase/tests/teams.sql`, anexar ao runner; observar falha por funções ausentes.
+- [x] Gerar migration pelo CLI: tabelas, índices de FKs, RLS/SELECT admin, recibos privados com deny, leitores invoker e dois escritores privados delimitados. Testar do zero e upgrade com dados C1 preservados; comandos versionados, pais, revogação e rollback.
+- [x] Inspecionar somente projeto novo; aplicar migration estável via plugin, executar contrato com fixtures isoladas/rollback, comparar contagens reais, gerar tipos e advisors. Não repetir contratos antigos contra dados reais.
+- [x] Commit da unidade de banco após verificações focais.
 
 ## C2.2 — transporte
 
-- [ ] Testar adapter antes de implementar `src/teams/provider.ts`; rotas fixas list/get/save, erros sanitizados e limites iguais aos contratos.
-- [ ] Adicionar métodos específicos no SessionStore e rotas `/api/teams` e `/api/registrations` (GET listagem, GET UUID, POST); sessão/origem/query/body testados no workerd. Não expor tokens.
-- [ ] Commit após tipos/testes focais.
+- [x] Testar adapter antes de implementar `src/teams/provider.ts`; rotas fixas list/get/save, erros sanitizados e limites iguais aos contratos.
+- [x] Adicionar métodos específicos no SessionStore e rotas `/api/teams` e `/api/registrations` (GET listagem, GET UUID, POST); sessão/origem/query/body testados no workerd. Não expor tokens.
+- [x] Commit após tipos/testes focais.
 
 ## C2.3 — experiência e entrega
 
-- [ ] Testes Playwright de criação global, duas inscrições/retomada/contexto, edição global, falha incerta/conflito e trabalho não salvo; observar vermelho antes da UI.
-- [ ] `src/teams/screen.tsx`: lista pesquisável com expansão por inscrição, cadastro/edição na página, escolha explícita de equipe global, sigla opcional, nome público independente. Vazio honesto de elenco até C3.
-- [ ] Integrar abas funcionais Informações e Equipes e elencos em `src/competition/screen.tsx`; não oferecer Jogos/Regulamento fictícios. URL conserva aba/disputa. Guardas de rascunho incluem ambos os editores, também ao sair/reautenticar.
+- [x] Testes Playwright de criação global, duas inscrições/retomada/contexto, edição global, falha incerta/conflito e trabalho não salvo; observar vermelho antes da UI.
+- [x] `src/teams/screen.tsx`: lista pesquisável com expansão por inscrição, cadastro/edição na página, escolha explícita de equipe global, sigla opcional, nome público independente. Vazio honesto de elenco até C3.
+- [x] Integrar abas funcionais Informações e Equipes e elencos em `src/competition/screen.tsx`; não oferecer Jogos/Regulamento fictícios. URL conserva aba/disputa. Guardas de rascunho incluem ambos os editores, também ao sair/reautenticar.
 - [ ] Focais, visual desktop/celular e gate consolidado quando estável; PR draft sobre C1, CI e publicação protegida do source exato. Preservar Access/cofre/namespace. Smokes novos e validação humana, sem senha do responsável.
 - [ ] Atualizar PROGRESSO.md, registrar evidências válidas/limitações e seguir C3 conforme cota real. Revisão independente somente se ferramenta disponível; não inventar aprovação.

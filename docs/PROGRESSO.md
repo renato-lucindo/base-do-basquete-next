@@ -1,4 +1,16 @@
-# Checkpoint — 23/10/2026, 08:54 America/Sao_Paulo (UTC-03)
+# Unidade atual — C2 equipes/inscrições, 23/10/2026
+
+Responsável autorizou seguir os próximos blocos e confirmou que a experiência do primeiro protótipo continua referência. Branch **`codex/equipes-inscricoes`**, base C1 **`929b1938429eddb89428467a1225544d0dd5c3c3`**. C2.1 banco em **`c9ea717`**, C2.2 API em **`6378169`**. Commits locais ainda a publicar; árvore contém somente UI/testes/documentação do agente. C1 continua publicado até o deploy C2 confirmado.
+
+Plano `docs/superpowers/plans/2026-10-23-equipes-inscricoes.md`, decisão 006. Migration **`20261023120105_teams_registrations`** aplicada somente no projeto novo `nizmasjddyrhmevvfviz`. Tipos regenerados. Contrato TS 4 testes PASS; SQL compartilhado PASS do zero/upgrade e com dados C1 existentes; contrato C2 também PASS no Supabase real com rollback. Contagens após rollback campeonato/edição/disputas 1/1/2, equipes/inscrições/recibos C2 0/0/0, usuário/admin 1/1. Nenhuma fixture promovida. Advisor somente WARN conhecido de senha vazada/Pro.
+
+Rotas específicas de equipes/inscrições verificadas com sessão/origem/query/body e provider, cinco cenários workerd totais PASS. UI implementada em aba funcional, com busca, expansão, escolha/criação global, nomes públicos independentes, guardas e retomada por URL. Seis cenários novos Playwright PASS desktop/celular; composição inspecionada inclusive 320px. Extração do helper HTTP de C1 conserva semântica. Workflow agora inclui branches `codex/**`.
+
+**Gate C2 PASS:** lint/formatação/tipos, 90 unitários/14 arquivos, cinco transportes, três cenários SQL, cinco workerd/DO, builds/fronteira/segredos. Ajuste posterior somente de foco da UI: typecheck/ESLint/build e teste RED→GREEN de foco aprovados; CI final deve consolidar o source publicado. Dez cenários C1/acesso e cinco de seis C2 passaram na regressão conjunta; a expiração do sexto tinha corrida na fixture (leitura em background expirava antes do clique). Fixture agora expira explicitamente na próxima escrita; seis repetições desktop/celular PASS, sem aumentar timeout ou mascarar erro de produto.
+
+**Próximo passo exato:** publicar commit UI estável/branch/PR draft sobre C1. Preparar build do source exato, conferir Access/cofre e publicar no mesmo Worker protegido; smokes novos sem senha do responsável. CI e avaliação humana C2 pendentes. Só iniciar C3 após reconciliação e cota real. Última cota desta unidade 59% usado/5h (41% restante), 47% semanal (53% restante), mesmo reset 23/10 13:09:01 UTC-03. Sem gatilho de retomada; automação permanece PAUSED. Nenhum upload/credencial temporária iniciado em C2.
+
+# Histórico de fechamento C1 — 23/10/2026, 08:54 America/Sao_Paulo (UTC-03)
 
 ## Objetivo, unidade e próximo passo
 

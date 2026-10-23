@@ -1,0 +1,44 @@
+.teams-workspace h3 {
+  margin: 0;
+}
+.teams-workspace h4 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+.teams-inline {
+  border-block: 1px solid #9caac0;
+  padding: 20px 0;
+  margin: 20px 0;
+}
+.teams-inline fieldset {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.teams-inline fieldset button {
+  justify-self: start;
+}
+.teams-inline label {
+  max-width: 640px;
+}
+.teams-workspace .competition-list button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.competition-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #9caac0;
+  padding-bottom: 12px;
+  margin: 24px 0;
+}
+.competition-tabs button[aria-current="page"] {
+  background: #075fca;
+  color: #fff;
+}
+.competition-destination {
+  margin: 20px 0;
+  max-width: 680px;
+}
