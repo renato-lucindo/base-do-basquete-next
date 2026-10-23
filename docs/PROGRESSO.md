@@ -1,4 +1,18 @@
-# C4 publicado para avaliação — 23/10/2026 15:38 America/Sao_Paulo (UTC-03)
+# Ajustes básicos C4 publicados — 23/10/2026 16:04 America/Sao_Paulo (UTC-03)
+
+**Unidade atual concluída tecnicamente:** responsável forneceu amostra João/Renato e pediu ajustes pequenos no MVP. Datas dd/mm/aa agora00–29→2000–2029,30–99→1930–1999; data completa preenche ano privado na interpretação/edição e mostra ano derivado em conferências antigas. Sem unidade,10–150 sugerem kg, acima150 cm; unidades explícitas prevalecem. João74,9kg; Renato01/01/1997/ano1997/peso127kg/altura151cm. Regras visíveis e campos editáveis. Não reescrever/reinterpretar drafts humanos automaticamente; responsável deve recarregar e interpretar novamente para novas medidas/data curta. Nenhum ano público inferido.
+
+**Git/entrega nova:** mesma branch codex/importacao-texto/PR draft#7, novo source **22529eae4f2d87fef931c93407e558521f582f35** salvo remoto. Workspace/ambiente/acessos abaixo permanecem. Deployment **5df3122d-f1ed-4097-9c3d-a84a5cf2780d**, versão8102da2b-48ee-4ac9-9458-524cddc21562,100%,publicado16:02:47 UTC-03 no preview protegido. Hashes em VALIDACAO-IMPORTADOR.md. Backend/CSS/banco/cofre/namespace/Access inalterados. Alterações não commitadas ao escrever: documentação final do agente; nenhum trabalho alheio alterado. Obter SHA documental final pelo Git.
+
+**Evidências novas:** RED em dois testes da amostra;15 testes focais TS PASS; gate consolidado PASS113 unitários/22arquivos,5 transportes,5 cenários PostgreSQL,7 workerd/tipos/lint/formatação/builds/fronteira/segredos;16 browsers do importador PASS e2 focais posteriores comprovam retomada de draft anterior com data/ano separado ausente. Smoke dos três arquivos/hash/source e dois browsers remotos PASS. Contratos reais de SQL/harness/negações do backend inalterados reutilizados. CI **40008208878/job120601471558** do source22529ea ainda em andamento ao escrever, gate aprovado e browsers executando; consultar resultado antes de afirmar sucesso.
+
+**Serviços/segurança:** token7395f5c0-7007-48c8-a8f6-a1ed16843d5c e política73295a6a-df0f-4dc6-88b6-35bd882efe11 de smoke revogados. Access somente responsável, previewsOFF, anônimo302 sem X-Bdb-Source reconfirmados. Nenhum DDL/upload/smoke/credencial/processo local em andamento. Dados humanos não foram editados, nem suas revisões reinterpretadas. Contagens abaixo são históricas e não substituem nova inspeção quando houver mutação no banco.
+
+**Fechamento:** CI40008208878/job120601471558 **SUCCESS**, no source22529ea, conferida após a publicação. A indicação “em andamento” acima registra o instante anterior à conclusão. Próximo exato: aguardar avaliação humana destes ajustes básicos; se outro erro, reproduzir focalmente com amostra antes de alterar. Não iniciar refinamento amplo nem outro bloco por conta própria. Automação de retomada permanece PAUSED, sem gatilho de cota atingido.
+
+**Cota observada16:04 UTC-03:**63%usado/37%restante5h;10%usado/90%restante semanal. Reset5h23/10/2026 19:42:49 America/Sao_Paulo; semanal30/10/2026 14:42:49 UTC-03. Sem compra/reset manual/alteração de plano. Aos85%usados em trabalho futuro, checkpoint/push seguro e atualizar a mesma automação para reset efetivo+2; sem duplicatas.
+
+# Histórico — C4 publicado para avaliação, 23/10/2026 15:38 UTC-03
 
 **Retorno humano incorporado:** responsável relatou títulos sem correspondência com campos. A aba aberta foi inspecionada: ainda tinha o cabeçalho antigo. Recarga segura e retomada da conferência salva exibiram os doze títulos corretos, com seis linhas preservadas e zero confirmadas; nenhum dado foi editado/confirmado pelo agente. Evidência visual local .preview-artifacts/importador-cabecalhos-real.png. Teste ampliado para todos os títulos e campos correspondentes: dois browsers PASS. O código publicado continua033d404, sem necessidade de novo deploy por mudança exclusiva de teste/documentação. Aceite do fluxo completo continua pendente.
 
