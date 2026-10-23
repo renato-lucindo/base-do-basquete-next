@@ -1,4 +1,10 @@
-# Checkpoint de cota — C3 pessoas/elencos, 23/10/2026 09:31:58 America/Sao_Paulo (UTC-03)
+# Retomada ativa — C3 pessoas/elencos, 23/10/2026 13:11 America/Sao_Paulo (UTC-03)
+
+Reset confirmado pela ferramenta: 0% usado/5h (100% restante), 52% semanal (48% restante); novo reset 5h Unix `1792789878` = 23/10 18:11:18 UTC-03. Git limpo/local=remoto no checkpoint `bb97268`, PR #6 draft correto, ambas CIs anteriores SUCCESS. Supabase/migrations/contagens e Cloudflare deployment/Access/cofre/namespace reconciliados, sem divergência. Retomada continua no mesmo branch, sem repetir gates de artefatos inalterados.
+
+C3.2b de comissão/Recentes concluída na migration remota/local `20261023161538_registration_staff`, contratos TS e quatro SQL locais + contrato real Supabase com rollback PASS. Dados reais preservados: campeonato 1, equipes/inscrições 2/2, pessoas/elenco/comissão 0, Auth 1. Types/advisors verificados, só aviso prévio Auth/Pro. Próximo: candidatos de pessoa com contexto público para desambiguar homônimos, depois adapter/API/UI contextual. Fonte C2 do preview permanece `22fbf9c`; nenhum novo Worker publicado neste bloco ainda.
+
+# Histórico do checkpoint de cota — C3, 23/10/2026 09:31:58 UTC-03
 
 Responsável autorizou continuar os próximos blocos. **C2 validado por ele (“Funcionou”) e CI `39951616663` SUCCESS**, código protegido `22fbf9c` preservado no Worker. Dados reais agora: campeonato/edição/disputas 1/1/2, equipes/inscrições 2/2, Auth/admin 1/1; não apagar nem usar como fixtures.
 

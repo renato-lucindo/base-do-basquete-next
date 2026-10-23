@@ -36,6 +36,7 @@ const competitionContract = await readFile(
 const teamsContract = await readFile("supabase/tests/teams.sql", "utf8");
 const peopleContract = await readFile("supabase/tests/people.sql", "utf8");
 const rosterContract = await readFile("supabase/tests/roster.sql", "utf8");
+const staffContract = await readFile("supabase/tests/staff.sql", "utf8");
 
 test("migrations from zero enforce the shared SQL access contract", async () => {
   const db = await PGlite.create();
@@ -48,6 +49,7 @@ test("migrations from zero enforce the shared SQL access contract", async () => 
     await db.exec(teamsContract);
     await db.exec(peopleContract);
     await db.exec(rosterContract);
+    await db.exec(staffContract);
     const { rows } = await db.query(
       "select count(*)::int as count from auth.users",
     );
@@ -79,6 +81,7 @@ test("upgrade preserves an existing administrator and enforces new defaults", as
     await db.exec(teamsContract);
     await db.exec(peopleContract);
     await db.exec(rosterContract);
+    await db.exec(staffContract);
   } finally {
     await db.close();
   }
@@ -99,6 +102,7 @@ test("C2 upgrade and rolled-back fixtures preserve saved C1 data", async () => {
     await db.exec(teamsContract);
     await db.exec(peopleContract);
     await db.exec(rosterContract);
+    await db.exec(staffContract);
     const after = await db.query(
       "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
     );
@@ -128,6 +132,7 @@ test("C3 upgrade preserves C2 registrations and their global identity", async ()
     for (const migration of migrations.slice(5)) await db.exec(migration);
     await db.exec(peopleContract);
     await db.exec(rosterContract);
+    await db.exec(staffContract);
     assert.deepEqual(
       (
         await db.query(
