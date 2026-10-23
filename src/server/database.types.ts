@@ -269,6 +269,59 @@ export type Database = {
           },
         ];
       };
+      pdf_sources: {
+        Row: {
+          byte_size: number;
+          created_by: string;
+          dispute_id: string;
+          filename: string;
+          id: string;
+          page_count: number;
+          parsed: Json;
+          ready: boolean;
+          saved_at: string;
+          sha256: string;
+          storage_path: string | null;
+          version: number;
+        };
+        Insert: {
+          byte_size: number;
+          created_by: string;
+          dispute_id: string;
+          filename: string;
+          id: string;
+          page_count: number;
+          parsed: Json;
+          ready?: boolean;
+          saved_at?: string;
+          sha256: string;
+          storage_path?: string | null;
+          version?: number;
+        };
+        Update: {
+          byte_size?: number;
+          created_by?: string;
+          dispute_id?: string;
+          filename?: string;
+          id?: string;
+          page_count?: number;
+          parsed?: Json;
+          ready?: boolean;
+          saved_at?: string;
+          sha256?: string;
+          storage_path?: string | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pdf_sources_dispute_id_fkey";
+            columns: ["dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "disputes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       persons: {
         Row: {
           biography: string | null;
@@ -513,6 +566,7 @@ export type Database = {
     };
     Functions: {
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
+      finish_pdf_source: { Args: { p_command: Json }; Returns: Json };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_sheet: { Args: { p_game_id: string }; Returns: Json };
@@ -524,6 +578,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
       get_roster_entry: { Args: { p_id: string }; Returns: Json };
@@ -536,6 +591,10 @@ export type Database = {
       };
       list_games: {
         Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      list_pdf_sources: {
+        Args: { p_dispute_id: string; p_offset?: number };
         Returns: Json;
       };
       list_persons: {
@@ -582,6 +641,7 @@ export type Database = {
         Args: { p_dispute_id: string; p_players: Json };
         Returns: Json;
       };
+      prepare_pdf_source: { Args: { p_command: Json }; Returns: Json };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
