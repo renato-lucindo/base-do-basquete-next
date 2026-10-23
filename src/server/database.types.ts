@@ -351,6 +351,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_import_person: {
         Args: {
@@ -410,6 +411,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };

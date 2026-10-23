@@ -229,6 +229,18 @@ export type TextReview = z.infer<typeof textReviewSchema>;
 export type TextReviewSnapshot = z.infer<typeof textReviewSnapshotSchema>;
 export type SaveTextReview = z.infer<typeof saveTextReviewSchema>;
 export type ConfirmTextRow = z.infer<typeof confirmTextRowSchema>;
+export const prepareTextTargetSchema = confirmTextRowSchema.omit({
+  rowId: true,
+});
+export const prepareTextResultSchema = z
+  .object({
+    id: z.uuid(),
+    version: version.min(1),
+    registrationId: z.uuid(),
+    registrationVersion: version.min(1),
+  })
+  .strict();
+export type PrepareTextTarget = z.infer<typeof prepareTextTargetSchema>;
 export const textReviewListingSchema = z
   .object({
     items: z
