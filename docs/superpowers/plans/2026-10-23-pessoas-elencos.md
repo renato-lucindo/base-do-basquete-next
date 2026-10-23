@@ -24,6 +24,8 @@ Subunidade de elenco persistido C3.2a: migration `20261023122809_roster_membersh
 
 Antes da UI: testar/proteger alteração global de sexo ou naipe que torne vínculo ativo incompatível; não basta validar somente na inclusão. Completar Recentes de edição global de pessoa após vinculação, respeitando a ordem de locks (atleta antes de campeonato no escritor de elenco). Não expor transferência automática: desativação básica é preparatória e, quando existirem participações, deverá respeitar as restrições/histórico da etapa 5. Comissão ainda não modelada.
 
+Guardas de sexo/naipe concluídas na migration `20261023123042_roster_context_guards`: triggers invoker privados recusam mudança incompatível com vínculos ativos, conservando os dados anteriores; vínculos inativos não congelam indefinidamente o dado atual. RED→GREEN nos quatro cenários locais e contrato real Supabase PASS com rollback. Tipos públicos não mudaram com triggers privados. Persistem pendentes comissão, Recentes de edição global de pessoa, API e UI. Corrida multi-conexão real ainda não foi medida. Não repetir esses contratos por sessão sem mudança de artefato.
+
 - [ ] Contratos/testes antes de DDL: elenco por inscrição com camisa textual 0/00/1–99, pessoa existente e apenas um vínculo ativo por disputa; índices únicos parciais e FK de contexto. Sem movimentar atleta/transferência nesta unidade. Repetição e conflito não duplicam vínculos.
 - [ ] Técnicos de inscrição referenciam `coaches`, papéis técnico/assistente distintos. Cadastro não escolhe capitão de jogo. Vínculos preservam histórico; não apagar pessoa para substituir nome.
 - [ ] Rotas/API e SessionStore específicos, adapter testado por JWT privado; matriz sessão/origem/destino/schema/ausência de token no workerd.

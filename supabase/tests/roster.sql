@@ -39,6 +39,13 @@ select pg_temp.r_assert(jsonb_array_length(public.list_roster(pg_temp.r_id(95))-
 select pg_temp.r_error($q$select public.save_roster_entry(jsonb_set(jsonb_set(pg_temp.r_command(),'{commandId}',to_jsonb(pg_temp.r_id(62))),'{expectedVersion}','3'))$q$,'PT400');
 select pg_temp.r_assert(not ((public.get_roster_entry(pg_temp.r_id(12))->'person') ? 'athlete'),'roster projection excludes private athlete details');
 reset role;
+-- Global edits must not invalidate an existing active context.
+select pg_temp.r_error($q$update private.athletes set sex='male' where person_id=pg_temp.r_id(50)$q$,'PT400');
+select pg_temp.r_error($q$update public.disputes set gender='masculino' where id=pg_temp.r_id(92)$q$,'PT400');
+select pg_temp.r_assert((select sex='female' from private.athletes where person_id=pg_temp.r_id(50)),'global sex mismatch rolled back');
+update public.roster_entries set ended_at=clock_timestamp() where person_id=pg_temp.r_id(50) and ended_at is null;
+update private.athletes set sex='male' where person_id=pg_temp.r_id(50);
+select pg_temp.r_assert((select sex='male' from private.athletes where person_id=pg_temp.r_id(50)),'inactive history does not freeze current private sex');
 update public.admin_access set enabled=false;
 set local role authenticated;
 select pg_temp.r_assert(public.get_roster_entry(pg_temp.r_id(2)) is null,'revoked reads');
