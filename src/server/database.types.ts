@@ -201,6 +201,50 @@ export type Database = {
           },
         ];
       };
+      roster_entries: {
+        Row: {
+          dispute_id: string;
+          ended_at: string | null;
+          id: string;
+          jersey: string;
+          person_id: string;
+          registration_id: string;
+          saved_at: string;
+          started_at: string;
+          version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          ended_at?: string | null;
+          id: string;
+          jersey: string;
+          person_id: string;
+          registration_id: string;
+          saved_at?: string;
+          started_at?: string;
+          version?: number;
+        };
+        Update: {
+          dispute_id?: string;
+          ended_at?: string | null;
+          id?: string;
+          jersey?: string;
+          person_id?: string;
+          registration_id?: string;
+          saved_at?: string;
+          started_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "roster_entries_registration_id_dispute_id_fkey";
+            columns: ["registration_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id", "dispute_id"];
+          },
+        ];
+      };
       seasons: {
         Row: {
           championship_id: string;
@@ -259,6 +303,7 @@ export type Database = {
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
+      get_roster_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
@@ -272,6 +317,14 @@ export type Database = {
         Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_roster: {
+        Args: {
+          p_active_only?: boolean;
+          p_offset?: number;
+          p_registration_id: string;
+        };
+        Returns: Json;
+      };
       list_teams: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
@@ -279,6 +332,7 @@ export type Database = {
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
+      save_roster_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
     };
     Enums: {

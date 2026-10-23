@@ -20,6 +20,10 @@ Concluído: migration `20261023122129_person_identity` aplicada no projeto novo.
 
 ## C3.2 — elencos e comissão
 
+Subunidade de elenco persistido C3.2a: migration `20261023122809_roster_membership` aplicada. Contrato TS PASS 0/00/1–99; quatro cenários PostgreSQL locais e contrato de elenco real Supabase PASS com rollback. FK composta deriva disputa da inscrição; índices parciais asseguram vínculo ativo por pessoa/disputa e camisa por inscrição. Inativos preservam identidade/vigência e não reabrem silenciosamente. Projeção de elenco contém apenas nome/apelido/ano público, sem sexo/nascimento/registro privado. Tipos regenerados, dados reais preservados, advisors só aviso conhecido. Nenhum vínculo fictício permanente, API/interface C3 ainda pendentes.
+
+Antes da UI: testar/proteger alteração global de sexo ou naipe que torne vínculo ativo incompatível; não basta validar somente na inclusão. Completar Recentes de edição global de pessoa após vinculação, respeitando a ordem de locks (atleta antes de campeonato no escritor de elenco). Não expor transferência automática: desativação básica é preparatória e, quando existirem participações, deverá respeitar as restrições/histórico da etapa 5. Comissão ainda não modelada.
+
 - [ ] Contratos/testes antes de DDL: elenco por inscrição com camisa textual 0/00/1–99, pessoa existente e apenas um vínculo ativo por disputa; índices únicos parciais e FK de contexto. Sem movimentar atleta/transferência nesta unidade. Repetição e conflito não duplicam vínculos.
 - [ ] Técnicos de inscrição referenciam `coaches`, papéis técnico/assistente distintos. Cadastro não escolhe capitão de jogo. Vínculos preservam histórico; não apagar pessoa para substituir nome.
 - [ ] Rotas/API e SessionStore específicos, adapter testado por JWT privado; matriz sessão/origem/destino/schema/ausência de token no workerd.
