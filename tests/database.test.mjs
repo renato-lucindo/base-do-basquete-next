@@ -37,6 +37,43 @@ const teamsContract = await readFile("supabase/tests/teams.sql", "utf8");
 const peopleContract = await readFile("supabase/tests/people.sql", "utf8");
 const rosterContract = await readFile("supabase/tests/roster.sql", "utf8");
 const staffContract = await readFile("supabase/tests/staff.sql", "utf8");
+const importFieldsContract = await readFile(
+  "supabase/tests/import_fields.sql",
+  "utf8",
+);
+
+test("C4 upgrade preserves existing C3 people, private details and numbered rosters", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((sql) =>
+      sql.includes("-- C4: nullable contextual jerseys"),
+    );
+    assert.ok(boundary > 0);
+    for (const migration of migrations.slice(0, boundary))
+      await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('b1000000-0000-4000-8000-000000000001','Existing C3');
+   insert into public.seasons(id,championship_id,year) values('b1000000-0000-4000-8000-000000000002','b1000000-0000-4000-8000-000000000001',2026);
+   insert into public.disputes(id,season_id,gender,category) values('b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000002','feminino','Adulto');
+   insert into public.teams(id,name) values('b1000000-0000-4000-8000-000000000004','Existing');
+   insert into public.registrations(id,dispute_id,team_id,name) values('b1000000-0000-4000-8000-000000000005','b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000004','Existing A');
+   insert into public.persons(id,name,nickname,position) values('b1000000-0000-4000-8000-000000000006','Existing athlete','Nickname','Armador / Ala');
+   insert into private.athletes(person_id,sex,birth_date,federation_registration) values('b1000000-0000-4000-8000-000000000006','female','2000-02-29','000123');
+   insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey) values('b1000000-0000-4000-8000-000000000007','b1000000-0000-4000-8000-000000000005','b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000006','00');`);
+    const query =
+      "select public.get_person('b1000000-0000-4000-8000-000000000006') as person, public.get_roster_entry('b1000000-0000-4000-8000-000000000007') as roster";
+    const before = await db.query(query);
+    for (const migration of migrations.slice(boundary))
+      await db.exec(migration);
+    assert.deepEqual((await db.query(query)).rows, before.rows);
+    assert.deepEqual(
+      (await db.query("select birth_year from private.athletes")).rows,
+      [{ birth_year: null }],
+    );
+  } finally {
+    await db.close();
+  }
+});
 
 test("migrations from zero enforce the shared SQL access contract", async () => {
   const db = await PGlite.create();
@@ -50,6 +87,7 @@ test("migrations from zero enforce the shared SQL access contract", async () => 
     await db.exec(peopleContract);
     await db.exec(rosterContract);
     await db.exec(staffContract);
+    await db.exec(importFieldsContract);
     const { rows } = await db.query(
       "select count(*)::int as count from auth.users",
     );
@@ -82,6 +120,7 @@ test("upgrade preserves an existing administrator and enforces new defaults", as
     await db.exec(peopleContract);
     await db.exec(rosterContract);
     await db.exec(staffContract);
+    await db.exec(importFieldsContract);
   } finally {
     await db.close();
   }
@@ -103,6 +142,7 @@ test("C2 upgrade and rolled-back fixtures preserve saved C1 data", async () => {
     await db.exec(peopleContract);
     await db.exec(rosterContract);
     await db.exec(staffContract);
+    await db.exec(importFieldsContract);
     const after = await db.query(
       "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
     );
@@ -133,6 +173,7 @@ test("C3 upgrade preserves C2 registrations and their global identity", async ()
     await db.exec(peopleContract);
     await db.exec(rosterContract);
     await db.exec(staffContract);
+    await db.exec(importFieldsContract);
     assert.deepEqual(
       (
         await db.query(

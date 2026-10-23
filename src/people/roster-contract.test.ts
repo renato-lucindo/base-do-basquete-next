@@ -19,6 +19,10 @@ describe("vínculo contextual e camisa textual", () => {
         saveRosterSchema.parse({ ...c, entry: { ...c.entry, jersey } }).entry
           .jersey,
       ).toBe(jersey);
+    expect(
+      saveRosterSchema.parse({ ...c, entry: { ...c.entry, jersey: null } })
+        .entry.jersey,
+    ).toBeNull();
     for (const jersey of ["01", "100", "-1", "", "1.5"])
       expect(
         saveRosterSchema.safeParse({ ...c, entry: { ...c.entry, jersey } })

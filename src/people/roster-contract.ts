@@ -5,7 +5,10 @@ export const rosterEntrySchema = z
     id: z.uuid(),
     registrationId: z.uuid(),
     personId: z.uuid(),
-    jersey: z.string().regex(/^(00|0|[1-9][0-9]?)$/),
+    jersey: z
+      .string()
+      .regex(/^(00|0|[1-9][0-9]?)$/)
+      .nullable(),
     active: z.boolean(),
   })
   .strict();

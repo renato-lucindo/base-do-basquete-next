@@ -7,7 +7,7 @@ create function pg_temp.p_command(n integer default 0) returns jsonb language sq
  select jsonb_build_object('commandId',pg_temp.p_id(n+1),'expectedVersion',0,'disputeId',null,'confirmHomonym',false,
  'person',jsonb_build_object('id',pg_temp.p_id(n+2),'name',case when n=0 then 'João da Silva' else 'Pessoa teste '||n::text end,'nickname',null,'publicBirthYear',null,
  'heightCm',null,'weightKg',null,'position',null,'dominantHand',null,'originCity',null,'originState',null,'biography',null,
- 'coach',false,'athlete',jsonb_build_object('sex','male','birthDate','2000-02-29','federationRegistration','private-fixture')))
+ 'coach',false,'athlete',jsonb_build_object('sex','male','birthDate','2000-02-29','federationRegistration',lpad((400000+n)::text,6,'0'))))
 $$;
 grant execute on function pg_temp.p_id(integer),pg_temp.p_assert(boolean,text),pg_temp.p_error(text,text),pg_temp.p_command(integer) to anon,authenticated;
 delete from public.admin_access;

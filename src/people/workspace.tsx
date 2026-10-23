@@ -282,7 +282,7 @@ export function MembersWorkspace({
             id: crypto.randomUUID(),
             registrationId: registration.id,
             personId: p.id,
-            jersey: "",
+            jersey: null,
             active: true,
           },
         },
@@ -686,11 +686,10 @@ export function MembersWorkspace({
                   <label>
                     Camisa
                     <input
-                      required
                       inputMode="numeric"
                       pattern="00|0|[1-9][0-9]?"
                       maxLength={2}
-                      value={editor.command.entry.jersey}
+                      value={editor.command.entry.jersey ?? ""}
                       onChange={(e) =>
                         setEditor((v) =>
                           v?.kind === "roster"
@@ -700,7 +699,7 @@ export function MembersWorkspace({
                                   ...v.command,
                                   entry: {
                                     ...v.command.entry,
-                                    jersey: e.target.value,
+                                    jersey: e.target.value || null,
                                   },
                                 },
                               }
@@ -806,7 +805,7 @@ export function MembersWorkspace({
                 <tbody>
                   {roster.items.map((r) => (
                     <tr key={r.id} data-testid="roster-row">
-                      <td>{r.jersey}</td>
+                      <td>{r.jersey ?? "Sem camisa"}</td>
                       <td>
                         {r.person.name}
                         {!r.active && <small> · Encerrado</small>}

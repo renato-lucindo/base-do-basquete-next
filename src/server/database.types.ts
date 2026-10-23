@@ -206,7 +206,7 @@ export type Database = {
           dispute_id: string;
           ended_at: string | null;
           id: string;
-          jersey: string;
+          jersey: string | null;
           person_id: string;
           registration_id: string;
           saved_at: string;
@@ -217,7 +217,7 @@ export type Database = {
           dispute_id: string;
           ended_at?: string | null;
           id: string;
-          jersey: string;
+          jersey?: string | null;
           person_id: string;
           registration_id: string;
           saved_at?: string;
@@ -228,7 +228,7 @@ export type Database = {
           dispute_id?: string;
           ended_at?: string | null;
           id?: string;
-          jersey?: string;
+          jersey?: string | null;
           person_id?: string;
           registration_id?: string;
           saved_at?: string;

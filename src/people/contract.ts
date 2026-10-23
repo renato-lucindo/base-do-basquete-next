@@ -35,7 +35,9 @@ export const athleteSchema = z
   .object({
     sex: z.enum(["male", "female"]),
     birthDate: z.iso.date().nullable(),
-    federationRegistration: text(120),
+    federationRegistration: text(6).refine(
+      (v) => v === null || /^[0-9]{6}$/u.test(v),
+    ),
   })
   .strict();
 export const personSchema = publicPersonSchema

@@ -112,7 +112,9 @@ export function PersonFields({
             <label>
               Registro federativo
               <input
-                maxLength={120}
+                maxLength={6}
+                pattern="[0-9]{6}"
+                inputMode="numeric"
                 value={person.athlete.federationRegistration ?? ""}
                 onChange={(e) => {
                   if (person.athlete)
