@@ -35,12 +35,96 @@ export type Database = {
         };
         Relationships: [];
       };
+      championships: {
+        Row: {
+          id: string;
+          name: string;
+          saved_at: string;
+          version: number;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          saved_at?: string;
+          version?: number;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          saved_at?: string;
+          version?: number;
+        };
+        Relationships: [];
+      };
+      disputes: {
+        Row: {
+          category: string;
+          division: string | null;
+          gender: string;
+          id: string;
+          season_id: string;
+        };
+        Insert: {
+          category: string;
+          division?: string | null;
+          gender: string;
+          id: string;
+          season_id: string;
+        };
+        Update: {
+          category?: string;
+          division?: string | null;
+          gender?: string;
+          id?: string;
+          season_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "disputes_season_id_fkey";
+            columns: ["season_id"];
+            isOneToOne: false;
+            referencedRelation: "seasons";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      seasons: {
+        Row: {
+          championship_id: string;
+          id: string;
+          year: number;
+        };
+        Insert: {
+          championship_id: string;
+          id: string;
+          year: number;
+        };
+        Update: {
+          championship_id?: string;
+          id?: string;
+          year?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "seasons_championship_id_fkey";
+            columns: ["championship_id"];
+            isOneToOne: false;
+            referencedRelation: "championships";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_competition: { Args: { p_id: string }; Returns: Json };
+      list_competitions: {
+        Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      save_competition: { Args: { p_command: Json }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;

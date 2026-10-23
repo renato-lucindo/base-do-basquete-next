@@ -29,6 +29,10 @@ const migrations = await Promise.all(
     .map((name) => readFile(`supabase/migrations/${name}`, "utf8")),
 );
 const contract = await readFile("supabase/tests/admin_access.sql", "utf8");
+const competitionContract = await readFile(
+  "supabase/tests/competition.sql",
+  "utf8",
+);
 
 test("migrations from zero enforce the shared SQL access contract", async () => {
   const db = await PGlite.create();
@@ -37,6 +41,7 @@ test("migrations from zero enforce the shared SQL access contract", async () => 
     for (const migration of migrations)
       await db.exec(`begin;\n${migration}\ncommit;`);
     await db.exec(contract);
+    await db.exec(competitionContract);
     const { rows } = await db.query(
       "select count(*)::int as count from auth.users",
     );
@@ -64,6 +69,7 @@ test("upgrade preserves an existing administrator and enforces new defaults", as
     ]);
     await db.exec("delete from public.admin_access; delete from auth.users;");
     await db.exec(contract);
+    await db.exec(competitionContract);
   } finally {
     await db.close();
   }

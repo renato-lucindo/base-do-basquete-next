@@ -1,4 +1,4 @@
-# Checkpoint — 23/10/2026, 08:14 America/Sao_Paulo (UTC-03)
+# Checkpoint — 23/10/2026, 08:26 America/Sao_Paulo (UTC-03)
 
 ## Objetivo e próximo passo exato
 
@@ -6,14 +6,20 @@ Nova Base do Basquete exclusivamente pelo ZIP preservado em `especificacao`, sem
 
 **Conta criada e habilitada:** responsável informou “conta criada”. No projeto correto, identidade exata `renato.lucindo.jr@gmail.com` confirmada, não anônima, não excluída/não banida; um usuário Auth e nenhum administrador antes do vínculo. Bootstrap operacional em transação com bloqueio da tabela, validação da identidade e recusa de administrador preexistente. Confirmado **um único administrador, habilitado e correspondente ao responsável**. Nenhuma senha/hash de senha consultado ou armazenado; nenhuma credencial nova gerada. Procedimento em [ACESSO-ADMINISTRATIVO.md](ACESSO-ADMINISTRATIVO.md).
 
-**Próximo passo exato:** preparar a unidade C1 da etapa 3 (contexto/cadastros), lendo as seções correspondentes de `ESCOPO.md`, `CONTRATOS.md` e `EXPERIENCIA.md` do pacote e os ajustes de experiência. Registrar plano em `docs/superpowers/plans/2026-10-23-contexto-cadastros.md`, ainda não criado. Começar pelo percurso de campeonato/temporada/disputa na mesma página, com contexto resolvido no servidor e persistência real; definir migration, constraints/RLS e validação de isolamento antes da DDL. Critério: criar/retomar contexto pelo fluxo real sem misturar inscrições de outra disputa. Equipes, elencos por texto, homônimos, Recentes e treinadores ligados à mesma pessoa seguem em unidades pequenas da mesma etapa. Não antecipar transferências/regulamento avançado nem promover fixtures. Ao retomar: cota primeiro, Git/CI/serviços reconciliados, preservando evidências válidas. Bootstrap não deve ser repetido.
+**Unidade atual C1 — etapa 3 autorizada por “proximo bloco”:** plano em `docs/superpowers/plans/2026-10-23-contexto-cadastros.md`. C1.1 concluída: contrato compartilhado normaliza nomes e recusa IDs/anos/disputas repetidos; PostgreSQL recebe agregado atômico, versão e comando idempotente. Migrations remotas `20261023112423_competition_context` e `20261023112534_competition_receipt_deny` aplicadas no projeto novo, histórico local reconciliado. Tabelas de campeonato/edição/disputa e recibos privados permanecem vazios após contrato SQL real com rollback. Conta única preservada. Tipos gerados; RLS/grants e autorização do escritor privado delimitado em decisão 005. Advisor: somente aviso Auth de proteção contra senhas vazadas, funcionalidade Pro; plano Free não alterado.
+
+**Próximo passo exato:** C1.2, adaptador servidor `src/competition/provider.ts`, operação autorizada na fila de `PersistentSession` e RPCs específicos do SessionStore, sem exportar JWT. Rotas HTTP da mesma origem e tela de campeonato/temporadas/disputas em C1.3. Verificar contrato/sessão/HTTP focalmente e depois gate estável/CI/preview protegido. Critério: criar/retomar contexto real com versão e idempotência, sem mistura de pais. Equipes/pessoas/treinadores/elencos por texto seguem em unidades posteriores. Não antecipar transferências/regulamento avançado nem promover fixtures. Ao retomar: cota primeiro e Git/CI/serviços reconciliados; bootstrap não deve ser repetido.
 
 ## Git, ambiente e autoria
 
 - Repositório novo público: https://github.com/renato-lucindo/base-do-basquete-next. Workspace `C:/Users/12405304716/Documents/Codex/Base do Basquete-v1`; Windows/PowerShell, Node 24.18.0, npm 11.16.0, Python 3.12.3.
-- Branch `feat/fundacao-acesso`, base `702efc9e21e751a40b578ae54b92028227b363b1` de `feat/prototipos-fluxos`. HEAD reconciliado antes deste checkpoint **`18b99f84f10502238ba469bcd031f7f5d580c76e`**, igual ao remoto; obter SHA final via Git. Código publicado **`6ecfacf618d30ba6fc0346597da6fb4d539d2eca`**. Alterações posteriores só no helper de smoke/documentação.
+- Branch atual **`feat/contexto-campeonatos`**, criada da fundação **`f03f2aa324052d71aeb8addd6de74136880944e3`**, sem alterações alheias. Fundação permanece em `feat/fundacao-acesso`, base `702efc9`. Obter HEAD final via Git. Código ainda publicado **`6ecfacf618d30ba6fc0346597da6fb4d539d2eca`**; C1 não foi publicada. Nenhum cofre/Access/Worker alterado nesta unidade de banco.
 - [PR draft #3](https://github.com/renato-lucindo/base-do-basquete-next/pull/3) empilhado sobre [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2), issue #1. Main `161a5b007833b0af6a0788353205bdba99b286b5` preservada, sem merge. Revisão pelo autor; revisão independente pendente.
-- Árvore limpa ao retomar. Mudanças deste fechamento: somente documentação do agente e pausa da automação, sem código/build/DDL/deploy/credencial. Vínculo administrativo já verificado na unidade anterior. ZIP original preservado/ignorado; nenhuma mudança alheia encontrada. Commit/push documental na branch de trabalho; conferir árvore/remoto depois. Nenhum WIP integrado à principal.
+- Árvore limpa ao iniciar C1. Mudanças desta unidade são do agente: plano/decisão, contrato/testes, duas migrations, contrato SQL e tipos gerados. ZIP original preservado/ignorado; nenhuma mudança alheia encontrada. Commit em branch de trabalho; conferir árvore/remoto ao fechar unidade. Nenhum WIP integrado à principal.
+
+## Evidência C1.1
+
+Três testes de contrato PASS após vermelho inicial. `npm run test:db` PASS do zero e upgrade com contrato novo e anterior; SQL compartilhado real PASS com rollback, inclusive idempotência, conflito, pais, omissão e ausência de escrita direta. Tipos/ESLint focais/segredos PASS. Após policy restritiva explícita, leitura de recibos pelo authenticated negada no banco real; único advisor restante é Auth/Pro. Não alegar corrida real multi-conexão a partir do PGlite serializado; limites na decisão 005. Gate consolidado de C1 será executado ao estabilizar transporte/tela, sem repetir harness/protótipo imutáveis.
 
 ## Fundação e verificações
 
@@ -74,7 +80,7 @@ Protótipos fictícios em https://base-do-basquete-prototipo.renato-lucindo-jr.w
 
 Servidor temporário de produção 4174 encerrado anteriormente por PID/linha de comando verificados. Smokes encerrados e credenciais transitórias revogadas. Vite antigo 5173/sessão 32934 preservado, verificar processo real antes de intervir. Nenhuma migration, gate, upload, CI ou transferência de credencial em andamento nesta unidade. Validação humana concluída. Nenhum redeploy necessário: código/assets/cofre inalterados.
 
-Consulta real **23/10/2026 08:12:50 UTC-03**: cinco horas **5% usado / 95% restante**; semanal **39% usado / 61% restante**. Reset 5h Unix `1792771741` = **23/10/2026 13:09:01 America/Sao_Paulo (16:09:01 UTC)**; semanal `1793293737` = **29/10/2026 14:08:57 America/Sao_Paulo (17:08:57 UTC)**. Franquia compartilhada; não estimar, comprar créditos, mudar plano ou usar resets manuais.
+Consulta real **23/10/2026 08:26 UTC-03**: cinco horas **17% usado / 83% restante**; semanal **41% usado / 59% restante**. Reset 5h Unix `1792771741` = **23/10/2026 13:09:01 America/Sao_Paulo (16:09:01 UTC)**; semanal `1793293737` = **29/10/2026 14:08:57 America/Sao_Paulo (17:08:57 UTC)**. Franquia compartilhada; não estimar, comprar créditos, mudar plano ou usar resets manuais.
 
 Automação oficial `retomar-preview-base-do-basquete`, nome “Retomar fundação Base do Basquete”: **PAUSED**, atualização bem-sucedida pela ferramenta oficial e status conferido após conclusão da fundação. Nenhuma duplicata ou despertar novo criado. Na próxima unidade, se cota real atingir <=15% restante: checkpoint seguro, push quando seguro e atualizar **essa mesma automação** para reset efetivo +2 minutos, confirmando sucesso. Ao despertar: cota primeiro, reconciliar tudo e preservar evidências válidas.
 
