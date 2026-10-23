@@ -1,47 +1,42 @@
-# C4 — importar equipes e elencos por texto
+# C4 — importador de um elenco por texto
 
-**Revisão de direção, 23/10 13:55 UTC-03:** responsável não gostou do fluxo e forneceu `IMPORTADOR-DE-EQUIPES-20261023.zip` para análise. Ler primeiro `docs/ANALISE-IMPORTADOR-DE-EQUIPES.md`. C4.1 abaixo tem sete testes/tipos/ESLint PASS, mas está sem integração/publicação. Incorporar atributos opcionais/sugestões e compor a revisão em tabela antes de executar a DDL/UI deste plano. Não tratar o fluxo anterior como aprovado.
+> Executar inline com executing-plans/TDD; continuidade e cota conforme PROGRESSO.md. Autorizado em 23/10: “Ok, bora implementar”. Branch codex/importacao-texto sobre C3 0d34242. Sem aprovação técnica redundante; revisão independente indisponível.
 
-> Executar com superpowers:executing-plans e test-driven-development, na mesma conversa. Decisões reversíveis delegadas; branch `codex/importacao-texto` sobre C3 `0d34242`. Sem subagente/revisão independente disponível.
+**Objetivo:** importar/atualizar uma equipe por operação, em tabela editável, resolvendo identidades e gravando os selecionados com resultado individual.
 
-**Objetivo:** colar lista/blocos, revisar e resolver identidades no contexto, confirmar itens válidos e manter texto/pendências/sucessos para retomada.
+**Spec:** docs/ESCOPO-IMPORTADOR-DE-EQUIPES.md fornecido pelo responsável, complementar e posterior aos ZIPs. Módulo adicional analisado em ANALISE-IMPORTADOR-DE-EQUIPES.md; manter regras gerais de autorização/privacidade/contexto do pacote original. O escopo novo substitui múltiplas equipes e camisa obrigatória do WIP anterior. Preservar literalmente o documento do responsável.
 
-**Arquitetura:** parser puro de prévia e schemas TS novos, sem alterar o parser fictício do protótipo. Revisão privada/versionada no PostgreSQL, operações específicas por sessão no Worker. Cada linha é unidade atômica: equipe global + inscrição, ou pessoa necessária + vínculo de elenco. Lote é sequência de itens, com resultados independentes e retry do mesmo comando. Não usar duas escritas HTTP independentes para anunciar uma linha concluída.
+**Arquitetura:** parser puro de atributos + revisão privada/versionada no PostgreSQL + operações específicas no Worker/SessionStore, sem SDK/token no browser. Confirmação transacional por atleta (dados aprovados + vínculo), com idempotência e versões; uma falha não desfaz os outros itens. Equipe/inscrição nova também atômica. Texto/decisões e sucessos sobrevivem recarga, sem construir histórico detalhado de importações.
 
-**Stack:** React/TypeScript/Zod/Worker/PostgreSQL existentes e versões fixadas; sem dependências novas.
+## Decisões relevantes
 
-**Spec:** ZIP, EXPERIENCIA F03/F04 e exemplos, CONTRATOS “Texto de equipes/elencos”/concorrência, ARQUITETURA/VALIDACAO etapa 3. Feedback em AJUSTES-DE-EXPERIENCIA.md. Apenas projeto novo, dados humanos preservados.
+- Nome único obrigatório na UI; sexo de novo atleta derivado do naipe no servidor. Camisa pode ser null, inclusive várias ausentes; números informados preservam 0/00 e unicidade ativa por inscrição. Jogo continuará exigindo camisas quando necessário à súmula.
+- Registro federativo privado nullable, seis dígitos ASCII e único globalmente quando informado, zeros iniciais preservados. Auditar antes da constraint sem corrigir dados humanos silenciosamente.
+- Data completa/ano parcial de nascimento são privados. Ano público segue separado; não publicar implicitamente o ano extraído do texto. Adicionar ano parcial privado para identificação sem inventar mês/dia. Até duas posições canônicas no DTO do importador; perfil existente conserva representação textual compatível, sem perda das duas posições.
+- Novo atleta assume mão direita quando ausente. Em existente, campo ausente não altera cadastro; alterações/limpezas explícitas ficam destacadas antes da confirmação. Versões de pessoa/vínculo impedem sobrescrita concorrente.
+- Busca de sugestões ocorre no backend administrativo, primeiro registro, depois nome normalizado, depois aproximação/dados disponíveis. Nomes semelhantes não fundem; conflitos/homônimos permitem escolher identidade ou confirmar nova. Vínculo ativo incompatível na mesma disputa bloqueia, outra disputa/edição não.
+- Entrada usa inscrição aberta ou criação/escolha contextual na mesma área. Cabeçalhos são metadados, não atletas; segundo nome de equipe distinto bloqueia para correção. Tabela com todos os campos, correção local/teclado, ações/pendências por linha; cadastro individual continua alternativa.
+- Limites operacionais iniciais: 20 mil caracteres, 500 linhas físicas, 200 atletas e JSON até256KiB; sem truncar dados silenciosamente. Sem CSV/XLSX, lote de equipes, aprendizado ou histórico detalhado.
 
-## Decisões do implementador
+## M1 — compatibilidade do cadastro e banco
 
-Revisão tem texto original imutável, modo, disputa, linhas com origem e escolhas editáveis. Reinterpretar texto gera outra revisão; linhas já confirmadas não podem ser apagadas/regravadas por salvar uma cópia antiga. Guardar no servidor evita perder pendências na recarga e não expõe cadastros em armazenamento anônimo do browser.
+- [ ] RED TS/SQL para camisa null, múltiplas ausentes, 0/00, registro formato/unicidade e ano privado parcial/data coerente. Reutilizar contratos válidos sem repetir harness.
+- [ ] Migration CLI própria, writer de elenco nullable e ano privado/registro com constraints; dados/RLS/recibos/lock order preservados. C3 UI compatível com null e validação federativa. Do zero/upgrade com dados C3 e contrato real rollback; tipos/advisors/contagens e commit.
 
-Cada cabeçalho/lista representa uma inscrição revisável, inclusive blocos vazios e nomes repetidos. Não agrupar cabeçalhos pelo nome. Opções explícitas: nova equipe/inscrição, inscrição nova usando equipe global existente ou inscrição existente no destino. Atleta: nova identidade com confirmação de homônimo quando necessária, ou identidade existente/versionada. Cadastro existente não é renomeado nem tem sexo alterado pelo texto. Novo atleta recebe sexo do naipe atual no servidor; técnico existente pode receber papel atleta preservando seus dados.
+## M2 — parser rico e revisão
 
-Formato visível: uma equipe por linha, ou `Equipe: Nome` e linhas `camisa - nome`; também aceitar travessão/dois-pontos/tab/espaço após número. Camisa ausente continua pendente, 0/00 distintos; nada de inferência pelo nome. Sem CSV/XLSX. Limites de operação: 20 mil caracteres, 500 linhas físicas e 200 itens, envio JSON até 256 KiB. Limites não são regras esportivas.
+- [ ] Substituir WIP não integrado por DTO de uma equipe e atletas com origem, campos normalizados, campos efetivamente informados, pendências e decisão/versionamento. RED antes de código.
+- [ ] Casos do escopo: separadores - ; | / espaço, nomes/apelidos hifenizados, cabeçalhos, sem camisa, 0/00, datas reais, metros/cm, duas posições PG/SF e1-2, desconhecidos/ambiguidade, zeros de registro e limites. Preservar tokens não reconhecidos para correção. Focais/tipos/commit.
 
-## Pontos de revisão e provas
+## M3 — revisão durável, matching e confirmação
 
-Cabeçalhos homônimos não fundem inscrições; atleta antes do cabeçalho mantém linha sem destino. Camisa repetida é avaliada entre itens selecionados do mesmo destino, incluindo inscrições existentes resolvidas; desmarcar uma linha permite importar a outra. Nome igual nunca escolhe pessoa automaticamente. Falha após commit repete comando; mudança de versão não obtém token novo para dados antigos. Uma linha recusada não desfaz as concluídas.
+- [ ] SQL RED: draft privado, shapes/limites/origem, matching administrativo, identidade única, contextos, mudanças explícitas, versão/idempotência, atomicidade, sucessos entre falhas, sem apagar ausentes.
+- [ ] Migrations/readers invoker/writers privados delimitados. Autorização fresca antes de dados/recibos; ordem atleta → campeonato, nada de service-role. Aplicar apenas projeto novo, contrato real isolado rollback, tipos/advisors e commit.
+- [ ] Provider/SessionStore/rotas fixas com sessão/origem/query/schema/limites e erros sanitizados; testes focais/workerd. Sem segredos/SQL nos erros.
 
-## C4.1 — contratos e parser
+## M4 — fluxo em tabela e entrega
 
-- [ ] Criar `src/text-import/contract.test.ts` e `parse.test.ts`; observar RED. Schemas de revisão/linhas/resolução/resultado, limites/IDs/parentes e ausência de status de sucesso editável.
-- [ ] Implementar `contract.ts`, `parse.ts` e `review.ts` (pendências/readiness), mantendo fontes/linhas, cabeçalhos distintos, camisas e identidades explícitas. Exercitar os três exemplos do ZIP e entradas sem separador, órfãs/Unicode/CRLF/limites; rodar focais/tipos e commit.
-
-## C4.2 — revisão durável e confirmação por item
-
-- [ ] `supabase/tests/text_import.sql` com fixtures isoladas/rollback, anexar ao runner, RED antes de migration CLI. Cobrir autorização/RLS/grants/revogação, pais/versão/recibos, proteção de linhas aplicadas, sexo derivado/preservado, rollback pessoa+vínculo, sucessos entre falhas e retomada.
-- [ ] Migration própria: revisão privada, resultados por linha/recibos privados; leitores invoker e escritores privados delimitados autorizados antes dos dados. Validar shapes/limites/origem/identidades no banco, manter ordem de locks atleta → campeonato. Reutilizar writers privados C2/C3 sem contornar regras.
-- [ ] Do zero/upgrade com C3 salvo, contrato real no projeto novo com rollback, contagens/advisors/tipos e commit. Não repetir contratos antigos não isolados sobre dados humanos.
-
-## C4.3 — transporte e UI
-
-- [ ] Provider/SessionStore/rotas fixas de revisar/retomar/salvar/confirmar item; testes de sessão/origem/query/schema/limites e erro por item. Sem SDK/token no browser.
-- [ ] UI dentro de Equipes e elencos: texto/modo/explicação, prévia editável, escolha contextual de equipe/inscrição/pessoa, seleção dos prontos, progresso/resultados/pendências e recarga explícita em conflito. Estado não salvo/gravando/salvo/falha, rascunho e guardas/foco/reautenticação, desktop/celular.
-- [ ] Testes browser RED→GREEN: exemplos, homônimos, correção/deseleção, cabeçalhos repetidos, partial/retry/reload/destino e 320px. Amostra real solicitada ao responsável; não declarar compatibilidade universal ou aceite sem ela.
-
-## C4.4 — entrega
-
-- [ ] Gate consolidado ao estabilizar, PR draft sobre C3, CI source exato e preview protegido, smokes novos/credenciais temporárias revogadas. Reusar harness/protótipo inalterados.
-- [ ] Checkpoint, evidências/limites, avaliação humana e próximo bloco da etapa 4 conforme pacote/cota. Ao gatilho real de 85% usado, encerrar menor operação consistente, salvar remoto e atualizar mesma automação para reset+2.
+- [ ] UI colar → interpretar → tabela editável/sugestões → confirmar válidos → resultado por item. Todos os campos editáveis; diferenças em pessoa e elenco visíveis; ausentes mantidos. Rascunho/reload/guardas/foco/reautenticação, desktop/celular320 e confirmação coletiva dos novos sem dupla gravação por pessoa.
+- [ ] Browser RED→GREEN para exemplo rico, corrigir/selecionar/homônimo, comparar atual/ausente, parcial/retry/recarga/conflito e teclado. Mostrar composição revisada, continuar integração autorizada; amostra real solicitada, sem alegar compatibilidade universal.
+- [ ] Gate consolidado estável, PR draft sobre C3, CI source exato, preview protegido/hash/negação e revogação dos acessos temporários. Reusar artefatos inalterados.
+- [ ] Checkpoint/avaliação humana/próxima etapa. Aos85%usados5h, menor operação segura, push/checkpoint e mesma automação reset+2; semanal também, sem compras/resets manuais.
