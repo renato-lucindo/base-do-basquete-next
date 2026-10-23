@@ -36,7 +36,11 @@
 
 ## M4 — fluxo em tabela e entrega
 
-- [ ] UI colar → interpretar → tabela editável/sugestões → confirmar válidos → resultado por item. Todos os campos editáveis; diferenças em pessoa e elenco visíveis; ausentes mantidos. Rascunho/reload/guardas/foco/reautenticação, desktop/celular320 e confirmação coletiva dos novos sem dupla gravação por pessoa.
-- [ ] Browser RED→GREEN para exemplo rico, corrigir/selecionar/homônimo, comparar atual/ausente, parcial/retry/recarga/conflito e teclado. Mostrar composição revisada, continuar integração autorizada; amostra real solicitada, sem alegar compatibilidade universal.
-- [ ] Gate consolidado estável, PR draft sobre C3, CI source exato, preview protegido/hash/negação e revogação dos acessos temporários. Reusar artefatos inalterados.
+- [x] UI colar → interpretar → tabela editável/sugestões → confirmar válidos → resultado por item. Todos os campos editáveis; diferenças em pessoa e elenco visíveis; ausentes mantidos. Rascunho/reload/guardas/foco/reautenticação, desktop/celular320 e confirmação coletiva dos novos sem dupla gravação por pessoa.
+- [x] Browser RED→GREEN para exemplo rico, corrigir/selecionar/homônimo, comparar atual/ausente, parcial/retry/recarga/conflito e teclado. Mostrar composição revisada, continuar integração autorizada; amostra real solicitada, sem alegar compatibilidade universal.
+- [x] Gate consolidado estável, PR draft sobre C3, CI source exato, preview protegido/hash/negação e revogação dos acessos temporários. Reusar artefatos inalterados.
 - [ ] Checkpoint/avaliação humana/próxima etapa. Aos85%usados5h, menor operação segura, push/checkpoint e mesma automação reset+2; semanal também, sem compras/resets manuais.
+
+## Entrega de M4
+
+Source033d404 publicado no preview protegido em23/10 15:32 UTC-03; evidencias em VALIDACAO-IMPORTADOR.md. CI40003611826 SUCCESS em c5a8d10; delta final de cabecalho/teste verificado focalmente, sem repetir gate inteiro. Avaliacao humana com texto real solicitada; aceite pendente.

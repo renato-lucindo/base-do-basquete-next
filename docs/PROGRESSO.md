@@ -1,4 +1,28 @@
-# Implementação ativa — M1/M2/M3 prontos, próxima tabela M4, 23/10/2026 15:03 UTC-03
+# C4 publicado para avaliação — 23/10/2026 15:38 America/Sao_Paulo (UTC-03)
+
+**Retorno humano incorporado:** responsável relatou títulos sem correspondência com campos. A aba aberta foi inspecionada: ainda tinha o cabeçalho antigo. Recarga segura e retomada da conferência salva exibiram os doze títulos corretos, com seis linhas preservadas e zero confirmadas; nenhum dado foi editado/confirmado pelo agente. Evidência visual local .preview-artifacts/importador-cabecalhos-real.png. Teste ampliado para todos os títulos e campos correspondentes: dois browsers PASS. O código publicado continua033d404, sem necessidade de novo deploy por mudança exclusiva de teste/documentação. Aceite do fluxo completo continua pendente.
+
+**Contagens atuais15:38:** campeonato/edição/disputas1/1/2,equipes/inscrições2/2,pessoas1,elenco0,Auth1. Agora há **uma conferência e um recibo criados pelo responsável**, preservados. As contagens zero de revisões abaixo são históricas, anteriores ao teste humano. Nenhuma alteração de produto do agente após a publicação.
+
+**Objetivo/unidade:** importador de uma equipe por texto autorizado em “Ok, bora implementar”, conforme ESCOPO-IMPORTADOR-DE-EQUIPES.md preservado. M1–M4 implementados/publicados; avaliação humana com texto real solicitada e pendente. Incorporar o retorno deste fluxo antes de iniciar outro bloco de produto.
+
+**Git/ambiente:** C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, Windows/PowerShell, Node24.18/npm11.16/Python3.12. Novo remoto https://github.com/renato-lucindo/base-do-basquete-next, branch codex/importacao-texto, PR draft#7 sobre C3/#6, base0d34242. Código M4 c5a8d100df7d32778b8e79eeea2c8f6c65bcea7f; ajuste focal de cabeçalho e source publicado **033d404571e2b48c75124883a790aa1b88397c9f**. Sem merge. Alterações não commitadas ao escrever: somente documentação de fechamento do agente; obter HEAD documental final pelo Git. Nenhuma mudança alheia alterada.
+
+**Concluído:** campos opcionais/privados e constraints, parser rico, matching administrativo/homônimos, revisão privada retomável, confirmação atômica por atleta, resultados parciais/idempotência/versões, API/SessionStore e tabela integrada nos dois pontos de entrada. Campos omitidos preservam existente; alteração global mostra antes/depois com aprovação; ausentes não são removidos. Migrations e tipos reconciliados. Detalhes/hashes/limites em docs/VALIDACAO-IMPORTADOR.md.
+
+**Verificações:** gate local PASS111 unitários/22arquivos,5 transportes,5 cenários PostgreSQL do zero/upgrade,7 workerd, tipos/lint/format/build/fronteira/segredos. Contratos Supabase reais com rollback PASS reutilizados, SQL inalterado.36 browsers C1–C4 PASS,14 focais após ajuste da tabela e2 adicionais RED→GREEN para o título da coluna. CI40003611826/job120585801014 **SUCCESS em c5a8d10**, incluindo70 browsers Linux.033d404 é delta exclusivo de markup/teste validado focalmente/build; não atribuir a ele a CI do pai. Harness imutável126 não repetido.
+
+**Serviços:** preview protegido https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/ no source033d404, deployment37c716d3-54e0-4515-8844-2f930d6cc6d4, versão658ee17e-8dc5-4e61-b6a8-06f06915bc9b,100%,15:32:21 UTC-03. Smokes/hash/source/desktop/mobile PASS; backend de hash idêntico reutiliza smoke c5a8d10 com15 rotas privadas401/Auth inválido/ausência de cookie. Access só responsável, previews OFF, namespace/cofre preservados. Dois tokens/políticas de smoke C4 revogados; anônimo302 sem X-Bdb-Source reconfirmado. Nenhum DDL/upload/gate/smoke/credencial/processo em andamento.
+
+**Banco/dados:** somente projeto nizmasjddyrhmevvfviz/org base-do-basquete/vínculo link_6adaa8aab5688191b1e7ae1cddc55a82, Free. Contagens15:28 UTC-03: campeonato/edição/disputas1/1/2,equipes/inscrições2/2,pessoas1,elenco0,revisões/recibos de texto0,Auth1; preservar. Aviso conhecido de senha vazada/Pro não motivou contratação. Nunca consultar/clonar repo/serviços anteriores, extrair segredos de conectores nem pedir senha/token no chat.
+
+**Pendências/limites:** amostra e avaliação humana do importador solicitadas nesta conversa; revisão independente, escala, concorrência real entre conexões e WCAG completa não comprovadas. Sem CSV/XLSX/lote de equipes/transferência automática/histórico detalhado. Automação retomar-preview-base-do-basquete permanece PAUSED para aguardar retorno, sem despertar desnecessário.
+
+**Próximo exato:** ler a resposta ao pedido de teste do importador, reconciliar Git/CI/deployment/dados humanos, reproduzir eventuais falhas com cenário focal antes de alterar. Se aprovado, registrar aceite e escolher próxima unidade do pacote/plano. Sem amostra, manter entrega técnica sem alegar compatibilidade universal. Reutilizar evidências de artefatos inalterados e consultar cota real antes de retomar.
+
+**Cota real15:33 UTC-03:**46%usado/54%restante5h e7%usado/93%restante semanal. Reset5h23/10/2026 19:42:49 America/Sao_Paulo (22:42:49 UTC); semanal30/10/2026 14:42:49 UTC-03. Sem compra/reset manual/mudança de plano pelo agente. Gatilho85%usado não atingido. Em retomada futura, ao gatilho checkpoint/push seguro e atualizar esta mesma automação para reset efetivo+2, sem duplicata.
+
+# Histórico — M1/M2/M3 prontos, próxima tabela M4, 23/10/2026 15:03 UTC-03
 
 Importador autorizado pelo responsável (“Ok, bora implementar”), conforme ESCOPO-IMPORTADOR-DE-EQUIPES.md preservado. Branch **codex/importacao-texto**, base C3 0d34242. M1 833e85a; parser M2 f49ace4; revisão/matching fe922fd; confirmação atômica a043a8d; **API/SessionStore em 1e742093a334467fd7a4d3bd776e012a5a98684f**. PR draft **#7** sobre codex/pessoas-elencos/#6, anexado. Sem merge/alteração alheia.
 

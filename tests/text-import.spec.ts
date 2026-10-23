@@ -16,8 +16,34 @@ test("importa dados ricos, conserva existentes/ausentes e retoma conferência sa
   await expect(
     page.getByRole("table", { name: "Conferência do elenco" }),
   ).toBeVisible();
-  await expect(page.getByRole("columnheader").first()).toHaveText("Nome");
-  await expect(page.getByRole("columnheader").nth(1)).toHaveText("Camisa");
+  const columns = [
+    "Nome",
+    "Camisa",
+    "Apelido",
+    "Nascimento",
+    "Ano de nascimento",
+    "Posições",
+    "Altura (cm)",
+    "Peso (kg)",
+    "Mão dominante",
+    "Registro federativo",
+    "Selecionar e situação",
+    "Identidade e alterações",
+  ];
+  await expect(page.getByRole("columnheader")).toHaveText(columns);
+  const firstRow = page
+    .getByRole("table", { name: "Conferência do elenco" })
+    .getByRole("row")
+    .nth(1);
+  for (let index = 0; index < 10; index++) {
+    const label = index === 5 ? "Posição 1" : columns[index];
+    await expect(
+      firstRow
+        .getByRole("cell")
+        .nth(index)
+        .getByLabel(`${label}, linha 2`, { exact: true }),
+    ).toHaveCount(1);
+  }
   await page
     .getByTestId(`candidate-${tid(10)}`)
     .getByRole("button", { name: /Usar/ })
