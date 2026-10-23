@@ -1,4 +1,4 @@
-# Checkpoint — 23/10/2026, 01:36 America/Araguaina (UTC-03)
+# Checkpoint — 23/10/2026, 01:38 America/Araguaina (UTC-03)
 
 ## Objetivo e próximo passo exato
 
@@ -28,7 +28,7 @@ F3: Auth/Data API somente no Worker, sem SDK/chave de banco no browser, service-
 - CI do código publicado [39898411474](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39898411474), job `120234092263`, SUCCESS. Helpers em `d7432bb`: [39899003570](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39899003570), job `120235967424`, SUCCESS. F2 [39894744143](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39894744143) e núcleo F3 [39897511068](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39897511068), SUCCESS. Workflow por push de código, ignora docs/README, sem deploy/segredos.
 - Smoke remoto PASS: três arquivos conferidos por hash e `X-Bdb-Source` exato; health 200, sessão ausente 401, `/worker.js` 404 após Access. Senha inválida recusada pelo **Auth Supabase real**, sem cookie da aplicação. Tela em 1440×1000 e 390×844, sem erros ou browser storage. Capturas ignoradas `access-desktop.png` e `access-mobile.png` em `.preview-artifacts`, inspecionadas.
 - Helper aguardava `networkidle`, impedido por conexões de fundo apesar da tela pronta. Ajustado para `domcontentloaded` + heading; smoke aprovado com esse ajuste. Access define cookies próprios; teste negativo exige ausência do cookie da aplicação. Sem alteração da aplicação por esses ajustes.
-- Fechamento focal do helper em `f54ea4c`: ESLint, sintaxe Node, formatação e scan de segredos PASS. CI automática [39901121382](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39901121382) iniciada pelo push; em andamento na consulta de 01:35 UTC-03, não iniciar gate local duplicado. PR #3 atualizado com escopo/evidências/pendências atuais, mantido draft.
+- Fechamento focal do helper em `f54ea4c`: ESLint, sintaxe Node, formatação e scan de segredos PASS. CI automática [39901121382](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39901121382), job `120242684580`: integridade e gate **SUCCESS**, em instalação do Chromium às 01:37 UTC-03; cenários de navegador ainda pendentes nessa execução. Não iniciar gate local duplicado. CI anterior dos mesmos arquivos de aplicação aprovada e válida. PR #3 atualizado com escopo/evidências/pendências atuais, mantido draft.
 - Senha correta, recarga/renovação e saída do responsável em produção **pendentes**; fixtures e contrato SQL não substituem essa evidência. Nenhuma conta criada automaticamente.
 
 ## Cloudflare — fundação publicada
@@ -71,9 +71,9 @@ Protótipos fictícios em https://base-do-basquete-prototipo.renato-lucindo-jr.w
 
 ## Processos, cota e retomada
 
-Servidor temporário de produção 4174 encerrado por PID/linha de comando verificados. Smokes encerrados e credenciais transitórias revogadas. Vite antigo 5173/sessão 32934 preservado, verificar processo real antes de intervir. Nenhuma migration, gate, upload ou transferência de credencial em andamento. Apenas intervenção humana no formulário pendente.
+Servidor temporário de produção 4174 encerrado por PID/linha de comando verificados. Smokes encerrados e credenciais transitórias revogadas. Vite antigo 5173/sessão 32934 preservado, verificar processo real antes de intervir. Nenhuma migration, gate local, upload ou transferência de credencial em andamento. CI remota acima em andamento; intervenção humana no formulário pendente. Fechamento documental `d71447123b05e56276f58b2e11c67735c9ecc9f3` enviado; árvore limpa/remoto iguais antes desta atualização de estado.
 
-Consulta real **23/10/2026 01:35 UTC-03**: cinco horas **69% usado / 31% restante**; semanal **38% usado / 62% restante**. Reset 5h Unix `1792743217` = **23/10/2026 05:13:37 America/Araguaina (08:13:37 UTC)**; semanal `1793293737` = **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Franquia compartilhada; não estimar, comprar créditos, mudar plano ou usar resets manuais.
+Consulta real **23/10/2026 01:37:54 UTC-03**: cinco horas **71% usado / 29% restante**; semanal **38% usado / 62% restante**. Reset 5h Unix `1792743217` = **23/10/2026 05:13:37 America/Araguaina (08:13:37 UTC)**; semanal `1793293737` = **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Franquia compartilhada; não estimar, comprar créditos, mudar plano ou usar resets manuais.
 
 Automação oficial existente `retomar-preview-base-do-basquete`, nome “Retomar fundação Base do Basquete”: ocorrência única de 23/10 00:13:28 executada. Configuração ainda ACTIVE, `COUNT=1`, sem novo despertar solicitado neste fechamento; não criar ciclo de tentativas para senha humana. Fundação pendente: pausar/excluir ao concluir F3/F4. Se cota real atingir <=15% restante: checkpoint seguro, push quando seguro e atualizar **essa mesma automação** para reset efetivo +2 minutos, confirmando sucesso. Ao despertar: cota primeiro, reconciliar tudo e preservar evidências válidas.
 
