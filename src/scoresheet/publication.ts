@@ -1,6 +1,7 @@
 import type { Prototype } from "../prototype/model";
 import { aggregate, validateSheet, type Sheet } from "../domain/scoresheet";
 import { assertStaffReady } from "./staff";
+import { assertStartingFive } from "./lineup";
 
 export function preparePublication(data: Prototype, reason: string): Prototype {
   if (
@@ -14,6 +15,7 @@ export function preparePublication(data: Prototype, reason: string): Prototype {
     );
   const sheet = validateSheet(data.sheet.present, true);
   assertStaffReady(sheet);
+  assertStartingFive(sheet);
   const previous = data.publications
     .filter((p) => p.id === data.game.id && p.source === "sheet")
     .at(-1);

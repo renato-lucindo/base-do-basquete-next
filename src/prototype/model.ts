@@ -68,6 +68,17 @@ export type Prototype = {
 };
 
 export function initialState(): Prototype {
+  const additionalHome = [
+    { id: 6, name: "Fernanda Nunes", jersey: "8" },
+    { id: 7, name: "Gabriela Luz", jersey: "9" },
+    { id: 8, name: "Helena Rocha", jersey: "10" },
+  ];
+  const additionalAway = [
+    { id: 9, name: "Luiza Melo", jersey: "0" },
+    { id: 10, name: "Marina Santos", jersey: "00" },
+    { id: 11, name: "Natália Pereira", jersey: "7" },
+    { id: 12, name: "Olívia Barros", jersey: "8" },
+  ];
   const document: Sheet = {
     rulesVersion: "FIBA_2024",
     periods: 4,
@@ -107,6 +118,20 @@ export function initialState(): Prototype {
         jersey: "12",
         played: false,
       },
+      ...additionalHome.map((player) => ({
+        rosterEntryId: player.id,
+        registrationId: 1,
+        side: "home" as const,
+        jersey: player.jersey,
+        played: false,
+      })),
+      ...additionalAway.map((player) => ({
+        rosterEntryId: player.id,
+        registrationId: 2,
+        side: "away" as const,
+        jersey: player.jersey,
+        played: false,
+      })),
     ],
     coachPlayer: { home: 1, away: 4 },
     staff: {
@@ -148,6 +173,7 @@ export function initialState(): Prototype {
           { id: 1, name: "Ana da Silva", jersey: "7" },
           { id: 2, name: "Beatriz Costa", jersey: "00" },
           { id: 3, name: "Elisa Rocha", jersey: "0" },
+          ...additionalHome,
         ],
       },
       {
@@ -158,6 +184,7 @@ export function initialState(): Prototype {
         players: [
           { id: 4, name: "Carla Souza", jersey: "4" },
           { id: 5, name: "Daniela Lima", jersey: "12" },
+          ...additionalAway,
         ],
       },
     ],

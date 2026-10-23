@@ -160,6 +160,45 @@ try {
       await page
         .getByRole("heading", { name: "Súmula por teclado", exact: true })
         .waitFor();
+      if (process.argv.includes("--scoresheet-lineup")) {
+        stage = `titulares e ordenação ${viewport.width}`;
+        for (const side of ["A", "B"]) {
+          const region = page.getByRole("region", {
+            name: `Relacionados ${side}`,
+            exact: true,
+          });
+          const jerseys = await region
+            .locator("input.jersey")
+            .evaluateAll((inputs) =>
+              inputs.map((input) => input.getAttribute("value")),
+            );
+          assert.deepEqual(
+            jerseys,
+            side === "A"
+              ? ["0", "00", "7", "8", "9", "10"]
+              : ["0", "00", "4", "7", "8", "12"],
+          );
+          for (const box of (
+            await region.getByRole("checkbox", { name: / titular$/ }).all()
+          ).slice(0, 5))
+            await box.check();
+          assert.equal(
+            await region
+              .getByRole("checkbox", { name: / titular$/, checked: true })
+              .count(),
+            5,
+          );
+        }
+        assert.equal(
+          await page
+            .getByRole("region", {
+              name: "Outras opções da súmula",
+              exact: true,
+            })
+            .count(),
+          1,
+        );
+      }
       if (process.argv.includes("--scoresheet-staff")) {
         stage = `comissão técnica ${viewport.width}`;
         const staff = page.getByRole("group", {
@@ -274,6 +313,7 @@ try {
       scoresheetReview: process.argv.includes("--scoresheet-review"),
       keyboardCycle: process.argv.includes("--scoresheet-review"),
       scoresheetStaff: process.argv.includes("--scoresheet-staff"),
+      scoresheetLineup: process.argv.includes("--scoresheet-lineup"),
       applicationCommit: manifest.applicationCommit,
       sourceCommit: manifest.sourceCommit,
     }),

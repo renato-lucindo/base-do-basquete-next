@@ -9,6 +9,7 @@ export const rosterSchema = z.object({
   side: sideSchema,
   jersey: z.string().regex(/^(00|0|[1-9][0-9]?)$/),
   played: z.boolean(),
+  starter: z.boolean().optional(),
 });
 export type RosterSlot = z.infer<typeof rosterSchema>;
 export const eventSchema = z.object({
@@ -137,6 +138,12 @@ export function aggregate(sheet: Sheet) {
   const errors: string[] = [];
   for (const side of ["home", "away"] as const) {
     const roster = sheet.roster.filter((s) => s.side === side);
+    if (roster.filter((slot) => slot.starter).length > 5)
+      errors.push(
+        `Selecione no máximo 5 titulares da equipe ${side === "home" ? "A" : "B"}.`,
+      );
+    if (roster.some((slot) => slot.starter && !slot.played))
+      errors.push("Titular deve estar marcado como participante do jogo.");
     const staff = sheet.staff?.[side];
     if (staff) {
       if (

@@ -6,6 +6,7 @@ import {
 } from "../domain/scoresheet";
 import { Field } from "../ui";
 import { getTeamStaff, withTeamStaff } from "./staff";
+import { orderedRoster } from "./lineup";
 
 export function StaffEditor({
   sheet,
@@ -51,13 +52,13 @@ export function StaffEditor({
           }
         >
           <option value="">Selecionar capitão relacionado</option>
-          {sheet.roster
-            .filter((slot) => slot.side === side)
-            .map((slot) => (
+          {orderedRoster(sheet.roster.filter((slot) => slot.side === side)).map(
+            (slot) => (
               <option key={slot.rosterEntryId} value={slot.rosterEntryId}>
                 #{slot.jersey} · {playerName(slot.rosterEntryId)}
               </option>
-            ))}
+            ),
+          )}
         </select>
       </Field>
       <label className="staff-fallback">

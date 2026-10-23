@@ -3,6 +3,7 @@ import { initialState } from "../prototype/model";
 import { aggregate, change, undo, validateSheet } from "../domain/scoresheet";
 import { getTeamStaff, withTeamStaff, assertStaffReady } from "./staff";
 import { preparePublication } from "./publication";
+import { readyPrototype } from "./test-support";
 
 it("sem técnico, somente o capitão relacionado assume e recebe as faltas nos dois papéis", () => {
   let s = initialState().sheet.present;
@@ -101,7 +102,7 @@ it("interpreta atleta-treinador legado como capitão sem reescrever o documento 
 });
 
 it("preserva a comissão anterior ao corrigir e republicar, com motivo obrigatório", () => {
-  const data = initialState();
+  const data = readyPrototype();
   data.sheet.present.roster[0].played = true;
   data.sheet.present.events = [
     {

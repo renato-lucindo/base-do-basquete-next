@@ -9,6 +9,16 @@ try {
   ]) {
     const page = await browser.newPage({ viewport: { width, height } });
     await page.goto("http://127.0.0.1:5173/#/sumula");
+    for (const side of ["A", "B"]) {
+      const roster = page.getByRole("region", {
+        name: `Relacionados ${side}`,
+        exact: true,
+      });
+      for (const box of (
+        await roster.getByRole("checkbox", { name: / titular$/ }).all()
+      ).slice(0, 5))
+        await box.check();
+    }
     const staff = page.getByRole("group", {
       name: "Comissão técnica de Águias",
       exact: true,

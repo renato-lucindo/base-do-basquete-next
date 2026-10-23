@@ -38,3 +38,14 @@ Solicitação posterior de 22/10: o atleta que assume como técnico é sempre o 
 O papel duplo usa a mesma identidade do relacionado e o motor existente de faltas/desqualificações. Mudança de capitão/técnico revalida a sequência inteira; edição inválida preserva o estado anterior. Rascunho pode ficar incompleto; publicação exige capitão selecionado quando assume ou nome do técnico próprio. Assistente não é admitido no modo capitão-técnico. Alternar para esse modo retira os nomes de técnico/assistente da súmula atual, com desfazer disponível.
 
 Os exemplos fictícios iniciais já identificam Ana da Silva e Carla Souza como capitãs; jogos novos e rascunhos antigos sem essa informação exigem seleção explícita, sem inferir capitão pelo primeiro atleta. Atleta-treinador identificado no formato legado é interpretado como capitão conforme a regra do responsável. Metadados são preservados nas versões publicadas; corrigir exige motivo e republicação, sem reescrever a versão anterior. Seleção real de identidades de treinadores permanece na integração futura.
+
+## Ordem dos relacionados, cinco titulares e opções no final
+
+Solicitação de 22/10 após autorização para seguir à fundação: mover criação de confronto e revisão de fontes para o final da súmula; ordenar atletas pela camisa e selecionar os cinco titulares.
+
+- Blocos auxiliares ficam em “Outras opções”, depois dos controles de publicação/histórico. O primeiro foi renomeado para “Criar outro jogo nesta área”: cria novo rascunho e preserva o trabalho anterior; não é seletor de jogo existente. Jogos existentes são abertos pela lista Jogos. A utilidade foi explicada ao responsável antes da alteração.
+- Relacionados e seletores usam ordem numérica de camisa, 0 antes de 00, preservando IDs e sem reordenar o documento salvo apenas para apresentação.
+- Checkbox “Titular” por atleta e contador por equipe. No máximo cinco na edição e exatamente cinco de cada lado para publicar a súmula. Rascunhos incompletos continuam salváveis. Titular implica participação; desmarcar não apaga a participação já registrada. Desfazer/refazer, recarga e versões preservam os marcadores. Formato legado sem marcador não infere titularidade.
+- Fixture inicial ampliada para seis atletas por equipe, sem titulares pré-selecionados. Rascunhos anteriores não recebem pessoas fictícias automaticamente; se tiverem menos de cinco relacionados, precisam ser completados pelo fluxo contextual.
+
+O responsável autorizou avançar às próximas etapas antes deste refinamento. Concluir e publicar o ajuste, então continuar a fundação real em unidades pequenas; a interrupção anterior ocorreu antes de qualquer mutação de infraestrutura. Não solicitar novamente autorização já concedida. Criação de serviço pago continua condicionada à decisão específica do responsável.

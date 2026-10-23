@@ -14,6 +14,7 @@ import { Badge, Field, Heading, disputeLabel, type ScreenProps } from "../ui";
 import { preparePublication } from "./publication";
 import { orderedActions, editAction, deleteAction } from "./actions";
 import { StaffEditor } from "./staff-editor";
+import { orderedRoster, setStarter } from "./lineup";
 
 export function ScoresheetWorkspace({
   data,
@@ -359,121 +360,6 @@ export function ScoresheetWorkspace({
         Confira os relacionados, transcreva as ações e publique o resultado
         neste percurso.
       </p>
-      <details className="game-setup" open={data.game.dispute !== dispute}>
-        <summary>Selecionar ou criar confronto nesta área</summary>
-        <div className="inline-panel">
-          <div className="form-grid">
-            <Field id="game-home" label="Equipe A">
-              <input
-                id="game-home"
-                list="game-teams"
-                value={home}
-                onChange={(e) => setHome(e.target.value)}
-              />
-            </Field>
-            <Field id="game-away" label="Equipe B">
-              <input
-                id="game-away"
-                list="game-teams"
-                value={away}
-                onChange={(e) => setAway(e.target.value)}
-              />
-            </Field>
-          </div>
-          <datalist id="game-teams">
-            {data.registrations
-              .filter((r) => r.dispute === dispute)
-              .map((r) => (
-                <option key={r.id}>{r.name}</option>
-              ))}
-          </datalist>
-          <p>
-            Destino do novo confronto: {disputeLabel(data, dispute)}. Equipes
-            ausentes podem ser criadas aqui.
-          </p>
-          <button onClick={createGame}>Preparar este confronto</button>
-        </div>
-      </details>
-      <section className="source-choice">
-        <details>
-          <summary>Fonte do resultado e revisão de divergência</summary>
-          <p>
-            Fonte atual: súmula manual. O exemplo abaixo permite avaliar uma
-            divergência com um PDF, sem substituir fontes silenciosamente.
-          </p>
-          <button
-            onClick={() => {
-              update({
-                ...data,
-                fallback: { required: true, decided: false, reason: "" },
-              });
-              setReview(false);
-            }}
-          >
-            Demonstrar divergência com PDF de exemplo
-          </button>
-        </details>
-        {data.fallback?.required && (
-          <div className="confirmation">
-            <h2>Divergência entre PDF e súmula</h2>
-            <p>
-              O PDF de exemplo é a fonte primária. Para usar a transcrição
-              manual, registre uma decisão explícita com justificativa. O
-              conteúdo das fontes continua preservado nesta avaliação.
-            </p>
-            <Field id="fallback-reason" label="Justificativa do fallback *">
-              <textarea
-                id="fallback-reason"
-                rows={2}
-                maxLength={500}
-                value={data.fallback.reason}
-                onChange={(e) => {
-                  update({
-                    ...data,
-                    fallback: {
-                      required: true,
-                      decided: false,
-                      reason: e.target.value,
-                    },
-                  });
-                  setReview(false);
-                }}
-              />
-            </Field>
-            <div className="actions">
-              <button
-                className="primary"
-                onClick={() => {
-                  if ((data.fallback?.reason.trim().length ?? 0) < 10) {
-                    setError("Justifique o fallback com 10 a 500 caracteres.");
-                    return;
-                  }
-                  update({
-                    ...data,
-                    fallback: { ...data.fallback!, decided: true },
-                  });
-                  setError("");
-                }}
-              >
-                Usar súmula como fallback
-              </button>
-              <button
-                onClick={() => {
-                  update({ ...data, fallback: undefined });
-                  setReview(false);
-                }}
-              >
-                Cancelar esta demonstração
-              </button>
-            </div>
-            {data.fallback.decided && (
-              <p className="success-text">
-                Decisão registrada. A justificativa acompanhará a confirmação.
-              </p>
-            )}
-          </div>
-        )}
-      </section>
       <div className="scoreboard" aria-label="Placar da súmula">
         <div>
           <span>Equipe A</span>
@@ -521,6 +407,7 @@ export function ScoresheetWorkspace({
                     <tr>
                       <th>Camisa</th>
                       <th>Atleta</th>
+                      <th>Titular</th>
                       <th>Jogou</th>
                       <th>PTS</th>
                       <th>FC</th>
@@ -528,70 +415,101 @@ export function ScoresheetWorkspace({
                     </tr>
                   </thead>
                   <tbody>
-                    {sheet.roster
-                      .filter((r) => r.side === side)
-                      .map((r) => {
-                        const total = totals.players.find(
-                          (p) => p.rosterEntryId === r.rosterEntryId,
-                        )!;
-                        return (
-                          <tr key={r.rosterEntryId}>
-                            <td>
-                              <input
-                                className="jersey"
-                                aria-label={`Camisa de ${playerName(r.rosterEntryId)}`}
-                                disabled={!!previous}
-                                value={r.jersey}
-                                onChange={(e) => {
-                                  const next = {
-                                    ...sheet,
-                                    roster: sheet.roster.map((x) =>
-                                      x.rosterEntryId === r.rosterEntryId
-                                        ? { ...x, jersey: e.target.value }
-                                        : x,
+                    {orderedRoster(
+                      sheet.roster.filter((r) => r.side === side),
+                    ).map((r) => {
+                      const total = totals.players.find(
+                        (p) => p.rosterEntryId === r.rosterEntryId,
+                      )!;
+                      return (
+                        <tr key={r.rosterEntryId}>
+                          <td>
+                            <input
+                              className="jersey"
+                              aria-label={`Camisa de ${playerName(r.rosterEntryId)}`}
+                              disabled={!!previous}
+                              value={r.jersey}
+                              onChange={(e) => {
+                                const next = {
+                                  ...sheet,
+                                  roster: sheet.roster.map((x) =>
+                                    x.rosterEntryId === r.rosterEntryId
+                                      ? { ...x, jersey: e.target.value }
+                                      : x,
+                                  ),
+                                };
+                                update({
+                                  ...data,
+                                  sheet: { ...data.sheet, present: next },
+                                });
+                                setReview(false);
+                              }}
+                            />
+                          </td>
+                          <th scope="row">{playerName(r.rosterEntryId)}</th>
+                          <td>
+                            <input
+                              type="checkbox"
+                              aria-label={`${playerName(r.rosterEntryId)} titular`}
+                              checked={!!r.starter}
+                              onChange={(event) => {
+                                try {
+                                  mutate(
+                                    setStarter(
+                                      sheet,
+                                      r.rosterEntryId,
+                                      event.target.checked,
                                     ),
-                                  };
-                                  update({
-                                    ...data,
-                                    sheet: { ...data.sheet, present: next },
-                                  });
-                                  setReview(false);
-                                }}
-                              />
-                            </td>
-                            <th scope="row">{playerName(r.rosterEntryId)}</th>
-                            <td>
-                              <input
-                                type="checkbox"
-                                aria-label={`${playerName(r.rosterEntryId)} jogou`}
-                                checked={r.played}
-                                onChange={(e) =>
-                                  mutate({
-                                    ...sheet,
-                                    roster: sheet.roster.map((x) =>
-                                      x.rosterEntryId === r.rosterEntryId
-                                        ? { ...x, played: e.target.checked }
-                                        : x,
-                                    ),
-                                  })
+                                  );
+                                } catch (error) {
+                                  setError((error as Error).message);
                                 }
-                              />
-                            </td>
-                            <td className="number">{total.points}</td>
-                            <td className="number">{total.fouls}</td>
-                            <td>
-                              {total.status === "eligible"
-                                ? "Apto"
-                                : total.status === "excluded"
-                                  ? "Excluído"
-                                  : total.status}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              }}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              aria-label={`${playerName(r.rosterEntryId)} jogou`}
+                              checked={r.played}
+                              disabled={!!r.starter}
+                              onChange={(e) =>
+                                mutate({
+                                  ...sheet,
+                                  roster: sheet.roster.map((x) =>
+                                    x.rosterEntryId === r.rosterEntryId
+                                      ? { ...x, played: e.target.checked }
+                                      : x,
+                                  ),
+                                })
+                              }
+                            />
+                          </td>
+                          <td className="number">{total.points}</td>
+                          <td className="number">{total.fouls}</td>
+                          <td>
+                            {total.status === "eligible"
+                              ? "Apto"
+                              : total.status === "excluded"
+                                ? "Excluído"
+                                : total.status}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
+              <p className="muted" aria-live="polite">
+                Titulares:{" "}
+                {
+                  sheet.roster.filter(
+                    (slot) => slot.side === side && slot.starter,
+                  ).length
+                }
+                /5. Selecione cinco antes de publicar. Titulares já contam como
+                participantes.
+              </p>
               <StaffEditor
                 sheet={sheet}
                 side={side}
@@ -753,11 +671,11 @@ export function ScoresheetWorkspace({
             />
           </Field>
           <datalist id="entry-targets">
-            {sheet.roster
-              .filter((r) => r.side === side)
-              .map((r) => (
+            {orderedRoster(sheet.roster.filter((r) => r.side === side)).map(
+              (r) => (
                 <option key={r.rosterEntryId}>{r.jersey}</option>
-              ))}
+              ),
+            )}
             <option>B</option>
             <option>C</option>
           </datalist>
@@ -1069,6 +987,130 @@ export function ScoresheetWorkspace({
           </button>
         </div>
       )}
+      <section className="sheet-options" aria-label="Outras opções da súmula">
+        <h2>Outras opções</h2>
+        <details className="game-setup" open={data.game.dispute !== dispute}>
+          <summary>Criar outro jogo nesta área</summary>
+          <div className="inline-panel">
+            <p>
+              Cria um novo rascunho entre as equipes abaixo e guarda o trabalho
+              atual. Para abrir um jogo existente, volte à lista Jogos.
+            </p>
+            <div className="form-grid">
+              <Field id="game-home" label="Equipe A">
+                <input
+                  id="game-home"
+                  list="game-teams"
+                  value={home}
+                  onChange={(e) => setHome(e.target.value)}
+                />
+              </Field>
+              <Field id="game-away" label="Equipe B">
+                <input
+                  id="game-away"
+                  list="game-teams"
+                  value={away}
+                  onChange={(e) => setAway(e.target.value)}
+                />
+              </Field>
+            </div>
+            <datalist id="game-teams">
+              {data.registrations
+                .filter((r) => r.dispute === dispute)
+                .map((r) => (
+                  <option key={r.id}>{r.name}</option>
+                ))}
+            </datalist>
+            <p>
+              Destino do novo confronto: {disputeLabel(data, dispute)}. Equipes
+              ausentes podem ser criadas aqui.
+            </p>
+            <button onClick={createGame}>Preparar este confronto</button>
+          </div>
+        </details>
+        <section className="source-choice">
+          <details>
+            <summary>Fonte do resultado e revisão de divergência</summary>
+            <p>
+              Fonte atual: súmula manual. O exemplo abaixo permite avaliar uma
+              divergência com um PDF, sem substituir fontes silenciosamente.
+            </p>
+            <button
+              onClick={() => {
+                update({
+                  ...data,
+                  fallback: { required: true, decided: false, reason: "" },
+                });
+                setReview(false);
+              }}
+            >
+              Demonstrar divergência com PDF de exemplo
+            </button>
+          </details>
+          {data.fallback?.required && (
+            <div className="confirmation">
+              <h2>Divergência entre PDF e súmula</h2>
+              <p>
+                O PDF de exemplo é a fonte primária. Para usar a transcrição
+                manual, registre uma decisão explícita com justificativa. O
+                conteúdo das fontes continua preservado nesta avaliação.
+              </p>
+              <Field id="fallback-reason" label="Justificativa do fallback *">
+                <textarea
+                  id="fallback-reason"
+                  rows={2}
+                  maxLength={500}
+                  value={data.fallback.reason}
+                  onChange={(e) => {
+                    update({
+                      ...data,
+                      fallback: {
+                        required: true,
+                        decided: false,
+                        reason: e.target.value,
+                      },
+                    });
+                    setReview(false);
+                  }}
+                />
+              </Field>
+              <div className="actions">
+                <button
+                  className="primary"
+                  onClick={() => {
+                    if ((data.fallback?.reason.trim().length ?? 0) < 10) {
+                      setError(
+                        "Justifique o fallback com 10 a 500 caracteres.",
+                      );
+                      return;
+                    }
+                    update({
+                      ...data,
+                      fallback: { ...data.fallback!, decided: true },
+                    });
+                    setError("");
+                  }}
+                >
+                  Usar súmula como fallback
+                </button>
+                <button
+                  onClick={() => {
+                    update({ ...data, fallback: undefined });
+                    setReview(false);
+                  }}
+                >
+                  Cancelar esta demonstração
+                </button>
+              </div>
+              {data.fallback.decided && (
+                <p className="success-text">
+                  Decisão registrada. A justificativa acompanhará a confirmação.
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+      </section>
     </section>
   );
 }

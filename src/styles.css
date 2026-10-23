@@ -947,6 +947,15 @@
   .entry-workspace {
     margin-top: 28px;
   }
+  .sheet-options {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .sheet-options > details,
+  .sheet-options > section {
+    margin-top: 20px;
+  }
   .staff-editor {
     min-width: 0;
     margin: 20px 0 0;

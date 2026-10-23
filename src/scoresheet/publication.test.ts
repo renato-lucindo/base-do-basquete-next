@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { initialState } from "../prototype/model";
+import { readyPrototype } from "./test-support";
 import { preparePublication } from "./publication";
 
 it("exige decisão explícita e justificativa para fallback da fonte PDF", () => {
-  const data = initialState();
+  const data = readyPrototype();
   data.sheet.present.roster[0].played = true;
   data.sheet.present.events.push({
     id: crypto.randomUUID(),
@@ -25,7 +25,7 @@ it("exige decisão explícita e justificativa para fallback da fonte PDF", () =>
 });
 
 it("publica somente o jogo atual e mantém a versão anterior após correção", () => {
-  const data = initialState();
+  const data = readyPrototype();
   data.sheet.present.roster[0].played = true;
   data.sheet.present.events.push({
     id: crypto.randomUUID(),
@@ -74,7 +74,7 @@ it("publica somente o jogo atual e mantém a versão anterior após correção",
   expect(second.batch[0].status).toBe("ready");
 });
 it("não permite alterar camisas confirmadas mas permite corrigir participação", () => {
-  const data = initialState();
+  const data = readyPrototype();
   data.sheet.present.roster[0].played = true;
   data.sheet.present.events.push({
     id: crypto.randomUUID(),
@@ -84,12 +84,13 @@ it("não permite alterar camisas confirmadas mas permite corrigir participação
     code: "2",
   });
   const saved = preparePublication(data, "");
-  saved.sheet.present.roster[1].played = true;
+  saved.sheet.present.roster.find((slot) => slot.rosterEntryId === 8)!.played =
+    true;
   expect(
     preparePublication(saved, "Participação sem ações confirmada.")
       .publications,
   ).toHaveLength(2);
-  saved.sheet.present.roster[1].jersey = "10";
+  saved.sheet.present.roster[1].jersey = "99";
   expect(() =>
     preparePublication(saved, "Alteração da camisa confirmada."),
   ).toThrow("relacionados");

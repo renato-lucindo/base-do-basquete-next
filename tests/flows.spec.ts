@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { selectStarters } from "./scoresheet-helpers";
 
 test("campeonato, disputas, texto com pendências e elenco na própria lista", async ({
   page,
@@ -100,6 +101,7 @@ test("súmula por teclado, participação sem ações, desfazer/refazer e republ
   page,
 }) => {
   await page.goto("/#/sumula");
+  await selectStarters(page);
   await page.getByLabel("Beatriz Costa jogou").check();
   await page.getByLabel("Código", { exact: true }).fill("2");
   await page.getByLabel("Código", { exact: true }).press("Enter");
@@ -248,6 +250,7 @@ test("fallback exige decisão e motivo antes da confirmação", async ({
   page,
 }) => {
   await page.goto("/#/sumula");
+  await selectStarters(page);
   await page.getByLabel("Código", { exact: true }).fill("2");
   await page.getByLabel("Código", { exact: true }).press("Enter");
   await page
@@ -283,9 +286,7 @@ test("novo confronto preserva o rascunho anterior e filtros voltam no retorno", 
   await page
     .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
     .click();
-  await page
-    .getByText("Selecionar ou criar confronto nesta área", { exact: true })
-    .click();
+  await page.getByText("Criar outro jogo nesta área", { exact: true }).click();
   await page
     .getByRole("button", { name: "Preparar este confronto", exact: true })
     .click();

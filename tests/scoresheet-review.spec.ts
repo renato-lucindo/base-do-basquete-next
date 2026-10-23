@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { selectStarters } from "./scoresheet-helpers";
 test("confere quartos, edita e exclui ação específica com recuperação e histórico", async ({
   page,
 }) => {
@@ -66,6 +67,7 @@ test("confere quartos, edita e exclui ação específica com recuperação e his
   ).toBeVisible();
   await page.reload();
   await expect(page.locator(".score")).toHaveText("7×0");
+  await selectStarters(page);
   await page
     .getByRole("button", { name: "Revisar resultado", exact: true })
     .click();
