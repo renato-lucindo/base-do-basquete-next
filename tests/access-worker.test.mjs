@@ -66,6 +66,61 @@ async function fixture(options = {}) {
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
         if (
+          [
+            "list_text_reviews",
+            "get_text_review",
+            "get_import_person",
+            "save_text_review",
+            "prepare_text_target",
+            "confirm_text_row",
+            "match_import_players",
+            "match_import_players_new_target",
+          ].some((name) => url.pathname === `/rest/v1/rpc/${name}`)
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const args = await request.json();
+          if (url.pathname.endsWith("/list_text_reviews"))
+            return Response.json({ items: [], hasMore: false });
+          if (
+            url.pathname.endsWith("/get_text_review") ||
+            url.pathname.endsWith("/get_import_person")
+          )
+            return Response.json(null);
+          if (url.pathname.endsWith("/save_text_review"))
+            return Response.json({
+              id: args.p_command.review.id,
+              version: args.p_command.expectedVersion + 1,
+            });
+          if (url.pathname.endsWith("/prepare_text_target"))
+            return Response.json({
+              id: args.p_command.reviewId,
+              version: args.p_command.expectedVersion,
+              registrationId: id,
+              registrationVersion: 1,
+            });
+          if (url.pathname.endsWith("/confirm_text_row"))
+            return Response.json({
+              id: args.p_command.reviewId,
+              version: args.p_command.expectedVersion + 1,
+              result: {
+                rowId: args.p_command.rowId,
+                entityId: id,
+                entityVersion: 1,
+              },
+            });
+          return Response.json({
+            items: args.p_players.map((p) => ({
+              rowId: p.rowId,
+              status: "new",
+              candidates: [],
+              hasMore: false,
+            })),
+          });
+        }
+        if (
           ["list_persons", "list_roster", "list_staff"].some(
             (name) => url.pathname === `/rest/v1/rpc/${name}`,
           )
@@ -171,6 +226,149 @@ async function fixture(options = {}) {
     });
   return { mf, send, login, calls };
 }
+
+test("text import routes enforce session, origin, bounds and fixed private operations", async () => {
+  const f = await fixture();
+  try {
+    for (const path of [
+      `/api/text-import?disputeId=${id}`,
+      `/api/text-import/${id}`,
+      `/api/text-import/people/${id}?disputeId=${id}`,
+    ])
+      assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, path, body, headers = {}) =>
+      f.mf.dispatchFetch(`${origin}${path}`, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...headers,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal(
+      (await send("GET", `/api/text-import?disputeId=${id}`)).status,
+      200,
+    );
+    assert.equal((await send("GET", `/api/text-import/${id}`)).status, 404);
+    assert.equal(
+      (await send("GET", `/api/text-import/people/${id}?disputeId=${id}`))
+        .status,
+      404,
+    );
+    const review = {
+      id,
+      disputeId: id,
+      text: "Ana",
+      teamName: null,
+      target: { kind: "registration", registrationId: id, version: 1 },
+      ignoredLines: [],
+      issues: [],
+      rows: [
+        {
+          id,
+          line: 1,
+          source: "Ana",
+          selected: true,
+          rosterId: id,
+          rosterVersion: 0,
+          decision: null,
+          issues: [],
+          provided: ["name"],
+          data: {
+            name: "Ana",
+            jersey: null,
+            nickname: null,
+            birthDate: null,
+            birthYear: null,
+            positions: [],
+            heightCm: null,
+            weightKg: null,
+            dominantHand: "right",
+            federationRegistration: null,
+          },
+        },
+      ],
+    };
+    const save = { commandId: id, expectedVersion: 0, review };
+    const matching = {
+      disputeId: id,
+      registrationId: null,
+      players: [
+        {
+          rowId: id,
+          name: "Ana",
+          nickname: null,
+          birthDate: null,
+          birthYear: null,
+          federationRegistration: null,
+        },
+      ],
+    };
+    for (const [path, command] of [
+      ["/api/text-import", save],
+      ["/api/text-import/match", matching],
+      ["/api/text-import/match", { ...matching, registrationId: id }],
+      [
+        "/api/text-import/prepare",
+        { commandId: id, reviewId: id, expectedVersion: 1 },
+      ],
+      [
+        "/api/text-import/confirm",
+        { commandId: id, reviewId: id, rowId: id, expectedVersion: 1 },
+      ],
+    ]) {
+      const r = await send("POST", path, command);
+      assert.equal(r.status, 200);
+      assert.ok(!(await r.text()).includes("fixture-access"));
+    }
+    const before = f.calls.length;
+    assert.equal(
+      (
+        await send("POST", "/api/text-import", save, {
+          origin: "https://outside.example.test",
+        })
+      ).status,
+      403,
+    );
+    assert.equal(
+      (await send("POST", "/api/text-import", { ...save, actorId: id })).status,
+      400,
+    );
+    assert.equal(
+      (
+        await send("POST", "/api/text-import", {
+          ...save,
+          review: { ...review, text: "a".repeat(262144) },
+        })
+      ).status,
+      413,
+    );
+    assert.equal(
+      (await send("GET", `/api/text-import?disputeId=${id}&disputeId=${id}`))
+        .status,
+      400,
+    );
+    assert.equal(
+      (await send("GET", `/api/text-import?disputeId=${id}&offset=-1`)).status,
+      400,
+    );
+    assert.equal(
+      (
+        await send(
+          "GET",
+          `/api/text-import/people/${id}?disputeId=${id}&token=x`,
+        )
+      ).status,
+      400,
+    );
+    assert.equal(f.calls.length, before);
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("people, roster and staff routes validate private session, commands and contextual reads", async () => {
   const f = await fixture();

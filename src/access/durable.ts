@@ -1,4 +1,17 @@
 import { SupabasePeople } from "../people/provider";
+import { SupabaseTextImport } from "../text-import/provider";
+import {
+  saveTextReviewSchema,
+  confirmTextRowSchema,
+  prepareTextTargetSchema,
+  type SaveTextReview,
+  type ConfirmTextRow,
+  type PrepareTextTarget,
+} from "../text-import/contract";
+import {
+  matchingRequestSchema,
+  type MatchingRequest,
+} from "../text-import/matching-contract";
 import { savePersonSchema, type SavePerson } from "../people/contract";
 import { saveRosterSchema, type SaveRoster } from "../people/roster-contract";
 import { saveStaffSchema, type SaveStaff } from "../people/staff-contract";
@@ -28,8 +41,13 @@ export class SessionStore extends DurableObject<Env> {
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
   private readonly people: SupabasePeople;
+  private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.textImport = new SupabaseTextImport({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.people = new SupabasePeople({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -160,6 +178,66 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.people.saveStaff(accessToken, saveStaffSchema.parse(command)),
+      ),
+    );
+  }
+
+  listTextReviews(disputeId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.list(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  getTextReview(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.get(accessToken, id),
+      ),
+    );
+  }
+  saveTextReview(command: SaveTextReview) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.save(accessToken, saveTextReviewSchema.parse(command)),
+      ),
+    );
+  }
+  prepareTextTarget(command: PrepareTextTarget) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.prepare(
+          accessToken,
+          prepareTextTargetSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  confirmTextRow(command: ConfirmTextRow) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.confirm(
+          accessToken,
+          confirmTextRowSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  matchImportPlayers(query: MatchingRequest) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.match(accessToken, matchingRequestSchema.parse(query)),
+      ),
+    );
+  }
+  getImportPerson(
+    id: string,
+    disputeId: string,
+    registrationId: string | null,
+  ) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.textImport.person(accessToken, id, disputeId, registrationId),
       ),
     );
   }

@@ -411,6 +411,10 @@ export type Database = {
         };
         Returns: Json;
       };
+      match_import_players_new_target: {
+        Args: { p_dispute_id: string; p_players: Json };
+        Returns: Json;
+      };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
