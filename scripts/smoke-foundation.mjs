@@ -96,6 +96,16 @@ try {
   status = session.status;
   assert.equal(status, 401);
   await session.arrayBuffer();
+  for (const path of [
+    "/api/competitions",
+    `/api/competitions/${randomUUID()}`,
+  ]) {
+    stage = `private competition route ${path}`;
+    const denied = await fetch(`${origin}${path}`, { headers });
+    status = denied.status;
+    assert.equal(status, 401);
+    await denied.arrayBuffer();
+  }
   const privateModule = await fetch(`${origin}/worker.js`, { headers });
   status = privateModule.status;
   assert.equal(status, 404);
