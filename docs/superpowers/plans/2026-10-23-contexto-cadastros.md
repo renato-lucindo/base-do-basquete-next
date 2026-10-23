@@ -32,10 +32,10 @@ Limites operacionais iniciais: nome 120, categoria/divisão 80 caracteres, até 
 ## C1.3 — percurso e publicação
 
 - [x] Tela/CSS: lista/busca/Recentes e página única de temporadas/disputas, contexto explícito, gravação/recarga/retorno e conflito sem sobrescrever. Edição em memória sobrevive reautenticação; logout com alterações exige confirmação e limpa estado após saída. Nenhuma aba funcional fictícia.
-- [x] Seis cenários novos de navegador PASS em desktop/celular, incluindo reflow 320, validação, repetição de envio, conflito e reautenticação. Quatro cenários de acesso existentes PASS; duas capturas com fixture atualizadas/inspecionadas. Contrato SQL real aprovado; percurso HTTP/SQL real com senha do responsável não foi repetido para C1, sem seed no projeto.
-- [ ] Gate consolidado ao estabilizar; CI, PR draft empilhado sobre fundação e preview protegido com artefato identificado. Reutilizar harness/protótipo inalterados. Atualizar checkpoint e preservar sessão/cofre/Access existentes. Não declarar validação humana nova sem resposta do responsável.
+- [x] Seis cenários novos de navegador PASS em desktop/celular, incluindo reflow 320, validação, repetição de envio, conflito e reautenticação. Quatro cenários de acesso existentes PASS; duas capturas com fixture atualizadas/inspecionadas. Contrato SQL real aprovado. Responsável confirmou “Cadastro, salvamento e retomada funcionaram” no preview real; nenhum seed promovido.
+- [x] Gate, CI `39947912211` SUCCESS, PR draft #4 sobre fundação e preview protegido do código `9c64ab9`. Smokes por hash/transporte/negação aprovados; duas credenciais temporárias revogadas, namespace/cofre preservados. Evidência humana e limitações registradas. Revisão independente pendente, sem merge.
 
-Gate local C1 PASS: 86 unitários/12 arquivos, cinco de transporte, dois cenários de banco com contratos completos, quatro workerd/DO, tipos/lint/formatação/builds/fronteira/segredos. JS/CSS do protótipo mantêm hashes anteriores. Publicação e CI pendentes antes de encerrar C1.
+**C1 concluída:** gate local PASS com 86 unitários/12 arquivos, cinco de transporte, dois cenários de banco com contratos completos, quatro workerd/DO, tipos/lint/formatação/builds/fronteira/segredos. CI inclui 40 cenários de navegador. JS/CSS do protótipo mantêm hashes anteriores. Deployment `dd4c204b-3312-40f6-82a7-40046dd5cce5`, versão `b4bff8b2-4997-4dab-bf65-2dcdc6b4c22d`, fonte `9c64ab948781c284c63182168b02bcd3c9a30454`. Dados do responsável preservados.
 
 ## Depois de C1
 
