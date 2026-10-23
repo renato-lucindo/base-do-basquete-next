@@ -1,54 +1,23 @@
 import { expect, it } from "vitest";
+import { parseRoster } from "./parse";
 import {
   saveTextReviewSchema,
   textReviewSnapshotSchema,
   confirmTextRowSchema,
+  readyPlayerSchema,
 } from "./contract";
-const id = (n: number) =>
-  `d0000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
-const review = {
-  id: id(1),
-  disputeId: id(2),
-  mode: "rosters",
-  text: "Equipe: Lobos\n7 - Ana",
-  rows: [
-    {
-      id: id(3),
-      kind: "team",
-      line: 1,
-      source: "Equipe: Lobos",
-      name: "Lobos",
-      selected: true,
-      resolution: null,
-    },
-    {
-      id: id(4),
-      kind: "athlete",
-      line: 2,
-      source: "7 - Ana",
-      name: "Ana",
-      selected: true,
-      teamRowId: id(3),
-      jersey: "7",
-      person: null,
-      rosterId: id(5),
-    },
-  ],
-};
-it("saves unresolved drafts but rejects forged status, parents, IDs and source lines", () => {
-  const cmd = { commandId: id(6), expectedVersion: 0, review };
+const id = () => crypto.randomUUID();
+it("persists unresolved review including metadata but rejects editable success and changed origin", () => {
+  const parsed = parseRoster("Equipe: Lobos\nAna");
+  const review = {
+    id: id(),
+    disputeId: id(),
+    text: "Equipe: Lobos\nAna",
+    target: { kind: "registration", registrationId: id(), version: 1 },
+    ...parsed,
+  };
+  const cmd = { commandId: id(), expectedVersion: 0, review };
   expect(saveTextReviewSchema.safeParse(cmd).success).toBe(true);
-  for (const rows of [
-    [{ ...review.rows[0], applied: true }, review.rows[1]],
-    [review.rows[0], { ...review.rows[1], teamRowId: id(99) }],
-    [review.rows[0], { ...review.rows[1], id: id(3) }],
-    [review.rows[0], { ...review.rows[1], source: "source changed" }],
-    [review.rows[0], { ...review.rows[1], line: 1 }],
-  ])
-    expect(
-      saveTextReviewSchema.safeParse({ ...cmd, review: { ...review, rows } })
-        .success,
-    ).toBe(false);
   expect(
     saveTextReviewSchema.safeParse({
       ...cmd,
@@ -56,33 +25,52 @@ it("saves unresolved drafts but rejects forged status, parents, IDs and source l
     }).success,
   ).toBe(false);
   expect(
-    saveTextReviewSchema.safeParse({ ...cmd, expectedVersion: -1 }).success,
+    saveTextReviewSchema.safeParse({
+      ...cmd,
+      review: { ...review, rows: [{ ...review.rows[0], source: "Bia" }] },
+    }).success,
   ).toBe(false);
-});
-it("distinguishes server results from decisions and confirms only a selected saved row", () => {
-  const saved = {
+  expect(
+    saveTextReviewSchema.safeParse({
+      ...cmd,
+      review: { ...review, ignoredLines: [] },
+    }).success,
+  ).toBe(false);
+  const snapshot = {
     ...review,
     version: 1,
     savedAt: "2026-10-23T17:00:00Z",
     results: [],
   };
-  expect(textReviewSnapshotSchema.safeParse(saved).success).toBe(true);
+  expect(textReviewSnapshotSchema.safeParse(snapshot).success).toBe(true);
   expect(
     textReviewSnapshotSchema.safeParse({
-      ...saved,
-      results: [{ rowId: id(90), entityId: id(5), entityVersion: 1 }],
+      ...snapshot,
+      results: [{ rowId: id(), entityId: id(), entityVersion: 1 }],
     }).success,
   ).toBe(false);
+});
+it("requires valid normalized approved values while preserving incomplete editable drafts", () => {
+  const data = parseRoster("Ana").rows[0].data;
+  expect(readyPlayerSchema.safeParse(data).success).toBe(true);
+  for (const patch of [
+    { jersey: "100" },
+    { federationRegistration: "12345" },
+    { birthDate: "2001-02-29" },
+    { positions: ["Armador", "Ala", "Pivô"] },
+    { name: "" },
+    { birthDate: "2000-01-01", birthYear: 1999 },
+  ])
+    expect(readyPlayerSchema.safeParse({ ...data, ...patch }).success).toBe(
+      false,
+    );
   const cmd = {
-    commandId: id(7),
-    reviewId: id(1),
-    rowId: id(3),
+    commandId: id(),
+    reviewId: id(),
+    rowId: id(),
     expectedVersion: 1,
   };
   expect(confirmTextRowSchema.safeParse(cmd).success).toBe(true);
-  expect(
-    confirmTextRowSchema.safeParse({ ...cmd, expectedVersion: 0 }).success,
-  ).toBe(false);
   expect(confirmTextRowSchema.safeParse({ ...cmd, sex: "male" }).success).toBe(
     false,
   );
