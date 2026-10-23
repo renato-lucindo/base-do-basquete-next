@@ -1,8 +1,8 @@
-# Checkpoint — 22/10/2026, 21:29 America/Araguaina (UTC-03)
+# Checkpoint — 22/10/2026, 21:30 America/Araguaina (UTC-03)
 
 ## Objetivo, unidade e próximo passo
 
-Nova Base do Basquete exclusivamente pelo ZIP fornecido, sem consultar/clonar o repositório anterior. Marco de protótipos U1–U4 implementado e avaliado com feedback incremental. O responsável autorizou seguir às próximas etapas (“Ótimo, siga com as próximas etapas”); os últimos refinamentos não revogam essa autorização. Última unidade de UI concluída: **opções auxiliares no final, atletas por camisa e cinco titulares por equipe**, publicada no preview protegido. Fundação real autorizada, ainda não integrada.
+Nova Base do Basquete exclusivamente pelo ZIP fornecido, sem consultar/clonar o repositório anterior. Marco de protótipos U1–U4 implementado e avaliado com feedback incremental. O responsável autorizou seguir às próximas etapas (“Ótimo, siga com as próximas etapas”); os últimos refinamentos não revogam essa autorização. Última unidade de UI concluída: **opções auxiliares no final, atletas por camisa e cinco titulares por equipe**, publicada no preview protegido. Fundação real autorizada, ainda não integrada. **Pausa por cota: 15% restante. Nenhuma nova unidade/DDL/gate iniciada ao atingir o gatilho.**
 
 Próximo passo exato: iniciar F2 do plano em `docs/superpowers/plans/2026-10-22-fundacao.md`: conferir cota, Git/CI e estado do projeto novo; preparar migration de autorização administrativa e testes SQL/RLS de criação do zero e upgrade. Usar CLI fixado `npx --yes supabase@2.121.0`, cujo help foi consultado, e criar arquivos com `supabase migration new` após consultar o help específico. Docker/psql/CLI global não foram encontrados no PATH; definir validação descartável real antes de aplicar DDL, sem alegar que mocks provam RLS. Não há migration aplicada, Auth configurado ou conta administrativa criada.
 
@@ -13,7 +13,7 @@ Apresentação existente: [súmula protegida](https://base-do-basquete-prototipo
 ## Git, ambiente e autoria
 
 - Novo repositório público: https://github.com/renato-lucindo/base-do-basquete-next. Workspace `C:/Users/12405304716/Documents/Codex/Base do Basquete-v1`; Windows/PowerShell, Node 24.18.0, npm 11.16.0, Python 3.12.3.
-- Branch atual `feat/fundacao-acesso`, base `702efc9e21e751a40b578ae54b92028227b363b1` de `feat/prototipos-fluxos`; material **`63bbac0fcf6b0bb269ab797356f9adec63af3790`**, já no remoto. Main `161a5b007833b0af6a0788353205bdba99b286b5` preservada, sem merge. PRs #2 e #3 abertos/draft e anexados. Revisão pelo autor; revisão independente pendente.
+- Branch atual `feat/fundacao-acesso`, base `702efc9e21e751a40b578ae54b92028227b363b1` de `feat/prototipos-fluxos`; material **`63bbac0fcf6b0bb269ab797356f9adec63af3790`**, já no remoto; último HEAD de metadados antes deste checkpoint `7b532f4e268745d2335076b68c1ef9958373a79a`. Main `161a5b007833b0af6a0788353205bdba99b286b5` preservada, sem merge. PRs #2 e #3 abertos/draft e anexados. Revisão pelo autor; revisão independente pendente.
 - Aplicação e capturas da súmula **`169c2debcc6625804ef73367b70b9c6d3284b582`**; transporte congelado **`397e12ffc6403ae495327ce3cbaeaefcaf811fab`**. Código enviado ao remoto; este checkpoint documental é posterior, obter HEAD real com Git. Capturas dos demais fluxos continuam no SHA inicial `8482d1a4a5a15a12bef8b8ae805a70a01f0c6c23`.
 - Todo código/documentação novos são do agente desta conversa; ZIP original do usuário preservado/ignorado. Nenhuma alteração alheia encontrada. Árvore limpa antes deste checkpoint; após commit/push documental, verificar novamente. Nenhum WIP integrado à principal.
 
@@ -36,7 +36,7 @@ Leitor de tela, zoom real de 200% e auditoria completa de contraste/teclado cont
 
 `src/server/http.ts` lê JSON de mutações de forma incremental e limitada por bytes, exige origem configurada no servidor e método/media type válidos, valida schema e retorna erros públicos sem ecoar conteúdo. Cancela stream acima do teto mesmo com Content-Length falso; UTF-8 inválido é rejeitado. Respostas JSON sem cache e sem sniffing. Ainda não há endpoints de sessão, SDK, nova publicação ou banco integrado.
 
-13 testes focais PASS após vermelho inicial; gate consolidado PASS com **67 unitários/8 arquivos**, três de transporte, lint/formatação/typecheck/build/segredos. Um erro de tipagem no fixture de headers foi corrigido antes do gate. Build JS/CSS idêntico pelos SHA-256 abaixo: 30 cenários de navegador e smoke remoto do protótipo continuam válidos, sem repetição local. CI da branch [39877797571](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39877797571) em andamento na última consulta; conferir conclusão antes de declarar aprovado. Não há processos de gate/deploy locais pendentes.
+13 testes focais PASS após vermelho inicial; gate consolidado PASS com **67 unitários/8 arquivos**, três de transporte, lint/formatação/typecheck/build/segredos. Um erro de tipagem no fixture de headers foi corrigido antes do gate. Build JS/CSS idêntico pelos SHA-256 abaixo: 30 cenários de navegador e smoke remoto do protótipo continuam válidos, sem repetição local. CI da branch [39877797571](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39877797571), job `120167557129`, concluído **SUCCESS** na reconciliação de 21:30: gate, integridade e 30 cenários de navegador Linux aprovados. Reutilizar evidência para arquivos inalterados. Não há processos de gate/deploy locais pendentes.
 
 ## Evidências e artefato atual
 
@@ -63,6 +63,8 @@ Supabase: organização escolhida `base-do-basquete` (`jniqbaccwwhabzokjvfu`), F
 
 ## Cota e retomada
 
-Última consulta real, 22/10/2026 21:28 UTC-03: **17% restante/5h** (83% usado), **73% restante semanal** (27% usado). Reset/5h **23/10/2026 00:11:28 America/Araguaina (03:11:28 UTC)**; semanal **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Outras conversas compartilham a cota; conferir ferramenta ao retomar. Não comprar créditos, mudar plano ou usar reset manual.
+Última consulta real, 22/10/2026 21:29:54 UTC-03: **15% restante/5h** (85% usado), **73% restante semanal** (27% usado). Reset/5h **23/10/2026 00:11:28 America/Araguaina (03:11:28 UTC)**; semanal **29/10/2026 14:08:57 America/Araguaina (17:08:57 UTC)**. Outras conversas compartilham a cota; conferir ferramenta ao retomar. Não comprar créditos, mudar plano ou usar reset manual.
 
-Gatilho <=15% restante não atingido. Automação oficial `retomar-preview-base-do-basquete` continua **PAUSED**, conforme confirmação da publicação inicial; não há retomada pendente. Ao retomar: conferir cota primeiro, ler esta abertura, reconciliar Git/PR/CI/feedback/serviços e seguir o próximo passo exato da abertura. Preservar evidências de arquivos inalterados e mudanças alheias.
+Gatilho <=15% restante atingido. Unidade F1 e provisionamento já seguros no remoto; árvore limpa antes deste checkpoint, sem alterações alheias/WIP. Nenhuma migration, deploy, gate ou processo de credencial em andamento. Próximo passo exato continua F2 da abertura; não iniciar antes de conferir o reset real. Automação existente `retomar-preview-base-do-basquete` será atualizada pela ferramenta oficial para despertar nesta mesma conversa em **23/10/2026 00:13:28 America/Araguaina (03:13:28 UTC)**, reset +2 minutos, sem duplicata. Registrar a confirmação real após a chamada.
+
+Ao despertar: consultar cota de 5h/semanal primeiro. Se ainda não houver capacidade, reagendar para reset efetivo aplicável +2 minutos e encerrar sem gates; não tentar em ciclos frequentes. Ler este checkpoint e o plano, reconciliar Git/PRs/CI/serviços e preservar evidências. Ao concluir a fundação autorizada ou se o responsável cancelar, pausar/excluir a automação. Notificar somente avanço relevante, conclusão, falha ou necessidade humana.
