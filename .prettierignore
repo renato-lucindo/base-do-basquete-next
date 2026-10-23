@@ -3,3 +3,6 @@ dist/
 node_modules/
 docs/evidencias/
 package-lock.json
+
+# Reproducible generated bindings, checked by Wrangler.
+worker-configuration.d.ts

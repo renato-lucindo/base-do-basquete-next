@@ -79,7 +79,7 @@ export async function readMutationJson<T>(
   let parsed: unknown;
   try {
     parsed = JSON.parse(
-      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+      new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes),
     );
   } catch {
     throw invalidInput();

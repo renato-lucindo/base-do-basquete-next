@@ -1,0 +1,15 @@
+# 004 — sessão por senha mantida no servidor
+
+Estado: implementada localmente; validação remota e bootstrap humano pendentes.
+
+O browser chama somente `/api/session` no Worker: POST entra, GET verifica e DELETE sai. Recebe apenas estado de autenticação e um cookie opaco `__Host-bdb-session`, Secure/HttpOnly/SameSite=Strict, sem Domain. Não recebe JWT, refresh token, SDK Supabase ou chave de banco. Cookies têm nonce de 256 bits e HMAC derivado por HKDF; assinatura inválida é recusada antes de acessar armazenamento.
+
+Cada sessão tem um Durable Object SQLite independente. JWT/refresh token/identidade ficam cifrados com AES-GCM e chave no cofre do Worker, nunca em bindings públicos, código, browser storage ou logs. Vida máxima inicial de oito horas; alarmes removem estado expirado. Uma fila por instância coordena chamadas de renovação e saída sem manter `blockConcurrencyWhile` durante I/O externo. Estado crítico é persistido antes de responder; rotação é salva antes de novas consultas. Recriação da instância recupera o estado cifrado. [Regras oficiais de Durable Objects](https://developers.cloudflare.com/durable-objects/best-practices/rules-of-durable-objects/).
+
+O adaptador REST é exclusivo do servidor, com chave publicável e JWT do usuário: verifica identidade no Auth e autorização fresca em `admin_access` por RLS. Não usa service-role genérica nem user_metadata para autorizar. Renova tokens próximos da expiração; troca de identidade, expiração e revogação invalidam a sessão. Indisponibilidade transitória preserva estado para nova tentativa. Saída apaga a sessão local antes de revogar no Auth; se o provedor estiver indisponível, o cookie antigo continua inválido na aplicação e apenas um evento sem dados sensíveis pode registrar a revogação externa não confirmada. [Sessões do Supabase](https://supabase.com/docs/guides/auth/sessions).
+
+Origem e host canônicos, método, JSON/UTF-8/schema e tamanho são verificados no servidor. Login tem limites por IP e conta com chaves de hash; não se registram IP/e-mail/senha/token no log da aplicação. Respostas sem cache, CSP, nosniff e bloqueio de frame. Outra identidade autenticada continua sem acesso, mesmo que um cliente chame diretamente o Supabase.
+
+Frontend da fundação tem build independente do protótipo; não promove fixtures nem publicações fictícias para o banco real. Worker novo `base-do-basquete-next-preview` terá proteção Access aplicada antes do tráfego. O preview de protótipos permanece no seu Worker anterior desta conversa. Código de e-mail do Access é proteção do preview; não substitui a senha interna.
+
+Evidência local: 12 testes de adaptador/sessão; três cenários workerd/Miniflare (Auth e asset binding substituídos por fixtures), incluindo renovação concorrente; quatro cenários de UI desktop/celular com API simulada. Esses testes não são evidência de login real do administrador. Correções encontradas: chamada indireta de fetch precisava preservar o binding global do runtime; foco após login foi movido para efeito posterior ao commit do React. Migrations/RLS reais têm evidência separada na decisão 003.

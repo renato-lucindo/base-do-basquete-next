@@ -14,12 +14,17 @@
     "test:e2e": "playwright test",
     "test:transport": "node --test tests/preview-transport.test.mjs",
     "test:db": "node --test tests/database.test.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
     "lint": "eslint src tests scripts",
-    "format": "prettier --write src tests scripts index.html *.json *.ts *.mjs .github docs README.md",
-    "format:check": "prettier --check src tests scripts index.html *.json *.ts *.mjs .github docs README.md",
+    "format": "prettier --write src tests scripts index.html foundation.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md",
+    "format:check": "prettier --check src tests scripts index.html foundation.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md",
     "secrets": "node scripts/check-secrets.mjs",
-    "gate": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run secrets"
+    "gate": "npm run lint && npm run format:check && npm run types:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run build:foundation && npm run test:access && node scripts/check-client-boundary.mjs && npm run secrets",
+    "dev:foundation": "vite --config vite.foundation.config.ts",
+    "build:foundation": "vite build --config vite.foundation.config.ts",
+    "build:worker": "tsc --noEmit -p tsconfig.worker.json && wrangler deploy --dry-run --outdir .worker-artifacts",
+    "test:access": "npm run build:worker && node --test tests/access-worker.test.mjs",
+    "types:check": "wrangler types --include-runtime false --strict-vars false --check"
   },
   "dependencies": {
     "react": "19.3.0",
@@ -27,6 +32,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20261023.1",
     "@electric-sql/pglite": "0.5.11",
     "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",
@@ -34,10 +40,12 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
     "eslint": "10.13.0",
+    "miniflare": "5.20261019.2-beta",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
     "vite": "8.3.5",
-    "vitest": "5.0.3"
+    "vitest": "5.0.3",
+    "wrangler": "4.152.0"
   }
 }

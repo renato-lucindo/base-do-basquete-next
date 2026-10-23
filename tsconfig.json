@@ -14,5 +14,12 @@
     "noUnusedParameters": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["src", "tests", "vite.config.ts", "playwright.config.ts"]
+  "include": [
+    "src",
+    "tests",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "vite.foundation.config.ts"
+  ],
+  "exclude": ["src/server/worker.ts", "src/access/durable.ts"]
 }
