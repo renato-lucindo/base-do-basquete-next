@@ -96,8 +96,11 @@ async function fixture(page: Page) {
   const receipts = new Map<string, unknown>(),
     attempts: string[] = [];
   await page.route(`**/api/games/${tid(80)}/sheet`, async (route) => {
-    if (route.request().method() === "GET")
+    if (route.request().method() === "GET") {
+      // Exercise the loading boundary instead of assuming a synchronous fixture.
+      await new Promise((resolve) => setTimeout(resolve, 120));
       return route.fulfill({ json: snapshot });
+    }
     if (expired) {
       expired = false;
       return route.fulfill({
@@ -194,6 +197,9 @@ async function open(page: Page) {
   ).toBeVisible();
 }
 async function relate(page: Page) {
+  await expect(
+    page.getByText("Selecionar atletas do elenco", { exact: true }),
+  ).toHaveCount(2);
   for (const summary of await page
     .getByText("Selecionar atletas do elenco", { exact: true })
     .all())

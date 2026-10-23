@@ -38,3 +38,7 @@ Dez browsers focais G2 PASS e58 cenários da composição C1–C4/G1/G2 PASS, de
 Gate consolidado G2 PASS em23/10/2026:128 unitários/27 arquivos,5 transportes,8 cenários PostgreSQL,9 workerd, tipos/lint/formatação/builds/fronteira/segredos. Contrato real SQL G2 anterior inalterado reutilizado. Harness126 imutável não repetido localmente. CI do source G2 ainda será disparada; preview continua22529ea por OAuth Cloudflare, sem deploy/smoke remoto novos.
 
 Limitações: sem publicação/imutabilidade confirmada/fallback nesta unidade (G4), sem PDFs/fontes (G3), sem revisão independente/carga/corrida multi-conexão/WCAG completa. Guardas/versões e testes reais não são evidência dessas verificações adicionais.
+
+## Correção da CI G2
+
+CI40038527019/source56a8701: gate completo PASS,90/92 browsers PASS; dois desktops expiraram no início da seleção de relacionados. Rastros baixados pelo plugin GitHub mostram helper usando locator.all antes da conclusão do GET da súmula (zero summaries), deixando detalhes fechados. Falha reproduzida localmente com120ms de latência, sem alterar comportamento da aplicação. Helper agora aguarda os dois seletores antes de enumerá-los;10 browsers focais G2 PASS com a mesma latência. Sem aumentar timeout, remover cenários ou repetir gate SQL/código inalterado. Nova CI deve confirmar o ajuste.
