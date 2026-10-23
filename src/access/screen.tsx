@@ -5,6 +5,7 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { CompetitionWorkspace } from "../competition/screen";
 
 export function AccessScreen() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -16,6 +17,12 @@ export function AccessScreen() {
   const [password, setPassword] = useState("");
   const passwordRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const workspaceGuard = useRef(() => true);
+  const [workspaceKey, setWorkspaceKey] = useState(0);
+  const sessionLost = useCallback(() => {
+    setAuthenticated(false);
+    setError("Sua sessão terminou. Entre novamente para continuar a edição.");
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -77,12 +84,14 @@ export function AccessScreen() {
   }
 
   async function logout() {
+    if (!workspaceGuard.current()) return;
     setSaving(true);
     setError("");
     try {
       const response = await send("DELETE", {});
       if (!response.ok) throw new Error();
       setAuthenticated(false);
+      setWorkspaceKey((n) => n + 1);
       setPassword("");
     } catch {
       setError("Não foi possível confirmar a saída. Tente novamente.");
@@ -125,10 +134,6 @@ export function AccessScreen() {
               </p>
             )}
             <p>Você está conectado.</p>
-            <section className="access-empty">
-              <h2>Campeonatos</h2>
-              <p>Ainda não há campeonatos cadastrados.</p>
-            </section>
           </section>
         ) : (
           <section className="access-card">
@@ -169,6 +174,14 @@ export function AccessScreen() {
             </form>
           </section>
         )}
+        <div hidden={!authenticated}>
+          <CompetitionWorkspace
+            key={workspaceKey}
+            enabled={authenticated}
+            guard={workspaceGuard}
+            onSessionLost={sessionLost}
+          />
+        </div>
       </main>
     </>
   );

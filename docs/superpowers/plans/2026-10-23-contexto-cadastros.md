@@ -31,9 +31,11 @@ Limites operacionais iniciais: nome 120, categoria/divisão 80 caracteres, até 
 
 ## C1.3 — percurso e publicação
 
-- [ ] `src/competition/screen.tsx` e CSS: lista/busca/Recentes, nova competição e edição única com temporadas/disputas, categoria/divisão, seleção explícita de contexto, salvar/recarregar/retornar, falha e conflito sem sobrescrever. Não oferecer abas funcionais de equipes/jogos/regulamento antes das unidades correspondentes.
-- [ ] Testes de navegador desktop/celular/teclado e reflow 320; integração real de servidor/banco validada por contrato SQL + transporte real. Nenhum seed fictício persistido no projeto de desenvolvimento.
+- [x] Tela/CSS: lista/busca/Recentes e página única de temporadas/disputas, contexto explícito, gravação/recarga/retorno e conflito sem sobrescrever. Edição em memória sobrevive reautenticação; logout com alterações exige confirmação e limpa estado após saída. Nenhuma aba funcional fictícia.
+- [x] Seis cenários novos de navegador PASS em desktop/celular, incluindo reflow 320, validação, repetição de envio, conflito e reautenticação. Quatro cenários de acesso existentes PASS; duas capturas com fixture atualizadas/inspecionadas. Contrato SQL real aprovado; percurso HTTP/SQL real com senha do responsável não foi repetido para C1, sem seed no projeto.
 - [ ] Gate consolidado ao estabilizar; CI, PR draft empilhado sobre fundação e preview protegido com artefato identificado. Reutilizar harness/protótipo inalterados. Atualizar checkpoint e preservar sessão/cofre/Access existentes. Não declarar validação humana nova sem resposta do responsável.
+
+Gate local C1 PASS: 86 unitários/12 arquivos, cinco de transporte, dois cenários de banco com contratos completos, quatro workerd/DO, tipos/lint/formatação/builds/fronteira/segredos. JS/CSS do protótipo mantêm hashes anteriores. Publicação e CI pendentes antes de encerrar C1.
 
 ## Depois de C1
 

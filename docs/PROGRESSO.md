@@ -1,4 +1,4 @@
-# Checkpoint — 23/10/2026, 08:26 America/Sao_Paulo (UTC-03)
+# Checkpoint — 23/10/2026, 08:41 America/Sao_Paulo (UTC-03)
 
 ## Objetivo e próximo passo exato
 
@@ -8,18 +8,24 @@ Nova Base do Basquete exclusivamente pelo ZIP preservado em `especificacao`, sem
 
 **Unidade atual C1 — etapa 3 autorizada por “proximo bloco”:** plano em `docs/superpowers/plans/2026-10-23-contexto-cadastros.md`. C1.1 concluída: contrato compartilhado normaliza nomes e recusa IDs/anos/disputas repetidos; PostgreSQL recebe agregado atômico, versão e comando idempotente. Migrations remotas `20261023112423_competition_context` e `20261023112534_competition_receipt_deny` aplicadas no projeto novo, histórico local reconciliado. Tabelas de campeonato/edição/disputa e recibos privados permanecem vazios após contrato SQL real com rollback. Conta única preservada. Tipos gerados; RLS/grants e autorização do escritor privado delimitado em decisão 005. Advisor: somente aviso Auth de proteção contra senhas vazadas, funcionalidade Pro; plano Free não alterado.
 
-**Próximo passo exato:** C1.2, adaptador servidor `src/competition/provider.ts`, operação autorizada na fila de `PersistentSession` e RPCs específicos do SessionStore, sem exportar JWT. Rotas HTTP da mesma origem e tela de campeonato/temporadas/disputas em C1.3. Verificar contrato/sessão/HTTP focalmente e depois gate estável/CI/preview protegido. Critério: criar/retomar contexto real com versão e idempotência, sem mistura de pais. Equipes/pessoas/treinadores/elencos por texto seguem em unidades posteriores. Não antecipar transferências/regulamento avançado nem promover fixtures. Ao retomar: cota primeiro e Git/CI/serviços reconciliados; bootstrap não deve ser repetido.
+**Próximo passo exato:** C1.2/C1.3 implementadas localmente, gate PASS. Commitar tela/testes e preparar publicação com `node scripts/prepare-foundation.mjs` a partir da árvore limpa; push/PR draft sobre `feat/fundacao-acesso`, conferir CI e publicar pelo plugin Cloudflare com uploader guardado. Preservar dois secrets e namespace de sessão `0411ac931ca54d289d270606c7e87ef7`, Access único e previews desabilitados. Smoke do novo artefato por hash/transporte, sem senha do responsável ou seeds reais; registrar limites e disponibilizar validação humana de criar/retomar contexto. Equipes/pessoas/treinadores/elencos por texto seguem nas próximas unidades. Não repetir gate/harness inalterado.
 
 ## Git, ambiente e autoria
 
 - Repositório novo público: https://github.com/renato-lucindo/base-do-basquete-next. Workspace `C:/Users/12405304716/Documents/Codex/Base do Basquete-v1`; Windows/PowerShell, Node 24.18.0, npm 11.16.0, Python 3.12.3.
-- Branch atual **`feat/contexto-campeonatos`**, criada da fundação **`f03f2aa324052d71aeb8addd6de74136880944e3`**, sem alterações alheias. Fundação permanece em `feat/fundacao-acesso`, base `702efc9`. Obter HEAD final via Git. Código ainda publicado **`6ecfacf618d30ba6fc0346597da6fb4d539d2eca`**; C1 não foi publicada. Nenhum cofre/Access/Worker alterado nesta unidade de banco.
+- Branch atual **`feat/contexto-campeonatos`**, base **`f03f2aa324052d71aeb8addd6de74136880944e3`**. Banco em `e725e82`, transporte de sessão em `78d2fd8`; tela/testes/checkpoint desta unidade são do agente e serão commitados juntos. Fundação permanece em `feat/fundacao-acesso`, base `702efc9`. Obter HEAD final via Git. Código ainda publicado **`6ecfacf618d30ba6fc0346597da6fb4d539d2eca`**; C1 não publicada. Nenhum cofre/Access/Worker alterado até aqui.
 - [PR draft #3](https://github.com/renato-lucindo/base-do-basquete-next/pull/3) empilhado sobre [PR draft #2](https://github.com/renato-lucindo/base-do-basquete-next/pull/2), issue #1. Main `161a5b007833b0af6a0788353205bdba99b286b5` preservada, sem merge. Revisão pelo autor; revisão independente pendente.
 - Árvore limpa ao iniciar C1. Mudanças desta unidade são do agente: plano/decisão, contrato/testes, duas migrations, contrato SQL e tipos gerados. ZIP original preservado/ignorado; nenhuma mudança alheia encontrada. Commit em branch de trabalho; conferir árvore/remoto ao fechar unidade. Nenhum WIP integrado à principal.
 
 ## Evidência C1.1
 
 Três testes de contrato PASS após vermelho inicial. `npm run test:db` PASS do zero e upgrade com contrato novo e anterior; SQL compartilhado real PASS com rollback, inclusive idempotência, conflito, pais, omissão e ausência de escrita direta. Tipos/ESLint focais/segredos PASS. Após policy restritiva explícita, leitura de recibos pelo authenticated negada no banco real; único advisor restante é Auth/Pro. Não alegar corrida real multi-conexão a partir do PGlite serializado; limites na decisão 005. Gate consolidado de C1 será executado ao estabilizar transporte/tela, sem repetir harness/protótipo imutáveis.
+
+## Evidência C1.2/C1.3
+
+Adaptador de competição usa RPCs fixos/JWT somente dentro da sessão; `runAuthorized` preserva fila/rotação/saída e não exporta tokens. Teste novo em workerd verifica sessão, origem, schema, queries e ausência de tokens; quatro cenários totais PASS. Tela permite edições/naipes/categorias/divisões na mesma página, retomada por endereço, busca e Recentes, validação, confirmação de saída, estado salvo e envio incerto. Repetição usa o mesmo comando, conflito mantém conteúdo até recarga explícita. Estado de edição permanece apenas em memória durante reautenticação, sem browser storage; logout limpa essa memória.
+
+**Gate consolidado local C1 PASS:** 86 unitários/12 arquivos, cinco de transporte, dois cenários SQL com contratos novos/anteriores, quatro workerd/DO, lint/formatação/tipos/builds/fronteira/segredos. Seis cenários de navegador novos PASS em desktop/celular (inclui reflow 320), quatro de acesso existentes PASS; capturas de fixture em `.preview-artifacts/contexto-desktop.png` e `contexto-mobile.png` inspecionadas. Correção visual de rótulo de divisão/temporada verificada em duas novas capturas. Não são seeds reais nem evidência humana de C1. Código do protótipo conserva os hashes; reutilizar suas evidências.
 
 ## Fundação e verificações
 
@@ -63,7 +69,7 @@ Manifesto remoto conferido:
 
 Vínculo **`link_6adaa8aab5688191b1e7ae1cddc55a82`**, organização escolhida **base-do-basquete** (`jniqbaccwwhabzokjvfu`), Free. Não usar outro vínculo, organização antiga ou `base-do-basquete-v1`. Projeto **base-do-basquete-next-dev**, ref **nizmasjddyrhmevvfviz**, `sa-east-1`, ACTIVE_HEALTHY, PostgreSQL 17.11.0.003. Custo consultado/comunicado US$ 0/mês, sem contratação paga.
 
-Duas migrations, **um usuário Auth e um administrador habilitado** após criação humana/bootstrap em 23/10 **08:09 UTC-03**. Antes da operação, `admin_access` estava vazia e somente a identidade esperada era elegível. Nenhum dado Auth editado pelo agente. Storage permanece sem alteração; última contagem real em 01:21: zero buckets/objetos. Sem seeds/cadastros de negócio. Advisors sem avisos após DDL; nenhuma DDL nova nesta unidade.
+Fundação F2 tem duas migrations; C1 acrescentou duas migrations indicadas na abertura. **Um usuário Auth e um administrador habilitado** após criação humana/bootstrap em 23/10 **08:09 UTC-03**, preservados após contrato C1. Nenhum dado Auth editado pelo agente. Campeonato/temporadas/disputas/recibos: zero após rollback real em 08:24. Storage não alterado, última contagem real em 01:21: zero buckets/objetos. Sem seeds. Advisor atual tem somente WARN `auth_leaked_password_protection`; recurso requer Pro segundo documentação oficial, não alterar plano. Policy restritiva privada elimina INFO de RLS sem policy sem ampliar acesso.
 
 Plugin sem configuração de Auth: painel autenticado do projeto novo usado para signup público OFF salvo, anonymous OFF, e-mail ON, senha mínima 12 salva. “Confirm email” permanece ON. Configuração local do CLI não aplicada automaticamente ao remoto. Nenhuma exigência adicional de MFA criada. Formulário manual com auto-confirm preparado, nunca submetido. Evidência ignorada `.preview-artifacts/auth-config.png`.
 
