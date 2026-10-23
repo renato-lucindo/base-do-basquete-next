@@ -2,6 +2,11 @@ import { DurableObject } from "cloudflare:workers";
 import { HttpError } from "../server/http";
 import { SupabaseAccess, type Credentials } from "./provider";
 import { PersistentSession, type SessionRecord } from "./session";
+import { SupabaseCompetitions } from "../competition/provider";
+import {
+  saveCompetitionSchema,
+  type SaveCompetition,
+} from "../competition/contract";
 
 type RpcResult<T> =
   | { ok: true; value: T }
@@ -9,8 +14,13 @@ type RpcResult<T> =
 
 export class SessionStore extends DurableObject<Env> {
   private readonly session: PersistentSession;
+  private readonly competitions: SupabaseCompetitions;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.competitions = new SupabaseCompetitions({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.session = new PersistentSession(
       {
         read: () => ctx.storage.get<SessionRecord>("session"),
@@ -39,6 +49,30 @@ export class SessionStore extends DurableObject<Env> {
   }
   close() {
     return safely(() => this.session.close());
+  }
+  listCompetitions(query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.list(accessToken, query, offset),
+      ),
+    );
+  }
+  getCompetition(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.get(accessToken, id),
+      ),
+    );
+  }
+  saveCompetition(command: SaveCompetition) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.save(
+          accessToken,
+          saveCompetitionSchema.parse(command),
+        ),
+      ),
+    );
   }
 
   async alarm() {

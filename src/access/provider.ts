@@ -154,7 +154,10 @@ export function unavailable() {
   );
 }
 
-async function providerJson(response: Response): Promise<unknown> {
+export async function providerJson(
+  response: Response,
+  maxBytes = 65536,
+): Promise<unknown> {
   const reader = response.body?.getReader();
   if (!reader) throw unavailable();
   const chunks: Uint8Array[] = [];
@@ -164,7 +167,7 @@ async function providerJson(response: Response): Promise<unknown> {
       const { done, value } = await reader.read();
       if (done) break;
       size += value.byteLength;
-      if (size > 65536) {
+      if (size > maxBytes) {
         await reader.cancel().catch(() => undefined);
         throw unavailable();
       }

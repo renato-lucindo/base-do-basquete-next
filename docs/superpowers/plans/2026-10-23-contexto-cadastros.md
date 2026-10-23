@@ -26,8 +26,8 @@ Limites operacionais iniciais: nome 120, categoria/divisão 80 caracteres, até 
 
 ## C1.2 — sessão e transporte
 
-- [ ] `src/competition/provider.ts`: REST por JWT no servidor, limites/timeout, schema da resposta e erros públicos sanitizados. `PersistentSession.runAuthorized` mantém token/renovação dentro da fila e SessionStore expõe apenas operações específicas de competição.
-- [ ] Worker: GET `/api/competitions`, GET `/api/competitions/:id`, POST `/api/competitions`; validação/origem/cookie/autorização e resposta sem tokens. Testes focais de sessão/HTTP/workerd com provedor substituído por fixture são distintos da prova de SQL/API reais.
+- [x] `src/competition/provider.ts`: REST por JWT no servidor, limites/timeout, schema da resposta e erros sanitizados. `PersistentSession.runAuthorized` mantém token/renovação na fila; SessionStore expõe operações específicas. Três testes de adaptador e cenário novo de fila/saída PASS; testes existentes de sessão preservados.
+- [x] Rotas GET/POST implementadas e cenário workerd PASS para sessão/origem/schema/contexto/query, RPCs fixos e ausência de tokens. Quatro cenários workerd totais PASS, tipos/ESLint focais PASS. Provedor substituído por fixture, distinto da prova de SQL real.
 
 ## C1.3 — percurso e publicação
 

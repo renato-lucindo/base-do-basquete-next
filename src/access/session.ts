@@ -47,6 +47,13 @@ export class PersistentSession {
   }
 
   actor(): Promise<Actor> {
+    return this.runAuthorized(async ({ actor }) => actor);
+  }
+
+  /** Internal callback only: no RPC/browser endpoint ever returns these tokens. */
+  runAuthorized<T>(
+    operation: (authority: { actor: Actor; accessToken: string }) => Promise<T>,
+  ): Promise<T> {
     return this.serial(async () => {
       const record = await this.store.read();
       if (!record || record.expiresAt <= this.now()) {
@@ -71,7 +78,10 @@ export class PersistentSession {
         );
         if (actor.id !== contents.actorId || record.expiresAt <= this.now())
           throw invalidSession();
-        return actor;
+        return await operation({
+          actor,
+          accessToken: contents.tokens.accessToken,
+        });
       } catch (error) {
         if (error instanceof HttpError && [401, 403].includes(error.status)) {
           await this.store.clear();
