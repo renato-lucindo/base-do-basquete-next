@@ -20,8 +20,8 @@
 
 ## M1 — compatibilidade do cadastro e banco
 
-- [ ] RED TS/SQL para camisa null, múltiplas ausentes, 0/00, registro formato/unicidade e ano privado parcial/data coerente. Reutilizar contratos válidos sem repetir harness.
-- [ ] Migration CLI própria, writer de elenco nullable e ano privado/registro com constraints; dados/RLS/recibos/lock order preservados. C3 UI compatível com null e validação federativa. Do zero/upgrade com dados C3 e contrato real rollback; tipos/advisors/contagens e commit.
+- [x] RED TS/SQL para camisa null, múltiplas ausentes, 0/00, registro formato/unicidade e ano privado parcial/data coerente. Reutilizar contratos válidos sem repetir harness.
+- [x] Migration CLI própria, writer de elenco nullable e ano privado/registro com constraints; dados/RLS/recibos/lock order preservados. C3 UI compatível com null e validação federativa. Do zero/upgrade com dados C3 e contrato real rollback; tipos/advisors/contagens e commit.
 
 ## M2 — parser rico e revisão
 

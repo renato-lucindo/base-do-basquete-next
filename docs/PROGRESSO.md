@@ -1,3 +1,15 @@
+# Implementação ativa — importador autorizado, M1 concluído, 23/10/2026 14:30 UTC-03
+
+Responsável autorizou implementar o escopo complementar (“Ok, bora implementar”). Branch codex/importacao-texto, M1 em **833e85adf2c19535db90fe18abef3e1103ae63c8**, plano atualizado/decisão008 em f4298e9. Documento original ESCOPO-IMPORTADOR-DE-EQUIPES.md preservado; uma equipe por operação, tabela editável/atributos, camisa opcional, registro privado único seis dígitos, alterações explícitas e confirmação efetiva por item. Continuar autonomamente, sem nova aprovação técnica.
+
+**M1 concluído:** migration local/remota **20261023172909_import_optional_fields** (CLI gerou172807, renomeada para versão real retornada pelo histórico), camisa nullable com unicidade dos informados/0 antes00, registro privado seis dígitos/unique e ano parcial privado separado do público. Writer legado de pessoa substitui ano parcial ao informar data completa, sem ampliar payload legado. Contratos TS RED→GREEN, quatro cenários PostgreSQL completos e quinto upgrade preservando dados C3 PASS; contrato real import_fields.sql com rollback PASS; dois browsers desktop/celular de vários atletas sem camisa PASS; tipos/ESLint/segredos PASS. Types gerados; advisor somente aviso conhecido senha vazada/Pro, sem contratação. Gate consolidado só quando C4 estável.
+
+Dados reais atuais: C1 1/1/2, equipes/inscrições2/2, **pessoas1**, elenco/comissão0, Auth1; este novo cadastro é humano, preservar integralmente. Preflight registro sem inválidos/duplicados; contrato real não deixou fixtures. Preview permanece C3 source81f5f41, deployment2ff9f5e0-9dee-4c26-a4dd-e9b0aeeff429, Access/cofre/namespace preservados, sem novo deploy. Nenhum DDL/gate/smoke/credencial em andamento.
+
+Próximo exato **M2:** substituir contratos/parser WIP não integrados por DTO de um elenco com atributos opcionais/campos informados, origem/cabeçalhos/pendências e resolução por UUID/versão. Escrever testes RED de todo exemplo rico/sem camisa/0/00/hífen/separadores/data/altura/duas posições antes de implementar. Depois M3 revisão durável/matching/confirmar por item e M4 UI/gate/CI/preview. Não executar o antigo modelo multiequipe. Última cota real52%usada5h,60%semanal, resets23/10 18:11:18 e29/10 14:08:57 America/Sao_Paulo. Automação existente PAUSED até novo gatilho; aos85%usar mesma automação reset+2, sem duplicata.
+
+---
+
 # Direção atual — análise do módulo complementar, 23/10/2026 13:57 America/Sao_Paulo (UTC-03)
 
 Responsável **não gostou do fluxo** e pediu analisar `IMPORTADOR-DE-EQUIPES-20261023.zip`. Análise concluída em `docs/ANALISE-IMPORTADOR-DE-EQUIPES.md`: SHA-256 e 11 fontes conferidos, sete testes fornecidos PASS e probes adicionais reproduzem perdas de camisa/nome corrigido, defaults de criação, hífen/data/altura e persistência sem atomicidade. Não consultar repositório/serviços antigos; este novo ZIP é referência complementar explicitamente fornecida. Original preservado/ignorado, cópia de análise em `.preview-artifacts`.
