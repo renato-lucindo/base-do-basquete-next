@@ -34,6 +34,7 @@ const competitionContract = await readFile(
   "utf8",
 );
 const teamsContract = await readFile("supabase/tests/teams.sql", "utf8");
+const peopleContract = await readFile("supabase/tests/people.sql", "utf8");
 
 test("migrations from zero enforce the shared SQL access contract", async () => {
   const db = await PGlite.create();
@@ -44,6 +45,7 @@ test("migrations from zero enforce the shared SQL access contract", async () => 
     await db.exec(contract);
     await db.exec(competitionContract);
     await db.exec(teamsContract);
+    await db.exec(peopleContract);
     const { rows } = await db.query(
       "select count(*)::int as count from auth.users",
     );
@@ -73,6 +75,7 @@ test("upgrade preserves an existing administrator and enforces new defaults", as
     await db.exec(contract);
     await db.exec(competitionContract);
     await db.exec(teamsContract);
+    await db.exec(peopleContract);
   } finally {
     await db.close();
   }
@@ -91,12 +94,46 @@ test("C2 upgrade and rolled-back fixtures preserve saved C1 data", async () => {
     );
     for (const migration of migrations.slice(4)) await db.exec(migration);
     await db.exec(teamsContract);
+    await db.exec(peopleContract);
     const after = await db.query(
       "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
     );
     assert.deepEqual(after.rows, before.rows);
     assert.deepEqual(
       (await db.query("select count(*)::int as count from public.teams")).rows,
+      [{ count: 0 }],
+    );
+  } finally {
+    await db.close();
+  }
+});
+
+test("C3 upgrade preserves C2 registrations and their global identity", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations.slice(0, 5)) await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('70000000-0000-4000-8000-000000000001','Existing');
+   insert into public.seasons(id,championship_id,year) values('70000000-0000-4000-8000-000000000002','70000000-0000-4000-8000-000000000001',2026);
+   insert into public.disputes(id,season_id,gender,category) values('70000000-0000-4000-8000-000000000003','70000000-0000-4000-8000-000000000002','masculino','Adulto');
+   insert into public.teams(id,name) values('70000000-0000-4000-8000-000000000004','Team');
+   insert into public.registrations(id,dispute_id,team_id,name) values('70000000-0000-4000-8000-000000000005','70000000-0000-4000-8000-000000000003','70000000-0000-4000-8000-000000000004','Team B');`);
+    const before = await db.query(
+      "select public.get_registration('70000000-0000-4000-8000-000000000005') as data",
+    );
+    for (const migration of migrations.slice(5)) await db.exec(migration);
+    await db.exec(peopleContract);
+    assert.deepEqual(
+      (
+        await db.query(
+          "select public.get_registration('70000000-0000-4000-8000-000000000005') as data",
+        )
+      ).rows,
+      before.rows,
+    );
+    assert.deepEqual(
+      (await db.query("select count(*)::int as count from public.persons"))
+        .rows,
       [{ count: 0 }],
     );
   } finally {

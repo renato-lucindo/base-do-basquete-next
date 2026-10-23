@@ -56,6 +56,26 @@ export type Database = {
         };
         Relationships: [];
       };
+      coaches: {
+        Row: {
+          person_id: string;
+        };
+        Insert: {
+          person_id: string;
+        };
+        Update: {
+          person_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "coaches_person_id_fkey";
+            columns: ["person_id"];
+            isOneToOne: true;
+            referencedRelation: "persons";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       disputes: {
         Row: {
           category: string;
@@ -87,6 +107,57 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      persons: {
+        Row: {
+          biography: string | null;
+          dominant_hand: string | null;
+          height_cm: number | null;
+          id: string;
+          name: string;
+          name_key: string | null;
+          nickname: string | null;
+          origin_city: string | null;
+          origin_state: string | null;
+          position: string | null;
+          public_birth_year: number | null;
+          saved_at: string;
+          version: number;
+          weight_kg: number | null;
+        };
+        Insert: {
+          biography?: string | null;
+          dominant_hand?: string | null;
+          height_cm?: number | null;
+          id: string;
+          name: string;
+          name_key?: string | null;
+          nickname?: string | null;
+          origin_city?: string | null;
+          origin_state?: string | null;
+          position?: string | null;
+          public_birth_year?: number | null;
+          saved_at?: string;
+          version?: number;
+          weight_kg?: number | null;
+        };
+        Update: {
+          biography?: string | null;
+          dominant_hand?: string | null;
+          height_cm?: number | null;
+          id?: string;
+          name?: string;
+          name_key?: string | null;
+          nickname?: string | null;
+          origin_city?: string | null;
+          origin_state?: string | null;
+          position?: string | null;
+          public_birth_year?: number | null;
+          saved_at?: string;
+          version?: number;
+          weight_kg?: number | null;
+        };
+        Relationships: [];
       };
       registrations: {
         Row: {
@@ -186,10 +257,15 @@ export type Database = {
     };
     Functions: {
       get_competition: { Args: { p_id: string }; Returns: Json };
+      get_person: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      list_persons: {
+        Args: { p_kind?: string; p_offset?: number; p_query?: string };
         Returns: Json;
       };
       list_registrations: {
@@ -201,6 +277,7 @@ export type Database = {
         Returns: Json;
       };
       save_competition: { Args: { p_command: Json }; Returns: Json };
+      save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
     };
