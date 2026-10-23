@@ -1,6 +1,6 @@
 # Apresentação do marco 1
 
-Estado: pronto para avaliação do responsável; nenhum aceite humano foi presumido. Dados fictícios e armazenamento local. A implementação completa, o acesso real por senha e a integração dependem desta avaliação.
+Estado: protótipo avaliado com feedback incremental; o responsável autorizou seguir à fundação real. Dados fictícios e armazenamento local ainda vigentes; autorização de continuidade não equivale a aceite de produção.
 
 ## Abrir
 
@@ -50,7 +50,7 @@ Supabase: organização conectada e plano Free confirmados; capacidade/custo de 
 
 Solicitação de capitão/comissão aplicada: selecionar capitão por equipe, marcar “Sem técnico: capitão assume” e conferir “Técnico” preenchido automaticamente, sem “Ass. Técnico”. Desmarcar permite técnico próprio/assistente, mantendo o capitão separado. Conferir recuperação do rascunho e desfazer da troca; faltas de atleta/técnico combinam somente quando o capitão assume. Alteração incompatível com ações posteriores deve ser recusada sem perda. Gate desta unidade PASS: 51 testes unitários/três de transporte; navegador PASS **28 cenários**, incluindo quatro novas execuções desktop/celular. Dois screenshots da súmula atualizados; demais composições e evidência do harness imutável reaproveitadas.
 
-Preview atual: aplicação `0f40ac1`, transporte `d5b09b0`, 13 hashes remotos conferidos. Smoke autenticado dos três fluxos, teclado, revisão de ações e comissão técnica aprovado em dois tamanhos; credencial/política transitórias revogadas e seis consultas anônimas finais redirecionadas ao Access. CI [39874315721](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39874315721), job `prototype`, aprovado com gate e 28 cenários Linux. Registros anteriores abaixo permanecem como histórico.
+Preview atual: aplicação `169c2de`, transporte `397e12f`, 13 hashes remotos conferidos. Smoke autenticado dos três fluxos, teclado, revisão de ações, comissão, ordenação e cinco titulares aprovado em dois tamanhos; credencial/política transitórias revogadas e seis consultas anônimas finais redirecionadas ao Access. CI [39876425911](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/39876425911), job `prototype`, aprovado com gate e 30 cenários Linux. Registros anteriores abaixo permanecem como histórico.
 
 Feedback de 22/10 aplicado à súmula conforme `docs/AJUSTES-DE-EXPERIENCIA.md`: cores suaves por quarto, ordenação alternativa e edição/exclusão individual. Conferir: lançar fora de ordem → selecionar “Por quarto” → editar uma ação anterior → conferir recálculo → excluir outra com confirmação → desfazer/refazer → salvar e recarregar. Em resultado publicado, conferir motivo e preservação da versão anterior. As ações anteriores às últimas trinta também ficam acessíveis.
 
