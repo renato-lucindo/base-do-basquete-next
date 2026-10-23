@@ -3,6 +3,7 @@ export class ApiFailure extends Error {
   constructor(
     readonly status: number,
     message: string,
+    readonly code: string = "unknown",
   ) {
     super(message);
   }
@@ -53,7 +54,17 @@ export async function api<T>(
       typeof body.error.message === "string"
         ? body.error.message.slice(0, 500)
         : "Não foi possível concluir a operação. Tente novamente.";
-    throw new ApiFailure(response.status, message);
+    const code =
+      body &&
+      typeof body === "object" &&
+      "error" in body &&
+      body.error &&
+      typeof body.error === "object" &&
+      "code" in body.error &&
+      typeof body.error.code === "string"
+        ? body.error.code.slice(0, 100)
+        : "unknown";
+    throw new ApiFailure(response.status, message, code);
   }
   const parsed = schema.safeParse(body);
   if (!parsed.success)

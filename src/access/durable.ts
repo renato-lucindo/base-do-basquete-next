@@ -1,3 +1,7 @@
+import { SupabasePeople } from "../people/provider";
+import { savePersonSchema, type SavePerson } from "../people/contract";
+import { saveRosterSchema, type SaveRoster } from "../people/roster-contract";
+import { saveStaffSchema, type SaveStaff } from "../people/staff-contract";
 import { DurableObject } from "cloudflare:workers";
 import { HttpError } from "../server/http";
 import { SupabaseAccess, type Credentials } from "./provider";
@@ -23,8 +27,13 @@ export class SessionStore extends DurableObject<Env> {
   private readonly session: PersistentSession;
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
+  private readonly people: SupabasePeople;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.people = new SupabasePeople({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.teams = new SupabaseTeams({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -83,6 +92,74 @@ export class SessionStore extends DurableObject<Env> {
           accessToken,
           saveCompetitionSchema.parse(command),
         ),
+      ),
+    );
+  }
+
+  listPersons(
+    query: string,
+    kind: "all" | "athlete" | "coach",
+    offset: number,
+  ) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.listPersons(accessToken, query, kind, offset),
+      ),
+    );
+  }
+  getPerson(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.getPerson(accessToken, id),
+      ),
+    );
+  }
+  savePerson(command: SavePerson) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.savePerson(accessToken, savePersonSchema.parse(command)),
+      ),
+    );
+  }
+  listRoster(registrationId: string, activeOnly: boolean, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.listRoster(accessToken, registrationId, activeOnly, offset),
+      ),
+    );
+  }
+  getRoster(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.getRoster(accessToken, id),
+      ),
+    );
+  }
+  saveRoster(command: SaveRoster) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.saveRoster(accessToken, saveRosterSchema.parse(command)),
+      ),
+    );
+  }
+  listStaff(registrationId: string, activeOnly: boolean, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.listStaff(accessToken, registrationId, activeOnly, offset),
+      ),
+    );
+  }
+  getStaff(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.getStaff(accessToken, id),
+      ),
+    );
+  }
+  saveStaff(command: SaveStaff) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.people.saveStaff(accessToken, saveStaffSchema.parse(command)),
       ),
     );
   }
