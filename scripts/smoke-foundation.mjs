@@ -111,7 +111,12 @@ try {
   assert.equal(status, 401);
   const rejection = await invalid.json();
   assert.equal(rejection.error.code, "invalid_session");
-  assert.ok(!invalid.headers.get("set-cookie"));
+  // Access can set its own cookies; failed password login must not mint an app session.
+  assert.ok(
+    !invalid.headers
+      .getSetCookie()
+      .some((cookie) => cookie.startsWith("__Host-bdb-session=")),
+  );
   browser = await chromium.launch({ headless: true });
   for (const [name, viewport] of [
     ["desktop", { width: 1440, height: 1000 }],
