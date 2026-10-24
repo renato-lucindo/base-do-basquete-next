@@ -181,6 +181,8 @@ async function fixture(options = {}) {
           [
             "get_game_publication_state",
             "get_game_publication_version",
+            "get_pdf_publication_preparation",
+            "save_pdf_publication_preparation",
             "publish_sheet_game",
             "publish_pdf_game",
           ].some((n) => url.pathname === `/rest/v1/rpc/${n}`)
@@ -190,6 +192,22 @@ async function fixture(options = {}) {
             "Bearer fixture-access",
           );
           const args = await request.json();
+          if (url.pathname.endsWith("/get_pdf_publication_preparation"))
+            return Response.json(options.preparation ?? null);
+          if (url.pathname.endsWith("/save_pdf_publication_preparation")) {
+            const c = args.p_command;
+            options.preparation = {
+              sourceId: c.publication.source.sourceId,
+              version: c.expectedVersion + 1,
+              savedAt: "2026-10-24T14:00:00Z",
+              publication: c.publication,
+            };
+            return Response.json({
+              sourceId: options.preparation.sourceId,
+              version: options.preparation.version,
+              requestId: c.publication.requestId,
+            });
+          }
           if (url.pathname.endsWith("/get_game_publication_state"))
             return Response.json({
               gameId: args.p_game_id,
@@ -544,13 +562,45 @@ test("publication routes enforce fresh sessions, correlate commands and recover 
       reason: "Revisão com dados do PDF.",
       acceptDivergence: false,
     };
+    const preparationPath = root + "/preparation/" + id;
+    const getPreparation = () =>
+      f.mf.dispatchFetch(origin + preparationPath, { headers: { cookie } });
+    assert.equal(await (await getPreparation()).json(), null);
+    const prep = { commandId: id, expectedVersion: 0, publication: pdf };
+    assert.equal(
+      (await send(preparationPath, prep, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    assert.equal((await send(preparationPath, " ".repeat(65537))).status, 413);
+    assert.equal(
+      (
+        await send(preparationPath, {
+          ...prep,
+          publication: {
+            ...pdf,
+            gameId: "10000000-0000-4000-8000-000000000003",
+          },
+        })
+      ).status,
+      400,
+    );
+    assert.equal((await send(preparationPath, prep)).status, 200);
+    assert.equal(
+      (await (await getPreparation()).json()).publication.requestId,
+      pdf.requestId,
+    );
+    assert.equal(options.publicationCommits, 1);
     assert.equal((await send(root + "/pdf", " ".repeat(65537))).status, 413);
     assert.equal((await send(root + "/pdf", pdf)).status, 200);
     const before = f.calls.filter(
       (p) => p.includes("publication") || p.includes("publish_"),
     ).length;
     options.denied = true;
-    assert.equal((await send(root + "/pdf", pdf)).status, 403);
+    assert.equal((await getPreparation()).status, 403);
+    // Fresh denial discards the session; subsequent operations remain unauthenticated.
+    assert.equal((await send(preparationPath, prep)).status, 401);
+    assert.equal((await send(root + "/pdf", pdf)).status, 401);
     assert.equal(
       f.calls.filter((p) => p.includes("publication") || p.includes("publish_"))
         .length,

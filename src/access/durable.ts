@@ -344,6 +344,20 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  getPdfPreparation(sourceId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.getPreparation(accessToken, sourceId),
+      ),
+    );
+  }
+  savePdfPreparation(command: SavePreparation) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.savePreparation(accessToken, command),
+      ),
+    );
+  }
   getGameSheet(gameId: string) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
@@ -486,3 +500,4 @@ async function safely<T>(operation: () => Promise<T>): Promise<RpcResult<T>> {
     };
   }
 }
+import { type SavePreparation } from "../publication/preparation-contract";

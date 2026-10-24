@@ -6,6 +6,12 @@ import type { Database } from "../server/database.types";
 import { publishSheetSchema, type PublishSheet } from "./contract";
 import { prepareManualPublication } from "./manual";
 import {
+  savePreparationSchema,
+  preparationSchema,
+  preparationAckSchema,
+  type SavePreparation,
+} from "./preparation-contract";
+import {
   publishPdfSchema,
   publicResultSchema,
   type PublishPdf,
@@ -21,6 +27,8 @@ type Rpc =
   | "get_game_publication_state"
   | "get_game_publication_version"
   | "get_public_game"
+  | "get_pdf_publication_preparation"
+  | "save_pdf_publication_preparation"
   | "publish_sheet_game"
   | "publish_pdf_game";
 const messages = {
@@ -67,6 +75,35 @@ export class SupabasePublications {
       init: RequestInit,
     ) => Promise<Response> = (url, init) => fetch(url, init),
   ) {}
+  async getPreparation(token: string, sourceId: string) {
+    if (!z.uuid().safeParse(sourceId).success) throw badInput();
+    const r = await this.rpc(
+      preparationSchema.nullable(),
+      "get_pdf_publication_preparation",
+      { p_source_id: sourceId },
+      token,
+    );
+    if (r && r.sourceId !== sourceId) throw unavailable();
+    return r;
+  }
+  async savePreparation(token: string, input: SavePreparation) {
+    const parsed = savePreparationSchema.safeParse(input);
+    if (!parsed.success) throw badInput();
+    const c = parsed.data;
+    const r = await this.rpc(
+      preparationAckSchema,
+      "save_pdf_publication_preparation",
+      { p_command: c },
+      token,
+    );
+    if (
+      r.sourceId !== c.publication.source.sourceId ||
+      r.requestId !== c.publication.requestId ||
+      r.version !== c.expectedVersion + 1
+    )
+      throw unavailable();
+    return r;
+  }
   async getState(token: string, gameId: string, offset = 0) {
     if (
       !z.uuid().safeParse(gameId).success ||
@@ -179,7 +216,11 @@ export class SupabasePublications {
     }
     if (response.ok) {
       const body = await providerJson(response, 1048576);
-      if (body === null && name !== "get_public_game")
+      if (
+        body === null &&
+        name !== "get_public_game" &&
+        name !== "get_pdf_publication_preparation"
+      )
         throw new HttpError(
           404,
           "context_not_found",

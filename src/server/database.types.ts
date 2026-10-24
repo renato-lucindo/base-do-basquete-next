@@ -670,6 +670,10 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_pdf_publication_preparation: {
+        Args: { p_source_id: string };
+        Returns: Json;
+      };
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
@@ -742,6 +746,10 @@ export type Database = {
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
       save_game_sheet: { Args: { p_command: Json }; Returns: Json };
+      save_pdf_publication_preparation: {
+        Args: { p_command: Json };
+        Returns: Json;
+      };
       save_pdf_review: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };

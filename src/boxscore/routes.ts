@@ -42,6 +42,16 @@ export async function pdfSourcesRoute(request: Request, env: Env, url: URL) {
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }
+  const preparation = /^\/api\/pdf-sources\/([^/]+)\/preparation$/u.exec(
+    url.pathname,
+  );
+  if (preparation && !url.search && request.method === "GET") {
+    const id = z.uuid().safeParse(preparation[1]);
+    if (!id.success) throw badPdfInput();
+    const r = await session.getPdfPreparation(id.data);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
   const match = /^\/api\/pdf-sources\/([^/]+)(\/review)?$/u.exec(url.pathname);
   if (match && !url.search) {
     const id = z.uuid().safeParse(match[1]);

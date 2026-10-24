@@ -4,6 +4,7 @@ import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { publishSheetSchema } from "./contract";
 import { publishPdfSchema } from "./pdf-contract";
 import { SupabasePublications } from "./provider";
+import { savePreparationSchema } from "./preparation-contract";
 function badInput() {
   return new HttpError(
     400,
@@ -46,6 +47,31 @@ export async function publicationRoute(request: Request, env: Env, url: URL) {
     return jsonResponse(r.value);
   }
   if (url.search) throw badInput();
+  const preparation = /^\/preparation\/([^/]+)$/u.exec(tail);
+  if (preparation) {
+    const sourceId = z.uuid().safeParse(preparation[1]);
+    if (!sourceId.success) throw badInput();
+    if (request.method === "GET") {
+      const r = await session.getPdfPreparation(sourceId.data);
+      if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+      if (r.value && r.value.publication.gameId !== id.data) throw badInput();
+      return jsonResponse(r.value);
+    }
+    if (request.method === "POST") {
+      const command = await readMutationJson(request, savePreparationSchema, {
+        origin: env.APP_ORIGIN,
+        maxBytes: 65536,
+      });
+      if (
+        command.publication.gameId !== id.data ||
+        command.publication.source.sourceId !== sourceId.data
+      )
+        throw badInput();
+      const r = await session.savePdfPreparation(command);
+      if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+      return jsonResponse(r.value);
+    }
+  }
   const version = /^\/versions\/([0-9]+)$/u.exec(tail);
   if (version && request.method === "GET") {
     const n = Number(version[1]);

@@ -27,6 +27,59 @@ const sheetAck = () => ({
   sourceVersion: 1,
   publishedAt: stamp,
 });
+it("saves a private preparation with correlated identity and never publishes while saving", async () => {
+  const { review, supplement, authority } = await pdfPublicationFixture();
+  const publication = {
+    requestId,
+    gameId: review.document.gameId!,
+    gameVersion: 1,
+    basePublicationVersion: 0,
+    source: {
+      kind: "pdf" as const,
+      sourceId: review.source.id,
+      sourceVersion: 2 as const,
+      reviewVersion: 1,
+    },
+    supplement,
+    authority,
+    sheetVersion: null,
+    reason: "",
+    acceptDivergence: false,
+  };
+  const command = { commandId: gameId, expectedVersion: 0, publication };
+  const send = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
+    async () =>
+      Response.json({ sourceId: review.source.id, requestId, version: 1 }),
+  );
+  const db = new SupabasePublications(config, send);
+  expect((await db.savePreparation("fixture-jwt", command)).version).toBe(1);
+  expect(send.mock.calls[0]?.[0]).toBe(
+    config.url + "/rest/v1/rpc/save_pdf_publication_preparation",
+  );
+  send.mockImplementation(async () =>
+    Response.json({ sourceId: gameId, requestId, version: 1 }),
+  );
+  await expect(
+    db.savePreparation("fixture-jwt", command),
+  ).rejects.toMatchObject({ status: 503 });
+  send.mockImplementation(async () => Response.json(null));
+  expect(await db.getPreparation("fixture-jwt", review.source.id)).toBeNull();
+  send.mockImplementation(async () =>
+    Response.json({
+      sourceId: review.source.id,
+      version: 1,
+      savedAt: stamp,
+      publication,
+    }),
+  );
+  expect(
+    (await db.getPreparation("fixture-jwt", review.source.id))?.publication
+      .requestId,
+  ).toBe(requestId);
+  await expect(db.getPreparation("fixture-jwt", gameId)).rejects.toMatchObject({
+    status: 503,
+  });
+});
 it("fixes administrative RPCs and sends no user token for the public-only reader", async () => {
   const send = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
       async () =>
