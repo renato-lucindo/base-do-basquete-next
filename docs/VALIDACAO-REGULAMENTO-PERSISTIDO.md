@@ -27,3 +27,13 @@ Gate consolidado local **PASS264unit/57arquivos,5transportes,13regressõesPostgr
 ## Limites e próximo passo
 
 Contratos locais/SQL não provam transporte autenticado da API nova, concorrência real multi-conexão, carga ouWCAG. Provider/SessionStore/rotas/editor/histórico visual/consulta pública de classificação e ocorrências persistidas ainda pendentes. Ao mapear409 de edição de jogo, diferenciar `regulation_group_opponents_locked` de versão antiga para orientar a revisar a atribuição; não dizer que outra aba alterou quando a causa é o grupo. Cálculo continua no backend, sem aceitar derivado enviado pelo browser. Avaliação humanaG4 e pilotoStorageHTTP real ainda não substituídos por estes testes.
+
+## R3c1 — API administrativa e prévia
+
+Provider/SessionStore/rotas GETestado/GETversão/POSTpreview/POSTsave implementados, ainda sem publicação. O Worker devolve projeção calculada e DTOs fechados, sem contexto bruto de fontes.8unitários novos do provider e1novo do mapper de jogos,11focais com regressões existentesPASS. IDsUUID normalizados antes da correlação; testeRED de casing→GREEN. Leitura usa3RPCs fixos, fonte/disputa/versão/fingerprint são conferidos. Prévia lê estado/fatos atuais e não grava; save não fazGET prévio que impediria replay deACK perdido. Mensagens fixas distinguem contexto alterado, versão e confirmação de impacto, sem vazar detalhes do provedor.
+
+Transporte workerd14/14PASS no primeiro build com a rota, log `.preview-artifacts/r3-regulation-access.log` SHA2564236e1aa8e0266c8e7eaed4839ad17dfaba4b2c07650566ed088b506110a82b6. Build/focal1/1 posteriores incluem normalizaçãoUUID e casos novos de streamJSON>1MiB, tipo/origem/query/correlação/versão histórica, sessão revogada antes da leitura eACK perdido apóscommit com replayúnico. Reutilizar14cenários anteriores para caminhos inalterados; não afirmar testeHTTP autenticado real só pelo outbound controlado. Tipos/lint/formato/segredosPASS. `tsconfig` mantém a rota somente na compilaçãoWorker, como demais fronteirasHTTP. Nenhuma configuração/binding/namespace/cofre alterado.
+
+DocsCloudflareWorkers/DOstub atuais consultados; tipos5.20261024.1 obtidos apenas como referência ignorada, dependências do projeto preservadas. O erro de grupo no providerde jogos agora orienta revisar atribuição, em vez de mensagem de outra versão. RED do teste reproduziu o diagnóstico anterior errado. Editor/consulta pública/ocorrências persistidas continuam pendentes; consolidar gate quando a próxima unidade vertical estiver estável.
+
+CI banco **40126871143/job120970084694 SUCCESS** em46e3f0d,264unit/57arquivos e158browsersLinux. Isso não cobre o códigoAPI posterior. EvidênciasG4/harness126 preservadas, sem repetição por sessão ou documentação.

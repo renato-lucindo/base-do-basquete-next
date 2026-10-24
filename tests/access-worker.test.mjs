@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { Miniflare, Response, convertV4MiniflareOptions } from "miniflare";
+import { regulationFixture, regulationId } from "./fixtures/regulation.ts";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -13,6 +14,8 @@ async function fixture(options = {}) {
     originalBytes,
     reviewDocument,
     reviewVersion = 0;
+  const regulation = regulationFixture(),
+    regulationReceipts = new Map();
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -70,6 +73,81 @@ async function fixture(options = {}) {
           );
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (
+          options.regulation &&
+          [
+            "get_regulation_state",
+            "get_regulation_version",
+            "save_regulation",
+          ].some((name) => url.pathname === `/rest/v1/rpc/${name}`)
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const args = await request.json();
+          if (url.pathname.endsWith("/get_regulation_state"))
+            return Response.json({
+              ...regulation,
+              contextFingerprint: options.changedRegulationContext
+                ? "b".repeat(64)
+                : regulation.contextFingerprint,
+            });
+          if (url.pathname.endsWith("/get_regulation_version"))
+            return Response.json(
+              args.p_version === 1
+                ? {
+                    ...regulationFixture(),
+                    definition: regulationFixture().definition,
+                    context: regulationFixture().context,
+                    version: 1,
+                    actorId: id,
+                    reason: "Regra anterior",
+                    algorithmVersion: "organized-v1",
+                    history: undefined,
+                    hasMore: undefined,
+                  }
+                : null,
+            );
+          const c = args.p_command,
+            existing = regulationReceipts.get(c.commandId);
+          if (existing) {
+            assert.deepEqual(c, existing.command);
+            return Response.json(existing.ack);
+          }
+          if (c.expectedVersion !== regulation.version)
+            return Response.json(
+              { message: "version_conflict" },
+              { status: 409 },
+            );
+          if (c.expectedContextFingerprint !== regulation.contextFingerprint)
+            return Response.json(
+              { message: "context_conflict" },
+              { status: 409 },
+            );
+          const ack = {
+            commandId: c.commandId,
+            disputeId: c.disputeId,
+            version: c.expectedVersion + 1,
+            savedAt: regulation.savedAt,
+            contextFingerprint: regulation.contextFingerprint,
+          };
+          regulation.version = ack.version;
+          regulation.definition = c.definition;
+          options.regulationCommits = (options.regulationCommits ?? 0) + 1;
+          regulationReceipts.set(c.commandId, {
+            command: structuredClone(c),
+            ack,
+          });
+          if (options.loseRegulationAck) {
+            options.loseRegulationAck = false;
+            return Response.json(
+              { message: "fixture-private-value" },
+              { status: 503 },
+            );
+          }
+          return Response.json(ack);
+        }
         if (
           options.pdf &&
           (url.pathname.includes("pdf_source") ||
@@ -449,6 +527,116 @@ async function fixture(options = {}) {
   return { mf, send, login, calls };
 }
 
+test("regulation routes authorize before source reads, compute previews and replay frozen writes after a lost ACK", async () => {
+  const options = { regulation: true, loseRegulationAck: true },
+    f = await fixture(options),
+    did = regulationId(90),
+    path = `/api/regulations/${did}`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + path)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (tail, method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + tail, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    const view = await send("");
+    assert.equal(view.status, 200);
+    const value = await view.json();
+    assert.equal(value.context, undefined);
+    assert.equal(
+      value.preview.groupPhases[0].groups[0].standings.rows[0].leaguePoints,
+      2,
+    );
+    const definition = regulationFixture().definition;
+    definition.groupPhases[0].rules.points = { win: 5, loss: 0 };
+    const preview = {
+      expectedVersion: 1,
+      expectedContextFingerprint: "a".repeat(64),
+      definition,
+    };
+    const p = await send("/preview", "POST", preview);
+    assert.equal(p.status, 200);
+    assert.equal(
+      (await p.json()).after.groupPhases[0].groups[0].standings.rows[0]
+        .leaguePoints,
+      5,
+    );
+    assert.equal(options.regulationCommits, undefined);
+    assert.equal((await send("?offset=0&offset=1")).status, 400);
+    assert.equal((await send("?offset=-1")).status, 400);
+    assert.equal(
+      (
+        await send("/preview", "POST", preview, {
+          "content-type": "text/plain",
+        })
+      ).status,
+      415,
+    );
+    const tooLarge = await f.mf.dispatchFetch(origin + path + "/preview", {
+      method: "POST",
+      headers: { cookie, origin, "content-type": "application/json" },
+      body: new ReadableStream({
+        start(c) {
+          c.enqueue(new Uint8Array(1048577));
+          c.close();
+        },
+      }),
+      duplex: "half",
+    });
+    assert.equal(tooLarge.status, 413);
+    await tooLarge.text();
+    assert.equal(
+      (await send("/preview", "POST", { ...preview, facts: [] })).status,
+      400,
+    );
+    assert.equal(
+      (await send("/preview", "POST", preview, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    options.changedRegulationContext = true;
+    assert.equal((await send("/preview", "POST", preview)).status, 409);
+    options.changedRegulationContext = false;
+    const command = {
+      ...preview,
+      commandId: regulationId(600),
+      disputeId: did,
+      reason: "Conferido depois da prévia",
+      acknowledgeImpact: true,
+    };
+    assert.equal(
+      (await send("", "POST", { ...command, disputeId: regulationId(999) }))
+        .status,
+      400,
+    );
+    assert.equal((await send("", "POST", command)).status, 503);
+    const retry = await send("", "POST", command);
+    assert.equal(retry.status, 200);
+    assert.equal((await retry.json()).version, 2);
+    assert.equal(options.regulationCommits, 1);
+    const history = await send("/versions/1");
+    assert.equal(history.status, 200);
+    assert.equal((await history.json()).context, undefined);
+    assert.equal((await send("/versions/0")).status, 400);
+    assert.ok(
+      f.calls.lastIndexOf(
+        "/rest/v1/admin_access?select=user_id,enabled&user_id=eq." + id,
+      ) < f.calls.lastIndexOf("/rest/v1/rpc/get_regulation_version"),
+    );
+    options.denied = true;
+    assert.equal((await send("/preview", "POST", preview)).status, 403);
+    assert.ok(!JSON.stringify(value).includes("fixture-access"));
+  } finally {
+    await f.mf.dispose();
+  }
+});
 test("publication routes enforce fresh sessions, correlate commands and recover a response lost after commit", async () => {
   const options = { failPublicationAfterCommit: true },
     f = await fixture(options);

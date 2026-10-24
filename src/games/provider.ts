@@ -131,6 +131,16 @@ export class SupabaseGames {
     }
     if (response.status === 409) {
       const body = await providerJson(response);
+      if (
+        z
+          .object({ message: z.literal("regulation_group_opponents_locked") })
+          .safeParse(body).success
+      )
+        throw new HttpError(
+          409,
+          "regulation_assignment_conflict",
+          "O jogo pertence a um grupo. Revise a atribuição no regulamento antes de trocar os adversários.",
+        );
       const replay = z
         .object({ message: z.literal("idempotency_conflict") })
         .safeParse(body).success;

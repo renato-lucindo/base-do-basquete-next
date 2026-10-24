@@ -1,4 +1,13 @@
 import { SupabasePublications } from "../publication/provider";
+import { SupabaseRegulations } from "../regulation/provider";
+import {
+  saveRegulationSchema,
+  type SaveRegulation,
+} from "../regulation/persistence-contract";
+import {
+  previewRegulationSchema,
+  type PreviewRegulation,
+} from "../regulation/view-contract";
 import type { PublishSheet } from "../publication/contract";
 import type { PublishPdf } from "../publication/pdf-contract";
 import { SupabasePeople } from "../people/provider";
@@ -61,12 +70,17 @@ export class SessionStore extends DurableObject<Env> {
   private readonly teams: SupabaseTeams;
   private readonly games: SupabaseGames;
   private readonly publications: SupabasePublications;
+  private readonly regulations: SupabaseRegulations;
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.regulations = new SupabaseRegulations({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.pdfSources = new SupabasePdfSources({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -320,6 +334,38 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.publications.getState(accessToken, gameId, offset),
+      ),
+    );
+  }
+  getRegulationState(disputeId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.getView(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  getRegulationVersion(disputeId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.getVersionView(accessToken, disputeId, version),
+      ),
+    );
+  }
+  previewRegulation(disputeId: string, command: PreviewRegulation) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.preview(
+          accessToken,
+          disputeId,
+          previewRegulationSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveRegulation(command: SaveRegulation) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.save(accessToken, saveRegulationSchema.parse(command)),
       ),
     );
   }

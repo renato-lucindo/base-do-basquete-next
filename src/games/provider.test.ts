@@ -2,6 +2,21 @@ import { describe, it, expect, vi } from "vitest";
 import { SupabaseGames } from "./provider";
 const id = "d1000000-0000-4000-8000-000000000001";
 describe("fixed game server operations", () => {
+  it("explains a regulation assignment conflict instead of reporting a stale game", async () => {
+    const db = new SupabaseGames(
+      { url: "https://db.example.test", key: "fixture" },
+      async () =>
+        Response.json(
+          { message: "regulation_group_opponents_locked" },
+          { status: 409 },
+        ),
+    );
+    await expect(db.get("fixture", id)).rejects.toMatchObject({
+      status: 409,
+      code: "regulation_assignment_conflict",
+      message: expect.stringContaining("grupo"),
+    });
+  });
   it("keeps JWT server-side and fixes list context", async () => {
     const send = vi.fn(async () =>
       Response.json({ items: [], hasMore: false }),
