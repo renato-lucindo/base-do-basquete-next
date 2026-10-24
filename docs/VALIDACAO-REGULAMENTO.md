@@ -21,3 +21,9 @@ Confronto com duas inscrições, slots explícitos e jogos publicados: partidaú
 8casos novos e18focais da composição PASS: todos os formatos, mando alternado/ordem de entrada, liderança incompleta/gap de slot, agregado empatado, jogo extra, duplicatas/contexto/ocorrência indevida e entrada imutável/linhagem. Gate local **PASS208unit/49arquivos,5transportes,13PG,13workerd,prova4PDFs** e demais checks. Log .preview-artifacts/r2-series-gate.log SHA256002a27bb3a8d7699212919e3b71259b00be4ae38ef130f53420835df97d2d0df. Nenhum API/DDL/UI/deploy novo. R2 (fases/grupos/atribuições/ocorrências) continua parcial.
 
 CI R1 **40105853327/job120907267019 SUCCESS** em30ce516; não atribuir essa CI aos arquivosR2a posteriores. Nova CI do materialR2 será conferida antes de integração. Preview G4 e evidências de seus artefatos permanecem imutáveis.
+
+## R2b — atribuições explícitas de grupos (núcleo)
+
+Fase identificada porUUID e disputa, grupos/inscrições/partidas atribuídos explicitamente. Aplica as regras da fase e o cálculo de pontos corridos a cada grupo; jogo direto não atribuído não entra por nome/data/adversários. Não repete inscrição em grupos da mesma fase nem partida/versão. Resultado publicado ausente fica em unpublishedGameIds e não vira0–0; existência/parentesco da agenda serão revalidados por FK/escritor real na etapaR3. Não calcula cruzamentos nem classificado automaticamente.
+
+5casos novos e23focais da composição R1/R2a/R2b PASS: isolamento porgrupo/ordemdeterminística, jogo direto nãoatribuído, resultado pendente, partida com adversário fora dogrupo, duplicatas/crossdisputa e fórmula indevida. Typecheck/lint/formato focais PASS. Gate208 anterior cobre R1/R2a e arquivos inalterados; **não é gate consolidado do R2b posterior**. Consolidar com a composição de cruzamentos quando estável. Sem API/DDL/UI/deploy nesta unidade, sem dados/serviços humanos alterados.

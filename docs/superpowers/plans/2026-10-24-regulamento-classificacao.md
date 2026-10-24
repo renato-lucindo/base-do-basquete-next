@@ -50,3 +50,9 @@ Interface: RoundRobinRules exige pontuação e critérios ordenados finitos; Com
 ## Continuidade
 
 PROGRESSO.md governa a retomada. Cota real no início/entre unidades/antes de longas; aos85%usados5h menoroperação/checkpoint/push/MESMAautomação reset+2, também semanal. Sem compras/plano/resetmanual, sem segredos em logs/docs/agendamentos. Não alterar preview G4 enquanto esta unidade pura é preparada; incorporar feedback humano quando chegar.
+
+### Subunidades R2 verificadas
+
+- R2a: resolvedor puro de séries e8cenários, gate208local. Sem API/UI/DDL; CI própria deve ser reconciliada.
+- R2b: grupos/atribuições explícitas e5cenários;23focais composição/types/lint/format PASS. Cruzamentos e grafo de classificados ainda pendentes; não marcar todaR2concluída.
+- PróximoR2c: referências de entradas por inscrição/posição de grupo/vencedor ou perdedor de série; impedir ciclos/crosscontexto e avanço por empate ou publicação pendente. Classificação é prévia, decisão final/honraria exige confirmação e histórico próprios. Começar por testeRED de empate na posição/corte e referência cíclica, com efeitos observáveis no resolvedor.
