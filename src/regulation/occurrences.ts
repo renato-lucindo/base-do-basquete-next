@@ -199,15 +199,18 @@ export const occurrencesInputSchema = z
   });
 export type OccurrencesInput = z.infer<typeof occurrencesInputSchema>;
 export type GameOccurrence = z.infer<typeof gameOccurrenceSchema>;
-export type CompetitiveAward = {
-  kind: "wo" | "administrative";
-  occurrenceId: string;
-  version: number;
-  winnerRegistrationId: string;
-  homeLeaguePoints: number;
-  awayLeaguePoints: number;
-  score: z.infer<typeof administrativeScoreSchema> | null;
-};
+export const competitiveAwardSchema = z
+  .object({
+    kind: z.enum(["wo", "administrative"]),
+    occurrenceId: uuid,
+    version,
+    winnerRegistrationId: uuid,
+    homeLeaguePoints: leaguePoints,
+    awayLeaguePoints: leaguePoints,
+    score: administrativeScoreSchema.nullable(),
+  })
+  .strict();
+export type CompetitiveAward = z.infer<typeof competitiveAwardSchema>;
 export type CompetitiveOutcome =
   | { kind: "played"; publication: CompetitiveFact }
   | { kind: "awarded"; award: CompetitiveAward };
