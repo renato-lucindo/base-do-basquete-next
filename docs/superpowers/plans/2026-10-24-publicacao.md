@@ -47,7 +47,7 @@ P1 implementado em f461077/ea6bf19; a CI inicial foi reconciliada e as evidênci
 
 ## P4 — gate, preview e evidências
 
-- [ ] Gate consolidado somente quando unidade estável, CI/source correspondentes e preview protegido com smokes públicos/administrativos, hashes e revogação efêmera. Reutilizar gates/SQL/harness de artefatos inalterados.
+- [x] Gate consolidado somente quando unidade estável, CI/source correspondentes e preview protegido com smokes públicos/administrativos, hashes e revogação efêmera. Reutilizar gates/SQL/harness de artefatos inalterados.
 - [ ] Piloto StorageHTTP real autenticado e avaliação humana da etapa continuam necessários; mocks outbound e SQL de metadados não os substituem. Não extrair tokens do cofre/conectores nem solicitar senha no chat para obter essa evidência.
 - [ ] Registrar limites e volumes de testes. Projeção por PK e listagem contextual paginada devem ter metas explícitas antes de alegar desempenho; banco vazio não prova escala. Não implantar seeds como dados reais.
 - [ ] Só marcar etapa4 concluída após percurso completo e avaliação apropriada. Regulamento/transferências/ocorrências e exploradores completos seguem nas etapas5/6.
