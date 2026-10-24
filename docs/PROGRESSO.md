@@ -1,3 +1,15 @@
+# P2b domínios preparados — 24/10/2026 05:59 America/Sao_Paulo (UTC-03)
+
+Branch codex/publicacao-jogos, baseP2a3887a90. CI40079689771/job120830458062 SUCCESS integral no fb3476f (161unit/gate/13PG/11workerd/prova4PDFs/browsersLinux); P2a/P2b posteriores ainda não têm gate integral, somente focais. Novo código deste commit pertence ao agente, sem mudanças humanas.
+
+Autoridade explícita por domínio e combinação PDF/manual prontas como funções puras;5 novos testes e17focais composição PASS/types/lint/segredos. Pontos oficiais/avançados separados, fallback/divergência requerem motivo/aceite, períodos ausentes não inventados; sem DDL/deploy/API/UI. Evidências em VALIDACAO-PUBLICACAO.
+
+Próximo P2c: testes SQL RED para derivação PDF a partir de original pronto + revisão persistida + suplemento/autoridade, writer com versões/locks e projeção/histórico/receipt atômicos. Evoluir FK de origem por registro tipado, preservando versões manuais existentes sem reescrevê-las; original/hash imutáveis. Revalidar identidades/membros/naipe/comissão/contextos sob locks, privacidade/grants/falhas/replay/upgrade. Depois tipos/providers/API/UI/P4. Confirmar Supabase preflight/schema/advisors antes de nova DDL; único projeto e vínculo abaixo. Preview permanece G3f2d634b/Access só responsável/previewsOFF. Piloto StorageHTTP/avaliação humana ainda pendentes, etapa4 incompleta.
+
+Cota última10%usados5h/43%semanal, reset5h1792849774/semanal1793382169. Sem DDL/deploy/serviço/credencial/processo em andamento. Cota real entre unidades/antes de longas; gatilho85%, MESMA automação reset+2 sem compras/reset manual. Reutilizar evidências inalteradas; ZIP/feedback são única especificação, projeto anterior proibido.
+
+---
+
 # Retomada / P2a — 24/10/2026 05:55 America/Sao_Paulo (UTC-03)
 
 Cota real reiniciada0%5h/41%semanal, reset5h1792849774. Git/remoto limpos ca98177 reconciliados com PRdraft11. Supabase contagens preservadas: jogos/sheets/fontes/revisões/publicações/versões/objetos0,pessoas1,inscrições2,Auth1. Cloudflare deploymentG3/Access exclusivo/previewsOFF reconciliados inalterados; sem deploy nesta unidade.

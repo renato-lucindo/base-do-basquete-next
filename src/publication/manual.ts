@@ -34,33 +34,34 @@ export function prepareManualPublication(
         "Os relacionados e as camisas confirmados não podem ser alterados nesta revisão.",
       );
   }
+  return { command, facts: deriveManualFacts(document) };
+}
+export function deriveManualFacts(input: PersistedSheet) {
+  const document = validatePersistedSheet(input, true);
   const total = aggregate(toEngineSheet(document));
   return {
-    command,
-    facts: {
-      rulesVersion: document.rulesVersion,
-      periods: document.periods,
-      teams: total.teams,
-      players: document.participants.map((p, index) => {
-        const t = total.players[index];
-        return {
-          rosterEntryId: p.rosterEntryId,
-          side: p.side,
-          jersey: p.jersey,
-          played: p.played,
-          starter: p.starter,
-          captain:
-            document.staff[p.side].captainRosterEntryId === p.rosterEntryId,
-          two: t.two,
-          three: t.three,
-          free: t.free,
-          points: t.points,
-          fouls: t.fouls,
-          technical: t.technical,
-          unsportsmanlike: t.unsportsmanlike,
-          status: t.status,
-        };
-      }),
-    },
+    rulesVersion: document.rulesVersion,
+    periods: document.periods,
+    teams: total.teams,
+    players: document.participants.map((p, index) => {
+      const t = total.players[index];
+      return {
+        rosterEntryId: p.rosterEntryId,
+        side: p.side,
+        jersey: p.jersey,
+        played: p.played,
+        starter: p.starter,
+        captain:
+          document.staff[p.side].captainRosterEntryId === p.rosterEntryId,
+        two: t.two,
+        three: t.three,
+        free: t.free,
+        points: t.points,
+        fouls: t.fouls,
+        technical: t.technical,
+        unsportsmanlike: t.unsportsmanlike,
+        status: t.status,
+      };
+    }),
   };
 }
