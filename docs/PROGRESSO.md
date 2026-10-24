@@ -1,3 +1,15 @@
+# Retomada / P2a — 24/10/2026 05:55 America/Sao_Paulo (UTC-03)
+
+Cota real reiniciada0%5h/41%semanal, reset5h1792849774. Git/remoto limpos ca98177 reconciliados com PRdraft11. Supabase contagens preservadas: jogos/sheets/fontes/revisões/publicações/versões/objetos0,pessoas1,inscrições2,Auth1. Cloudflare deploymentG3/Access exclusivo/previewsOFF reconciliados inalterados; sem deploy nesta unidade.
+
+CI40064059180 falhou no retry PDF/30s após161unit/13PG/builds, não no banco de publicação. Simulador de upload duplicado agora consome/verifica corpo também em409 e inclui endpoints seguros no diagnóstico.11workerd locais PASS; CI40079689771/job120830458062 gate SUCCESS no fb3476f, browsers em andamento. Verificar conclusão antes de alegar CI integral. Falha não reproduzida no Windows5vezes; não atribuir causalidade exclusiva sem evidência adicional.
+
+P2a comparador UUID completo + suplemento explícito implementados com8 focais RED→GREEN/types/lint PASS; detalhes em VALIDACAO-PUBLICACAO. Código neste commit de trabalho, obter SHA peloGit; nenhuma DDL/API/UI de publicação ainda. Somente alterações do agente.
+
+**Próximo:** P2b testes RED de autoridade/cobertura PDF por domínio; manual oficial com advanced_points distintos precisa decisão/motivo e não fabricar períodos/minutos. Depois migrations próprias de writer PDF/histórico/versões com revalidação sob locks, API/UI e validação da vertical. Ler plano atual e fontes contratuais; manter cenário Site desconhecido e FKs do histórico manual. Nenhum processo local/DDL/deploy/upload/credencial em andamento; gate remoto mencionado ainda pode rodar browsers. Limitações de piloto StorageHTTP humano/revisão independente persistem. Cota real entre unidades/antes de longas, aos85% mesma automação reset+2, sem duplicata/compras/reset manual.
+
+---
+
 # CHECKPOINT de cota — 24/10/2026 01:53 America/Sao_Paulo (UTC-03)
 
 **Objetivo/unidade:** etapa4 jogo completo; G3 PDFs publicado, G4P1a/P1b fundação de publicação manual concluída, P2PDF/P3APIUI/P4 validação pendentes. Repo https://github.com/renato-lucindo/base-do-basquete-next, workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, branch **codex/publicacao-jogos**, código remoto **ea6bf19afc4b03bd5f6a5333c253d8ddf22c8565**, baseG3f2d634bbef005fed9daf91989e168b4bdbb9d916. Checkpoint documental terá SHA posterior; consultar Git. PRdraft11 sobre10, ambos já anexados. Nenhum merge.
