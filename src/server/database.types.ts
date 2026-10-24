@@ -425,6 +425,38 @@ export type Database = {
         };
         Relationships: [];
       };
+      published_games: {
+        Row: {
+          dispute_id: string;
+          game_id: string;
+          published_at: string;
+          snapshot: Json;
+          version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          game_id: string;
+          published_at: string;
+          snapshot: Json;
+          version: number;
+        };
+        Update: {
+          dispute_id?: string;
+          game_id?: string;
+          published_at?: string;
+          snapshot?: Json;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "published_games_game_id_dispute_id_fkey";
+            columns: ["game_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id", "dispute_id"];
+          },
+        ];
+      };
       registrations: {
         Row: {
           dispute_id: string;
@@ -621,6 +653,14 @@ export type Database = {
       finish_pdf_source: { Args: { p_command: Json }; Returns: Json };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
+      get_game_publication_state: {
+        Args: { p_game_id: string; p_offset?: number };
+        Returns: Json;
+      };
+      get_game_publication_version: {
+        Args: { p_game_id: string; p_version: number };
+        Returns: Json;
+      };
       get_game_sheet: { Args: { p_game_id: string }; Returns: Json };
       get_import_person: {
         Args: {
@@ -633,6 +673,7 @@ export type Database = {
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
+      get_public_game: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
       get_roster_entry: { Args: { p_id: string }; Returns: Json };
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
@@ -696,6 +737,8 @@ export type Database = {
       };
       prepare_pdf_source: { Args: { p_command: Json }; Returns: Json };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
+      publish_pdf_game: { Args: { p_command: Json }; Returns: Json };
+      publish_sheet_game: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
       save_game_sheet: { Args: { p_command: Json }; Returns: Json };

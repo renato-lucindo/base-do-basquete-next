@@ -26,6 +26,7 @@
     "src/access/durable.ts",
     "src/teams/routes.ts",
     "src/games/routes.ts",
+    "src/publication/routes.ts",
     "src/boxscore/routes.ts",
     "src/people/routes.ts",
     "src/text-import/routes.ts"

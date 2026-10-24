@@ -91,7 +91,7 @@ export const sheetSaveResultSchema = z
   .object({
     requestId: z.uuid(),
     version: z.number().int().positive(),
-    confirmed: z.literal(false),
+    confirmed: z.boolean(),
   })
   .strict();
 const person = z
@@ -114,7 +114,7 @@ export const sheetSnapshotSchema = z
     gameVersion: z.number().int().positive(),
     version: z.number().int().positive(),
     savedAt: z.iso.datetime({ offset: true }),
-    confirmed: z.literal(false),
+    confirmed: z.boolean(),
     document: persistedSheetSchema,
     participants: z
       .array(

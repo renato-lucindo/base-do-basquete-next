@@ -521,7 +521,11 @@ export function GamesWorkspace(props: Props) {
                 </p>
                 {g.venue && <p>{g.venue}</p>}
                 {g.number && <p>Jogo {g.number}</p>}
-                <p>Sem resultado</p>
+                <p>
+                  {g.state === "finished"
+                    ? "Resultado publicado"
+                    : "Sem resultado"}
+                </p>
               </li>
             ))}
           </ul>

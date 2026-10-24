@@ -223,6 +223,7 @@ export const savePdfReviewSchema = z
     sourceId: z.uuid(),
     expectedVersion: z.number().int().min(0).max(2147483646),
     document: pdfReviewDocumentSchema,
+    reason: z.string().trim().max(500).optional(),
   })
   .strict();
 export const pdfReviewSnapshotSchema = z

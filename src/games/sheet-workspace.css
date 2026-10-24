@@ -94,3 +94,24 @@
     padding: 8px;
   }
 }
+
+.sheet-publication {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid #cbd8e8;
+  background: #f4f7fb;
+}
+.sheet-publication label {
+  display: block;
+  margin: 12px 0;
+}
+.game-sheet textarea {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  min-height: 80px;
+  font: inherit;
+}
+.sheet-publication button {
+  margin: 6px 8px 6px 0;
+}

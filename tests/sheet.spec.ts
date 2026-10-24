@@ -1,3 +1,6 @@
+import { publishedSheet } from "./fixtures/published-game";
+import { publicationSheetResultSchema } from "../src/publication/data-contract";
+import { publishSheetSchema } from "../src/publication/contract";
 import { test, expect, type Page } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
@@ -478,4 +481,300 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
   await expect(
     page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
   ).toBeVisible();
+});
+
+async function publicationFixture(page: Page) {
+  const f = await fixture(page),
+    game = f.games.get(tid(80))!,
+    stamp = "2026-10-24T09:00:00Z";
+  const participants = f.members
+    .filter((m) => m.registrationId === game.home.id || m.id !== tid(115))
+    .map((m) => ({
+      rosterEntryId: m.id,
+      side:
+        m.registrationId === game.home.id
+          ? ("home" as const)
+          : ("away" as const),
+      jersey: m.jersey!,
+      played: m.id !== tid(105),
+      starter: m.id !== tid(105),
+    }));
+  const document = {
+    rulesVersion: "FIBA_2024" as const,
+    periods: 4,
+    participants,
+    staff: {
+      home: {
+        captainRosterEntryId: tid(100),
+        coachStaffEntryId: null,
+        assistantStaffEntryId: null,
+      },
+      away: {
+        captainRosterEntryId: tid(110),
+        coachStaffEntryId: null,
+        assistantStaffEntryId: null,
+      },
+    },
+    events: [
+      {
+        id: tid(900),
+        side: "home" as const,
+        period: 4,
+        target: "00",
+        code: "2",
+      },
+    ],
+  };
+  let source: SheetSnapshot = {
+    gameId: game.id,
+    gameVersion: 1,
+    version: 1,
+    savedAt: stamp,
+    confirmed: false,
+    document,
+    participants: participants.map((p) => {
+      const m = f.members.find((m) => m.id === p.rosterEntryId)!;
+      return {
+        rosterEntryId: m.id,
+        registrationId: m.registrationId,
+        side: p.side,
+        person: { id: m.personId, name: m.person.name, nickname: null },
+      };
+    }),
+    staff: {
+      home: { captain: null, coach: null, assistant: null },
+      away: { captain: null, coach: null, assistant: null },
+    },
+  };
+  let publicVersion = 0,
+    fallback = false,
+    lost = false,
+    readFailure = false;
+  const receipts = new Map<string, unknown>(),
+    attempts: string[] = [];
+  await page.route(`**/api/games/${game.id}/sheet`, async (route) => {
+    if (route.request().method() === "GET") {
+      if (readFailure) {
+        readFailure = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Leitura temporariamente indisponível.",
+            },
+          },
+        });
+      }
+      return route.fulfill({ json: source });
+    }
+    const c = saveSheetSchema.parse(route.request().postDataJSON());
+    source = { ...source, document: c.document, version: source.version + 1 };
+    return route.fulfill({
+      json: {
+        requestId: c.requestId,
+        version: source.version,
+        confirmed: source.confirmed,
+      },
+    });
+  });
+  await page.route(`**/api/games/${game.id}/publication`, (route) =>
+    route.fulfill({
+      json: {
+        gameId: game.id,
+        version: publicVersion,
+        published: publicVersion
+          ? publishedSheet(
+              source.document,
+              game.id,
+              game.home.id,
+              game.away.id,
+              publicVersion,
+              source.version,
+              source.gameVersion,
+            )
+          : null,
+        history: [],
+        hasMore: false,
+        requiresFallback: fallback,
+      },
+    }),
+  );
+  await page.route(
+    `**/api/games/${game.id}/publication/sheet`,
+    async (route) => {
+      const c = publishSheetSchema.parse(route.request().postDataJSON());
+      attempts.push(c.requestId);
+      if (receipts.has(c.requestId))
+        return route.fulfill({ json: receipts.get(c.requestId) });
+      publicVersion++;
+      source = {
+        ...source,
+        document: c.source.document,
+        version: c.source.baseSheetVersion + 1,
+        gameVersion: c.gameVersion + 1,
+        confirmed: true,
+      };
+      f.games.set(game.id, {
+        ...game,
+        version: source.gameVersion,
+        state: "finished",
+      });
+      const ack = publicationSheetResultSchema.parse({
+        requestId: c.requestId,
+        gameId: game.id,
+        version: publicVersion,
+        sourceVersion: source.version,
+        gameVersion: source.gameVersion,
+        publishedAt: stamp,
+      });
+      receipts.set(c.requestId, ack);
+      if (lost) {
+        lost = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Resposta não confirmada.",
+            },
+          },
+        });
+      }
+      return route.fulfill({ json: ack });
+    },
+  );
+  return {
+    ...f,
+    attempts,
+    source: () => source,
+    fallback: () => {
+      fallback = true;
+    },
+    lose: () => {
+      lost = true;
+    },
+    failRead: () => {
+      readFailure = true;
+    },
+  };
+}
+test("manual publication confirms identities, keeps participation editable and republishes with a reason", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Placar a publicar", { exact: true }),
+  ).toContainText("2 × 0");
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("region", { name: "Publicação deste jogo", exact: true })
+    .screenshot({
+      path: `.preview-artifacts/manual-publication-320-${test.info().project.name}.png`,
+    });
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("Camisa de Atleta home 0", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByLabel("Relacionar Atleta home 0", { exact: true }),
+  ).toBeDisabled();
+  await page.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  await page
+    .getByLabel("Motivo da revisão da súmula", { exact: true })
+    .fill("Atleta também participou sem ações.");
+  await page
+    .getByRole("button", { name: "Salvar e republicar", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Republicar este jogo", exact: true })
+    .click();
+  await expect.poll(() => f.source().version).toBe(3);
+  expect(
+    f.source().document.participants.find((p) => p.rosterEntryId === tid(105))
+      ?.played,
+  ).toBe(true);
+  await expect(
+    page.getByRole("link", { name: "Ver resultado publicado", exact: true }),
+  ).toHaveAttribute("target", "_blank");
+});
+test("manual fallback requires an explicit decision and uncertain publication repeats the frozen command", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  f.fallback();
+  f.lose();
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Publicar este jogo", exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByLabel("Usar súmula manual em vez do PDF", { exact: true })
+    .check();
+  await page
+    .getByLabel("Motivo da publicação", { exact: true })
+    .fill("Súmula oficial revisada pelo responsável.");
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Repetir publicação", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("Camisa de Atleta home 0", { exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Repetir publicação", exact: true })
+    .click();
+  await expect.poll(() => f.attempts.length).toBe(2);
+  expect(f.attempts[0]).toBe(f.attempts[1]);
+  await expect(
+    page.getByRole("link", { name: "Ver resultado publicado", exact: true }),
+  ).toBeVisible();
+});
+test("known publication with failed source retrieval retries only the read", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  f.failRead();
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Recarregar súmula publicada",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Ver resultado publicado", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Recarregar súmula publicada", exact: true })
+    .click();
+  await expect(
+    page.getByRole("link", { name: "Ver resultado publicado", exact: true }),
+  ).toBeVisible();
+  expect(f.attempts).toHaveLength(1);
 });

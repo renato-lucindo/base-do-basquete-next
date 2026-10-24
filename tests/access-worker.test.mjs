@@ -7,7 +7,8 @@ const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
 async function fixture(options = {}) {
-  const calls = [];
+  const calls = [],
+    publicationReceipts = new Map();
   let pdfSource,
     originalBytes,
     reviewDocument,
@@ -83,12 +84,17 @@ async function fixture(options = {}) {
             if (request.method === "POST") {
               assert.ok(pdfSource);
               assert.equal(request.headers.get("x-upsert"), "false");
-              if (originalBytes)
+              // Drain every upload, including duplicate attempts. The Node/workerd
+              // service bridge must not leave the request body pending on a retry.
+              const received = new Uint8Array(await request.arrayBuffer());
+              if (originalBytes) {
+                assert.deepEqual(received, originalBytes);
                 return Response.json(
                   { code: "ResourceAlreadyExists" },
                   { status: 409 },
                 );
-              originalBytes = new Uint8Array(await request.arrayBuffer());
+              }
+              originalBytes = received;
               options.originalBytes = originalBytes;
               return Response.json({
                 Key: `boxscore-sources/sources/${pdfSource.id}.pdf`,
@@ -165,6 +171,69 @@ async function fixture(options = {}) {
                   }
                 : null,
             );
+        }
+        if (url.pathname === "/rest/v1/rpc/get_public_game") {
+          assert.equal(request.headers.get("authorization"), null);
+          assert.equal(request.headers.get("apikey"), "fixture-publishable");
+          return Response.json(options.publicResult ?? null);
+        }
+        if (
+          [
+            "get_game_publication_state",
+            "get_game_publication_version",
+            "publish_sheet_game",
+            "publish_pdf_game",
+          ].some((n) => url.pathname === `/rest/v1/rpc/${n}`)
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const args = await request.json();
+          if (url.pathname.endsWith("/get_game_publication_state"))
+            return Response.json({
+              gameId: args.p_game_id,
+              version: 0,
+              published: null,
+              history: [],
+              hasMore: false,
+              requiresFallback: false,
+            });
+          if (url.pathname.endsWith("/get_game_publication_version"))
+            return Response.json(options.publicationVersion ?? null);
+          const c = args.p_command,
+            prior = publicationReceipts.get(c.requestId),
+            fingerprint = JSON.stringify(c);
+          if (prior) {
+            if (prior.fingerprint !== fingerprint)
+              return Response.json(
+                { message: "idempotency_conflict", details: "private" },
+                { status: 409 },
+              );
+            return Response.json(prior.result);
+          }
+          const result = {
+            requestId: c.requestId,
+            gameId: c.gameId,
+            version: c.basePublicationVersion + 1,
+            gameVersion: c.gameVersion + 1,
+            sourceVersion:
+              c.source.kind === "sheet" ? c.source.baseSheetVersion + 1 : 2,
+            ...(c.source.kind === "pdf"
+              ? { reviewVersion: c.source.reviewVersion }
+              : {}),
+            publishedAt: "2026-10-24T09:00:00Z",
+          };
+          publicationReceipts.set(c.requestId, { fingerprint, result });
+          options.publicationCommits = (options.publicationCommits ?? 0) + 1;
+          if (options.failPublicationAfterCommit) {
+            options.failPublicationAfterCommit = false;
+            return Response.json(
+              { message: "private response lost" },
+              { status: 503 },
+            );
+          }
+          return Response.json(result);
         }
         if (url.pathname === "/rest/v1/rpc/list_games") {
           assert.equal(
@@ -362,6 +431,167 @@ async function fixture(options = {}) {
   return { mf, send, login, calls };
 }
 
+test("publication routes enforce fresh sessions, correlate commands and recover a response lost after commit", async () => {
+  const options = { failPublicationAfterCommit: true },
+    f = await fixture(options);
+  try {
+    const root = `/api/games/${id}/publication`;
+    assert.equal((await f.mf.dispatchFetch(origin + root)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const participants = ["home", "away"].flatMap((side, n) =>
+      Array.from({ length: 5 }, (_, i) => ({
+        rosterEntryId: `10000000-0000-4000-8000-${String(10 + n * 10 + i).padStart(12, "0")}`,
+        side,
+        jersey: i === 1 ? "00" : String(i),
+        played: true,
+        starter: true,
+      })),
+    );
+    const sideStaff = (side) => ({
+      captainRosterEntryId: participants.find((p) => p.side === side)
+        .rosterEntryId,
+      coachStaffEntryId: null,
+      assistantStaffEntryId: null,
+    });
+    const sheet = {
+      requestId: id,
+      gameId: id,
+      gameVersion: 1,
+      basePublicationVersion: 0,
+      source: {
+        kind: "sheet",
+        baseSheetVersion: 0,
+        document: {
+          rulesVersion: "FIBA_2024",
+          periods: 4,
+          participants,
+          staff: { home: sideStaff("home"), away: sideStaff("away") },
+          events: [{ id, side: "home", period: 4, target: "0", code: "2" }],
+        },
+      },
+      reason: "",
+      fallback: false,
+    };
+    const send = (path, body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path, {
+        method: "POST",
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        body: typeof body === "string" ? body : JSON.stringify(body),
+      });
+    const state = await f.mf.dispatchFetch(origin + root, {
+      headers: { cookie },
+    });
+    assert.equal(state.status, 200);
+    assert.equal((await state.json()).gameId, id);
+    assert.equal(
+      (await send(root + "/sheet", sheet, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    assert.equal(
+      (
+        await send(root + "/sheet", {
+          ...sheet,
+          gameId: "10000000-0000-4000-8000-000000000002",
+        })
+      ).status,
+      400,
+    );
+    assert.equal((await send(root + "/sheet", " ".repeat(524289))).status, 413);
+    assert.equal((await send(root + "/sheet", sheet)).status, 503);
+    const retried = await send(root + "/sheet", sheet);
+    assert.equal(retried.status, 200, await retried.clone().text());
+    assert.equal((await retried.json()).requestId, id);
+    assert.equal(options.publicationCommits, 1);
+    assert.equal(
+      (await send(root + "/sheet", { ...sheet, reason: "different payload" }))
+        .status,
+      409,
+    );
+    const pdf = {
+      requestId: "10000000-0000-4000-8000-000000000002",
+      gameId: id,
+      gameVersion: 2,
+      basePublicationVersion: 1,
+      source: { kind: "pdf", sourceId: id, sourceVersion: 2, reviewVersion: 1 },
+      supplement: {
+        rows: participants.map((p, i) => ({
+          sourceSide: p.side === "home" ? 0 : 1,
+          sourceIndex: i % 5,
+          played: true,
+          starter: true,
+          captain: i % 5 === 0,
+        })),
+        staff: {
+          home: { coachStaffEntryId: null, assistantStaffEntryId: null },
+          away: { coachStaffEntryId: null, assistantStaffEntryId: null },
+        },
+      },
+      authority: {
+        scorePoints: "pdf",
+        periodScores: "none",
+        playerAdvanced: "pdf",
+        foulsReceived: "none",
+        teamAdvanced: "none",
+        gameAdvanced: "none",
+      },
+      sheetVersion: null,
+      reason: "Revisão com dados do PDF.",
+      acceptDivergence: false,
+    };
+    assert.equal((await send(root + "/pdf", " ".repeat(65537))).status, 413);
+    assert.equal((await send(root + "/pdf", pdf)).status, 200);
+    const before = f.calls.filter(
+      (p) => p.includes("publication") || p.includes("publish_"),
+    ).length;
+    options.denied = true;
+    assert.equal((await send(root + "/pdf", pdf)).status, 403);
+    assert.equal(
+      f.calls.filter((p) => p.includes("publication") || p.includes("publish_"))
+        .length,
+      before,
+    );
+    assert.ok(
+      f.calls.indexOf(
+        "/rest/v1/admin_access?select=user_id,enabled&user_id=eq." + id,
+      ) < f.calls.indexOf("/rest/v1/rpc/publish_sheet_game"),
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+test("public result transport uses only the projection RPC without session cookies, admin JWT or draft metadata", async () => {
+  const options = {},
+    f = await fixture(options);
+  try {
+    const path = `/api/public/games/${id}`;
+    const r = await f.mf.dispatchFetch(origin + path, {
+      headers: { cookie: "bdb_session=invalid" },
+    });
+    assert.equal(r.status, 404);
+    assert.equal(r.headers.get("set-cookie"), null);
+    assert.deepEqual(f.calls, ["/rest/v1/rpc/get_public_game"]);
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path, { method: "POST", body: "{}" }))
+        .status,
+      405,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path + "?private=true")).status,
+      400,
+    );
+    options.publicResult = { private: "not a public projection" };
+    assert.equal((await f.mf.dispatchFetch(origin + path)).status, 503);
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
 test("PDF transport parses in the authorized DO, recovers an incomplete original without overwrite and resumes review", async () => {
   const options = { pdf: true, failFinish: true },
     f = await fixture(options);
@@ -400,7 +630,14 @@ test("PDF transport parses in the authorized DO, recovers an incomplete original
       headers,
       body: bytes,
     });
-    assert.equal(retried.status, 200, await retried.clone().text());
+    assert.equal(
+      retried.status,
+      200,
+      JSON.stringify({
+        response: await retried.clone().text(),
+        calls: f.calls,
+      }),
+    );
     assert.deepEqual(await retried.json(), {
       id,
       version: 2,

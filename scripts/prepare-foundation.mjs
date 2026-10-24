@@ -14,10 +14,15 @@ if (dirty)
 const manifest = {};
 const paths = [
   "foundation.html",
+  "resultado.html",
   ...readdirSync("dist-foundation/assets").map((name) => `assets/${name}`),
 ];
 for (const path of paths) {
-  if (!/^(foundation\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(path))
+  if (
+    !/^((?:foundation|resultado)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
+      path,
+    )
+  )
     throw new Error("Unexpected client artifact");
   const bytes = readFileSync(`dist-foundation/${path}`);
   manifest[`/${path}`] = {
