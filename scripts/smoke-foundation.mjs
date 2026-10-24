@@ -106,9 +106,13 @@ try {
     `/api/games?disputeId=${randomUUID()}`,
     `/api/games/${randomUUID()}`,
     `/api/games/${randomUUID()}/sheet`,
+    `/api/games/${randomUUID()}/publication`,
+    `/api/games/${randomUUID()}/publication/versions/1`,
+    `/api/games/${randomUUID()}/publication/preparation/${randomUUID()}`,
     `/api/pdf-sources?disputeId=${randomUUID()}`,
     `/api/pdf-sources/${randomUUID()}`,
     `/api/pdf-sources/${randomUUID()}/review`,
+    `/api/pdf-sources/${randomUUID()}/preparation`,
     "/api/people",
     `/api/people/${randomUUID()}`,
     `/api/roster?registrationId=${randomUUID()}`,
@@ -125,6 +129,19 @@ try {
     assert.equal(status, 401);
     await denied.arrayBuffer();
   }
+  stage = "public projection without application authentication";
+  const publicMissing = await fetch(
+    `${origin}/api/public/games/${randomUUID()}`,
+    { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
+  );
+  status = publicMissing.status;
+  assert.equal(status, 404);
+  assert.equal((await publicMissing.json()).error.code, "public_not_found");
+  assert.ok(
+    !publicMissing.headers
+      .getSetCookie()
+      .some((c) => c.startsWith("__Host-bdb-session=")),
+  );
   const privateModule = await fetch(`${origin}/worker.js`, { headers });
   status = privateModule.status;
   assert.equal(status, 404);
@@ -191,6 +208,15 @@ try {
       { local: 0, session: 0 },
     );
     assert.deepEqual(errors, []);
+    stage = `browser ${name} public projection`;
+    const resultDocument = await page.goto(
+      `${origin}/resultado.html#${randomUUID()}`,
+      { waitUntil: "domcontentloaded" },
+    );
+    assert.equal(resultDocument.status(), 200);
+    await page.getByRole("alert").waitFor();
+    assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+    assert.deepEqual(errors, []);
     await context.close();
   }
   console.log(
@@ -200,6 +226,7 @@ try {
       files: Object.keys(manifest.manifest).length,
       browsers: 2,
       realAuthInvalidLogin: true,
+      publicProjectionRead: true,
       ownerLoginPending: true,
     }),
   );

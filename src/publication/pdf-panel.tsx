@@ -28,6 +28,7 @@ import { publishPdfSchema, type PublishPdf } from "./pdf-contract";
 import { preparePdfFacts, type PdfAuthority } from "./pdf-authority";
 import type { PdfSupplement } from "./pdf-selection";
 import { aggregate } from "../domain/scoresheet";
+import { PublicationHistory } from "./history";
 import { toEngineSheet } from "../games/sheet-contract";
 
 type Side = "home" | "away";
@@ -927,6 +928,11 @@ export function PdfPublicationPanel(p: Props) {
           )}
         </>
       )}
+      <PublicationHistory
+        gameId={p.game.id}
+        enabled={!p.disabled && !busy}
+        onSessionLost={p.onSessionLost}
+      />
     </section>
   );
 }

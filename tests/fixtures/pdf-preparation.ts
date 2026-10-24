@@ -199,6 +199,7 @@ export async function pdfPreparationFixture(page: Page) {
     publicVersion++;
     projection = {
       ...template,
+      source: { ...template.source, version: 2 },
       id: game.id,
       disputeId: game.disputeId,
       version: publicVersion,
@@ -210,6 +211,12 @@ export async function pdfPreparationFixture(page: Page) {
       },
       facts: {
         ...template.facts,
+        origins: Object.fromEntries(
+          Object.entries(template.facts.origins).map(([key, value]) => [
+            key,
+            value ? { ...value, version: 2 } : null,
+          ]),
+        ) as typeof template.facts.origins,
         players: template.facts.players.map((p) => ({
           ...p,
           registrationId: p.side === "home" ? game.home.id : game.away.id,
@@ -254,6 +261,7 @@ export async function pdfPreparationFixture(page: Page) {
     saveAttempts,
     publishAttempts,
     saved: () => saved,
+    projection: () => projection,
     loseSave: () => {
       lostSave = true;
     },

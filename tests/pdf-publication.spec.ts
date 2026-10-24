@@ -322,3 +322,81 @@ test("a changed PDF review does not silently reuse the prior supplement", async 
     }),
   ).toHaveCount(0);
 });
+
+test("PDF history shows the frozen result and source decisions without republishing", async ({
+  page,
+}) => {
+  const f = await pdfPreparationFixture(page);
+  await open(page);
+  await selectPlayers(page, f);
+  await page
+    .getByRole("button", { name: "Salvar preparação", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Publicar preparação salva", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  const c = f.saved()!.publication,
+    header = {
+      version: 1,
+      sourceKind: "pdf",
+      sourceVersion: 2,
+      reason: "Conferência original",
+      actorId: tid(99),
+      publishedAt: "2026-10-24T14:25:00Z",
+    };
+  await page.route(
+    new RegExp(`/api/games/${tid(8)}/publication(?:\\?.*)?$`),
+    (route) =>
+      route.fulfill({
+        json: {
+          gameId: tid(8),
+          version: 1,
+          published: f.projection(),
+          history: [header],
+          hasMore: false,
+          requiresFallback: true,
+        },
+      }),
+  );
+  await page.route(`**/api/games/${tid(8)}/publication/versions/1`, (route) =>
+    route.fulfill({
+      json: {
+        ...header,
+        gameId: tid(8),
+        snapshot: f.projection(),
+        document: {
+          source: c.source,
+          review: f.review.document,
+          supplement: c.supplement,
+          authority: c.authority,
+          sheetVersion: null,
+          manual: null,
+          acceptDivergence: false,
+        },
+      },
+    }),
+  );
+  await page
+    .getByRole("button", { name: "Ver histórico deste jogo", exact: true })
+    .click();
+  const history = page.getByRole("region", {
+    name: "Histórico administrativo de publicação",
+    exact: true,
+  });
+  await history
+    .getByRole("button", { name: "Ver versão 1", exact: true })
+    .click();
+  await expect(
+    history.getByRole("heading", { name: "Versão publicada 1", exact: true }),
+  ).toBeVisible();
+  await history
+    .getByText("Decisões de fonte desta versão", { exact: true })
+    .click();
+  await expect(
+    history.getByText("Períodos: Não publicar", { exact: true }),
+  ).toBeVisible();
+  expect(f.publishAttempts).toHaveLength(1);
+});

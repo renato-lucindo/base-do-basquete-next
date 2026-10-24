@@ -71,3 +71,15 @@
     color: #42526b;
   }
 }
+.publication-history section {
+  min-width: 0;
+}
+.publication-history p {
+  overflow-wrap: anywhere;
+}
+.publication-versions {
+  padding-inline-start: 1.25rem;
+}
+.publication-versions li {
+  margin-block: 1rem;
+}

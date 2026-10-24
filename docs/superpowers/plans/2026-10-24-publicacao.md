@@ -28,22 +28,22 @@
 - [x] Matriz anônimo/autenticado não autorizado/admin: readers públicos enxergam só projeção mínima publicada; não recebem tabelas esportivas privadas por grants incidentais. Histórico/autoria/motivo só administrativos. Criação do zero e upgrade preservam drafts G1–G3.
 - [x] Aplicar somente após focais locais verdes; contrato Supabase real com rollback, contagens após teste, tipos gerados/advisors, commit coerente. Sem declarar corrida multi-conexão/escala por teste PGlite sequencial.
 
-P1 implementado em f461077/ea6bf19; evidências e limitação da saída do gate em VALIDACAO-PUBLICACAO.md. CI material40064059180 em andamento, API/UI de publicação ainda não conectadas.
+P1 implementado em f461077/ea6bf19; a CI inicial foi reconciliada e as evidências posteriores de banco/API/UI estão em VALIDACAO-PUBLICACAO.md. P2/P3 implementados nas unidades seguintes; P4 ainda depende de CI/preview/piloto e avaliação apropriada.
 
 ## P2 — PDF e autoridade por domínio
 
-- [ ] Integrar comparator fornecido por adaptador UUID; comparar confronto, número quando informado, placar/parciais cobertos, participação e pontos/cestas. Empate de identidade permanece pendente; inversão de lados é escolha registrada. Testes RED de fonte divergente, ausência e mismatch de equipe/jogo.
-- [ ] Documento suplementar explícito para marcadores/participação/comissão que o Site não informa. Cinco titulares/capitão escolhidos sem atribuir origemPDF a esses dados. FIBA pode apresentar marcadores da fonte para conferência. Cada linha publicada resolve pessoa/vínculo do destino; não criar identidades por similaridade.
-- [ ] Versões independentes de fonte/revisão/jogo/publicação; confirmação deriva fatos do original pronto e revisão salva/validada. Escolha de fonte por domínio: placar/pontos básicos, períodos, fatos avançados de atleta, faltas recebidas e blocos coletivos/gerais quando disponíveis. Só combinar fontes compatíveis ou decisão explícita com motivo; nunca sobreposição silenciosa.
-- [ ] SQL revalida todos os IDs/versões/capacidades, fingerprint e integridade. Snapshot anterior preservado; correção pode substituir apenas o jogo selecionado. Preservar o original, hash e parser privados. Derivados congelados têm origem/versão e são substituídos atomicamente ao republicar.
+- [x] Integrar comparator fornecido por adaptador UUID; comparar confronto, número quando informado, placar/parciais cobertos, participação e pontos/cestas. Empate de identidade permanece pendente; inversão de lados é escolha registrada. Testes RED de fonte divergente, ausência e mismatch de equipe/jogo.
+- [x] Documento suplementar explícito para marcadores/participação/comissão que o Site não informa. Cinco titulares/capitão escolhidos sem atribuir origemPDF a esses dados. FIBA pode apresentar marcadores da fonte para conferência. Cada linha publicada resolve pessoa/vínculo do destino; não criar identidades por similaridade.
+- [x] Versões independentes de fonte/revisão/jogo/publicação; confirmação deriva fatos do original pronto e revisão salva/validada. Escolha de fonte por domínio: placar/pontos básicos, períodos, fatos avançados de atleta, faltas recebidas e blocos coletivos/gerais quando disponíveis. Só combinar fontes compatíveis ou decisão explícita com motivo; nunca sobreposição silenciosa.
+- [x] SQL revalida todos os IDs/versões/capacidades, fingerprint e integridade. Snapshot anterior preservado; correção pode substituir apenas o jogo selecionado. Preservar o original, hash e parser privados. Derivados congelados têm origem/versão e são substituídos atomicamente ao republicar.
 
 ## P3 — API, administração e consulta mínima
 
-- [ ] Provider/SessionStore/rotas específicos com testes workerd de sessão/origem/limites/ACK/versões/falha. Consulta pública mínima usa DTO explícito e não reutiliza reader administrativo. Cloudflare Access continua protegendo a apresentação do preview.
-- [ ] Súmula: Confirmar e publicar / Salvar e republicar na própria tarefa, validação/motivo e comparação de fontes. Rascunho de outro jogo não é publicado. Fonte confirmada mostra restrição de relacionados/camisas; participação corrigível.
-- [ ] PDFs: seleção dos itens prontos e publicação por jogo com resultado individual. Chamadas/commits separados, não uma transação de lote. Erro mantém pendência; resposta perdida permite repetir o mesmo comando e verificar o resultado. Nenhum sucesso completo quando um item falhou.
-- [ ] Prévia de impacto limitada aos derivados implementados da etapa4; não inventar classificação/chave enquanto etapa5 não existe. Manter versão pública anterior administrativa e uma consulta mínima de resultado/participações/fatos realmente cobertos, com estados ausente/insuficiente do módulo estatístico.
-- [ ] Testes browser RED de publicação/correção/duas abas/retry/lote parcial/privacidade/320px e teclado; foco/restauração/reauth. Auditoria WCAG completa e carga só serão alegadas com evidência própria.
+- [x] Provider/SessionStore/rotas específicos com testes workerd de sessão/origem/limites/ACK/versões/falha. Consulta pública mínima usa DTO explícito e não reutiliza reader administrativo. Cloudflare Access continua protegendo a apresentação do preview.
+- [x] Súmula: Confirmar e publicar / Salvar e republicar na própria tarefa, validação/motivo e comparação de fontes. Rascunho de outro jogo não é publicado. Fonte confirmada mostra restrição de relacionados/camisas; participação corrigível.
+- [x] PDFs: seleção dos itens prontos e publicação por jogo com resultado individual. Chamadas/commits separados, não uma transação de lote. Erro mantém pendência; resposta perdida permite repetir o mesmo comando e verificar o resultado. Nenhum sucesso completo quando um item falhou.
+- [x] Prévia de impacto limitada aos derivados implementados da etapa4; não inventar classificação/chave enquanto etapa5 não existe. Manter versão pública anterior administrativa e uma consulta mínima de resultado/participações/fatos realmente cobertos, com estados ausente/insuficiente do módulo estatístico.
+- [x] Testes browser RED de publicação/correção/duas abas/retry/lote parcial/privacidade/320px e teclado; foco/restauração/reauth. Auditoria WCAG completa e carga só serão alegadas com evidência própria.
 
 ## P4 — gate, preview e evidências
 

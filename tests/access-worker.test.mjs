@@ -590,6 +590,20 @@ test("publication routes enforce fresh sessions, correlate commands and recover 
       (await (await getPreparation()).json()).publication.requestId,
       pdf.requestId,
     );
+    const sourcePreparationPath = `/api/pdf-sources/${id}/preparation`;
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + sourcePreparationPath)).status,
+      401,
+    );
+    const fromSource = await f.mf.dispatchFetch(
+      origin + sourcePreparationPath,
+      { headers: { cookie } },
+    );
+    assert.equal(fromSource.status, 200);
+    assert.equal(
+      (await fromSource.json()).publication.requestId,
+      pdf.requestId,
+    );
     assert.equal(options.publicationCommits, 1);
     assert.equal((await send(root + "/pdf", " ".repeat(65537))).status, 413);
     assert.equal((await send(root + "/pdf", pdf)).status, 200);

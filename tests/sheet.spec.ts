@@ -897,3 +897,169 @@ test("expired publication session preserves the frozen command and protects leav
   expect(f.commands).toHaveLength(2);
   expect(f.commands[1]).toBe(f.commands[0]);
 });
+
+async function historyFixture(page: Page, wrongGame = false) {
+  const f = await publicationFixture(page),
+    id = tid(80),
+    stamp = "2026-10-24T14:20:00Z",
+    doc = f.source().document;
+  const header = (version: number) => ({
+    version,
+    sourceKind: "sheet",
+    sourceVersion: version + 1,
+    reason: `Conferência histórica ${version}`,
+    actorId: tid(999),
+    publishedAt: stamp,
+  });
+  const version = (v: number) => {
+    const document = {
+      ...doc,
+      events: doc.events.map((e) => ({ ...e, code: v === 1 ? "2" : "3" })),
+    };
+    const snapshot = publishedSheet(
+      document,
+      wrongGame ? tid(81) : id,
+      tid(5),
+      tid(6),
+      v,
+      v + 1,
+      v + 1,
+    );
+    return { ...header(v), gameId: snapshot.id, snapshot, document };
+  };
+  const reads: string[] = [];
+  await page.route(
+    new RegExp(`/api/games/${id}/publication(?:\\?.*)?$`),
+    (route) => {
+      const u = new URL(route.request().url()),
+        offset = Number(u.searchParams.get("offset") ?? 0);
+      reads.push(u.pathname + u.search);
+      return route.fulfill({
+        json: {
+          gameId: id,
+          version: 21,
+          published: { ...version(21).snapshot, id },
+          history: Array.from({ length: 21 }, (_, i) => header(21 - i)).slice(
+            offset,
+            offset + 20,
+          ),
+          hasMore: offset === 0,
+          requiresFallback: false,
+        },
+      });
+    },
+  );
+  await page.route(
+    new RegExp(`/api/games/${id}/publication/versions/[0-9]+$`),
+    async (route) => {
+      const v = Number(route.request().url().split("/").at(-1));
+      if (v === 2) await new Promise((resolve) => setTimeout(resolve, 200));
+      return route.fulfill({ json: version(v) });
+    },
+  );
+  return { ...f, reads };
+}
+test("administrative publication history pages through immutable versions without changing the draft", async ({
+  page,
+}) => {
+  const f = await historyFixture(page);
+  await open(page);
+  await page.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  const trigger = page.getByRole("button", {
+    name: "Ver histórico deste jogo",
+    exact: true,
+  });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const region = page.getByRole("region", {
+    name: "Histórico administrativo de publicação",
+    exact: true,
+  });
+  await region
+    .getByRole("button", { name: "Versões anteriores", exact: true })
+    .click();
+  await region
+    .getByRole("button", { name: "Ver versão 1", exact: true })
+    .click();
+  await expect(
+    region.getByRole("heading", { name: "Versão publicada 1", exact: true }),
+  ).toBeVisible();
+  await expect(
+    region.getByRole("heading", { name: /Lobos 2 × 0/ }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(f.reads.some((u) => u.endsWith("offset=20"))).toBe(true);
+  await region
+    .getByRole("button", { name: "Fechar histórico", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Participou Atleta home 5", { exact: true }),
+  ).toBeChecked();
+  expect(f.attempts).toHaveLength(0);
+});
+test("historical responses from another game are rejected", async ({
+  page,
+}) => {
+  await historyFixture(page, true);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Ver histórico deste jogo", exact: true })
+    .click();
+  const region = page.getByRole("region", {
+    name: "Histórico administrativo de publicação",
+    exact: true,
+  });
+  await region
+    .getByRole("button", { name: "Ver versão 21", exact: true })
+    .click();
+  await expect(region.getByRole("alert")).toBeVisible();
+  await expect(region.locator(".public-game")).toHaveCount(0);
+});
+test("a late historical response cannot replace the selected newer version", async ({
+  page,
+}) => {
+  await historyFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Ver histórico deste jogo", exact: true })
+    .click();
+  const region = page.getByRole("region", {
+    name: "Histórico administrativo de publicação",
+    exact: true,
+  });
+  await region
+    .getByRole("button", { name: "Ver versão 2", exact: true })
+    .click();
+  await region
+    .getByRole("button", { name: "Ver versão 21", exact: true })
+    .click();
+  await expect(
+    region.getByRole("heading", { name: "Versão publicada 21", exact: true }),
+  ).toBeVisible();
+  await page.waitForTimeout(250);
+  await expect(
+    region.getByRole("heading", { name: "Versão publicada 2", exact: true }),
+  ).toHaveCount(0);
+  await region
+    .getByRole("button", { name: "Ver versão 2", exact: true })
+    .click();
+  await region
+    .getByRole("button", { name: "Fechar histórico", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Ver histórico deste jogo", exact: true })
+    .click();
+  await expect(
+    region.getByRole("button", { name: "Ver versão 21", exact: true }),
+  ).toBeVisible();
+  await expect(
+    region
+      .getByRole("status")
+      .filter({ hasText: "Carregando versão selecionada" }),
+  ).toHaveCount(0);
+});

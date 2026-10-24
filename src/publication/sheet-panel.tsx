@@ -1,4 +1,5 @@
 import { aggregate } from "../domain/scoresheet";
+import { PublicationHistory } from "./history";
 import { toEngineSheet } from "../games/sheet-contract";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
@@ -291,20 +292,6 @@ export function SheetPublicationPanel(p: Props) {
               Recarregar estado da publicação
             </button>
           )}
-          {state.history.length > 0 && (
-            <details>
-              <summary>Histórico de publicação</summary>
-              <ul>
-                {state.history.map((h) => (
-                  <li key={h.version}>
-                    Versão {h.version} ·{" "}
-                    {h.sourceKind === "sheet" ? "Súmula manual" : "PDF"} ·{" "}
-                    {h.reason || "Primeira publicação"}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
         </>
       )}
       {(p.confirmed || state?.published || ack) && (
@@ -318,6 +305,11 @@ export function SheetPublicationPanel(p: Props) {
           </a>
         </p>
       )}
+      <PublicationHistory
+        gameId={p.game.id}
+        enabled={!p.disabled && !busy}
+        onSessionLost={p.onSessionLost}
+      />
     </section>
   );
 }
