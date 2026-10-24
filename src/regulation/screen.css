@@ -1,0 +1,95 @@
+.regulation {
+  min-width: 0;
+}
+.regulation fieldset {
+  min-width: 0;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #9caec1;
+  border-radius: 0.35rem;
+}
+.regulation legend {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+.regulation label {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.7rem 0;
+}
+.regulation input:not([type="checkbox"]),
+.regulation select,
+.regulation textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.regulation .reg-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+.regulation .reg-check input {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.reg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+.reg-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 0.9rem;
+}
+.reg-table {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.reg-table table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 36rem;
+}
+.reg-table th,
+.reg-table td {
+  padding: 0.65rem;
+  border-bottom: 1px solid #cbd5e1;
+  text-align: left;
+  vertical-align: top;
+  min-width: 5rem;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.reg-table caption {
+  text-align: left;
+  font-weight: 600;
+}
+.reg-review,
+.reg-projection {
+  margin: 1.25rem 0;
+  padding: 0.8rem;
+  border: 1px solid #b5c8d9;
+  border-radius: 0.35rem;
+}
+.regulation p,
+.regulation li,
+.regulation th,
+.regulation td {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 420px) {
+  .regulation fieldset {
+    padding: 0.6rem;
+  }
+  .reg-actions button {
+    max-width: 100%;
+  }
+}

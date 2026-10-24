@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
+import { RegulationWorkspace } from "../regulation/workspace";
 import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
@@ -61,10 +62,13 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selected, setSelected] = useState("");
-  const [tab, setTab] = useState<"info" | "teams" | "games" | "pdfs">("info");
+  const [tab, setTab] = useState<
+    "info" | "teams" | "games" | "pdfs" | "regulation"
+  >("info");
   const teamsGuard = useRef<() => boolean>(() => true);
   const gamesGuard = useRef<() => boolean>(() => true);
   const pdfGuard = useRef<() => boolean>(() => true);
+  const regulationGuard = useRef<() => boolean>(() => true);
   const [opening, setOpening] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -89,6 +93,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
       teamsGuard.current() &&
       gamesGuard.current() &&
       pdfGuard.current() &&
+      regulationGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
           "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
@@ -158,20 +163,22 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     if (!enabled || restored.current) return;
     restored.current = true;
     const match =
-      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/(?:equipes|jogos(?:\/pdfs)?))?$/i.exec(
+      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/(?:equipes|regulamento|jogos(?:\/pdfs)?))?$/i.exec(
         location.hash,
       );
     if (match)
       void openCompetition(
         match[1],
         match[2],
-        match[3] === "/jogos/pdfs"
-          ? "pdfs"
-          : match[3] === "/jogos"
-            ? "games"
-            : match[3]
-              ? "teams"
-              : "info",
+        match[3] === "/regulamento"
+          ? "regulation"
+          : match[3] === "/jogos/pdfs"
+            ? "pdfs"
+            : match[3] === "/jogos"
+              ? "games"
+              : match[3]
+                ? "teams"
+                : "info",
       );
   }, [enabled]);
 
@@ -210,7 +217,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   async function openCompetition(
     id: string,
     wanted?: string,
-    targetTab: "info" | "teams" | "games" | "pdfs" = "info",
+    targetTab: "info" | "teams" | "games" | "pdfs" | "regulation" = "info",
   ) {
     if (!mayLeave()) return;
     setOpening(true);
@@ -461,7 +468,12 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
                 value={selected}
                 onChange={(event) => {
                   if (!teamsGuard.current()) return;
-                  if (!gamesGuard.current() || !pdfGuard.current()) return;
+                  if (
+                    !gamesGuard.current() ||
+                    !pdfGuard.current() ||
+                    !regulationGuard.current()
+                  )
+                    return;
                   setSelected(event.target.value);
                   setRoute(editor.draft.id, event.target.value, tab);
                 }}
@@ -517,7 +529,30 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
             >
               Jogos
             </button>
+            <button
+              className="secondary"
+              disabled={!context || !editor.savedIds.has(context.id)}
+              aria-current={tab === "regulation" ? "page" : undefined}
+              onClick={() => {
+                setTab("regulation");
+                setRoute(editor.draft.id, selected, "regulation");
+              }}
+            >
+              Regulamento
+            </button>
           </nav>
+          {context && editor.savedIds.has(context.id) && (
+            <div hidden={tab !== "regulation"}>
+              <RegulationWorkspace
+                key={context.id}
+                disputeId={context.id}
+                enabled={enabled && tab === "regulation"}
+                guard={regulationGuard}
+                onSessionLost={onSessionLost}
+                onSaved={() => setRefresh((n) => n + 1)}
+              />
+            </div>
+          )}
           <div hidden={tab !== "info"}>
             <p role="status" data-testid="competition-save-state">
               {saving
@@ -847,9 +882,9 @@ function snapshotWithoutMetadata(value: CompetitionSnapshot): Competition {
 function setRoute(
   id: string,
   dispute: string,
-  tab: "info" | "teams" | "games" | "pdfs" = "info",
+  tab: "info" | "teams" | "games" | "pdfs" | "regulation" = "info",
 ) {
-  const next = `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "pdfs" ? "/jogos/pdfs" : tab === "games" ? "/jogos" : tab === "teams" ? "/equipes" : ""}`;
+  const next = `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "regulation" ? "/regulamento" : tab === "pdfs" ? "/jogos/pdfs" : tab === "games" ? "/jogos" : tab === "teams" ? "/equipes" : ""}`;
   history.replaceState(
     next === location.pathname + location.search + location.hash
       ? history.state
