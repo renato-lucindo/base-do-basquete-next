@@ -2,6 +2,10 @@ import { it, expect } from "vitest";
 import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { platform } from "../../tests/fixtures/database-platform";
+import {
+  publicationStateSchema,
+  publicationVersionSchema,
+} from "./data-contract";
 import { publicResultSchema, publishPdfSchema } from "./pdf-contract";
 import {
   pdfPublicationFixture,
@@ -29,6 +33,21 @@ it("publishes PDF facts atomically with versioned sources, private history, reas
     ).rows;
     expect(rows).toHaveLength(1);
     expect(publicResultSchema.parse(rows[0].snapshot).source.kind).toBe("pdf");
+    await db.exec(
+      "update public.admin_access set enabled=true where user_id=pg_temp.pp_id(98);",
+    );
+    const state = (
+      await db.query<{ state: unknown }>(
+        "select public.get_game_publication_state(pg_temp.pp_id(8)) as state",
+      )
+    ).rows[0].state;
+    expect(publicationStateSchema.parse(state).requiresFallback).toBe(true);
+    const version = (
+      await db.query<{ version: unknown }>(
+        "select public.get_game_publication_version(pg_temp.pp_id(8),3) as version",
+      )
+    ).rows[0].version;
+    expect(publicationVersionSchema.parse(version).sourceKind).toBe("pdf");
     await db.exec("rollback;");
   } finally {
     await db.close();

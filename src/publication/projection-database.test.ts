@@ -15,6 +15,9 @@ it("actual SQL publications conform to a public-only projection with historical 
       await readFile("supabase/tests/publication.sql", "utf8")
     ).replace(/\nrollback;\s*$/u, "\n");
     await db.exec(sql);
+    await db.exec(
+      await readFile("supabase/tests/publication_read_state.sql", "utf8"),
+    );
     const rows = (
       await db.query<{ snapshot: unknown }>(
         "select snapshot from public.published_games order by game_id",

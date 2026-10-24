@@ -1,3 +1,4 @@
+import { publicationRoute, publicGameRoute } from "../publication/routes";
 import { z } from "zod";
 import { HttpError, jsonResponse, readMutationJson } from "./http";
 import { saveCompetitionSchema } from "../competition/contract";
@@ -31,6 +32,13 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/public/games" ||
+        url.pathname.startsWith("/api/public/games/")
+      )
+        response = await publicGameRoute(request, env, url);
+      else if (/^\/api\/games\/[^/]+\/publication(?:\/|$)/u.test(url.pathname))
+        response = await publicationRoute(request, env, url);
       else if (
         url.pathname === "/api/pdf-sources" ||
         url.pathname.startsWith("/api/pdf-sources/")

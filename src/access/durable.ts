@@ -1,3 +1,6 @@
+import { SupabasePublications } from "../publication/provider";
+import type { PublishSheet } from "../publication/contract";
+import type { PublishPdf } from "../publication/pdf-contract";
 import { SupabasePeople } from "../people/provider";
 import { SupabaseTextImport } from "../text-import/provider";
 import {
@@ -57,6 +60,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
   private readonly games: SupabaseGames;
+  private readonly publications: SupabasePublications;
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
@@ -68,6 +72,10 @@ export class SessionStore extends DurableObject<Env> {
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
     this.pdfOriginals = new SupabasePdfOriginals({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
+    this.publications = new SupabasePublications({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
@@ -305,6 +313,34 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.save(accessToken, saveGameSchema.parse(command)),
+      ),
+    );
+  }
+  getPublicationState(gameId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.getState(accessToken, gameId, offset),
+      ),
+    );
+  }
+  getPublicationVersion(gameId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.getVersion(accessToken, gameId, version),
+      ),
+    );
+  }
+  publishSheet(command: PublishSheet) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.publishSheet(accessToken, command),
+      ),
+    );
+  }
+  publishPdf(command: PublishPdf) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.publishPdf(accessToken, command),
       ),
     );
   }
