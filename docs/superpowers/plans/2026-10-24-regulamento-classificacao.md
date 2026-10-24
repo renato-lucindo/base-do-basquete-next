@@ -56,3 +56,13 @@ PROGRESSO.md governa a retomada. Cota real no início/entre unidades/antes de lo
 - R2a: resolvedor puro de séries e8cenários, gate208local. Sem API/UI/DDL; CI própria deve ser reconciliada.
 - R2b: grupos/atribuições explícitas e5cenários;23focais composição/types/lint/format PASS. Cruzamentos e grafo de classificados ainda pendentes; não marcar todaR2concluída.
 - PróximoR2c: referências de entradas por inscrição/posição de grupo/vencedor ou perdedor de série; impedir ciclos/crosscontexto e avanço por empate ou publicação pendente. Classificação é prévia, decisão final/honraria exige confirmação e histórico próprios. Começar por testeRED de empate na posição/corte e referência cíclica, com efeitos observáveis no resolvedor.
+
+### R2c — contrato a implementar na próxima unidade
+
+Referências fechadas: registration(registrationId), group_rank(phaseId,groupId,position), series_winner(seriesId), series_loser(seriesId). IDs sempre da disputa declarada; registro e existência serão guardados no escritor, sem resolver por nome. Grafo dirigido por referências explícitas, rejeitando alvo ausente, autorreferência e ciclo, inclusive entre fases; não inferir dependência por posição na lista/data/nome.
+
+A resolução é uma prévia. Posição solicitada coberta por empate remanescente (inclusive posição2 num empate1–2) fica pendente, sem escolherUUID. Grupo com partida atribuída ainda sem publicação ou sem resultado não fornece classificado definitivo. Série só oferece vencedor/perdedor quando concluída; lacuna/empate mantém pendência. Entrada ainda desconhecida não vira inscrição fictícia. Se duas referências resolverem a mesma inscrição para um confronto, exigir correção explícita.
+
+Arquivos sugeridos src/regulation/crossings.ts e crossings.test.ts. PrimeiroRED: posição1/2 empatada não resolve, referência de vencedor em ciclo é recusada, jogos pendentes impedem avanço e inscrição fora da disputa é recusada. Depois implementar catálogo/validador/resolvedor e testes de combinação grupo→semifinal→final/perdedor. Não é escritor nem autorização; consumidor autoritativo futuro confere versões sob lock e exige confirmação.
+
+Recalcular uma prévia após correção não muda automaticamente os adversários de jogo já publicado/confirmado nem seus fatos. A integração deve mostrar impacto/conflito e preservar as guardas históricas G4. Não criar confrontos/cadastros em serviço nesta unidade pura. Consolidar gate do R2b/R2c quando a composição estiver estável; evidências R1/R2a/G4 permanecem válidas para seus arquivos inalterados.
