@@ -34,9 +34,10 @@ it("upgrades existing manual and PDF history without rewriting publications", as
     const names = (await readdir("supabase/migrations"))
       .filter((n) => n.endsWith(".sql"))
       .sort();
-    for (const name of names.filter(
-      (n) => !n.includes("pdf_publication_preparations"),
-    ))
+    const start = names.findIndex((n) =>
+      n.includes("pdf_publication_preparations"),
+    );
+    for (const name of names.slice(0, start))
       await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     await db.exec(
       (await readFile("supabase/tests/pdf_publication.sql", "utf8")).replace(
@@ -47,12 +48,8 @@ it("upgrades existing manual and PDF history without rewriting publications", as
     const before = await db.query(
       "select * from private.game_publication_versions order by game_id,version",
     );
-    await db.exec(
-      await readFile(
-        `supabase/migrations/${names.find((n) => n.includes("pdf_publication_preparations"))!}`,
-        "utf8",
-      ),
-    );
+    for (const name of names.slice(start))
+      await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     expect(
       (
         await db.query(
