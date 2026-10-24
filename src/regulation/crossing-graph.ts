@@ -62,11 +62,8 @@ export type GraphGroupPhase = {
     };
   }[];
 };
-/** Internal typed composition seam. Public entry points validate the catalog and context before calling it. */
-export function previewEntrantGraph<R extends Result>(
-  catalogSeries: GraphSeries[],
-  groupPhases: GraphGroupPhase[],
-  resolve: (id: string, home: string, away: string) => R,
+export function seriesDependencyOrder(
+  catalogSeries: Pick<GraphSeries, "id" | "home" | "away">[],
 ) {
   const catalog = new Map(catalogSeries.map((n) => [n.id, n])),
     visited = new Set<string>(),
@@ -87,6 +84,16 @@ export function previewEntrantGraph<R extends Result>(
     order.push(id);
   };
   [...catalog.keys()].sort().forEach(visit);
+  return order;
+}
+/** Internal typed composition seam. Public entry points validate the catalog and context before calling it. */
+export function previewEntrantGraph<R extends Result>(
+  catalogSeries: GraphSeries[],
+  groupPhases: GraphGroupPhase[],
+  resolve: (id: string, home: string, away: string) => R,
+) {
+  const catalog = new Map(catalogSeries.map((n) => [n.id, n])),
+    order = seriesDependencyOrder(catalogSeries);
   const phases = new Map(groupPhases.map((p) => [p.phaseId, p])),
     nodes = new Map<string, Node<R>>();
   const entry = (ref: Reference): Entry => {
