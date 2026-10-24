@@ -1,3 +1,19 @@
+# G4P1b transação manual — 24/10/2026 01:52 America/Sao_Paulo (UTC-03)
+
+Branch **codex/publicacao-jogos**, baseG3f2d634bbef005fed9daf91989e168b4bdbb9d916, P1af4610771efef031306a17391f21c5caed0130fe0. P1b material neste commit; obter SHA final no Git. PRdraft11 sobre10, sem merge. Somente alterações do agente; dados e mudanças humanos preservados.
+
+**Concluído:** migration20261024044610_manual_game_publication aplicada/reconciliada no Supabase novo. Publicação manual atômica, projeção mínima/RLS, histórico privado imutável/FKs, recibo/replay fresco, guarda de identidades/camisas e motivo, correção da participação sem republicação implícita. Fallback explícito quando há PDF associado. publicação.sql local e real com rollback PASS;13 cenários PostgreSQL de criação/upgrade aprovados em focais/composição, dois TS×PG focais PASS novamente01:51/3.09s. Types/advisors/contagens reconciliados. Detalhes/limitações em VALIDACAO-PUBLICACAO e decisão011.
+
+**Gate/CI:** primeira tentativa apenas dois timeouts PGlite5s sob paralelismo; corrigidos para20s já usado nos testes de banco existentes. Segunda execução consolidada teve saída final perdida na compactação: não alegar PASS; CI deste commit deve fornecer resultado verificável antes de deploy. G3CI40061809309 SUCCESS,78 browsers e harness126 inalterados reutilizados. Sem revisão independente/carga/corrida multi-conexão/WCAG completa.
+
+**Serviços:** preview protegido continua G3sourcef2d634b/deployment964bfe43-d5e5-4460-b1f6-b856e1bfce24/versão2d67e166-e560-4468-9b99-7f32cfb4cbc5, Access só responsável/previewsOFF/cofre e namespace preservados. Credenciais/políticas efêmeras revogadas; OAuth resolvido. P1b sem deploy/API/UI. Projeto nizmasjddyrhmevvfviz somente vínculo autorizado; pós-rollback jogos/súmulas/fontes/revisõesPDF/elencos/publicações/versões/recibos/objetos0,pessoas1,inscrições2,Auth/admin1. Advisor só WARN conhecido. Sem DDL/upload/credencial/processo em andamento.
+
+**Próximo exato:** conferir CI do commit material; corrigir focalmente se necessário. P2 do plano2026-10-24-publicacao.md: testes RED do adaptador UUID do comparator fornecido e suplemento explícito de marcadores/participação/comissão desconhecidos do Site, antes de implementar autoridade PDF/domínios/versões. Ler módulos e contratos atuais; não inferir negativos/DNP/quartos nem publicar métricas incompletas. Preservar histórico manual e FKs ao adicionar fontePDF. Depois P3API/UI/P4preview e piloto StorageHTTP real/avaliação humana ainda pendentes. Etapa4 incompleta.
+
+**Cota:** última82%usados5h/41%semanal, resets Unix1792831649/1793382169. Conferir entre unidades e antes de longas; aos85%, checkpoint/push seguro e MESMA automação reset+2. Sem compra/plano/reset manual. Repositório/serviços anteriores proibidos.
+
+---
+
 # G4P1a fechamento integrado — 24/10/2026 01:34 America/Sao_Paulo (UTC-03)
 
 Branch **codex/publicacao-jogos**, baseG3f2d634bbef005fed9daf91989e168b4bdbb9d916, plano2026-10-24-publicacao.md. P1a finalização/fatos manuais prontos no TS/SQL; obter SHA material final pelo Git. Todas as mudanças do agente; nenhuma alteração humana preservada foi tocada. G3 publicado e protegido conforme bloco seguinte, sem novo deploy nesta unidade.

@@ -50,4 +50,4 @@ it("PostgreSQL closure agrees with engine on overtime, FT, captains and starting
   } finally {
     await db.close();
   }
-});
+}, 20000);

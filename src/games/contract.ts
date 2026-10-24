@@ -48,7 +48,7 @@ export const gameSnapshotSchema = z
     ...gameFields,
     version: z.number().int().positive(),
     savedAt: z.iso.datetime({ offset: true }),
-    state: z.literal("scheduled"),
+    state: z.enum(["scheduled", "finished"]),
     timeZone: z.literal("America/Sao_Paulo"),
     scheduledAt: z.iso.datetime({ offset: true }).nullable(),
     home: registrationSnapshotSchema,

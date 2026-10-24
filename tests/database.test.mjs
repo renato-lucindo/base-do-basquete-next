@@ -36,6 +36,47 @@ const textConfirmContract = await readFile(
   "utf8",
 );
 const gamesContract = await readFile("supabase/tests/games.sql", "utf8");
+test("G4 upgrade preserves an existing G2 sheet draft without publishing it", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((m) =>
+      m.includes("-- G4b manual publication:"),
+    );
+    assert.ok(boundary > 0);
+    for (const m of migrations.slice(0, boundary)) await db.exec(m);
+    const contract = await readFile("supabase/tests/publication.sql", "utf8");
+    await db.exec(contract.slice(0, contract.indexOf("set local role anon;")));
+    await db.exec(
+      `set local role authenticated;set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098';select public.save_game_sheet(jsonb_build_object('requestId',pg_temp.pu_id(900),'gameId',pg_temp.pu_id(8),'gameVersion',1,'baseVersion',0,'document',pg_temp.pu_doc(),'confirm',false,'reason',''));reset role;`,
+    );
+    const query = "select public.get_game_sheet(pg_temp.pu_id(8)) as sheet";
+    const before = (await db.query(query)).rows;
+    for (const m of migrations.slice(boundary)) await db.exec(m);
+    assert.deepEqual((await db.query(query)).rows, before);
+    assert.equal(
+      (
+        await db.query(
+          "select count(*)::integer as n from public.published_games",
+        )
+      ).rows[0].n,
+      0,
+    );
+    await db.exec("rollback;");
+  } finally {
+    await db.close();
+  }
+});
+test("G4 sheet publication is atomic, versioned, private by default and preserves confirmed identities", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(await readFile("supabase/tests/publication.sql", "utf8"));
+  } finally {
+    await db.close();
+  }
+});
 test("G4 final sheet helper enforces closure and keeps privileged computations private", async () => {
   const db = await PGlite.create();
   try {
