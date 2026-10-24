@@ -679,6 +679,14 @@ export type Database = {
       get_person: { Args: { p_id: string }; Returns: Json };
       get_public_game: { Args: { p_id: string }; Returns: Json };
       get_registration: { Args: { p_id: string }; Returns: Json };
+      get_regulation_state: {
+        Args: { p_dispute_id: string; p_offset?: number };
+        Returns: Json;
+      };
+      get_regulation_version: {
+        Args: { p_dispute_id: string; p_version: number };
+        Returns: Json;
+      };
       get_roster_entry: { Args: { p_id: string }; Returns: Json };
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
@@ -753,6 +761,7 @@ export type Database = {
       save_pdf_review: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
+      save_regulation: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };
       save_staff_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
