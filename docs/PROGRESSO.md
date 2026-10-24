@@ -1,3 +1,15 @@
+# Retomada e preparação PDF durável — 24/10/2026 11:05 America/Sao_Paulo (UTC-03)
+
+Branch codex/publicacao-jogos, HEAD material4d1329d, complemento manual4ce8d83; CI40085171623/job120846516967 SUCCESS integral no checkpoint anteriorb387087. Serviços reais reconciliados sem mudança humana. Migração20261024135915_pdf_publication_preparations aplicada e reconciliada (CLI135744), tipos gerados. Não reaplicar. Preparação privada persistida separada de publicar, guarda versões/comando congelado para retomada/lote; decisão011 e validação atualizadas.2PG do zero/upgrade,7provider e transporte focalPASS, SQLreal comrollbackPASS; fixture deixoupreparações/recibos/jogos/fontes/publicações/objetos0,pessoas1,inscrições2,Auth1. Advisors só aviso segurança conhecido,10INFOFKs anteriores/30INFOíndices sem uso.
+
+Complemento manual: duas abas preservam rascunho em409 até recarga explícita; reautenticação mantém corpo do comando. Guarda beforeunload agora inclui publicação pendente mesmo em súmula limpa; testeRED→GREEN4browsers. Código próprio, nenhum dado humano alterado. API de preparação ainda sem deploy; preview segue G3 protegido.
+
+Próximo exato: UI PDF dentro da revisão salva, teste tests/pdf-publication.spec.ts RED por botão ausente; ligar seleção explícita de participação/cinco titulares/capitão/comissão, fontes disponíveis, motivo/divergência, salvar intenção privada e retomar/retry idempotente. Depois lista de prontos/lote individual e histórico completo, gate consolidado/CI e preview/P4piloto. Tests/fixtures/pdf-preparation.ts e spec são WIP do agente enquanto esta unidade prossegue. Não atribuir evidência de banco/API ao browser ainda ausente. Etapa4 incompleta, sem pilotoHTTP real/humano/revisão independente/escala/WCAGcompleta. Detalhes de serviços preservados abaixo; nada DDL/upload/deploy/credencial em andamento.
+
+Cota real mais recente7%usados5h/56%semanal, reset5h1792867900/semanal1793382169; checar entreunidades/antesdelongas, aos85%mesmaautomação reset+2. Sem compra/plano/resetmanual/repo antigo.
+
+---
+
 # Pausa por cota — 24/10/2026 07:14 America/Sao_Paulo (UTC-03)
 
 Checkpoint material remoto b387087bbb07f5259ccf2a316f38df2f960cf538; CI nova **40085171623 em andamento** sobre esse SHA, não assumir sucesso. Retomada **confirmada pela ferramenta oficial**, mesma automação ACTIVE para24/10/2026 **10:51:34 America/Sao_Paulo**, sem duplicata.
