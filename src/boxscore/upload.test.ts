@@ -2,6 +2,36 @@ import { expect, it, vi } from "vitest";
 import { PDF_UPLOAD_LIMIT, pdfUploadMetadata, readPdfBody } from "./upload";
 const origin = "https://app.example.test",
   id = "f8200000-0000-4000-8000-000000000001";
+it("rejects oversized declared length without consuming or cancelling the untrusted body", () => {
+  const pull = vi.fn(),
+    cancel = vi.fn();
+  const request = new Request(
+    origin +
+      "/api/pdf-sources?" +
+      new URLSearchParams({
+        commandId: id,
+        sourceId: id,
+        disputeId: id,
+        filename: "sample.pdf",
+      }),
+    {
+      method: "POST",
+      headers: {
+        origin,
+        "content-type": "application/pdf",
+        "content-length": String(PDF_UPLOAD_LIMIT + 1),
+      },
+      body: new ReadableStream({ pull, cancel }),
+      duplex: "half",
+    } as RequestInit,
+  );
+  expect(() => pdfUploadMetadata(request, origin)).toThrow(
+    expect.objectContaining({ status: 413 }),
+  );
+  expect(request.bodyUsed).toBe(false);
+  expect(pull).not.toHaveBeenCalled();
+  expect(cancel).not.toHaveBeenCalled();
+});
 it("bounds an unknown-length byte stream and cancels it instead of trusting Content-Length", async () => {
   const cancel = vi.fn(),
     stream = new ReadableStream<Uint8Array>({

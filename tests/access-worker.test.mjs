@@ -755,7 +755,7 @@ test("PDF transport parses in the authorized DO, recovers an incomplete original
     await f.mf.dispose();
   }
 });
-test("PDF transport denies invalid origin, query, type, limits and revoked admin before extraction or Storage", async () => {
+test("PDF transport denies invalid origin, query, type, limits and revoked admin before extraction or Storage", async (t) => {
   const options = { pdf: true },
     f = await fixture(options);
   try {
@@ -767,13 +767,31 @@ test("PDF transport denies invalid origin, query, type, limits and revoked admin
       [path + "&sourceId=" + id, headers, "%PDF-", 400],
       [path, { ...headers, "content-type": "text/plain" }, "%PDF-", 415],
       [path.replace("sample.pdf", "..%2Fsecret.pdf"), headers, "%PDF-", 400],
-      [path, headers, new Uint8Array(10485761), 413],
+      // Unknown length exercises the authorized streaming limit with real bytes.
+      // An oversized Content-Length is checked without consuming the body in
+      // upload.test.ts. Sending that rejected body over Miniflare's entry binding
+      // hits workerd#7634 (early response resets the TCP upload).
+      [
+        path,
+        headers,
+        new ReadableStream({
+          start(c) {
+            c.enqueue(new Uint8Array(10485761));
+            c.close();
+          },
+        }),
+        413,
+      ],
       [path, headers, "not PDF", 400],
     ]) {
+      t.diagnostic(
+        `PDF rejection: expected ${status}, ${typeof body === "string" ? body.length + " bytes" : "stream without Content-Length"}`,
+      );
       const r = await f.mf.dispatchFetch(origin + url, {
         method: "POST",
         headers: h,
         body,
+        duplex: "half",
       });
       assert.equal(r.status, status, await r.text());
     }
