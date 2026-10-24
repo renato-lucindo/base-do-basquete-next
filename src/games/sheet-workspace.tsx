@@ -1,3 +1,4 @@
+import { SheetPublicationPanel } from "../publication/sheet-panel";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import {
@@ -64,7 +65,9 @@ export function GameSheetWorkspace(props: Props) {
     [baseline, setBaseline] = useState(""),
     [version, setVersion] = useState(0),
     [gameVersion, setGameVersion] = useState(props.game.version),
-    [snapshot, setSnapshot] = useState<SheetSnapshot | null>(null);
+    [snapshot, setSnapshot] = useState<SheetSnapshot | null>(null),
+    [reason, setReason] = useState(""),
+    [publicationLocked, setPublicationLocked] = useState(false);
   const [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
     [conflict, setConflict] = useState(false),
@@ -95,6 +98,7 @@ export function GameSheetWorkspace(props: Props) {
   const pending = useRef<SaveSheet | null>(null),
     initialized = useRef(false),
     auxGuard = useRef(() => true),
+    publicationGuard = useRef(() => true),
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     targetRef = useRef<HTMLInputElement>(null),
@@ -107,10 +111,11 @@ export function GameSheetWorkspace(props: Props) {
     returningToSide = useRef<Side | null>(null);
   const d = history?.present,
     dirty = !!d && JSON.stringify(d) !== baseline,
-    locked = busy || uncertain || conflict;
+    locked = busy || uncertain || conflict || publicationLocked;
   function mayLeave() {
     return (
       !busy &&
+      publicationGuard.current() &&
       auxGuard.current() &&
       (!(dirty || uncertain || editing) ||
         window.confirm(
@@ -283,6 +288,22 @@ export function GameSheetWorkspace(props: Props) {
   function mutate(next: PersistedSheet) {
     if (locked || !history) return false;
     try {
+      if (snapshot?.confirmed) {
+        const identities = (doc: PersistedSheet) =>
+          JSON.stringify(
+            doc.participants
+              .map((p) => ({
+                id: p.rosterEntryId,
+                side: p.side,
+                jersey: p.jersey,
+              }))
+              .sort((a, b) => a.id.localeCompare(b.id)),
+          );
+        if (identities(next) !== identities(snapshot.document))
+          throw Error(
+            "Os relacionados e as camisas confirmados não podem ser alterados.",
+          );
+      }
       const document = validatePersistedSheet(next);
       setHistory({
         present: document,
@@ -373,6 +394,10 @@ export function GameSheetWorkspace(props: Props) {
       setError("Conclua ou cancele a alteração da ação antes de salvar.");
       return;
     }
+    if (snapshot?.confirmed && !pending.current && reason.trim().length < 10) {
+      setError("Informe o motivo da revisão da súmula (10 a 500 caracteres).");
+      return;
+    }
     const command = pending.current ?? {
       requestId: crypto.randomUUID(),
       gameId: props.game.id,
@@ -380,7 +405,7 @@ export function GameSheetWorkspace(props: Props) {
       baseVersion: version,
       document: d,
       confirm: false as const,
-      reason: "",
+      reason,
     };
     try {
       validatePersistedSheet(command.document);
@@ -429,6 +454,7 @@ export function GameSheetWorkspace(props: Props) {
         await api(`/api/games/${g.id}/sheet`, sheetSnapshotSchema.nullable()),
         g.version,
       );
+      setReason("");
       setStatus("Súmula recarregada");
       setEpoch((v) => v + 1);
     } catch (e) {
@@ -452,8 +478,10 @@ export function GameSheetWorkspace(props: Props) {
         Relacionados e súmula
       </h3>
       <p>
-        {props.game.home.name} × {props.game.away.name}. Rascunho privado;
-        salvar não publica o resultado.
+        {props.game.home.name} × {props.game.away.name}.{" "}
+        {snapshot?.confirmed
+          ? "Súmula confirmada; novas alterações ficam privadas até republicar."
+          : "Rascunho privado; salvar não publica o resultado."}
       </p>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1} className="access-error">
@@ -554,6 +582,7 @@ export function GameSheetWorkspace(props: Props) {
                               <input
                                 type="checkbox"
                                 checked={selected}
+                                disabled={snapshot?.confirmed}
                                 aria-label={`Relacionar ${m.person.name}`}
                                 onChange={(e) => {
                                   if (e.target.checked) {
@@ -639,6 +668,7 @@ export function GameSheetWorkspace(props: Props) {
                             Camisa de {name(p.rosterEntryId)}
                             <input
                               value={p.jersey}
+                              disabled={snapshot?.confirmed}
                               maxLength={2}
                               inputMode="numeric"
                               onChange={(e) =>
@@ -1056,16 +1086,32 @@ export function GameSheetWorkspace(props: Props) {
               </button>
             </div>
           )}
+          {snapshot?.confirmed && (
+            <label>
+              Motivo da revisão da súmula
+              <textarea
+                maxLength={500}
+                value={reason}
+                disabled={locked}
+                onChange={(e) => setReason(e.target.value)}
+              />
+            </label>
+          )}
           <div className="competition-actions">
             <button
-              disabled={busy || conflict || !!editing || !!deleting}
+              disabled={
+                busy || publicationLocked || conflict || !!editing || !!deleting
+              }
               onClick={() => void save()}
             >
               {uncertain
                 ? "Repetir envio da súmula"
                 : "Salvar rascunho da súmula"}
             </button>
-            <button disabled={busy} onClick={() => void reload()}>
+            <button
+              disabled={busy || publicationLocked}
+              onClick={() => void reload()}
+            >
               Recarregar súmula
             </button>
             <button
@@ -1077,11 +1123,57 @@ export function GameSheetWorkspace(props: Props) {
               Voltar aos dados do jogo
             </button>
           </div>
-          <p>
-            Para publicar depois: selecione exatamente cinco titulares e um
-            capitão por equipe; confira comissão e fechamento. Este botão salva
-            somente o rascunho.
-          </p>
+          <SheetPublicationPanel
+            key={`${props.game.id}:${gameVersion}:${version}`}
+            game={props.game}
+            document={d}
+            sourceVersion={version}
+            gameVersion={gameVersion}
+            confirmed={!!snapshot?.confirmed}
+            reason={reason}
+            onReason={setReason}
+            disabled={
+              !props.enabled ||
+              busy ||
+              uncertain ||
+              conflict ||
+              !!editing ||
+              !!deleting
+            }
+            guard={publicationGuard}
+            onLock={setPublicationLocked}
+            onConflict={() => setConflict(true)}
+            onSessionLost={props.onSessionLost}
+            onPublished={async (result, explicitReload) => {
+              const latest = await api(
+                `/api/games/${props.game.id}/sheet`,
+                sheetSnapshotSchema,
+              );
+              if (
+                latest.gameId !== props.game.id ||
+                !latest.confirmed ||
+                latest.version < result.sourceVersion ||
+                latest.gameVersion < result.gameVersion
+              )
+                throw new ApiFailure(
+                  503,
+                  "A publicação foi confirmada, mas a fonte salva não pôde ser reconciliada. Recarregue a súmula publicada.",
+                );
+              if (
+                !explicitReload &&
+                (latest.version !== result.sourceVersion ||
+                  latest.gameVersion !== result.gameVersion)
+              )
+                throw new ApiFailure(
+                  409,
+                  "A publicação foi confirmada e a súmula recebeu outras alterações. Recarregue para conferir.",
+                );
+              accept(latest);
+              setReason("");
+              setStatus("Resultado publicado");
+              props.onSaved();
+            }}
+          />
         </>
       ) : (
         !busy && (
