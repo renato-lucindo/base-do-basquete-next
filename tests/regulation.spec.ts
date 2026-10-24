@@ -295,3 +295,64 @@ test("retoma o mesmo comando após reautenticação sem perder a edição", asyn
   expect(sent[0]).toBe(sent[1]);
   expect(f.getState().version).toBe(1);
 });
+
+test("resolve inscrições do grupo na prévia de eliminatória sem inventar resultado da série", async ({
+  page,
+}) => {
+  await regulationBrowserFixture(page);
+  await prepare(page);
+  await page
+    .getByRole("button", { name: "Adicionar eliminatória", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Adicionar confronto", exact: true })
+    .click();
+  for (const [side, position] of [
+    ["A", 1],
+    ["B", 2],
+  ] as const) {
+    const group = page.getByRole("group", {
+      name: `Confronto 1: equipe ${side}`,
+      exact: true,
+    });
+    await page
+      .getByRole("combobox", {
+        name: `Confronto 1: equipe ${side}: origem`,
+        exact: true,
+      })
+      .selectOption("group_rank");
+    await group
+      .getByRole("combobox", { name: "Grupo", exact: true })
+      .selectOption({ label: "Fase 1 / Grupo 1" });
+    await group
+      .getByRole("spinbutton", { name: "Posição no grupo", exact: true })
+      .fill(String(position));
+  }
+  for (const format of [
+    "single",
+    "two_leg",
+    "best_of_3",
+    "best_of_5",
+    "best_of_7",
+  ]) {
+    await page
+      .getByRole("combobox", { name: "Formato do confronto", exact: true })
+      .selectOption(format);
+    await page
+      .getByRole("button", { name: "Conferir impacto", exact: true })
+      .click();
+    const after = page.locator(".reg-review .reg-projection").filter({
+      has: page.getByRole("heading", {
+        name: "Depois da alteração",
+        exact: true,
+      }),
+    });
+    await expect(after.getByRole("article")).toContainText("Lobos × Lobos B");
+    await expect(after.getByRole("article")).toContainText(
+      "Aguardando definição ou resultados.",
+    );
+    await expect(
+      after.getByText("Vencedor da série:", { exact: false }),
+    ).toHaveCount(0);
+  }
+});

@@ -49,3 +49,5 @@ RED observado para aba ausente, recuperação incompleta do catálogo e reduçã
 Ainda faltam cenários dedicados de grupos→semifinal→final/perdedor no editor, duas abas reais, recuperação GET após ACK e paginações extensas/histórico. Ocorrências autoritativas, consulta pública de classificação e regras restantes da etapa5 continuam pendentes. Não expor esta unidade como etapa5 completa. Sem deploy, carga/corridaPG multiconexão/revisão independente comprovada. CI posterior deve ser reconciliado antes do preview; reutilizar evidências imutáveis anteriores.
 
 Composição final após ajuste visual: **36/36 browsers PASS** (14regulamento +22C1/equipes/jogos), desktop/mobile. Log r3-regulation-editor-browsers.log SHA256 **721d567ff33857c117bde697e5d3ad1ed95a0b1e85126eab9afe178c834b5906**. Build final/fronteiraPASS; sem mudança de banco/algoritmo após o gate.
+
+Focal posterior somente de teste: grupos alimentam eliminatória nos5formatos (single/ida-volta/BO3/5/7), sem declarar vencedor com série vazia, desktop/mobile2/2PASS. Não mudou implementação; reutilizar gate273 e36browsers para caminhos inalterados.
