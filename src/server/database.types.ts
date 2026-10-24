@@ -737,6 +737,7 @@ export type Database = {
       };
       prepare_pdf_source: { Args: { p_command: Json }; Returns: Json };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
+      publish_pdf_game: { Args: { p_command: Json }; Returns: Json };
       publish_sheet_game: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
