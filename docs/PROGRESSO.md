@@ -1,5 +1,7 @@
 # Pausa por cota — 24/10/2026 07:14 America/Sao_Paulo (UTC-03)
 
+Checkpoint material remoto b387087bbb07f5259ccf2a316f38df2f960cf538; CI nova **40085171623 em andamento** sobre esse SHA, não assumir sucesso. Retomada **confirmada pela ferramenta oficial**, mesma automação ACTIVE para24/10/2026 **10:51:34 America/Sao_Paulo**, sem duplicata.
+
 **Objetivo:** nova Base do Basquete conforme ZIPs preservados e feedback aceito. Etapa4/G4 publicação em andamento; unidade P3b1 manual implementada, sem novo deploy. Workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, remoto https://github.com/renato-lucindo/base-do-basquete-next, branch codex/publicacao-jogos, material **f713fc76eff7f931b5efa77cdfe1d87e1b483926**, base anterior f7d96d438c3ab34f59f759159625c8102923eccf. SHA deste checkpoint é consultável no Git. PRdraft11 sobre10. Todas alterações desta execução do agente, dados e alterações humanos preservados; nenhuma alteração não commitada prevista depois de salvar este checkpoint.
 
 **Concluído:** derivação/comparação/autoridade PDF e escritores SQL manual/PDF atômicos, origens tipadas/histórico imutável, API privada e consulta pública mínima; página resultado.html#UUID. Painel manual na súmula: confirmar/republicar, placar de conferência, motivo/fallback, retry do mesmo comando, ACK conhecido com recuperação somente leitura, trava de relacionados/camisas após confirmar, participação corrigível. Evidências e hashes em VALIDACAO-PUBLICACAO.md. Banco aplicado até20261024093639_publication_read_state; não reaplicar migrations.
