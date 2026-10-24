@@ -33,3 +33,11 @@ Provider de leitura em b9ee7f13d1de24d824bbbb6505e36783211f615b (WIP sem rotas):
 ## Reconciliação 24/10/2026
 
 CI40041674631/job120713952602 SUCCESS em3edcc11 (gate/browsersLinux). Cloudflare reconectado; preview source1161f1a contém G1/G2 e dependênciaZod corrigida, G3 permanece sem rotas/UI. Smoke/segurança da entrega em VALIDACAO-JOGOS; não afirma upload HTTP dePDFs. Próximo G3c provider/transporte autorizado.
+
+## Transporte G3c — 24/10/2026
+
+Provider fixed RPCs prepare/finish/list/saveReview, schemas e ACK/contexto correlacionados, conflitos explícitos e mensagens sanitizadas. Quatro novos provider RED→GREEN (seis no total). Quatro focais Storage verificam bytes/hash/MIME/tamanho, caminho gerado, nega overwrite, dupes atuais/legadas e cancelamento de stream. Três focais de leitura binária provam limite sem Content-Length e preservação dos bytes. Request transferido ao DO por RPC; runAuthorized executa antes de ler corpo/extrair, conforme [RPC Cloudflare](https://developers.cloudflare.com/workers/runtime-apis/rpc/). Endpoints específicos /api/pdf-sources e /:id/review; até10MiB/4p, contexto/origem/query estritos, revisão16KiB.
+
+Dois cenários workerd/SQLiteDO da aplicação RED→GREEN: extração real do Site/autorização, intention-before-blob, falha depois de upload, retry do mesmo comando com Duplicate→GET/hash antes de finish, metadados/revisão retomados; input/origem/limite/revogação negados. Fornecedor de Auth/Data API/Storage controlado pelo teste; não é prova HTTP de bytes no serviço real. SQL e políticas reais anteriores inalterados reutilizados. Nenhum upload real/DDL/dado humano modificado. Os formatos Storage foram conferidos em [uploads](https://supabase.com/docs/guides/storage/uploads/standard-uploads) e [erros](https://supabase.com/docs/guides/storage/debugging/error-codes); changelog inspecionado, TLS moderno do Worker sem ajuste legado.
+
+Gate PASS151unitários/34arquivos,5transportes,10PostgreSQL,11workerd e1prova4PDFs; tipos/lint/formatação/builds/fronteira/segredos. Harness126 imutável reutilizado localmente. Ainda sem UI/matching, integração Storage real ou G4 publicação. Preview atual1161f1a permanece G1/G2, este gate não equivale a deploy da API.

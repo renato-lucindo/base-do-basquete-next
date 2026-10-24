@@ -3,6 +3,7 @@ import { HttpError, jsonResponse, readMutationJson } from "./http";
 import { saveCompetitionSchema } from "../competition/contract";
 import { teamsRoute } from "../teams/routes";
 import { gamesRoute } from "../games/routes";
+import { pdfSourcesRoute } from "../boxscore/routes";
 import { peopleRoute } from "../people/routes";
 import { textImportRoute } from "../text-import/routes";
 import {
@@ -30,6 +31,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/pdf-sources" ||
+        url.pathname.startsWith("/api/pdf-sources/")
+      )
+        response = await pdfSourcesRoute(request, env, url);
       else if (
         url.pathname === "/api/games" ||
         url.pathname.startsWith("/api/games/")

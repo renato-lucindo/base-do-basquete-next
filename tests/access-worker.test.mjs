@@ -8,6 +8,10 @@ const id = "10000000-0000-4000-8000-000000000001";
 
 async function fixture(options = {}) {
   const calls = [];
+  let pdfSource,
+    originalBytes,
+    reviewDocument,
+    reviewVersion = 0;
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -65,6 +69,103 @@ async function fixture(options = {}) {
           );
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (
+          options.pdf &&
+          (url.pathname.includes("pdf_source") ||
+            url.pathname.includes("pdf_review") ||
+            url.pathname.startsWith("/storage/v1/object/"))
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          if (url.pathname.startsWith("/storage/v1/object/")) {
+            if (request.method === "POST") {
+              assert.ok(pdfSource);
+              assert.equal(request.headers.get("x-upsert"), "false");
+              if (originalBytes)
+                return Response.json(
+                  { code: "ResourceAlreadyExists" },
+                  { status: 409 },
+                );
+              originalBytes = new Uint8Array(await request.arrayBuffer());
+              options.originalBytes = originalBytes;
+              return Response.json({
+                Key: `boxscore-sources/sources/${pdfSource.id}.pdf`,
+              });
+            }
+            return new Response(originalBytes, {
+              headers: { "Content-Type": "application/pdf" },
+            });
+          }
+          const args = await request.json();
+          if (url.pathname.endsWith("/prepare_pdf_source")) {
+            options.prepared ??= args.p_command;
+            assert.deepEqual(args.p_command, options.prepared);
+            pdfSource ??= {
+              ...args.p_command.source,
+              ready: false,
+              version: 1,
+              savedAt: "2026-10-24T03:00:00Z",
+            };
+            return Response.json({
+              id: pdfSource.id,
+              storagePath: `sources/${pdfSource.id}.pdf`,
+              sha256: pdfSource.sha256,
+              byteSize: pdfSource.byteSize,
+              ready: false,
+              duplicate: false,
+            });
+          }
+          if (url.pathname.endsWith("/finish_pdf_source")) {
+            assert.ok(originalBytes);
+            if (options.failFinish) {
+              options.failFinish = false;
+              return Response.json(
+                { message: "private provider value" },
+                { status: 503 },
+              );
+            }
+            pdfSource = { ...pdfSource, ready: true, version: 2 };
+            return Response.json({ id: pdfSource.id, version: 2 });
+          }
+          if (url.pathname.endsWith("/get_pdf_source"))
+            return Response.json(pdfSource ?? null);
+          if (url.pathname.endsWith("/list_pdf_sources"))
+            return Response.json({
+              items: pdfSource ? [pdfSource] : [],
+              hasMore: false,
+            });
+          if (url.pathname.endsWith("/save_pdf_review")) {
+            reviewDocument = args.p_command.document;
+            reviewVersion++;
+            return Response.json({ id: pdfSource.id, version: reviewVersion });
+          }
+          if (url.pathname.endsWith("/get_pdf_review"))
+            return Response.json(
+              pdfSource
+                ? {
+                    source: pdfSource,
+                    version: reviewVersion,
+                    savedAt: reviewVersion ? "2026-10-24T03:01:00Z" : null,
+                    document: reviewDocument ?? {
+                      disputeId: pdfSource.disputeId,
+                      gameId: null,
+                      invertSides: false,
+                      mappings: pdfSource.parsed.teams.flatMap((t, side) =>
+                        t.players.map((p, index) => ({
+                          sourceSide: side,
+                          sourceIndex: index,
+                          rosterEntryId: null,
+                          jersey: p.jerseyNumber,
+                        })),
+                      ),
+                      notes: "",
+                    },
+                  }
+                : null,
+            );
+        }
         if (url.pathname === "/rest/v1/rpc/list_games") {
           assert.equal(
             request.headers.get("authorization"),
@@ -261,6 +362,141 @@ async function fixture(options = {}) {
   return { mf, send, login, calls };
 }
 
+test("PDF transport parses in the authorized DO, recovers an incomplete original without overwrite and resumes review", async () => {
+  const options = { pdf: true, failFinish: true },
+    f = await fixture(options);
+  try {
+    const params = new URLSearchParams({
+        commandId: id,
+        sourceId: id,
+        disputeId: id,
+        filename: "sample.pdf",
+      }),
+      path = `/api/pdf-sources?${params}`;
+    const bytes = await readFile(
+      "especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/docs/plan/referencias/modelos-boxscore/Boxscore-site.pdf",
+    );
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(origin + path, {
+          method: "POST",
+          headers: { origin, "content-type": "application/pdf" },
+          body: bytes,
+        })
+      ).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0],
+      headers = { cookie, origin, "content-type": "application/pdf" };
+    const initial = await f.mf.dispatchFetch(origin + path, {
+      method: "POST",
+      headers,
+      body: bytes,
+    });
+    assert.equal(initial.status, 503, await initial.text());
+    assert.deepEqual(Buffer.from(options.originalBytes), bytes);
+    const retried = await f.mf.dispatchFetch(origin + path, {
+      method: "POST",
+      headers,
+      body: bytes,
+    });
+    assert.equal(retried.status, 200, await retried.clone().text());
+    assert.deepEqual(await retried.json(), {
+      id,
+      version: 2,
+      duplicate: false,
+    });
+    assert.equal(
+      f.calls.filter((p) =>
+        p.startsWith("/storage/v1/object/boxscore-sources/"),
+      ).length,
+      2,
+    );
+    assert.equal(
+      f.calls.filter((p) => p.startsWith("/storage/v1/object/authenticated/"))
+        .length,
+      2,
+    );
+    const get = async (path) =>
+      f.mf.dispatchFetch(origin + path, { headers: { cookie } });
+    assert.equal((await get(`/api/pdf-sources?disputeId=${id}`)).status, 200);
+    const source = await get(`/api/pdf-sources/${id}`);
+    assert.equal(source.status, 200);
+    assert.equal((await source.json()).parsed.format, "BASKETBALL_SITE");
+    const review = await get(`/api/pdf-sources/${id}/review`),
+      document = (await review.json()).document;
+    const saved = await f.mf.dispatchFetch(
+      `${origin}/api/pdf-sources/${id}/review`,
+      {
+        method: "POST",
+        headers: { cookie, origin, "content-type": "application/json" },
+        body: JSON.stringify({
+          sourceId: id,
+          commandId: id,
+          expectedVersion: 0,
+          document: { ...document, notes: "revisado" },
+        }),
+      },
+    );
+    assert.equal(saved.status, 200, await saved.clone().text());
+    assert.deepEqual(await saved.json(), { id, version: 1 });
+    assert.equal(
+      (await (await get(`/api/pdf-sources/${id}/review`)).json()).document
+        .notes,
+      "revisado",
+    );
+    assert.ok(
+      f.calls.indexOf(
+        "/rest/v1/admin_access?select=user_id,enabled&user_id=eq." + id,
+      ) < f.calls.indexOf("/rest/v1/rpc/prepare_pdf_source"),
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+test("PDF transport denies invalid origin, query, type, limits and revoked admin before extraction or Storage", async () => {
+  const options = { pdf: true },
+    f = await fixture(options);
+  try {
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0],
+      headers = { cookie, origin, "content-type": "application/pdf" };
+    const path = `/api/pdf-sources?${new URLSearchParams({ commandId: id, sourceId: id, disputeId: id, filename: "sample.pdf" })}`;
+    for (const [url, h, body, status] of [
+      [path, { ...headers, origin: "https://evil.test" }, "%PDF-", 403],
+      [path + "&sourceId=" + id, headers, "%PDF-", 400],
+      [path, { ...headers, "content-type": "text/plain" }, "%PDF-", 415],
+      [path.replace("sample.pdf", "..%2Fsecret.pdf"), headers, "%PDF-", 400],
+      [path, headers, new Uint8Array(10485761), 413],
+      [path, headers, "not PDF", 400],
+    ]) {
+      const r = await f.mf.dispatchFetch(origin + url, {
+        method: "POST",
+        headers: h,
+        body,
+      });
+      assert.equal(r.status, status, await r.text());
+    }
+    assert.ok(
+      !f.calls.some(
+        (p) => p.includes("pdf_source") || p.startsWith("/storage/"),
+      ),
+    );
+    options.denied = true;
+    const denied = await f.mf.dispatchFetch(origin + path, {
+      method: "POST",
+      headers,
+      body: "%PDF-",
+    });
+    assert.equal(denied.status, 403);
+    assert.ok(
+      !f.calls.some(
+        (p) => p.includes("pdf_source") || p.startsWith("/storage/"),
+      ),
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 test("sheet routes authorize and validate domain, path correlation, origin and limits before RPC", async () => {
   const f = await fixture();
   try {

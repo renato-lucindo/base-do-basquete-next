@@ -1,3 +1,17 @@
+# G3c transporte/API estável — 24/10/2026 00:57 America/Sao_Paulo (UTC-03)
+
+**Unidade:** provider de escrita/listagem, original privado e transporte binário integrados; UI/matching de PDFs e G4 pendentes. Branch codex/pdf-fontes, base documentalb3ea446, obter SHA material final pelo Git. Somente alterações do agente, nenhuma alteração humana/dado real editado. PRdraft10 sobre9. Preview publicado1161f1a é G1/G2, não contém esta API nova.
+
+**Evidências:** quatro novos testes provider RED→GREEN (mais2 anteriores),4 Storage focais e3 limites de streaming PASS. Dois cenários reais workerd/SQLiteDO RED→GREEN: sessão/origem/limites/revogação, extração do Site dentro da operação autorizada, intenção antes de bytes, download privado/hash antes de finalizar, recuperação de falha pós-upload sem overwrite e retomada de revisão. Gate consolidado PASS151 unitários/34arquivos,5transportes,10PostgreSQL,11workerd e1prova4PDFs; tipos/lint/formatação/builds/fronteira/segredos. Banco/migrations/tipos inalterados: contratos reais anteriores reutilizados. Testes outbound usam fornecedor controlado: ainda NÃO provam StorageHTTP real do projeto.
+
+**Arquitetura:** Request é transferido via RPC com fluxo de bytes para o DO; runAuthorized valida Auth/admin antes de consumir corpo/extrair. Até10MiB/4p, nome/query estritos/origem, sem Buffer/bytes no cofre. Writers fixos/ACK correlacionado/versões/conflitos; listagem segue contexto atual sem reescrever origem. Storage só bucket dedicado/path da intenção, x-upsert=false; novo ou existente sempre tem GET privado/tamanho/MIME/hash verificados antes de finish. Retry mantém commandId/sourceId; duplicidade pronta retorna ID existente explícito. Nunca token no browser ou chave privilegiada.
+
+**Serviços/CI:** sem DDL/deploy/upload real nesta unidade; dados humanos preservados. G3CI40041674631/job120713952602 SUCCESS na fundação anterior. Próxima CI deve validar este commit; não atribuir resultado antecipado. Preview/Access/tokenrevogação conforme bloco anterior, nenhum processo/credencial em andamento. Avaliação humana G1/G2 pendente.
+
+**Próximo exato:** commit/push G3c e conferir CI correspondente; G3d matching com adaptador UUID do módulo fornecido e testes de correspondência única/ambígua/equipe/naipe, sem fusão ou seleção silenciosa. UI contextual em Jogos: lote por arquivo, troca de destino sem reenvio, preparação/cadastros de jogo e elenco na tarefa, revisão durável/retomada/retry/reauth/guardas. Fonte Site não informa titular/capitão/DNP negativo nem quartos. G4 confirmação/publicação/correção e autoridade permanecem pendentes. Sem revisão independente/carga/WCAG completa comprovadas. Última cota12%usados5h/30%semanal, conferir entre unidades/antes de longas; gatilho85%, automação existente reset+2.
+
+---
+
 # Retomada e preview G1/G2 — 24/10/2026 00:50 America/Sao_Paulo (UTC-03)
 
 **Estado real:** cota reiniciada, 4%usados5h/29%semanal na última consulta. Reconexão humana Cloudflare confirmada; alvo/Access/namespace reconciliados. Branch codex/pdf-fontes, HEAD documental1161f1a, leitorWIPb9ee7f1, fundação3edcc11. Árvore limpa no início, remoto idêntico; nenhuma mudança humana alterada. PRdraft10 aberto sobre9. CI40041674631/job120713952602 **SUCCESS**, gate e browsersLinux; evidência anterior agora reconciliada, sem repetir suítes.

@@ -22,6 +22,19 @@ import { PersistentSession, type SessionRecord } from "./session";
 import { SupabaseCompetitions } from "../competition/provider";
 import { SupabaseTeams } from "../teams/provider";
 import { SupabaseGames } from "../games/provider";
+import { SupabasePdfSources } from "../boxscore/provider";
+import { SupabasePdfOriginals } from "../boxscore/storage";
+import { extractSupportedPdf } from "../boxscore/extract";
+import {
+  pdfUploadMetadata,
+  readPdfBody,
+  badPdfInput,
+} from "../boxscore/upload";
+import {
+  preparePdfSourceSchema,
+  savePdfReviewSchema,
+  type SavePdfReview,
+} from "../boxscore/source-contract";
 import { saveGameSchema, type SaveGame } from "../games/contract";
 import { saveSheetSchema, type SaveSheet } from "../games/sheet-contract";
 import {
@@ -44,10 +57,20 @@ export class SessionStore extends DurableObject<Env> {
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
   private readonly games: SupabaseGames;
+  private readonly pdfSources: SupabasePdfSources;
+  private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.pdfSources = new SupabasePdfSources({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
+    this.pdfOriginals = new SupabasePdfOriginals({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.games = new SupabaseGames({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -289,6 +312,75 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.getSheet(accessToken, gameId),
+      ),
+    );
+  }
+  uploadPdf(request: Request) {
+    return safely(() =>
+      this.session.runAuthorized(async ({ accessToken }) => {
+        const meta = pdfUploadMetadata(request, this.env.APP_ORIGIN);
+        const bytes = await readPdfBody(request);
+        let command;
+        try {
+          const p = await extractSupportedPdf(
+            bytes,
+            meta.filename,
+            "application/pdf",
+          );
+          command = preparePdfSourceSchema.parse({
+            commandId: meta.commandId,
+            source: {
+              id: meta.sourceId,
+              disputeId: meta.disputeId,
+              filename: p.filename,
+              sha256: p.sha256,
+              byteSize: bytes.length,
+              pageCount: p.pageCount,
+              parsed: p.parsed,
+            },
+          });
+        } catch {
+          throw badPdfInput();
+        }
+        const intent = await this.pdfSources.prepare(accessToken, command);
+        if (!intent.ready)
+          await this.pdfOriginals.put(accessToken, intent, bytes);
+        const finished = await this.pdfSources.finish(accessToken, {
+          commandId: meta.commandId,
+          sourceId: intent.id,
+        });
+        return { ...finished, duplicate: intent.duplicate };
+      }),
+    );
+  }
+  listPdfSources(disputeId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.pdfSources.list(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  getPdfSource(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.pdfSources.source(accessToken, id),
+      ),
+    );
+  }
+  getPdfReview(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.pdfSources.review(accessToken, id),
+      ),
+    );
+  }
+  savePdfReview(command: SavePdfReview) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.pdfSources.saveReview(
+          accessToken,
+          savePdfReviewSchema.parse(command),
+        ),
       ),
     );
   }
