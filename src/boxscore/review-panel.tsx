@@ -23,6 +23,7 @@ import {
   type SavePdfReview,
 } from "./source-contract";
 import { suggestPdfPlayer } from "./matching";
+import { PdfPublicationPanel } from "../publication/pdf-panel";
 type Props = {
   sourceId: string;
   contexts: PdfContext[];
@@ -43,6 +44,8 @@ export function PdfReviewPanel(props: Props) {
     [error, setError] = useState(""),
     [status, setStatus] = useState(""),
     [epoch, setEpoch] = useState(0);
+  const [publicationLocked, setPublicationLocked] = useState(false),
+    [reviewReason, setReviewReason] = useState("");
   const [games, setGames] = useState<GameSnapshot[]>([]),
     [gameQuery, setGameQuery] = useState(""),
     [gameOffset, setGameOffset] = useState(0),
@@ -64,12 +67,16 @@ export function PdfReviewPanel(props: Props) {
     auxGuard = useRef(() => true),
     auxTrigger = useRef<HTMLElement | null>(null),
     wasAux = useRef(false);
-  const dirty = !!doc && JSON.stringify(doc) !== baseline,
+  const publicationGuard = useRef(() => true);
+  const dirty =
+      !!doc &&
+      (JSON.stringify(doc) !== baseline || reviewReason.trim().length > 0),
     auxiliary = gamesAux || memberAux !== null,
     context = props.contexts.find((c) => c.id === doc?.disputeId);
   function mayLeave() {
     return (
       !busy &&
+      publicationGuard.current() &&
       auxGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
@@ -117,6 +124,7 @@ export function PdfReviewPanel(props: Props) {
     setBaseline(JSON.stringify(s.document));
     setUncertain(false);
     setConflict(false);
+    setReviewReason("");
     pending.current = null;
     loaded.current = true;
   }
@@ -230,7 +238,7 @@ export function PdfReviewPanel(props: Props) {
     };
   }, [props.enabled, doc?.disputeId, doc?.gameId, epoch]);
   function change(next: PdfReviewDocument) {
-    if (busy || uncertain || conflict) return;
+    if (busy || uncertain || conflict || publicationLocked) return;
     setDoc(next);
     setStatus("");
   }
@@ -287,13 +295,14 @@ export function PdfReviewPanel(props: Props) {
     }
   }
   async function save() {
-    if (!doc || !snapshot || busy || conflict) return;
+    if (!doc || !snapshot || busy || conflict || publicationLocked) return;
     const result = savePdfReviewSchema.safeParse(
       pending.current ?? {
         commandId: crypto.randomUUID(),
         sourceId: props.sourceId,
         expectedVersion: snapshot.version,
         document: doc,
+        reason: reviewReason,
       },
     );
     if (!result.success) {
@@ -337,7 +346,8 @@ export function PdfReviewPanel(props: Props) {
       setEpoch((v) => v + 1);
     }
   }
-  const disabled = busy || uncertain || conflict || !props.enabled,
+  const disabled =
+      busy || uncertain || conflict || !props.enabled || publicationLocked,
     source = snapshot?.source;
   return (
     <section className="pdf-review" aria-busy={busy}>
@@ -662,13 +672,15 @@ export function PdfReviewPanel(props: Props) {
             </label>
             <div className="competition-actions">
               <button
-                disabled={busy || conflict || !props.enabled}
+                disabled={
+                  busy || conflict || !props.enabled || publicationLocked
+                }
                 onClick={() => void save()}
               >
                 {uncertain ? "Repetir salvamento da revisão" : "Salvar revisão"}
               </button>
               <button
-                disabled={busy || !props.enabled}
+                disabled={busy || !props.enabled || publicationLocked}
                 onClick={() => {
                   if (mayLeave()) void load();
                 }}
@@ -688,6 +700,41 @@ export function PdfReviewPanel(props: Props) {
               Associações pendentes podem ser salvas para continuar depois. Esta
               revisão ainda não publica o resultado.
             </p>
+            <label>
+              Motivo da revisão do PDF
+              <textarea
+                maxLength={500}
+                value={reviewReason}
+                disabled={disabled}
+                onChange={(e) => setReviewReason(e.target.value)}
+              />
+            </label>
+            <p>
+              Se este PDF já foi publicado, informe o motivo da alteração (10 a
+              500 caracteres). Salvar mantém o resultado público anterior.
+            </p>
+            {snapshot && game && (
+              <PdfPublicationPanel
+                key={`${props.sourceId}:${snapshot.version}`}
+                review={snapshot}
+                game={game}
+                disabled={
+                  !props.enabled ||
+                  busy ||
+                  uncertain ||
+                  conflict ||
+                  dirty ||
+                  auxiliary
+                }
+                guard={publicationGuard}
+                onLock={setPublicationLocked}
+                onSessionLost={props.onSessionLost}
+                onPublished={() => {
+                  setEpoch((v) => v + 1);
+                  props.onSaved();
+                }}
+              />
+            )}
           </>
         )}
         {!source && !busy && (

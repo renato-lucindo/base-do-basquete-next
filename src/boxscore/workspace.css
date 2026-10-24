@@ -62,3 +62,13 @@
 .pdf-workspace [hidden] {
   display: none;
 }
+.pdf-publication {
+  background: #f5f7fb;
+  border: 1px solid #b8c6db;
+  padding: 14px;
+  margin-block: 20px;
+  min-width: 0;
+}
+.pdf-publication fieldset {
+  min-width: 0;
+}
