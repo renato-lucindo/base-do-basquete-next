@@ -1,3 +1,13 @@
+# Retomada e preview G1/G2 — 24/10/2026 00:50 America/Sao_Paulo (UTC-03)
+
+**Estado real:** cota reiniciada, 4%usados5h/29%semanal na última consulta. Reconexão humana Cloudflare confirmada; alvo/Access/namespace reconciliados. Branch codex/pdf-fontes, HEAD documental1161f1a, leitorWIPb9ee7f1, fundação3edcc11. Árvore limpa no início, remoto idêntico; nenhuma mudança humana alterada. PRdraft10 aberto sobre9. CI40041674631/job120713952602 **SUCCESS**, gate e browsersLinux; evidência anterior agora reconciliada, sem repetir suítes.
+
+**Publicado:** source1161f1a03902282db461e4f39429b01e58c42827, deploymentb41386a7-d9bf-4c27-8a6e-03b498e421c6, versão154146b8-574d-4be4-a094-66671d4c7aad,100%,03:48:41UTC. G1 jogos e G2 rascunho de súmula disponíveis no preview habitual. G3 ainda sem endpoints/UI. Builds regenerados para entrega, sem novo gate: cliente/Worker compilados; hashes em VALIDACAO-JOGOS. Smoke remoto PASS3arquivos/2browsers/rotas privadas incluindo sheet/negaçõesAuth. Token7a2b60de-26d8-41da-ba95-7518d78f4bf2 e política9512a65b-398d-4daf-af3d-fd68597bfcb3 revogados imediatamente. Access só responsável/previewsOFF/anônimo302 semX-Bdb-Source, namespace/cofre preservados. Sem serviços anteriores alterados, sem DDL nesta retomada.
+
+**Próximo exato:** continuar G3c provider+transporte conforme checkpoint abaixo. Avaliação humana G1/G2 solicitada, não bloqueia partes independentes. Novos métodos prepare/finish/list/saveReview com ACK/contexto e testes focais antes de binário/DO/StorageHTTP. Não declarar PDF integrado, jogo publicado ou etapa4 concluída. Sem processo de deploy/smoke/credencial em andamento. Automação antiga disparou; atualizar mesma ao próximo gatilho85%, reset5h real Unix1792831649 e semanal1793382169, sem compras/reset manual.
+
+---
+
 # Checkpoint de cota — 23/10/2026 20:49 America/Sao_Paulo (UTC-03)
 
 **Objetivo/unidade:** continuar etapa4 autorizada após importador. G1 cadastro de jogos/G2 súmula em rascunho estáveis/CI aprovadas; G3 extração/fontes/revisão no banco concluídas, provider de leitura iniciado; transporte binário/matching/UI eG4 confirmar/publicar/corrigir pendentes. Não declarar etapa4 completa nem Jogos publicados.

@@ -29,3 +29,7 @@ Pós-rollback: jogos/fontes/revisõesPDF/recibosPDF/objetos0; pessoas1,inscriç�
 Gate consolidado da fundação G3 PASS:138 unitários/31arquivos,5 transportes,10 cenários PostgreSQL,9 workerd da aplicação e1 prova workerd/DO com4PDFs, tipos/lint/formatação/builds/fronteira/segredos. CI será disparada pelo commit estável, ainda sem resultado correspondente. Primeiro início parou no lint de bundle local gerado em caminho antigo, sem executar suítes. Limpeza desse bundle foi rejeitada automaticamente; arquivos preservados e exclusão consistente de .preview-artifacts adicionada a ESLint/Prettier, sem ocultar código-fonte.
 
 Provider de leitura em b9ee7f13d1de24d824bbbb6505e36783211f615b (WIP sem rotas):2 testes RED→GREEN para RPCs fixos, schemas/erros sanitizados e headers de servidor; types/lint/format/segredos focais PASS. Gate138 refere-se à fundação3edcc11; CI40041674631 em andamento ao checkpoint de cota. Nenhum novo deploy/smoke remoto.
+
+## Reconciliação 24/10/2026
+
+CI40041674631/job120713952602 SUCCESS em3edcc11 (gate/browsersLinux). Cloudflare reconectado; preview source1161f1a contém G1/G2 e dependênciaZod corrigida, G3 permanece sem rotas/UI. Smoke/segurança da entrega em VALIDACAO-JOGOS; não afirma upload HTTP dePDFs. Próximo G3c provider/transporte autorizado.
