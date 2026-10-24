@@ -29,8 +29,11 @@ export async function api<T>(
       : AbortSignal.timeout(45000),
     ...(command
       ? {
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(command),
+          headers: {
+            "Content-Type":
+              command instanceof Blob ? command.type : "application/json",
+          },
+          body: command instanceof Blob ? command : JSON.stringify(command),
         }
       : {}),
   });

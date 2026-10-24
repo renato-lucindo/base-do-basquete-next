@@ -182,6 +182,9 @@ export const preparePdfResultSchema = z
 export const finishPdfSchema = z
   .object({ commandId: z.uuid(), sourceId: z.uuid() })
   .strict();
+export const pdfUploadResultSchema = z
+  .object({ id: z.uuid(), version: z.literal(2), duplicate: z.boolean() })
+  .strict();
 export const pdfReviewDocumentSchema = z
   .object({
     disputeId: z.uuid(),

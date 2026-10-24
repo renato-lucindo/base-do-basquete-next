@@ -1,0 +1,11 @@
+# G3d — revisão contextual de PDFs
+
+Continuação inline do plano jogo-completo, protótipo F05 já avaliado e execução autorizada. Não requer nova aprovação para decisões reversíveis. Branch codex/pdf-fontes, base66e4af7 (transporte gate151); sugestões fa99a1b. G4 confirmação/publicação permanece unidade posterior.
+
+1. Cliente binário usa a mesma origem/cookies e contrato de erros da API, sem SDK/chave/JWT. Lote sequencial, estado por arquivo, erros isolados e retry conserva commandId/sourceId/File em memória; não persistir bytes no browser. Fonte pendente do banco pode ser concluída escolhendo o mesmo PDF com nova intenção correlacionada, sem sobrescrever. Não iniciar uploads durante sessão perdida.
+2. Entrada Jogos→Importar PDFs, área própria preservada ao abrir cadastros auxiliares. Destino padrão da disputa; destinos por revisão e de outras competições pesquisáveis. Lista/retomada com paginação; erro não apaga sucessos. Reload recupera fontes/revisões salvas, arquivos locais ainda não enviados exigem nova seleção.
+3. Revisão mostra dados realmente extraídos e capacidades/ausências, origem separada do destino. Alterar disputa/jogo/inversão limpa associações incompatíveis explicitamente e não reenvia bytes. Salvar/retry/401/409/guardas; campos bloqueados enquanto envio incerto, recuperar versão explícita.
+4. Seleção de jogo paginada, cadastros de jogo/inscrições e elenco dentro da área com retorno/foco/documento preservados. Sugestões do módulo adaptado nunca selecionam/fundem identidades. Camisas0/00 distintas, UUIDs completos; elenco paginado com clareza de candidatos parciais e histórico já selecionado. Backend SQL decide validade final de vínculos/naipe.
+5. Testes browser RED para lote/isolamento, salvar-retomar-destino-sem-upload, retry/401/409/guardas/auxiliar e320px; focais durante implementação. Gate consolidado quando vertical estável, CI e preview protegido com smokes novos e revogação. StorageHTTP real ainda requer evidência apropriada: mocks outbound/SQLmetadados não a substituem. Não expor controles de publicação enquanto G4 não existir.
+
+Evidências e próximo exato em PROGRESSO.md/VALIDACAO-PDFS.md. Não repetir gate151/contratos reais/harness126 por documentação ou nova sessão; novo gate cobre a composição estável. Preservar dados humanos e serviços antigos.

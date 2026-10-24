@@ -45,3 +45,11 @@ Gate PASS151unitários/34arquivos,5transportes,10PostgreSQL,11workerd e1prova4PD
 ## Sugestões por vínculo G3d1
 
 matching-reference.ts é cópia apenas formatada do módulo fornecido. Adaptador UUID usa slots locais e devolve IDs completos; não seleciona/funde identidades. Três focais RED→GREEN PASS: abreviação única, homônimos,0/00,equipe/disputa/vínculo inativo e paginação incompleta sem afirmar exatidão. Types/lint/segredos focais PASS; banco/HTTP inalterados e gate151 anterior reutilizado. UI ainda não conectada; nenhuma promessa de matching automático global.
+
+## Revisão contextual G3d — 24/10/2026
+
+UI Jogos→Importar PDFs, Blob original com cookies de mesma origem (RED→GREEN), lote com estado/erro individual e retry da mesma intenção. Duplicidade entre destinos oferece retomada explícita do documento já existente. Fontes/revisões privadas retomadas; destino por documento/outra competição muda sem reupload e limpa associações incompatíveis. GamesWorkspace/MembersWorkspace reutilizados como auxiliares com guarda/foco/documento preservados. UUID completo, sugestões não automáticas, 0/00, elenco/paginação/histórico. Site apresenta ausência real de quartos/marcadores; não inventa DNP de minuto zero. Cache de navegação no history apenas IDs/filtros/contextos; notas, fatos, bytes e tokens não são persistidos no browser.
+
+20 cenários PDF desktop/mobile PASS e58 regressões da composição C1–C4/G1/G2 PASS (78 no total). Bugs de carregamento preso ao cancelar busca de elenco, filtro perdido após reload e duplicado fora do filtro reproduzidos antes de correções focais. Capturas320/top/bottom inspecionadas sem corte; grade responsiva de atletas em desktop. Gate consolidado PASS155unitários/35arquivos,5transportes,10PostgreSQL,11workerd,1prova4PDFs e checks estáticos/build/segredos. SQL real/migrations e harness126 inalterados reutilizados. Sem prova de revisão independente/carga/WCAG completa.
+
+CI transporte40060415546/job120772483885 SUCCESS no source66e4af7. UI será conferida em novaCI antes de deploy. Preview1161f1a ainda G1/G2, sem API/UI PDFs; smokescript ampliado com3GETs privadosPDF. Nenhum upload real/DDL/dado humano alterado. Piloto Storage HTTP autenticado continua pendente; não extrapolar prova de mocks outbound/metadados SQL. G4 confirmar/publicar/corrigir permanece pendente, UI não oferece controles falsos de publicação.
