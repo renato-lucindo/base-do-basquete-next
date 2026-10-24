@@ -36,6 +36,18 @@ const textConfirmContract = await readFile(
   "utf8",
 );
 const gamesContract = await readFile("supabase/tests/games.sql", "utf8");
+test("G4 final sheet helper enforces closure and keeps privileged computations private", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(
+      await readFile("supabase/tests/publication_final.sql", "utf8"),
+    );
+  } finally {
+    await db.close();
+  }
+});
 test("G3 PDF review retargets without reupload and revalidates roster, game and versions", async () => {
   const db = await PGlite.create();
   try {

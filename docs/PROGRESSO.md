@@ -1,3 +1,15 @@
+# G4P1a fechamento integrado — 24/10/2026 01:34 America/Sao_Paulo (UTC-03)
+
+Branch **codex/publicacao-jogos**, baseG3f2d634bbef005fed9daf91989e168b4bdbb9d916, plano2026-10-24-publicacao.md. P1a finalização/fatos manuais prontos no TS/SQL; obter SHA material final pelo Git. Todas as mudanças do agente; nenhuma alteração humana preservada foi tocada. G3 publicado e protegido conforme bloco seguinte, sem novo deploy nesta unidade.
+
+Migration **20261024043153_final_sheet_facts** aplicada/reconciliada no projeto novo. Helpers privados, validação final OT/LL/capitães/cinco titulares, cálculo SQL único reutilizado no rascunho.6 focais PASS (81cenários finais SQL×motor e335 anteriores incluídos),11 PostgreSQL do zero/upgrade PASS; **publication_final.sql e game_sheet.sql reais com rollback PASS**. Types gerados sem delta semântico,types/lint/format/segredos focais PASS. Não repetir gate/build/browsers G3 inalterados; gate consolidado da vertical G4 será feito quando estável. Pós-rollback jogos/súmulas/fontes/revisõesPDF/elencos/objetos0,pessoas1,inscrições2,Auth1; advisor só WARN conhecido. Sem publicação de resultado, sem API/UI G4 ou projeto antigo consultado.
+
+**Próximo exato P1b:** testes SQL RED antes de migration de projeção atual pública mínima/histórico/entriesFK/receipts privados e escritor atomic publish_sheet_game. Fresh admin antes de replay, versões da agenda/súmula/publicação sob locks; final_sheet_facts deriva dados, save_game_sheet resolve identidades, confirmação/projeção/histórico/receipt na mesma transação. Guards SQL de relacionados/camisas confirmados e motivo na edição. Tratar fallback explicitamente quando há PDF associado; nenhuma fonte é sobrescrita silenciosamente. Só o jogo escolhido. Leitores anon apenas da projeção já publicada, nenhum draft/campo privado/autor/motivo/pathStorage. Revalidar estado/publicação e FK/contexto em SQL; testes de falha/duas tentativas antigas/ator revogado/upgrade. P2PDF/domínios/P3APIUI/P4gate continuam depois. Não declarar etapa4 concluída.
+
+Sem gate/DDL/deploy/upload/credencial/processo em andamento. PR novo deve ser criado/anexado empilhado no draft10. Última cota62%usados5h/38%semanal; conferir antes de longas/entre unidades, gatilho85%, MESMA automação reset efetivo+2, sem compras/plano/reset manual. Limitações/piloto humano e referências em VALIDACAO-PUBLICACAO/PDFS e plano.
+
+---
+
 # G3 publicado / início G4 — 24/10/2026 01:24 America/Sao_Paulo (UTC-03)
 
 **Estado:** G3 revisão/API publicados para avaliação; G4 confirmação/publicação/correção inicia em branch própria **codex/publicacao-jogos** sobre **f2d634bbef005fed9daf91989e168b4bdbb9d916**. Novo repo/workspace habituais; nenhum merge/dado humano alterado. Alterações não commitadas somente documentação do agente; obter SHA documental final no Git. PR10 draft preservado, nova unidade terá PR empilhado próprio.
