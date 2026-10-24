@@ -1,3 +1,13 @@
+# P2c1 derivação SQL verificada — 24/10/2026 06:06 America/Sao_Paulo (UTC-03)
+
+Branch codex/publicacao-jogos, base86edc94. Migration **20261024090443_pdf_publication_facts** já aplicada/reconciliada no único Supabase novo; helper privado, sem nova API/writer/consulta pública.19focais composição PASS, SQL×TS4PDFs×2orientações/15inválidos/mistura manual PASS; prova real8casos+grants com rollback PASS. Artefato/hash/comando em VALIDACAO-PUBLICACAO. Público/tipos inalterados, types/lint/format focais verificados. Correção NJ contraditório com fatos positivos RED→GREEN. Sem dado humano alterado, contagens reais preservadas (jogos/fontes/revisões/publicações/objetos0,pessoas1,inscrições2,Auth1), advisor só conhecido. Alterações deste commit do agente; obterSHA peloGit. Sem DDL/deploy/upload/credencial/processo em andamento.
+
+**Próximo exato P2c2:** teste PostgreSQL RED de upgrade com histórico manual já publicado e registro tipado de origem. Criar nova migration CLI para FK (kind,id) em private.publication_sources com FKs reais sheet_game_id/pdf_source_id e bound_game_id imutável; preservar versões manuais por INSERT no registro, sem UPDATE/DELETE no histórico. Trigger de registro para novas versões, sem grants diretos. Verificar publicação manual anterior/nova, tentativa de reusar um PDF em outro jogo, RLS/grants e upgrade; depois escritor PDF e proteção de revisões confirmadas com motivo, source/review/game/publication tokens e locks compatíveis. P3API/UI/P4 continuam pendentes. Não declarar etapa4 concluída nem uploadHTTP real/humano comprovados.
+
+CI40079689771/job120830458062 SUCCESS emfb3476f; código P2posterior sófocais por enquanto. PreviewG3sourcef2d634b/deployment964bfe43-d5e5-4460-b1f6-b856e1bfce24/Access só responsável/previewsOFF preservados. Supabase somente link_6adaa8aab5688191b1e7ae1cddc55a82/projeto nizmasjddyrhmevvfviz. Cota última17%usados5h/44%semanal, reset5h1792849774/semanal1793382169; verificar entre unidades/antes de longas, aos85% mesma automação reset+2. Sem compra/plano/reset manual, sem repo/serviços antigos.
+
+---
+
 # P2b domínios preparados — 24/10/2026 05:59 America/Sao_Paulo (UTC-03)
 
 Branch codex/publicacao-jogos, baseP2a3887a90. CI40079689771/job120830458062 SUCCESS integral no fb3476f (161unit/gate/13PG/11workerd/prova4PDFs/browsersLinux); P2a/P2b posteriores ainda não têm gate integral, somente focais. Novo código deste commit pertence ao agente, sem mudanças humanas.

@@ -253,3 +253,22 @@ it("rejects unrelated zero-stat rows when mixing instead of supplying fabricated
     ),
   ).toThrow(/relacionados/u);
 });
+
+it("does not let a contradictory FIBA DNP flag conceal positive participation facts", () => {
+  const r = structuredClone(fiba);
+  r.source.parsed.teams[0].players[0].didNotPlay = true;
+  const s: PdfSupplement = {
+    ...supplement,
+    rows: r.document.mappings.map((m) => ({
+      sourceSide: m.sourceSide,
+      sourceIndex: m.sourceIndex,
+      played: !(m.sourceSide === 0 && m.sourceIndex === 0),
+      starter:
+        m.sourceSide === 0
+          ? m.sourceIndex >= 1 && m.sourceIndex <= 5
+          : m.sourceIndex < 5,
+      captain: m.sourceIndex === 0,
+    })),
+  };
+  expect(() => preparePdfFacts(r, s, choice())).toThrow(/participação/u);
+});

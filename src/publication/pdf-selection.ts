@@ -62,9 +62,20 @@ export function resolvePdfSelection(
       m = mappings.get(k);
     if (!c || !m?.rosterEntryId) return fail();
     const markers = sourceMarkers(r.source.parsed, p);
+    const hasFacts =
+      p.secondsPlayed > 0 ||
+      p.fieldGoals.attempted > 0 ||
+      p.freeThrows.attempted > 0 ||
+      p.rebounds > 0 ||
+      p.assists > 0 ||
+      p.turnovers > 0 ||
+      p.steals > 0 ||
+      p.blocks > 0 ||
+      p.foulsCommitted > 0 ||
+      (p.foulsReceived ?? 0) > 0;
     if (
       (c.starter && !c.played) ||
-      (!c.played && markers.participation === "played")
+      (!c.played && (hasFacts || markers.participation === "played"))
     )
       fail();
     const side = (
