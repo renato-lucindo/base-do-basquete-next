@@ -1,3 +1,17 @@
+# Etapa5 R1 concluído no domínio — 24/10/2026 12:10 America/Sao_Paulo (UTC-03)
+
+Branch **codex/regulamento-classificacao**, base820eb9648ca689920f802aed4f47d6c6a6681d6a/G4, material **30ce516ddbeaeb34bd4d95251adcf3fadac30781**, PRdraft **12** sobre11, anexado. CI **40105853327 em andamento** sobre30ce516, conferir antes de atribuirPASS. Plano docs/superpowers/plans/2026-10-24-regulamento-classificacao.md, decisão012 e VALIDACAO-REGULAMENTO.md. Checkout sequencial existente; não criar checkout paralelo sem necessidade. Nenhuma mudança humana ou serviço alterado nesta unidade.
+
+R1 puro: contratos declarativos de pontos corridos, critérios globais/confronto direto no subgrupo remanescente, classificação provisória explicável e empates sem desempate porID. Adapta apenasPublicResultestrito/placar oficial/origem por domínio; rejeita versão repetida de jogo/contexto e fórmulas. Grupos vazios/incompletos não ganham posição.10focaisPASS, gate **200unit/48arquivos,5transportes,13PG,13workerd,prova4PDFs** e demais checksPASS. Medição sintética100inscrições/1000fatos p95=9,366ms Node24.18/Windowsx64, não medeedge/banco/carga. Todos7assets eWorkerJS idênticos ao previewG4; não repetirbrowsers/smokes por biblioteca ainda não conectada.
+
+Próximoexato R2a: contratos e testes RED do resolvedor de séries normalizadas porinscrição/jogo/slot explícito, partidaúnica/ida-volta/BO3/5/7; contar vitórias com mando alternado, agregado sóquando aplicável e empate semvencedorimplícito. Não inferir ordem por datas/nomes, não processar W.O. comoestatística de partida. Preservar comandos/fatos publicados; partidas além de série decidida exigem revisão da atribuição. Depoisfases/grupos/atribuições/ocorrências, SQL/API/UI/classificação de cadaformato/transferências/premiações conformeplano. Etapa5incompleta, sem API/DDL/UI/deploy R1.
+
+G4previewcontinua source0166b142797e9a77e14b46883f53db4906f7f152/deployment74c98ab1-b80c-4e25-90ff-ef5bfc3f01fd/versãocfb6a4bb-1911-4a5e-87d6-d3a1625394db,Accesssóresponsável/previewsOFF. CI40102901620/job120898523098 SUCCESS com158browsers e smokesremotosPASS. Nenhuma credencial/processo ativo; tokens/políticas temporários revogados. Supabaseaté20261024141114, sem novaDDL; contagenshumanas1pessoa/2inscrições/1Auth e0jogos/fontes/publicações/objetospreservadas. Detalhes/hashes emaberturasanteriores. P4humano/StorageHTTP real ainda pendentes; pergunta enviada, sem resposta. Não declarar etapa4concluída por previewtécnico.
+
+Cota realúltima72%usados5h/66%semanal, reset5h1792867900/semanal1793382169. Checarentreunidades/antesdelongas; aos85% sómenorop/checkpoint/push/MESMAautomação reset+2, semcompras/plano/resetmanual. Nuncaextrairsegredos do conector/cofre, pedirsenha/token ou consultar/clonar repoanterior. Reutilizarevidênciasimutáveis; revisãoindependente/corridaPGmulti-conexão/carga/WCAGcompletanãoprovadas.
+
+---
+
 # Preview G4 publicado e verificado — 24/10/2026 11:45 America/Sao_Paulo (UTC-03)
 
 **Unidade:** G4P1–P3 implementados; P4 técnico publicado, avaliação humana/pilotoStorageHTTP real pendentes. Branch codex/publicacao-jogos, material/source **0166b142797e9a77e14b46883f53db4906f7f152**, CI **40102901620/job120898523098 SUCCESS**, gate190unit/47arquivos,5transportes,13PG,13workerd,prova4PDFs e158browsersLinux. Composição local76browsers PASS. Reutilizar logs/hashes de VALIDACAO-PUBLICACAO.md e harness126 imutável, sem repetir gates por checkpoint/docs. Código/API/UI/histórico/lote verificados; nenhuma revisão independente/carga/corridaPG multi-conexão/WCAGcompleta alegada.
