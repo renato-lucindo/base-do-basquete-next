@@ -549,104 +549,144 @@ async function publicationFixture(page: Page) {
   let publicVersion = 0,
     fallback = false,
     lost = false,
-    readFailure = false;
+    readFailure = false,
+    publicationExpired = false;
   const receipts = new Map<string, unknown>(),
-    attempts: string[] = [];
-  await page.route(`**/api/games/${game.id}/sheet`, async (route) => {
-    if (route.request().method() === "GET") {
-      if (readFailure) {
-        readFailure = false;
-        return route.fulfill({
-          status: 503,
-          json: {
-            error: {
-              code: "access_unavailable",
-              message: "Leitura temporariamente indisponível.",
+    attempts: string[] = [],
+    commands: string[] = [];
+  async function attach(targetPage: Page) {
+    if (targetPage !== page) await fixture(targetPage);
+    await targetPage.route(`**/api/games/${game.id}`, (route) =>
+      route.request().method() === "GET"
+        ? route.fulfill({ json: f.games.get(game.id) })
+        : route.fallback(),
+    );
+    await targetPage.route(`**/api/games/${game.id}/sheet`, async (route) => {
+      if (route.request().method() === "GET") {
+        if (readFailure) {
+          readFailure = false;
+          return route.fulfill({
+            status: 503,
+            json: {
+              error: {
+                code: "access_unavailable",
+                message: "Leitura temporariamente indisponível.",
+              },
             },
-          },
-        });
+          });
+        }
+        return route.fulfill({ json: source });
       }
-      return route.fulfill({ json: source });
-    }
-    const c = saveSheetSchema.parse(route.request().postDataJSON());
-    source = { ...source, document: c.document, version: source.version + 1 };
-    return route.fulfill({
-      json: {
-        requestId: c.requestId,
-        version: source.version,
-        confirmed: source.confirmed,
-      },
+      const c = saveSheetSchema.parse(route.request().postDataJSON());
+      source = { ...source, document: c.document, version: source.version + 1 };
+      return route.fulfill({
+        json: {
+          requestId: c.requestId,
+          version: source.version,
+          confirmed: source.confirmed,
+        },
+      });
     });
-  });
-  await page.route(`**/api/games/${game.id}/publication`, (route) =>
-    route.fulfill({
-      json: {
-        gameId: game.id,
-        version: publicVersion,
-        published: publicVersion
-          ? publishedSheet(
-              source.document,
-              game.id,
-              game.home.id,
-              game.away.id,
-              publicVersion,
-              source.version,
-              source.gameVersion,
-            )
-          : null,
-        history: [],
-        hasMore: false,
-        requiresFallback: fallback,
-      },
-    }),
-  );
-  await page.route(
-    `**/api/games/${game.id}/publication/sheet`,
-    async (route) => {
-      const c = publishSheetSchema.parse(route.request().postDataJSON());
-      attempts.push(c.requestId);
-      if (receipts.has(c.requestId))
-        return route.fulfill({ json: receipts.get(c.requestId) });
-      publicVersion++;
-      source = {
-        ...source,
-        document: c.source.document,
-        version: c.source.baseSheetVersion + 1,
-        gameVersion: c.gameVersion + 1,
-        confirmed: true,
-      };
-      f.games.set(game.id, {
-        ...game,
-        version: source.gameVersion,
-        state: "finished",
-      });
-      const ack = publicationSheetResultSchema.parse({
-        requestId: c.requestId,
-        gameId: game.id,
-        version: publicVersion,
-        sourceVersion: source.version,
-        gameVersion: source.gameVersion,
-        publishedAt: stamp,
-      });
-      receipts.set(c.requestId, ack);
-      if (lost) {
-        lost = false;
-        return route.fulfill({
-          status: 503,
-          json: {
-            error: {
-              code: "access_unavailable",
-              message: "Resposta não confirmada.",
+    await targetPage.route(`**/api/games/${game.id}/publication`, (route) =>
+      route.fulfill({
+        json: {
+          gameId: game.id,
+          version: publicVersion,
+          published: publicVersion
+            ? publishedSheet(
+                source.document,
+                game.id,
+                game.home.id,
+                game.away.id,
+                publicVersion,
+                source.version,
+                source.gameVersion,
+              )
+            : null,
+          history: [],
+          hasMore: false,
+          requiresFallback: fallback,
+        },
+      }),
+    );
+    await targetPage.route(
+      `**/api/games/${game.id}/publication/sheet`,
+      async (route) => {
+        const c = publishSheetSchema.parse(route.request().postDataJSON());
+        attempts.push(c.requestId);
+        commands.push(route.request().postData()!);
+        if (publicationExpired) {
+          publicationExpired = false;
+          return route.fulfill({
+            status: 401,
+            json: {
+              error: { code: "invalid_session", message: "Entre novamente." },
             },
-          },
+          });
+        }
+        if (receipts.has(c.requestId))
+          return route.fulfill({ json: receipts.get(c.requestId) });
+        if (
+          c.basePublicationVersion !== publicVersion ||
+          c.source.baseSheetVersion !== source.version ||
+          c.gameVersion !== source.gameVersion
+        )
+          return route.fulfill({
+            status: 409,
+            json: {
+              error: {
+                code: "version_conflict",
+                message: "Outra aba publicou este jogo. Recarregue a súmula.",
+              },
+            },
+          });
+        publicVersion++;
+        source = {
+          ...source,
+          document: c.source.document,
+          version: c.source.baseSheetVersion + 1,
+          gameVersion: c.gameVersion + 1,
+          confirmed: true,
+        };
+        f.games.set(game.id, {
+          ...game,
+          version: source.gameVersion,
+          state: "finished",
         });
-      }
-      return route.fulfill({ json: ack });
-    },
-  );
+        const ack = publicationSheetResultSchema.parse({
+          requestId: c.requestId,
+          gameId: game.id,
+          version: publicVersion,
+          sourceVersion: source.version,
+          gameVersion: source.gameVersion,
+          publishedAt: stamp,
+        });
+        receipts.set(c.requestId, ack);
+        if (lost) {
+          lost = false;
+          return route.fulfill({
+            status: 503,
+            json: {
+              error: {
+                code: "access_unavailable",
+                message: "Resposta não confirmada.",
+              },
+            },
+          });
+        }
+        return route.fulfill({ json: ack });
+      },
+    );
+  }
+  await attach(page);
   return {
     ...f,
     attempts,
+    commands,
+    attach,
+    expirePublication: () => {
+      publicationExpired = true;
+    },
     source: () => source,
     fallback: () => {
       fallback = true;
@@ -777,4 +817,83 @@ test("known publication with failed source retrieval retries only the read", asy
     page.getByRole("link", { name: "Ver resultado publicado", exact: true }),
   ).toBeVisible();
   expect(f.attempts).toHaveLength(1);
+});
+
+test("two tabs keep a stale publication draft until explicit reload", async ({
+  page,
+  context,
+}) => {
+  const f = await publicationFixture(page),
+    second = await context.newPage();
+  await f.attach(second);
+  await open(page);
+  await open(second);
+  await second.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  for (const tab of [page, second])
+    await tab
+      .getByRole("button", { name: "Confirmar e publicar", exact: true })
+      .click();
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  await second
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    second.getByRole("alert").filter({ hasText: "Outra aba publicou" }),
+  ).toBeVisible();
+  await expect(
+    second.getByLabel("Participou Atleta home 5", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    second.getByRole("button", { name: "Publicar este jogo", exact: true }),
+  ).toBeDisabled();
+  expect(f.source().version).toBe(2);
+  second.once("dialog", (d) => d.accept());
+  await second
+    .getByRole("button", { name: "Recarregar súmula", exact: true })
+    .click();
+  await expect(
+    second.getByLabel("Participou Atleta home 5", { exact: true }),
+  ).not.toBeChecked();
+  await expect(
+    second.getByLabel("Relacionar Atleta home 0", { exact: true }),
+  ).toBeDisabled();
+  expect(f.attempts).toHaveLength(2);
+});
+
+test("expired publication session preserves the frozen command and protects leaving a clean sheet", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  f.expirePublication();
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(page.getByLabel("E-mail", { exact: true })).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    }),
+  ).toBe(true);
+  await page.getByLabel("E-mail", { exact: true }).fill("admin@example.test");
+  await page.getByLabel("Senha", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Repetir publicação", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  expect(f.commands).toHaveLength(2);
+  expect(f.commands[1]).toBe(f.commands[0]);
 });

@@ -130,14 +130,14 @@ export function GameSheetWorkspace(props: Props) {
     };
   });
   useEffect(() => {
-    if (!dirty && !uncertain && !editing) return;
+    if (!dirty && !uncertain && !editing && !publicationLocked) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, uncertain, editing]);
+  }, [dirty, uncertain, editing, publicationLocked]);
   useEffect(() => {
     if (!props.enabled) return;
     if (!auxiliary && returningToSide.current) {
