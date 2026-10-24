@@ -55,6 +55,7 @@ PROGRESSO.md governa a retomada. Cota real no início/entre unidades/antes de lo
 
 - R2a: resolvedor puro de séries e8cenários, gate208local. Sem API/UI/DDL; CI própria deve ser reconciliada.
 - R2b: grupos/atribuições explícitas e5cenários;23focais composição/types/lint/format PASS. Cruzamentos e grafo de classificados ainda pendentes; não marcar todaR2concluída.
+- R2c: prévia de grafo/cruzamentos implementada,10novos/33focais PASS; conflitos preservam fatos e versões. Gate local interrompido em workerd por rejeição antecipada de upload; diagnóstico/testes por fronteira e evidências exatas na validação. CI consolidada pendente. R2ocorrências ainda não implementado.
 - PróximoR2c: referências de entradas por inscrição/posição de grupo/vencedor ou perdedor de série; impedir ciclos/crosscontexto e avanço por empate ou publicação pendente. Classificação é prévia, decisão final/honraria exige confirmação e histórico próprios. Começar por testeRED de empate na posição/corte e referência cíclica, com efeitos observáveis no resolvedor.
 
 ### R2c — contrato a implementar na próxima unidade
