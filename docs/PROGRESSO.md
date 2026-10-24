@@ -1,3 +1,15 @@
+# Consulta pública mínima / preparação da súmula — 24/10/2026 06:56 America/Sao_Paulo (UTC-03)
+
+Branch codex/publicacao-jogos, baseAPI5b5ffa6. Entrada **resultado.html#UUID**, DTO somente público e apresentação manual/PDF com cobertura real pronta,6browsers desktop/mobile PASS e capturas320 inspecionadas. Skip-link preservaUUID, erro/ausência não exibemprivados; buildmultipágina/clientboundary PASS. Manifesto permite os doisHTML conhecidos. Decisão011/VALIDACAO-PUBLICACAO atualizados. Código deste commit do agente, sem alterações humanas/deploy/DDL/serviços em andamento; preview permaneceG3 protegido. Novo gate consolidado será feito com a interface de publicação estável, sem repetirSQL/harness por esta leitura.
+
+CIAPI **40083043887/job120840336623** teve gate187 SUCCESS e browsers111/112, falhaC1mobile. Trace baixado pelo conector, hash/artefatoemVALIDACAO: GETinicialde200ms recebeu401 apósexpire() antesdocliqueSalvar. Teste passou a aguardarconsulta inicial antes da expiração.2focaisdesktop/mobilePASS; novaCI necessária antesdedeploy, não assumirverde. Não mudado timeoutnemaplicação.
+
+**Próximo exato:** manualUI com testes browser RED dentro de tests/sheet.spec.ts para aproveitarfixture existente (não importar spec emoutro spec). Fixture nova parte de súmula salva com6relacionadoshome/5away,5titulares/capitão porlado,2–0, versões independentes. Painel na GameSheetWorkspace: conferir estado+gameSnapshot sem reciclar tokens; Confirmar/publicar e Salvar/republicar, motivo/fallback, comando congelado no retry503,409exige recarga. PubACK conhecido +falha no GETposterior deve repetir somente leitura; bloquearcamisas/relacionadosconfirmados e deixarparticipação editávelcom motivo. Linkaoresultado abrenovaaba. Reutilizar PublicGameView parahistórico quando necessário. DepoisPDF/suplemento/fontes/lote porjogo eP4preview/piloto. Etapa4incompleta.
+
+Última cota69%usados5h/52%semanal, reset5h1792849774/semanal1793382169; checarantes deoutraunidade/longas. Ao85%menorop/checkpoint/push/MESMAautomação reset+2. TudoSupabaseaplicadoaté20261024093639, único projeto/vínculo em registros abaixo; contagens humanas preservadas. SemuploadHTTP real/avaliaçãohumana/revisãoindependente/carga/corrida multi-conexão/WCAGcompleta comprovados. Sem compra/plano/resetmanual/repo antigo.
+
+---
+
 # P3a API verificada — 24/10/2026 06:41 America/Sao_Paulo (UTC-03)
 
 Branch codex/publicacao-jogos, base68bf4c6; material neste commit (obterSHA noGit). CI40082023804/job120837362377 SUCCESS integral em68bf4c6. Migration **20261024093639_publication_read_state** aplicada/reconciliada; todas migrações anteriores já aplicadas, não reaplicar. Provider com RPCs fixos/ACKs/DTOs, métodos autorizados no SessionStore, rotas privadas /api/games/:id/publication [GET], /sheet e /pdf [POST], /versions/:n [GET]; público /api/public/games/:id [GET] só projeção/anon/chavepublicável no servidor. Sem JWT/cofre/conta administrativa na leitura pública. Novo reader correlaciona gameId e requiresFallback.

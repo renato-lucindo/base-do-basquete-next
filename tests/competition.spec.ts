@@ -212,7 +212,15 @@ test("unsaved work prevents accidental logout and survives reauthentication in m
   page,
 }) => {
   const f = await fixture(page);
+  // Expire the editing operation after the independently scheduled initial listing.
+  // Otherwise its delayed GET may expire first and hide Save before the click.
+  const initialListing = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === "/api/competitions" &&
+      response.request().method() === "GET",
+  );
   await page.goto("http://127.0.0.1:5174/foundation.html");
+  await initialListing;
   await create(page);
   await page.getByLabel("Nome do campeonato").fill("Edição preservada");
   page.once("dialog", (dialog) => dialog.dismiss());

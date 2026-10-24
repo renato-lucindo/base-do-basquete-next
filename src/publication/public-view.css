@@ -1,0 +1,73 @@
+.public-result,
+.public-game,
+.public-game section {
+  min-width: 0;
+  max-width: 100%;
+}
+.public-game h2 {
+  overflow-wrap: anywhere;
+  font-size: 1.6rem;
+}
+.public-game section {
+  margin: 2rem 0;
+}
+.public-scroll {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid #d9e2ee;
+  border-radius: 4px;
+  background: white;
+}
+.public-scroll table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 620px;
+}
+.public-scroll caption {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+}
+.public-scroll th,
+.public-scroll td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d9e2ee;
+}
+.public-scroll thead {
+  background: #edf3fa;
+}
+.public-scroll th[scope="row"] {
+  min-width: 160px;
+}
+@media (max-width: 480px) {
+  .public-result {
+    padding: 16px;
+  }
+  .public-game h2 {
+    font-size: 1.3rem;
+  }
+  .public-game p {
+    overflow-wrap: anywhere;
+  }
+}
+
+.public-table-hint {
+  display: none;
+}
+.public-periods table {
+  min-width: 0;
+}
+.public-periods th,
+.public-periods td {
+  padding: 8px 6px;
+}
+.public-periods th[scope="row"] {
+  min-width: 80px;
+}
+@media (max-width: 600px) {
+  .public-table-hint {
+    display: block;
+    color: #42526b;
+  }
+}
