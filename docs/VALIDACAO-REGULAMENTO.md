@@ -42,6 +42,8 @@ Prova4PDFs workerd rodada após interrupção do gate PASS (.preview-artifacts/r
 
 CI consolidada **40123498354/job120959898862 SUCCESS** sobre **b7adaac128c791f79325489e9fa0c4d8f7139082**; inclui R2b/R2c e o teste de limite por fronteira corrigido. Não atribuir essa CI ao R2d posterior.
 
+Logs CI conferidos:224unit/51arquivos,5transportes,13PG,13workerd,prova4PDFs e158browsersLinux PASS. WorkerJS aindaSHA0ff2e4a93d679b1b88267626ad1562a87525043e3832f1b5a19c5c2f1ca2000e; preview não alterado.
+
 ## R2d — ocorrências e desistências (prévia pura)
 
 11novos/44focais composição R1/R2a/b/c/d PASS, tipos/lint/formato PASS. RED inicial módulo ausente. Regras WO explícitas/pontos e penalidade/score opcional orientado, decisão administrativa award ou exclude, adiamento/interrupção pendentes e cancelamento distinto de0–0. Versões de agenda/publicação, vencedores/contextos/repetições/motivo/contratos fechados guardados. Duas políticas de desistência preservam fontes; resultados prévios são IDs explícitos, futuros não viramWO, resultado publicado fora da relação revisada exige conferência. Duas desistências em ordem invertida produzem o mesmo efeito. Entrada/publicação permanecem intactas e nenhum fato individual é produzido.
@@ -53,3 +55,13 @@ R2d ainda não alimenta classificação/séries; próximoR2e no plano2026-10-24-
 11novos/55focais de composição atéR2e1 PASS, tipos/lint/formato PASS. Contrato OutcomeGame valida contexto/fato ou award separados. Classificação distingue playedGames/awardedGames/scoreGamesCovered, aplica pontuação/vitórias administrativas e não cria placar quando ausente; pontos/saldo ficamnull quando cobertura incompleta. Critério que requer placar desconhecido bloqueia aquele empate sem pular para critério seguinte. Confronto direto recalcula o subgrupo com os efeitos explícitos.
 
 Série partidaúnica/melhor3/5/7 usa vencedores administrativos sem tratá-los como jogos com estatística individual. Ida-volta exige ambos placares competitivos ou decisão revista: score ausente mantém score_or_decision, sem soma falsa0. Mando, slots/lacunas, jogo após decisão e linhagem publicação/ocorrência guardados. R2e2composição com grupos/cruzamentos ainda em implementação, sem gate/CI novo desta subunidade. CI224/51 e158browsers do b7adaac não é evidência dos novos arquivos.
+
+## R2e2 — composição de grupos, séries e ocorrências
+
+8novos/63focais do módulo PASS, tipos/lint/formato PASS. RED inicial módulo ausente e RED adicional de avanço indevido quando dois awards sugeriam vencedor mas havia resultado publicado fora da relação de desistência revisada. Guardaunresolved_results agora bloqueia essa série e seus dependentes; não elimina silenciosamente o resultado conflitante.
+
+Composição cobre grupo→semifinais normal/WO→final, WO no grupo com placarnull, adiamento/interrupção/cancelamento, desistência em ambas políticas, mudança de classificado incompatível com jogo existente, ida-volta sem cobertura de placar e IDs/contextos/slots/ciclos. Extração do grafo compartilhado mantém os10casos R2c anteriores. Fontes/versões/origens preservadas, entrada imutável; nenhuma agenda/adversário/fato público reescrito. Gate/CI da composição estável ainda a executar/conferir; sem API/DDL/UI/deploy novo.
+
+Gate R2d/e executado: lint/format/types PASS, unitários253/254 com timeout5s no provider que extraiPDF real na fixture,54/55arquivosPASS. **Essa primeira execução não é PASS integral.** Log .preview-artifacts/r2-occurrences-gate.log SHA256bd56435137b6f525324400c3b249013ac321d5c1947c05495e3be15ef844c873. Provider isolado7/7 em865ms;55workers iniciados no conjunto/12CPUs disponíveis. Hipótese de contenção na inicialização CPU/WASM levou a testar somente o limite de paralelismo:4workers →254/254/55arquivosPASS em16,58s. Log .preview-artifacts/r2-occurrences-unit-bounded.log SHA25619c54e58a8b4a1c3d2d56618e9538abd166b8877af6ed67619b3c56cd4ca203d. Config agora limita4workers, sem aumentar timeout/skip/retry de cenário.
+
+Fechamento em etapas reutiliza unitários/focais válidos: tipos/lint/formato focais após a configuraçãoPASS;5transportes,13PG,ambosbuilds,13workerd,prova4PDFs,fronteira/segredosPASS na sequência restante(exit0). Não repetimos de novo254unitários nem marcamos o primeiro gate integralPASS. NovaCI consolidada verificará o commit material. Todos7assets iguais ao manifesto0166b14 eWorkerJS0ff2e4a93d679b1b88267626ad1562a87525043e3832f1b5a19c5c2f1ca2000e: semsmoke/browser/deploy novo para artefatos inalterados. Aviso já conhecido de importdinâmico staff sem chunk separado permanece sem mudança de artefato.

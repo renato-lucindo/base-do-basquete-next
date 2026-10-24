@@ -31,9 +31,9 @@ Interface: RoundRobinRules exige pontuação e critérios ordenados finitos; Com
 
 ## R2 — organização e resolução competitiva
 
-- [ ] Contratos/testes de fases/grupos/atribuições e séries partida única, ida-volta, melhor3/5/7. Cruzamentos explícitos e sugestões opcionais; bloqueio de avanço em empate/pendência.
-- [ ] Conectar cada formato à resolução e classificação correspondente, sem disponibilizar formato que não calcula seu resultado.
-- [ ] Ocorrências W.O./adiamento/cancelamento/interrupção/desistência/decisão administrativa, efeito configurado no regulamento e prévia sem estatística individual fabricada.
+- [x] Núcleo puro: contratos/testes de fases/grupos/atribuições e séries partida única, ida-volta, melhor3/5/7. Cruzamentos explícitos; bloqueio de avanço em empate/pendência. Sugestões automáticas opcionais não incluídas.
+- [x] Conectar cada formato à resolução/classificação na prévia organizada. API/UI permanecemR3; nenhum formato parcial disponibilizado ao usuário.
+- [x] Núcleo puro de W.O./adiamento/cancelamento/interrupção/desistência/decisão administrativa e prévia organizada sem estatística individual fabricada. Persistência/autoridade/histórico e UI permanecemR3.
 
 ## R3 — persistência/API/UI e histórico
 

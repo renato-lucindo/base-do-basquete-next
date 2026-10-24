@@ -3,5 +3,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  test: { include: ["src/**/*.test.ts"] },
+  // Bound CPU/WASM initialization when PDF fixtures and PostgreSQL suites run together.
+  test: { include: ["src/**/*.test.ts"], maxWorkers: 4 },
 });
