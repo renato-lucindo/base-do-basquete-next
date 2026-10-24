@@ -13,3 +13,11 @@ Comparação de artefatos: todos os7arquivos clientes idênticos ao manifesto do
 Medição sintética local do cálculo,100inscrições/1000fatos publicados,5aquecimentos/20amostras: Nodev24.18.0 Windowsx64, p50=4,948ms,p95=9,366ms,máximo9,904ms, meta declarada250ms. Artefato ignorado .preview-artifacts/standings-benchmark.json SHA25668960e5073ebf94b90ed5143a3300629c13533ab6e85dda3041b2a90c5977f17. Mede validação/cálculo puro com fixtures; não mede banco, rede, Worker/DO real, concorrência ou carga de produção e não certifica escala.
 
 R2/R3/R4 pendentes: organização/fases/séries/ocorrências, persistência e impacto autoritativo, API/UI, transferências/retornos/premiações, CI/preview e avaliação. Etapa5 incompleta. A avaliação humana/pilotoStorageHTTP real da etapa4 continua pendente; preview protegido segue0166b14. Nenhuma revisão independente, corridaPG multi-conexão ou auditoriaWCAG completa comprovada.
+
+## R2a — resolução pura de séries
+
+Confronto com duas inscrições, slots explícitos e jogos publicados: partidaúnica, ida-volta e melhor3/5/7. Identidades A/B do confronto independem do mando de cada partida; placares são reorientados por ID. Melhor-de-N conta vitórias e recusa partida adicional após decisão. Ida-volta soma os dois placares oficiais; empate agregado mantém pendência de decisão, sem gol/cesta fora ou jogo extra presumidos. Slot anterior sem resultado impede conclusão automática; zero partidas não fabrica placar0–0. Esta unidade não define campeão, não processa W.O. como partida jogada e não reescreve fontes.
+
+8casos novos e18focais da composição PASS: todos os formatos, mando alternado/ordem de entrada, liderança incompleta/gap de slot, agregado empatado, jogo extra, duplicatas/contexto/ocorrência indevida e entrada imutável/linhagem. Gate local **PASS208unit/49arquivos,5transportes,13PG,13workerd,prova4PDFs** e demais checks. Log .preview-artifacts/r2-series-gate.log SHA256002a27bb3a8d7699212919e3b71259b00be4ae38ef130f53420835df97d2d0df. Nenhum API/DDL/UI/deploy novo. R2 (fases/grupos/atribuições/ocorrências) continua parcial.
+
+CI R1 **40105853327/job120907267019 SUCCESS** em30ce516; não atribuir essa CI aos arquivosR2a posteriores. Nova CI do materialR2 será conferida antes de integração. Preview G4 e evidências de seus artefatos permanecem imutáveis.
