@@ -1,0 +1,10 @@
+{
+  "name": "bdb-pdf-local-proof",
+  "main": "pdf-worker.mjs",
+  "compatibility_date": "2026-10-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [{ "name": "PARSER", "class_name": "PdfProbe" }],
+  },
+  "migrations": [{ "tag": "test-v1", "new_sqlite_classes": ["PdfProbe"] }],
+}

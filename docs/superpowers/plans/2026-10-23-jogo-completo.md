@@ -38,3 +38,11 @@ Consultar cota real no início/entre unidades/antes de longas. Aos85%usados5h, m
 ## Checkpoint G1, cota85%
 
 DB ab6e80b e API17d9fb2 salvos remotamente, PRdraft#8. UI em WIP e seis browsers focais PASS; faltam cadastro auxiliar, regressoes da composicao, inspecao visual, gate/CI/deploy. Migration real20261023192926, contratos/tipos/seguranca verificados. Retomar pelo proximo exato de PROGRESSO.md, sem repetir SQL/harness inalterados.
+
+## Checkpoint G3, 23/10/2026
+
+G1/G2 estáveis/CI aprovadas, publicação aguardando OAuthCloudflare. G3a/b: extração real4fixtures, fonte privada/revisão duráveis e contratos reais com rollback aprovados, gate138/10SQL/9workerd+provaPDF em3edcc11. Provider de leituraWIPb9ee7f1 validado focalmente; API binária/Storage HTTP/matching/UI/G4 pendentes. Aos85%usados, checkpoint/retomada oficial em PROGRESSO.md. Não repetir gate ao despertar; primeiro reconciliar CI40041674631 e serviços.
+
+## G3d — composição estável em24/10
+
+API66e4af7/CI40060415546 SUCCESS, sugestõesfa99a1b; UI contextual/lote/retomada/auxiliares implementados. Gate155/35arquivos,10SQL,11workerd+prova4PDFs e78browsers da composição PASS. CI/UI/deploy e piloto StorageHTTP real ainda serão reconciliados; não repetir esses gates só por sessão/docs. Plano detalhado2026-10-24-pdf-workspace.md, evidências/proximo em PROGRESSO.md. G4/publicação atômica não implementada ainda.

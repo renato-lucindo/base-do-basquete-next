@@ -19,17 +19,19 @@
     "format": "prettier --write src tests scripts index.html foundation.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md",
     "format:check": "prettier --check src tests scripts index.html foundation.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md",
     "secrets": "node scripts/check-secrets.mjs",
-    "gate": "npm run lint && npm run format:check && npm run types:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run build:foundation && npm run test:access && node scripts/check-client-boundary.mjs && npm run secrets",
+    "gate": "npm run lint && npm run format:check && npm run types:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run build:foundation && npm run test:access && npm run test:pdf-runtime && node scripts/check-client-boundary.mjs && npm run secrets",
     "dev:foundation": "vite --config vite.foundation.config.ts",
     "build:foundation": "vite build --config vite.foundation.config.ts",
     "build:worker": "tsc --noEmit -p tsconfig.worker.json && wrangler deploy --dry-run --outdir .worker-artifacts",
     "test:access": "npm run build:worker && node --test tests/access-worker.test.mjs",
-    "types:check": "wrangler types --include-runtime false --strict-vars false --check"
+    "types:check": "wrangler types --include-runtime false --strict-vars false --check",
+    "test:pdf-runtime": "wrangler deploy --dry-run --config tests/fixtures/pdf-worker.wrangler.jsonc --outdir ../../.preview-artifacts/pdf-worker && node --test tests/pdf-runtime.test.mjs"
   },
   "dependencies": {
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "zod": "4.6.5"
+    "unpdf": "1.8.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261023.1",

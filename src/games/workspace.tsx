@@ -22,6 +22,7 @@ type Props = {
   guard: { current: () => boolean };
   onSessionLost: () => void;
   onSaved: () => void;
+  onImportPdfs?: () => void;
 };
 const document = (s: GameSnapshot) =>
   gameSchema.parse({
@@ -254,6 +255,16 @@ export function GamesWorkspace(props: Props) {
         <h3 ref={heading} tabIndex={-1}>
           Jogos
         </h3>
+        {props.onImportPdfs && (
+          <button
+            disabled={busy || auxiliary || sheetVisible}
+            onClick={() => {
+              if (mayLeave()) props.onImportPdfs?.();
+            }}
+          >
+            Importar PDFs
+          </button>
+        )}
         <button
           disabled={busy || auxiliary || sheetVisible}
           onClick={() => {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
+import { PdfSourcesWorkspace } from "../boxscore/workspace";
 import {
   competitionSchema,
   listingSchema,
@@ -60,9 +61,10 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selected, setSelected] = useState("");
-  const [tab, setTab] = useState<"info" | "teams" | "games">("info");
+  const [tab, setTab] = useState<"info" | "teams" | "games" | "pdfs">("info");
   const teamsGuard = useRef<() => boolean>(() => true);
   const gamesGuard = useRef<() => boolean>(() => true);
+  const pdfGuard = useRef<() => boolean>(() => true);
   const [opening, setOpening] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -86,6 +88,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     return (
       teamsGuard.current() &&
       gamesGuard.current() &&
+      pdfGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
           "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
@@ -155,14 +158,20 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
     if (!enabled || restored.current) return;
     restored.current = true;
     const match =
-      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/(?:equipes|jogos))?$/i.exec(
+      /^#campeonato\/([0-9a-f-]{36})(?:\/([0-9a-f-]{36}))?(\/(?:equipes|jogos(?:\/pdfs)?))?$/i.exec(
         location.hash,
       );
     if (match)
       void openCompetition(
         match[1],
         match[2],
-        match[3] === "/jogos" ? "games" : match[3] ? "teams" : "info",
+        match[3] === "/jogos/pdfs"
+          ? "pdfs"
+          : match[3] === "/jogos"
+            ? "games"
+            : match[3]
+              ? "teams"
+              : "info",
       );
   }, [enabled]);
 
@@ -201,7 +210,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
   async function openCompetition(
     id: string,
     wanted?: string,
-    targetTab: "info" | "teams" | "games" = "info",
+    targetTab: "info" | "teams" | "games" | "pdfs" = "info",
   ) {
     if (!mayLeave()) return;
     setOpening(true);
@@ -452,6 +461,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
                 value={selected}
                 onChange={(event) => {
                   if (!teamsGuard.current()) return;
+                  if (!gamesGuard.current() || !pdfGuard.current()) return;
                   setSelected(event.target.value);
                   setRoute(editor.draft.id, event.target.value, tab);
                 }}
@@ -739,6 +749,29 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
               />
             </div>
           )}
+          {context && editor.savedIds.has(context.id) && savedCompetition && (
+            <div hidden={tab !== "pdfs"}>
+              <PdfSourcesWorkspace
+                key={context.id}
+                defaultDisputeId={context.id}
+                initialContexts={savedCompetition.seasons.flatMap((s) =>
+                  s.disputes.map((d) => ({
+                    id: d.id,
+                    gender: d.gender,
+                    label: `${savedCompetition.name} · ${s.year} · ${d.gender === "feminino" ? "Feminino" : "Masculino"} · ${d.category}${d.division ? " · " + d.division : ""}`,
+                  })),
+                )}
+                enabled={enabled && tab === "pdfs"}
+                guard={pdfGuard}
+                onSessionLost={onSessionLost}
+                onSaved={() => setRefresh((v) => v + 1)}
+                onBack={() => {
+                  setTab("games");
+                  setRoute(editor.draft.id, selected, "games");
+                }}
+              />
+            </div>
+          )}
           {context && editor.savedIds.has(context.id) && (
             <div hidden={tab !== "games"}>
               <GamesWorkspace
@@ -753,6 +786,10 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
                 guard={gamesGuard}
                 onSessionLost={onSessionLost}
                 onSaved={() => setRefresh((v) => v + 1)}
+                onImportPdfs={() => {
+                  setTab("pdfs");
+                  setRoute(editor.draft.id, selected, "pdfs");
+                }}
               />
             </div>
           )}
@@ -810,11 +847,14 @@ function snapshotWithoutMetadata(value: CompetitionSnapshot): Competition {
 function setRoute(
   id: string,
   dispute: string,
-  tab: "info" | "teams" | "games" = "info",
+  tab: "info" | "teams" | "games" | "pdfs" = "info",
 ) {
+  const next = `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "pdfs" ? "/jogos/pdfs" : tab === "games" ? "/jogos" : tab === "teams" ? "/equipes" : ""}`;
   history.replaceState(
-    null,
+    next === location.pathname + location.search + location.hash
+      ? history.state
+      : null,
     "",
-    `${location.pathname}${location.search}#campeonato/${id}/${dispute}${tab === "games" ? "/jogos" : tab === "teams" ? "/equipes" : ""}`,
+    next,
   );
 }

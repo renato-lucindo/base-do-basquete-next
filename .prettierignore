@@ -8,3 +8,6 @@ package-lock.json
 
 # Reproducible generated bindings, checked by Wrangler.
 worker-configuration.d.ts
+
+# Local runtime probes and screenshots are generated evidence.
+**/.preview-artifacts/
