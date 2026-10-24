@@ -7,6 +7,7 @@ import {
 } from "./source-contract";
 import { PdfContextPicker, type PdfContext } from "./context-picker";
 import { PdfReviewPanel } from "./review-panel";
+import { PdfPublicationBatch } from "../publication/pdf-batch";
 import { readPdfView } from "./view";
 import "./workspace.css";
 type Job = {
@@ -45,6 +46,8 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
     [error, setError] = useState(""),
     [selected, setSelected] = useState<string | null>(restored.selected),
     [loading, setLoading] = useState(false);
+  const [batchBusy, setBatchBusy] = useState(false);
+  const batchGuard = useRef(() => true);
   const reviewGuard = useRef(() => true),
     busyRef = useRef(false),
     enabled = useRef(props.enabled),
@@ -80,6 +83,7 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
   function mayLeave() {
     return (
       !busyRef.current &&
+      batchGuard.current() &&
       reviewGuard.current() &&
       (!jobs.some((j) => ["queued", "uncertain"].includes(j.state)) ||
         window.confirm(
@@ -225,7 +229,7 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
           Importar PDFs
         </h3>
         <button
-          disabled={busy}
+          disabled={busy || batchBusy}
           onClick={() => {
             if (mayLeave()) props.onBack();
           }}
@@ -245,10 +249,12 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
           contexts={contexts}
           onContexts={addContexts}
           onChange={(id) => {
-            setDestination(id);
-            setOffset(0);
+            if (batchGuard.current()) {
+              setDestination(id);
+              setOffset(0);
+            }
           }}
-          disabled={busy || !props.enabled}
+          disabled={busy || batchBusy || !props.enabled}
           onSessionLost={props.onSessionLost}
         />
         <label>
@@ -258,7 +264,7 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
             type="file"
             accept="application/pdf,.pdf"
             multiple
-            disabled={busy || !props.enabled}
+            disabled={busy || batchBusy || !props.enabled}
             onChange={(e) => {
               select(e.target.files);
               e.currentTarget.value = "";
@@ -279,15 +285,17 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
               <p>{j.message}</p>
               {j.state === "done" && j.duplicate && (
                 <button
-                  disabled={busy || !props.enabled}
-                  onClick={() => setSelected(j.sourceId)}
+                  disabled={busy || batchBusy || !props.enabled}
+                  onClick={() => {
+                    if (batchGuard.current()) setSelected(j.sourceId);
+                  }}
                 >
                   Retomar documento existente de {j.file.name}
                 </button>
               )}
               {["uncertain", "queued"].includes(j.state) && (
                 <button
-                  disabled={busy || !props.enabled}
+                  disabled={busy || batchBusy || !props.enabled}
                   onClick={() => void run([j])}
                 >
                   Repetir envio de {j.file.name}
@@ -303,20 +311,24 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
         )}
         <div className="competition-actions">
           <button
-            disabled={busy || !props.enabled}
+            disabled={busy || batchBusy || !props.enabled}
             onClick={() => setEpoch((v) => v + 1)}
           >
             Atualizar documentos
           </button>
           <button
-            disabled={!offset || busy}
-            onClick={() => setOffset(Math.max(0, offset - 20))}
+            disabled={!offset || busy || batchBusy}
+            onClick={() => {
+              if (batchGuard.current()) setOffset(Math.max(0, offset - 20));
+            }}
           >
             Documentos anteriores
           </button>
           <button
-            disabled={!list.hasMore || busy}
-            onClick={() => setOffset(offset + 20)}
+            disabled={!list.hasMore || busy || batchBusy}
+            onClick={() => {
+              if (batchGuard.current()) setOffset(offset + 20);
+            }}
           >
             Mais documentos
           </button>
@@ -331,7 +343,12 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
                   : "Envio incompleto · selecione o mesmo PDF para concluir"}
               </p>
               {s.ready ? (
-                <button disabled={busy} onClick={() => setSelected(s.id)}>
+                <button
+                  disabled={busy || batchBusy}
+                  onClick={() => {
+                    if (batchGuard.current()) setSelected(s.id);
+                  }}
+                >
                   Revisar {s.filename}
                 </button>
               ) : (
@@ -340,7 +357,7 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
                   <input
                     type="file"
                     accept="application/pdf,.pdf"
-                    disabled={busy || !props.enabled}
+                    disabled={busy || batchBusy || !props.enabled}
                     onChange={(e) => {
                       select(e.target.files, s);
                       e.currentTarget.value = "";
@@ -353,6 +370,21 @@ export function PdfSourcesWorkspace(props: PdfWorkspaceProps) {
         </ul>
         {!loading && !list.items.length && (
           <p>Nenhum documento salvo neste destino.</p>
+        )}
+        {list.items.length > 0 && (
+          <PdfPublicationBatch
+            key={`${destination}:${offset}`}
+            sources={list.items}
+            enabled={props.enabled && !busy}
+            guard={batchGuard}
+            onLock={setBatchBusy}
+            onSessionLost={props.onSessionLost}
+            onReview={setSelected}
+            onPublished={() => {
+              setEpoch((v) => v + 1);
+              props.onSaved();
+            }}
+          />
         )}
       </div>
       {selected && (
