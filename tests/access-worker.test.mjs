@@ -83,12 +83,17 @@ async function fixture(options = {}) {
             if (request.method === "POST") {
               assert.ok(pdfSource);
               assert.equal(request.headers.get("x-upsert"), "false");
-              if (originalBytes)
+              // Drain every upload, including duplicate attempts. The Node/workerd
+              // service bridge must not leave the request body pending on a retry.
+              const received = new Uint8Array(await request.arrayBuffer());
+              if (originalBytes) {
+                assert.deepEqual(received, originalBytes);
                 return Response.json(
                   { code: "ResourceAlreadyExists" },
                   { status: 409 },
                 );
-              originalBytes = new Uint8Array(await request.arrayBuffer());
+              }
+              originalBytes = received;
               options.originalBytes = originalBytes;
               return Response.json({
                 Key: `boxscore-sources/sources/${pdfSource.id}.pdf`,
@@ -400,7 +405,14 @@ test("PDF transport parses in the authorized DO, recovers an incomplete original
       headers,
       body: bytes,
     });
-    assert.equal(retried.status, 200, await retried.clone().text());
+    assert.equal(
+      retried.status,
+      200,
+      JSON.stringify({
+        response: await retried.clone().text(),
+        calls: f.calls,
+      }),
+    );
     assert.deepEqual(await retried.json(), {
       id,
       version: 2,
