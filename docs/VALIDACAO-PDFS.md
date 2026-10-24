@@ -53,3 +53,11 @@ UI Jogos→Importar PDFs, Blob original com cookies de mesma origem (RED→GREEN
 20 cenários PDF desktop/mobile PASS e58 regressões da composição C1–C4/G1/G2 PASS (78 no total). Bugs de carregamento preso ao cancelar busca de elenco, filtro perdido após reload e duplicado fora do filtro reproduzidos antes de correções focais. Capturas320/top/bottom inspecionadas sem corte; grade responsiva de atletas em desktop. Gate consolidado PASS155unitários/35arquivos,5transportes,10PostgreSQL,11workerd,1prova4PDFs e checks estáticos/build/segredos. SQL real/migrations e harness126 inalterados reutilizados. Sem prova de revisão independente/carga/WCAG completa.
 
 CI transporte40060415546/job120772483885 SUCCESS no source66e4af7. UI será conferida em novaCI antes de deploy. Preview1161f1a ainda G1/G2, sem API/UI PDFs; smokescript ampliado com3GETs privadosPDF. Nenhum upload real/DDL/dado humano alterado. Piloto Storage HTTP autenticado continua pendente; não extrapolar prova de mocks outbound/metadados SQL. G4 confirmar/publicar/corrigir permanece pendente, UI não oferece controles falsos de publicação.
+
+## Publicação do preview G3
+
+Source **f2d634bbef005fed9daf91989e168b4bdbb9d916**, CI40061809309/job120776741403 SUCCESS. Deployment964bfe43-d5e5-4460-b1f6-b856e1bfce24, versão2d67e166-e560-4468-9b99-7f32cfb4cbc5,100%,24/10/2026 04:22:45UTC. Smoke remoto PASS3arquivos/hash/source,21GETs privados incluindo3PDF,health,Auth inválido semcookieapp,backend404 e2browsers. Token7f93ab81-efa8-4e8a-a73b-37ca9f7459ea/política617bcbac-8273-4fcd-973b-b6cfeae95096 revogados; Access só responsável,previewsOFF,anônimo302 semsource. Cofre/namespace preservados.
+
+SHA256: Worker2c21af37e024c3e97d62659c887d20bc23333e28883a6ebb1ba241d438bb670e; HTML3fe4fba87f92fbfad162555e9bb0deaed2b47fc714a36692e8b4b7ca0fc6fb85; JSfoundation-25sEsgs3.js4fccc3c425eb268311406c536532f3672646ce8d2a3ffac3b58e0cad4c85fb0a; CSSfoundation-CHm98BJF.csse1b4d477c9afa26c1b3f0d39e6e0524f497f4acb257bad46769b2e8bcb772bf2. Manifesto local ignorado .worker-artifacts/foundation-manifest.json.
+
+Piloto StorageHTTP autenticado/avaliação humana solicitados e pendentes. O smoke não envia arquivo nem usa a senha real; não alegar operação administrativa do owner comprovada. G4 ainda não implementado. Gate/smoke desta versão podem ser reutilizados se os artefatos permanecerem inalterados.

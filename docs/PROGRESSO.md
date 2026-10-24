@@ -1,3 +1,17 @@
+# G3 publicado / início G4 — 24/10/2026 01:24 America/Sao_Paulo (UTC-03)
+
+**Estado:** G3 revisão/API publicados para avaliação; G4 confirmação/publicação/correção inicia em branch própria **codex/publicacao-jogos** sobre **f2d634bbef005fed9daf91989e168b4bdbb9d916**. Novo repo/workspace habituais; nenhum merge/dado humano alterado. Alterações não commitadas somente documentação do agente; obter SHA documental final no Git. PR10 draft preservado, nova unidade terá PR empilhado próprio.
+
+**Entrega verificada:** CI **40061809309/job120776741403 SUCCESS** no sourcef2d634b, gate155/35arquivos,5transportes,10PostgreSQL,11workerd,1prova4PDFs e todos browsersLinux.78 browsers da composição local PASS; harness126/SQL reais inalterados reutilizados. Publicado **04:22:45UTC**, deployment **964bfe43-d5e5-4460-b1f6-b856e1bfce24**, versão **2d67e166-e560-4468-9b99-7f32cfb4cbc5**,100%, sourcef2d634bbef005fed9daf91989e168b4bdbb9d916. Smoke PASS3arquivos/hash/source,21GETs privados incluindo3PDF,health/Auth inválido semcookieapp,backend404,2browsers. Token7f93ab81-efa8-4e8a-a73b-37ca9f7459ea e política617bcbac-8273-4fcd-973b-b6cfeae95096 revogados; Access só responsável/previewsOFF/anônimo302 semsource. Namespace0411ac931ca54d289d270606c7e87ef7/cofre preservados. Sem deploy/upload/credencial/processo em andamento. BackendProviderStorage usa JWT administrativo da sessão, nunca chave genérica.
+
+**Limitação real:** o smoke remoto não entra como administrador nem envia PDF. Piloto StorageHTTP autenticado e avaliação humana do fluxo permanecem pendentes; solicitação de retorno enviada ao responsável. Não declarar etapa4 concluída. Sem DDL nesta retomada, sem fixtures em Storage/dados reais; contagens históricas abaixo não substituem nova inspeção antes de mutação. Sem prova de revisão independente/carga/corrida multi-conexão/WCAG completa.
+
+**Próximo exato:** ler plano **docs/superpowers/plans/2026-10-24-publicacao.md** e contratos atuais de fechamento/autoridade/atomicidade. P1: contrato TS e testes SQL RED de confirmação manual/versões/motivo/replay/imutabilidade de relacionados e camisas/projeção pública mínima por jogo, antes de migration CLI. Preflight somente projeto nizmasjddyrhmevvfviz/vínculo link_6adaa8aab5688191b1e7ae1cddc55a82 e contagens humanas. Alinhar SQL final ao motor (OT/LL/capitães/cinco titulares), atualizar readers/guardas de fonte confirmada sem caminho alternativo. Depois P2 PDF/domínios/suplementos, P3 API/UI/consulta mínima e P4 gate/CI/preview/percurso real. Preservar evidências G3; não repetir gate por documentação/sessão.
+
+**Cota:** última42%usados5h/34%semanal, reset5h Unix1792831649/semanal1793382169. Conferir entre unidades/antes de longas; aos85%usados checkpoint/push seguro e MESMA automação retomar-preview-base-do-basquete reset+2, sem duplicata/compras/plano/reset manual. OAuth Cloudflare resolvido.
+
+---
+
 # G3d revisão integrada estável — 24/10/2026 01:18 America/Sao_Paulo (UTC-03)
 
 **Unidade:** interface real de PDFs/revisão contextual pronta para CI e preview; G4 confirmar/publicar/corrigir ainda pendente. Branch codex/pdf-fontes, transporte66e4af7467980f059bc6efcd8d22fe5ba7b05b89, sugestõesfa99a1b. Obter SHA material final deste commit no Git. PRdraft10 sobre9. Todas as alterações são do agente, nenhuma mudança/dado humano alterado. Sem merge.
