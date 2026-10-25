@@ -29,6 +29,36 @@ const empty = (): RegulationDefinition => ({
   knockoutPhases: [],
   series: [],
 });
+
+async function loadRegistrationCatalog(
+  disputeId: string,
+  view: RegulationView,
+  signal?: AbortSignal,
+) {
+  if (view.disputeId !== disputeId) throw new Error("Contexto inesperado.");
+  const rows: RegistrationSnapshot[] = [];
+  for (let offset = 0; offset < 1000; offset += 20) {
+    const page = await api(
+      `/api/registrations?disputeId=${disputeId}&q=&offset=${offset}`,
+      registrationListingSchema,
+      undefined,
+      signal,
+    );
+    if (page.items.some((r) => r.disputeId !== disputeId))
+      throw new Error("Inscrições de outro contexto foram recusadas.");
+    rows.push(...page.items);
+    if (!page.hasMore) break;
+    if (offset === 980)
+      throw new Error("O catálogo excede o limite desta operação.");
+  }
+  const ids = new Set(rows.map((r) => r.id));
+  if (
+    ids.size !== rows.length ||
+    view.registrationIds.some((id) => !ids.has(id))
+  )
+    throw new Error("O catálogo mudou durante a leitura. Carregue novamente.");
+  return rows;
+}
 type Props = {
   disputeId: string;
   enabled: boolean;
@@ -139,29 +169,7 @@ export function RegulationWorkspace({
     void (async () => {
       try {
         const v = await api(path, regulationViewSchema, undefined, c.signal),
-          rows: RegistrationSnapshot[] = [];
-        for (let offset = 0; offset < 1000; offset += 20) {
-          const page = await api(
-            `/api/registrations?disputeId=${disputeId}&q=&offset=${offset}`,
-            registrationListingSchema,
-            undefined,
-            c.signal,
-          );
-          if (page.items.some((r) => r.disputeId !== disputeId))
-            throw new Error("Inscrições de outro contexto foram recusadas.");
-          rows.push(...page.items);
-          if (!page.hasMore) break;
-          if (offset === 980)
-            throw new Error("O catálogo excede o limite desta operação.");
-        }
-        if (
-          new Set(rows.map((r) => r.id)).size !== rows.length ||
-          v.registrationIds.some((id) => !rows.some((r) => r.id === id))
-        )
-          throw new Error(
-            "O catálogo mudou durante a leitura. Carregue novamente.",
-          );
-        if (v.disputeId !== disputeId) throw new Error("Contexto inesperado.");
+          rows = await loadRegistrationCatalog(disputeId, v, c.signal);
         if (c.signal.aborted) return;
         setRegistrations(rows);
         accept(v);
@@ -264,9 +272,10 @@ export function RegulationWorkspace({
     setError("");
     try {
       const v = await api(path, regulationViewSchema);
-      if (v.disputeId !== disputeId) throw new Error("Contexto inesperado.");
+      const rows = await loadRegistrationCatalog(disputeId, v);
       if (!alive.current) return;
       const own = pending.current?.command.expectedVersion;
+      setRegistrations(rows);
       accept(v, preserve);
       pending.current = null;
       setUncertain(false);
