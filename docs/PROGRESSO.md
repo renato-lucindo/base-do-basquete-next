@@ -1,3 +1,17 @@
+# Estatísticas S1 normalizadas; próximo S2 agregação — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Atual:** branch codex/estatisticas-confirmadas, base documentalremota **df136a70206614bc8b2e5bc39a80ce3414768f83** sobre código/preview **7997a15849e3c6660cc69b762b0d16dc7b7b0fc5**. Plano/ADR016 remoto **9eca7a1**, S1 neste commit; PRdraft empilhado sobre17 a criar depois do push. Workspace/novo remoto inalterados, somente alterações próprias/dados humanos preservados, nenhuma integração na principal/produção.
+
+**S1 concluída:** normalização pura de snapshots públicos confirmados manual/PDF; preserva contexto de pessoa/inscrição/equipe/camisa e origem/versão. DNP sem observações, playedsem ações comzero conhecido; fontes/domínios faltantes permanecemnull; fallbackmanual não substitui pontos/arremessos avançados; fase desconhecidanull.8focais finais PASS e composição19/4arquivos PASS, tipos/lint/formato/segredos528 antes do último acréscimo sóteste. Hashes/limites em VALIDACAO-ESTATISTICAS.md. Nenhuma rota/SQL/deploy novo; biblioteca ainda não consumida pelo produto. Não repetir gate399/harness126/CI268/browsers/smokes de artefatos inalterados por sessão/docs.
+
+**Serviços preservados:** preview de premiações7997a158/deployment06fef618-6087-4b74-9273-f2fa00b5d7b4/versão91cda000-b87a-47a7-9248-d2da6ac1b317100%, CI40194877229/job121173460326 SUCCESS399unit/268Linuxbrowsers, smokes7assets/36GETs/11POSTs/2browsers e temporários revogados. Accesssóresponsável/previewsOFF/cofre/namespace/rate preservados. Supabase somente vínculo/projeto novos indicados abaixo,39migrations até20261025120438_achievement_workspace imutáveis,1pessoa/2inscrições/1Auth/1adminativo e0prêmios/jogos/elenco/objetos no último pós-smoke. Nenhum DDL/deploy/smoke/credencial/processo ativo ao fechar checks.
+
+**Próximo exato:** S2 RED em src/statistics/aggregate.test.ts para agregar as linhas de confirmed-facts por pessoa+inscrição, com total/per-game/per30 e cobertura específica. Provar5/10+1/2→50%, média sódos jogos cobertos, PTSoficiais separados deadvanced_points/minutos, mínimo600/amostra insuficiente, plus/minus sem0inventado, DNP foraJ e jogos não classificados sóemall. Reutilizar/adaptar helpers puros do ZIP após inspecionar assinaturas, sem tipos/queries do schema antigo. Não criar DDL/API pública antes da fonte/linhagem e metadados congelados. Perfil opcional sóde dados confirmados, política de agenda futura/inscritos pendente sem nova pergunta.
+
+**Cota/pendências:** última81%usado5h/27%semanal; resets1792946164/1793514809. Conferir antes de continuarunidade, aos85% somente menoroperação consistente/checkpoint/push/MESMAautomação reset+2. Aceite humano e pilotoStorageHTTP real continuam pendentes sem repetir pedidos adiados; etapas4/5 incompletas, sem provas independentes/carga/corridaPGmulticonexão/WCAGcompleta.
+
+---
+
 # Premiações publicadas; próximo bloco estatísticas confirmadas — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Atual:** branch codex/conquistas-honrarias, código material/remoto e preview **7997a15849e3c6660cc69b762b0d16dc7b7b0fc5**, PRdraft17 sobre16. CI **40194877229/job121173460326 SUCCESS399unit/81arquivos/268browsersLinux**. Workspace/novo remoto inalterados; alterações somente próprias/dados humanos preservados, nenhuma integração de PR/principal/produção. Este checkpoint sódocumentação; manter provas/bundles da fonte7997a158 sem repetir gate por docs.

@@ -6,10 +6,10 @@ Objetivo: adaptar os contratos/módulos estatísticos portáveis aos snapshots c
 
 ## S1 — fatos normalizados, domínio puro
 
-- [ ] Examinar DTOs reais manual/PDF e módulos/referências estatísticos do ZIP. Separar pontos oficiais de pontos/arremessos avançados nos domínios mistos.
-- [ ] RED em src/statistics/confirmed-facts.test.ts: manual sem minutos/tentativas; jogador que jogou sem ações versus DNP;0/00 e nome/equipe/camisa da ocasião; FIBA eSite com coberturas distintas; fallbackmanual não muda pontos avançados; sem fase inferida por nome/data; IDs canônicos/duplicidades/contextos adulterados/privacidade.
-- [ ] Adaptador recebe somente publicResultSchema válido, emite fatos fechados/versionados por jogador/jogo/publicação e não consulta serviços. Preservar origem/versão de cada domínio, sem achatar pontos oficiais e avançados num único contador.
-- [ ] GREEN focal, composição dos contratos de publicação afetados, tipos/lint/formato/segredos. Sem gate integral/deploy por biblioteca não consumida; reutilizar399unit/268browsers/smokes de7997a158 para seus artefatos inalterados. Commit/PRdraft18 empilhado sobre17 e checkpoint exato.
+- [x] Examinar DTOs reais manual/PDF e módulos/referências estatísticos do ZIP. Separar pontos oficiais de pontos/arremessos avançados nos domínios mistos.
+- [x] RED em src/statistics/confirmed-facts.test.ts: manual sem minutos/tentativas; jogador que jogou sem ações versus DNP;0/00 e nome/equipe/camisa da ocasião; FIBA eSite com coberturas distintas; fallbackmanual não muda pontos avançados; sem fase inferida por nome/data; IDs canônicos/duplicidades/contextos adulterados/privacidade.
+- [x] Adaptador recebe somente publicResultSchema válido, emite fatos fechados/versionados por jogador/jogo/publicação e não consulta serviços. Preservar origem/versão de cada domínio, sem achatar pontos oficiais e avançados num único contador.
+- [x] GREEN focal, composição dos contratos de publicação afetados, tipos/lint/formato/segredos. Sem gate integral/deploy por biblioteca não consumida; reutilizar399unit/268browsers/smokes de7997a158 para seus artefatos inalterados. Commit e checkpoint neste registro; PRdraft empilhado sobre17 a criar após push, sem antecipar seu número.
 
 ## S2 — agregação e consultas
 
