@@ -37,6 +37,8 @@ A2b concluída: rascunho versionado privado, recibo/ACK e contexto derivado pres
 
 ## A3 — integração e confirmação contextual
 
+A2c concluída: confirmação do rascunho corrente com fonte fresca, revisão com motivo, ACK/atomicidade e histórico/snapshot mínimo sem dados privados. Mudanças na fonte/rascunho sinalizam revisão e preservam confirmação anterior. Gate383unit e contrato realBEGIN/ROLLBACK PASS; aplicada/reconciliada **20261025115754_achievement_publication**,38migrations. Nenhuma premiação real confirmada. Próxima unidade A3a: fonte de trabalho enxuta para a UI com fonte/grupos/séries e nomes dos destinatários já selecionados, sem enviar catálogo10000identidades/fatos internos ao navegador; provider/DO/rotas específicos e testes de correlação/reauth/ACK. API/UI ainda não disponíveis.
+
 - [ ] Adapter/SessionStore/rotas com authfresh antes do corpo e no DO, limites/mesma origem, ACK e correlações. Repetir comando congelado na incerteza, somenteGET depois de ACK conhecido. Nenhum derivado aceito do browser.
 - [ ] Administração dentro de Regulamento/contexto da disputa: escolher fonte da sugestão, revisar posições/honrarias, selecionar atletas por identidade e contexto, guardar rascunho, confirmar/revisar com motivo e mostrar impacto/pendências. Manter teclado/foco/guardas/320px e histórico.
 - [ ] Focais desktop/mobile e composição, gate único estável, CI e preview protegido com smokes novos/revogação. Evidência remota/técnica não substitui aceite humano, carga/concorrência real ou auditoriaWCAG completa.

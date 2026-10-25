@@ -1,5 +1,15 @@
 # Colocações e honrarias — evidências
 
+## A2c — confirmação e revisão próprias, 25/10/2026
+
+RED de contrato ausente e duas RPCs inexistentes observado. Confirmação recebe apenas referências/versões/fingerprint/motivo/conferência; nenhum conteúdo público vindo do browser. Exige rascunho corrente e fonte ainda revisada. Revisão com motivo, recibo/authfresh/locks, snapshot mínimo e histórico imutável; salvar, corrigir pessoa ou mudar a fonte não republica. Histórico pagina20/20 e preserva snapshots anteriores. Primeira confirmação vazia recusada; retirada de premiações exige correção explícita com motivo. Nenhum dado real foi confirmado/publicado.
+
+Composição **27testes/6arquivos PASS**, SHA256 **503e64434bdb8c7f054a28a25b7b0cad1af2f76e5e9ae55761b8f79038345b77**. Últimos4focais com ACK/versão completa também PASS, SHA256 **5af312f7f2555ab3aa4c6ec1098fac8eb98be037fed5fc1a45c32a9c917e0c8c**. Matriz TS×SQL de confirmação/Unicode/limites, fonte/versão/autor/revogação, falha após histórico com rollback, direitos do anônimo/serviço, snapshots sem campos privados e G4 intacto.
+
+Gate **PASS383unit/79arquivos,5transportes,13PG,16workerd,4PDFs/builds/tipos/fronteira/segredos509**; achievements-a2c-gate.log SHA256 **ee5d1e936e24bf53156b7ab6768178a4d5649df7a3b7aa41cb2ddc637101f417**. MigrationCLI115231 aplicada/reconciliada **20261025115754_achievement_publication.sql**, SHA256 **bb64cee61675fdddb7e92ba9814273801273e9b0251bd66370a0093f1df00c44**. **38migrations**, não editar/reaplicar. Tipos gerados e verificados novamente após geração.
+
+Contrato real Supabase **BEGIN/ROLLBACK PASS**, achievement-publication-proof.sql SHA256 **961abae304c34c4af23796f7d82da90edd3e055aa5c638447d01ca934ca1ddf8**. Pós-rollback0draftVersions/awardVersions/publicAwards/awardReceipts/gamePublications/roster/objetos,1pessoa/2inscrições/1Auth preservados. Segurança sóWARN conhecido; performance10FKs antigas sem índice, nenhuma nova de premiação. Sem nova rotaWorker/UI/deploy/CI; integração A3 pendente. Não atribuir CI246browsers do preview às premiações novas. Sem revisão independente/carga/corridaPGmulticonexão/WCAGcompleta.
+
 ## A2b — rascunho privado versionado, 25/10/2026
 
 RED observado de contrato ausente e dois PostgreSQL zero/upgrade por RPC inexistente42883. Gravação privada com versão/fingerprint, fonte opcional explícita, snapshot autoritativo, histórico imutável paginado20/20 e âncoras de inscrições/pessoas/períodos. Reenvio idêntico devolve ACK conhecido sem atualizar Recentes, mesmo após mudança de fonte; novo conteúdo com mesmo ID, versão antiga, destinatário/inscrição de outro contexto e administrador diferente/revogado são recusados. Falha injetada depois do histórico preserva cabeçalho, recibos, vínculos e Recentes. Atleta de período encerrado e atleta sem publicação permanecem elegíveis. Fonte alterada sinaliza revisão sem substituir decisões. Salvar nunca publica.

@@ -1,3 +1,15 @@
+# Colocações/honrarias A2c concluída; próximo A3 integração — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Atual:** branch codex/conquistas-honrarias/PRdraft17 sobre16, A2b remoto **7d9d572**; A2c neste commit. Workspace/novo remoto inalterados; somente alterações próprias, dados humanos preservados, sem merge/principal/produção. Cota real última20%usado5h/17%semanal, resets1792946164/1793514809; seguir nesta execução. Não houve gatilho de pausa.
+
+**A2c concluída:** confirmação própria do rascunho corrente/fonte fresca; revisão com motivo, histórico privado imutável, snapshot público mínimo e flags de fonte/rascunho alterados sem substituição silenciosa. Salvar não republica. Gate **383unit/79arquivos,5transportes,13PG,16workerd,4PDFs/builds/tipos/fronteira/segredos509 PASS**, composição27 e4focais finais PASS. Supabase realBEGIN/ROLLBACK PASS, nenhuma premiação real confirmada/publicada. Evidências/hashes em VALIDACAO-CONQUISTAS.md, sem repetição por sessão.
+
+**Banco:** sólink_6adaa8aab5688191b1e7ae1cddc55a82/projeto nizmasjddyrhmevvfviz/orgbase-do-basquete/Free, **38migrations** até **20261025115754_achievement_publication**, aplicadas/reconciliadas; NÃO editar/reaplicar. Tipos gerados/typecheckPASS. Pós-rollback0draftVersions/awardVersions/publicAwards/awardReceipts/gamePublications/roster/objetos,1pessoa/2inscrições/1Auth. Advisor sóWARN conhecido, nenhuma FK nova sem índice. PreviewT3source4b2f4d7/Access/cofre preservados, sem nova rota/UI/deploy/CI de premiação e nenhum processo/credencial/DDL em curso.
+
+**Próximo exato:** A3a RED de workspace privado enxuto (grupos/séries explicitamente escolhíveis, inscrições e nomes dos destinatários já selecionados; sem catálogo10000/fatos internos no browser). Fonte e estado coerentes, authfresh, nova migrationCLI apósRED se necessária. Depois adapter/provider específico, sugestão calculada no backend, DO/rotas com auth antes do corpo/limites/correlação e ACK congelado/reauth; UI dentro de Regulamento e resultado confirmado mínimo. Gate/CI/preview protegido quando vertical estável. Política pública de inscritos/agenda futura e aceite humano continuam pendentes, sem repetir pedidos. Etapas4/5 incompletas, sem revisão independente/carga/corridaPGmulticonexão/WCAGcompleta.
+
+---
+
 # Colocações/honrarias A2b concluída; próximo A2c confirmação — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Atual:** workspace/novo remoto inalterados, branch codex/conquistas-honrarias, base materialc201a16/checkpoint17fbfe7. A2b será salvo neste commit. PRdraft17 sobre16 aberto/mergeável, sem reviews/CI novo, sem merge/produção. Todas mudanças desta execução são do agente, árvore limpa na retomada; dados humanos preservados. Cota real inicial3%usado5h/14%semanal; última12%/16%, resets5h1792946164/semanal1793514809. Continuidade nesta execução, sem pausa por cota agora.
