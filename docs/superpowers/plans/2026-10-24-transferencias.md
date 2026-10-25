@@ -47,5 +47,5 @@ Novos supabase/tests/transfers.sql, src/people/transfer-database.test.ts; migrat
 
 - [x] Adapter/SessionStore/rotas específicos, sessão fresca antes do corpo/operação, limites/mesma origem/erro seguro. Prévia backend, ACK conhecido recupera sóGET; replay congelado na resposta incerta/reautenticação.
 - [x] Editor da permissão no Regulamento e operação dentro da expansão do elenco. Buscar inscrição de destino na mesma disputa,0/00, motivo/impacto explícitos, histórico por período, retorno/versão409 preservando edição. Não ocultar participações publicadas após inativação.
-- [ ] Browsers desktop/mobile320 e composição equipes/pessoas/importador/regulamento/jogos; conflitos/duasabas/reauth, foco/saída/retomada. Gate único estável/CI/previewAccess/smokes novos e revogação. Não repetir suites por sessão/docs; registrar limitações de corrida/carga/WCAG/revisão independente.
-- [ ] PRdraft empilhado, checkpoint exato, avaliação humana futura sem solicitar hoje. Etapas4/5 não encerradas apenas por este bloco.
+- [x] Browsers desktop/mobile320 e composição equipes/pessoas/importador/regulamento/jogos; conflitos/duasabas/reauth, foco/saída/retomada. Gate único estável/CI/previewAccess/smokes novos e revogação. Não repetir suites por sessão/docs; registrar limitações de corrida/carga/WCAG/revisão independente.
+- [x] PRdraft empilhado, checkpoint exato, avaliação humana futura sem solicitar hoje. Etapas4/5 não encerradas apenas por este bloco.
