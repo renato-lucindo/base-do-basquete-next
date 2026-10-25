@@ -18,11 +18,11 @@
 
 Arquivos novos `src/achievements/contract.ts`, `suggest.ts`, `suggest.test.ts` e `tests/fixtures/achievements.ts` somente quando a interface existente estiver examinada. Não usar DTO de classificação fornecido pelo browser como fonte autoritativa futura.
 
-- [ ] Examinar `regulation/view-contract.ts`, `organized.ts`, `groups.ts`, `series.ts` e contratos de publicação; usar a projeção real, sem segunda fórmula.
-- [ ] RED: fonte de grupo explícita e completa sugere inscrições distintas nas posições; partida pendente, classificação empatada/incompleta ou fonte fora do contexto bloqueia. Identidade competitiva preservada mesmo com mesma equipe global.
-- [ ] RED: final/bronze escolhidos explicitamente; campeão/vice e bronze sócom séries completas e entradas coerentes. Sem bronze, deixar demais posições pendentes. Não adivinhar dependências por nomes/ordem/data; recusar sobreposição de finalistas/bronze.
-- [ ] Contrato fechado da decisão privada: grupos de posição/inscrições sem repetição e honrarias ID/título/destinatários explícitos. Sem ator/fatos/fórmulas do browser; referências sóIDs e contexto conhecido. Limites compatíveis com o regulamento; normalização Unicode/UUID consistente.
-- [ ] GREEN focal, composição de regulamento/classificação afetada e tipos/lint/formato. Registar evidências e commit próprio; sem gate integral ou deploy por biblioteca pura.
+- [x] Examinar `regulation/view-contract.ts`, `organized.ts`, `groups.ts`, `series.ts` e contratos de publicação; usar a projeção real, sem segunda fórmula.
+- [x] RED: fonte de grupo explícita e completa sugere inscrições distintas nas posições; partida pendente, classificação empatada/incompleta ou fonte fora do contexto bloqueia. Identidade competitiva preservada mesmo com mesma equipe global.
+- [x] RED: final/bronze escolhidos explicitamente; campeão/vice e bronze sócom séries completas e entradas coerentes. Sem bronze, deixar demais posições pendentes. Não adivinhar dependências por nomes/ordem/data; recusar sobreposição de finalistas/bronze.
+- [x] Contrato fechado da decisão privada: grupos de posição/inscrições sem repetição e honrarias ID/título/destinatários explícitos. Sem ator/fatos/fórmulas do browser; referências sóIDs e contexto conhecido. Limites compatíveis com o regulamento; normalização Unicode/UUID consistente.
+- [x] GREEN focal, composição de regulamento/classificação afetada e tipos/lint/formato. Registar evidências e commit próprio; sem gate integral ou deploy por biblioteca pura.
 
 ## A2 — fonte e persistência próprias
 
