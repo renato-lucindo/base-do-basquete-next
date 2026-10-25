@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { Miniflare, Response, convertV4MiniflareOptions } from "miniflare";
 import { regulationFixture, regulationId } from "./fixtures/regulation.ts";
+import { decisionBackend } from "./fixtures/decisions.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -16,6 +17,7 @@ async function fixture(options = {}) {
     reviewVersion = 0;
   const regulation = regulationFixture(),
     regulationReceipts = new Map();
+  const decisionResponse = decisionBackend(regulation, options);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -49,6 +51,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (options.decisions) {
+          const response = await decisionResponse(request);
+          if (response) return response;
+        }
         if (url.pathname === "/auth/v1/token") {
           if (options.invalid)
             return Response.json(
@@ -67,10 +73,17 @@ async function fixture(options = {}) {
         }
         if (url.pathname === "/auth/v1/user")
           return Response.json({ id, is_anonymous: false });
-        if (url.pathname === "/rest/v1/admin_access")
+        if (url.pathname === "/rest/v1/admin_access") {
+          if (options.decisions)
+            options.authorizationReads = (options.authorizationReads ?? 0) + 1;
           return Response.json(
-            options.denied ? [] : [{ user_id: id, enabled: true }],
+            options.denied ||
+              (options.denyAuthorizationAt &&
+                options.authorizationReads >= options.denyAuthorizationAt)
+              ? []
+              : [{ user_id: id, enabled: true }],
           );
+        }
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
         if (
@@ -1711,6 +1724,165 @@ test("Worker applies login rate limits before issuing additional Auth requests",
     assert.ok(limited);
     assert.ok(f.calls.length > 0);
     assert.ok(f.calls.length <= 10);
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("competitive decision routes preserve authorization, bounded bodies, previews and durable replay", async () => {
+  const options = {
+      regulation: true,
+      decisions: true,
+      loseOccurrenceAck: true,
+      loseWithdrawalAck: true,
+    },
+    f = await fixture(options),
+    gid = regulationId(100),
+    rid = regulationId(1),
+    did = regulationId(90),
+    occPath = `/api/games/${gid}/occurrence`,
+    wrPath = `/api/registrations/${rid}/withdrawal`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + occPath)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (path, method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal((await send(occPath)).status, 200);
+    const c = {
+      commandId: regulationId(800),
+      disputeId: did,
+      gameId: gid,
+      occurrenceId: regulationId(801),
+      expectedVersion: 0,
+      expectedGameVersion: 2,
+      expectedPublicationVersion: 1,
+      expectedRegulationVersion: 1,
+      expectedContextFingerprint: "a".repeat(64),
+      effect: { kind: "cancelled" },
+      reason: "Cancelamento conferido",
+      acknowledgeImpact: true,
+    };
+    const preview = await send(occPath + "/preview", "POST", c);
+    assert.equal(preview.status, 200);
+    assert.equal((await preview.json()).affected.after[0].state, "excluded");
+    assert.equal(options.occurrenceCommits, undefined);
+    assert.equal((await send(occPath + "?offset=0&offset=20")).status, 400);
+    assert.equal(
+      (await send(occPath + "/preview", "POST", { ...c, projection: [] }))
+        .status,
+      400,
+    );
+    assert.equal(
+      (await send(occPath, "POST", { ...c, gameId: regulationId(999) })).status,
+      400,
+    );
+    assert.equal(
+      (await send(occPath, "POST", c, { origin: "https://evil.test" })).status,
+      403,
+    );
+    assert.equal(
+      (await send(occPath, "POST", c, { "content-type": "text/plain" })).status,
+      415,
+    );
+    assert.equal((await send(occPath, "POST", c)).status, 503);
+    const ack = await send(occPath, "POST", c);
+    assert.equal(ack.status, 200);
+    assert.equal((await ack.json()).version, 1);
+    assert.equal(options.occurrenceCommits, 1);
+    assert.equal((await send(occPath + "/versions/1")).status, 200);
+    assert.equal((await send(occPath + "/versions/999")).status, 404);
+    assert.equal((await send(occPath + "/versions/0")).status, 400);
+    const state = await send(wrPath);
+    assert.equal(state.status, 200);
+    const s = await state.json();
+    const w = {
+      commandId: regulationId(810),
+      disputeId: did,
+      registrationId: rid,
+      withdrawalId: regulationId(811),
+      expectedVersion: 0,
+      expectedRegulationVersion: 1,
+      expectedContextFingerprint: s.contextFingerprint,
+      policy: "exclude_results",
+      previousGameIds: s.previousGameIds,
+      reason: "Desistência conferida",
+      acknowledgeImpact: true,
+    };
+    assert.equal((await send(wrPath + "/preview", "POST", w)).status, 200);
+    assert.equal((await send(wrPath, "POST", w)).status, 503);
+    assert.equal((await send(wrPath, "POST", w)).status, 200);
+    assert.equal(options.withdrawalCommits, 1);
+    assert.equal((await send(wrPath + "/versions/1")).status, 200);
+    assert.equal((await send(occPath + "/preview", "POST", c)).status, 409);
+    for (const [path, size] of [
+      [occPath, 65537],
+      [wrPath, 1048577],
+    ]) {
+      const r = await f.mf.dispatchFetch(origin + path, {
+        method: "POST",
+        headers: { cookie, origin, "content-type": "application/json" },
+        body: new ReadableStream({
+          start(controller) {
+            controller.enqueue(new Uint8Array(size));
+            controller.close();
+          },
+        }),
+        duplex: "half",
+      });
+      assert.equal(r.status, 413);
+      await r.text();
+    }
+    options.denyAuthorizationAt = options.authorizationReads + 2;
+    const dataCallsBeforeRevocation = f.calls.filter((p) =>
+      /game_occurrence|registration_withdrawal|get_regulation_state/.test(p),
+    ).length;
+    assert.equal((await send(wrPath, "POST", w)).status, 403);
+    assert.equal(
+      f.calls.filter((p) =>
+        /game_occurrence|registration_withdrawal|get_regulation_state/.test(p),
+      ).length,
+      dataCallsBeforeRevocation,
+    );
+    delete options.denyAuthorizationAt;
+    const freshCookie = (await f.login()).headers
+      .get("set-cookie")
+      .split(";", 1)[0];
+    options.denied = true;
+    const sourceCalls = f.calls.filter((p) =>
+      /game_occurrence|registration_withdrawal|get_regulation_state/.test(p),
+    ).length;
+    const revoked = await f.mf.dispatchFetch(origin + occPath, {
+      method: "POST",
+      headers: {
+        cookie: freshCookie,
+        origin,
+        "content-type": "application/json",
+      },
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(65537));
+          controller.close();
+        },
+      }),
+      duplex: "half",
+    });
+    assert.equal(revoked.status, 403);
+    await revoked.text();
+    assert.equal(
+      f.calls.filter((p) =>
+        /game_occurrence|registration_withdrawal|get_regulation_state/.test(p),
+      ).length,
+      sourceCalls,
+    );
   } finally {
     await f.mf.dispose();
   }

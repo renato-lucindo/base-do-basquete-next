@@ -28,6 +28,7 @@
     "src/games/routes.ts",
     "src/publication/routes.ts",
     "src/regulation/routes.ts",
+    "src/regulation/decision-routes.ts",
     "src/boxscore/routes.ts",
     "src/people/routes.ts",
     "src/text-import/routes.ts"

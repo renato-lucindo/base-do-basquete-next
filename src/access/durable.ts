@@ -1,5 +1,14 @@
 import { SupabasePublications } from "../publication/provider";
 import { SupabaseRegulations } from "../regulation/provider";
+import { SupabaseDecisions } from "../regulation/decision-provider";
+import {
+  saveGameOccurrenceSchema,
+  type SaveGameOccurrence,
+} from "../regulation/occurrence-contract";
+import {
+  saveRegistrationWithdrawalSchema,
+  type SaveRegistrationWithdrawal,
+} from "../regulation/withdrawal-contract";
 import {
   saveRegulationSchema,
   type SaveRegulation,
@@ -71,12 +80,17 @@ export class SessionStore extends DurableObject<Env> {
   private readonly games: SupabaseGames;
   private readonly publications: SupabasePublications;
   private readonly regulations: SupabaseRegulations;
+  private readonly decisions: SupabaseDecisions;
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.decisions = new SupabaseDecisions({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.regulations = new SupabaseRegulations({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -341,6 +355,78 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.regulations.getView(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  getGameOccurrence(gameId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.getOccurrence(accessToken, gameId, offset),
+      ),
+    );
+  }
+  getGameOccurrenceVersion(gameId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.getOccurrenceVersion(accessToken, gameId, version),
+      ),
+    );
+  }
+  previewGameOccurrence(command: SaveGameOccurrence) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.previewOccurrence(
+          accessToken,
+          saveGameOccurrenceSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveGameOccurrence(command: SaveGameOccurrence) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.saveOccurrence(
+          accessToken,
+          saveGameOccurrenceSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  getRegistrationWithdrawal(registrationId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.getWithdrawal(accessToken, registrationId, offset),
+      ),
+    );
+  }
+  getRegistrationWithdrawalVersion(registrationId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.getWithdrawalVersion(
+          accessToken,
+          registrationId,
+          version,
+        ),
+      ),
+    );
+  }
+  previewRegistrationWithdrawal(command: SaveRegistrationWithdrawal) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.previewWithdrawal(
+          accessToken,
+          saveRegistrationWithdrawalSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveRegistrationWithdrawal(command: SaveRegistrationWithdrawal) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.decisions.saveWithdrawal(
+          accessToken,
+          saveRegistrationWithdrawalSchema.parse(command),
+        ),
       ),
     );
   }
