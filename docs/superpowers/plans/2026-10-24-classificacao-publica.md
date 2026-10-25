@@ -30,10 +30,10 @@
 
 Arquivos novos src/regulation/public-contract.ts, public.ts, public.test.ts; fixture tests/fixtures/public-regulation.ts. Reusar persistence-contract/occurrences/view-contract/domínio, sem mudar contratos privados aplicados.
 
-- [ ] RED de módulo ausente: fonte fechada recusa ator/motivo/sexo/nascimento completo/campos de rascunho; IDs duplicados/fora da disputa, jogo não atribuído ou efeito fora do conjunto recusados. Fonte já confirmada é precondição, não autorização forjada pelo browser.
-- [ ] Definir publicStandingsSourceSchema e publicStandingsSchema: contexto mínimo, versão pública/regulamento/data, identidades públicas, agenda incluída, fatos e efeitos sem motivo/autor. Reusar validação de data/horário e invariantes, sem timestamp inventado.
-- [ ] buildPublicStandings(source): validar fonte, adaptar metadado neutro sóinterno quando o domínio exigir motivo, calcular com previewRegulationDefinition e sanitizar/validar DTO. Sem devolver contexto bruto ou privados; IDs finais contidos na fonte pública. Não criar transição pública/honraria a partir do cálculo.
-- [ ] Focais GREEN: grupos/eliminação/empate/cobertura, W.O./score null, desistência e correção de fato já publicado. Alterar fato fora do conjunto deve ser recusado, não refletir no DTO. Tipos/lint/formato/segredos; commit próprio, sem DDL/deploy/gate completo para contrato puro.
+- [x] RED de módulo ausente: fonte fechada recusa ator/motivo/sexo/nascimento completo/campos de rascunho; IDs duplicados/fora da disputa, jogo não atribuído ou efeito fora do conjunto recusados. Fonte já confirmada é precondição, não autorização forjada pelo browser.
+- [x] Definir publicStandingsSourceSchema e publicStandingsSchema: contexto mínimo, versão pública/regulamento/data, identidades públicas, agenda incluída, fatos e efeitos sem motivo/autor. Reusar validação de data/horário e invariantes, sem timestamp inventado.
+- [x] buildPublicStandings(source): validar fonte, adaptar metadado neutro sóinterno quando o domínio exigir motivo, calcular com previewRegulationDefinition e sanitizar/validar DTO. Sem devolver contexto bruto ou privados; IDs finais contidos na fonte pública. Não criar transição pública/honraria a partir do cálculo.
+- [x] Focais GREEN: grupos/eliminação/empate/cobertura, W.O./score null, desistência e correção de fato já publicado. Alterar fato fora do conjunto deve ser recusado, não refletir no DTO. Tipos/lint/formato/segredos; commit próprio, sem DDL/deploy/gate completo para contrato puro.
 
 ## P2 — confirmação persistida e leitura pública mínima
 
