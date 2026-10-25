@@ -8,9 +8,114 @@ import { transferBackend } from "./fixtures/transfer-backend.mjs";
 import { transferFixture, transferId } from "./fixtures/transfers.ts";
 import { achievementBackendFixture } from "./fixtures/achievement-backend.ts";
 import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
+import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
+
+test("public player career route derives a page without app session, JWT or cookie", async () => {
+  const f = await fixture({ playerProfiles: true });
+  const source = JSON.parse(
+      await readFile("tests/fixtures/player-career.json", "utf8"),
+    ),
+    path = `/api/public/players/${source.personId}`;
+  try {
+    const r = await f.mf.dispatchFetch(origin + path + "?scope=all", {
+      headers: { cookie: "bdb_session=broken" },
+    });
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get("set-cookie"), null);
+    const page = await r.json();
+    assert.equal(page.personId, source.personId);
+    assert.equal(page.statistics.summary.gamesPlayed, 2);
+    assert.equal("participations" in page, false);
+    assert.equal(
+      f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
+      false,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path, { method: "POST", body: "{}" }))
+        .status,
+      405,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + "/api/public/players/bad")).status,
+      400,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + `/api/public/players/${id}`)).status,
+      404,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path + "?x=" + "x".repeat(8193)))
+        .status,
+      414,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+test("private player profile routes authorize before body and preserve confirmation receipts", async () => {
+  const options = { playerProfiles: true, loseProfileAck: true },
+    f = await fixture(options),
+    source = JSON.parse(
+      await readFile("tests/fixtures/player-career.json", "utf8"),
+    ),
+    path = `/api/people/${source.personId}/profile`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + path)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (tail = "", method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + tail, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body !== undefined
+          ? { body: typeof body === "string" ? body : JSON.stringify(body) }
+          : {}),
+      });
+    assert.equal((await send()).status, 200);
+    const c = {
+      commandId: "f9400000-0000-4000-8000-000000009900",
+      personId: source.personId,
+      expectedPersonVersion: 1,
+      expectedPublicationVersion: 0,
+      reason: "",
+      acknowledgeImpact: true,
+    };
+    assert.equal(
+      (await send("", "POST", c, { origin: "https://elsewhere.example.test" }))
+        .status,
+      403,
+    );
+    assert.equal(options.profileConfirmAttempts.length, 0);
+    assert.equal((await send("", "POST", c)).status, 503);
+    const retry = await send("", "POST", c);
+    assert.equal(retry.status, 200);
+    assert.equal((await retry.json()).version, 1);
+    assert.equal(
+      options.profileConfirmAttempts[0],
+      options.profileConfirmAttempts[1],
+    );
+    options.profileFailRead = true;
+    assert.equal((await send()).status, 503);
+    options.profileFailRead = false;
+    assert.equal((await send()).status, 200);
+    assert.equal(options.profileConfirmAttempts.length, 2);
+    assert.equal((await send("/versions/1")).status, 200);
+    assert.equal((await send("", "POST", { ...c, personId: id })).status, 400);
+    assert.equal(options.profileConfirmAttempts.length, 2);
+    options.denied = true;
+    assert.equal((await send("", "POST", "{bad")).status, 403);
+    assert.equal(options.profileConfirmAttempts.length, 2);
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("public statistics route derives scoped pages without app session or exposing source documents", async () => {
   const f = await fixture({ statistics: true });
@@ -70,6 +175,7 @@ async function fixture(options = {}) {
   const decisionResponse = decisionBackend(regulation, options);
   const transferResponse = transferBackend(options);
   const achievementResponse = achievementOutbound(options);
+  const playerProfileResponse = playerProfileOutbound(options, id);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -103,6 +209,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (options.playerProfiles) {
+          const r = await playerProfileResponse(request);
+          if (r) return r;
+        }
         if (
           options.statistics &&
           url.pathname === "/rest/v1/rpc/get_public_statistics_source"

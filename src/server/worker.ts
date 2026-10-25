@@ -1,6 +1,10 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
 import {
+  publicPlayerProfileRoute,
+  privatePlayerProfileRoute,
+} from "../player-profile/routes";
+import {
   achievementRoute,
   publicAchievementRoute,
 } from "../achievements/routes";
@@ -40,6 +44,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/public/players" ||
+        url.pathname.startsWith("/api/public/players/")
+      )
+        response = await publicPlayerProfileRoute(request, env, url);
       else if (
         url.pathname === "/api/public/statistics" ||
         url.pathname.startsWith("/api/public/statistics/")
@@ -90,6 +99,8 @@ export default {
         response = await textImportRoute(request, env, url);
       else if (/^\/api\/roster\/[^/]+\/transfer(?:\/|$)/u.test(url.pathname))
         response = await transferRoute(request, env, url);
+      else if (/^\/api\/people\/[^/]+\/profile(?:\/|$)/u.test(url.pathname))
+        response = await privatePlayerProfileRoute(request, env, url);
       else if (
         ["/api/people", "/api/roster", "/api/staff"].some(
           (p) => url.pathname === p || url.pathname.startsWith(`${p}/`),

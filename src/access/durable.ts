@@ -30,6 +30,11 @@ import {
 import type { PublishSheet } from "../publication/contract";
 import type { PublishPdf } from "../publication/pdf-contract";
 import { SupabasePeople } from "../people/provider";
+import { SupabasePlayerProfiles } from "../player-profile/provider";
+import {
+  confirmPlayerProfileSchema,
+  type ConfirmPlayerProfile,
+} from "../player-profile/contract";
 import { SupabaseTransfers } from "../people/transfer-provider";
 import {
   saveTransferSchema,
@@ -99,11 +104,16 @@ export class SessionStore extends DurableObject<Env> {
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
+  private readonly playerProfiles: SupabasePlayerProfiles;
   private readonly transfers: SupabaseTransfers;
   private readonly achievements: SupabaseAchievements;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.playerProfiles = new SupabasePlayerProfiles({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.achievements = new SupabaseAchievements({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -221,6 +231,30 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.people.getPerson(accessToken, id),
+      ),
+    );
+  }
+  getPlayerProfileWorkspace(id: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.playerProfiles.getWorkspace(accessToken, id, offset),
+      ),
+    );
+  }
+  getPlayerProfileVersion(id: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.playerProfiles.getVersion(accessToken, id, version),
+      ),
+    );
+  }
+  confirmPlayerProfile(command: ConfirmPlayerProfile) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.playerProfiles.confirm(
+          accessToken,
+          confirmPlayerProfileSchema.parse(command),
+        ),
       ),
     );
   }

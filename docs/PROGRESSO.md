@@ -1,3 +1,13 @@
+# Perfil P4a API local estável; próxima confirmação administrativa — 25/10/2026 UTC-03
+
+Branch codex/perfil-confirmado/PRdraft19 sobre18, P3 remoto1d35fee; P4a próprio pronto para commit/push. Provider/SessionStore/rotas privadas de perfil/histórico/confirmação e pública /api/public/players/:id implementados, ainda sem deploy.23unitários de composição/4arquivos e20workerd PASS; tipos app/Worker/lint/buildWorker PASS. Banco43 inalterado, nenhumaDDL ou credencial nesta unidade. Não atribuir gate454 nem CI estatístico ao código novo; consolidar a vertical depois de UI estável. Hashes/escopo em VALIDACAO-PERFIL.
+
+Próximo EXATO P4b: browsers RED do painel de publicação de metadados pelo contexto da pessoa/linha do elenco; confirmar apenas dados salvos, preservar motivo/ACK/reauth,409/retry de GET conhecido, guardas e histórico20. Integrar componente ao MembersWorkspace com guard próprio, botão Perfil público por atleta/inscrição histórica e sem publicar alterações privadas não salvas. Depois P4c atleta.html e links em resultados/estatísticas, cinco seções/recortes/URL/foco/reflow320; completar paginação do histórico da apresentação sem reduzir totais da carreira. Ainda não existe HTML/UI de perfil no preview.
+
+Preview e00ba15 protegido/CI40237064549 SUCCESS443/292 permanece; Access sóresponsável/previewsOFF/DO/rate/cofre preservados, tokens temporários revogados. Nenhum DDL/deploy/gate/CI/upload/smoke/credencial/processo local em andamento. Aceites humanos/política pública de agenda/inscritos e StorageHTTP real continuam pendentes, sem repetir perguntas ou inferir aceite. Cota real69%usado5h/53%semanal, conferir antes de unidade/longas; gatilho85%→mínimo consistente/checkpoint/push/MESMAautomação reset+2.
+
+---
+
 # Perfil P1/P2 integrado e P3 puro estável; próxima API/UI — 25/10/2026 19:33UTC-03
 
 Branch codex/perfil-confirmado, PRdraft19 sobre18 anexado, P2 remoto08c3bdb; P3 próprio pronto para commit/push, árvore sem mudanças humanas. Domínio de carreira/página/URL implementado,39focais/6arquivos e tipos app/Worker/lint/formato PASS; agregação existente preserva guardas por disputa e nova carreira reúne fatos validados sem média de médias. Fonte inteira validada antes do filtro. Perfil confirmado ou última ocasião pública com proveniência, DNP/vazios e mínimos misturados sem números inventados; cinco seções, recortes, histórico contextual e paginação20 independente dos totais. Sem API/Worker/UI de perfil ainda. Evidências em VALIDACAO-PERFIL, plano2026-10-25-perfil-confirmado.

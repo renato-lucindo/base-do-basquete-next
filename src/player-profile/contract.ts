@@ -144,3 +144,18 @@ export type PublicPlayerProfile = z.infer<typeof publicPlayerProfileSchema>;
 export type PlayerProfileProposal = z.infer<typeof playerProfileProposalSchema>;
 export type PlayerProfileState = z.infer<typeof playerProfileStateSchema>;
 export type PlayerProfileAck = z.infer<typeof playerProfileAckSchema>;
+
+export const playerProfileWorkspaceSchema = z
+  .object({
+    proposal: playerProfileProposalSchema,
+    state: playerProfileStateSchema,
+  })
+  .strict()
+  .refine(
+    (w) =>
+      w.proposal.personId === w.state.personId &&
+      w.proposal.personVersion === w.state.personVersion,
+  );
+export type PlayerProfileWorkspace = z.infer<
+  typeof playerProfileWorkspaceSchema
+>;

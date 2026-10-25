@@ -1,5 +1,15 @@
 # Perfil confirmado — evidências
 
+## P4a — API/Worker local, 25/10/2026
+
+Provider específico para leitura pública, workspace administrativo/histórico e confirmação. Somente UUID entra na RPC pública; backend valida toda a fonte e produz a página, sem JWT/cookie/SDK no browser ou documento bruto de carreira no retorno. Corpo de resposta stream limitado5MiB, timeout8s, excesso413/limitação429 explícitos, erros técnicos sanitizados. Comando privado validado/correlacionado sem GET antes da mutação; workspace recusa leitura inconsistente entre pessoa e publicação, ACK precisa corresponder ao comando original.
+
+Rotas privadas /api/people/:id/profile e /versions/:n usam SessionStore/runAuthorized e authfresh antes de ler o corpo, origem/tamanho/contexto fechados. Pública /api/public/players/:id independente da sessão app, sem limpar cookie inválido administrativo. Nenhuma mudança de namespace/cofre/configuração externa. Rota nova permanece excluída do projeto TS de browser e verificada no projeto Worker; erro inicial Env no projeto de browser corrigido nesse limite, sem declarar Env manualmente.
+
+RED workerd público404/privado400 antes das rotas; GREEN2focais e **20cenários workerd de composição PASS** após integração, SHA256 **7a92824f4c8f94cb685c2989ba2d2472fcf95407256fea8766feb560e5376743**. Inclui ACK perdido/replay, ACK conhecido+GET falho sem novoPOST, origem e identidade divergente, administrador revogado antes de JSON inválido, públicos400/404/405/414 e ausência de Auth no provedor. **23unitários/4arquivos PASS**, SHA256 **af742c72814e6196f4db4be666a526eb31dc1521c9b66d83ba7928f1c6b759f1**; tipos app/Worker/lint/buildWorkerPASS. Fixture JSON própria extraída da transação sintética járevertida, sem dados humanos/credenciais; outbound controlado não prova AuthHTTP/Storage reais.
+
+API/UI ainda NÃO publicadas. Falta confirmação de metadados no percurso da pessoa, página atleta.html, links, browsers/capturas e gate/CI da vertical. Histórico de apresentação do perfil ainda precisa paginação independente, antes de finalizar UI. Gate454 antecede estas mudanças; sem repeti-lo por documentação.
+
 ## P3 — domínio e consultas puras, 25/10/2026
 
 Carreira valida cada disputa e identidade antes de reunir observações no mesmo observedMetrics usado nas estatísticas; consulta de uma disputa continua recusando contextos misturados. Percentuais ponderados e médias por cobertura permanecem sobre fatos, não médias intermediárias. Todas inscrições/nomes da ocasião são preservados, duplicidade global de jogo/pessoa e inscrição cruzada são recusadas. Sem nova DDL.

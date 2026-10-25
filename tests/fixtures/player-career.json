@@ -1,0 +1,222 @@
+{
+  "kind": "confirmed-player-career-v1",
+  "honors": [
+    {
+      "honor": { "id": "f9200000-0000-4000-8000-000000000900", "title": "MVP" },
+      "context": {
+        "name": "Publication fixture",
+        "year": 2026,
+        "gender": "masculino",
+        "category": "Adulto",
+        "division": null,
+        "seasonId": "f9200000-0000-4000-8000-000000000002",
+        "championshipId": "f9200000-0000-4000-8000-000000000001"
+      },
+      "version": 1,
+      "disputeId": "f9200000-0000-4000-8000-000000000003",
+      "recipient": {
+        "name": "Identidade corrigida",
+        "nickname": null,
+        "personId": "f9200000-0000-4000-8000-000000000201",
+        "publicBirthYear": null
+      },
+      "confirmedAt": "2026-10-25T22:20:24.325945+00:00"
+    }
+  ],
+  "profile": null,
+  "personId": "f9200000-0000-4000-8000-000000000201",
+  "participations": [
+    {
+      "fact": {
+        "side": "home",
+        "phase": null,
+        "gameId": "f9200000-0000-4000-8000-000000000008",
+        "jersey": "0",
+        "person": {
+          "id": "f9200000-0000-4000-8000-000000000201",
+          "name": "Player 1",
+          "nickname": null
+        },
+        "played": true,
+        "source": {
+          "kind": "sheet",
+          "version": 2,
+          "rulesVersion": "FIBA_2024"
+        },
+        "captain": true,
+        "context": {
+          "name": "Publication fixture",
+          "year": 2026,
+          "gender": "masculino",
+          "category": "Adulto",
+          "division": null,
+          "seasonId": "f9200000-0000-4000-8000-000000000002",
+          "championshipId": "f9200000-0000-4000-8000-000000000001"
+        },
+        "scoring": {
+          "origin": { "kind": "sheet", "version": 2 },
+          "points": 3,
+          "twoMade": 0,
+          "freeMade": 0,
+          "threeMade": 1
+        },
+        "starter": true,
+        "advanced": null,
+        "disputeId": "f9200000-0000-4000-8000-000000000003",
+        "discipline": "eligible",
+        "publishedAt": "2026-10-25T22:20:24.005964+00:00",
+        "registration": {
+          "name": "Home",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000005"
+        },
+        "foulsReceived": null,
+        "foulsCommitted": {
+          "value": 0,
+          "origin": { "kind": "sheet", "version": 2 }
+        },
+        "publicationVersion": 2,
+        "normalizationVersion": "confirmed-statistics-v1"
+      },
+      "game": {
+        "away": {
+          "name": "Away",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000006"
+        },
+        "date": null,
+        "home": {
+          "name": "Home",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000005"
+        },
+        "time": null,
+        "venue": null,
+        "number": null,
+        "timeZone": "America/Sao_Paulo"
+      },
+      "kind": "confirmed-player-game-v1",
+      "minimumSeconds": 600,
+      "statisticsVersion": 2
+    },
+    {
+      "fact": {
+        "side": "home",
+        "phase": null,
+        "gameId": "f9200000-0000-4000-8000-000000000009",
+        "jersey": "0",
+        "person": {
+          "id": "f9200000-0000-4000-8000-000000000201",
+          "name": "Player 1",
+          "nickname": null
+        },
+        "played": true,
+        "source": {
+          "kind": "sheet",
+          "version": 1,
+          "rulesVersion": "FIBA_2024"
+        },
+        "captain": true,
+        "context": {
+          "name": "Publication fixture",
+          "year": 2026,
+          "gender": "masculino",
+          "category": "Adulto",
+          "division": null,
+          "seasonId": "f9200000-0000-4000-8000-000000000002",
+          "championshipId": "f9200000-0000-4000-8000-000000000001"
+        },
+        "scoring": {
+          "origin": { "kind": "sheet", "version": 1 },
+          "points": 2,
+          "twoMade": 1,
+          "freeMade": 0,
+          "threeMade": 0
+        },
+        "starter": true,
+        "advanced": null,
+        "disputeId": "f9200000-0000-4000-8000-000000000003",
+        "discipline": "eligible",
+        "publishedAt": "2026-10-25T22:20:24.032975+00:00",
+        "registration": {
+          "name": "Home",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000005"
+        },
+        "foulsReceived": null,
+        "foulsCommitted": {
+          "value": 0,
+          "origin": { "kind": "sheet", "version": 1 }
+        },
+        "publicationVersion": 1,
+        "normalizationVersion": "confirmed-statistics-v1"
+      },
+      "game": {
+        "away": {
+          "name": "Away",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000006"
+        },
+        "date": null,
+        "home": {
+          "name": "Home",
+          "team": {
+            "id": "f9200000-0000-4000-8000-000000000004",
+            "name": "Global team",
+            "abbreviation": null
+          },
+          "registrationId": "f9200000-0000-4000-8000-000000000005"
+        },
+        "time": null,
+        "venue": null,
+        "number": null,
+        "timeZone": "America/Sao_Paulo"
+      },
+      "kind": "confirmed-player-game-v1",
+      "minimumSeconds": 600,
+      "statisticsVersion": 3
+    }
+  ],
+  "teamPlacements": [
+    {
+      "context": {
+        "name": "Publication fixture",
+        "year": 2026,
+        "gender": "masculino",
+        "category": "Adulto",
+        "division": null,
+        "seasonId": "f9200000-0000-4000-8000-000000000002",
+        "championshipId": "f9200000-0000-4000-8000-000000000001"
+      },
+      "version": 1,
+      "position": 1,
+      "disputeId": "f9200000-0000-4000-8000-000000000003",
+      "confirmedAt": "2026-10-25T22:20:24.325945+00:00",
+      "registration": {
+        "name": "Home",
+        "teamId": "f9200000-0000-4000-8000-000000000004",
+        "registrationId": "f9200000-0000-4000-8000-000000000005"
+      }
+    }
+  ]
+}
