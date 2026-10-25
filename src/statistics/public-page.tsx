@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { api, ApiFailure } from "../competition/api";
 import { statisticsPageSchema, type StatisticsPage } from "./page-contract";
@@ -96,16 +96,6 @@ export function StatisticsPageView() {
           page: next.page,
         });
         window.history.replaceState(null, "", `#${route.id}?${canonical}`);
-        if (focusTarget.current) {
-          const target = focusTarget.current;
-          focusTarget.current = null;
-          requestAnimationFrame(() =>
-            (document.getElementById(target) ?? resultHeading.current)?.focus(),
-          );
-        } else if (focusResult.current) {
-          focusResult.current = false;
-          requestAnimationFrame(() => resultHeading.current?.focus());
-        }
       })
       .catch((e: unknown) => {
         if (!controller.signal.aborted) setError(e);
@@ -115,6 +105,18 @@ export function StatisticsPageView() {
       });
     return () => controller.abort();
   }, [route.id, serialized, retry]);
+  useLayoutEffect(() => {
+    if (!data) return;
+    // Network completion does not imply that React has committed the replacement table.
+    if (focusTarget.current) {
+      const target = focusTarget.current;
+      focusTarget.current = null;
+      (document.getElementById(target) ?? resultHeading.current)?.focus();
+    } else if (focusResult.current) {
+      focusResult.current = false;
+      resultHeading.current?.focus();
+    }
+  }, [data]);
   function navigate(next: StatisticsQuery, focus = false, validate = true) {
     if (!route.id || (validate && !form.current?.reportValidity())) return;
     const normalized = parseStatisticsQuery(serializeStatisticsQuery(next));

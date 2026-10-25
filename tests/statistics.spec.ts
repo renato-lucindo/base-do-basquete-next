@@ -64,6 +64,14 @@ test("seleção por teclado mantém foco após consulta e limita comparação a 
   await page.keyboard.press("Space");
   const first = table.getByRole("checkbox", { name: label!, exact: true });
   await expect(first).toBeChecked();
+  await expect(
+    page
+      .getByRole("table", {
+        name: "Resumo comparativo dos atletas",
+        exact: true,
+      })
+      .getByRole("columnheader", { name: /Resumo: João 1-0/u }),
+  ).toBeVisible();
   await expect(first).toBeFocused();
   await boxes.nth(1).check();
   await expect(boxes.nth(2)).toBeDisabled();

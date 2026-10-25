@@ -1,5 +1,13 @@
 # Estatísticas confirmadas — evidências
 
+## Correção focal de foco apósCI — 25/10/2026
+
+CI **40217885869/job121242890649**, fonte **661bb5b4af93fa39e890317e43efafd77e380083**: gate443 PASS, browsers **291/292**, falha mobile em seleção por teclado após reconsulta (checkbox marcado, foco inativo). NÃO declarar CI integralPASS ou publicar essa fonte. Download do trace falhou duas vezes porTLS; sem terceiro retry e sem reproduzir URLs assinadas em documentação/logs próprios. Diagnóstico disponível vem do log real e inspeção do código, não do trace ausente.
+
+O foco era restaurado num requestAnimationFrame agendado no término do fetch, que não garante commit da nova tabela React. Correção move a restauração para useLayoutEffect ligado aos dados efetivamente montados. Teste agora espera também o resumo da resposta atual antes de verificar o foco, evitando passar sobre o checkbox otimista anterior. Hipótese de corrida de commit é coerente com o código; confirmação Linux ainda depende do próximoCI.
+
+**16browsers focais PASS** (seleção/limite2, filtro incompleto/foco, paginação/reload e resposta atrasada, desktop/mobile repetidos duas vezes), SHA256 **55e4b0405961449b12e916006d9243596001cb97d6b3156871ef328c48ea894d**. Tipos app/Worker/lint/buildfoundation/fronteiraPASS. Sem repetição do gate integral local: lógica backend/SQL/métricas e seus artefatos permanecem inalterados, reutilizar provas443; apenas agendamento de foco e teste mudaram. Manifesto preparado661 ficou obsoleto após correção dos assets; regenerar somente após fonte/CI estáveis. Preview permanece7997, nenhuma credencial/Access temporário criado, sem deploy realizado nesta unidade.
+
 ## S3a — tabela pública contextual estável, 25/10/2026
 
 estatisticas.html#UUID?estado tem modo/escopo/busca/equipes/filtros numéricos/presets/colunas/ordem/líderes/página20/comparação e URL recuperável. Entrada na disputa salva abre outra aba para preservar a edição administrativa. Controles/métricas/DTO públicos separados do cálculo backend, sem SDK/chave/sessão/banco no cliente. PresetSúmula mostra J/PTS/2C/3C/LL/FC/GD; GD conta desqualificação real, não exclusão por5faltas ou ausência disciplinar, e não escala por30. Células conhecidas, ausentes e insuficientes diferentes; MIN oculta com preferência restaurada. Resumo comparativo soma fatos de todas inscrições por pessoa com denominadores próprios, sem média de médias; detalhe conserva cada inscrição e a direção de melhor/pior/empate/ausência vem do backend.
