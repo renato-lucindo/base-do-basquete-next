@@ -14,6 +14,8 @@
 
 **Cota e retomada:** gatilho real **85% usados/15% restantes em5h**, **13% usados/87% restantes semanais**, ordinaryUsageAllowed true. Nenhuma unidade/gate iniciada após a observação; somente consistência/checkpoint/push/agendamento. Reset5h **25/10/2026 03:30:55 America/Araguaina (UTC-03) /06:30:55 UTC**,1792909855; semanal **31/10/2026 22:30:55 UTC-03 /01/11 01:30:55 UTC**,1793496655. Atualizar a MESMA automação **retomar-preview-base-do-basquete** para **25/10/2026 03:32:55 UTC-03 /06:32:55 UTC**, nesta conversa, sem duplicata, com referências deste checkpoint. Confirmar sucesso abaixo antes de encerrar. Ao despertar conferir primeiro cota5h/semanal; se não reiniciou ou impedir continuidade, reagendar reset aplicável+2 sem gates/tentativas frequentes. Não comprar créditos, mudar plano ou usar reset manual; nunca expor/pedir credenciais.
 
+**Salvamento e retomada CONFIRMADOS:** material WIP remoto **ba40e75e4dcde51fb1fddccebc525cb2ddc323bb**, árvore limpa após push; somente esta confirmação documental a salvar. PR16 atualizado como WIP, sem merge. Ferramenta oficial confirmou atualização da MESMA automação retomar-preview-base-do-basquete ACTIVE, nesta conversa, para **25/10/2026 03:32:55 America/Araguaina (UTC-03) /06:32:55 UTC** (reset+2). Status/horário/target conferidos no TOML, sem duplicata. Execução encerrada após push desta confirmação; nenhum gate/DDL/deploy novo iniciado após o gatilho.
+
 ---
 
 # Transferências/T2b1 — fonte privada real — 24/10/2026 23:40 America/Araguaina (UTC-03)
