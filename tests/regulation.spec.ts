@@ -2,6 +2,41 @@ import { test, expect, type Page } from "@playwright/test";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
 
+test("permissão de transferência começa pendente e só muda por confirmação do regulamento", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page);
+  await prepare(page);
+  const permission = page.getByLabel("Transferências entre inscrições", {
+    exact: true,
+  });
+  await expect(permission).toHaveValue("");
+  await permission.selectOption("allowed");
+  await page
+    .getByRole("button", { name: "Conferir impacto", exact: true })
+    .click();
+  await page
+    .getByLabel("Motivo da alteração", { exact: true })
+    .fill("Permissão de transferência definida no regulamento");
+  await page
+    .getByLabel("Conferi o impacto nos resultados e cruzamentos", {
+      exact: true,
+    })
+    .check();
+  await page
+    .getByRole("button", {
+      name: "Confirmar e salvar regulamento",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Regulamento salvo" }),
+  ).toBeVisible();
+  expect(f.getState().definition?.transfers).toBe("allowed");
+  await page.reload();
+  await expect(permission).toHaveValue("allowed");
+});
+
 test("placar opcional de W.O. exige valores coerentes e retirada da regra é explícita", async ({
   page,
 }) => {

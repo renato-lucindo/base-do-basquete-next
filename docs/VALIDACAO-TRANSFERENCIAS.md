@@ -1,5 +1,19 @@
 # Transferências e retornos — evidências
 
+## T3 vertical estável — 25/10/2026
+
+Operação contextual no elenco, com destino da mesma disputa, camisa0/00/não definida, motivo, prévia backend e confirmação. Transferência encerra/abre; retorno cria período novo. Histórico integral paginado de20em20, com inscrições/vigência no horário de Brasília. Campo opcional do Regulamento começa “Não definido”; permitir/proibir só tem efeito após conferir/salvar a regra. Sem ampliar exposição pública.
+
+Comando congelado em503/reautenticação; ACK conhecido recupera sóGET, inclusive com edição posterior legítima do vínculo.409 preserva campos e exige atualização explícita; contexto novo na prévia mostra pendência e impede confirmação. Guardas de saída/recarga, foco após carregar destino/confirmar e tabela com região rolável em320px.
+
+**94browsers desktop/mobile composição PASS** (transferências, pessoas, importação, equipes, regulamento e jogos), `.preview-artifacts/transfers-t3-browsers-composition.log` SHA256 **7ac3adc26d7d0cf0b86ac83ee07009f0ef18a7dd0de53f00364eacbdf6408954**. Depois do ajuste de foco, **18browsers de transferência PASS** no código final, `.preview-artifacts/transfers-t3-ui-final.log` SHA256 **a768b7278231fc62108b9c0d88eac58cffc3600b36365ca4b27c7c32e56a8126**. Incluem duas abas com fonte compartilhada/versão antiga recusada, reautenticação, ACK incerto/GET falho, retorno novoID,26períodos e guarda320px. Captura transfer-mobile-320.png inspecionada: sem overflow da página, tabela com rolagem própria; não é auditoriaWCAG completa.
+
+REDs: botão/adapter/rota ausentes; prévia bloqueada por contexto novo confundida com resposta inválida; ACK conhecido recusava edição posterior legítima; foco perdido ao carregar destino. Corrigidos com focais antes do gate. Campos têm nomes explícitos, evitando agregar opções/conteúdo do textarea ao seletor de rótulo. Sem afrouxar contexto nem repetirPOST depois de ACK conhecido.
+
+Gate T3 **PASS354unit/72arquivos,5transportes,13PG,16workerd,4PDFs**, builds/tipos/lint/formato/fronteira/segredos487. `.preview-artifacts/transfers-t3-gate.log` SHA256 **3d9ca6810de3734583c4216a1ddad3adc2556b3d93613afdbd1a07c991b71ea5**. Nenhuma alteração de implementação depois deste gate. Banco35migrations, writer20261025064940 imutável/provas reais T2 reutilizadas. Sem DDL adicional ou gate repetido por documentação.
+
+CI do T2 **a9ebec45a69572567dc2263f0c30b5f546345960 SUCCESS40170631938/job121100561120**,350unit/226browsersLinux. API/DO/rotas remotas **1f97303** têm focais próprios; CI/preview T3 serão registrados após confirmação, sem atribuir evidência anterior à UI nova. Avaliação humana continua pendente, sem novo pedido; sem revisão independente/corridaPGmulticonexão/carga/WCAG completa comprovadas.
+
 ## T2 concluído — 25/10/2026 03:50 UTC-03
 
 Gate consolidado **PASS**:350unitários/71arquivos,5transportes,13cenários PostgreSQL,15workerd,prova4PDFs, builds/fronteira/tipos/lint/formato/segredos480. Log `.preview-artifacts/transfers-t2-gate.log`, SHA256 **269fab032a8cdd69c678105e1cd7752db36d2f7d3a1f611196af521a05a018ff**. Inclui matriz fechada TS×SQL, ACK mínimo real, zero/upgrade com G4 preservado, guardas de capacidade1999→2000/recusa2001, versões/contexto/permissão revogada/FKs/RLS e importador C4 real. Regressão C3 atualizada: depois de inativar, nova abertura da mesma pessoa exige transferência; primeira inscrição de outra pessoa continua funcionando. Não alterada migration aplicada para acomodar fixture.

@@ -26,6 +26,7 @@ import {
   type StaffSnapshot,
 } from "./staff-contract";
 import { PersonFields } from "./person-fields";
+import { TransferPanel } from "./transfer-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
 import type { RegistrationSnapshot } from "../teams/contract";
 import "./workspace.css";
@@ -66,6 +67,8 @@ export function MembersWorkspace({
   onSaved,
 }: Props) {
   const [importing, setImporting] = useState(false);
+  const [transferring, setTransferring] = useState<RosterSnapshot | null>(null);
+  const transferGuard = useRef<() => boolean>(() => true);
   const importGuard = useRef<() => boolean>(() => true);
   const [roster, setRoster] = useState<z.infer<typeof rosterListingSchema>>({
     items: [],
@@ -103,6 +106,7 @@ export function MembersWorkspace({
   function mayLeave() {
     return (
       importGuard.current() &&
+      transferGuard.current() &&
       (!(busy || dirty || uncertain) ||
         (!busy &&
           window.confirm(
@@ -506,6 +510,24 @@ export function MembersWorkspace({
     }
   }
   const disabled = busy || !canEdit;
+  if (transferring)
+    return (
+      <TransferPanel
+        key={transferring.id}
+        source={transferring}
+        enabled={enabled && canEdit}
+        guard={transferGuard}
+        onSessionLost={onSessionLost}
+        onSaved={() => {
+          setRefresh((v) => v + 1);
+          onSaved();
+        }}
+        onClose={() => {
+          setTransferring(null);
+          setRefresh((v) => v + 1);
+        }}
+      />
+    );
   if (importing)
     return (
       <TextImportWorkspace
@@ -851,6 +873,22 @@ export function MembersWorkspace({
                       </td>
                       <td>
                         <div className="competition-actions">
+                          <button
+                            className="secondary"
+                            disabled={disabled}
+                            aria-label={`${r.active ? "Transferir" : "Retornar"} ${r.person.name}`}
+                            onClick={() => {
+                              if (mayLeave()) {
+                                setEditor(null);
+                                setTarget(null);
+                                setTransferring(r);
+                              }
+                            }}
+                          >
+                            {r.active
+                              ? "Transferir ou retornar"
+                              : "Retornar ou transferir"}
+                          </button>
                           {r.active && (
                             <button
                               className="secondary"

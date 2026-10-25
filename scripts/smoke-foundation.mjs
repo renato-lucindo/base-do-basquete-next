@@ -123,6 +123,7 @@ try {
     `/api/people/${randomUUID()}`,
     `/api/roster?registrationId=${randomUUID()}`,
     `/api/roster/${randomUUID()}`,
+    `/api/roster/${randomUUID()}/transfer?destinationRegistrationId=${randomUUID()}`,
     `/api/staff?registrationId=${randomUUID()}`,
     `/api/staff/${randomUUID()}`,
     `/api/text-import?disputeId=${randomUUID()}`,
@@ -142,6 +143,8 @@ try {
     `/api/games/${randomUUID()}/occurrence/preview`,
     `/api/registrations/${randomUUID()}/withdrawal`,
     `/api/registrations/${randomUUID()}/withdrawal/preview`,
+    `/api/roster/${randomUUID()}/transfer`,
+    `/api/roster/${randomUUID()}/transfer/preview`,
   ]) {
     stage = `private decision command ${path}`;
     const denied = await fetch(`${origin}${path}`, {
@@ -255,6 +258,8 @@ try {
       browsers: 2,
       realAuthInvalidLogin: true,
       privateDecisionCommands: 6,
+      privateTransferRead: true,
+      privateTransferCommands: 2,
       publicProjectionRead: true,
       ownerLoginPending: true,
     }),

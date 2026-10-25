@@ -211,6 +211,33 @@ export function DefinitionEditor({
   return (
     <>
       <fieldset>
+        <legend>Transferências de atletas</legend>
+        <label>
+          Transferências entre inscrições
+          <select
+            aria-label="Transferências entre inscrições"
+            value={d.transfers ?? ""}
+            onChange={(e) =>
+              change((v) => {
+                v.transfers =
+                  e.target.value === ""
+                    ? null
+                    : (e.target.value as "allowed" | "forbidden");
+              })
+            }
+          >
+            <option value="">Não definido</option>
+            <option value="allowed">Permitidas</option>
+            <option value="forbidden">Proibidas</option>
+          </select>
+        </label>
+        <p>
+          Sem definição, novos períodos por transferência ou retorno ficam
+          bloqueados. As participações anteriores são preservadas. A mudança só
+          passa a valer depois de conferir e salvar o regulamento.
+        </p>
+      </fieldset>
+      <fieldset>
         <legend>Regra de W.O.</legend>
         <label className="reg-check">
           <input

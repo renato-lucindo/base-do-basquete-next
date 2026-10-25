@@ -1,3 +1,17 @@
+# Transferências T3 estáveis — CI/preview pendentes — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Unidade atual:** nova Base do Basquete, transferências/retornos conforme regulamento. Workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, novo remoto https://github.com/renato-lucindo/base-do-basquete-next, branch **codex/transferencias**, T2 remoto **a9ebec45a69572567dc2263f0c30b5f546345960**, API remoto **1f97303**; UI estável será salva no commit deste checkpoint. PRdraft16 sobre15, sem merge/produção. Todas mudanças desta retomada são próprias; dados/mudanças humanos preservados, nenhum repo/serviço anterior consultado.
+
+**Concluído:** banco T2 aplicado e provado realrollback; T3 API/DO/rotas e UI de permissão/transferência/retorno/histórico integrados.94browsers composição e18focais finais PASS; gate **PASS354unit/72arquivos,5transportes,13PG,16workerd,4PDFs/builds/tipos/fronteira/segredos487**. Hashes/limitações em docs/VALIDACAO-TRANSFERENCIAS.md. CI T2 **40170631938/job121100561120 SUCCESS350unit/226browsersLinux**; não atribuir à UI posterior. Não repetir evidências inalteradas por sessão/documentação.
+
+**Serviços:** Supabase somente link_6adaa8aab5688191b1e7ae1cddc55a82/org base-do-basquete/projeto nizmasjddyrhmevvfviz/Free.35migrations até20261025064940_roster_transfers, NÃO editar/reaplicar; tipos gerados. Pós-rollback0transferências/elenco/publicationVersions/objetos,2inscrições/1Auth. SegurançaWARN conhecido senha vazada/Pro, sem contratação. Preview aindaO4source50f6f30/deployment9580952c-1f5c-47df-9941-a24f54354c91/versão5b36ede7-ac2e-4904-ad35-26c3e47bbdcc. ContaCloudflare16b4a5e0a99a031d28051ebadb4811cc/Workerbase-do-basquete-next-preview; Access556be918-42ad-44e5-a85f-c2783f65b2ba sóresponsável, previewsOFF/namespace0411ac931ca54d289d270606c7e87ef7/rate862073195184/cofre preservados. Nenhum DDL/deploy/smoke/credencial/processo local em andamento após gate. Bundles com exclusão rejeitada preservados/ignorados.
+
+**Próximo exato:** commit/push desta UI estável, conferir CI (diagnóstico focal se falhar), preparar manifesto de árvore limpa e publicar pelo pluginCloudflare somente no preview protegido. Smokes novos GETcontexto/twoPOSTs sem sessão devem negar401, assets/hash/Auth/browser e anônimo302→Access; entregar credencial efêmera sócifrada e revogar política/token em seguida. Depois sugestões/confirmar colocações/honrarias conforme pacote. Elegibilidade pública de inscritos/agenda futura ainda não definida: R3eP2/P3 aguardam regra. Não repetir pedidos de testes manuais adiados pelo responsável. Etapas4/5 incompletas; sem revisão independente/corridaPGmulticonexão/carga/WCAG completa comprovadas.
+
+**Cota:** última44%usado5h/7%semanal; reset5h1792928009, semanal1793514809. Sem compra/plano/resetmanual. Continuar e consultar entre unidades; aos85%usados, checkpoint/push/MESMAautomação reset+2.
+
+---
+
 # Retomada — T2 banco concluído, T3 a iniciar — 25/10/2026 03:50 America/Sao_Paulo (UTC-03)
 
 Workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1; novo remoto https://github.com/renato-lucindo/base-do-basquete-next, branch **codex/transferencias**, base desta retomada/remoto **e823da51088812d9f8f9dacdd7664ed2a424431c**, WIP anterior ba40e75. PRdraft16 sobre15 sem reviews/checks novos, sem merge/produção. Fetch/status/serviços reconciliados; alterações desta execução são somente do agente, dados humanos preservados. Material T2 salvo no commit deste registro; SHA confirmado no log após commit/push. Nenhum repositório/serviço anterior consultado.
