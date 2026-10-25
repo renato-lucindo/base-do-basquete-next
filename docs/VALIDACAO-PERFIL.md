@@ -1,5 +1,15 @@
 # Perfil confirmado — evidências
 
+## P4b1 — painel administrativo local, 25/10/2026
+
+Ação Perfil público na linha do atleta, inclusive vínculo histórico, abre conferência dos metadados salvos; guard próprio preserva motivo/envio durante navegação e reautenticação. Campos públicos são apresentados explicitamente, sem nascimento completo/sexo/registro; revisão exige motivo. Comando sóreferencia versões/identidade. ACK incerto mantém comando congelado; ACK conhecido com falha de leitura repete sóGET;409 preserva motivo e exige atualização/conferência. Link público sódepois de existir confirmação. Hook de foco roda após commit para cabeçalho/status/checkbox e retorno ao elenco.
+
+RED browser por ação ausente, depois **10focais desktop/mobile PASS**, SHA256 **90e88740b6b644a3885872d5f927c2dc45a9d5948971a315eec2c370287baf15**. Composição com cadastro de pessoas e transferências **38browsers PASS**, SHA256 **167b1d4f0848962943d4c7265d011ec37c98d96f1ba9cbf1155c02cc8214f8b5**. Inclui reabrir, nenhuma propriedade person no comando, source409, reauth, perda deACK/GET e guarda/reflow320. Screenshot móvel inspecionada, SHA256 **3766a804a2de0fa1f80dbc7e74ac9f91396ac37ecee805bd132503af11b6b163**; sem overflow horizontal. Tipos app/Worker, lint/formato/buildfoundation/fronteira PASS após as alterações finais. Sem gate global novo por unidade local ainda sem página pública.
+
+Fora do que foi provado: duas abas do painel de perfil real, detalhe visual de snapshots anteriores e paginação longa do painel ainda precisam casos próprios. Não confundir com os testes de duas abas de transferências já presentes na composição. Histórico do perfil público também precisa paginação independente em P3/P4c; a fonte completa permanece preservada e totais não podem depender da página.
+
+Página atleta.html e links de resultados/estatísticas ainda ausentes. Portanto o link do painel é contrato da integração futura, NÃO motivo para publicar este build isolado. Preview segue e00ba15 estatístico, sem novo deploy/CI/DDL/credencial. Manifesto e payload e00ba15 preservam a prova do preview antigo; dist/Worker locais játêm alterações posteriores, regenerar manifesto de fonte limpa/gate/CI verificadas na futura publicação. Aceites humanos permanecem pendentes.
+
 ## P4a — API/Worker local, 25/10/2026
 
 Provider específico para leitura pública, workspace administrativo/histórico e confirmação. Somente UUID entra na RPC pública; backend valida toda a fonte e produz a página, sem JWT/cookie/SDK no browser ou documento bruto de carreira no retorno. Corpo de resposta stream limitado5MiB, timeout8s, excesso413/limitação429 explícitos, erros técnicos sanitizados. Comando privado validado/correlacionado sem GET antes da mutação; workspace recusa leitura inconsistente entre pessoa e publicação, ACK precisa corresponder ao comando original.

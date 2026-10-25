@@ -1,3 +1,15 @@
+# Perfil P4b1 painel administrativo local estável; próxima página pública — 25/10/2026 UTC-03
+
+Branch codex/perfil-confirmado, PRdraft19 sobre18 anexado; API/Worker remotos7b9cfff, P3 1d35fee/P2 08c3bdb/P1 a859977. Painel de publicação de metadados próprio pronto para commit/push, sem mudanças humanas.10browsers desktop/mobile e composição38com pessoas/transferências PASS; tipos app/Worker/lint/formato/buildfoundation/fronteiraPASS finais. Guarda/motivo/ACK incerto/GET conhecido/reauth/409/foco/320 aprovados, captura inspecionada. Ainda faltam duas abas e detalhe de snapshots do painel, além da página atleta.html. VALIDACAO-PERFIL descreve escopo/hashes sem atribuir gate454/CI estatístico ao código posterior.
+
+Próximo EXATO: P4c/paginação de apresentação. Primeiro teste RED para histórico público com mais de20inscrições/contextos, independente de totais e página de jogos; hoje PlayerProfilePage.history é array completo e precisa paginação própria/URL. Depois atleta.html com cinco seções/recortes/links profundos/voltar/foco/vazios, links de estatísticas e resultados e allowlist/manifesto/smokes. Completar casos privados pendentes P4b2. Sóquando vertical estável executar gate/CI único e publicar protegido, sem pedir novamente testes humanos adiados ou afirmar aceite.
+
+Banco43 imutável até20261025221911, perfis/participações/jogos/prêmios/objetos0 apósrollbacks,1pessoa/2inscrições/1Auth/1adminativo; preservar dados posteriores. Preview sourcee00ba15/deployment316098d6-182e-4378-b96e-ad1a3f1893d5/versão23bfec3d-1082-4f49-8988-b09d4b3d7765100% continua. Access sóresponsável/previewsOFF/DO/rate/cofre preservados, tokens revogados. Manifesto e00 é evidência antiga, NÃO reutilizar para código novo. Nenhum DDL/deploy/upload/gate/CI/smoke/credencial/processo local em andamento após fechamento; não repetir454/harness126 por sessão/docs.
+
+Cota real84%usado5h/55%semanal às19:58UTC-03. Fechar somente esta unidade; conferir novamente. Ao85%usar checkpoint/push e MESMAautomação reset+2. Política pública de agenda/inscritos, aceites humanos e StorageHTTP real continuam pendentes; sem revisão independente/corridaPGmulticonexão/carga/WCAGcompleta comprovadas.
+
+---
+
 # Perfil P4a API local estável; próxima confirmação administrativa — 25/10/2026 UTC-03
 
 Branch codex/perfil-confirmado/PRdraft19 sobre18, P3 remoto1d35fee; P4a próprio pronto para commit/push. Provider/SessionStore/rotas privadas de perfil/histórico/confirmação e pública /api/public/players/:id implementados, ainda sem deploy.23unitários de composição/4arquivos e20workerd PASS; tipos app/Worker/lint/buildWorker PASS. Banco43 inalterado, nenhumaDDL ou credencial nesta unidade. Não atribuir gate454 nem CI estatístico ao código novo; consolidar a vertical depois de UI estável. Hashes/escopo em VALIDACAO-PERFIL.

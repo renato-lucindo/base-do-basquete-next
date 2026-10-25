@@ -26,6 +26,7 @@ import {
   type StaffSnapshot,
 } from "./staff-contract";
 import { PersonFields } from "./person-fields";
+import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
 import type { RegistrationSnapshot } from "../teams/contract";
@@ -67,6 +68,8 @@ export function MembersWorkspace({
   onSaved,
 }: Props) {
   const [importing, setImporting] = useState(false);
+  const [profiling, setProfiling] = useState<string | null>(null);
+  const profileGuard = useRef<() => boolean>(() => true);
   const [transferring, setTransferring] = useState<RosterSnapshot | null>(null);
   const transferGuard = useRef<() => boolean>(() => true);
   const importGuard = useRef<() => boolean>(() => true);
@@ -103,10 +106,14 @@ export function MembersWorkspace({
     form = useRef<HTMLFormElement>(null),
     search = useRef<HTMLInputElement>(null);
   const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
+  useEffect(() => {
+    if (!profiling) heading.current?.focus();
+  }, [profiling]);
   function mayLeave() {
     return (
       importGuard.current() &&
       transferGuard.current() &&
+      profileGuard.current() &&
       (!(busy || dirty || uncertain) ||
         (!busy &&
           window.confirm(
@@ -510,6 +517,21 @@ export function MembersWorkspace({
     }
   }
   const disabled = busy || !canEdit;
+  if (profiling)
+    return (
+      <ProfilePublicationPanel
+        key={profiling}
+        personId={profiling}
+        enabled={enabled && canEdit}
+        guard={profileGuard}
+        onSessionLost={onSessionLost}
+        onSaved={onSaved}
+        onClose={() => {
+          setProfiling(null);
+          setRefresh((v) => v + 1);
+        }}
+      />
+    );
   if (transferring)
     return (
       <TransferPanel
@@ -873,6 +895,20 @@ export function MembersWorkspace({
                       </td>
                       <td>
                         <div className="competition-actions">
+                          <button
+                            className="secondary"
+                            disabled={disabled}
+                            aria-label={`Perfil público de ${r.person.name}`}
+                            onClick={() => {
+                              if (mayLeave()) {
+                                setEditor(null);
+                                setTarget(null);
+                                setProfiling(r.personId);
+                              }
+                            }}
+                          >
+                            Perfil público
+                          </button>
                           <button
                             className="secondary"
                             disabled={disabled}

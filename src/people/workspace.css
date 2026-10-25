@@ -106,3 +106,31 @@
 .members-workspace .competition-list li {
   overflow-wrap: anywhere;
 }
+.profile-publication {
+  overflow-wrap: anywhere;
+}
+.profile-public-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.profile-public-fields dt {
+  font-weight: 600;
+}
+.profile-public-fields dd {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+}
+.profile-publication textarea {
+  width: 100%;
+  min-height: 90px;
+}
+.profile-publication button {
+  max-width: 100%;
+  white-space: normal;
+}
+@media (max-width: 500px) {
+  .profile-public-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
