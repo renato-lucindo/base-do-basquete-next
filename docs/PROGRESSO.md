@@ -1,3 +1,15 @@
+# Colocações/honrarias A2b concluída; próximo A2c confirmação — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Atual:** workspace/novo remoto inalterados, branch codex/conquistas-honrarias, base materialc201a16/checkpoint17fbfe7. A2b será salvo neste commit. PRdraft17 sobre16 aberto/mergeável, sem reviews/CI novo, sem merge/produção. Todas mudanças desta execução são do agente, árvore limpa na retomada; dados humanos preservados. Cota real inicial3%usado5h/14%semanal; última12%/16%, resets5h1792946164/semanal1793514809. Continuidade nesta execução, sem pausa por cota agora.
+
+**A2b concluída:** writer privado/authfresh, locks ordenados de identidades/atletas antes da raiz, contexto backend e versão/recibo/Recentes, histórico imutável e âncoras relacionais. Replay conhecido não regrava nem tocaRecentes; fonte alterada sinaliza revisão sem substituir rascunho. Composição23PASS, gate **379unit/77arquivos,5transportes,13PG,16workerd,4PDFs/builds/tipos/fronteira/segredos504 PASS**; hashes em VALIDACAO-CONQUISTAS.md. Contrato realSupabaseBEGIN/ROLLBACK PASS. Não repetir suítes inalteradas por sessão/docs.
+
+**Serviços:** sóSupabaselink_6adaa8aab5688191b1e7ae1cddc55a82/projeto nizmasjddyrhmevvfviz/orgbase-do-basquete/Free. **37migrations** até **20261025114819_achievement_drafts**, aplicada uma vez/reconciliada; NÃO editar/reaplicar. Tipos gerados/trêsRPCs/typecheckPASS. Pós-rollback0draftVersions/heads/commands/publicationVersions/elenco/objetos,1pessoa/2inscrições/1Auth. Segurança sóWARN conhecido, performance nenhuma FK nova sem índice. Nenhum processo/DDL/deploy/credencial em andamento. PreviewT3source4b2f4d7/Access sóresponsável inalterado; nenhuma rota/UI de premiação disponível.
+
+**Próximo exato:** A2c RED de confirmação do rascunho corrente sem aceitar conteúdo público do browser. Guardas de versão/fonte fresca, motivo/impacto ao revisar publicação, ACK/replay/revogação/atomicidade e histórico/snapshot público mínimo. Fonte alterada requer revisão explícita e não substitui publicação existente. Nova migrationCLI sóapósRED;37anteriores imutáveis. Depois A3 adapter/DO/rotas/UI, CI/preview protegido. Política pública de inscritos/agenda futura e aceite humano permanecem pendentes; não repetir perguntas manuais. Sem revisão independente/carga/corridaPGmulticonexão/WCAGcompleta; etapas4/5 incompletas.
+
+---
+
 # Pausa por cota — A2a concluída; próximo A2b rascunho privado — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Retomada CONFIRMADA:** ferramenta oficial atualizou a mesma automação retomar-preview-base-do-basquete/ACTIVE e a visualização/configuração salva foram conferidas, nesta mesma conversa, para **25/10/2026 08:35:29 America/Sao_Paulo (11:35:29UTC)**. Sem duplicata. Checkpoint anterior remoto **ab7e22fbbd3668696129440cfc2312977379472a**/material **c201a165ea609effdf19d8898b823bbb996745ea**; este acréscimo é somente confirmação documental, sem código/serviço/verificação nova. Trabalho encerrado pelo gatilho de cota, aguardando despertar.

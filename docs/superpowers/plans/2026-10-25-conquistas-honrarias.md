@@ -33,6 +33,8 @@ A2a concluída: get_achievement_context deriva regulamento/contexto/catálogos/v
 - [ ] Gerar migration pela CLI fixada após RED; nunca editar/reaplicar migrations anteriores. Matriz TS×SQL para validação compartilhada, gate quando estável; aplicar uma vez somente no projeto novo, reconciliar versão/tipos/advisors/prova real com rollback e preservar dados humanos.
 - [ ] Consulta pública entrega somente premiação confirmada/DTO mínimo; confirmação não libera agenda futura ou rascunhos externos. Não implementar exposição enquanto seu contrato/invalidação não estiverem provados.
 
+A2b concluída: rascunho versionado privado, recibo/ACK e contexto derivado preservados; fonte opcional explícita, histórico20/20 e leitura de versão completa. Matriz TS×SQL/rollback/zero-upgrade aprovados; gate379unit e contrato real Supabase PASS. Migration **20261025114819_achievement_drafts**,37aplicadas/reconciliadas, tipos/advisors atualizados. Nenhuma confirmação/publicação/rota/UI ainda. Próximo A2c: RED de confirmação do rascunho atual, fonte/versão/recibo/motivo de revisão, snapshot público mínimo e sinalização de fonte alterada sem substituição automática; depois integração A3.
+
 ## A3 — integração e confirmação contextual
 
 - [ ] Adapter/SessionStore/rotas com authfresh antes do corpo e no DO, limites/mesma origem, ACK e correlações. Repetir comando congelado na incerteza, somenteGET depois de ACK conhecido. Nenhum derivado aceito do browser.

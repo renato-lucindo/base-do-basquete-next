@@ -1,5 +1,15 @@
 # Colocações e honrarias — evidências
 
+## A2b — rascunho privado versionado, 25/10/2026
+
+RED observado de contrato ausente e dois PostgreSQL zero/upgrade por RPC inexistente42883. Gravação privada com versão/fingerprint, fonte opcional explícita, snapshot autoritativo, histórico imutável paginado20/20 e âncoras de inscrições/pessoas/períodos. Reenvio idêntico devolve ACK conhecido sem atualizar Recentes, mesmo após mudança de fonte; novo conteúdo com mesmo ID, versão antiga, destinatário/inscrição de outro contexto e administrador diferente/revogado são recusados. Falha injetada depois do histórico preserva cabeçalho, recibos, vínculos e Recentes. Atleta de período encerrado e atleta sem publicação permanecem elegíveis. Fonte alterada sinaliza revisão sem substituir decisões. Salvar nunca publica.
+
+Composição focal **23testes/4arquivos PASS**, incluindo matriz real TS×SQL de UUIDs, títulos Unicode/trim/controles, posições compartilhadas, capacidade1000inscrições/1000honrarias/10000referências, fonte estrita e versão. Log achievements-a2b-composition.log SHA256 **01146f470c0526ac4b33954766ed575eb5ffb17962fc9a32bd7ba20430344975**. Ajustes de fixture corrigiram a troca da conta singleton e verificaram a FK específica de um destinatário sem súmula; não houve enfraquecimento das guardas produtivas.
+
+Gate **PASS379unit/77arquivos,5transportes,13PG,16workerd,4PDFs/builds/tipos/fronteira/segredos504**. Log achievements-a2b-gate.log SHA256 **b94126ddc98354726e4458cc3055cda0139d04d94497df53aa082d421952e952**. MigrationCLI114145 aplicada uma vez/reconciliada como **20261025114819_achievement_drafts.sql**, SHA256 **af0be5e5ad1fe345972ca74f891aad9dcf957e13317fe3cebb8d695195b0b2a1**,37migrations no projeto novo. Não editar/reaplicar. Tipos gerados com três RPCs e verificados após geração.
+
+Prova real **BEGIN/ROLLBACK PASS**, achievement-draft-proof.sql SHA256 **75cc151ea7b52949b5901181a2273f0eedb010407d84dc50d2620f16ba643d19**. Pós-rollback0rascunhos/cabeçalhos/recibos/publicationVersions/elenco/objetos;1pessoa/2inscrições/1Auth preservados. Segurança sóWARN conhecido senha vazada/Pro. Performance mantém10INFO de FKs antigas, nenhuma nova FK de premiações sem índice; índices novos sem uso em serviço vazio são esperados, não removidos. Sem deploy/rota/UI de premiação, confirmação pública ainda pendente. Sem prova independente/carga/corridaPGmulticonexão/WCAGcompleta.
+
 ## A2a — fonte privada real, 25/10/2026
 
 DoisRED zero/upgrade por RPC inexistente e RED específico de motivo administrativo desnecessário observado. Fonte get_achievement_context e pesquisa list_achievement_athletes implementadas: authfresh, raiz compartilhada, contexto/regra/catálogos/versões derivados, histórico encerrado elegível e homônimos porID. Sem filtrar por vínculo ou sexo atuais. FK obrigatória da publicaçãoG4 já preserva o período de participação. Busca20/20, qualificação real na disputa, sem nascimento completo/sexo/registro federativo/motivo original. Getter remove histórico de autoria desnecessário e substitui motivos por marcador contextual, mantendo efeito/versão e fingerprint.

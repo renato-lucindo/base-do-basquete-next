@@ -655,6 +655,14 @@ export type Database = {
         Args: { p_dispute_id: string };
         Returns: Json;
       };
+      get_achievement_draft_state: {
+        Args: { p_dispute_id: string; p_offset?: number };
+        Returns: Json;
+      };
+      get_achievement_draft_version: {
+        Args: { p_dispute_id: string; p_version: number };
+        Returns: Json;
+      };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_occurrence_state: {
@@ -782,6 +790,7 @@ export type Database = {
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       publish_pdf_game: { Args: { p_command: Json }; Returns: Json };
       publish_sheet_game: { Args: { p_command: Json }; Returns: Json };
+      save_achievement_draft: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
       save_game_occurrence: { Args: { p_command: Json }; Returns: Json };
