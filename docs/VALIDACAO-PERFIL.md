@@ -1,5 +1,21 @@
 # Perfil confirmado — evidências
 
+## P2 — participações e fonte de carreira integradas, 25/10/2026 19:21UTC-03
+
+Adaptador privado SQL comparado a normalizeConfirmedGame para súmula/DNP/0/00, quatro PDFs preservados e fallback misto. RED por função ausente antes de migration CLI. Projeção pública por pessoa+jogo, com FKs para participante/versão imutável e metadados estatísticos; source/nomes/equipes/camisas da ocasião. Trigger posterior ao estatístico, mesma transação, replay sem nova projeção e owner-backfill ordenado. Nenhuma leitura de pessoa/equipe/elenco live compõe os fatos.
+
+Fonte fechada confirmed-player-career-v1 oferece somente perfil explicitamente publicado, participações da identidade, honrarias de destinatário explícito e colocações de equipe com prova contextual de inscrição E equipe em participação publicada. Vínculo privado sem jogo não comprova colocação individual. Perfil sem jogos e premiado sem jogos preservam vazios; cadastro privado isolado não cria fonte. Retirada de honraria sóao confirmar correção; histórico privado não reaparece. Consulta invoker/STABLE usa tabelas públicas/índices próprios e GIN dos destinatários, sem chave/SDK no browser.
+
+RED de projeção/RPC observados, zero/upgrade/rollback e composição **218testes/44arquivos PASS**. Gate consolidado **454unit/94arquivos,5transportes,13PG,18workerd,4PDFs/builds/tipos/fronteira/segredos575 PASS**. Esse gate não inclui UI/API do perfil, ainda ausentes. Exportação posterior de fixture e consumo opcional do artefato real modificaram somente testes; focais pós-exportação/geração de tipos aprovados, sem repetição do gate inteiro.
+
+Migration aplicada UMA vez no projeto novo e reconciliada como **20261025221911_player_participation_projection.sql**; arquivo CLI220548 renomeado para o timestamp real. **43migrations**, imutáveis após aplicação. SQL normalizador REAL correspondeu ao TS em6casos, **124participações** (11/24/22/23/20/24), sem persistir fixtures. Provas reais separadas BEGIN/ROLLBACK da linhagem/transação e carreira/honrarias também PASS. Quatro focais posteriores parsearam fontes reais pelos contratos TS. Tipos gerados, advisor sóWARN conhecido senha vazada/Pro e10INFOFKs antigas; nenhuma FK nova sem índice.
+
+Pós-rollback1pessoa/2inscrições/1Auth/1adminativo;0perfis/versões/jogos/participações públicas/prêmios/estatísticas/objetos. Nenhum dado humano confirmado, removido ou sobrescrito. Preview continua e00ba15 e proteção anterior; não houve novo deploy nem credencial temporária nesta unidade.
+
+Limites explícitos:10000participações/honrarias/colocações e4MiB de fonte; excedente é erro, sem totais silenciosamente truncados. Fronteiras de capacidade e carga reais ainda não comprovadas, nem corrida multiconexão. Perfil e histórico da UI/API/P3 continuam pendentes; não atribuir aceite humano ou CI estatístico a este bloco.
+
+SHA256: gate454 **63ebc2d0578776fc54fd90083354d5cd90c51cbe42dae22782b9017342a5de09**; fontes reais ignoradas **d504b13f97ca6e9ef1fe5c2fe79f1be91659b6969f43978b001f4d36ff039871**; focais de tipos reais **ef684ad63ac5e411ecaad0410e00c483cd82628cc3454a7fa6dce47d2272604c**; migration43 **8a21e4a343c25bd1f7e76d7c9e5abc32c45246dbabc8a63403584c08e07ccb55**.
+
 ## P1 — banco novo reconciliado, 25/10/2026 19:01UTC-03
 
 Migration aplicada UMA vez pelo plugin no projeto novo nizmasjddyrhmevvfviz/vínculo link_6adaa8aab5688191b1e7ae1cddc55a82. Versão real **20261025215954_player_profile_publications.sql**, arquivo CLI215131 renomeado para o timestamp remoto, sem reaplicar; SHA256 **5c12f0d86bc28b53e9bd5d0c873d40af49d3bf1f1e6e5878ce878137e1f4816e**.42migrations reconciliadas, imutáveis após aplicação.

@@ -486,6 +486,41 @@ export type Database = {
           },
         ];
       };
+      published_player_games: {
+        Row: {
+          dispute_id: string;
+          game_id: string;
+          person_id: string;
+          publication_version: number;
+          snapshot: Json;
+          statistics_version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          game_id: string;
+          person_id: string;
+          publication_version: number;
+          snapshot: Json;
+          statistics_version: number;
+        };
+        Update: {
+          dispute_id?: string;
+          game_id?: string;
+          person_id?: string;
+          publication_version?: number;
+          snapshot?: Json;
+          statistics_version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "published_player_games_game_id_dispute_id_fkey";
+            columns: ["game_id", "dispute_id"];
+            isOneToOne: false;
+            referencedRelation: "games";
+            referencedColumns: ["id", "dispute_id"];
+          },
+        ];
+      };
       published_player_profiles: {
         Row: {
           person_id: string;
@@ -780,6 +815,10 @@ export type Database = {
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
+      get_player_career_source: {
+        Args: { p_person_id: string };
+        Returns: Json;
+      };
       get_player_profile_proposal: {
         Args: { p_person_id: string };
         Returns: Json;

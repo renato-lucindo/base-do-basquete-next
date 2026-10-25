@@ -22,10 +22,10 @@ Ruling: iniciar contratos puros em branch codex/perfil-confirmado baseada na cor
 
 ## P2 — participações públicas por identidade
 
-- [ ] RED do adaptador SQL×TS contra normalizeConfirmedGame para súmula/PDFSite/FIBA/domínios mistos/DNP/camisa0/00, homônimos e participação sem ações. Snapshot público por jogo+pessoa conserva contexto/jogo/versão/fatos/fase explícita e mínimo da fonte estatística; lookup indexado por pessoa e contexto, sem depender de elenco ativo.
-- [ ] Trigger de projeção acompanha publicação/correção do jogo, na ordem de locks existente. Falha preserva resultado/fonte/recibo; guardar linhagem/FKs para versões confirmadas. Sem expor rascunhos, atribuições privadas de fase, agenda futura ou cadastros atuais. Dados antigos de jogo continuam na ocasião correta.
-- [ ] RPC pública read-only retorna fonte fechada por pessoa: metadados confirmados ou null, participações publicadas e honrarias de destinatário explícito. Limites de tamanho/capacidade são explícitos, sem truncar carreira para fabricar totais; paginação dos jogos/histórico independente dos totais. Não copiar todos os demais atletas para cada consulta.
-- [ ] Colocações de equipe sópodem aparecer com ligação contextual comprovada por participação publicada; não inferir premiação individual ou elegibilidade a medalha de vínculo live ou de uma primeira inscrição arbitrária. Fonte insuficiente permanece identificada. Prêmios individuais exigem personId confirmado no snapshot da honraria.
+- [x] RED do adaptador SQL×TS contra normalizeConfirmedGame para súmula/PDFSite/FIBA/domínios mistos/DNP/camisa0/00, homônimos e participação sem ações. Snapshot público por jogo+pessoa conserva contexto/jogo/versão/fatos/fase explícita e mínimo da fonte estatística; lookup indexado por pessoa e contexto, sem depender de elenco ativo.
+- [x] Trigger de projeção acompanha publicação/correção do jogo, na ordem de locks existente. Falha preserva resultado/fonte/recibo; guardar linhagem/FKs para versões confirmadas. Sem expor rascunhos, atribuições privadas de fase, agenda futura ou cadastros atuais. Dados antigos de jogo continuam na ocasião correta.
+- [x] RPC pública read-only retorna fonte fechada por pessoa: metadados confirmados ou null, participações publicadas e honrarias de destinatário explícito. Limites de tamanho/capacidade explícitos, sem truncar carreira para fabricar totais; paginação de apresentação fica em P3/P4. Não copia todos os demais atletas para cada consulta.43migrations e provas reais reconciliadas em VALIDACAO-PERFIL.
+- [x] Colocações de equipe sóaparecem com ligação contextual comprovada de inscrição E equipe em participação publicada; não inferir premiação individual ou elegibilidade a medalha de vínculo live ou de uma primeira inscrição arbitrária. Fonte insuficiente permanece identificada. Prêmios individuais exigem personId confirmado no snapshot da honraria.
 
 ## P3 — domínio de perfil/carreira
 
