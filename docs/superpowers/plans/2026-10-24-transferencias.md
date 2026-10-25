@@ -23,10 +23,10 @@
 
 Novos src/people/transfer-contract.ts, transfer.ts, transfer.test.ts e tests/fixtures/transfers.ts. Contrato usa apenas os metadados necessários dos vínculos, regra, destino e instante autoritativo; não reutiliza dados pessoais privados ou jogos completos.
 
-- [ ] RED de módulo ausente; casos funcionais: transferência fecha/abre no mesmo instante sem mutar contexto; retorno cria período novo; origem encerrada sem ativo permite retorno, com ativo diferente bloqueia; destino igual ao ativo pede edição comum.
-- [ ] Fonte completa fornecida pelo futuro leitor: histórico da pessoa na disputa e ocupação ativa do destino; validar escopo, unicidade de ativos/camisas e períodos. Contrato fechado recusa ator/pessoa/tempo/fatos inseridos pelo browser; comando inclui versões da origem/destino/regulamento, fingerprint, motivo e confirmação.
-- [ ] Prévia bloqueia regra ausente/proibida, versão/fingerprint diferentes, camisa ocupada, IDnovo já usado e origem histórica ultrapassada. Camisa0/00 distinta; não confundir inscrições da mesma equipe. Não aceitar transferência entre disputas. Relógio preserva microssegundos e equivalência de fuso.
-- [ ] GREEN focal e composição de contratos de pessoas/elenco; tipos/lint/formato/segredos, evidências e commit. Sem DDL/rotas/deploy; não atribuir prova de autorização/atomicidade/RLS ao planejador.
+- [x] RED de módulo ausente; casos funcionais: transferência fecha/abre no mesmo instante sem mutar contexto; retorno cria período novo; origem encerrada sem ativo permite retorno, com ativo diferente bloqueia; destino igual ao ativo pede edição comum.
+- [x] Fonte completa fornecida pelo futuro leitor: histórico da pessoa na disputa e ocupação ativa do destino; validar escopo, unicidade de ativos/camisas e períodos. Contrato fechado recusa ator/pessoa/tempo/fatos inseridos pelo browser; comando inclui versões da origem/destino/regulamento, fingerprint, motivo e confirmação.
+- [x] Prévia bloqueia regra ausente/proibida, versão/fingerprint diferentes, camisa ocupada, IDnovo já usado e origem histórica ultrapassada. Camisa0/00 distinta; não confundir inscrições da mesma equipe. Não aceitar transferência entre disputas. Relógio preserva microssegundos e equivalência de fuso.
+- [x] GREEN focal e composição de contratos de pessoas/elenco; tipos/lint/formato/segredos, evidências e commit. Sem DDL/rotas/deploy; não atribuir prova de autorização/atomicidade/RLS ao planejador.
 
 ## T2 — regulamento e transação no banco
 
