@@ -701,6 +701,14 @@ export type Database = {
         Args: { p_dispute_id: string; p_version: number };
         Returns: Json;
       };
+      get_achievement_workspace: {
+        Args: {
+          p_dispute_id: string;
+          p_draft_offset?: number;
+          p_publication_offset?: number;
+        };
+        Returns: Json;
+      };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_occurrence_state: {

@@ -1,5 +1,11 @@
 # Colocações e honrarias — evidências
 
+## A3a — fonte da interface, 25/10/2026
+
+RED de contrato/RPC ausentes observado, doisPostgreSQL zero/upgrade **PASS**. Fonte transacional privada entrega catálogos de inscrições, opções explícitas de grupo/série, rascunho/versões e somente nomes dos destinatários já selecionados. Não envia catálogo10000identidades, jogos/fatos internos/contextSnapshot nem duplica o snapshot público no workspace. Seleção nova usa busca contextual20/20 existente. DTO valida contexto/fingerprint e conjunto exato de identidades escolhidas; limite de resposta16MiB causa recusa explícita, sem truncate. Ausência de regulamento/rascunho retorna opções vazias/versão0, não uma premiação inventada.
+
+Focal achievements-a3-workspace-focal.log SHA256 **c34f41294debd2454a02b83a969d7f2caa1288ed8efe21a787be7ed76035ba1a**. MigrationCLI120227 aplicada/reconciliada **20261025120438_achievement_workspace.sql**, SHA256 **67204450011dd9ac54da381b3f778a26b3d9d7ce07d08c51b0c8c0509185e638**,39migrations; não editar/reaplicar. Prova realBEGIN/ROLLBACK PASS, achievement-workspace-proof.sql SHA256 **d18b9bead614c5e7f9ba79d8a97b789d947b1f0bff43dca4fa46eb39cd072341**. Pós-rollback1pessoa/2inscrições/1Auth,0publicAwards/draftVersions/roster; advisor sóWARN conhecido. Tipos gerados. A3 vertical em andamento: gate consolidado da integração será executado quando estiver estável; não atribuir gate383 anterior a este leitor novo. Sem rota/UI/deploy/CI novo ainda.
+
 ## A2c — confirmação e revisão próprias, 25/10/2026
 
 RED de contrato ausente e duas RPCs inexistentes observado. Confirmação recebe apenas referências/versões/fingerprint/motivo/conferência; nenhum conteúdo público vindo do browser. Exige rascunho corrente e fonte ainda revisada. Revisão com motivo, recibo/authfresh/locks, snapshot mínimo e histórico imutável; salvar, corrigir pessoa ou mudar a fonte não republica. Histórico pagina20/20 e preserva snapshots anteriores. Primeira confirmação vazia recusada; retirada de premiações exige correção explícita com motivo. Nenhum dado real foi confirmado/publicado.

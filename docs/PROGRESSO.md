@@ -1,3 +1,13 @@
+# Colocações/honrarias A3a fonte da interface pronta; API/UI pendentes — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Atual:** branch codex/conquistas-honrarias, A2b **7d9d572**, A2c remoto **fa35e51bbdf8949aef9ef5c2d4fa77c8630116e0**. PRdraft17 sobre16 atualizado/mergeável, sem merge/produção/CI novo. Workspace/novo remoto e somente dados humanos preservados. Fonte privada da interface será salva neste commit; nenhuma rota/UI de premiações ainda no Worker. Cota real última25%usado5h/18%semanal, resets1792946164/1793514809, continuidade autorizada.
+
+**A3a:** workspace privado coerente, inscrições/opções explícitas de grupo/série/nomes dos destinatários selecionados, sem catálogo10000/fatos internos/snapshot privado.2PGzero/upgrade e contrato realSupabaseBEGIN/ROLLBACK PASS; hashes em VALIDACAO-CONQUISTAS.md. Tipos gerados, advisor sóWARN conhecido, pós-rollback1pessoa/2inscrições/1Auth e0publicAwards/draftVersions/roster. **39migrations** até **20261025120438_achievement_workspace**, aplicada uma vez/reconciliada; NÃO editar/reaplicar. A3 vertical ainda em construção, sem novo gate consolidado; reutilizar provas A2/artefatos imutáveis.
+
+**Próximo exato:** RED do provider de premiações, com workspace/candidatos/sugestão calculada na fonte backend/salvar/confirmar/históricos/consulta pública mínima. DTOs fechados, UUID/correlação/ACK/limites/erros; preservar replay sem GET prévio nas mutações. Depois DO/rotas, authfresh antes do corpo e dentro da operação, UI contextual de Regulamento com teclado/guardas/ACK conhecido→GET/reautenticação e browsers focais. Gate/CI/preview protegido quando estável. Preview segueT3source4b2f4d7/Access sóresponsável, sem DDL/deploy/credencial/processo em andamento após checks. Política pública de inscritos/agenda futura/aceite humano continuam pendentes, sem novos pedidos. Sem provas independentes/carga/concorrênciaPGreal/WCAGcompleta.
+
+---
+
 # Colocações/honrarias A2c concluída; próximo A3 integração — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Atual:** branch codex/conquistas-honrarias/PRdraft17 sobre16, A2b remoto **7d9d572**; A2c neste commit. Workspace/novo remoto inalterados; somente alterações próprias, dados humanos preservados, sem merge/principal/produção. Cota real última20%usado5h/17%semanal, resets1792946164/1793514809; seguir nesta execução. Não houve gatilho de pausa.

@@ -1,0 +1,16 @@
+reset role;
+set local role anon;
+select pg_temp.pu_error('select public.get_achievement_workspace(pg_temp.pu_id(3))','42501');
+set local role authenticated;
+select set_config('request.jwt.claim.sub',pg_temp.pu_id(98)::text,true);
+select pg_temp.pu_error('select public.get_achievement_workspace(pg_temp.pu_id(3))','PT403');
+reset role;
+update public.admin_access set enabled=true;
+set local role authenticated;
+select pg_temp.pu_error('select public.get_achievement_workspace(pg_temp.pu_id(3),-1,0)','PT400');
+select pg_temp.pu_error('select public.get_achievement_workspace(pg_temp.pu_id(3),0,100001)','PT400');
+select public.get_achievement_workspace(pg_temp.pu_id(3)) as achievement_workspace;
+select public.get_achievement_workspace(pg_temp.pu_id(605)) as achievement_empty_workspace;
+select pg_temp.pu_assert(not(public.get_achievement_workspace(pg_temp.pu_id(3))::text~'"(eligibleAthletes|contextSnapshot|games|publishedGames|birthDate|sex|federationRegistration)"'),'browser receives only selected identities and choices, no internal facts');
+select pg_temp.pu_assert(public.get_achievement_workspace(pg_temp.pu_id(3),20,0)#>'{draft,history}'=public.get_achievement_draft_state(pg_temp.pu_id(3),20)->'history','draft pagination preserved');
+reset role;
