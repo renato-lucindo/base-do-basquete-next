@@ -1,4 +1,14 @@
 import { SupabasePublications } from "../publication/provider";
+import { SupabaseAchievements } from "../achievements/provider";
+import {
+  saveAchievementDraftSchema,
+  type SaveAchievementDraft,
+} from "../achievements/draft-contract";
+import {
+  confirmAchievementsSchema,
+  type ConfirmAchievements,
+} from "../achievements/publication-contract";
+import { previewAchievementsSchema } from "../achievements/view-contract";
 import { SupabaseRegulations } from "../regulation/provider";
 import { SupabaseDecisions } from "../regulation/decision-provider";
 import {
@@ -90,9 +100,14 @@ export class SessionStore extends DurableObject<Env> {
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
   private readonly transfers: SupabaseTransfers;
+  private readonly achievements: SupabaseAchievements;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.achievements = new SupabaseAchievements({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.transfers = new SupabaseTransfers({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -358,6 +373,77 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.publications.getState(accessToken, gameId, offset),
+      ),
+    );
+  }
+  getAchievementWorkspace(
+    disputeId: string,
+    draftOffset: number,
+    publicationOffset: number,
+  ) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.getWorkspace(
+          accessToken,
+          disputeId,
+          draftOffset,
+          publicationOffset,
+        ),
+      ),
+    );
+  }
+  getAchievementCandidates(disputeId: string, q: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.getCandidates(accessToken, disputeId, q, offset),
+      ),
+    );
+  }
+  getAchievementDraftVersion(disputeId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.getDraftVersion(accessToken, disputeId, version),
+      ),
+    );
+  }
+  getAchievementPublicationVersion(disputeId: string, version: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.getPublicationVersion(
+          accessToken,
+          disputeId,
+          version,
+        ),
+      ),
+    );
+  }
+  previewAchievements(command: unknown) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.preview(
+          accessToken,
+          previewAchievementsSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveAchievementDraft(command: SaveAchievementDraft) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.save(
+          accessToken,
+          saveAchievementDraftSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  confirmAchievements(command: ConfirmAchievements) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.achievements.confirm(
+          accessToken,
+          confirmAchievementsSchema.parse(command),
+        ),
       ),
     );
   }

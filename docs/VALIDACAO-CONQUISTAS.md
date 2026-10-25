@@ -1,5 +1,13 @@
 # Colocações e honrarias — evidências
 
+## A3b — provider e transporte privado, 25/10/2026
+
+RED de provider ausente e rota retornando404 em vez de401 observado. Provider específico calcula sugestão com motor existente sobre fonte autoritativa; não aceita resultado/eligíveis do browser. Workspace/candidatos/sugestão/rascunho/confirmação/históricos e DTO público com limites/correlação. Mutações não fazem GET prévio e validam ACK contra o comando congelado. Histórico de rascunho elimina contexto de fatos internos antes de responder ao navegador. Consulta pública usa somente publishable key e DTO confirmado.
+
+**14provider +2PG de composição PASS**, achievements-api-composition.log SHA256 **847f4f65027bd6c0f52845ef35a6c76fc86fd3403016edfcdebba5a53d23186c**. **17workerd PASS**, incluindo cenário novo de corpo/origem/CSRF/tipos/contexto/limites, auth fresca antes do corpo e de novo no DO, ACK perdido de salvar/confirmar, replay único e projeção pública sem login interno. Log achievements-api-workerd.log SHA256 **7da11612ab5623d0114de46c44d84d618e6c3695e91f1cef92d336913140750b**. RED routes SHA256 **ef0fa83efb24d2d537374ff018dff1112e89ea359b35c1225d51d3485f9b63cf**.
+
+Tipos app/Worker, lint e buildWorker PASS. Cloudflare best-practices atual consultado, types5.20261025.1 baixados somente para referência ignorada; dependências/configuração de runtime mantidas. Nenhum deploy/CI novo; UI e gate consolidado da vertical pendentes. Outbound controlado não substitui SQL real, carga, corrida multiconexão ou aceite humano.
+
 ## A3a — fonte da interface, 25/10/2026
 
 RED de contrato/RPC ausentes observado, doisPostgreSQL zero/upgrade **PASS**. Fonte transacional privada entrega catálogos de inscrições, opções explícitas de grupo/série, rascunho/versões e somente nomes dos destinatários já selecionados. Não envia catálogo10000identidades, jogos/fatos internos/contextSnapshot nem duplica o snapshot público no workspace. Seleção nova usa busca contextual20/20 existente. DTO valida contexto/fingerprint e conjunto exato de identidades escolhidas; limite de resposta16MiB causa recusa explícita, sem truncate. Ausência de regulamento/rascunho retorna opções vazias/versão0, não uma premiação inventada.

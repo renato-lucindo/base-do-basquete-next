@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { achievementContextSchema } from "./context-contract";
 import { achievementDraftStateSchema } from "./draft-contract";
+import { achievementDraftVersionSchema } from "./draft-contract";
 import { achievementPublicationStateSchema } from "./publication-contract";
 import { placementSourceSchema, placementSuggestionSchema } from "./contract";
 import { publicPersonSchema } from "../people/contract";
@@ -107,3 +108,13 @@ export const achievementSuggestionViewSchema = z
   .strict()
   .refine((v) => v.suggestion.disputeId === v.disputeId);
 export type AchievementWorkspace = z.infer<typeof achievementWorkspaceSchema>;
+export const achievementDraftVersionViewSchema = z
+  .object(achievementDraftVersionSchema.shape)
+  .omit({ contextSnapshot: true })
+  .extend({ registrations: achievementContextSchema.shape.registrations })
+  .strict()
+  .refine(
+    (v) =>
+      v.draft.disputeId === v.disputeId &&
+      v.registrations.every((r) => r.disputeId === v.disputeId),
+  );

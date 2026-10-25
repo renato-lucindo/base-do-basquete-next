@@ -23,6 +23,7 @@
   ],
   "exclude": [
     "src/server/worker.ts",
+    "src/achievements/routes.ts",
     "src/access/durable.ts",
     "src/teams/routes.ts",
     "src/games/routes.ts",

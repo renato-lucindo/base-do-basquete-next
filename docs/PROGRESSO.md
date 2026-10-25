@@ -1,3 +1,13 @@
+# Colocações/honrarias A3b API pronta; próxima interface — 25/10/2026 America/Sao_Paulo (UTC-03)
+
+**Atual:** branch codex/conquistas-honrarias/PRdraft17 sobre16; A2b7d9d572/A2cfa35e51/A3a fonte remota **4acf8b1**. API neste commit; somente mudanças próprias/dados humanos preservados, sem merge/produção/CI/deploy. Novo remoto/workspace inalterados. Cota real última32%usado5h/19%semanal, resets1792946164/1793514809; continuar nesta execução.
+
+**A3b pronta:** provider/DO/rotas específicas de workspace/candidatos/sugestão/rascunho/confirmação/históricos e DTO público mínimo. Sugestão calculada no backend, correlação estrita; authfresh antes do corpo e novamente no DO, origem/limites fixos. ACK perdido/replay de salvar/confirmar verificados sem GET prévio nas mutações. Histórico de rascunho omite fatos internos.14provider+2PG composição,17workerd/tipos/lint/buildWorker PASS; hashes em VALIDACAO-CONQUISTAS.md. Gate/CI da vertical quando UI estável, sem atribuir gate383 antigo a novos leitores/transportes. Banco39migrations até20261025120438 inalterado, não reaplicar; nenhuma premiação humana confirmada, dados preservados. Preview segueT3source4b2f4d7 protegido; bundle local novo ainda não publicado.
+
+**Próximo exato:** RED browsers desktop/mobile da interface dentro de Regulamento. Abrir “Colocações e honrarias”, fonte explícita→sugestão→revisar posições compartilhadas/honrarias/destinatários→salvar→confirmar com motivo/revisão→reabrir. Cobrir ACK conhecido com falhaGET (retry sóGET), duas abas409 preservando edição, reautenticação com comando congelado, guardas/foco/320px/históricos/paginações. Não deixar guardas de Regulamento e premiações se sobrescreverem; somente uma edição ativa por vez, preservar quando perde sessão. Depois composição/gate/CI/preview protegido/smokes novos e revogação. Nenhum processo/DDL/deploy/credencial ativo ao fechar checks. Política de agenda futura/inscritos e aceite humano pendentes sem repetir perguntas; sem revisão independente/carga/corridaPGreal/WCAGcompleta.
+
+---
+
 # Colocações/honrarias A3a fonte da interface pronta; API/UI pendentes — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Atual:** branch codex/conquistas-honrarias, A2b **7d9d572**, A2c remoto **fa35e51bbdf8949aef9ef5c2d4fa77c8630116e0**. PRdraft17 sobre16 atualizado/mergeável, sem merge/produção/CI novo. Workspace/novo remoto e somente dados humanos preservados. Fonte privada da interface será salva neste commit; nenhuma rota/UI de premiações ainda no Worker. Cota real última25%usado5h/18%semanal, resets1792946164/1793514809, continuidade autorizada.

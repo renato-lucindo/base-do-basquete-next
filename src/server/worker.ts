@@ -1,4 +1,8 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
+import {
+  achievementRoute,
+  publicAchievementRoute,
+} from "../achievements/routes";
 import { regulationRoute } from "../regulation/routes";
 import { decisionRoute } from "../regulation/decision-routes";
 import { z } from "zod";
@@ -35,6 +39,16 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/public/achievements" ||
+        url.pathname.startsWith("/api/public/achievements/")
+      )
+        response = await publicAchievementRoute(request, env, url);
+      else if (
+        url.pathname === "/api/achievements" ||
+        url.pathname.startsWith("/api/achievements/")
+      )
+        response = await achievementRoute(request, env, url);
       else if (
         url.pathname === "/api/public/games" ||
         url.pathname.startsWith("/api/public/games/")

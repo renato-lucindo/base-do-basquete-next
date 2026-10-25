@@ -6,6 +6,8 @@ import { regulationFixture, regulationId } from "./fixtures/regulation.ts";
 import { decisionBackend } from "./fixtures/decisions.mjs";
 import { transferBackend } from "./fixtures/transfer-backend.mjs";
 import { transferFixture, transferId } from "./fixtures/transfers.ts";
+import { achievementBackendFixture } from "./fixtures/achievement-backend.ts";
+import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -21,6 +23,7 @@ async function fixture(options = {}) {
     regulationReceipts = new Map();
   const decisionResponse = decisionBackend(regulation, options);
   const transferResponse = transferBackend(options);
+  const achievementResponse = achievementOutbound(options);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -54,6 +57,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (options.achievements) {
+          const response = await achievementResponse(request);
+          if (response) return response;
+        }
         if (options.transfers) {
           const response = await transferResponse(request);
           if (response) return response;
@@ -81,7 +88,7 @@ async function fixture(options = {}) {
         if (url.pathname === "/auth/v1/user")
           return Response.json({ id, is_anonymous: false });
         if (url.pathname === "/rest/v1/admin_access") {
-          if (options.decisions || options.transfers)
+          if (options.decisions || options.transfers || options.achievements)
             options.authorizationReads = (options.authorizationReads ?? 0) + 1;
           return Response.json(
             options.denied ||
@@ -1890,6 +1897,140 @@ test("competitive decision routes preserve authorization, bounded bodies, previe
       ).length,
       sourceCalls,
     );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("achievement routes authorize before body, derive suggestions and recover draft/confirmation receipts", async () => {
+  const options = {
+      achievements: true,
+      loseAchievementSaveAck: true,
+      loseAchievementConfirmAck: true,
+    },
+    f = await fixture(options),
+    a = achievementBackendFixture(),
+    path = `/api/achievements/${a.source.disputeId}`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + path)).status, 401);
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(
+          origin + `/api/public/achievements/${a.source.disputeId}`,
+        )
+      ).status,
+      404,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (suffix = "", method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + suffix, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal((await send()).status, 200);
+    assert.equal((await send("?draftOffset=0&draftOffset=0")).status, 400);
+    assert.equal((await send("?publicationOffset=-1")).status, 400);
+    assert.equal((await send("/athletes?q=Atleta&offset=0")).status, 200);
+    const suggestion = {
+      disputeId: a.source.disputeId,
+      expectedContextFingerprint: a.fp,
+      source: a.request.source,
+    };
+    const preview = await send("/suggestion", "POST", suggestion);
+    assert.equal(preview.status, 200);
+    assert.equal((await preview.json()).suggestion.ready, true);
+    assert.equal(
+      (
+        await send("/suggestion", "POST", {
+          ...suggestion,
+          eligibleAthletes: [],
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await send("/suggestion", "POST", {
+          ...suggestion,
+          disputeId: a.id(999),
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (await send("", "POST", a.draft, { origin: "https://evil.test" })).status,
+      403,
+    );
+    assert.equal(
+      (await send("", "POST", a.draft, { "content-type": "text/plain" }))
+        .status,
+      415,
+    );
+    assert.equal((await send("", "POST", a.draft)).status, 503);
+    assert.equal((await send("", "POST", a.draft)).status, 200);
+    assert.equal(options.achievementSaves, 1);
+    assert.equal((await send("/drafts/1")).status, 200);
+    assert.equal((await send("/drafts/0")).status, 400);
+    assert.equal((await send("/drafts/99")).status, 404);
+    assert.equal((await send("/confirm", "POST", a.confirmation)).status, 503);
+    assert.equal((await send("/confirm", "POST", a.confirmation)).status, 200);
+    assert.equal(options.achievementConfirmations, 1);
+    assert.equal((await send("/confirmations/1")).status, 200);
+    const publicValue = await f.mf.dispatchFetch(
+      origin + `/api/public/achievements/${a.source.disputeId}`,
+    );
+    assert.equal(publicValue.status, 200);
+    assert.ok(!(await publicValue.text()).includes("contextFingerprint"));
+    const huge = () =>
+        new ReadableStream({
+          start(c) {
+            c.enqueue(new Uint8Array(1048577));
+            c.close();
+          },
+        }),
+      calls = () => f.calls.filter((p) => /achievement/.test(p)).length;
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(origin + path, {
+          method: "POST",
+          headers: { cookie, origin, "content-type": "application/json" },
+          body: huge(),
+          duplex: "half",
+        })
+      ).status,
+      413,
+    );
+    const before = calls();
+    options.denyAuthorizationAt = options.authorizationReads + 2;
+    assert.equal((await send("", "POST", a.draft)).status, 403);
+    assert.equal(calls(), before);
+    delete options.denyAuthorizationAt;
+    const freshCookie = (await f.login()).headers
+      .get("set-cookie")
+      .split(";", 1)[0];
+    options.denied = true;
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(origin + path, {
+          method: "POST",
+          headers: {
+            cookie: freshCookie,
+            origin,
+            "content-type": "application/json",
+          },
+          body: huge(),
+          duplex: "half",
+        })
+      ).status,
+      403,
+    );
+    assert.equal(calls(), before);
   } finally {
     await f.mf.dispose();
   }
