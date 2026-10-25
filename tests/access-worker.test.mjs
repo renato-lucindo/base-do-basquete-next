@@ -12,6 +12,52 @@ import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
+test("public statistics route derives scoped pages without app session or exposing source documents", async () => {
+  const f = await fixture({ statistics: true });
+  const source = JSON.parse(
+    await readFile("tests/fixtures/statistics-source.json", "utf8"),
+  );
+  const path = `/api/public/statistics/${source.disputeId}`;
+  try {
+    const response = await f.mf.dispatchFetch(
+      origin + path + "?scope=all&mode=total&page=2",
+    );
+    assert.equal(response.status, 200);
+    const value = await response.json();
+    assert.equal(value.total, 33);
+    assert.equal(value.rows.length, 13);
+    assert.equal(value.version, source.version);
+    assert.equal(value.pageSize, 20);
+    assert.equal("games" in value, false);
+    assert.equal(
+      f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
+      false,
+    );
+    assert.equal((await f.mf.dispatchFetch(origin + path)).status, 200);
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path, { method: "POST", body: "{}" }))
+        .status,
+      405,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + "/api/public/statistics/bad")).status,
+      400,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + `/api/public/statistics/${id}`))
+        .status,
+      404,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path + "?q=" + "x".repeat(8193)))
+        .status,
+      414,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
 async function fixture(options = {}) {
   const calls = [],
     publicationReceipts = new Map();
@@ -57,6 +103,21 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (
+          options.statistics &&
+          url.pathname === "/rest/v1/rpc/get_public_statistics_source"
+        ) {
+          assert.equal(request.headers.get("authorization"), null);
+          assert.equal(request.headers.get("cookie"), null);
+          const source = JSON.parse(
+            await readFile("tests/fixtures/statistics-source.json", "utf8"),
+          );
+          const args = await request.json();
+          assert.deepEqual(Object.keys(args), ["p_dispute_id"]);
+          return Response.json(
+            args.p_dispute_id === source.disputeId ? source : null,
+          );
+        }
         if (options.achievements) {
           const response = await achievementResponse(request);
           if (response) return response;

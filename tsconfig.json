@@ -22,6 +22,7 @@
     "vite.foundation.config.ts"
   ],
   "exclude": [
+    "src/statistics/routes.ts",
     "src/server/worker.ts",
     "src/achievements/routes.ts",
     "src/access/durable.ts",

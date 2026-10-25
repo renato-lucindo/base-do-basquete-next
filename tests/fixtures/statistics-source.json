@@ -1,0 +1,1029 @@
+{
+  "kind": "confirmed-statistics-v1",
+  "games": [
+    {
+      "phase": "round_robin",
+      "snapshot": {
+        "id": "f9300000-0000-4000-8000-000000000900",
+        "game": {
+          "away": {
+            "name": "Águias",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000006"
+          },
+          "date": null,
+          "home": {
+            "name": "Lobos",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000005"
+          },
+          "time": null,
+          "venue": null,
+          "number": null,
+          "timeZone": "America/Sao_Paulo"
+        },
+        "facts": {
+          "teams": {
+            "away": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 0,
+              "periods": [0, 0, 0, 0],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            },
+            "home": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 2,
+              "periods": [0, 0, 0, 2],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            }
+          },
+          "periods": 4,
+          "players": [
+            {
+              "two": 1,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010000",
+                "name": "João 1-0",
+                "nickname": "MJ"
+              },
+              "played": true,
+              "points": 2,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010001",
+                "name": "Atleta 1-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010002",
+                "name": "Atleta 1-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010003",
+                "name": "Atleta 1-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010004",
+                "name": "Atleta 1-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010005",
+                "name": "Atleta 1-0",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010006",
+                "name": "Atleta 1-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010007",
+                "name": "Atleta 1-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010008",
+                "name": "Atleta 1-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010009",
+                "name": "Atleta 1-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "9",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010010",
+                "name": "Atleta 1-9",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": false,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            }
+          ],
+          "rulesVersion": "FIBA_2024"
+        },
+        "staff": {
+          "away": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010005",
+              "name": "Atleta 1-0",
+              "nickname": null
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010005",
+              "name": "Atleta 1-0",
+              "nickname": null
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          },
+          "home": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010000",
+              "name": "João 1-0",
+              "nickname": "MJ"
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010000",
+              "name": "João 1-0",
+              "nickname": "MJ"
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          }
+        },
+        "source": {
+          "kind": "sheet",
+          "version": 4,
+          "rulesVersion": "FIBA_2024"
+        },
+        "context": {
+          "name": "Copa de exemplo",
+          "year": 2026,
+          "gender": "masculino",
+          "category": "Adulto",
+          "division": null,
+          "seasonId": "f9200000-0000-4000-8000-000000000002",
+          "championshipId": "f9200000-0000-4000-8000-000000000001"
+        },
+        "version": 1,
+        "disputeId": "f9200000-0000-4000-8000-000000000003",
+        "gameVersion": 4,
+        "publishedAt": "2026-10-25T17:04:01.476078+00:00"
+      }
+    },
+    {
+      "phase": "knockout",
+      "snapshot": {
+        "id": "f9300000-0000-4000-8000-000000000901",
+        "game": {
+          "away": {
+            "name": "Águias",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000006"
+          },
+          "date": null,
+          "home": {
+            "name": "Lobos",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000005"
+          },
+          "time": null,
+          "venue": null,
+          "number": null,
+          "timeZone": "America/Sao_Paulo"
+        },
+        "facts": {
+          "teams": {
+            "away": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 0,
+              "periods": [0, 0, 0, 0],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            },
+            "home": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 2,
+              "periods": [0, 0, 0, 2],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            }
+          },
+          "periods": 4,
+          "players": [
+            {
+              "two": 1,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010100",
+                "name": "João 2-0",
+                "nickname": "MJ"
+              },
+              "played": true,
+              "points": 2,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010101",
+                "name": "Atleta 2-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010102",
+                "name": "Atleta 2-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010103",
+                "name": "Atleta 2-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010104",
+                "name": "Atleta 2-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010105",
+                "name": "Atleta 2-0",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010106",
+                "name": "Atleta 2-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010107",
+                "name": "Atleta 2-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010108",
+                "name": "Atleta 2-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010109",
+                "name": "Atleta 2-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "9",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010110",
+                "name": "Atleta 2-9",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": false,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            }
+          ],
+          "rulesVersion": "FIBA_2024"
+        },
+        "staff": {
+          "away": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010105",
+              "name": "Atleta 2-0",
+              "nickname": null
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010105",
+              "name": "Atleta 2-0",
+              "nickname": null
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          },
+          "home": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010100",
+              "name": "João 2-0",
+              "nickname": "MJ"
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010100",
+              "name": "João 2-0",
+              "nickname": "MJ"
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          }
+        },
+        "source": {
+          "kind": "sheet",
+          "version": 4,
+          "rulesVersion": "FIBA_2024"
+        },
+        "context": {
+          "name": "Copa de exemplo",
+          "year": 2026,
+          "gender": "masculino",
+          "category": "Adulto",
+          "division": null,
+          "seasonId": "f9200000-0000-4000-8000-000000000002",
+          "championshipId": "f9200000-0000-4000-8000-000000000001"
+        },
+        "version": 1,
+        "disputeId": "f9200000-0000-4000-8000-000000000003",
+        "gameVersion": 4,
+        "publishedAt": "2026-10-25T17:04:01.476078+00:00"
+      }
+    },
+    {
+      "phase": null,
+      "snapshot": {
+        "id": "f9300000-0000-4000-8000-000000000902",
+        "game": {
+          "away": {
+            "name": "Águias",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000006"
+          },
+          "date": null,
+          "home": {
+            "name": "Lobos",
+            "team": {
+              "id": "f9200000-0000-4000-8000-000000000004",
+              "name": "Clube de exemplo",
+              "abbreviation": null
+            },
+            "registrationId": "f9200000-0000-4000-8000-000000000005"
+          },
+          "time": null,
+          "venue": null,
+          "number": null,
+          "timeZone": "America/Sao_Paulo"
+        },
+        "facts": {
+          "teams": {
+            "away": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 0,
+              "periods": [0, 0, 0, 0],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            },
+            "home": {
+              "coachB": 0,
+              "coachC": 0,
+              "points": 2,
+              "periods": [0, 0, 0, 2],
+              "freeMade": 0,
+              "freeTaken": 0,
+              "coachStatus": "eligible",
+              "freeConceded": 0,
+              "foulsByPeriod": [0, 0, 0, 0]
+            }
+          },
+          "periods": 4,
+          "players": [
+            {
+              "two": 1,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010200",
+                "name": "João 3-0",
+                "nickname": "MJ"
+              },
+              "played": true,
+              "points": 2,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010201",
+                "name": "Atleta 3-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010202",
+                "name": "Atleta 3-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010203",
+                "name": "Atleta 3-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010204",
+                "name": "Atleta 3-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "0",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010205",
+                "name": "Atleta 3-0",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": true,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "00",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010206",
+                "name": "Atleta 3-00",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "5",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010207",
+                "name": "Atleta 3-5",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "6",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010208",
+                "name": "Atleta 3-6",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "away",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "2",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010209",
+                "name": "Atleta 3-2",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": true,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000006",
+              "unsportsmanlike": 0
+            },
+            {
+              "two": 0,
+              "free": 0,
+              "side": "home",
+              "fouls": 0,
+              "three": 0,
+              "jersey": "9",
+              "person": {
+                "id": "f9300000-0000-4000-8000-000000010210",
+                "name": "Atleta 3-9",
+                "nickname": null
+              },
+              "played": true,
+              "points": 0,
+              "status": "eligible",
+              "captain": false,
+              "starter": false,
+              "technical": 0,
+              "registrationId": "f9200000-0000-4000-8000-000000000005",
+              "unsportsmanlike": 0
+            }
+          ],
+          "rulesVersion": "FIBA_2024"
+        },
+        "staff": {
+          "away": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010205",
+              "name": "Atleta 3-0",
+              "nickname": null
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010205",
+              "name": "Atleta 3-0",
+              "nickname": null
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          },
+          "home": {
+            "captain": {
+              "id": "f9300000-0000-4000-8000-000000010200",
+              "name": "João 3-0",
+              "nickname": "MJ"
+            },
+            "coach": {
+              "id": "f9300000-0000-4000-8000-000000010200",
+              "name": "João 3-0",
+              "nickname": "MJ"
+            },
+            "assistant": null,
+            "captainIsCoach": true
+          }
+        },
+        "source": {
+          "kind": "sheet",
+          "version": 4,
+          "rulesVersion": "FIBA_2024"
+        },
+        "context": {
+          "name": "Copa de exemplo",
+          "year": 2026,
+          "gender": "masculino",
+          "category": "Adulto",
+          "division": null,
+          "seasonId": "f9200000-0000-4000-8000-000000000002",
+          "championshipId": "f9200000-0000-4000-8000-000000000001"
+        },
+        "version": 1,
+        "disputeId": "f9200000-0000-4000-8000-000000000003",
+        "gameVersion": 4,
+        "publishedAt": "2026-10-25T17:04:01.476078+00:00"
+      }
+    }
+  ],
+  "version": 1,
+  "disputeId": "f9200000-0000-4000-8000-000000000003",
+  "confirmedAt": "2026-10-25T17:04:01.478094+00:00",
+  "minimumSeconds": 600
+}

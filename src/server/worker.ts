@@ -1,4 +1,5 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
+import { publicStatisticsRoute } from "../statistics/routes";
 import {
   achievementRoute,
   publicAchievementRoute,
@@ -39,6 +40,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/public/statistics" ||
+        url.pathname.startsWith("/api/public/statistics/")
+      )
+        response = await publicStatisticsRoute(request, env, url);
       else if (
         url.pathname === "/api/public/achievements" ||
         url.pathname.startsWith("/api/public/achievements/")

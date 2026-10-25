@@ -1,5 +1,11 @@
 # Estatísticas confirmadas — evidências
 
+## S2d — API de consulta, 25/10/2026
+
+GET /api/public/statistics/:UUID usa somente chave publicável no backend e RPC pública read-only. UUID canônico é o único argumento da RPC; filtros/modos/ordem/página/comparação são calculados pelo backend novo sobre a fonte fechada. Nenhum JWT/cookie administrativo enviado ao provedor e nenhum documento completo de fonte devolvido ao browser. Leitura stream limitada5MiB, timeout8s, consulta URL limitada8192, GET exclusivo; provider/JSON/contexto inválido vira erro sanitizado, não falso estado vazio.
+
+4provider novosPASS, composição14/3arquivosPASS (ac5d0c075f5dca5c09fe4deada5123c1edf7c3611d64ba6c9b49a7289bc18fd3), tipos app/Worker/lint/segredos543 e buildWorkerPASS. Cenário workerd real observouRED404 antes de registrar a rota, depoisGREEN200 para33linhas/segunda página13, versão/sem fonte inteira e sem sessão app; POST405/ID400/desconhecido404/query414. LogSHA256 **5ab886eb50f246d29905025cf41e62d354631d39b59f7fed67054d17900586f4**. Fixture JSON própria e sintética, derivada da forma real verificada e com IDs/nomes fictícios, nunca dados humanos; não é prova de acesso autenticado ou escala. Gate433 antecede esta API; não atribuir-lhe esses transportes novos. Consolidar a vertical quando a UI estiver estável. Sem CI/deploy estatístico ainda.
+
 ## S2c — fonte SQL atômica, 25/10/2026
 
 Migration CLI inicial165318 aplicada pelo plugin e reconciliada como **20261025170111_confirmed_statistics.sql** (SHA256 **8560ee3a76d0669d5cf860e149027e3fd201628d2b2eb6e60aa7fe487638dfbd**). Imutável. Um trigger sobre published_games acompanha publicação/correção na mesma transação; replay conhecido ou rascunho não cria versão estatística. Cabeçalho público atual contém somente snapshots já públicos, mínimo600 congelado e fase null. Histórico privado imutável guarda cabeçalhos e mudanças incrementais com FKs para versões dos jogos, sem recopiá-los integralmente em cada versão. Limite operacional10000jogos/4MiB, erro explícito e rollback, sem truncamento; não é prova de escala/carga.
