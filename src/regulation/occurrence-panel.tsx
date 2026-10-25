@@ -14,6 +14,7 @@ import {
   type DecisionPreviewResult,
 } from "./decision-view-contract";
 import { RegulationProjection } from "./projection";
+import { DecisionHistory } from "./decision-history";
 import "./screen.css";
 const labels = {
   postponed: "Adiamento",
@@ -611,25 +612,23 @@ export function GameOccurrencePanel(props: Props) {
                     : "Repetir decisão do jogo"}
                 </button>
               )}
-              <details>
-                <summary>Histórico de decisões do jogo</summary>
-                {view.history.length ? (
-                  <ul>
-                    {view.history.map((h) => (
-                      <li key={h.version}>
-                        Versão {h.version} ·{" "}
-                        {h.active ? "Ativa nessa versão" : "Retirada"} ·{" "}
-                        {h.reason}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>Nenhuma decisão registrada.</p>
-                )}
-                {view.hasMore && (
-                  <p>Há versões anteriores disponíveis para consulta.</p>
-                )}
-              </details>
+              <DecisionHistory
+                key={view.head?.version ?? 0}
+                kind="occurrence"
+                path={path}
+                disputeId={view.disputeId}
+                targetId={view.gameId}
+                head={view.head}
+                history={view.history}
+                hasMore={view.hasMore}
+                enabled={!locked && props.enabled}
+                names={names}
+                onSessionLost={props.onSessionLost}
+                onConflict={() => {
+                  setConflict(true);
+                  setProposal(null);
+                }}
+              />
             </>
           )}
         </>

@@ -1,6 +1,100 @@
 import { test, expect, type Page } from "@playwright/test";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
+
+test("placar opcional de W.O. exige valores coerentes e retirada da regra é explícita", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page);
+  await prepare(page);
+  await page
+    .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
+    .check();
+  await page
+    .getByRole("spinbutton", {
+      name: "Pontos de classificação do vencedor por W.O.",
+      exact: true,
+    })
+    .fill("2");
+  await page
+    .getByRole("spinbutton", {
+      name: "Pontos de classificação do perdedor por W.O.",
+      exact: true,
+    })
+    .fill("0");
+  await page
+    .getByRole("checkbox", {
+      name: "Definir placar administrativo do W.O.",
+      exact: true,
+    })
+    .check();
+  const winner = page.getByRole("spinbutton", {
+      name: "Placar do vencedor por W.O.",
+      exact: true,
+    }),
+    loser = page.getByRole("spinbutton", {
+      name: "Placar do perdedor por W.O.",
+      exact: true,
+    });
+  await expect(winner).toHaveValue("");
+  await expect(loser).toHaveValue("");
+  await page
+    .getByRole("button", { name: "Conferir impacto", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Depois da alteração", exact: true }),
+  ).toHaveCount(0);
+  expect(f.getState().version).toBe(0);
+  await winner.fill("0");
+  await loser.fill("0");
+  await page
+    .getByRole("button", { name: "Conferir impacto", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Depois da alteração", exact: true }),
+  ).toHaveCount(0);
+  await winner.fill("20");
+  await saveRules(page, "Regra com placar administrativo conferida");
+  expect(f.getState().definition?.occurrenceRules.wo?.score).toEqual({
+    winner: 20,
+    loser: 0,
+  });
+  await page
+    .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
+    .uncheck();
+  await saveRules(page, "Retirada da regra após conferência de impacto");
+  expect(f.getState().definition?.occurrenceRules.wo).toBeNull();
+  expect(f.getState().version).toBe(2);
+  await page.reload();
+  await expect(
+    page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
+  ).not.toBeChecked();
+});
+async function saveRules(page: Page, reason: string) {
+  await page
+    .getByRole("button", { name: "Conferir impacto", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Depois da alteração", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Motivo da alteração", exact: true })
+    .fill(reason);
+  await page
+    .getByLabel("Conferi o impacto nos resultados e cruzamentos", {
+      exact: true,
+    })
+    .check();
+  await page
+    .getByRole("button", {
+      name: "Confirmar e salvar regulamento",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Regulamento salvo" }),
+  ).toBeVisible();
+}
 test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", async ({
   page,
 }) => {
