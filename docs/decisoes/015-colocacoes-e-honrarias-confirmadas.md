@@ -1,0 +1,13 @@
+# 015 — Colocações e honrarias confirmadas
+
+25/10/2026. ESCOPO§8, CONTRATOS§perfil público e ARQUITETURA§Resultados exigem sugestões de colocações, revisão/confirmação e somente premiações confirmadas no público. Continuação independente da política de agenda futura/inscritos ainda pendente. Escolhas técnicas reversíveis delegadas; não atribuir aprovação humana ou aceite manual a estas decisões.
+
+Sugestão e decisão final são objetos diferentes. Recalcular uma sugestão não altera uma premiação confirmada. Um fluxo apenas manual não entrega a sugestão pedida; premiar automaticamente ao terminar um jogo viola a confirmação. Usaremos fonte de classificação já calculada no backend, selecionada explicitamente pelo responsável, e uma decisão versionada própria para o que foi conferido.
+
+Na primeira unidade, domínio privado e puro. Fonte explícita de um grupo escolhido sugere suas posições apenas quando todos os jogos atribuídos têm decisão final e não há empate de posição. Final/bronze exigem IDs explícitos das séries; nunca descobrir a final por nome, data ou ordem da lista. Série pendente, atribuição incoerente, empate ou fonte ausente produzem pendência, não um campeão. Sem bronze definido, não inventar terceiros colocados. A sugestão pode ser parcial e continua sujeita à conferência.
+
+Decisão manual de colocações usa posição e conjunto explícito de inscrições; empate compartilhado é representado no mesmo conjunto, sem deduplicar por equipe global. Não exigir ranking completo nem inventar desempate porUUID. Inscrição não pode aparecer duas vezes. Honraria tem ID, título e atletas escolhidos explicitamente; MVP, cestinha e seleção são exemplos de títulos, não fórmulas automáticas. Não escolher atletas por nome, vínculo atual ou contagem ausente convertida em zero.
+
+Persistência posterior mantém rascunho privado e confirmação/snapshot público separados. Identidades/contexto vêm do servidor, autorização fresca, versão/fingerprint/recibo e motivo em correção. Histórico e premiações de quem transferiu/inativou permanecem vinculados à identidade e inscrição da ocasião. Só a confirmação específica publica o conteúdo correspondente; não libera inscritos/agenda de outros rascunhos. Backend deverá sinalizar revisão necessária quando a fonte publicada de uma sugestão confirmada mudar, sem substituir a decisão silenciosamente.
+
+Esta decisão não expõe uma rota nem aplica DDL. Fonte pública de classificaçãoR3eP2/P3 continua aguardando a definição anterior. A elegibilidade exata dos destinatários será conferida com vínculos/participações reais antes do writer, evitando criar uma restrição de produto por suposição. Nenhuma verificação manual adicional será solicitada nesta retomada.
