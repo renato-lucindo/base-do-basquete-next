@@ -123,8 +123,8 @@ declare actor uuid:=auth.uid();cmd uuid;pid uuid;pv integer;old_version integer;
 end$$;
 create function private.get_player_profile_state(pid uuid,off integer) returns jsonb language plpgsql volatile security definer set search_path='' as $$
 declare proposal jsonb;pv integer;v private.player_profile_versions%rowtype;history jsonb;more boolean;begin
- if off is null or off<0 or off>2147483626 then raise sqlstate 'PT400' using message='invalid_profile_offset';end if;
  proposal:=private.get_player_profile_proposal(pid);pv:=(proposal->>'personVersion')::integer;
+ if off is null or off<0 or off>2147483626 then raise sqlstate 'PT400' using message='invalid_profile_offset';end if;
  select x.* into v from private.player_profile_versions x join public.published_player_profiles h on h.person_id=x.person_id and h.version=x.version where x.person_id=pid;
  select coalesce(jsonb_agg(jsonb_build_object('version',page.version,'personVersion',page.person_version,'confirmedAt',page.confirmed_at,'actorId',page.confirmed_by,'reason',page.reason) order by page.version desc),'[]'::jsonb) into history from (select * from private.player_profile_versions where person_id=pid order by version desc limit 20 offset off) page;
  more:=exists(select 1 from private.player_profile_versions where person_id=pid order by version desc limit 1 offset off+20);

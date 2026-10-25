@@ -61,6 +61,29 @@ it.each(["zero", "upgrade"] as const)(
       playerProfileVersionSchema.parse(get("profile_version"));
       playerProfileAckSchema.parse(get("profile_ack"));
       playerProfileAckSchema.parse(get("revised_profile_ack"));
+      if (process.env.BDB_REAL_PROFILE_PROOF === "1" && mode === "zero") {
+        const real = JSON.parse(
+          await readFile(
+            ".preview-artifacts/profile-p1-real-proof.json",
+            "utf8",
+          ),
+        );
+        expect(
+          publicPlayerProfileSchema.parse(real.public_player_profile).version,
+        ).toBe(2);
+        playerProfileProposalSchema.parse(real.profile_proposal);
+        playerProfileAckSchema.parse(real.profile_ack);
+        playerProfileAckSchema.parse(real.revised_profile_ack);
+        playerProfileStateSchema.parse(real.empty_profile_state);
+        playerProfileStateSchema.parse(real.profile_state);
+        expect(
+          playerProfileStateSchema.parse(real.profile_first_page).history,
+        ).toHaveLength(20);
+        expect(
+          playerProfileStateSchema.parse(real.profile_last_page).history,
+        ).toHaveLength(3);
+        playerProfileVersionSchema.parse(real.profile_version);
+      }
       const base = {
         commandId: "f9400000-0000-4000-8000-000000000002",
         personId: "f9400000-0000-4000-8000-000000000001",

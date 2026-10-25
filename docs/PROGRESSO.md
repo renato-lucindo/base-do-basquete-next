@@ -1,3 +1,17 @@
+# Perfil confirmado P1 integrado; estatísticas no preview — 25/10/2026 19:01UTC-03
+
+**Unidade atual/Git:** codex/perfil-confirmado, base documental c6c28cd sobre código estatístico e00ba15, P1 inicial8dc00e5 após rebase exclusivamente documental de b3a8a05. Somente mudanças próprias, sem mudanças humanas sobrescritas. Contratos e publicação de metadados no banco concluídos; sem API/DO/UI de perfil ainda. Plano2026-10-25-perfil-confirmado/ADR017/VALIDACAO-PERFIL registram escopo e provas. Próximo commit inclui reconciliação real/tipos e este checkpoint.
+
+**Banco novo:** somente link_6adaa8aab5688191b1e7ae1cddc55a82/orgbase-do-basquete jniqbaccwwhabzokjvfu/projeto nizmasjddyrhmevvfviz,Free. **42migrations**, última20261025215954_player_profile_publications, aplicada UMA vez/reconciliada; NÃO editar/reaplicar. Prova real BEGIN/ROLLBACK e contratosTS PASS, histórico23/20+3, fontes privadas omitidas, versões/replay/revogação/rollback atômico. Pós-rollback1pessoa/2inscrições/1Auth/1adminativo,0perfis/versões/recibos/jogos/estatísticas/objetos; preservar dados humanos posteriores. Advisor sóWARN conhecido senha vazada/Pro e10INFOFKs antigas, nenhuma nova de perfil. Sem contratação/segredo/credencial.
+
+**Verificações:** gate local450unit/91arquivos/5transportes/13PG/18workerd/4PDFs/builds/tipos/fronteira/segredos565 PASS; após ele correção focal da ordem auth→offset no leitor novo teve RED→GREEN2cenários, tipos gerados/typecheck/lint e7focais com prova SQLreal parseadaTS PASS. Hashes/escopo em VALIDACAO-PERFIL. Não atribuir CI e00ba15 ao perfil, sem CI específico deste bloco ainda. Não repetir450/harness126 por sessão ou documentação.
+
+**Próximo EXATO:** registrar/push do bloco P1 em branch própria/PRdraft empilhado sobre18; em seguida P2 RED da adaptação por pessoa/jogo a partir de snapshots confirmados, comparação SQL×normalizeConfirmedGame para manual/PDF/FIBA/Site/misto/DNP/0/00, antes de migration nova. Não ler elenco/cadastro atual como fonte da carreira, nem copiar outros atletas inteiros para cada consulta; fonte por identidade limitada explicitamente e sem truncar totais. P3carreira/API/UI depois. P1 não está disponível no preview.
+
+**Serviços/processos:** preview sourcee00ba15/deployment316098d6-182e-4378-b96e-ad1a3f1893d5/versão23bfec3d-1082-4f49-8988-b09d4b3d7765100%, CI40237064549 SUCCESS443/292Linux.12assets/hash/Xsource/36GETs/11POSTs/3projeções/2browsersPASS, token/política temporários revogados; Access somente responsável/previewsOFF/DO/rate/cofre preservados. Nenhum DDL/deploy/gate/CI/upload/smoke/credencial/processo local em andamento. Reutilizar provas inalteradas. Aceites humanos/política pública de agenda/inscritos/StorageHTTP real pendentes, sem repetir perguntas; sem revisão independente/carga/corridaPGmulticonexão/WCAGcompleta comprovadas. Cota real mais recente26%usado5h/46%semanal, conferir entre unidades e antes de longas; aos85%usar checkpoint/MESMAautomação reset+2.
+
+---
+
 # Estatísticas publicadas; próxima unidade perfil confirmado — 25/10/2026 UTC-03
 
 **Unidade concluída tecnicamente:** tabela estatística de fatos confirmados no preview protegido. Branch codex/estatisticas-confirmadas, fonte e00ba154a473ec4ec1254c3c5f7034d789e0fa57; CI40237064549/job121300775753 SUCCESS443unit/292browsersLinux, transportes/13PG/18workerd/4PDFs aprovados. PRdraft18 sobre17, sem merge/principal/produção. Árvores próprias preservadas, nenhuma mudança humana sobrescrita.

@@ -1,6 +1,6 @@
 # Perfil público confirmado — plano de implementação
 
-> Execução inline com as skills executing-plans/TDD. Decisões reversíveis já delegadas pelo responsável; não pedir aprovação redundante. Este plano é a próxima unidade, ainda sem código/DDL próprios.
+> Execução inline com as skills executing-plans/TDD. Decisões reversíveis já delegadas pelo responsável; não pedir aprovação redundante. P1 concluído tecnicamente em25/10, ainda sem UI própria; evidências em VALIDACAO-PERFIL.md.
 
 **Objetivo:** uma URL por pessoa, com Resumo, Estatísticas, Conquistas e honrarias, Jogos e Histórico derivados de fontes publicadas; metadados opcionais têm confirmação própria.
 
@@ -14,11 +14,11 @@
 
 Ruling: iniciar contratos puros em branch codex/perfil-confirmado baseada na correção e00ba15 enquanto CI40237064549 verifica a composição Linux — trabalho independente sem DDL/API/deploy do perfil. Manifesto estatístico já preparado permanece vinculado a e00ba15 e sópode ser publicado se esse CI passar. Se falhar, corrigir a unidade anterior sem misturar contratos do perfil no artefato; nenhuma aprovação humana é inferida. Reutilizar checkout sequencial limpo, preservando a separação das branches, sem worktree paralelo.
 
-- [ ] RED em src/player-profile/contract.test.ts e publication-database.test.ts, supabase/tests/player_profiles.sql: nome obrigatório/opcionais ausentes, homônimos separados, UTF16/Unicode/limites, versão esperada de pessoa/perfil, revogação/replay/rollback, privado nunca público, perfil sem jogos não cria placar/estatísticas fictícias. Observar RED antes de migration new pela CLI fixada.
-- [ ] Contratos: proposta privada contém somente publicPersonSchema e versão de origem, estado/histórico paginado. Comando de confirmação usa commandId/personId/expectedPersonVersion/expectedPublicationVersion/reason/acknowledgeImpact, nunca metadados derivados do cliente. Mesmo sem jogos, confirmação explícita pode publicar o perfil de atleta; não publica inscrições/agenda. Sem foto/visibilidade por campo/MFA adicional.
-- [ ] Writer próprio: authfresh→commandlock→pessoa/atleta, snapshot de campos permitidos lido no servidor sob lock, recibo idempotente privado e histórico imutável/FKs. Replay conhecido retorna ACK original sócom autorização fresca; não faz GET prévio de mutação no adapter. Revisão exige motivo. Nunca obter ano público a partir do nascimento privado neste fluxo; publicBirthYear é campo distinto.
-- [ ] Perfil público atual somente SELECT com RLS/grants mínimos; snapshots não incluem sexo/data completa/registro federativo/ator/motivo ou versão privada da pessoa. Editar cadastro não republica o perfil nem reescreve nome/camisa de jogos anteriores.
-- [ ] PostgreSQL do zero/upgrade, matriz TS×SQL e rollback real antes de declarar integração. Migration própria aplicada uma vez no projeto novo, reconciliar timestamp/tipos/advisors. Provas existentes inalteradas não se repetem por sessão.
+- [x] RED em src/player-profile/contract.test.ts e publication-database.test.ts, supabase/tests/player_profiles.sql: nome obrigatório/opcionais ausentes, homônimos separados, UTF16/Unicode/limites, versão esperada de pessoa/perfil, revogação/replay/rollback, privado nunca público, perfil sem jogos não cria placar/estatísticas fictícias. Observar RED antes de migration new pela CLI fixada.
+- [x] Contratos: proposta privada contém somente publicPersonSchema e versão de origem, estado/histórico paginado. Comando de confirmação usa commandId/personId/expectedPersonVersion/expectedPublicationVersion/reason/acknowledgeImpact, nunca metadados derivados do cliente. Mesmo sem jogos, confirmação explícita pode publicar o perfil de atleta; não publica inscrições/agenda. Sem foto/visibilidade por campo/MFA adicional.
+- [x] Writer próprio: authfresh→commandlock→pessoa/atleta, snapshot de campos permitidos lido no servidor sob lock, recibo idempotente privado e histórico imutável/FKs. Replay conhecido retorna ACK original sócom autorização fresca; leitura derivada no servidor, adapter futuro não fará GET prévio da mutação. Revisão exige motivo. Nunca obter ano público a partir do nascimento privado neste fluxo; publicBirthYear é campo distinto.
+- [x] Perfil público atual somente SELECT com RLS/grants mínimos; snapshots não incluem sexo/data completa/registro federativo/ator/motivo ou versão privada da pessoa. Editar cadastro não republica o perfil nem reescreve nome/camisa de jogos anteriores.
+- [x] PostgreSQL do zero/upgrade, matriz TS×SQL e rollback real antes de declarar integração. Migration20261025215954 aplicada uma vez no projeto novo;42migrations/tipos/advisors reconciliados. Provas existentes inalteradas não se repetem por sessão.
 
 ## P2 — participações públicas por identidade
 

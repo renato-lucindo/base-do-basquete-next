@@ -74,5 +74,6 @@ update public.admin_access set enabled=false;
 set local role authenticated;
 select pg_temp.pp_error('select public.confirm_player_profile(pg_temp.pp_command())','PT403');
 select pg_temp.pp_error('select public.get_player_profile_state(pg_temp.pp_id(1))','PT403');
+select pg_temp.pp_error('select public.get_player_profile_state(pg_temp.pp_id(1),-1)','PT403');
 reset role;
 rollback;

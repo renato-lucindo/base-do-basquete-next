@@ -486,6 +486,24 @@ export type Database = {
           },
         ];
       };
+      published_player_profiles: {
+        Row: {
+          person_id: string;
+          snapshot: Json;
+          version: number;
+        };
+        Insert: {
+          person_id: string;
+          snapshot: Json;
+          version: number;
+        };
+        Update: {
+          person_id?: string;
+          snapshot?: Json;
+          version?: number;
+        };
+        Relationships: [];
+      };
       published_statistics: {
         Row: {
           dispute_id: string;
@@ -697,6 +715,7 @@ export type Database = {
     };
     Functions: {
       confirm_achievements: { Args: { p_command: Json }; Returns: Json };
+      confirm_player_profile: { Args: { p_command: Json }; Returns: Json };
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       finish_pdf_source: { Args: { p_command: Json }; Returns: Json };
       get_achievement_context: {
@@ -761,11 +780,27 @@ export type Database = {
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
+      get_player_profile_proposal: {
+        Args: { p_person_id: string };
+        Returns: Json;
+      };
+      get_player_profile_state: {
+        Args: { p_offset?: number; p_person_id: string };
+        Returns: Json;
+      };
+      get_player_profile_version: {
+        Args: { p_person_id: string; p_version: number };
+        Returns: Json;
+      };
       get_public_achievements: {
         Args: { p_dispute_id: string };
         Returns: Json;
       };
       get_public_game: { Args: { p_id: string }; Returns: Json };
+      get_public_player_profile: {
+        Args: { p_person_id: string };
+        Returns: Json;
+      };
       get_public_statistics_source: {
         Args: { p_dispute_id: string };
         Returns: Json;
