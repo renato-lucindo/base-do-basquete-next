@@ -1,5 +1,13 @@
 # Estatísticas confirmadas — evidências
 
+## Reconciliação e foco da transferência — 25/10/2026, retomada18:40UTC-03
+
+CI40219198459/job121246865396 em b8116ed terminou com gate443 PASS e291/292browsers. Os cenários estatísticos passaram; a falha foi em transferências/mobile, retorno cria terceiro período, esperando foco em Camisa no destino. Não atribuir PASS ao CI integral. Download desta nova evidência falhou porTLS, mensagem sanitizada sem URLs assinadas; diagnóstico confirmado por reprodução local e trace local preservado.
+
+RED local: mesmo cenário mobile repetido3vezes,2PASS/1FAIL com foco inativo; transfer-focus-before.log SHA256 b7acbd9f38e7194923e07148280696a9ccc4d65a1346b8c559fedebb7a3cf691. TransferPanel agendava foco em requestAnimationFrame após fetch, enquanto fieldset dependia do commit busy=false. Correção guarda destino do foco e consome em useLayoutEffect após view montado, busy=false e sessão habilitada. Nenhuma alteração no writer/SQL/recibos.
+
+GREEN: toda composição transferências, desktop/mobile repetida2vezes,36PASS; transfer-focus-after.log SHA256 9bebee8f3143603503c89c030113383f1beaca7353d7f3a220013193152a7805. Tipos app/Worker, lint/formato focal, buildfoundation/fronteira PASS. Reutilizar443unit/SQL/workerd imutáveis; próximo CI precisa confirmar composição Linux antes do deploy. Preview segue7997, Access somente responsável/previewsOFF reconferidos, sem novo token/política/deploy.
+
 ## Correção focal de foco apósCI — 25/10/2026
 
 CI **40217885869/job121242890649**, fonte **661bb5b4af93fa39e890317e43efafd77e380083**: gate443 PASS, browsers **291/292**, falha mobile em seleção por teclado após reconsulta (checkbox marcado, foco inativo). NÃO declarar CI integralPASS ou publicar essa fonte. Download do trace falhou duas vezes porTLS; sem terceiro retry e sem reproduzir URLs assinadas em documentação/logs próprios. Diagnóstico disponível vem do log real e inspeção do código, não do trace ausente.

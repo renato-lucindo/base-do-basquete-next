@@ -1,4 +1,12 @@
-# Pausa por cota — estatísticas corrigidas; CI novo pendente — 25/10/2026 America/Sao_Paulo (UTC-03)
+# Retomada — foco da transferência corrigido; publicação estatística aguarda CI — 25/10/2026 UTC-03
+
+Cota real na retomada:3%usado5h/42%semanal, depois7%/43%; janela renovada. Branch codex/estatisticas-confirmadas, remoto reconciliado965c66b, árvore antes limpa, somente alteração própria em TransferPanel e estes registros. PR18 OPEN/MERGEABLE/sem reviews. CI40219198459 em b8116ed passou gate443 e estatísticas, mas291/292browsers: foco da camisa em transferência/mobile. Reproduzido localmente2PASS/1FAIL antes da correção; agora36browsers de transferências PASS, tipos/lint/formato/buildfoundation/fronteiraPASS. Detalhes/hashes em VALIDACAO-ESTATISTICAS.md. Sem repetir gate integral local ou SQL imutável.
+
+Próximo: commit/push da correção e conferir novo CI; sófonte verificada pode gerar manifesto novo e publicar no Worker existente protegido, seguido de smoke/revogação. Cloudflare atual reconciliado7997/deployment06fef618/versão91cda000100%, Access sóresponsável/previewsOFF. Sem DDL/deploy/upload/token/política/processo de credencial em andamento. Estatísticas ainda não publicadas; perfil sóplanejado, branch futura codex/perfil-confirmado. Preservar dados humanos e41migrations. Políticas públicas/aceites humanos pendentes continuam sem inferência e sem perguntas repetidas.
+
+---
+
+# Pausa anterior por cota — estatísticas corrigidas; CI novo pendente — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Retomada confirmada:** ferramenta oficial atualizou com sucesso a MESMAautomação retomar-preview-base-do-basquete, ACTIVE, nesta conversa, para **25/10/2026 18:40:36 America/Sao_Paulo (21:40:36UTC)**; configuração salva reconferida, sem duplicata. Checkpoint remoto **5519462b818a6f0b20ff4e769f7830207d424e50**, árvore limpa antes desta confirmação exclusivamente documental. Nenhum novo código/gate/serviço/deploy.
 

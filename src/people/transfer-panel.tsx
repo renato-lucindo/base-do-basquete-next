@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { rosterSnapshotSchema, type RosterSnapshot } from "./roster-contract";
 import {
@@ -63,6 +63,7 @@ export function TransferPanel(p: Props) {
     } | null>(null),
     entryId = useRef(crypto.randomUUID()),
     alive = useRef(true),
+    contextFocus = useRef<"destination" | "jersey" | false>(false),
     alert = useRef<HTMLParagraphElement>(null),
     resultStatus = useRef<HTMLParagraphElement>(null),
     jerseyField = useRef<HTMLInputElement>(null),
@@ -105,6 +106,13 @@ export function TransferPanel(p: Props) {
   useEffect(() => {
     if (completed && p.enabled) resultStatus.current?.focus();
   }, [completed, p.enabled]);
+  useLayoutEffect(() => {
+    if (!view || busy || !p.enabled || !contextFocus.current) return;
+    const field =
+      contextFocus.current === "destination" ? destinationField : jerseyField;
+    contextFocus.current = false;
+    field.current?.focus();
+  }, [view, busy, p.enabled]);
   useEffect(() => {
     alive.current = true;
     void load(p.source.registrationId, "destination");
@@ -150,15 +158,9 @@ export function TransferPanel(p: Props) {
     try {
       const value = await context(id);
       if (alive.current) {
+        contextFocus.current = focus;
         setView(value);
         setConflict(false);
-        if (focus)
-          requestAnimationFrame(() =>
-            (focus === "destination"
-              ? destinationField
-              : jerseyField
-            ).current?.focus(),
-          );
       }
     } catch (e) {
       if (alive.current) {
