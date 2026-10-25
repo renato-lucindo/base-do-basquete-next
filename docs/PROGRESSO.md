@@ -1,4 +1,16 @@
-# Retomada — foco da transferência corrigido; publicação estatística aguarda CI — 25/10/2026 UTC-03
+# Estatísticas publicadas; próxima unidade perfil confirmado — 25/10/2026 UTC-03
+
+**Unidade concluída tecnicamente:** tabela estatística de fatos confirmados no preview protegido. Branch codex/estatisticas-confirmadas, fonte e00ba154a473ec4ec1254c3c5f7034d789e0fa57; CI40237064549/job121300775753 SUCCESS443unit/292browsersLinux, transportes/13PG/18workerd/4PDFs aprovados. PRdraft18 sobre17, sem merge/principal/produção. Árvores próprias preservadas, nenhuma mudança humana sobrescrita.
+
+**Preview atual:** https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/, conta16b4a5e0a99a031d28051ebadb4811cc/Workerbase-do-basquete-next-preview. Deployment316098d6-182e-4378-b96e-ad1a3f1893d5/versão23bfec3d-1082-4f49-8988-b09d4b3d7765100%, sourcee00ba15.12arquivos/hash/Xsource/36GETs privados/11POSTs/health/Auth inválido/3projeções/2browsers PASS. Token9a78a3d8-29e6-42c8-bf6c-44b5243dca08 e políticaa341d0cc-1112-4d98-9ab0-8002cbca8e14 revogados. Access somente responsável, previewsOFF/DO/rate/cofre preservados, anônimo302em três caminhos após revogação. Hashes e escopo em VALIDACAO-ESTATISTICAS.md. Sem serviço/processo/credencial temporário em andamento.
+
+**Próximo exato:** retornar à branch própria codex/perfil-confirmado, reconciliar este checkpoint documental sem alterar a fonte e00ba15 publicada. P1 local já implementado em b3a8a05 (SHA poderá mudar ao rebase exclusivamente documental): contratos de metadados/publicação e migration local20261025215131, zero/upgrade e composição10PASS, gate450unit/91arquivos/5transportes/13PG/18workerd/4PDFs PASS. Ainda NÃO aplicada no remoto, sem API/UI do perfil. Ler plano2026-10-25-perfil-confirmado/ADR017/VALIDACAO-PERFIL; revisar limites/locks e aplicar uma vez no projeto novo somente após essa unidade verificada, depois prova real rollback/tipos/advisors e P2. Reutilizar evidências de artefatos inalterados, sem repetir450/harness126 por sessão.
+
+**Banco reconciliado antes de P1:** Supabase somente vínculo link_6adaa8aab5688191b1e7ae1cddc55a82/orgbase-do-basquete jniqbaccwwhabzokjvfu/projeto nizmasjddyrhmevvfviz,41migrations até20261025170346,1pessoa/2inscrições/0jogos/0estatísticas/0objetos, sem tabela de perfil. Preservar novosdadoshumanos, não recriar/bootstrap/consultar serviços anteriores. Política pública de inscritos/agenda futura e aceites manuais continuam pendentes; não repetir pedidos adiados. Sem prova de StorageHTTP autenticado, revisão independente, carga, corridaPGmulticonexão ou WCAGcompleta.
+
+---
+
+# Retomada anterior — foco da transferência corrigido; publicação estatística aguarda CI — 25/10/2026 UTC-03
 
 Cota real na retomada:3%usado5h/42%semanal, depois7%/43%; janela renovada. Branch codex/estatisticas-confirmadas, remoto reconciliado965c66b, árvore antes limpa, somente alteração própria em TransferPanel e estes registros. PR18 OPEN/MERGEABLE/sem reviews. CI40219198459 em b8116ed passou gate443 e estatísticas, mas291/292browsers: foco da camisa em transferência/mobile. Reproduzido localmente2PASS/1FAIL antes da correção; agora36browsers de transferências PASS, tipos/lint/formato/buildfoundation/fronteiraPASS. Detalhes/hashes em VALIDACAO-ESTATISTICAS.md. Sem repetir gate integral local ou SQL imutável.
 

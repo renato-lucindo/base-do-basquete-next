@@ -1,5 +1,15 @@
 # Estatísticas confirmadas — evidências
 
+## Preview protegido publicado — 25/10/2026, 18:56UTC-03
+
+Fonte **e00ba154a473ec4ec1254c3c5f7034d789e0fa57**, CI **40237064549/job121300775753 SUCCESS**:443unit/89arquivos,5transportes,13PG,18workerd,prova4PDFs e292browsersLinux. Log SHA256 **9f50ef623b7cc6673b610a118a6524a929ff4cd1a7324ee2319ca9e33f1deb8e**. A falha anterior de foco foi reproduzida/corrigida; não reclassificar runs anteriores como sucesso.
+
+Manifesto regenerado deHEAD limpo e00ba15 antes de preparar perfil,12arquivos, SHA256 **89ea5b72d5fe0aabe3d1bbb4979d7edc261baa39dcb79a33c03173aff9971aae**; Worker SHA256 **9fae58bd9cab2c69d348f5068fc5647d41a17c93f619e61529c58633fd3aca61**. Somente esse payload foi enviado pelo plugin Cloudflare ao Worker existente. Deployment **316098d6-182e-4378-b96e-ad1a3f1893d5**, versão **23bfec3d-1082-4f49-8988-b09d4b3d7765**,100%.
+
+Smoke remoto PASS:12assets com hash/Xsource,36GETs privados e11POSTs sem sessão, health/sessão/Auth inválido/backend404, três projeções públicas de IDs inexistentes e dois browsers incluindo estatisticas.html. Nenhum dado fictício ou perfil novo publicado. TTY recebeu somente ciphertextRSA para credencial efêmera; token **9a78a3d8-29e6-42c8-bf6c-44b5243dca08** e política **a341d0cc-1112-4d98-9ab0-8002cbca8e14** foram excluídos imediatamente, sucesso reconferido. Nenhuma credencial em arquivo/log/commit.
+
+Access final somente responsável, política30cc3ab4; previewsOFF/DO0411ac931ca54d289d270606c7e87ef7/rate862073195184/cofre preservados. Anônimo retornou302→Access em /, /api/games e /estatisticas.html após revogação. Integração técnica não equivale a aceite humano. Perfil segue unidade própria; suas mudanças posteriores não fazem parte do artefato e00ba15.
+
 ## Reconciliação e foco da transferência — 25/10/2026, retomada18:40UTC-03
 
 CI40219198459/job121246865396 em b8116ed terminou com gate443 PASS e291/292browsers. Os cenários estatísticos passaram; a falha foi em transferências/mobile, retorno cria terceiro período, esperando foco em Camisa no destino. Não atribuir PASS ao CI integral. Download desta nova evidência falhou porTLS, mensagem sanitizada sem URLs assinadas; diagnóstico confirmado por reprodução local e trace local preservado.
