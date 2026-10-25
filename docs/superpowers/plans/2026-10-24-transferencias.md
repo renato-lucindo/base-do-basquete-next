@@ -32,6 +32,8 @@ Novos src/people/transfer-contract.ts, transfer.ts, transfer.test.ts e tests/fix
 
 T2a concluída isoladamente: permissão opcional/finita compatível com regras antigas, migration20261025022957 aplicada/reconciliada;4novos/51composição e contrato realrollbackPASS. NÃO reaplicar. Leitor/contexto integral, writer, fechamento do desvio e UI permanecem pendentes nas tarefas abaixo.
 
+T2b1 leitor privado concluído: migration20261025023543 aplicada/reconciliada;2PG zero/upgrade/25composição, tipos gerados e contrato realrollbackPASS. NÃO reaplicar. Completo/bounded, fonte derivada, ordem atleta→raiz compartilhada e autorização fresca; sem gravação. Writer/fechamento do desvio/T3 continuam pendentes. Evidências e observações sobre limite após abertura/fixtures históricas na validação.
+
 Novos supabase/tests/transfers.sql, src/people/transfer-database.test.ts; migrations próprias via CLI. Não editar/reaplicar migrations existentes. Ler guardas de sexo, writers de pessoa/elenco/importação e lock order antes da nova DDL.
 
 - [ ] RED PostgreSQL: configuração de permissão compatível com regulamentos antigos, contexto integral/autorizado, sem fonte/ator do browser. Autoridade deriva pessoa/disputa/campeonato da origem/destino. Hash/versionamento de todos os vínculos relevantes.

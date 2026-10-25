@@ -707,6 +707,13 @@ export type Database = {
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
       get_text_review: { Args: { p_id: string }; Returns: Json };
+      get_transfer_context: {
+        Args: {
+          p_destination_registration_id: string;
+          p_source_entry_id: string;
+        };
+        Returns: Json;
+      };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
