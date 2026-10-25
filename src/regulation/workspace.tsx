@@ -20,6 +20,7 @@ import {
 } from "./view-contract";
 import { DefinitionEditor } from "./definition-editor";
 import { RegulationProjection } from "./projection";
+import { AchievementPanel } from "../achievements/panel";
 import "./screen.css";
 type VersionView = ReturnType<typeof regulationVersionViewSchema.parse>;
 const empty = (): RegulationDefinition => ({
@@ -74,6 +75,7 @@ export function RegulationWorkspace({
   onSaved,
 }: Props) {
   const [view, setView] = useState<RegulationView | null>(null),
+    [showAchievements, setShowAchievements] = useState(false),
     [draft, setDraft] = useState<RegulationDefinition>(empty),
     [baseline, setBaseline] = useState(""),
     [registrations, setRegistrations] = useState<RegistrationSnapshot[]>([]),
@@ -108,6 +110,7 @@ export function RegulationWorkspace({
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     panel = useRef<HTMLElement>(null);
+  const achievementGuard = useRef(() => true);
   const dirty = !!view && JSON.stringify(draft) !== baseline,
     locked = busy || !!pending.current;
   const names = new Map(registrations.map((r) => [r.id, r.name]));
@@ -125,7 +128,8 @@ export function RegulationWorkspace({
       (!(dirty || pending.current) ||
         window.confirm(
           "Há alterações no regulamento ou um envio não confirmado. Sair desta edição?",
-        ));
+        )) &&
+      achievementGuard.current();
     return () => {
       guard.current = () => true;
     };
@@ -383,11 +387,37 @@ export function RegulationWorkspace({
       if (alive.current) setBusy(false);
     }
   }
+  if (showAchievements)
+    return (
+      <AchievementPanel
+        disputeId={disputeId}
+        enabled={enabled}
+        guard={achievementGuard}
+        onSessionLost={onSessionLost}
+        onSaved={onSaved}
+        onClose={() => {
+          setShowAchievements(false);
+          requestAnimationFrame(() => heading.current?.focus());
+        }}
+      />
+    );
   return (
     <section className="regulation" ref={panel}>
       <h2 ref={heading} tabIndex={-1}>
         Regulamento da disputa
       </h2>
+      <button
+        type="button"
+        disabled={!view || locked || dirty || !enabled}
+        onClick={() => setShowAchievements(true)}
+      >
+        Colocações e honrarias
+      </button>
+      {dirty && (
+        <p>
+          Salve as regras ou descarte sua edição antes de abrir as premiações.
+        </p>
+      )}
       {error && (
         <p className="access-error" role="alert" ref={alert} tabIndex={-1}>
           {error}

@@ -2,8 +2,11 @@ import assert from "node:assert/strict";
 import { Response } from "miniflare";
 import { achievementBackendFixture } from "./achievement-backend.ts";
 // Transport/UX fixture only; PostgreSQL proofs cover eligibility and atomicity.
-export function achievementOutbound(options = {}) {
-  const f = achievementBackendFixture(),
+export function achievementOutbound(
+  options = {},
+  fixture = achievementBackendFixture(),
+) {
+  const f = fixture,
     workspace = structuredClone(f.workspace),
     saves = new Map(),
     confirmations = new Map(),
@@ -33,7 +36,23 @@ export function achievementOutbound(options = {}) {
     else assert.equal(request.headers.get("authorization"), null);
     const args = await request.json();
     if (name === "get_achievement_context") return Response.json(f.source);
-    if (name === "get_achievement_workspace") return Response.json(workspace);
+    if (name === "get_achievement_workspace") {
+      const value = structuredClone(workspace),
+        draftOffset = args.p_draft_offset ?? 0,
+        pubOffset = args.p_publication_offset ?? 0;
+      value.draft.history = workspace.draft.history.slice(
+        draftOffset,
+        draftOffset + 20,
+      );
+      value.draft.hasMore = workspace.draft.history.length > draftOffset + 20;
+      value.publication.history = workspace.publication.history.slice(
+        pubOffset,
+        pubOffset + 20,
+      );
+      value.publication.hasMore =
+        workspace.publication.history.length > pubOffset + 20;
+      return Response.json(value);
+    }
     if (name === "get_public_achievements") return Response.json(published);
     if (name === "list_achievement_athletes")
       return Response.json({

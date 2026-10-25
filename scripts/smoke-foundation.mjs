@@ -111,6 +111,10 @@ try {
     `/api/games/${randomUUID()}/publication/preparation/${randomUUID()}`,
     `/api/regulations/${randomUUID()}`,
     `/api/regulations/${randomUUID()}/versions/1`,
+    `/api/achievements/${randomUUID()}`,
+    `/api/achievements/${randomUUID()}/athletes?q=&offset=0`,
+    `/api/achievements/${randomUUID()}/drafts/1`,
+    `/api/achievements/${randomUUID()}/confirmations/1`,
     `/api/games/${randomUUID()}/occurrence`,
     `/api/games/${randomUUID()}/occurrence/versions/1`,
     `/api/registrations/${randomUUID()}/withdrawal`,
@@ -139,6 +143,9 @@ try {
   for (const path of [
     `/api/regulations/${randomUUID()}`,
     `/api/regulations/${randomUUID()}/preview`,
+    `/api/achievements/${randomUUID()}`,
+    `/api/achievements/${randomUUID()}/suggestion`,
+    `/api/achievements/${randomUUID()}/confirm`,
     `/api/games/${randomUUID()}/occurrence`,
     `/api/games/${randomUUID()}/occurrence/preview`,
     `/api/registrations/${randomUUID()}/withdrawal`,
@@ -161,18 +168,20 @@ try {
     await denied.arrayBuffer();
   }
   stage = "public projection without application authentication";
-  const publicMissing = await fetch(
-    `${origin}/api/public/games/${randomUUID()}`,
-    { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
-  );
-  status = publicMissing.status;
-  assert.equal(status, 404);
-  assert.equal((await publicMissing.json()).error.code, "public_not_found");
-  assert.ok(
-    !publicMissing.headers
-      .getSetCookie()
-      .some((c) => c.startsWith("__Host-bdb-session=")),
-  );
+  for (const resource of ["games", "achievements"]) {
+    const publicMissing = await fetch(
+      `${origin}/api/public/${resource}/${randomUUID()}`,
+      { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
+    );
+    status = publicMissing.status;
+    assert.equal(status, 404);
+    assert.equal((await publicMissing.json()).error.code, "public_not_found");
+    assert.ok(
+      !publicMissing.headers
+        .getSetCookie()
+        .some((c) => c.startsWith("__Host-bdb-session=")),
+    );
+  }
   const privateModule = await fetch(`${origin}/worker.js`, { headers });
   status = privateModule.status;
   assert.equal(status, 404);
@@ -260,6 +269,9 @@ try {
       privateDecisionCommands: 6,
       privateTransferRead: true,
       privateTransferCommands: 2,
+      privateAchievementReads: 4,
+      privateAchievementCommands: 3,
+      publicAchievementProjectionRead: true,
       publicProjectionRead: true,
       ownerLoginPending: true,
     }),

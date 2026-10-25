@@ -1,0 +1,40 @@
+.achievements {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.achievement-positions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.5rem 1rem;
+}
+.achievements button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.achievement-recipients {
+  padding-left: 1.2rem;
+}
+.achievement-recipients li {
+  margin: 0.6rem 0;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.achievement-confirmed {
+  padding: 1rem;
+  border: 1px solid #9caec1;
+  border-radius: 0.35rem;
+  background: #f5f8fc;
+  margin: 1rem 0;
+}
+.achievements :is(h2, h3, [role="status"]):focus {
+  outline: 2px solid #235ea4;
+  outline-offset: 4px;
+}
+.achievements label.reg-check {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  align-items: start;
+}
