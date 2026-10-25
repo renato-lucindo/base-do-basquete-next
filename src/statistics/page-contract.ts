@@ -59,7 +59,7 @@ export const statisticsRowSchema = reference
 const uniqueRows = (rows: { personId: string; registrationId: string }[]) =>
   new Set(rows.map((r) => `${r.personId}/${r.registrationId}`)).size ===
   rows.length;
-const summary = z
+export const statisticsSummarySchema = z
   .object({
     personId: uuid,
     names,
@@ -100,7 +100,7 @@ export const statisticsPageSchema = z
     totalPages: version,
     rows: z.array(statisticsRowSchema).max(20),
     compared: z.array(statisticsRowSchema).max(2000),
-    comparisonSummaries: z.array(summary).max(2),
+    comparisonSummaries: z.array(statisticsSummarySchema).max(2),
     comparisonStates: z.record(
       statisticsMetricSchema,
       z.object({ left: comparisonState, right: comparisonState }).strict(),

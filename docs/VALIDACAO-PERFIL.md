@@ -1,5 +1,13 @@
 # Perfil confirmado — evidências
 
+## P3 — domínio e consultas puras, 25/10/2026
+
+Carreira valida cada disputa e identidade antes de reunir observações no mesmo observedMetrics usado nas estatísticas; consulta de uma disputa continua recusando contextos misturados. Percentuais ponderados e médias por cobertura permanecem sobre fatos, não médias intermediárias. Todas inscrições/nomes da ocasião são preservados, duplicidade global de jogo/pessoa e inscrição cruzada são recusadas. Sem nova DDL.
+
+Resumo/Estatísticas/Conquistas e honrarias/Jogos/Histórico têm contrato de página e URL próprios. Nome principal vem do perfil explicitamente confirmado; sem ele, última ocasião pública com origem indicada, inclusive honraria explícita. Opcionais não são derivados dessa honraria. Histórico mantém inscrições, equipe, camisas, nomes e datas conhecidas de jogos; não inventa início/fim de vínculo ou equipe atual. Jogos paginam20 sem reduzir os totais. Fase desconhecida sóentra emall; mínimos de por30 diferentes bloqueiam esse modo até um recorte compatível. DNP aparece no histórico/jogos, sem linha estatística fictícia.
+
+RED por domínio ausente, depois caso fora do recorte mostrou que uma origem inválida poderia ficar oculta. Validação de toda a fonte precede o filtro; RED→GREEN observado. **39focais/6arquivos PASS**, SHA256 **a460f05f7e9fa55a3a5bfb2b524cc48748df809be99aa0e7705aef13f46cb97c**, incluindo agregações/regressões da tabela, URL, identidade, mínimos, DNP, datas ausentes e paginação. Tipos app/Worker/lint/formato PASS. Não atribuir gate454 a este código posterior; consolidar com API/UI estáveis. Banco43 e provas reais anteriores inalterados; sem novo deploy/credencial/SQL.
+
 ## P2 — participações e fonte de carreira integradas, 25/10/2026 19:21UTC-03
 
 Adaptador privado SQL comparado a normalizeConfirmedGame para súmula/DNP/0/00, quatro PDFs preservados e fallback misto. RED por função ausente antes de migration CLI. Projeção pública por pessoa+jogo, com FKs para participante/versão imutável e metadados estatísticos; source/nomes/equipes/camisas da ocasião. Trigger posterior ao estatístico, mesma transação, replay sem nova projeção e owner-backfill ordenado. Nenhuma leitura de pessoa/equipe/elenco live compõe os fatos.

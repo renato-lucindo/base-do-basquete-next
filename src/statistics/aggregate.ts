@@ -327,6 +327,53 @@ export type ComparisonSummary = Pick<
   StatisticsRow,
   "personId" | "names" | "nicknames" | "gamesPlayed" | "coverage" | "metrics"
 > & { registrationIds: string[] };
+
+/** Validates each dispute before pooling raw observations for one public identity. */
+export function validateCareerFacts(
+  input: unknown,
+  personId: string,
+): ConfirmedPlayerFact[] {
+  const id = z
+      .uuid()
+      .transform((v) => v.toLowerCase())
+      .parse(personId),
+    rows = z.array(confirmedPlayerFactSchema).parse(input),
+    contexts = new Map<string, ConfirmedPlayerFact[]>(),
+    games = new Set<string>(),
+    registrations = new Map<string, string>();
+  for (const row of rows) {
+    if (row.person.id !== id || games.has(row.gameId))
+      throw Error("Identidade ou jogo repetido na carreira.");
+    games.add(row.gameId);
+    const reg = row.registration.registrationId,
+      owner = row.disputeId + "/" + row.registration.team.id;
+    if (registrations.has(reg) && registrations.get(reg) !== owner)
+      throw Error("Inscrição e disputa inconsistentes na carreira.");
+    registrations.set(reg, owner);
+    const group = contexts.get(row.disputeId) ?? [];
+    group.push(row);
+    contexts.set(row.disputeId, group);
+  }
+  for (const group of contexts.values()) validatedFacts(group);
+  return rows;
+}
+export function aggregateCareerStatistics(
+  input: unknown,
+  personId: string,
+  options: AggregationOptions,
+): ComparisonSummary | null {
+  const rows = validateCareerFacts(input, personId),
+    config = aggregationOptionsSchema.parse(options);
+  return rows.length
+    ? {
+        personId: rows[0].person.id,
+        names: unique(rows.map((r) => r.person.name)),
+        nicknames: unique(rows.map((r) => r.person.nickname)),
+        registrationIds: unique(rows.map((r) => r.registration.registrationId)),
+        ...observedMetrics(rows, config),
+      }
+    : null;
+}
 /** All selected registrations contribute to one explicitly labelled person summary. */
 export function aggregateComparedStatistics(
   input: unknown,

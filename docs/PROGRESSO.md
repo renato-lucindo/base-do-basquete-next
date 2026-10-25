@@ -1,3 +1,13 @@
+# Perfil P1/P2 integrado e P3 puro estável; próxima API/UI — 25/10/2026 19:33UTC-03
+
+Branch codex/perfil-confirmado, PRdraft19 sobre18 anexado, P2 remoto08c3bdb; P3 próprio pronto para commit/push, árvore sem mudanças humanas. Domínio de carreira/página/URL implementado,39focais/6arquivos e tipos app/Worker/lint/formato PASS; agregação existente preserva guardas por disputa e nova carreira reúne fatos validados sem média de médias. Fonte inteira validada antes do filtro. Perfil confirmado ou última ocasião pública com proveniência, DNP/vazios e mínimos misturados sem números inventados; cinco seções, recortes, histórico contextual e paginação20 independente dos totais. Sem API/Worker/UI de perfil ainda. Evidências em VALIDACAO-PERFIL, plano2026-10-25-perfil-confirmado.
+
+Próximo EXATO P4a: RED de provider privado de proposta/estado/histórico/confirmação e leitura pública da página, com RPCs específicas e sem GET antes da mutação; validação de IDs/versões/ACK e erros/resposta limitada. Conectar métodos SessionStore por runAuthorized, rotas privadas /api/people/:id/profile com authfresh antes de ler corpo, e pública /api/public/players/:id sem JWT/cookie no provedor; público não limpa sessão inválida administrativa. Testes workerd focais antes de gate vertical. Depois confirmar metadados no percurso de pessoa e atleta.html com cinco seções/URL/foco/reauth/ACK/capturas320. Não declarar perfil disponível antes de API/UI/CI/preview verificados.
+
+Banco43migrations inalterado desde20261025221911; não reaplicar. Gate454/provas reais P1/P2 mantêm escopo anterior, não incluem P3 posterior. Preview continua sourcee00ba15 protegido, CI40237064549 SUCCESS443/292; nenhum DDL/deploy/gate/CI/upload/smoke/credencial/processo local ativo. Cota real55%usado5h/51%semanal às19:32UTC-03; verificar entreunidades/anteslongas, gatilho85%usados→checkpoint/push/MESMAautomação reset+2. Restante dos serviços/limitações preservado abaixo; não repetir pedidos humanos adiados, sem aceitar política pública pendente por silêncio.
+
+---
+
 # Perfil P1/P2 integrado; próximo domínio de carreira — 25/10/2026 19:21UTC-03
 
 **Git/unidade:** branch codex/perfil-confirmado, base c6c28cd/e00ba15, P1 remoto a859977; PRdraft19 sobre18 criado/anexado, sem merge/principal/produção. P2 local/real concluído, alterações próprias prontas para commit/push. Nenhuma alteração humana sobrescrita. Fonte de participações/carreira nova ainda não consumida no Worker/UI.
