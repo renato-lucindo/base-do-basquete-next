@@ -1,163 +1,25 @@
-import { z } from "zod";
 import {
   aggregateConfirmedStatistics,
-  STATISTICS_METRICS,
-  type StatisticsMetric,
+  aggregateComparedStatistics,
   type StatisticsRow,
 } from "./aggregate";
+import { STATISTICS_METRICS, type StatisticsMetric } from "./metrics";
 import { selectStatisticsFacts } from "./source";
 import {
-  parseBoxscoreGameScope,
-  parseBoxscoreStatisticsMode,
-  type BoxscoreGameScope,
-  type BoxscoreStatisticsMode,
-} from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
-export type FilterOperator = ">=" | ">" | "<=" | "<" | "=";
-export interface StatisticsQuery {
-  mode: BoxscoreStatisticsMode;
-  scope: BoxscoreGameScope;
-  sort: StatisticsMetric | "player" | "team";
-  direction: "asc" | "desc";
-  search: string;
-  teams: string[] | null;
-  filters: {
-    metric: StatisticsMetric;
-    operator: FilterOperator;
-    value: number;
-  }[];
-  page: number;
-  compare: string[];
-  preset: "essentials" | "all" | "custom";
-  /** Remembered preference: MIN is hidden, not removed, in per-30. */
-  columns: StatisticsMetric[];
-}
+  parseStatisticsQuery,
+  serializeStatisticsQuery,
+  normalizeStatisticsSearch as normalize,
+  type StatisticsQuery,
+  type FilterOperator,
+} from "./query-contract";
+export {
+  parseStatisticsQuery,
+  serializeStatisticsQuery,
+  updateStatisticsQuery,
+  type StatisticsQuery,
+} from "./query-contract";
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
-const isMetric = (value: string): value is StatisticsMetric =>
-  Object.hasOwn(STATISTICS_METRICS, value);
-const essentials: StatisticsMetric[] = [
-  "games",
-  "minutes",
-  "points",
-  "rebounds",
-  "assists",
-  "fieldGoalPercentage",
-  "threePointPercentage",
-  "freeThrowPercentage",
-  "efficiency",
-  "plusMinus",
-];
-const uuid = (s: string): string[] =>
-  z.uuid().safeParse(s).success ? [s.toLowerCase()] : [];
 const unique = <T>(values: T[]) => [...new Set(values)];
-const operators = new Set<FilterOperator>([">=", ">", "<=", "<", "="]);
-const normalize = (v: string) =>
-  v
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/gu, "")
-    .toLocaleLowerCase("pt-BR")
-    .trim();
-
-/** Adapted from the portable parser; public identities are UUIDs in this implementation. */
-export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
-  const mode = parseBoxscoreStatisticsMode(params.get("mode")),
-    requestedSort = params.get("sort") ?? "points",
-    sort =
-      requestedSort === "player" ||
-      requestedSort === "team" ||
-      isMetric(requestedSort)
-        ? requestedSort
-        : "points",
-    preset =
-      params.get("preset") === "all"
-        ? "all"
-        : params.get("preset") === "custom"
-          ? "custom"
-          : "essentials",
-    columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
-    page = Number(params.get("page"));
-  return {
-    mode,
-    scope: parseBoxscoreGameScope(params.get("scope")),
-    sort: mode === "per-30" && sort === "minutes" ? "points" : sort,
-    direction: params.get("dir") === "asc" ? "asc" : "desc",
-    search: (params.get("q") ?? "").trim().slice(0, 80),
-    teams: params.has("team")
-      ? unique(params.getAll("team").flatMap(uuid)).slice(0, 32)
-      : null,
-    filters: (params.get("filters") ?? "")
-      .split(";")
-      .slice(0, 5)
-      .flatMap((entry) => {
-        const [metric, operator, raw, ...rest] = entry.split(":"),
-          value = Number(raw);
-        return metric &&
-          isMetric(metric) &&
-          operators.has(operator as FilterOperator) &&
-          raw?.trim() &&
-          !rest.length &&
-          Number.isFinite(value) &&
-          !(mode === "per-30" && metric === "minutes")
-          ? [{ metric, operator: operator as FilterOperator, value }]
-          : [];
-      }),
-    page:
-      /^[1-9][0-9]*$/u.test(params.get("page") ?? "") &&
-      Number.isSafeInteger(page)
-        ? page
-        : 1,
-    compare: unique(
-      (params.get("compare") ?? "").split(",").flatMap(uuid),
-    ).slice(0, 2),
-    preset,
-    columns: columns.length
-      ? columns
-      : preset === "all"
-        ? [...metricKeys]
-        : [...essentials],
-  };
-}
-export function serializeStatisticsQuery(
-  query: StatisticsQuery,
-): URLSearchParams {
-  const p = new URLSearchParams({
-    mode: query.mode,
-    scope: query.scope,
-    sort: query.sort,
-    dir: query.direction,
-    page: String(query.page),
-    preset: query.preset,
-    columns: query.columns.join(","),
-  });
-  if (query.search) p.set("q", query.search);
-  if (query.teams !== null)
-    for (const id of query.teams.length ? query.teams : [""])
-      p.append("team", id);
-  if (query.filters.length)
-    p.set(
-      "filters",
-      query.filters
-        .map((f) => `${f.metric}:${f.operator}:${f.value}`)
-        .join(";"),
-    );
-  if (query.compare.length) p.set("compare", query.compare.join(","));
-  return p;
-}
-export function updateStatisticsQuery(
-  query: StatisticsQuery,
-  patch: Partial<StatisticsQuery>,
-) {
-  return parseStatisticsQuery(
-    serializeStatisticsQuery({
-      ...query,
-      ...patch,
-      page:
-        (patch.mode !== undefined && patch.mode !== query.mode) ||
-        (patch.scope !== undefined && patch.scope !== query.scope)
-          ? 1
-          : (patch.page ?? query.page),
-    }),
-  );
-}
 function matches(value: number, operator: FilterOperator, target: number) {
   switch (operator) {
     case ">=":
@@ -250,6 +112,24 @@ export function buildStatisticsPage(
   }
   const totalPages = Math.max(1, Math.ceil(sorted.length / 20)),
     page = Math.min(query.page, totalPages);
+  const comparisonSummaries = query.compare.length
+    ? aggregateComparedStatistics(selected.facts, query.compare, {
+        mode: query.mode,
+        minimumSeconds: selected.minimumSeconds,
+      })
+    : [];
+  const comparisonStates = Object.fromEntries(
+    metricKeys.map((key) => [
+      key,
+      comparisonSummaries.length === 2
+        ? compareStatisticsRows(
+            comparisonSummaries[0],
+            comparisonSummaries[1],
+            key,
+          )
+        : { left: "unavailable" as const, right: "unavailable" as const },
+    ]),
+  ) as Record<StatisticsMetric, ReturnType<typeof compareStatisticsRows>>;
   return {
     kind: "confirmed-statistics-page-v1" as const,
     disputeId: selected.disputeId,
@@ -271,6 +151,8 @@ export function buildStatisticsPage(
     compared: query.compare.flatMap((id) =>
       all.filter((r) => r.personId === id),
     ),
+    comparisonSummaries,
+    comparisonStates,
     leaders,
     teams: unique(all.map((r) => r.teamId)).map((id) => ({
       id,
@@ -284,8 +166,8 @@ export function buildStatisticsPage(
   };
 }
 export function compareStatisticsRows(
-  a: StatisticsRow,
-  b: StatisticsRow,
+  a: Pick<StatisticsRow, "metrics">,
+  b: Pick<StatisticsRow, "metrics">,
   metric: StatisticsMetric,
 ) {
   const av = a.metrics[metric],

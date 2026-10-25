@@ -15,11 +15,12 @@ const manifest = {};
 const paths = [
   "foundation.html",
   "resultado.html",
+  "estatisticas.html",
   ...readdirSync("dist-foundation/assets").map((name) => `assets/${name}`),
 ];
 for (const path of paths) {
   if (
-    !/^((?:foundation|resultado)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
+    !/^((?:foundation|resultado|estatisticas)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
       path,
     )
   )

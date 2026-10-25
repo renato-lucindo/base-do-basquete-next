@@ -149,6 +149,17 @@
   color: #172033;
   border-color: #74839b;
 }
+.competition-public-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 9px 18px;
+  border: 1px solid #74839b;
+  border-radius: 4px;
+  background: #fff;
+  color: #172033;
+  text-decoration: none;
+}
 @media (max-width: 650px) {
   .competition-workspace {
     padding: 16px 0;

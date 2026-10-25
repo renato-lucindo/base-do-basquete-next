@@ -131,7 +131,7 @@ it("comparação recupera todas as inscrições dos dois atletas fora da página
   third.staff.home.coach = third.facts.players[0].person;
   const query = parseStatisticsQuery(
     new URLSearchParams(
-      `scope=all&q=sem-correspondencia&compare=${first.person.id},${pubId(10101)}`,
+      `scope=all&mode=total&q=sem-correspondencia&compare=${first.person.id},${pubId(10101)}`,
     ),
   );
   const result = buildStatisticsPage(source, query);
@@ -141,6 +141,24 @@ it("comparação recupera todas as inscrições dos dois atletas fora da página
     [first.person.id, pubId(55)],
     [pubId(10101), pubId(5)],
   ]);
+  expect(
+    result.comparisonSummaries.map((r) => [
+      r.personId,
+      r.gamesPlayed,
+      r.metrics.points.value,
+    ]),
+  ).toEqual([
+    [first.person.id, 2, 4],
+    [pubId(10101), 1, 2],
+  ]);
+  expect(result.comparisonStates.points).toEqual({
+    left: "better",
+    right: "worse",
+  });
+  expect(result.comparisonStates.minutes).toEqual({
+    left: "unavailable",
+    right: "unavailable",
+  });
 });
 it("busca ignora acentos incluindo apelido/equipe e filtro só considera células disponíveis", () => {
   const source = sourceFixture();
@@ -222,4 +240,19 @@ it("comparação usa direção de melhor valor e não inventa empate com ausênc
     left: "unavailable",
     right: "unavailable",
   });
+});
+it("preset de súmula exibe apenas dados simples e compartilha a preferência na URL", () => {
+  const query = parseStatisticsQuery(
+    new URLSearchParams("preset=simple&scope=all"),
+  );
+  expect(query.columns).toEqual([
+    "games",
+    "points",
+    "twoMade",
+    "threeMade",
+    "freeMade",
+    "foulsCommitted",
+    "disqualifications",
+  ]);
+  expect(parseStatisticsQuery(serializeStatisticsQuery(query))).toEqual(query);
 });

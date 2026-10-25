@@ -540,6 +540,16 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
             >
               Regulamento
             </button>
+            {context && editor.savedIds.has(context.id) && (
+              <a
+                className="competition-public-link"
+                href={`/estatisticas.html#${context.id}?scope=all`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Estatísticas publicadas
+              </a>
+            )}
           </nav>
           {context && editor.savedIds.has(context.id) && (
             <div hidden={tab !== "regulation"}>

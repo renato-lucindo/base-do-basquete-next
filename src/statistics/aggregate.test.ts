@@ -311,3 +311,27 @@ it("valida modos/amostra e campos extras sem normalizar um contexto adulterado",
   ).toThrow();
   expect(aggregateConfirmedStatistics([])).toEqual([]);
 });
+it("desqualificações simples não confundem exclusão por5faltas nem ausência disciplinar", () => {
+  const a = normalizeConfirmedGame(confirmedManualFixture())[0],
+    b = structuredClone(a),
+    c = structuredClone(a);
+  a.discipline = "GD";
+  b.gameId = pubId(901);
+  b.discipline = "excluded";
+  c.gameId = pubId(902);
+  c.discipline = null;
+  for (const mode of ["total", "per-game", "per-30"] as const) {
+    const [row] = aggregateConfirmedStatistics([a, b, c], {
+      mode,
+      minimumSeconds: 600,
+    });
+    expect(row.metrics.disqualifications).toEqual({
+      status: "available",
+      value: 1,
+    });
+    expect(row.coverage.disciplineGames).toBe(2);
+  }
+  expect(
+    aggregateConfirmedStatistics([c])[0].metrics.disqualifications,
+  ).toEqual({ status: "unavailable", value: null });
+});

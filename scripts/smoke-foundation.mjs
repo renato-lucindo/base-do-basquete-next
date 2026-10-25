@@ -168,7 +168,7 @@ try {
     await denied.arrayBuffer();
   }
   stage = "public projection without application authentication";
-  for (const resource of ["games", "achievements"]) {
+  for (const resource of ["games", "achievements", "statistics"]) {
     const publicMissing = await fetch(
       `${origin}/api/public/${resource}/${randomUUID()}`,
       { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
@@ -257,6 +257,19 @@ try {
     await page.getByRole("alert").waitFor();
     assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
     assert.deepEqual(errors, []);
+    stage = `browser ${name} public statistics`;
+    const statisticsDocument = await page.goto(
+      `${origin}/estatisticas.html#${randomUUID()}`,
+      { waitUntil: "domcontentloaded" },
+    );
+    assert.equal(statisticsDocument.status(), 200);
+    await page
+      .getByText("Ainda não há resultados confirmados nesta disputa.", {
+        exact: true,
+      })
+      .waitFor();
+    assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+    assert.deepEqual(errors, []);
     await context.close();
   }
   console.log(
@@ -273,6 +286,7 @@ try {
       privateAchievementCommands: 3,
       publicAchievementProjectionRead: true,
       publicProjectionRead: true,
+      publicStatisticsRead: true,
       ownerLoginPending: true,
     }),
   );

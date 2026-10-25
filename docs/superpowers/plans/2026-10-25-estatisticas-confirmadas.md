@@ -20,7 +20,9 @@ Objetivo: adaptar os contratos/módulos estatísticos portáveis aos snapshots c
 
 ## S3 — experiência pública e perfil
 
-- [ ] Tabela/URL: modos/escopos/busca/equipes/filtros/colunas/ordem/página/comparação, inclusive comparados fora da página e várias inscrições da mesma pessoa. MIN incompatível comper30; vazios/amostra/cobertura/empates explicados.
+S3a tabela/API/fonte concluídas tecnicamente na unidade de25/10, gate443/24browsers e provas reais comrollback descritas na validação. CI/preview novos após commit estável; S3b perfil continua pendente. FonteSQL real41migrations, fase pública inicialnull, sem publicação de regulamento privado/agenda por inferência. A comparação inclui resumo de todas inscrições e detalhe por vínculo, sem primeira linha arbitrária. Nenhum aceite humano inferido.
+
+- [x] Tabela/URL: modos/escopos/busca/equipes/filtros/colunas/ordem/página/comparação, inclusive comparados fora da página e várias inscrições da mesma pessoa. MIN incompatível comper30; vazios/amostra/cobertura/empates explicados.
 - [ ] Perfil por identidade, cinco seções do contrato, trajetória da ocasião e campos públicos opcionais somente quando confirmados. Não ler bio/altura/nascimento privados/live de uma pessoa sóporque teve um jogo confirmado antes. Não inventar nomes históricos nem equipe atual a partir de um vínculo passado.
 - [ ] Browsers focais/teclado/foco/reflow320/zoom, composição, gate/CI/preview protegido/smokes proporcionais. Aceite humano pendente é registrado, sem repetir pedidos adiados. Sem declarar etapas4/5 completas, carga/corridaPGmulticonexão/revisão independente/WCAGcompleta sem prova.
 
