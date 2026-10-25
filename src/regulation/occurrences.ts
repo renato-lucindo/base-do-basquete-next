@@ -189,14 +189,12 @@ export const occurrencesInputSchema = z
       )
         issue();
       for (const id of w.previousGameIds) {
-        const g = games.get(id),
-          effect = occurrences.get(id)?.effect;
+        const g = games.get(id);
         if (
           !g ||
           ![g.homeRegistrationId, g.awayRegistrationId].includes(
             w.registrationId,
-          ) ||
-          (!publications.has(id) && (!effect || !isAward(effect)))
+          )
         )
           issue();
       }
@@ -339,6 +337,16 @@ export function previewOccurrences(input: unknown) {
           item.needs = null;
           item.outcome = { kind: "awarded", award };
         }
+      }
+      if (
+        affected.some((w) => w.prior.has(g.id)) &&
+        !publication &&
+        (!occurrence || !isAward(occurrence.effect))
+      ) {
+        item.state = "conflict";
+        item.needs = "withdrawal_review";
+        item.outcome = null;
+        return item;
       }
       if (
         affected.some(

@@ -256,7 +256,7 @@ it("rejects future game/publication versions, foreign winners, missing targets a
   ])
     expect(() => previewOccurrences(value)).toThrow();
 });
-it("rejects foreign or result-less prior games, duplicate withdrawals and formulas or athlete stats in decisions", () => {
+it("rejects foreign prior games, duplicate withdrawals and formulas or athlete stats in decisions", () => {
   const s = base(),
     withdrawal = {
       id: id(300),
@@ -268,7 +268,6 @@ it("rejects foreign or result-less prior games, duplicate withdrawals and formul
     };
   for (const value of [
     { ...s, withdrawals: [withdrawal] },
-    { ...s, withdrawals: [{ ...withdrawal, registrationId: A }] },
     { ...s, withdrawals: [{ ...withdrawal, previousGameIds: [id(999)] }] },
     {
       ...s,
@@ -374,4 +373,25 @@ it("preserves the original winner identity after opponents change and blocks its
     outcome: null,
     occurrence: { effect: { winnerRegistrationId: B } },
   });
+});
+
+it("keeps a withdrawal reviewable when one of its previously awarded games no longer has a result", () => {
+  for (const policy of ["keep_results", "exclude_results"] as const) {
+    const s = base();
+    s.withdrawals = [
+      {
+        id: id(300),
+        version: 1,
+        registrationId: A,
+        reason: "Desistência anteriormente conferida",
+        policy,
+        previousGameIds: [id(100)],
+      },
+    ];
+    expect(first(s)).toMatchObject({
+      state: "conflict",
+      needs: "withdrawal_review",
+      outcome: null,
+    });
+  }
 });
