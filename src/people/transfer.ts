@@ -70,6 +70,7 @@ export function previewTransfer(
   if (context.regulation.transfers === null) return blocked("rule_required");
   if (context.regulation.transfers === "forbidden")
     return blocked("transfer_forbidden");
+  if (context.memberships.length >= 2000) return blocked("context_too_large");
   if (context.memberships.some((m) => m.id === command.newEntryId))
     return blocked("entry_id_used");
   if (active?.registrationId === destination.id)

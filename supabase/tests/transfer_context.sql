@@ -1,7 +1,14 @@
 -- Read-only transfer context: run after publication.sql + regulation.sql in rollback.
 reset role;
-insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey,started_at,ended_at)
-values(pg_temp.pu_id(800),pg_temp.pu_id(6),pg_temp.pu_id(3),pg_temp.pu_id(201),'0','2000-01-01Z','2001-01-01Z');
+-- Owner-only historical fixture bootstrap, inside this rollback transaction. This
+-- does not exercise/relax product authorization; transfers.sql proves the guard enabled.
+do $$declare guarded boolean;begin
+ guarded:=exists(select 1 from pg_trigger where tgrelid='public.roster_entries'::regclass and tgname='roster_transfer_required');
+ if guarded then alter table public.roster_entries disable trigger roster_transfer_required;end if;
+ insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey,started_at,ended_at)
+ values(pg_temp.pu_id(800),pg_temp.pu_id(6),pg_temp.pu_id(3),pg_temp.pu_id(201),'0','2000-01-01Z','2001-01-01Z');
+ if guarded then alter table public.roster_entries enable trigger roster_transfer_required;end if;
+end$$;
 create temp table tc_publications as select * from private.game_publication_versions;
 update public.championships set saved_at='2000-01-01Z' where id=pg_temp.pu_id(1);
 set local role anon;

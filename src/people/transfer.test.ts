@@ -11,6 +11,24 @@ import {
 } from "./transfer-contract";
 
 describe("transferência e retorno sem reatribuição histórica", () => {
+  it("nova abertura não pode deixar o contexto acima do limite de leitura", () => {
+    const s = fixture();
+    for (let n = 0; n < 1998; n++)
+      s.context.memberships.push({
+        ...s.context.memberships[1],
+        id: id(5000 + n),
+        personId: id(10000 + n),
+        jersey: null,
+      });
+    expect(s.context.memberships).toHaveLength(2000);
+    expect(previewTransfer(s.command, s.context)).toMatchObject({
+      ready: false,
+      needs: "context_too_large",
+      plan: null,
+    });
+    s.context.memberships.pop();
+    expect(previewTransfer(s.command, s.context).ready).toBe(true);
+  });
   it("fecha origem e abre outra inscrição da mesma equipe no mesmo instante do servidor", () => {
     const s = fixture(),
       before = structuredClone(s),

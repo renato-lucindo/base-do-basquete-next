@@ -125,6 +125,7 @@ export const transferContextSchema = z
   });
 export type TransferContext = z.infer<typeof transferContextSchema>;
 export const transferNeedSchema = z.enum([
+  "context_too_large",
   "rule_required",
   "transfer_forbidden",
   "source_changed",

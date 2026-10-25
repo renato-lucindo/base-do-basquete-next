@@ -34,6 +34,8 @@ T2a concluída isoladamente: permissão opcional/finita compatível com regras a
 
 T2b1 leitor privado concluído: migration20261025023543 aplicada/reconciliada;2PG zero/upgrade/25composição, tipos gerados e contrato realrollbackPASS. NÃO reaplicar. Completo/bounded, fonte derivada, ordem atleta→raiz compartilhada e autorização fresca; sem gravação. Writer/fechamento do desvio/T3 continuam pendentes. Evidências e observações sobre limite após abertura/fixtures históricas na validação.
 
+T2b2 WIP local: migrationCLI20261025024231_roster_transfers NÃO aplicada; writer/recibo/trigger implementados com2PG focais finais e28composição local anteriores PASS. Planejador com limite pós-abertura20T1/24contratosPASS. Ampliar matriz/importador/FKs/regressões e contratoACK antes do gate/aplicação. Detalhes exatos em VALIDACAO-TRANSFERENCIAS.md; não marcar T2 completo nem reaplicar migrations anteriores.
+
 Novos supabase/tests/transfers.sql, src/people/transfer-database.test.ts; migrations próprias via CLI. Não editar/reaplicar migrations existentes. Ler guardas de sexo, writers de pessoa/elenco/importação e lock order antes da nova DDL.
 
 - [ ] RED PostgreSQL: configuração de permissão compatível com regulamentos antigos, contexto integral/autorizado, sem fonte/ator do browser. Autoridade deriva pessoa/disputa/campeonato da origem/destino. Hash/versionamento de todos os vínculos relevantes.
