@@ -127,6 +127,12 @@ export const regulationContextSchema = z
     publishedGames: occurrencesInputSchema.shape.publishedGames,
     occurrences: occurrencesInputSchema.shape.occurrences,
     withdrawals: occurrencesInputSchema.shape.withdrawals,
+    decisionVersion: z
+      .number()
+      .int()
+      .min(0)
+      .max(Number.MAX_SAFE_INTEGER)
+      .optional(),
   })
   .strict();
 export type RegulationContext = z.infer<typeof regulationContextSchema>;
@@ -143,7 +149,11 @@ export function previewRegulationDefinition(
     throw Error("Inscrição selecionada não existe no contexto autoritativo.");
   return previewOrganizedCompetition({
     context: {
-      ...context,
+      registrationIds: context.registrationIds,
+      games: context.games,
+      publishedGames: context.publishedGames,
+      occurrences: context.occurrences,
+      withdrawals: context.withdrawals,
       disputeId,
       regulationVersion,
       rules: definition.occurrenceRules,

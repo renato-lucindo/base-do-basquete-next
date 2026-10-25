@@ -261,3 +261,26 @@ it("allows empty/partial configuration without producing positions or a qualifie
     status: "preview",
   });
 });
+
+it("reads a monotonic decision revision while keeping pre-occurrence historical contexts compatible", () => {
+  const c = context();
+  expect(
+    previewRegulationDefinition(
+      definition(),
+      { ...c, decisionVersion: 4 },
+      disputeId,
+      1,
+    ).status,
+  ).toBe("preview");
+  expect(
+    previewRegulationDefinition(definition(), c, disputeId, 1).status,
+  ).toBe("preview");
+  expect(() =>
+    previewRegulationDefinition(
+      definition(),
+      { ...c, decisionVersion: -1 },
+      disputeId,
+      1,
+    ),
+  ).toThrow();
+});
