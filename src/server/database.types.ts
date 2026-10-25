@@ -651,6 +651,10 @@ export type Database = {
     Functions: {
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       finish_pdf_source: { Args: { p_command: Json }; Returns: Json };
+      get_achievement_context: {
+        Args: { p_dispute_id: string };
+        Returns: Json;
+      };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_occurrence_state: {
@@ -712,6 +716,10 @@ export type Database = {
           p_destination_registration_id: string;
           p_source_entry_id: string;
         };
+        Returns: Json;
+      };
+      list_achievement_athletes: {
+        Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;
       };
       list_competitions: {

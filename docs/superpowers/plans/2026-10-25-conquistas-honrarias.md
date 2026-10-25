@@ -26,6 +26,8 @@ Arquivos novos `src/achievements/contract.ts`, `suggest.ts`, `suggest.test.ts` e
 
 ## A2 — fonte e persistência próprias
 
+A2a concluída: get_achievement_context deriva regulamento/contexto/catálogos/versões; list_achievement_athletes pesquisa nomes em períodos da disputa e pagina20/20. FK de publicaçãoG4 preserva vínculo, então histórico encerrado continua elegível; não filtrar pelo sexo ou vínculo ativo atuais. Authfresh→raiz compartilhada, sem lock de atleta depois da raiz. Fonte sem atributos privados nem motivos administrativos originais; fingerprint estável em visita/inativação que não altera elegibilidade, variável por identidade/regra/inscrição/fato relevante. Limites1000/10000 explícitos, sem truncate. Gate375unit/75arquivos e contrato realrollback PASS; aplicada/reconciliada **20261025074640_achievement_context**,36migrations. NÃO editar/reaplicar. Tipos/advisors reconciliados; detalhes em VALIDACAO-CONQUISTAS.md. Rascunho/confirmação permanecem pendentes.
+
 - [ ] Inspecionar tabelas/FKs/contexto real e definir elegibilidade contextual dos destinatários sem depender de vínculo ativo. Separar fatos estatísticos de decisões de premiação. Verificar invariantes do pacote antes da DDL.
 - [ ] RED PostgreSQL descartável do zero/upgrade: rascunho privado, fonte derivada/versionada, confirmação atômica, autor revogado, recibo/replay/conflito, motivo de revisão, nomes/IDs/contexto e invalidação de derivados. Histórico imutável e grants/RLS/índices próprios.
 - [ ] Gerar migration pela CLI fixada após RED; nunca editar/reaplicar migrations anteriores. Matriz TS×SQL para validação compartilhada, gate quando estável; aplicar uma vez somente no projeto novo, reconciliar versão/tipos/advisors/prova real com rollback e preservar dados humanos.
