@@ -34,7 +34,9 @@ select public.save_roster_entry(jsonb_set(jsonb_set(jsonb_set(pg_temp.r_command(
 select pg_temp.r_error($q$select public.save_roster_entry(jsonb_set(pg_temp.r_command(),'{commandId}',to_jsonb(pg_temp.r_id(61))))$q$,'PT409');
 select public.save_roster_entry(jsonb_set(jsonb_set(jsonb_set(jsonb_set(pg_temp.r_command(),'{commandId}',to_jsonb(pg_temp.r_id(61))),'{expectedVersion}','2'),'{entry,jersey}','"7"'),'{entry,active}','false'));
 select pg_temp.r_assert((public.get_roster_entry(pg_temp.r_id(2))->>'active')::boolean=false and public.get_roster_entry(pg_temp.r_id(2))->>'endedAt' is not null,'inactive history retained');
-select public.save_roster_entry(jsonb_set(pg_temp.r_command(20),'{entry,registrationId}',to_jsonb(pg_temp.r_id(96))));
+-- New periods now require the explicit transfer writer, even after inactivation.
+select pg_temp.r_error($q$select public.save_roster_entry(jsonb_set(pg_temp.r_command(20),'{entry,registrationId}',to_jsonb(pg_temp.r_id(96))))$q$,'PT400');
+select public.save_roster_entry(jsonb_set(jsonb_set(pg_temp.r_command(20),'{entry,registrationId}',to_jsonb(pg_temp.r_id(96))),'{entry,personId}',to_jsonb(pg_temp.r_id(54))));
 select pg_temp.r_assert(jsonb_array_length(public.list_roster(pg_temp.r_id(95))->'items')=1 and jsonb_array_length(public.list_roster(pg_temp.r_id(95),false)->'items')=2,'history separately inspectable');
 select pg_temp.r_error($q$select public.save_roster_entry(jsonb_set(jsonb_set(pg_temp.r_command(),'{commandId}',to_jsonb(pg_temp.r_id(62))),'{expectedVersion}','3'))$q$,'PT400');
 select pg_temp.r_assert(not ((public.get_roster_entry(pg_temp.r_id(12))->'person') ? 'athlete'),'roster projection excludes private athlete details');

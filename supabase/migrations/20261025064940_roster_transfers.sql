@@ -1,12 +1,18 @@
 -- T2b2 WIP: atomic periods and an immutable intent/receipt; validate before remote use.
-create function private.transfer_reason(v jsonb) returns text language plpgsql immutable security invoker set search_path='' as $$
-declare t text;units integer;
+-- Zod 4.6.7 counts Unicode code points. Match the existing reason contract.
+create function private.transfer_reason(v jsonb) returns text language sql immutable security invoker set search_path='' as $$select private.occurrence_reason(v)$$;
+create function private.valid_roster_transfer_command(c jsonb) returns boolean language plpgsql immutable security invoker set search_path='' as $$
 begin
- if jsonb_typeof(v) is distinct from 'string' then return null;end if;
- t:=btrim(v#>>'{}',E' \t\n\r\f'||chr(11)||chr(160)||chr(5760)||chr(8192)||chr(8193)||chr(8194)||chr(8195)||chr(8196)||chr(8197)||chr(8198)||chr(8199)||chr(8200)||chr(8201)||chr(8202)||chr(8232)||chr(8233)||chr(8239)||chr(8287)||chr(12288)||chr(65279));
- if length(t)>2000 then return null;end if;
- select coalesce(sum(case when ascii(ch)>65535 then 2 else 1 end),0) into units from regexp_split_to_table(t,'') ch;
- if units not between 3 and 2000 then return null;end if;return t;
+ if not private.context_keys(c,array['commandId','disputeId','sourceEntryId','expectedSourceVersion','destinationRegistrationId','expectedDestinationVersion','expectedRegulationVersion','expectedContextFingerprint','newEntryId','jersey','reason','acknowledgeImpact'])
+ or octet_length(c::text)>16384 or not private.regulation_uuid(c->'commandId') or not private.regulation_uuid(c->'disputeId')
+ or not private.regulation_uuid(c->'sourceEntryId') or not private.regulation_uuid(c->'destinationRegistrationId') or not private.regulation_uuid(c->'newEntryId')
+ or not private.regulation_integer(c->'expectedSourceVersion',1,2147483646) or not private.regulation_integer(c->'expectedDestinationVersion',1,2147483647)
+ or not private.regulation_integer(c->'expectedRegulationVersion',0,2147483647) or jsonb_typeof(c->'expectedContextFingerprint') is distinct from 'string'
+ or (c->>'expectedContextFingerprint')!~'^[a-f0-9]{64}$' or jsonb_typeof(c->'acknowledgeImpact') is distinct from 'boolean'
+ or (c->'jersey'<>'null'::jsonb and (jsonb_typeof(c->'jersey') is distinct from 'string' or (c->>'jersey')!~'^(00|0|[1-9][0-9]?)$'))
+ or private.transfer_reason(c->'reason') is null then return false;end if;
+ return (c->>'sourceEntryId')::uuid<>(c->>'newEntryId')::uuid;
+exception when invalid_text_representation or numeric_value_out_of_range then return false;
 end$$;
 
 create table private.roster_transfers (
@@ -17,7 +23,7 @@ create table private.roster_transfers (
  dispute_id uuid not null references public.disputes(id) on delete restrict,destination_registration_id uuid not null,
  regulation_version integer not null,effective_at timestamptz not null,jersey text,
  source_snapshot jsonb not null check(jsonb_typeof(source_snapshot)='object'),
- payload jsonb not null check(jsonb_typeof(payload)='object' and octet_length(payload::text)<=8192),
+ payload jsonb not null check(jsonb_typeof(payload)='object' and octet_length(payload::text)<=16384),
  result jsonb not null check(jsonb_typeof(result)='object'),
  foreign key(destination_registration_id,dispute_id) references public.registrations(id,dispute_id) on delete restrict,
  foreign key(dispute_id,regulation_version) references private.regulation_versions(dispute_id,version) on delete restrict,
@@ -51,13 +57,7 @@ declare actor uuid:=auth.uid();cmd uuid;source_id uuid;destination uuid;new_id u
 begin
  perform 1 from public.admin_access a where a.user_id=actor and a.enabled for share;
  if not found then raise sqlstate 'PT403' using message='forbidden';end if;
- if not private.context_keys(p_command,array['commandId','disputeId','sourceEntryId','expectedSourceVersion','destinationRegistrationId','expectedDestinationVersion','expectedRegulationVersion','expectedContextFingerprint','newEntryId','jersey','reason','acknowledgeImpact'])
- or octet_length(p_command::text)>8192 or not private.regulation_uuid(p_command->'commandId') or not private.regulation_uuid(p_command->'disputeId')
- or not private.regulation_uuid(p_command->'sourceEntryId') or not private.regulation_uuid(p_command->'destinationRegistrationId') or not private.regulation_uuid(p_command->'newEntryId')
- or not private.regulation_integer(p_command->'expectedSourceVersion',1,2147483646) or not private.regulation_integer(p_command->'expectedDestinationVersion',1,2147483647)
- or not private.regulation_integer(p_command->'expectedRegulationVersion',0,2147483647) or jsonb_typeof(p_command->'expectedContextFingerprint') is distinct from 'string'
- or (p_command->>'expectedContextFingerprint')!~'^[a-f0-9]{64}$' or p_command->'acknowledgeImpact' is distinct from 'true'::jsonb
- or (p_command->'jersey'<>'null'::jsonb and (jsonb_typeof(p_command->'jersey') is distinct from 'string' or (p_command->>'jersey')!~'^(00|0|[1-9][0-9]?)$'))
+ if not private.valid_roster_transfer_command(p_command) or p_command->'acknowledgeImpact' is distinct from 'true'::jsonb
  then raise sqlstate 'PT400' using message='invalid_transfer';end if;
  msg:=private.transfer_reason(p_command->'reason');if msg is null then raise sqlstate 'PT400' using message='transfer_reason_required';end if;
  cmd:=(p_command->>'commandId')::uuid;source_id:=(p_command->>'sourceEntryId')::uuid;destination:=(p_command->>'destinationRegistrationId')::uuid;
@@ -104,5 +104,5 @@ begin
 exception when invalid_text_representation or numeric_value_out_of_range or not_null_violation or check_violation or unique_violation or foreign_key_violation then raise sqlstate 'PT400' using message='invalid_transfer';
 end$$;
 create function public.transfer_roster_entry(p_command jsonb) returns jsonb language sql volatile security invoker set search_path='' as $$select private.transfer_roster_entry(p_command)$$;
-revoke all on function private.transfer_reason(jsonb),private.guard_roster_transfer_insert(),private.transfer_roster_entry(jsonb),public.transfer_roster_entry(jsonb) from public,anon,authenticated,service_role;
+revoke all on function private.transfer_reason(jsonb),private.valid_roster_transfer_command(jsonb),private.guard_roster_transfer_insert(),private.transfer_roster_entry(jsonb),public.transfer_roster_entry(jsonb) from public,anon,authenticated,service_role;
 grant execute on function private.transfer_roster_entry(jsonb),public.transfer_roster_entry(jsonb) to authenticated;

@@ -12,8 +12,8 @@ create function pg_temp.tr_command(n integer default 1,source_id uuid default nu
 $$;
 grant execute on function pg_temp.tr_command(integer,uuid,uuid) to authenticated;
 create temp table tr_publications as select * from private.game_publication_versions;
-select pg_temp.pu_assert(private.transfer_reason(to_jsonb('🙂a'::text))='🙂a','reason uses UTF16 units like TypeScript');
-select pg_temp.pu_assert(private.transfer_reason(to_jsonb(repeat('🙂',1001))) is null,'astral characters respect reason upper bound');
+select pg_temp.pu_assert(private.transfer_reason(to_jsonb('🙂ab'::text))='🙂ab','reason uses Unicode code points like installed Zod');
+select pg_temp.pu_assert(private.transfer_reason(to_jsonb(repeat('🙂',2001))) is null,'astral characters respect reason upper bound');
 set local role anon;
 select pg_temp.pu_error('select public.transfer_roster_entry(''{}''::jsonb)','42501');
 set local role service_role;

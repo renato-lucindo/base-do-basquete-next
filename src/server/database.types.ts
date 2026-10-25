@@ -794,6 +794,7 @@ export type Database = {
       save_staff_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
       save_text_review: { Args: { p_command: Json }; Returns: Json };
+      transfer_roster_entry: { Args: { p_command: Json }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;

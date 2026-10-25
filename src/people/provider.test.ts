@@ -58,4 +58,22 @@ describe("adapter de pessoas e vínculos", () => {
       await expect(db.getPerson("fixture", id)).rejects.toMatchObject({ code });
     }
   });
+  it("orienta a transferência explícita sem revelar o erro interno", async () => {
+    const db = new SupabasePeople(
+      { url: "https://db.example.test", key: "fixture" },
+      async () =>
+        Response.json(
+          { message: "transfer_required", details: "private SQL" },
+          { status: 400 },
+        ),
+    );
+    try {
+      await db.getPerson("fixture", id);
+      throw Error("expected failure");
+    } catch (error) {
+      expect(error).toMatchObject({ code: "transfer_required", status: 400 });
+      expect(String(error)).toContain("transferência");
+      expect(String(error)).not.toContain("private SQL");
+    }
+  });
 });

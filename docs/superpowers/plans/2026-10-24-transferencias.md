@@ -34,14 +34,14 @@ T2a concluída isoladamente: permissão opcional/finita compatível com regras a
 
 T2b1 leitor privado concluído: migration20261025023543 aplicada/reconciliada;2PG zero/upgrade/25composição, tipos gerados e contrato realrollbackPASS. NÃO reaplicar. Completo/bounded, fonte derivada, ordem atleta→raiz compartilhada e autorização fresca; sem gravação. Writer/fechamento do desvio/T3 continuam pendentes. Evidências e observações sobre limite após abertura/fixtures históricas na validação.
 
-T2b2 WIP local: migrationCLI20261025024231_roster_transfers NÃO aplicada; writer/recibo/trigger implementados com2PG focais finais e28composição local anteriores PASS. Planejador com limite pós-abertura20T1/24contratosPASS. Ampliar matriz/importador/FKs/regressões e contratoACK antes do gate/aplicação. Detalhes exatos em VALIDACAO-TRANSFERENCIAS.md; não marcar T2 completo nem reaplicar migrations anteriores.
+T2b2 concluída em25/10: migrationCLI20261025024231 reconciliada/aplicada como20261025064940_roster_transfers; não editar/reaplicar. Gate350unit/71arquivos,5transportes,13PG,15workerd,4PDFs PASS e provas reais writer/importador com rollback PASS. Matriz/Unicode/ACK/FKs/capacidade/sexo/versões/Recentes/G4 e regressões verificadas; detalhes em VALIDACAO-TRANSFERENCIAS.md. T3 ainda pendente, sem disponibilidade da operação no preview.
 
 Novos supabase/tests/transfers.sql, src/people/transfer-database.test.ts; migrations próprias via CLI. Não editar/reaplicar migrations existentes. Ler guardas de sexo, writers de pessoa/elenco/importação e lock order antes da nova DDL.
 
-- [ ] RED PostgreSQL: configuração de permissão compatível com regulamentos antigos, contexto integral/autorizado, sem fonte/ator do browser. Autoridade deriva pessoa/disputa/campeonato da origem/destino. Hash/versionamento de todos os vínculos relevantes.
-- [ ] Writer atômico exige motivo/confirmação; fecha origem ativa, cria vínculo novo e história/âncoras/recibo/Recentes. Origem encerrada sóúltima conhecida sem ativo. Checar camisa ativa, sexo/naipe, registro existente e permissão atual sob lock. Respeitar ordem atleta→campeonato.
-- [ ] Fechar desvio via save_roster_entry/importador: primeira inscrição legítima continua, novo período com histórico sóoperação autorizada. Preservar dados/história/publicações e fluxos C3/C4. Zero/upgrade, matriz TS×SQL, falha intermediária/replay/conflito/revogação, RLS/grants/sem service-role genérica.
-- [ ] Tipos/advisors/contratos reais com rollback no projeto novo depois dos focais; sóaplicar migration estável uma vez. Sem migração humana/limpeza/seed.
+- [x] RED PostgreSQL: configuração de permissão compatível com regulamentos antigos, contexto integral/autorizado, sem fonte/ator do browser. Autoridade deriva pessoa/disputa/campeonato da origem/destino. Hash/versionamento de todos os vínculos relevantes.
+- [x] Writer atômico exige motivo/confirmação; fecha origem ativa, cria vínculo novo e história/âncoras/recibo/Recentes. Origem encerrada sóúltima conhecida sem ativo. Checar camisa ativa, sexo/naipe, registro existente e permissão atual sob lock. Respeitar ordem atleta→campeonato.
+- [x] Fechar desvio via save_roster_entry/importador: primeira inscrição legítima continua, novo período com histórico sóoperação autorizada. Preservar dados/história/publicações e fluxos C3/C4. Zero/upgrade, matriz TS×SQL, falha intermediária/replay/conflito/revogação, RLS/grants/sem service-role genérica.
+- [x] Tipos/advisors/contratos reais com rollback no projeto novo depois dos focais; sóaplicar migration estável uma vez. Sem migração humana/limpeza/seed.
 
 ## T3 — Worker e experiência contextual
 

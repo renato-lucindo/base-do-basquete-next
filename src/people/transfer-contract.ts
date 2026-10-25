@@ -37,7 +37,15 @@ export const saveTransferSchema = z
     expectedContextFingerprint: fingerprint,
     newEntryId: uuid,
     jersey,
-    reason: z.string().trim().min(3).max(2000),
+    reason: z
+      .string()
+      .trim()
+      .min(3)
+      .max(2000)
+      .refine(
+        (v) => !/[\u0000\uD800-\uDFFF]/u.test(v),
+        "O motivo contém caracteres inválidos.",
+      ),
     acknowledgeImpact: z.boolean(),
   })
   .strict()
@@ -46,6 +54,26 @@ export const saveTransferSchema = z
     "Retorno exige vínculo novo.",
   );
 export type SaveTransfer = z.infer<typeof saveTransferSchema>;
+
+export const transferResultSchema = z
+  .object({
+    commandId: uuid,
+    disputeId: uuid,
+    personId: uuid,
+    sourceEntryId: uuid,
+    sourceVersion: positive,
+    newEntryId: uuid,
+    newEntryVersion: z.literal(1),
+    destinationRegistrationId: uuid,
+    effectiveAt: stamp,
+    kind: z.enum(["transfer", "return"]),
+  })
+  .strict()
+  .refine(
+    (r) => r.newEntryId !== r.sourceEntryId,
+    "Retorno exige vínculo novo.",
+  );
+export type TransferResult = z.infer<typeof transferResultSchema>;
 
 export const transferContextSchema = z
   .object({

@@ -175,7 +175,17 @@ export class SupabasePeople {
       };
       throw new HttpError(409, code, messages[code]);
     }
-    await response.body?.cancel().catch(() => undefined);
+    if (response.status === 400) {
+      const body = z
+        .object({ message: z.string() })
+        .safeParse(await providerJson(response));
+      if (body.success && body.data.message === "transfer_required")
+        throw new HttpError(
+          400,
+          "transfer_required",
+          "Este atleta já tem histórico na disputa. Use a operação de transferência ou retorno no elenco para abrir outro vínculo.",
+        );
+    } else await response.body?.cancel().catch(() => undefined);
     if (response.status === 401) throw invalidSession();
     if (response.status === 403) throw forbidden();
     if (response.status === 400)

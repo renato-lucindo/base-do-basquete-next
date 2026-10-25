@@ -1,3 +1,19 @@
+# Retomada — T2 banco concluído, T3 a iniciar — 25/10/2026 03:50 America/Sao_Paulo (UTC-03)
+
+Workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1; novo remoto https://github.com/renato-lucindo/base-do-basquete-next, branch **codex/transferencias**, base desta retomada/remoto **e823da51088812d9f8f9dacdd7664ed2a424431c**, WIP anterior ba40e75. PRdraft16 sobre15 sem reviews/checks novos, sem merge/produção. Fetch/status/serviços reconciliados; alterações desta execução são somente do agente, dados humanos preservados. Material T2 salvo no commit deste registro; SHA confirmado no log após commit/push. Nenhum repositório/serviço anterior consultado.
+
+**Concluído:** T2 writer atômico, história/recibo/FKs/RLS/grants e guarda geral de inserção inclusive importador; matriz TS×SQL/Unicode/capacidade/versões/permissão/sexo e ACK. Gate **PASS350unit/71arquivos,5transportes,13PG,15workerd,4PDFs/builds/tipos/fronteira/segredos480**. Log/hash e duas provas reais rollback em docs/VALIDACAO-TRANSFERENCIAS.md. Unicode corrigido antes da aplicação (Zod conta pontos de código); payload16KiB. Regressão C3 substitui antigo desvio por recusa explícita sem retirar primeira inscrição/edição legítimas. Sem repetir evidências O4/harness126 por sessão.
+
+**Banco:** Supabase somente link_6adaa8aab5688191b1e7ae1cddc55a82/projeto nizmasjddyrhmevvfviz/org base-do-basquete/Free. MigrationCLI20261025024231 aplicada uma vez e reconciliada **20261025064940_roster_transfers**, agora35migrations; NÃO editar/reaplicar. Tipos gerados com writer. Pós-rollback0transferências/elenco/publicationVersions/objetos,2inscrições/1Auth. SegurançaWARN conhecido senha vazada/Pro; performanceINFO anteriores registrados na validação. Nenhum DDL/credencial/processo em andamento após conclusão das verificações.
+
+**Preview:** continua O4source50f6f30/deployment9580952c-1f5c-47df-9941-a24f54354c91/versão5b36ede7-ac2e-4904-ad35-26c3e47bbdcc, Access sóresponsável/previewsOFF/cofre/namespace preservados. Sem deploy T2; UI/rota de transferência ainda não disponível. Bundles com exclusão rejeitada preservados/ignorados. Nenhuma credencial extraída/solicitada/exposta.
+
+**Próximo exato:** T3a testes RED de adapter de transferência: fonte/contexto e preview derivados no backend, comando/ACK correlacionados, erros seguros e16KiB; integrar SessionStore/rotas com authfresh antes do corpo e replay congelado. Depois editor de permissão/transferência contextual, browsers desktop/mobile320, gate estável/CI/preview privado/smokes novos. Plano2026-10-24-transferencias/decisão014. Fonte pública/agenda futura aguarda regra, não inferir autorização; responsável indisponível para testes manuais em24/10, não repetir pedidos pendentes. Etapas4/5 incompletas; revisão independente/corrida real/carga/WCAG completa não comprovadas.
+
+**Cota:** primeiro0%usado5h/0%semanal; última consulta20%usado5h/3%semanal, reset5h1792928009 e semanal1793514809. Sem compra/plano/reset manual. Continuidade nesta execução, automação existente será atualizada somente na próxima pausa por cota ou mudança necessária.
+
+---
+
 # Pausa por cota — transferências T2b2 WIP — 24/10/2026 23:48 America/Araguaina (UTC-03)
 
 **Objetivo e unidade:** nova Base do Basquete, etapa5, transação de transferência/retorno. Workspace Windows **C:/Users/12405304716/Documents/Codex/Base do Basquete-v1**; novo remoto **https://github.com/renato-lucindo/base-do-basquete-next**, branch **codex/transferencias**. Último código estável/remoto **5dfa258426b2c4d87ef26fb68c2a49d82ba8b688**, T2a a7afc27, T1 5f7b83a, P1 a9d0b8e. WIP desta pausa será salvo no commit deste registro; SHA material será confirmado abaixo após push. PRdraft16 sobre15, ambos anexados; sem merge/produção. Todas mudanças são do agente; nenhuma alteração/dado humano sobrescrito. Produto somente ZIPs preservados e feedback aceito; nunca consultar/clonar repo/serviços anteriores.

@@ -21,6 +21,8 @@ import {
 type Functions = Database["public"]["Functions"];
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 const messages = {
+  transfer_required:
+    "Este atleta já tem histórico na disputa. Use a operação de transferência ou retorno no elenco para abrir outro vínculo.",
   identity_confirmation_required:
     "Já existe pessoa com este nome. Escolha o cadastro ou confirme outra identidade.",
   version_conflict:

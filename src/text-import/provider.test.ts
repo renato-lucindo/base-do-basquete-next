@@ -61,6 +61,11 @@ describe("private text import adapter", () => {
         "birth_conflict",
       ],
       [
+        400,
+        { message: "transfer_required", details: "private SQL" },
+        "transfer_required",
+      ],
+      [
         409,
         { message: "identity_confirmation_required", details: "private SQL" },
         "identity_confirmation_required",

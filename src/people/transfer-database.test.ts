@@ -2,6 +2,7 @@ import { expect, it } from "vitest";
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { platform } from "../../tests/fixtures/database-platform";
+import { transferResultSchema } from "./transfer-contract";
 
 it.each(["zero", "upgrade"] as const)(
   "transfere e retorna atomicamente no %s sem reatribuir G4",
@@ -37,13 +38,24 @@ it.each(["zero", "upgrade"] as const)(
           )
         ).rows,
       ).toEqual(before);
-      const proof = await readFile("supabase/tests/transfers.sql", "utf8");
+      const proof =
+        (await readFile("supabase/tests/transfers.sql", "utf8")) +
+        (await readFile("supabase/tests/transfer_edges.sql", "utf8"));
       if (process.env.BDB_EXPORT_TRANSFER_PROOF === "1" && mode === "zero")
         await writeFile(
           ".preview-artifacts/transfers-proof.sql",
           seed + proof + "\nrollback;\n",
         );
-      await db.exec(proof + "\nrollback;");
+      await db.exec(proof);
+      const receipts = (
+        await db.query<{ result: unknown }>(
+          "select result from private.roster_transfers order by command_id",
+        )
+      ).rows;
+      expect(receipts.length).toBeGreaterThan(0);
+      for (const { result } of receipts)
+        expect(transferResultSchema.safeParse(result).success).toBe(true);
+      await db.exec("rollback;");
       expect(
         (await db.query("select count(*)::int as n from public.roster_entries"))
           .rows,

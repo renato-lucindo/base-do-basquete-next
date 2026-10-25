@@ -1,5 +1,19 @@
 # Transferências e retornos — evidências
 
+## T2 concluído — 25/10/2026 03:50 UTC-03
+
+Gate consolidado **PASS**:350unitários/71arquivos,5transportes,13cenários PostgreSQL,15workerd,prova4PDFs, builds/fronteira/tipos/lint/formato/segredos480. Log `.preview-artifacts/transfers-t2-gate.log`, SHA256 **269fab032a8cdd69c678105e1cd7752db36d2f7d3a1f611196af521a05a018ff**. Inclui matriz fechada TS×SQL, ACK mínimo real, zero/upgrade com G4 preservado, guardas de capacidade1999→2000/recusa2001, versões/contexto/permissão revogada/FKs/RLS e importador C4 real. Regressão C3 atualizada: depois de inativar, nova abertura da mesma pessoa exige transferência; primeira inscrição de outra pessoa continua funcionando. Não alterada migration aplicada para acomodar fixture.
+
+RED de ACK inexistente e erros genéricos nos dois adapters observado; GREEN focal11cenários/5arquivos antes do gate. Importação prova primeira inclusão e edição existentes, mas histórico inativo não contorna regra: falha `transfer_required` reverte inclusive alteração global aprovada, revisão e recibos. Mensagem específica nos adapters de pessoas/importador; interface de transferência ainda pendente. Fixture inicialmente nomeou recibo inexistente, corrigida para a tabela real text_review_commands. Guardas de naipe ativas/G4 foram mantidas; expectativas artificiais de mudança proibida corrigidas no teste.
+
+Matriz detectou divergência Unicode: Zod4.6.7 instalado usa pontos de código, não unidadesUTF16 como suposto no WIP anterior. SQL agora reutiliza occurrence_reason; motivo3–2000 pontos, NUL/substitutos isolados recusados no TS. Teto16KiB comporta motivos válidos com caracteres astrais/escapados. A afirmação UTF16 no registro WIP abaixo é histórica, substituída por esta correção antes da aplicação.
+
+MigrationCLI **20261025024231** validada e aplicada uma única vez pelo plugin, reconciliada/renomeada **20261025064940_roster_transfers.sql**, SHA256 **d283108c203e599b3ce891207c11306cfb1edb7ca5114ad1d1b7253cdbe7b079**. **35migrations** reconciliadas. Tipos gerados incluem somente mais uma assinatura pública transfer_roster_entry; tipos app/Worker novamente verificados após geração. Não editar/reaplicar esta migration.
+
+Duas provas reais Supabase **BEGIN/ROLLBACK PASS**: `.preview-artifacts/transfers-proof.sql` SHA256 **70413b49e124c9b1fe6e3491983ed45104b9c11c92188b810a558755da306527** e `.preview-artifacts/transfer-import-proof.sql` SHA256 **bdcfd90c1910a98786262708ee1f5e07d7d8b1a48911186c838c41f3151c4539**. Incluem lote sintético de fronteira e importador efetivo; não provam concorrência multiconexão nem carga real. Pós-rollback0transferências/elenco/publicationVersions/objetos,2inscrições/1Auth, dados humanos preservados. Segurança sóWARN conhecido senha vazada/Pro; performance10INFO de FKs em tabelas anteriores e45índices ainda sem uso, nenhuma FK nova de roster_transfers sem índice. Não remover índices por falta de tráfego sintético.
+
+Changelog Supabase de25/10 consultado/cacheado: grants explícitos/privado e mudançasPGminor conferidos, sem recurso novo/dependência/contratação. Documentação [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [grants](https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically), [PGminor](https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes). Preview continua O4, sem deploy; T3 Worker/UI pendente, não declarar transferência disponível. Sem revisão independente/corridaPGmulticonexão/carga/WCAG completa comprovadas. Evidências inalteradas não serão repetidas por sessão/documentação.
+
 ## T1 — contrato e planejador privados
 
 24/10/2026. Branch codex/transferencias, basea9d0b8e/PR15, plano/decisão014 em0a60917. Sem DDL, rotas, alteração de vínculos reais ou deploy. O leitor/escritor autoritativo e integração ainda não existem.
