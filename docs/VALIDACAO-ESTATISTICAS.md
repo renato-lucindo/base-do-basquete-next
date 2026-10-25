@@ -1,5 +1,11 @@
 # Estatísticas confirmadas — evidências
 
+## S2b — fonte fechada e consulta pura, 25/10/2026
+
+Fonte própria versionada com mínimo/fases explícitas e validação de toda a fonte antes do recorte. Três testes exercitam nove cruzamentos modo/escopo, null sóall, mínimo/versionamento e rejeição de jogo/revisão duplicada, contexto/privacidade mesmo fora do filtro. Sete testes novos de consulta exercitam allowlist/limites/URL, seleção vazia versus irrestrita, MIN preservada mas oculta empor30,30linhas/página20, líderes antes da página/empates por inscrição, comparação de todas inscrições fora de página/filtro, busca sem acento/apelido/equipe, ausência por último e exclusão de insuficientes em filtros/líderes. RED observado por módulos ausentes antes da implementação. **32testes/4arquivos estatísticos PASS**, statistics-s2b-final-focal.log SHA256 **e1684c8cc9a9b6842dd23245ee0e621009d5e299d21cebda83aa917f191987dc**. Tipos app/Worker/lint/formato focais PASS. Nenhuma fonte pública estatística persistida ou rota ainda; fase preenchida somente em fixtures de fonte congelada, nunca inferida de regulamento privado.
+
+Supabase real reconciliado:0jogos/publicações,1pessoa/2inscrições/1Auth. Listagem de migrations retornou timeout transitório; nenhum DDL/retry cego executado. Estrutura de published_games conferida antes da DDL nova. Changelog25/10 consultado, quebra TLS de12/10 não muda triggers/RLS; docs oficiais de triggers/RLS consultadas. Próximo SQL deve derivar fonte apenas de fatos já confirmados, atomicamente por resultado, conservar linhagem/histórico e testar do zero/upgrade/rollback. Preview7997a158 inalterado; sem CI/gate/deploy por bibliotecas puras.
+
 ## S2a — agregação pura, 25/10/2026
 
 Retomada reconciliou árvore limpa/remoto4383e18/PR18OPEN-MERGEABLE sem CI, cota real0%usado5h/28%semanal. Implementado aggregateConfirmedStatistics somente sobre fatos fechados confirmados, por pessoa+inscrição, com cobertura específica e pares métrica/segundos do mesmo jogo. Fontes/versões/contextos incompatíveis e duplicidades recusados. Totais/médias/por30 preservam fallback oficial separado de pontos avançados. Cestas oficiais2/3/LL disponíveis para súmula sem inventar tentativas; percentuais continuam dos arremessos avançados coerentes. Mantém catálogos históricos de nomes/camisas sem escolher a primeira inscrição e sem consultar cadastros live.

@@ -26,7 +26,8 @@ export const confirmedPlayerFactSchema = z
       publicGameSchema.shape.source,
       publicPdfGameSchema.shape.source,
     ]),
-    phase: z.null(),
+    // Normalization leaves this unknown. Only a confirmed statistics source supplies it.
+    phase: z.enum(["round_robin", "knockout"]).nullable(),
     person: publicPlayer.shape.person.extend({ id: uuid }),
     registration: registration.extend({
       registrationId: uuid,
