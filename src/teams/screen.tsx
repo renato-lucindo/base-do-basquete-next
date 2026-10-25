@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { TextImportWorkspace } from "../text-import/workspace";
+import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import {
   teamListingSchema,
   registrationListingSchema,
@@ -58,6 +59,8 @@ export function TeamsWorkspace({
   const [editor, setEditor] = useState<Edit | null>(null),
     [baseline, setBaseline] = useState("");
   const membersGuard = useRef<() => boolean>(() => true);
+  const withdrawalGuard = useRef<() => boolean>(() => true);
+  const [withdrawalLocked, setWithdrawalLocked] = useState(false);
   const [membersEpoch, setMembersEpoch] = useState(0);
   const [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -72,6 +75,7 @@ export function TeamsWorkspace({
     return (
       importGuard.current() &&
       membersGuard.current() &&
+      withdrawalGuard.current() &&
       (!(dirty || uncertain || busy) ||
         (!busy &&
           window.confirm(
@@ -366,11 +370,11 @@ export function TeamsWorkspace({
         <h3 ref={heading} tabIndex={-1}>
           Equipes e elencos
         </h3>
-        <button onClick={add} disabled={busy}>
+        <button onClick={add} disabled={busy || withdrawalLocked}>
           Adicionar inscrição
         </button>
         <button
-          disabled={busy}
+          disabled={busy || withdrawalLocked}
           onClick={() => {
             if (!mayLeave()) return;
             setEditor(null);
@@ -582,7 +586,7 @@ export function TeamsWorkspace({
           value={query}
           maxLength={120}
           onChange={(e) => {
-            if (!membersGuard.current()) return;
+            if (!membersGuard.current() || !withdrawalGuard.current()) return;
             setQuery(e.target.value);
             setOffset(0);
             setExpanded("");
@@ -601,7 +605,7 @@ export function TeamsWorkspace({
                   aria-controls={`registration-${r.id}`}
                   aria-label={`${expanded === r.id ? "Recolher" : "Expandir"} ${r.name}`}
                   onClick={() => {
-                    if (membersGuard.current())
+                    if (membersGuard.current() && withdrawalGuard.current())
                       setExpanded((v) => (v === r.id ? "" : r.id));
                   }}
                 >
@@ -616,7 +620,7 @@ export function TeamsWorkspace({
                   <div className="competition-actions">
                     <button
                       className="secondary"
-                      disabled={busy}
+                      disabled={busy || withdrawalLocked}
                       onClick={() => {
                         if (!mayLeave()) return;
                         setFinding(false);
@@ -640,7 +644,7 @@ export function TeamsWorkspace({
                     </button>
                     <button
                       className="secondary"
-                      disabled={busy}
+                      disabled={busy || withdrawalLocked}
                       onClick={() => {
                         if (!mayLeave()) return;
                         setFinding(false);
@@ -663,19 +667,36 @@ export function TeamsWorkspace({
                     </button>
                   </div>
                   {expanded === r.id && (
-                    <MembersWorkspace
-                      key={`${r.id}:${membersEpoch}`}
-                      registration={r}
-                      gender={gender}
-                      enabled={enabled}
-                      canEdit={!editor && !finding && !busy}
-                      guard={membersGuard}
-                      onSessionLost={onSessionLost}
-                      onSaved={() => {
-                        setRefresh((v) => v + 1);
-                        onSaved();
-                      }}
-                    />
+                    <>
+                      <MembersWorkspace
+                        key={`${r.id}:${membersEpoch}`}
+                        registration={r}
+                        gender={gender}
+                        enabled={enabled}
+                        canEdit={
+                          !editor && !finding && !busy && !withdrawalLocked
+                        }
+                        guard={membersGuard}
+                        onSessionLost={onSessionLost}
+                        onSaved={() => {
+                          setRefresh((v) => v + 1);
+                          onSaved();
+                        }}
+                      />
+                      <RegistrationWithdrawalPanel
+                        key={`withdrawal:${r.id}:${membersEpoch}`}
+                        registration={r}
+                        enabled={enabled && !editor && !finding && !busy}
+                        guard={withdrawalGuard}
+                        beforeOpen={() => membersGuard.current()}
+                        onLockedChange={setWithdrawalLocked}
+                        onSessionLost={onSessionLost}
+                        onSaved={() => {
+                          setRefresh((v) => v + 1);
+                          onSaved();
+                        }}
+                      />
+                    </>
                   )}
                 </div>
               </li>
@@ -692,7 +713,7 @@ export function TeamsWorkspace({
             offset={offset}
             hasMore={list.hasMore}
             setOffset={(n) => {
-              if (membersGuard.current()) {
+              if (membersGuard.current() && withdrawalGuard.current()) {
                 setExpanded("");
                 setOffset(n);
               }

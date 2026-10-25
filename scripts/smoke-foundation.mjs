@@ -109,6 +109,12 @@ try {
     `/api/games/${randomUUID()}/publication`,
     `/api/games/${randomUUID()}/publication/versions/1`,
     `/api/games/${randomUUID()}/publication/preparation/${randomUUID()}`,
+    `/api/regulations/${randomUUID()}`,
+    `/api/regulations/${randomUUID()}/versions/1`,
+    `/api/games/${randomUUID()}/occurrence`,
+    `/api/games/${randomUUID()}/occurrence/versions/1`,
+    `/api/registrations/${randomUUID()}/withdrawal`,
+    `/api/registrations/${randomUUID()}/withdrawal/versions/1`,
     `/api/pdf-sources?disputeId=${randomUUID()}`,
     `/api/pdf-sources/${randomUUID()}`,
     `/api/pdf-sources/${randomUUID()}/review`,
@@ -125,6 +131,28 @@ try {
   ]) {
     stage = `private application route ${path}`;
     const denied = await fetch(`${origin}${path}`, { headers });
+    status = denied.status;
+    assert.equal(status, 401);
+    await denied.arrayBuffer();
+  }
+  for (const path of [
+    `/api/regulations/${randomUUID()}`,
+    `/api/regulations/${randomUUID()}/preview`,
+    `/api/games/${randomUUID()}/occurrence`,
+    `/api/games/${randomUUID()}/occurrence/preview`,
+    `/api/registrations/${randomUUID()}/withdrawal`,
+    `/api/registrations/${randomUUID()}/withdrawal/preview`,
+  ]) {
+    stage = `private decision command ${path}`;
+    const denied = await fetch(`${origin}${path}`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        Origin: origin,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    });
     status = denied.status;
     assert.equal(status, 401);
     await denied.arrayBuffer();
@@ -226,6 +254,7 @@ try {
       files: Object.keys(manifest.manifest).length,
       browsers: 2,
       realAuthInvalidLogin: true,
+      privateDecisionCommands: 6,
       publicProjectionRead: true,
       ownerLoginPending: true,
     }),
