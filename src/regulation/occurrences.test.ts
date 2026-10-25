@@ -54,7 +54,11 @@ const first = (s: OccurrencesInput) => previewOccurrences(s).games[0];
 it("requires an explicit WO rule and keeps the administrative award separate from a played fact", () => {
   const s = base();
   s.occurrences = [occurrence({ kind: "wo", winnerRegistrationId: B })];
-  expect(() => previewOccurrences(s)).toThrow();
+  expect(first(s)).toMatchObject({
+    state: "conflict",
+    needs: "occurrence_review",
+    outcome: null,
+  });
   s.rules.wo = wo;
   const result = first(s);
   expect(result).toMatchObject({
@@ -227,12 +231,12 @@ it("does not depend on withdrawal ordering when one prior-results policy exclude
     previewOccurrences({ ...s, withdrawals: [...s.withdrawals].reverse() }),
   ).toEqual(result);
 });
-it("rejects stale game/publication versions, foreign winners, missing targets and repeated current decisions", () => {
+it("rejects future game/publication versions, foreign winners, missing targets and repeated current decisions", () => {
   const s = base();
   s.rules.wo = wo;
   const command = occurrence({ kind: "wo", winnerRegistrationId: B });
   for (const value of [
-    { ...s, occurrences: [{ ...command, gameVersion: 2 }] },
+    { ...s, occurrences: [{ ...command, gameVersion: 4 }] },
     { ...s, occurrences: [{ ...command, publicationVersion: 1 }] },
     { ...s, occurrences: [{ ...command, gameId: id(999) }] },
     { ...s, occurrences: [{ ...command, reason: " " }] },
@@ -323,4 +327,51 @@ it("preserves a normal published fact and exposes versions without mutating the 
     withdrawalVersions: [],
   });
   expect(s).toEqual(before);
+});
+
+it("turns a source revision after a decision into review conflict without applying the obsolete award", () => {
+  const s = base();
+  s.rules.wo = wo;
+  s.publishedGames = [played()];
+  s.occurrences = [
+    {
+      ...occurrence({ kind: "wo", winnerRegistrationId: B }),
+      publicationVersion: 2,
+      gameVersion: 2,
+    },
+  ];
+  expect(first(s)).toMatchObject({
+    state: "conflict",
+    needs: "occurrence_review",
+    outcome: null,
+    publication: played(),
+  });
+  s.occurrences[0].gameVersion = 3;
+  s.occurrences[0].publicationVersion = 1;
+  expect(first(s)).toMatchObject({
+    state: "conflict",
+    needs: "occurrence_review",
+    outcome: null,
+  });
+});
+it("keeps review pending when a later regulation removes a WO rule", () => {
+  const s = base();
+  s.occurrences = [occurrence({ kind: "wo", winnerRegistrationId: B })];
+  expect(first(s)).toMatchObject({
+    state: "conflict",
+    needs: "occurrence_review",
+    outcome: null,
+  });
+});
+it("preserves the original winner identity after opponents change and blocks its obsolete effect", () => {
+  const s = base();
+  s.rules.wo = wo;
+  s.games[0].version = 4;
+  s.games[0].awayRegistrationId = C;
+  s.occurrences = [occurrence({ kind: "wo", winnerRegistrationId: B })];
+  expect(first(s)).toMatchObject({
+    state: "conflict",
+    outcome: null,
+    occurrence: { effect: { winnerRegistrationId: B } },
+  });
 });

@@ -288,3 +288,21 @@ it("rejects missing/reused/foreign assignments, duplicate slots and cyclic refer
     expect(() => previewOrganizedCompetition(s)).toThrow();
   }
 });
+
+it("blocks a corrected occurrence and dependent final instead of silently counting the previous WO", () => {
+  const s = base();
+  s.context.games.find((g) => g.id === id(104))!.version = 2;
+  const p = previewOrganizedCompetition(s);
+  expect(p.series.find((n) => n.id === id(20))).toMatchObject({
+    status: "conflict",
+    result: null,
+  });
+  expect(p.series.find((n) => n.id === id(22))).toMatchObject({
+    status: "pending",
+    home: { status: "pending", registrationId: null },
+  });
+  expect(p.games.find((g) => g.gameId === id(104))).toMatchObject({
+    state: "conflict",
+    outcome: null,
+  });
+});

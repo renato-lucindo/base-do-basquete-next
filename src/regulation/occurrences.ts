@@ -142,14 +142,17 @@ export const occurrencesInputSchema = z
         e = o.effect;
       if (
         !game ||
-        o.gameVersion !== game.version ||
-        o.publicationVersion !==
+        o.gameVersion > game.version ||
+        o.publicationVersion >
           (publications.get(o.gameId)?.publicationVersion ?? 0)
       ) {
         issue();
         continue;
       }
-      if (e.kind === "wo" && !s.rules.wo) issue();
+      const stale =
+        o.gameVersion !== game.version ||
+        o.publicationVersion !==
+          (publications.get(o.gameId)?.publicationVersion ?? 0);
       const award =
         e.kind === "wo"
           ? e
@@ -158,9 +161,11 @@ export const occurrencesInputSchema = z
             : null;
       if (
         award &&
-        ![game.homeRegistrationId, game.awayRegistrationId].includes(
-          award.winnerRegistrationId,
-        )
+        (!registrations.has(award.winnerRegistrationId) ||
+          (!stale &&
+            ![game.homeRegistrationId, game.awayRegistrationId].includes(
+              award.winnerRegistrationId,
+            )))
       )
         issue();
       if (
@@ -172,7 +177,7 @@ export const occurrencesInputSchema = z
           homeWon = e.decision.winnerRegistrationId === game.homeRegistrationId;
         if (
           score.homePoints === score.awayPoints ||
-          homeWon !== score.homePoints > score.awayPoints
+          (!stale && homeWon !== score.homePoints > score.awayPoints)
         )
           issue();
       }
@@ -225,6 +230,7 @@ type PreviewGame = {
     | "interrupted"
     | "withdrawal_decision"
     | "withdrawal_review"
+    | "occurrence_review"
     | null;
   publication: CompetitiveFact | null;
   occurrence: GameOccurrence | null;
@@ -264,6 +270,20 @@ export function previewOccurrences(input: unknown) {
         withdrawals: affected.map((w) => w.record),
         outcome: publication ? { kind: "played", publication } : null,
       };
+      // Reading a prior decision is different from authorizing a new one. Keep the
+      // original source/identity visible but never apply an obsolete competitive effect.
+      if (
+        occurrence &&
+        (occurrence.gameVersion !== g.version ||
+          occurrence.publicationVersion !==
+            (publication?.publicationVersion ?? 0) ||
+          (occurrence.effect.kind === "wo" && !s.rules.wo))
+      ) {
+        item.state = "conflict";
+        item.needs = "occurrence_review";
+        item.outcome = null;
+        return item;
+      }
       if (occurrence) {
         const e = occurrence.effect;
         if (e.kind === "postponed" || e.kind === "interrupted") {
