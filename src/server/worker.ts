@@ -8,6 +8,7 @@ import { teamsRoute } from "../teams/routes";
 import { gamesRoute } from "../games/routes";
 import { pdfSourcesRoute } from "../boxscore/routes";
 import { peopleRoute } from "../people/routes";
+import { transferRoute } from "../people/transfer-routes";
 import { textImportRoute } from "../text-import/routes";
 import {
   cookieHeader,
@@ -67,6 +68,8 @@ export default {
         url.pathname.startsWith("/api/text-import/")
       )
         response = await textImportRoute(request, env, url);
+      else if (/^\/api\/roster\/[^/]+\/transfer(?:\/|$)/u.test(url.pathname))
+        response = await transferRoute(request, env, url);
       else if (
         ["/api/people", "/api/roster", "/api/staff"].some(
           (p) => url.pathname === p || url.pathname.startsWith(`${p}/`),

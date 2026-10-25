@@ -4,6 +4,8 @@ import { readFile } from "node:fs/promises";
 import { Miniflare, Response, convertV4MiniflareOptions } from "miniflare";
 import { regulationFixture, regulationId } from "./fixtures/regulation.ts";
 import { decisionBackend } from "./fixtures/decisions.mjs";
+import { transferBackend } from "./fixtures/transfer-backend.mjs";
+import { transferFixture, transferId } from "./fixtures/transfers.ts";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -18,6 +20,7 @@ async function fixture(options = {}) {
   const regulation = regulationFixture(),
     regulationReceipts = new Map();
   const decisionResponse = decisionBackend(regulation, options);
+  const transferResponse = transferBackend(options);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -51,6 +54,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (options.transfers) {
+          const response = await transferResponse(request);
+          if (response) return response;
+        }
         if (options.decisions) {
           const response = await decisionResponse(request);
           if (response) return response;
@@ -74,7 +81,7 @@ async function fixture(options = {}) {
         if (url.pathname === "/auth/v1/user")
           return Response.json({ id, is_anonymous: false });
         if (url.pathname === "/rest/v1/admin_access") {
-          if (options.decisions)
+          if (options.decisions || options.transfers)
             options.authorizationReads = (options.authorizationReads ?? 0) + 1;
           return Response.json(
             options.denied ||
@@ -1883,6 +1890,118 @@ test("competitive decision routes preserve authorization, bounded bodies, previe
       ).length,
       sourceCalls,
     );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("transfer routes authorize before body, derive previews and recover frozen commands after lost ACK", async () => {
+  const options = { transfers: true, loseTransferAck: true },
+    f = await fixture(options),
+    { command } = transferFixture(),
+    path = `/api/roster/${command.sourceEntryId}/transfer`,
+    query = `?destinationRegistrationId=${command.destinationRegistrationId}`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + path + query)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (suffix = "", method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + suffix, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal((await send(query)).status, 200);
+    assert.equal(
+      (
+        await send(
+          query +
+            "&destinationRegistrationId=" +
+            command.destinationRegistrationId,
+        )
+      ).status,
+      400,
+    );
+    const p = await send("/preview", "POST", command);
+    assert.equal(p.status, 200);
+    assert.equal((await p.json()).ready, true);
+    assert.equal(options.transferCommits, undefined);
+    for (const body of [
+      { ...command, sourceEntryId: transferId(999) },
+      { ...command, personId: transferId(999) },
+    ])
+      assert.equal((await send("/preview", "POST", body)).status, 400);
+    assert.equal(
+      (await send("/preview", "POST", command, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    assert.equal(
+      (
+        await send("/preview", "POST", command, {
+          "content-type": "text/plain",
+        })
+      ).status,
+      415,
+    );
+    assert.equal((await send("", "POST", command)).status, 400);
+    const frozen = { ...command, acknowledgeImpact: true };
+    assert.equal((await send("", "POST", frozen)).status, 503);
+    const ack = await send("", "POST", frozen);
+    assert.equal(ack.status, 200);
+    assert.equal((await ack.json()).newEntryId, command.newEntryId);
+    assert.equal(options.transferCommits, 1);
+    const stale = await send("", "POST", {
+      ...frozen,
+      commandId: transferId(500),
+      newEntryId: transferId(501),
+    });
+    assert.equal(stale.status, 409);
+    assert.ok(!(await stale.text()).includes("private SQL"));
+    const stream = () =>
+      new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array(16385));
+          controller.close();
+        },
+      });
+    const oversized = () =>
+      f.mf.dispatchFetch(origin + path, {
+        method: "POST",
+        headers: { cookie, origin, "content-type": "application/json" },
+        body: stream(),
+        duplex: "half",
+      });
+    assert.equal((await oversized()).status, 413);
+    const calls = () =>
+      f.calls.filter((p) =>
+        /get_transfer_context|transfer_roster_entry/.test(p),
+      ).length;
+    const before = calls();
+    options.denyAuthorizationAt = options.authorizationReads + 2;
+    assert.equal((await send("", "POST", frozen)).status, 403);
+    assert.equal(calls(), before);
+    delete options.denyAuthorizationAt;
+    const freshCookie = (await f.login()).headers
+      .get("set-cookie")
+      .split(";", 1)[0];
+    options.denied = true;
+    const revoked = await f.mf.dispatchFetch(origin + path, {
+      method: "POST",
+      headers: {
+        cookie: freshCookie,
+        origin,
+        "content-type": "application/json",
+      },
+      body: stream(),
+      duplex: "half",
+    });
+    assert.equal(revoked.status, 403);
+    assert.equal(calls(), before);
   } finally {
     await f.mf.dispose();
   }

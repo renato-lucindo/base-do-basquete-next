@@ -20,6 +20,11 @@ import {
 import type { PublishSheet } from "../publication/contract";
 import type { PublishPdf } from "../publication/pdf-contract";
 import { SupabasePeople } from "../people/provider";
+import { SupabaseTransfers } from "../people/transfer-provider";
+import {
+  saveTransferSchema,
+  type SaveTransfer,
+} from "../people/transfer-contract";
 import { SupabaseTextImport } from "../text-import/provider";
 import {
   saveTextReviewSchema,
@@ -84,9 +89,14 @@ export class SessionStore extends DurableObject<Env> {
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
   private readonly people: SupabasePeople;
+  private readonly transfers: SupabaseTransfers;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.transfers = new SupabaseTransfers({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.decisions = new SupabaseDecisions({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -355,6 +365,31 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.regulations.getView(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  getTransferContext(sourceEntryId: string, destinationRegistrationId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.transfers.getContext(
+          accessToken,
+          sourceEntryId,
+          destinationRegistrationId,
+        ),
+      ),
+    );
+  }
+  previewTransfer(command: SaveTransfer) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.transfers.preview(accessToken, saveTransferSchema.parse(command)),
+      ),
+    );
+  }
+  saveTransfer(command: SaveTransfer) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.transfers.save(accessToken, saveTransferSchema.parse(command)),
       ),
     );
   }

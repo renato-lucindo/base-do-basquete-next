@@ -31,6 +31,7 @@
     "src/regulation/decision-routes.ts",
     "src/boxscore/routes.ts",
     "src/people/routes.ts",
+    "src/people/transfer-routes.ts",
     "src/text-import/routes.ts"
   ]
 }

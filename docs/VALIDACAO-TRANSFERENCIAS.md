@@ -16,6 +16,14 @@ Changelog Supabase de25/10 consultado/cacheado: grants explícitos/privado e mud
 
 ## T1 — contrato e planejador privados
 
+### T3a — adapter e transporte locais
+
+RED do adapter ausente e da rota retornando405 observado. Prévia usa contexto novo do RPC privado, recusa fonte/pessoa/destino/contexto adulterados e calcula dentro da operação autorizada no DO; comando não transporta contexto/ator. GET contextual e POST/preview em `/api/roster/:id/transfer`, origem/limite16KiB/authfresh antes do corpo e novamente no DO. ACK correlaciona comando/disputa/origem/destino/novoID/versão; replay chama somente writer, preservando recuperação do recibo mesmo após mudanças posteriores de regra/contexto.
+
+**25focais TS/3arquivos PASS**, incluindo4novos cenários de adapter; `.preview-artifacts/transfers-t3-provider-final.log` SHA256 **623ef0fa44b2807cc638d18e7c7b687f8f22521cd18374fc8bdda0692e6ae99b**. BuildWorker/types e lint focal PASS. **4workerd composição PASS** (novo transporte e regressões pessoas/importador/decisões), `.preview-artifacts/transfers-t3-transport.log` SHA256 **1e334a7f9834e064d926b0d152c95462bcc0a38b2898580e462f608b6831f6e3**. Inclui ACK perdido/replay único,409, origem/MIME/campos extras/correlação/16KiB e revogação antes/durante o corpo. Outbound controlado não é prova SQL; esta já consta no T2 real.
+
+Nova fixture foi inicialmente nomeada transfers.mjs, sombreando transfers.ts em imports sem extensão do Vitest; composição revelou25falhas, causa corrigida renomeando para transfer-backend.mjs e composição verde. Nenhuma mudança no algoritmo/banco para acomodar a fixture. Sem gate novo/deploy; editor de permissão e operação no elenco ainda pendentes, evidências T2 imutáveis reutilizadas.
+
 24/10/2026. Branch codex/transferencias, basea9d0b8e/PR15, plano/decisão014 em0a60917. Sem DDL, rotas, alteração de vínculos reais ou deploy. O leitor/escritor autoritativo e integração ainda não existem.
 
 RED observado: src/people/transfer.test.ts falhou por módulo transfer ausente antes da implementação. GREEN: **19novos cenários e23focais em4arquivos PASS**, composição dos contratos de pessoa/elenco/comissão. Log ignorado .preview-artifacts/transfers-t1-focal.log SHA256 **db67cd1101fcf762a6629997c1ddcab90042673618585f3030d5069e460a1251**. Tipos app/Worker, lint/formato focais PASS antes dos dois últimos cenários; repetidos sobre o estado final antes do commit.
