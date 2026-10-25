@@ -1,5 +1,15 @@
 # Colocações e honrarias — evidências
 
+## A3d — CI e preview protegido publicados, 25/10/2026
+
+Fonte remota **7997a15849e3c6660cc69b762b0d16dc7b7b0fc5**, CI **40194877229/job121173460326 SUCCESS**: gate399unit/81arquivos e **268browsersLinux PASS**, incluindo22novos. Log local achievements-ci-40194877229.log SHA256 **9832e31004dfefdcd81a9d3d7ba7b263578478bcdb2a09051450f8ce56064d42**. Nenhum merge/produção. Manifesto regenerado de árvore limpa nessa fonte; código/bundles correspondem ao gate e à CI, sem novo gate por documentação.
+
+Cloudflare/Worker existentes atualizados pelo plugin: deployment **06fef618-6087-4b74-9273-f2fa00b5d7b4**, versão **91cda000-b87a-47a7-9248-d2da6ac1b317**,100%, em https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/. Namespace **0411ac931ca54d289d270606c7e87ef7**, limiter **862073195184**, cofre e previewsOFF preservados. A versão anterior foi conferida antes do upload; nenhum Worker alheio alterado.
+
+Smoke real **PASS**:7arquivos/hashes/X-Bdb-Source,36GETs privados/11POSTs recusados401, health200/session401, Authinválido real401 sem cookie da aplicação, backend404, projeções de jogo/premiação inexistentes404 sem login interno e2browsers desktop/mobile sem erros. Credencial de serviço efêmera criada/criptografadaRSA dentro do conector, entregue como ciphertext a processoTTY com chave privada em memória; nenhum segredo em chat/arquivo/log. Token **d16794d3-084e-4495-ab3e-afac773354d8** e política **3effcd19-c92f-4603-a10a-321b8375b03d** revogados imediatamente. OwnerOnly/previewsOFF/cofre/namespace reconferidos; anônimo302 em raiz/APIprivada/APIpública ao final. App/política permanente do responsável preservados. Evidência sanitizada em .preview-artifacts/achievements-remote-smoke.json.
+
+Pós-smoke Supabase:1pessoa/2inscrições/1Auth/1adminativo,0rascunhos/publicações de premiação/jogos/elenco/objetos. Nenhum dado humano confirmado como premiação. Acesso administrativo real e avaliação de uso das premiações ainda não exercitados pelo responsável; não confundir smoke sem sessão interna ou testes de outbound com aceite humano. Pedido manual adiado respeitado, sem nova cobrança. G4/regulamento/decisões/transferências/pilotoStorageHTTP real continuam sem aceite observado; etapas4/5 incompletas.
+
 ## A3c — interface estável; CI/preview pendentes, 25/10/2026
 
 Fluxo dentro de Regulamento: fonte de grupo/final/bronze explícita, sugestão backend, revisão de colocações compartilhadas e honrarias com busca contextual20/20, salvar privado, conferir/confirmar ou revisar com motivo, retomar após recarga e histórico20/20. Fonte duplicada final/bronze e honraria sem destinatário recusadas; nenhuma posição/MVP inferida. Uma edição ativa por vez, guardas compostas e troca de áreas preservando campos; motivo ainda não enviado também protegido. Foco passa da sugestão à primeira posição e da nova honraria ao título; erro e versão histórica recebem foco. Comandos congelados atravessam resposta perdida e reautenticação; ACK conhecido com GET indisponível repete somente GET.

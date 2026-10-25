@@ -41,5 +41,7 @@ A2c concluída: confirmação do rascunho corrente com fonte fresca, revisão co
 
 - [x] Adapter/SessionStore/rotas com authfresh antes do corpo e no DO, limites/mesma origem, ACK e correlações. Repetir comando congelado na incerteza, somenteGET depois de ACK conhecido. Nenhum derivado aceito do browser.
 - [x] Administração dentro de Regulamento/contexto da disputa: escolher fonte da sugestão, revisar posições/honrarias, selecionar atletas por identidade e contexto, guardar rascunho, confirmar/revisar com motivo e mostrar impacto/pendências. Manter teclado/foco/guardas/320px e histórico.
-- [ ] Focais desktop/mobile e composição, gate único estável, CI e preview protegido com smokes novos/revogação. Evidência remota/técnica não substitui aceite humano, carga/concorrência real ou auditoriaWCAG completa.
-- [ ] PRdraft empilhado e checkpoint exato. Depois retomar exposição pública/perfis/estatísticas conforme pacote e pendências; não declarar etapas4/5 completas antecipadamente.
+- [x] Focais desktop/mobile e composição, gate único estável, CI e preview protegido com smokes novos/revogação. Evidência remota/técnica não substitui aceite humano, carga/concorrência real ou auditoriaWCAG completa.
+- [x] PRdraft empilhado e checkpoint exato. Depois retomar exposição pública/perfis/estatísticas conforme pacote e pendências; não declarar etapas4/5 completas antecipadamente.
+
+Entrega técnica publicada da fonte7997a158, CI40194877229 SUCCESS399unit/268browsersLinux e smokes novos/revogação PASS. Nenhum prêmio humano publicado, nenhuma integração na principal/produção. Avaliação humana pendente sem nova solicitação. Próxima unidade independente: estatísticas sobre fatos confirmados, adaptando os módulos portáveis e preservando cobertura/amostra/participação; não liberar agenda futura/inscritos sem a definição pendente.
