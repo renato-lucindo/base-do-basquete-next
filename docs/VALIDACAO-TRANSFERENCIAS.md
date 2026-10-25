@@ -1,5 +1,15 @@
 # Transferências e retornos — evidências
 
+## T3 publicado no preview protegido — 25/10/2026 04:24 UTC-03
+
+Fonte **4b2f4d78b7b60e6777af2649402ae8e8757baaea**, CI **40171975751/job121104535245 SUCCESS**, gate354unit/72arquivos e **246browsersLinux PASS**; logs conferidos. Sem repetir gate por documentação posterior. WorkerJS SHA256 **2dc20260f230b6130e6206bc02f6cdd6c81d45b7824fb09cf94fbec45e0bbd96**, sete arquivos no manifesto de árvore limpa.
+
+PluginCloudflare atualizou somente base-do-basquete-next-preview: deployment **bfd824e4-ef23-43b7-aa54-57c139535c87**, versão **17882559-0e1d-4118-9584-25669414de7b**,100%. Access proprietário único conferido antes do upload e após revogação; previewsOFF, namespace0411ac931ca54d289d270606c7e87ef7/rate862073195184/nomes secretos preservados. Nenhum segredo existente extraído.
+
+Smoke real **PASS**: sete arquivos/hashes/X-Bdb-Source,32GETs privados401 incluindo contexto de transferência, seisPOSTs de decisões e doisPOSTs de transferência401, health/sessão/Authinválido real sem cookie aplicativo, backend404/projeção pública de jogo ausente404 e doisbrowsers. Anônimo302→Access em três caminhos antes/depois. Credencial efêmera criada pelo plugin, entregue somente cifradaRSA ao helperTTY com chave privada em memória; token **cf25133b-e717-4ecb-bd41-87f453575245** e política **ed1d13d9-f6c7-4b01-9d73-453741215a10** revogados imediatamente, sucesso confirmado. Nenhuma credencial/processo/smoke/DDL em andamento.
+
+Operação disponível no preview para avaliação futura; não solicitar novo teste manual agora. Não há aceite humano atribuído, uploadStorageHTTP real autenticado ou exposição de agenda/classificação pública nova. Etapas4/5 ainda incompletas. Próxima unidade independente: colocações/honrarias, ADR015/plano2026-10-25 na branch codex/conquistas-honrarias, planejamento remoto a36dbd3, sem implementação/DDL nessa branch ainda.
+
 ## T3 vertical estável — 25/10/2026
 
 Operação contextual no elenco, com destino da mesma disputa, camisa0/00/não definida, motivo, prévia backend e confirmação. Transferência encerra/abre; retorno cria período novo. Histórico integral paginado de20em20, com inscrições/vigência no horário de Brasília. Campo opcional do Regulamento começa “Não definido”; permitir/proibir só tem efeito após conferir/salvar a regra. Sem ampliar exposição pública.

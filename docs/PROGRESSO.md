@@ -1,3 +1,13 @@
+# Transferências publicadas; próxima unidade colocações/honrarias — 25/10/2026 04:24 America/Sao_Paulo (UTC-03)
+
+**Estado atual:** branch codex/transferencias, material remoto **4b2f4d78b7b60e6777af2649402ae8e8757baaea**. CI **40171975751/job121104535245 SUCCESS354unit/72arquivos e246browsersLinux**. Preview protegido atualizado para essa fonte: deployment **bfd824e4-ef23-43b7-aa54-57c139535c87**, versão **17882559-0e1d-4118-9584-25669414de7b**,100%, mesmo endereço/conta/Worker. Smoke seteassets/hash/Xsource,32GETs privados/seisPOSTs decisões/doisPOSTs transferência negados401, Authinválido real, projeção pública inexistente404 e doisbrowsers PASS. Anônimo302→Access antes/depois; proprietário único, previewsOFF/namespace/rate/cofre preservados. Token/política efêmeros revogados, IDs e evidências em VALIDACAO-TRANSFERENCIAS.md. Nenhum processo/credencial/DDL/deploy em andamento. Dados humanos preservados.
+
+**Próximo exato:** sincronizar este checkpoint documental na branch **codex/conquistas-honrarias**, cujo plano/ADR015 foram salvos/pushed em **a36dbd3** sobre4b2f4d7 enquanto a CI executava. A1: examinar contratos reais de projeção e começar RED de sugestão de colocações por grupo explicitamente escolhido, bloqueando empate, jogo pendente e fonte fora do contexto; depois final/bronze explícitos e contrato privado de decisão/honraria. Sem DDL/rota pública/gate integral por biblioteca pura. Plano docs/superpowers/plans/2026-10-25-conquistas-honrarias.md. Premiações ainda não implementadas. R3eP2/P3 e testes manuais adiados permanecem pendentes, sem nova pergunta; não expor agenda/inscritos por inferência. Sem merge de PR/principal/produção.
+
+Última cota56%usado5h/9%semanal; consultar entre unidades. Reutilizar gate/smokes imutáveis desta fonte, não repetir por checkpoint/sessão. Documentação histórica abaixo descreve instantes anteriores e não substitui esta abertura.
+
+---
+
 # Transferências T3 estáveis — CI/preview pendentes — 25/10/2026 America/Sao_Paulo (UTC-03)
 
 **Unidade atual:** nova Base do Basquete, transferências/retornos conforme regulamento. Workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, novo remoto https://github.com/renato-lucindo/base-do-basquete-next, branch **codex/transferencias**, T2 remoto **a9ebec45a69572567dc2263f0c30b5f546345960**, API remoto **1f97303**; UI estável será salva no commit deste checkpoint. PRdraft16 sobre15, sem merge/produção. Todas mudanças desta retomada são próprias; dados/mudanças humanos preservados, nenhum repo/serviço anterior consultado.
