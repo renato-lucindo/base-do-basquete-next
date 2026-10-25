@@ -21,6 +21,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
 const definitionShape = z
   .object({
     registrationIds: z.array(uuid).max(1000),
+    transfers: z.enum(["allowed", "forbidden"]).nullable().optional(),
     occurrenceRules: occurrenceRulesSchema,
     groupPhases: z
       .array(
