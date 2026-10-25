@@ -486,6 +486,24 @@ export type Database = {
           },
         ];
       };
+      published_statistics: {
+        Row: {
+          dispute_id: string;
+          snapshot: Json;
+          version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          snapshot: Json;
+          version: number;
+        };
+        Update: {
+          dispute_id?: string;
+          snapshot?: Json;
+          version?: number;
+        };
+        Relationships: [];
+      };
       registrations: {
         Row: {
           dispute_id: string;
@@ -748,6 +766,10 @@ export type Database = {
         Returns: Json;
       };
       get_public_game: { Args: { p_id: string }; Returns: Json };
+      get_public_statistics_source: {
+        Args: { p_dispute_id: string };
+        Returns: Json;
+      };
       get_registration: { Args: { p_id: string }; Returns: Json };
       get_registration_withdrawal_state: {
         Args: { p_offset?: number; p_registration_id: string };

@@ -1,0 +1,54 @@
+-- Requires publication.sql in the same transaction (its final rollback omitted).
+reset role;
+create temporary table statistics_before as select public.get_public_statistics_source(pg_temp.pu_id(3)) as snapshot;
+select pg_temp.pu_assert((select snapshot is not null and snapshot->'minimumSeconds'='600' and jsonb_array_length(snapshot->'games')=2 from statistics_before),'current confirmed source');
+select pg_temp.pu_assert((select bool_and(g.value->'phase'='null') from statistics_before b cross join lateral jsonb_array_elements(b.snapshot->'games') g),'private regulation does not infer phase');
+select pg_temp.pu_assert(not(public.get_public_statistics_source(pg_temp.pu_id(3))::text~'"(sex|birthDate|birth_date|reason|actorId|createdBy|storagePath)"'),'public privacy');
+-- Live edits are not new statistical publications.
+update public.persons set name='Private current name' where id=pg_temp.pu_id(201);
+update public.teams set name='Private current team' where id=pg_temp.pu_id(4);
+select pg_temp.pu_assert((select snapshot=public.get_public_statistics_source(pg_temp.pu_id(3)) from statistics_before),'live identity/team does not republish');
+update public.admin_access set enabled=true where user_id=pg_temp.pu_id(98);
+create function pg_temp.statistics_command() returns jsonb language sql as $$select jsonb_build_object('requestId',pg_temp.pu_id(9000),'gameId',pg_temp.pu_id(8),'gameVersion',(select version from public.games where id=pg_temp.pu_id(8)),'basePublicationVersion',2,'source',jsonb_build_object('kind','sheet','baseSheetVersion',(select version from public.game_sheets where game_id=pg_temp.pu_id(8)),'document',jsonb_set((select document from public.game_sheets where game_id=pg_temp.pu_id(8)),'{events,0,code}','"2"')),'reason','Nova conferência das ações registradas.','fallback',false)$$;
+-- Freeze command BEFORE mutation; retry cannot regenerate expected versions.
+create temporary table statistics_intent as select pg_temp.statistics_command() as payload;
+grant select on statistics_intent to authenticated;
+create function pg_temp.statistics_fail() returns trigger language plpgsql as $$begin raise exception 'fixture statistics failure';end$$;
+create trigger statistics_fixture_failure before insert on private.statistics_publication_changes for each row execute function pg_temp.statistics_fail();
+set local role authenticated;
+select pg_temp.pu_error('select public.publish_sheet_game((select payload from statistics_intent))','P0001');
+select pg_temp.pu_assert(public.get_public_game(pg_temp.pu_id(8))->'version'='2','failed statistics leaves prior public game');
+select pg_temp.pu_assert(public.get_game_sheet(pg_temp.pu_id(8))->'version'='3','failed statistics leaves source draft');
+reset role;
+select pg_temp.pu_assert((select snapshot=public.get_public_statistics_source(pg_temp.pu_id(3)) from statistics_before),'failed statistics leaves prior source');
+select pg_temp.pu_assert(not exists(select 1 from private.game_publication_commands where request_id=pg_temp.pu_id(9000)),'failed statistics leaves no receipt');
+drop trigger statistics_fixture_failure on private.statistics_publication_changes;
+set local role authenticated;
+select pg_temp.pu_assert(public.publish_sheet_game((select payload from statistics_intent))->'version'='3','same frozen intent succeeds after rollback');
+select pg_temp.pu_assert(public.publish_sheet_game((select payload from statistics_intent))->'version'='3','known ACK replay');
+select pg_temp.pu_error('select private.refresh_confirmed_statistics(pg_temp.pu_id(3))','42501');
+select pg_temp.pu_error('select * from private.statistics_publication_versions','42501');
+select pg_temp.pu_error('select * from private.statistics_publication_changes','42501');
+select pg_temp.pu_error('delete from public.published_statistics','42501');
+select pg_temp.pu_error('update public.published_statistics set version=version+1','42501');
+set local role anon;
+select pg_temp.pu_assert(public.get_public_statistics_source(pg_temp.pu_id(999)) is null,'unknown context is not a public draft');
+select pg_temp.pu_error('select private.refresh_confirmed_statistics(pg_temp.pu_id(3))','42501');
+select pg_temp.pu_error('insert into public.published_statistics select * from public.published_statistics','42501');
+select public.get_public_statistics_source(pg_temp.pu_id(3)) as statistics_source;
+reset role;
+select pg_temp.pu_assert((select (public.get_public_statistics_source(pg_temp.pu_id(3))->>'version')::integer=(snapshot->>'version')::integer+1 from statistics_before),'exactly one version, replay creates none');
+select pg_temp.pu_assert((select count(*) from private.statistics_publication_changes where dispute_id=pg_temp.pu_id(3) and version=(public.get_public_statistics_source(pg_temp.pu_id(3))->>'version')::integer)=1,'incremental lineage does not copy all games into every history version');
+select pg_temp.pu_error('update private.statistics_publication_versions set minimum_seconds=1200','PT409');
+select pg_temp.pu_error('delete from private.statistics_publication_changes','PT409');
+select pg_temp.pu_assert(exists(select 1 from private.statistics_publication_changes c join private.game_publication_versions g on g.game_id=c.game_id and g.version=c.publication_version where c.game_id=pg_temp.pu_id(8) and c.publication_version=2 and g.snapshot#>>'{facts,teams,home,points}'='3'),'old lineage/facts retained');
+-- Capacity failure must not leave a mismatched public result/head.
+select pg_temp.pu_error($q$update public.published_games set snapshot=jsonb_set(snapshot,'{capacityFixture}',to_jsonb(repeat('x',16777216))) where game_id=pg_temp.pu_id(8)$q$,'PT413');
+select pg_temp.pu_assert((select (public.get_public_statistics_source(pg_temp.pu_id(3))->>'version')::integer=(snapshot->>'version')::integer+1 from statistics_before),'capacity failure preserves version');
+select pg_temp.pu_assert((select relrowsecurity from pg_class where oid='public.published_statistics'::regclass),'RLS enabled');
+set local role service_role;
+select pg_temp.pu_error('select private.refresh_confirmed_statistics(pg_temp.pu_id(3))','42501');
+select pg_temp.pu_error('delete from public.published_statistics','42501');
+reset role;
+select public.get_public_statistics_source(pg_temp.pu_id(3)) as statistics_source;
+rollback;
