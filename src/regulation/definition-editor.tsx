@@ -211,6 +211,111 @@ export function DefinitionEditor({
   return (
     <>
       <fieldset>
+        <legend>Regra de W.O.</legend>
+        <label className="reg-check">
+          <input
+            type="checkbox"
+            checked={!!d.occurrenceRules.wo}
+            onChange={(e) =>
+              change((v) => {
+                v.occurrenceRules.wo = e.target.checked
+                  ? {
+                      winnerLeaguePoints: NaN,
+                      loserLeaguePoints: NaN,
+                      score: null,
+                    }
+                  : null;
+              })
+            }
+          />
+          Definir regra de W.O.
+        </label>
+        <p>
+          Preencha os efeitos previstos no regulamento. Nenhum placar será
+          presumido; a decisão de cada jogo exige conferência própria.
+        </p>
+        {d.occurrenceRules.wo && (
+          <>
+            <div className="reg-columns">
+              {(["winnerLeaguePoints", "loserLeaguePoints"] as const).map(
+                (key) => (
+                  <label key={key}>
+                    {key === "winnerLeaguePoints"
+                      ? "Pontos de classificação do vencedor por W.O."
+                      : "Pontos de classificação do perdedor por W.O."}
+                    <input
+                      type="number"
+                      required
+                      min={-1000000}
+                      max={1000000}
+                      step={1}
+                      value={
+                        Number.isFinite(d.occurrenceRules.wo![key])
+                          ? d.occurrenceRules.wo![key]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        change((v) => {
+                          v.occurrenceRules.wo![key] =
+                            e.target.value === ""
+                              ? NaN
+                              : Number(e.target.value);
+                        })
+                      }
+                    />
+                  </label>
+                ),
+              )}
+            </div>
+            <label className="reg-check">
+              <input
+                type="checkbox"
+                checked={!!d.occurrenceRules.wo.score}
+                onChange={(e) =>
+                  change((v) => {
+                    v.occurrenceRules.wo!.score = e.target.checked
+                      ? { winner: NaN, loser: NaN }
+                      : null;
+                  })
+                }
+              />
+              Definir placar administrativo do W.O.
+            </label>
+            {d.occurrenceRules.wo.score && (
+              <div className="reg-columns">
+                {(["winner", "loser"] as const).map((key) => (
+                  <label key={key}>
+                    {key === "winner"
+                      ? "Placar do vencedor por W.O."
+                      : "Placar do perdedor por W.O."}
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      max={2147483647}
+                      step={1}
+                      value={
+                        Number.isFinite(d.occurrenceRules.wo!.score![key])
+                          ? d.occurrenceRules.wo!.score![key]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        change((v) => {
+                          v.occurrenceRules.wo!.score![key] =
+                            e.target.value === ""
+                              ? NaN
+                              : Number(e.target.value);
+                        })
+                      }
+                    />
+                  </label>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </fieldset>
+      <fieldset>
         <legend>Inscrições na organização</legend>
         {registrations.map((r) => {
           const used =

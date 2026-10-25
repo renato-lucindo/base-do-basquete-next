@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
+import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -64,11 +65,13 @@ export function GamesWorkspace(props: Props) {
   const pending = useRef<SaveGame | null>(null),
     sheetGuard = useRef<() => boolean>(() => true),
     auxGuard = useRef<() => boolean>(() => true),
+    occurrenceGuard = useRef<() => boolean>(() => true),
     auxiliaryTrigger = useRef<HTMLButtonElement>(null),
     returningFromAuxiliary = useRef(false),
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null);
   const [savedGame, setSavedGame] = useState<GameSnapshot | null>(null),
+    [decisionLocked, setDecisionLocked] = useState(false),
     [sheetVisible, setSheetVisible] = useState(false);
   const dirty = !!editor && JSON.stringify(editor.game) !== baseline;
   function mayLeave() {
@@ -76,6 +79,7 @@ export function GamesWorkspace(props: Props) {
       !busy &&
       sheetGuard.current() &&
       auxGuard.current() &&
+      occurrenceGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
           "Há alterações não salvas ou um envio não confirmado. Deseja sair deste jogo?",
@@ -266,7 +270,7 @@ export function GamesWorkspace(props: Props) {
           </button>
         )}
         <button
-          disabled={busy || auxiliary || sheetVisible}
+          disabled={busy || auxiliary || sheetVisible || decisionLocked}
           onClick={() => {
             if (!mayLeave()) return;
             setEditor({
@@ -357,7 +361,7 @@ export function GamesWorkspace(props: Props) {
           </p>
           <fieldset
             className="competition-form"
-            disabled={busy || uncertain || conflict}
+            disabled={busy || uncertain || conflict || decisionLocked}
           >
             <legend>Dados do jogo</legend>
             <label>
@@ -418,7 +422,9 @@ export function GamesWorkspace(props: Props) {
               <button
                 ref={auxiliaryTrigger}
                 type="button"
-                onClick={() => setAuxiliary(true)}
+                onClick={() => {
+                  if (occurrenceGuard.current()) setAuxiliary(true);
+                }}
               >
                 Criar ou editar inscrição aqui
               </button>
@@ -459,11 +465,16 @@ export function GamesWorkspace(props: Props) {
           <div className="competition-actions">
             <button
               disabled={busy || uncertain || conflict || dirty || !savedGame}
-              onClick={() => setSheetVisible(true)}
+              onClick={() => {
+                if (occurrenceGuard.current()) setSheetVisible(true);
+              }}
             >
               Preparar súmula
             </button>
-            <button disabled={busy || conflict} onClick={() => void save()}>
+            <button
+              disabled={busy || conflict || decisionLocked}
+              onClick={() => void save()}
+            >
               {uncertain ? "Repetir o mesmo envio" : "Salvar jogo"}
             </button>
             {conflict && (
@@ -488,6 +499,19 @@ export function GamesWorkspace(props: Props) {
               Voltar à lista de jogos
             </button>
           </div>
+          {savedGame && (
+            <GameOccurrencePanel
+              key={savedGame.id}
+              game={savedGame}
+              enabled={
+                props.enabled && !busy && !dirty && !uncertain && !conflict
+              }
+              guard={occurrenceGuard}
+              onLockedChange={setDecisionLocked}
+              onSessionLost={props.onSessionLost}
+              onSaved={props.onSaved}
+            />
+          )}
         </div>
       ) : (
         <>

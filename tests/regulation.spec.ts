@@ -1,6 +1,71 @@
 import { test, expect, type Page } from "@playwright/test";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
+test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page);
+  await prepare(page);
+  await page
+    .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
+    .check();
+  await expect(
+    page.getByRole("spinbutton", {
+      name: "Pontos de classificação do vencedor por W.O.",
+      exact: true,
+    }),
+  ).toHaveValue("");
+  await page
+    .getByRole("spinbutton", {
+      name: "Pontos de classificação do vencedor por W.O.",
+      exact: true,
+    })
+    .fill("2");
+  await page
+    .getByRole("spinbutton", {
+      name: "Pontos de classificação do perdedor por W.O.",
+      exact: true,
+    })
+    .fill("0");
+  await page
+    .getByRole("button", { name: "Conferir impacto", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Depois da alteração", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Motivo da alteração", exact: true })
+    .fill("Regra de W.O. conferida sem placar administrativo");
+  await page
+    .getByLabel("Conferi o impacto nos resultados e cruzamentos", {
+      exact: true,
+    })
+    .check();
+  await page
+    .getByRole("button", {
+      name: "Confirmar e salvar regulamento",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Regulamento salvo" }),
+  ).toBeVisible();
+  expect(f.getState().definition?.occurrenceRules.wo).toEqual({
+    winnerLeaguePoints: 2,
+    loserLeaguePoints: 0,
+    score: null,
+  });
+  await page.reload();
+  await expect(
+    page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("checkbox", {
+      name: "Definir placar administrativo do W.O.",
+      exact: true,
+    }),
+  ).not.toBeChecked();
+});
 async function prepare(page: Page) {
   await page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
