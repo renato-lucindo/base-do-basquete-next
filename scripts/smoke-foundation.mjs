@@ -293,6 +293,19 @@ try {
       .waitFor();
     assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
     assert.deepEqual(errors, []);
+    stage = `browser ${name} public simple statistics`;
+    const simpleDocument = await page.goto(
+      `${origin}/estatisticas.html#${randomUUID()}?view=simple&scope=all`,
+      { waitUntil: "domcontentloaded" },
+    );
+    assert.equal(simpleDocument.status(), 200);
+    await page
+      .getByRole("heading", { name: "Estatísticas de súmula", exact: true })
+      .waitFor();
+    await page.getByRole("alert").waitFor();
+    assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+    assert.equal(await page.getByRole("table").count(), 0);
+    assert.deepEqual(errors, []);
     stage = `browser ${name} public player`;
     const playerDocument = await page.goto(
       `${origin}/atleta.html#${randomUUID()}`,
@@ -332,6 +345,7 @@ try {
       publicAchievementProjectionRead: true,
       publicProjectionRead: true,
       publicStatisticsRead: true,
+      publicSimpleStatisticsRead: true,
       publicPlayerProjectionRead: true,
       publicTeamReads: 2,
       privatePlayerProfileReads: 2,
