@@ -1,5 +1,13 @@
 # Acessibilidade das consultas confirmadas
 
+## Preview protegido — 26/10/2026 06:21UTC-03
+
+**CI40297505322/job121487036221 SUCCESS515unitários/104arquivos/352browsersLinux** sobre **bbcda6a27d3cc921b370a954278e41eac9943e7d**; log accessibility-ci-40297505322.log SHA256 **0a3c8b1421873cf99680f3bc34490af289495c239405e209bf007eb91f469c23**. Pacote deHEAD limpo dessa fonte,24assets/manifestoSHA **e9b85a67f5ec8c9b441c6ea5639cd60168fac810cd7b4b31896fd1eccc6d95ce**. WorkerSHA **840514f603ac4f998bd88a7a3bf87783623352aab7460fb408c2fe209e50990c** idêntico ao da capacidade; novas evidências não alteram contratos SQL nem substituem provas válidas deles.
+
+Somente Worker existente base-do-basquete-next-preview atualizado pelo pluginCloudflare, fontebbcda6a, **deploymentb8b61002-25e1-4770-b62f-1ed881eb140e/versão198c0264-762c-4ae8-a230-ae016effcfa8100%**. Access app/política de proprietário, previewsOFF, namespace/rate/cofre preservados. Smoke PASS24assets/hash/Xsource,38GETs privados/12POSTs/6leituras públicas/5HTMLs/duas browsers/health/Authinválido/backend404. Tokens/políticas efêmeros criados sópara o smoke: **753bdc9c-01ea-43d0-a6e1-2208a835959b/7cdb4aa7-9d98-45e6-90f9-82b6d59d718a revogados, ausência reconferida**, chave privada apenasRAM/processo encerrado, anônimo302→Access em raiz/perfil/equipes/API. Relatório accessibility-preview-smoke-bbcda6a.json SHA256 **83b7fef7bb64c69491a14589c637cc1b3b7cd1e45076bf40ecf23931df54506e**.
+
+Entrega técnica da unidade concluída/PRdraft22 sobre21, sem merge/produção. Resultado automático/histórico de deficiências e incomplete permanecem abaixo. ownerLoginPending sinaliza teste humano da versão ainda pendente; avaliações adiadas não foram solicitadas novamente nem inferidas como aceite. Nenhuma migration/dado humano/fixture remota alterados.
+
 ## Gate consolidado local — 26/10/2026
 
 **PASS515unitários/104arquivos,5transportes,13PostgreSQL,22workerd,quatroPDFs no runtime, builds/tipos/lint/formato/fronteira/segredos653** sobre a árvore de produto que gerou o commit desta entrega. Log accessibility-gate.log SHA256 **f27f2542a7ceeb3f553bc28b0dbe16b8d81b8c62e30b721387713d3601c0d5ba**. Compatibilidade do overrideUndici comprovada pelos transportes/workerd existentes, sem falhas ou repetição automática de gate.76browsers de composição PASS incluem14cenários novos/32varreduras, texto200% com tamanho computado dobrado, foco/ArrowRight e links/navegação/contextos anteriores. Captura viewport320 inspecionada SHA256 **bda775dfa8aec9253ec87e2bb0b333dcdeddb5057609d98a2e6e2a53c9faf154**.

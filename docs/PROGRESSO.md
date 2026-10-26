@@ -1,4 +1,18 @@
-# Acessibilidade local concluída — 26/10/2026; CI/preview pendentes
+# Acessibilidade publicada — 26/10/2026 06:21UTC-03; próxima provaPGnativa
+
+**Git/unidade:** branch codex/acessibilidade-consultas, material remoto **bbcda6a27d3cc921b370a954278e41eac9943e7d**, checkpoint/plano nativo **f57291c**, PRdraft22 sobre21 anexado. Somente documentação própria até este salvamento; mudanças/dados humanos preservados. Plano2026-10-26-acessibilidade-consultas/VALIDACAO-ACESSIBILIDADE.md. Sem merge/principal/produção.
+
+**Concluído/provas:** CI40297505322/job121487036221 SUCCESS515unit/104arquivos/352Linuxbrowsers. Gate515/5transportes/13PG/22workerd/quatroPDFs/fronteira/segredos653,76browsers composição/14novos/32varredurasaxe, fonte200% computada/foco/ArrowRight/320pxPASS; incomplete e avaliação assistiva/zoom nativo pendentes explicitamente. Audit0 com override devUndici7.30.1; sem alterar versões diretasWrangler/Miniflare. WorkerJS idêntico ao da capacidade (hash840514f6...); reutilizar SQL/C2/harness126, não repetir gates por sessão/docs.
+
+**Preview atual:** bbcda6a/deployment **b8b61002-25e1-4770-b62f-1ed881eb140e**/versão **198c0264-762c-4ae8-a230-ae016effcfa8**,100%. Access sóresponsável/previewsOFF/DO/rate/cofre preservados.24assets/38GETsprivados/12POSTs/6leituras públicas/5HTMLs/duas browsers smokePASS. Token753bdc9c/política7cdb4aa7 temporários revogados/reconferidos; chave sóRAM/TTY encerrado; anônimo302raiz/perfil/equipes/API. Não publicar fixtures nem extrair segredos. NenhumDDL/deploy/upload/gate/CI/smoke/credencial/processo local ativo.
+
+**Próximo EXATO:** cota/disco/Git primeiro; branch sequencial **codex/concorrencia-postgres** sobre checkout limpo; ler plano **docs/superpowers/plans/2026-10-26-concorrencia-postgres-nativo.md**. N1 preparar binários oficiais17.11 em diretório próprio ignorado e cluster novo loopback/porta livre, nunca dados/serviços existentes. Download/extração/cluster/runner ainda NÃO iniciados, metadadosHEAD/limites no plano. Definirfinally de stop antes de iniciar; sem instalação/serviço/PATHglobal/janela visível/exclusão recursiva. N2 fixture e escritores reais/pg_locks/pg_blocking_pids, ACK único/409 persistente/revogação403/versão de página, guardas ativas; depoisprova/CI dedicada conformeplano. Não confundirPGlite18.6conexãoúnica com17.11multiconexão.
+
+Supabase novo permanece44migrations/última20261026082747 imutável, último pós-rollback1pessoa/1Auth/1adminativo e0jogos/heads/mapping/participações/objetos; preserve novosdadoshumanos. Cota real última62%usados5h/10%semanal; consultar antes de baixar/iniciar. Aos85%usados5h parar cluster próprio seativo, mínima consistência/checkpoint/push/MESMAautomação resetefetivo+2; não comprar créditos/mudarplano/resetmanual. Política de inscritos/agenda/aceites humanos/StorageHTTP adiados seguem pendentes sem repetirperguntas. Sem revisor independente/carga/WCAGcompleta ouPGmulticonexão comprovados até essa próxima unidade. Registros seguintes são históricos.
+
+---
+
+# Acessibilidade local concluída — 26/10/2026; CI/preview pendentes (histórico)
 
 **Git/unidade:** branch codex/acessibilidade-consultas, material remoto **bbcda6a27d3cc921b370a954278e41eac9943e7d**, base a58270b/PR21; plano4671a80/depsa592576. PRdraft22 sobre21 anexado. Sem mudanças humanas; esta atualização somente documental própria até salvar. Produto: nomes acessíveis incluem siglas visíveis; alvos de links em tabelas≥24×24; paginação do perfil agora nav nomeada. Axe4.14dev e overrideUndici7.30.1 sóna cadeiaMiniflare; audit0 após3alertas reais. Versões diretasWrangler/Miniflare preservadas.
 
