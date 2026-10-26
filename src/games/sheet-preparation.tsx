@@ -224,9 +224,7 @@ export function SheetPreparation({
                               ["B", "C"].includes(e.target))),
                       );
                   const candidates = c.roster
-                    .filter(
-                      (r) => r.id === id || !selectedPeople.has(r.personId),
-                    )
+                    .filter((r) => !selectedPeople.has(r.personId))
                     .map((r) => ({
                       ...r,
                       jersey: c.lastJerseys[r.id] ?? r.jersey,

@@ -42,14 +42,12 @@ test.describe("desktop scoresheet MVP", () => {
     await add("home", 6, "1");
     const a = page.getByRole("table", { name: "Súmula equipe A", exact: true }),
       b = page.getByRole("table", { name: "Súmula equipe B", exact: true });
-    const player = a
-      .getByRole("row")
-      .filter({
-        has: page.getByRole("rowheader", {
-          name: "Jogador A 1 * C",
-          exact: true,
-        }),
-      });
+    const player = a.getByRole("row").filter({
+      has: page.getByRole("rowheader", {
+        name: "Jogador A 1 * C",
+        exact: true,
+      }),
+    });
     await expect(player.locator("td").nth(5)).toHaveText("6");
     await expect(player.locator(".sheet-black-total")).toHaveText("6");
     const partials = page.getByRole("table", {
@@ -62,11 +60,9 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       partials.getByRole("columnheader", { name: "OT2", exact: true }),
     ).toBeVisible();
-    const team = partials
-      .getByRole("row")
-      .filter({
-        has: page.getByRole("rowheader", { name: "A · Lobos", exact: true }),
-      });
+    const team = partials.getByRole("row").filter({
+      has: page.getByRole("rowheader", { name: "A · Lobos", exact: true }),
+    });
     await expect(team.getByRole("cell")).toHaveText([
       "0",
       "0",
@@ -115,12 +111,9 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(page.locator(".sheet-actions li")).toContainText(
       "4. Q1 - B - #1 - P (1)",
     );
-    await page
-      .locator(".sheet-desktop-teams")
-      .last()
-      .screenshot({
-        path: ".preview-artifacts/sheet-desktop-periods-fouls.png",
-      });
+    await page.locator(".sheet-desktop-teams").last().screenshot({
+      path: ".preview-artifacts/sheet-desktop-periods-fouls.png",
+    });
   });
   test("reopening preserves the saved participants and roles instead of applying a new suggestion", async ({
     page,
@@ -216,6 +209,9 @@ test.describe("desktop scoresheet MVP", () => {
     const name = page.getByLabel("Atleta A vaga 1", { exact: true });
     await name.click();
     await name.fill("Jogador A");
+    await expect(
+      page.getByRole("option", { name: "Jogador A 1", exact: true }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole("option", { name: "Jogador A 2", exact: true }),
     ).toHaveCount(0);
