@@ -6,7 +6,7 @@ Execução inline com executing-plans/TDD/continuidade. O responsável aprovou e
 - [x] S2: até12por lado, histórico elegível e preenchimento por camisa0/00; reaproveitar papéis, não participação dos reservas. Dropdown pesquisável sem duplicados, camisa editável,5titulares/capitão/comissão exigidos para avançar; salvar rascunho incompleto continua. Mesma lista nas duas etapas, A/B sempre lado a lado no desktop.
 - [x] S3: motor compartilhado gera progresso por ação e por jogador/quarto. Jogadores somamOT na colunaQ4; equipes preservamQ4/OT1/OT2 separados. Faltas Q1/Q3vermelho e Q2/Q4/OTazul; contorno interno reforçado nas faltasQ1/Q2, independentemente da posição; GD/D/5ªfalta não são falta extra.
 - [x] S3: últimas10ações totais, checkboxquarto/equipe/tipo, consulta integral paginada10, numeração global; contadores antes do filtro, edição/exclusão/undo/redo recalculam tudo. Exemplos2p(5),Tc(3),U2(GD). Teclado e revisão de publicado preservados.
-- [ ] S4: focais desktop, gate consolidado após estabilidade/CI/revisão do diff, preview protegido/smokes/revogação. Sem merge/produção. Evidências inalteradas permanecem válidas.
+- [x] S4: focais desktop, gate consolidado após estabilidade/CI/revisão do diff, preview protegido/smokes/revogação. CI40398538486 SUCCESS na fonte a370055; publicação e proteção verificadas em26/10/2026. Revisão separada do autor, sem parecer independente disponível. Sem merge/produção. Evidências inalteradas permanecem válidas.
 
 Base03d7ed868ed9dfc945437c21a980ea8cb9990719, branchcodex/sumula-desktop, checkout sequencial existente; nenhum worktree paralelo necessário. Material humano docs/boxscore permanece não rastreado e intacto.
 

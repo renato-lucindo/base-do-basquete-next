@@ -1,5 +1,15 @@
 # Súmula desktop — execução autorizada26/10/2026
 
+## Entrega técnica — 26/10/2026 18:01 America/Sao_Paulo
+
+Plano S1–S4 implementado e publicado no preview protegido, source **a3700552c501f8f6ea9d0e35cffd42ef5f1bd390**. CI **40398538486/job121837919167 SUCCESS**: **527unitários/108arquivos,360browsers PASS e20mobile adiados**, além do gate completo (5transportes/13PG/22workerd/prova4PDFs/builds/tipos/fronteira/segredos). Log ignorado desktop-ci-40398538486.log SHA256 `e504251dc98976669373f606cdc2d713201ce60d40cf6f84d423a52871868563`. A CI anterior f888 não foi usada para autorizar a fonte final.
+
+Deployment **ac0a08ff-5d37-4ec6-9067-c6b91178597c**, versão **fc99559c-269e-434d-bc53-ae27fd28f99b**,100%, no Worker existente base-do-basquete-next-preview. Smoke remoto **PASS**:24assets/hash/Xsource,39GETsprivados incluindo sheet/preparation,12POSTs recusados sem sessão, health/sessão/Authinválido/backend404, seis consultas públicas mínimas/cincoHTMLs e dois browsers. Não houve login do responsável nem alteração de dados humanos; aceite humano do novo fluxo permanece pendente. Provas locais e CI usam dados fictícios.
+
+Token temporário **3b9a30fc-a540-4766-8b41-5befa29b0c4a** e política **b8d3517b-f11b-471d-9b92-af0bca6205f7** revogados imediatamente após smoke; conferidos zero service_tokens e somente política do responsável30cc3ab4. Credencial entregue apenas por RSA-OAEP/TTY e chave privada emRAM; processo encerrado. Anônimo302 para Access na raiz e na nova rota após revogação. PreviewsOFF/DO0411ac931ca54d289d270606c7e87ef7/rate862073195184/bindings de segredos preservados. Nenhum segredo em arquivos ou logs.
+
+PRdraft26 aberto, sem merge/principal/produção. Sem revisão independente disponível; a passagem separada do autor encontrou e corrigiu os dois defeitos documentados abaixo. Não é evidência de carga/WCAG completa ou aceite manual. Entradas seguintes são o histórico cronológico da implementação e suas pendências daquela ocasião.
+
 Plano aprovado na conversa: preparação automática/12vagas, desktop lado a lado, lançamento comQ4+OT nos jogadores eOT separado nas equipes, cores/contornos de faltas e histórico pesquisável. Mobile/PDF/texto fora do recorte. Branchcodex/sumula-desktop sobre03d7ed8; sem merge/produção.
 
 ## S1 — fonte administrativa e sugestão
