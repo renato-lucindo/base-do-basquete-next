@@ -1,5 +1,16 @@
 # Ajustes solicitados na avaliação do protótipo
 
+## Feedback de26/10/2026 — importações e conferência do MVP
+
+Pedido do responsável, ainda em planejamento; não atribuir implementação ou aceite a estes itens:
+
+- PDF de teste do responsável não importou. Conferir uso do módulo e PDFs originais do ZIP; diagnosticar o arquivo `docs/boxscore/Box Score FIBA ALC vs IVV 02 junho.pdf`, preservado como material humano fora do Git. A reprodução local já mostrouBDB_PDF_TEAM_LARGEST_LEAD; integração autenticada completa continua a comprovar.
+- Interpretador precisa aceitar mudanças simples de ordem, inclusive nome do jogador antes da camisa. Evitar atribuir números a campos errados sem aviso.
+- Mostrar apenas o nome da equipe, sem código técnico na apresentação. IDs internos permanecem necessários para vínculos.
+- Súmula com filtros checkbox por quarto/equipe, separação de faltas e pontos e somente últimas10 ações na visualização inicial; ações anteriores continuam pesquisáveis.
+- Cada cesta deve indicar placar acumulado da própria equipe após a ação. Cada falta do atleta deve mostrar sua contagem ou a desqualificação gerada naquele lançamento. Exemplos pedidos: `3. Q1 - A - #25 - 2p (5)`; `23. Q3 - B - #12 - Tc (3)`; `24. Q3 - B - #12 - U2 (GD)`.
+- Outros refinamentos ficam para depois do MVP. Plano proposto em `docs/superpowers/plans/2026-10-26-refino-mvp-importacao-sumula.md`; paginação, duas seções e política explícita de ambiguidades são propostas técnicas, não escolhas já confirmadas pelo responsável.
+
 22/10/2026 — decisão posterior do responsável, complementar ao pacote original preservado. A solicitação não presume aceite final dos três percursos.
 
 ## Súmula: conferência e correção de ações
