@@ -117,9 +117,11 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                     <th>Atleta</th>
                     <th>Participação</th>
                     <th>PTS</th>
-                    <th>2C</th>
-                    <th>3C</th>
+                    <th>2PC</th>
+                    <th>3PC</th>
                     <th>LLC</th>
+                    <th>F</th>
+                    {r.source.kind === "sheet" && <th>GD</th>}
                     {hasAdvanced && (
                       <>
                         <th>MIN</th>
@@ -149,10 +151,26 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                               : "Participou"
                             : "Não participou"}
                         </td>
-                        <td>{p.points}</td>
-                        <td>{p.two}</td>
-                        <td>{p.three}</td>
-                        <td>{p.free}</td>
+                        <td>{p.played ? p.points : "—"}</td>
+                        <td>{p.played ? p.two : "—"}</td>
+                        <td>{p.played ? p.three : "—"}</td>
+                        <td>{p.played ? p.free : "—"}</td>
+                        <td>
+                          {p.played
+                            ? "fouls" in p
+                              ? p.fouls
+                              : (a?.foulsCommitted ?? "—")
+                            : "—"}
+                        </td>
+                        {r.source.kind === "sheet" && (
+                          <td>
+                            {p.played && "status" in p
+                              ? p.status === "GD" || p.status === "D"
+                                ? p.status
+                                : "0"
+                              : "—"}
+                          </td>
+                        )}
                         {hasAdvanced && (
                           <>
                             <td>

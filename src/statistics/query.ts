@@ -43,7 +43,7 @@ export function buildStatisticsPage(
   requested: StatisticsQuery,
 ) {
   const query = parseStatisticsQuery(serializeStatisticsQuery(requested)),
-    selected = selectStatisticsFacts(input, query.scope),
+    selected = selectStatisticsFacts(input, query.scope, query.dataset),
     all = aggregateConfirmedStatistics(selected.facts, {
       mode: query.mode,
       minimumSeconds: selected.minimumSeconds,
@@ -132,6 +132,7 @@ export function buildStatisticsPage(
   ) as Record<StatisticsMetric, ReturnType<typeof compareStatisticsRows>>;
   return {
     kind: "confirmed-statistics-page-v1" as const,
+    dataset: query.dataset,
     disputeId: selected.disputeId,
     version: selected.version,
     confirmedAt: selected.confirmedAt,

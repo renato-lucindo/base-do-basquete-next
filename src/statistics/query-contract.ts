@@ -8,6 +8,7 @@ import {
 } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 export type FilterOperator = ">=" | ">" | "<=" | "<" | "=";
 export interface StatisticsQuery {
+  dataset: "all" | "boxscore";
   mode: BoxscoreStatisticsMode;
   scope: BoxscoreGameScope;
   sort: StatisticsMetric | "player" | "team";
@@ -48,6 +49,7 @@ export const STATISTICS_COLUMN_PRESETS: Record<
   simple: [
     "games",
     "points",
+    "pointsPerGame",
     "twoMade",
     "threeMade",
     "freeMade",
@@ -88,6 +90,7 @@ export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
     columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
     page = Number(params.get("page"));
   return {
+    dataset: params.get("dataset") === "boxscore" ? "boxscore" : "all",
     mode,
     scope: parseBoxscoreGameScope(params.get("scope")),
     sort: mode === "per-30" && sort === "minutes" ? "points" : sort,
@@ -134,6 +137,7 @@ export function serializeStatisticsQuery(
   query: StatisticsQuery,
 ): URLSearchParams {
   const p = new URLSearchParams({
+    dataset: query.dataset,
     mode: query.mode,
     scope: query.scope,
     sort: query.sort,
@@ -165,6 +169,7 @@ export function updateStatisticsQuery(
       ...query,
       ...patch,
       page:
+        (patch.dataset !== undefined && patch.dataset !== query.dataset) ||
         (patch.mode !== undefined && patch.mode !== query.mode) ||
         (patch.scope !== undefined && patch.scope !== query.scope)
           ? 1

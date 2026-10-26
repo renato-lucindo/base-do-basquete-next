@@ -33,9 +33,11 @@ function Cell({ value }: { value: Row["metrics"][StatisticsMetric] }) {
 }
 function location() {
   const [id = "", search = ""] = window.location.hash.slice(1).split("?", 2);
+  const params = new URLSearchParams(search);
+  if (params.get("view") === "boxscore") params.set("dataset", "boxscore");
   return {
     id: z.uuid().safeParse(id).success ? id.toLowerCase() : null,
-    query: parseStatisticsQuery(new URLSearchParams(search)),
+    query: parseStatisticsQuery(params),
   };
 }
 export function StatisticsPageView() {
@@ -84,6 +86,7 @@ export function StatisticsPageView() {
           next.disputeId !== route.id ||
           next.mode !== requested.mode ||
           next.scope !== requested.scope ||
+          next.dataset !== requested.dataset ||
           next.compared.some((r) => !requested.compare.includes(r.personId))
         )
           throw new ApiFailure(
@@ -180,6 +183,16 @@ export function StatisticsPageView() {
         className="access-main statistics-page"
       >
         <h1>Estatísticas dos atletas</h1>
+        {route.id && (
+          <nav aria-label="Apresentação estatística">
+            <a href={`#${route.id}?view=simple&scope=${route.query.scope}`}>
+              Súmula e pontos
+            </a>
+          </nav>
+        )}
+        {route.query.dataset === "boxscore" && (
+          <p>Esta consulta inclui somente jogos com boxscore publicado.</p>
+        )}
         <p>
           Dados da ocasião confirmada. J conta quem jogou; um relacionado sem
           participação não acrescenta jogo nem observação estatística.

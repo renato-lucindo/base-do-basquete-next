@@ -8,14 +8,14 @@
 
 ## C1 — precisão autoritativa
 
-- [ ] RED PostgreSQL real para prefixo3, primeiro nome, sobrenome comum, apelido/data sem nome plausível; manter acentos/pontuação/grafia próxima/homônimos/registro.
-- [ ] Reutilizar normalização e similaridade Levenshtein do módulo fornecido. Sugestão exige nome completo plausível: >=2tokens significativos nos dois nomes, mesma quantidade de tokens, diferenças pequenas nos tokens e similaridade>=0,78. Igualdade normalizada e registro federativo continuam explícitos; não selecionar/mesclar sugestão. Não copiar substring irrestrita do ZIP. Informação complementar sóordena candidatos plausíveis.
+- [x] RED PostgreSQL real para prefixo3, primeiro nome, sobrenome comum, apelido/data sem nome plausível; manter acentos/pontuação/grafia próxima/homônimos/registro.
+- [x] Reutilizar normalização e similaridade Levenshtein do módulo fornecido. Sugestão exige nome completo plausível: >=2tokens significativos nos dois nomes, mesma quantidade de tokens, diferenças pequenas nos tokens e similaridade>=0,78. Igualdade normalizada e registro federativo continuam explícitos; não selecionar/mesclar sugestão. Não copiar substring irrestrita do ZIP. Informação complementar sóordena candidatos plausíveis.
 - [ ] Migration própria CLI depoisRED,46anteriores imutáveis, helpers invoker/search_path fechado/grants específicos. Mesmo DTO/RPC/save, wrapper_new_target preservado. SQL×TS/zero/upgrade/RLS/limites e regressões do importador. Aplicar somente no projeto novo após verificação.
 
 ## E1 — tabelas
 
-- [ ] RED de consulta mista e URL: simples soma todos, completa exclui participação exclusivamente manual e sua pontuação no denominador; DNP não somaJ. Pontos oficiais e avançados mantêm origens; ausente continua indisponível.
-- [ ] Contrato/query/view próprios, simples comtotal ePTS/J simultâneos, completa preservaexplorador e amostragem; links contextuais e troca de apresentação navegável.
+- [x] RED de consulta mista e URL: simples soma todos, completa exclui participação exclusivamente manual e sua pontuação no denominador; DNP não somaJ. Pontos oficiais e avançados mantêm origens; ausente continua indisponível.
+- [x] Contrato/query/view próprios, simples comtotal ePTS/J simultâneos, completa preservaexplorador e amostragem; links contextuais e troca de apresentação navegável.
 - [ ] Adaptar tabela/controles/CSS selecionados do ZIP ao design atual, sem folha global/rotas/schema antigo. Desktop prioritário; sem novo trabalho mobile. Detalhe do jogo também respeita ausência versuszero e fonte disponível, sem trocar o motor.
 - [ ] Focais desktop de duas tabelas/retomada/URLs/filtros/totais e capturas, revisão separada do autor se não houver ferramenta independente. Registrar limitações.
 
@@ -23,3 +23,5 @@
 
 - [ ] Gate único quando unidade estável; CI do mesmo código, PRdraft(s) coerentes e checkpoint. Reutilizar provas inalteradas/harness126, semgates por docs/sessão. Preview existente protegido; mudanças SQL exigem prova realBEGIN/ROLLBACK sem DML de admin/humanos; upload/smoke se assets/Worker mudarem, revogar temporários. Não declarar publicado antes de evidência.
 - [ ] Conferir cota entre unidades/anteslongas;85%usados5h mínimo seguro/checkpoint/push/MESMAautomação reset+2. Ao concluir, pausar agendamento. PDFparser, interpretador e mobile adiados; cadastro genérico busca parcial permanece busca, não sugestão automática de identidade.
+
+Prioridade reafirmada: primeiro súmula e compatibilidade. A apresentação simples e o recorte de fonte são a entrega atual; refinamento visual completo do PDF fica para outra unidade. Evidências em docs/VALIDACAO-COMPATIBILIDADE-SUMULA.md.

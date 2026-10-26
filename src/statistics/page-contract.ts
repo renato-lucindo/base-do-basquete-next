@@ -83,6 +83,7 @@ const comparisonState = z.enum(["better", "worse", "equal", "unavailable"]);
 export const statisticsPageSchema = z
   .object({
     kind: z.literal("confirmed-statistics-page-v1"),
+    dataset: z.enum(["all", "boxscore"]),
     disputeId: uuid,
     version,
     confirmedAt: z.iso.datetime({ offset: true }),

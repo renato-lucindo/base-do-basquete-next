@@ -53,28 +53,32 @@ export type StatisticsSource = z.infer<typeof statisticsSourceSchema>;
 export function selectStatisticsFacts(
   input: unknown,
   scope: BoxscoreGameScope,
+  dataset: "all" | "boxscore" = "all",
 ) {
   const source = statisticsSourceSchema.parse(input);
   z.enum(["regular", "playoffs", "all"]).parse(scope);
+  z.enum(["all", "boxscore"]).parse(dataset);
   // Validate/normalize every publication, including games outside the selected scope.
   const normalized = source.games.map(({ snapshot, phase }) => ({
     phase,
+    boxscore: snapshot.source.kind === "pdf",
     facts: normalizeParsedConfirmedGame(snapshot).map((fact) => ({
       ...fact,
       phase,
     })),
   }));
+  const eligible = normalized.filter((g) => dataset === "all" || g.boxscore);
   return {
     disputeId: source.disputeId,
     version: source.version,
     confirmedAt: source.confirmedAt,
     minimumSeconds: source.minimumSeconds,
     coverage: {
-      regularGames: normalized.filter((g) => g.phase === "round_robin").length,
-      playoffGames: normalized.filter((g) => g.phase === "knockout").length,
-      unclassifiedGames: normalized.filter((g) => g.phase === null).length,
+      regularGames: eligible.filter((g) => g.phase === "round_robin").length,
+      playoffGames: eligible.filter((g) => g.phase === "knockout").length,
+      unclassifiedGames: eligible.filter((g) => g.phase === null).length,
     },
-    facts: normalized
+    facts: eligible
       .filter((g) => scopesForStageKind(g.phase).includes(scope))
       .flatMap((g) => g.facts),
   };

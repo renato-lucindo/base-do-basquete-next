@@ -543,7 +543,7 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
             {context && editor.savedIds.has(context.id) && (
               <a
                 className="competition-public-link"
-                href={`/estatisticas.html#${context.id}?scope=all`}
+                href={`/estatisticas.html#${context.id}?view=simple&scope=all`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

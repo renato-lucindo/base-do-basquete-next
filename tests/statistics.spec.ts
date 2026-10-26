@@ -66,7 +66,7 @@ test("disputa salva oferece estatísticas em outra aba sem substituir edição a
   });
   await expect(link).toHaveAttribute(
     "href",
-    `/estatisticas.html#${tid(3)}?scope=all`,
+    `/estatisticas.html#${tid(3)}?view=simple&scope=all`,
   );
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link).toHaveAttribute("rel", /noopener/u);

@@ -165,3 +165,83 @@
     padding: 10px;
   }
 }
+
+/* Compact public scoresheet reference: one numeric row, totals and PTS/J together. */
+.simple-statistics {
+  max-width: 1200px;
+}
+.simple-statistics-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.simple-statistics-heading h1 {
+  margin-bottom: 4px;
+}
+.simple-statistics-heading p {
+  margin: 0;
+}
+.simple-statistics-view {
+  white-space: nowrap;
+  padding: 8px 0;
+}
+.simple-statistics-controls {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  align-items: end;
+  gap: 12px;
+  margin: 20px 0;
+}
+.simple-statistics-result {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+.simple-statistics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.simple-statistics-table th,
+.simple-statistics-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #d9e2ee;
+  text-align: right;
+}
+.simple-statistics-table th:nth-child(2),
+.simple-statistics-table th:nth-child(3),
+.simple-statistics-table td:nth-child(3) {
+  text-align: left;
+}
+.simple-statistics-table thead th {
+  white-space: nowrap;
+  background: #f2f6fb;
+}
+.simple-statistics-table th:first-child,
+.simple-statistics-table td:first-child {
+  width: 44px;
+  color: #536176;
+  text-align: center;
+}
+.simple-statistics-table tbody th {
+  min-width: 180px;
+  font-weight: 500;
+}
+.simple-statistics-table td:nth-child(3) {
+  min-width: 145px;
+}
+.simple-statistics-table .statistics-sort {
+  padding: 0;
+  min-height: 30px;
+  color: inherit;
+}
+.simple-statistics-table small {
+  display: block;
+  font-size: 0.8rem;
+  color: #536176;
+}
+.simple-statistics-note {
+  max-width: 850px;
+  color: #536176;
+}

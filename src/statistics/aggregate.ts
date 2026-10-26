@@ -221,7 +221,17 @@ function observedMetrics(
     (Object.keys(STATISTICS_METRICS) as StatisticsMetric[]).map((metric) => {
       let cell: MetricCell;
       if (metric === "games") cell = available(played.length);
-      else if (metric === "disqualifications") {
+      else if (metric === "pointsPerGame") {
+        const scoring = played.flatMap((r) =>
+          r.scoring ? [r.scoring.points] : [],
+        );
+        cell = available(
+          perGame(
+            scoring.reduce((sum, n) => sum + n, 0),
+            scoring.length,
+          ),
+        );
+      } else if (metric === "disqualifications") {
         const known = played.filter((r) => r.discipline !== null);
         cell = known.length
           ? available(

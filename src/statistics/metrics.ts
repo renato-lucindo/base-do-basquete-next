@@ -2,6 +2,12 @@ import { BOXSCORE_METRICS } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETU
 
 export const STATISTICS_METRICS = {
   ...BOXSCORE_METRICS,
+  pointsPerGame: {
+    label: "PTS/J",
+    name: "Pontos oficiais por jogo",
+    normalizable: false,
+    lowerIsBetter: false,
+  },
   disqualifications: {
     label: "GD",
     name: "Desqualificações",

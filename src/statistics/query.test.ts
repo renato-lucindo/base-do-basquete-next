@@ -248,6 +248,7 @@ it("preset de súmula exibe apenas dados simples e compartilha a preferência na
   expect(query.columns).toEqual([
     "games",
     "points",
+    "pointsPerGame",
     "twoMade",
     "threeMade",
     "freeMade",
