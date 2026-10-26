@@ -459,6 +459,7 @@ export async function textImportFixture(page: Page) {
     return route.fulfill({ json: reply });
   });
   return {
+    registrations,
     persons,
     members,
     reviews,

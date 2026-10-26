@@ -4,6 +4,7 @@ import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
+import { RegistrationRemovalPanel } from "./removal-panel";
 import {
   teamListingSchema,
   registrationListingSchema,
@@ -38,6 +39,11 @@ export function TeamsWorkspace({
   onSaved,
 }: Props) {
   const [importing, setImporting] = useState(false);
+  const [removing, setRemoving] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const removalGuard = useRef<() => boolean>(() => true),
+    removalReturn = useRef("");
   const importGuard = useRef<() => boolean>(() => true);
   const [list, setList] = useState({
     items: [] as RegistrationSnapshot[],
@@ -76,6 +82,7 @@ export function TeamsWorkspace({
       importGuard.current() &&
       membersGuard.current() &&
       withdrawalGuard.current() &&
+      removalGuard.current() &&
       (!(dirty || uncertain || busy) ||
         (!busy &&
           window.confirm(
@@ -99,10 +106,23 @@ export function TeamsWorkspace({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, uncertain]);
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || removing) return;
     if (editor) input.current?.focus();
-    else heading.current?.focus();
-  }, [editor?.kind, editor?.command.commandId, enabled, importing]);
+    else if (removalReturn.current) {
+      const target = document.getElementById(
+        `remove-registration-${removalReturn.current}`,
+      );
+      if (target) target.focus();
+      else heading.current?.focus();
+      removalReturn.current = "";
+    } else heading.current?.focus();
+  }, [
+    editor?.kind,
+    editor?.command.commandId,
+    enabled,
+    importing,
+    removing?.id,
+  ]);
   useEffect(() => {
     if (error && enabled) alert.current?.focus();
   }, [error, enabled]);
@@ -349,6 +369,33 @@ export function TeamsWorkspace({
       setBusy(false);
     }
   }
+  if (removing)
+    return (
+      <RegistrationRemovalPanel
+        key={removing.id}
+        id={removing.id}
+        name={removing.name}
+        disputeId={disputeId}
+        enabled={enabled}
+        guard={removalGuard}
+        onSessionLost={onSessionLost}
+        onRemoved={() => {
+          setList((old) => ({
+            ...old,
+            items: old.items.filter((r) => r.id !== removing.id),
+          }));
+          setRefresh((v) => v + 1);
+          onSaved();
+        }}
+        onClose={(removed) => {
+          setRemoving(null);
+          if (removed)
+            setStatus(
+              "Inscrição excluída. A equipe global permanece cadastrada.",
+            );
+        }}
+      />
+    );
   if (importing)
     return (
       <TextImportWorkspace
@@ -616,6 +663,24 @@ export function TeamsWorkspace({
                   {r.team.abbreviation ? ` · ${r.team.abbreviation}` : ""}{" "}
                   <small>· Inscrição {r.id.slice(-8)}</small>
                 </p>
+                <button
+                  id={`remove-registration-${r.id}`}
+                  className="secondary"
+                  aria-label={`Excluir inscrição ${r.name}`}
+                  disabled={!enabled || busy || withdrawalLocked}
+                  onClick={() => {
+                    if (!mayLeave()) return;
+                    removalReturn.current = r.id;
+                    setEditor(null);
+                    setFinding(false);
+                    setError("");
+                    setStatus("");
+                    setMembersEpoch((v) => v + 1);
+                    setRemoving({ id: r.id, name: r.name });
+                  }}
+                >
+                  Excluir inscrição
+                </button>
                 <div id={`registration-${r.id}`} hidden={expanded !== r.id}>
                   <div className="competition-actions">
                     <button
