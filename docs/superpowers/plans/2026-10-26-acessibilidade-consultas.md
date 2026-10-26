@@ -2,6 +2,8 @@
 
 Base a58270b/PR21/previewc2e8734; branch sequencial codex/acessibilidade-consultas. Especificação: EXPERIENCIA§Acessibilidade e VALIDACAO§Navegação do ZIP preservado. Unidade independente da política pública de inscritos/agenda e dos testes humanos adiados. Não altera publicação, banco, Auth, Access ou dados humanos.
 
+**Ruling de preparação:** npm audit real após instalar somente axe encontrou3alertas preexistentes na cadeia miniflare→undici7.29.1, incluindoGHSA-xjj6-f33q-929c alto, correção oficial7.30.1. Não provêm deaxe nem do bundle do produto. Aplicar override estreito miniflare.undici=7.30.1, preservando versões diretas fixadas de Wrangler/Miniflare e verificando audit/transporte/workerd. Não usar auditfix--force/downgrades sugeridos. O RED éo audit real nãozero; registrar resultado e custo dessa decisão reversível na validação.
+
 ## A1 — observação e RED
 
 - [ ] Fixar devDependency @axe-core/playwright4.14.0/lockfile, metadata/integridade do npm consultadas; sem scripts de instalação. Verificar licença/audit sem contratar serviço. Ferramenta somente de teste, nunca bundle do produto.
