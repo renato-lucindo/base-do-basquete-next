@@ -2,12 +2,13 @@ import { expect, it } from "vitest";
 import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { platform } from "../../tests/fixtures/database-platform";
+import { buildRemovalServiceProof } from "../../tests/fixtures/removal-service-proof";
 import {
   registrationRemovalSchema,
   removalContextSchema,
 } from "./removal-contract";
 
-it.each(["zero", "upgrade"] as const)(
+it.each(["zero", "upgrade", "existing_admin"] as const)(
   "remove só inscrição vazia no banco %s",
   async (mode) => {
     const db = await PGlite.create();
@@ -20,10 +21,32 @@ it.each(["zero", "upgrade"] as const)(
         n.endsWith("_registration_removal.sql"),
       );
       const split = position < 0 ? names.length : position;
-      for (const name of names.slice(0, mode === "zero" ? names.length : split))
+      for (const name of names.slice(
+        0,
+        mode === "upgrade" ? split : names.length,
+      ))
         await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
+      if (mode === "existing_admin")
+        await db.exec(`
+        insert into auth.users(id) values('f9500000-0000-4000-8000-000000000097');
+        insert into public.admin_access(user_id) values('f9500000-0000-4000-8000-000000000097');
+        insert into public.teams(id,name) values('f9500000-0000-4000-8000-000000000003','Clube a preservar');
+        insert into public.championships(id,name) values('f9500000-0000-4000-8000-000000000094','Contexto a preservar');
+        insert into public.seasons(id,championship_id,year) values('f9500000-0000-4000-8000-000000000095','f9500000-0000-4000-8000-000000000094',2026);
+        insert into public.disputes(id,season_id,gender,category) values('f9500000-0000-4000-8000-000000000096','f9500000-0000-4000-8000-000000000095','masculino','Adulto');
+        insert into public.registrations(id,dispute_id,team_id,name) values('f9500000-0000-4000-8000-000000000025','f9500000-0000-4000-8000-000000000096','f9500000-0000-4000-8000-000000000003','Inscrição a preservar');
+      `);
+      const original = (
+        await db.query(
+          "select jsonb_build_object('admin',(select jsonb_agg(a) from public.admin_access a),'teams',(select jsonb_agg(t) from public.teams t),'registrations',(select jsonb_agg(r) from public.registrations r),'users',(select jsonb_agg(u) from auth.users u)) data",
+        )
+      ).rows;
+      const source = await readFile(
+        "supabase/tests/registration_removal.sql",
+        "utf8",
+      );
       const [seed, proof] = (
-        await readFile("supabase/tests/registration_removal.sql", "utf8")
+        mode === "existing_admin" ? buildRemovalServiceProof(source) : source
       ).split("-- REMOVAL PROOF");
       await db.exec(seed);
       const before = (
@@ -136,9 +159,12 @@ it.each(["zero", "upgrade"] as const)(
       `);
       await db.exec(proof);
       expect(
-        (await db.query("select count(*)::int n from public.registrations"))
-          .rows,
-      ).toEqual([{ n: 0 }]);
+        (
+          await db.query(
+            "select jsonb_build_object('admin',(select jsonb_agg(a) from public.admin_access a),'teams',(select jsonb_agg(t) from public.teams t),'registrations',(select jsonb_agg(r) from public.registrations r),'users',(select jsonb_agg(u) from auth.users u)) data",
+          )
+        ).rows,
+      ).toEqual(original);
     } finally {
       await db.close();
     }

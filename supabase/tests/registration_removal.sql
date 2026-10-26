@@ -1,4 +1,5 @@
--- Own synthetic IDs only, including the temporary admin. Always roll back.
+-- Own synthetic business rows only. Preserve an existing singleton admin.
+-- The service export additionally requires an existing enabled admin. Always roll back.
 begin;
 create function pg_temp.rm_id(n integer) returns uuid language sql immutable as $$select ('f9500000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid$$;
 create function pg_temp.rm_assert(ok boolean,label text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAIL: %',label;end if;end$$;
@@ -6,14 +7,29 @@ create function pg_temp.rm_error(statement text,state text) returns void languag
 create function pg_temp.rm_command(n integer default 10,c integer default 510) returns jsonb language sql as $$select jsonb_build_object('commandId',pg_temp.rm_id(c),'registrationId',pg_temp.rm_id(n),'disputeId',pg_temp.rm_id(92),'expectedVersion',1)$$;
 create function pg_temp.rm_create(n integer) returns jsonb language sql as $$select jsonb_build_object('commandId',pg_temp.rm_id(n+1000),'expectedVersion',0,'registration',jsonb_build_object('id',pg_temp.rm_id(n),'disputeId',pg_temp.rm_id(92),'teamId',pg_temp.rm_id(2),'name','Reserva '||n))$$;
 grant execute on function pg_temp.rm_id(integer),pg_temp.rm_assert(boolean,text),pg_temp.rm_error(text,text),pg_temp.rm_command(integer,integer),pg_temp.rm_create(integer) to anon,authenticated,service_role;
-insert into auth.users(id) values(pg_temp.rm_id(98)),(pg_temp.rm_id(99));
-insert into public.admin_access(user_id) values(pg_temp.rm_id(98));
+create temporary table rm_fixture_state(created_admin boolean not null,actor uuid not null);
+revoke all on rm_fixture_state from public,anon,authenticated,service_role;
+-- DISPOSABLE ADMIN SETUP
+do $$declare created boolean:=not exists(select 1 from public.admin_access);actor uuid;begin
+ if created then
+  insert into auth.users(id) values(pg_temp.rm_id(98));
+  insert into public.admin_access(user_id) values(pg_temp.rm_id(98));
+ end if;
+ select user_id into actor from public.admin_access where enabled;
+ if actor is null then raise exception 'Enabled admin required for proof';end if;
+ insert into pg_temp.rm_fixture_state values(created,actor);
+end$$;
+-- END DISPOSABLE ADMIN SETUP
+create function pg_temp.rm_actor() returns uuid language sql stable security definer set search_path='' as $$select actor from pg_temp.rm_fixture_state$$;
+revoke all on function pg_temp.rm_actor() from public,anon,authenticated,service_role;
+grant execute on function pg_temp.rm_actor() to authenticated;
+insert into auth.users(id) values(pg_temp.rm_id(99));
 insert into public.championships(id,name) values(pg_temp.rm_id(90),'Removal fixture');
 insert into public.seasons(id,championship_id,year) values(pg_temp.rm_id(91),pg_temp.rm_id(90),2026);
 insert into public.disputes(id,season_id,gender,category) values(pg_temp.rm_id(92),pg_temp.rm_id(91),'masculino','Adulto'),(pg_temp.rm_id(93),pg_temp.rm_id(91),'feminino','Adulto');
 insert into public.teams(id,name) values(pg_temp.rm_id(2),'Mesmo clube');
 set local role authenticated;
-set local request.jwt.claim.sub='f9500000-0000-4000-8000-000000000098';
+do $$begin perform set_config('request.jwt.claim.sub',pg_temp.rm_actor()::text,true);end$$;
 select public.save_registration(pg_temp.rm_create(n)) from generate_series(10,17) n;
 reset role;
 insert into public.persons(id,name) values(pg_temp.rm_id(201),'Homônimo sintético');
@@ -24,8 +40,8 @@ insert into public.games(id,dispute_id,home_registration_id,away_registration_id
  values(pg_temp.rm_id(80),pg_temp.rm_id(92),pg_temp.rm_id(13),pg_temp.rm_id(11));
 -- Stored pending targets are dependencies even before they are prepared/linked.
 insert into private.text_reviews(id,actor_id,dispute_id,registration_id,document)
- values(pg_temp.rm_id(61),pg_temp.rm_id(98),pg_temp.rm_id(92),pg_temp.rm_id(14),'{}'),
- (pg_temp.rm_id(62),pg_temp.rm_id(98),pg_temp.rm_id(92),null,jsonb_build_object('target',jsonb_build_object('registrationId',upper(pg_temp.rm_id(15)::text))));
+ values(pg_temp.rm_id(61),pg_temp.rm_actor(),pg_temp.rm_id(92),pg_temp.rm_id(14),'{}'),
+ (pg_temp.rm_id(62),pg_temp.rm_actor(),pg_temp.rm_id(92),null,jsonb_build_object('target',jsonb_build_object('registrationId',upper(pg_temp.rm_id(15)::text))));
 insert into public.persons(id,name) values(pg_temp.rm_id(202),'Técnico sintético');
 insert into public.coaches(person_id) values(pg_temp.rm_id(202));
 insert into public.staff_entries(id,registration_id,dispute_id,person_id,role)
@@ -39,7 +55,7 @@ set local role authenticated;
 set local request.jwt.claim.sub='f9500000-0000-4000-8000-000000000099';
 select pg_temp.rm_error('select public.get_registration_removal_context(pg_temp.rm_id(10),pg_temp.rm_id(92))','PT403');
 select pg_temp.rm_error('select public.remove_registration(pg_temp.rm_command())','PT403');
-set local request.jwt.claim.sub='f9500000-0000-4000-8000-000000000098';
+do $$begin perform set_config('request.jwt.claim.sub',pg_temp.rm_actor()::text,true);end$$;
 select pg_temp.rm_assert(public.get_registration_removal_context(pg_temp.rm_id(10),pg_temp.rm_id(92))->>'state'='available','empty registration is eligible');
 select pg_temp.rm_error('select public.get_registration_removal_context(pg_temp.rm_id(10),pg_temp.rm_id(93))','PT404');
 select pg_temp.rm_error('select public.remove_registration(pg_temp.rm_command()||jsonb_build_object(''disputeId'',pg_temp.rm_id(93)))','PT404');
@@ -70,10 +86,19 @@ select pg_temp.rm_assert(public.get_registration(pg_temp.rm_id(10)) is null,'old
 select pg_temp.rm_error('select public.save_registration(pg_temp.rm_create(10)||jsonb_build_object(''commandId'',pg_temp.rm_id(1510)))','PT409');
 reset role;
 select pg_temp.rm_assert((select count(*)=1 from private.registration_removals where registration_id=pg_temp.rm_id(10)),'exactly one removal receipt');
-select pg_temp.rm_assert((select count(*)=1 from private.registration_removals where actor_id=pg_temp.rm_id(98)),'no receipts on failure');
+select pg_temp.rm_assert((select count(*)=1 from private.registration_removals where registration_id in(select pg_temp.rm_id(n) from generate_series(10,17) n)),'no receipts on failure');
 select pg_temp.rm_error('update private.registration_removals set deleted_version=2 where registration_id=pg_temp.rm_id(10)','PT403');
 select pg_temp.rm_error('delete from private.registration_removals where registration_id=pg_temp.rm_id(10)','PT403');
-update public.admin_access set enabled=false where user_id=pg_temp.rm_id(98);
+-- DISPOSABLE REVOCATION CHECK
+do $$begin
+ if (select created_admin from pg_temp.rm_fixture_state) then
+  update public.admin_access set enabled=false where user_id=pg_temp.rm_actor();
+ else
+  -- Existing admin remains untouched; simulate loss of authority via a synthetic nonadmin.
+  perform set_config('request.jwt.claim.sub',pg_temp.rm_id(99)::text,true);
+ end if;
+end$$;
+-- END DISPOSABLE REVOCATION CHECK
 set local role authenticated;
 select pg_temp.rm_error('select public.remove_registration(pg_temp.rm_command())','PT403');
 select pg_temp.rm_error('select public.get_registration_removal_context(pg_temp.rm_id(10),pg_temp.rm_id(92))','PT403');

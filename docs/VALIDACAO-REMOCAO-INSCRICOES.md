@@ -1,6 +1,22 @@
 # Remoção de inscrição vazia — evidência parcial
 
-26/10/2026, branch `codex/ciclo-inscricoes`, base `0c2017f`, contrato L1 `dd03e9b`. Somente fontes do pacote e decisões delegadas. Plano `docs/superpowers/plans/2026-10-26-remocao-inscricao.md`. Nenhuma remoção de registro humano ou alteração remota realizada.
+26/10/2026, branch `codex/ciclo-inscricoes`, base `0c2017f`, contrato L1 `dd03e9b`. Somente fontes do pacote e decisões delegadas. Plano `docs/superpowers/plans/2026-10-26-remocao-inscricao.md`. Nenhum cadastro humano excluído; alteração do esquema novo registrada abaixo.
+
+## Estado atual L2 — aplicado e reconciliado
+
+Migration **20261026135708_registration_removal.sql** aplicada uma vez e reconciliada (versão CLI inicial133442, renomeada para135708 após observar o ledger real). Conteúdo idêntico, SHA256 `ca525c6f32f362474d58dae93a0cb05bbeea09b5f1b02e8fceeb5bea5d93e4af`; agora integra as **45 migrations imutáveis**. Novos tipos gerados do schema real acrescentam somente duas RPCs; typecheck posterior PASS.
+
+Gate de backend **PASS** em52d8c87: 519 unitários/106 arquivos, cinco transportes, treze PostgreSQL, 22 workerd, quatro PDFs, builds/tipos/fronteira/segredos668. Log `removal-backend-gate.log`, SHA256 `7b9bee2e5f1d213e53abf4fd55eb42763c24a719a7f580490b40937b387641b5`. Provas adicionais posteriores de fixture não alteraram a migration ou o produto; não repetir esse gate por elas.
+
+**Contrato real BEGIN/ROLLBACK PASS**, exportado por `scripts/export-registration-removal-proof.mjs`, SHA256 `dba188afbbd5c8e2e3e6e69fbf617e93cc5fd0c0229a9bc0d07d142f119eac2b`. Exportação exige administrador já habilitado e não contém INSERT/UPDATE/DELETE em admin_access. Identidade administrativa existente é usada somente na transação para os próprios registros sintéticos, com não administrador sintético ao testar perda de acesso; nenhum cadastro administrativo real é modificado. Pós-rollback: duas equipes/duas inscrições/uma pessoa/um Auth/um admin ativo, zero remoções e zero Auth sintético. RLS ativo, anônimo sem EXECUTE e autenticado sem DELETE direto.
+
+As duas primeiras tentativas da prova não foram aprovadas: uma fixture tentava criar segundo administrador e atingiu singleton; depois a exportação por substituição de string reduziu `$$` a `$`. Ambas deram rollback, com contagens reais inalteradas. Novo modo local `existing_admin` reproduziu a primeira falha e protege dados pré-existentes; gerador usa callbacks de substituição e o arquivo exato passa nesse modo antes do envio. **Sete focais PASS** (três PostgreSQL + quatro contratos) e types/lint posteriores; log `removal-service-export-local.log`. Revogação efetiva do admin sintético continua nos modos locais vazios; no serviço, a conta real permanece intacta. Isso não é login HTTP/GoTrue.
+
+Após ajuste da fixture, repetidos apenas os três casos nativos afetados, todos PASS/stop0/porta fechada. Relatório atual `removal-native-concurrency.json` SHA256 `b52076e2d7e13cf741276d0d238839d40fa96aa5c49270a140c73b012ddac29e`, log `removal-native-final.log` SHA256 `9fea8d270baca4540c41ebac706be39735229551dce6f905fbade79364877545`. A primeira prova abaixo é histórica; os cinco casos nativos G4 permanecem válidos sem repetição.
+
+Advisors: nenhum aviso novo de segurança, nem FK nova sem índice; permanecem dez INFO de FKs antigas e 58 INFO de índices sem uso no banco quase vazio. WARN conhecido de [proteção contra senha vazada](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection), sem contratação. Não remover índices por isso.
+
+**Pendente L3:** adapter, Worker/rotas/UI e provas de navegador; não há remoção disponível na aplicação ainda. PR draft25 sobre24, sem CI específica nova nem deploy desta unidade. Preview continua source03d7ed8/deployment08840940-5c46-4add-af20-639f054c9d7c/CI515+370; assets/Worker inalterados. Registros seguintes descrevem etapas anteriores.
 
 ## Preparação e L1
 
