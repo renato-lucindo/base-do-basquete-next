@@ -12,6 +12,8 @@
 
 **Cota real26/10/2026 19:19:07UTC-03:**85%usados5h/15%restantes;41%usadossemanal/59%restantes. Reset5h26/10/2026 **19:50:37America/Sao_Paulo (22:50:37UTC)**, retomada oficial solicitada para **19:52:37UTC-03 (22:52:37UTC)**. Reset semanal02/11/2026 04:45:56UTC-03 (07:45:56UTC). Não iniciar nova unidade/gate agora. Mesma automação retomar-preview-base-do-basquete deve ser atualizada, sem duplicata; registrar confirmação pelo resultado oficial. Não comprar créditos/mudar plano/reset manual/expor segredos/pedir token ou senha. Ao completar correção, pausar automação. Aceites humanos/política pública/StorageHTTP anteriores seguem pendentes, sem insistir em perguntas adiadas.
 
+**Agendamento confirmado:** ferramenta oficial retornou Updated automation/ACTIVE para retomar-preview-base-do-basquete, ocorrência única26/10/2026 19:52:37America/Sao_Paulo, nesta conversa; mesma automação, sem duplicata. Checkpoint remoto iniciale8e47e6.
+
 ---
 
 # Súmula desktop entregue no preview protegido — 26/10/2026 18:01 America/Sao_Paulo (UTC-03)
