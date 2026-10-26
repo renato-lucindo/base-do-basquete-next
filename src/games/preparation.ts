@@ -58,12 +58,17 @@ export function suggestPreparation(
     );
     const heads = c.staff.filter((s) => s.role === "head"),
       assistants = c.staff.filter((s) => s.role === "assistant");
-    const coach =
-      heads.find((s) => s.personId === previous?.coachPersonId) ??
-      (heads.length === 1 ? heads[0] : undefined);
+    const coach = previous
+      ? heads.find((s) => s.personId === previous.coachPersonId)
+      : heads.length === 1
+        ? heads[0]
+        : undefined;
     const assistant = coach
-      ? (assistants.find((s) => s.personId === previous?.assistantPersonId) ??
-        (assistants.length === 1 ? assistants[0] : undefined))
+      ? previous
+        ? assistants.find((s) => s.personId === previous.assistantPersonId)
+        : assistants.length === 1
+          ? assistants[0]
+          : undefined
       : undefined;
     document.staff[side] = {
       captainRosterEntryId: captain?.id ?? null,

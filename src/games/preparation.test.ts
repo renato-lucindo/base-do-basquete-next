@@ -29,6 +29,43 @@ const context = (count = 11): PreparationContext => ({
     ]),
   ) as unknown as PreparationContext["sides"],
 });
+it("preserves captain-coach and no-assistant choices from the source instead of guessing a new staff member", () => {
+  const c = context(5),
+    h = c.sides.home;
+  h.staff = [
+    {
+      id: id(900),
+      personId: id(901),
+      role: "head",
+      person: { id: id(901), name: "Técnico disponível", nickname: null },
+    },
+    {
+      id: id(902),
+      personId: id(903),
+      role: "assistant",
+      person: { id: id(903), name: "Assistente disponível", nickname: null },
+    },
+  ];
+  expect(suggestPreparation(c).staff.home.coachStaffEntryId).toBe(id(900));
+  h.previous = {
+    gameId: id(90),
+    version: 1,
+    date: null,
+    time: null,
+    savedAt: "2026-10-20T20:00:00Z",
+    players: h.roster.map((r) => ({
+      personId: r.personId,
+      jersey: r.jersey!,
+      starter: true,
+    })),
+    captainPersonId: h.roster[0].personId,
+    coachPersonId: null,
+    assistantPersonId: null,
+  };
+  expect(suggestPreparation(c).staff.home.coachStaffEntryId).toBeNull();
+  h.previous.coachPersonId = id(901);
+  expect(suggestPreparation(c).staff.home.assistantStaffEntryId).toBeNull();
+});
 it("first game automatically relates eleven, leaves the twelfth empty and does not invent roles", () => {
   const r = suggestPreparation(context());
   expect(r.participants.filter((p) => p.side === "home")).toHaveLength(11);
