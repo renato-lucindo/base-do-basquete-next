@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Súmula desktop entregue no preview protegido — 26/10/2026 18:01 America/Sao_Paulo (UTC-03)
 
 **Objetivo/unidade:** concluído o plano desktop S1–S4 explicitamente aprovado pelo responsável. Workspace C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, remoto novo https://github.com/renato-lucindo/base-do-basquete-next, branch codex/sumula-desktop, source material **a3700552c501f8f6ea9d0e35cffd42ef5f1bd390**, checkpoint anterior398581a. PRdraft26 sobre24, sem merge/principal/produção. As alterações desta unidade são do agente; PDF humano emdocs/boxscore preservado, ignorado apenas localmente por caminho exato, nunca commitado/publicado. Nenhuma alteração humana sobrescrita.
@@ -38,9 +37,6 @@
 ---
 
 # Acessibilidade administrativa publicada — 26/10/2026 10:20 America/Sao_Paulo (UTC-03), histórico
-=======
-# Acessibilidade administrativa publicada — 26/10/2026 10:20 America/Sao_Paulo (UTC-03)
->>>>>>> origin/codex/acessibilidade-administrativa
 
 **Git/unidade:** branch `codex/acessibilidade-administrativa`, material **03d7ed868ed9dfc945437c21a980ea8cb9990719**, PR draft **24** sobre 23. Somente alterações do agente; dados humanos e migrations preservados. Gate local PASS 515 unitários/104 arquivos, cinco transportes, treze PostgreSQL, 22 workerd, quatro PDFs; composição final 24 browsers PASS e anterior 42 PASS. CI **40327603169/job121588250376 SUCCESS**, **370 browsers Linux**. Trinta e duas varreduras administrativas sem violações, com seis `incomplete color-contrast` de células parcialmente fora da área visível. Rótulo de transferência corrigido, tipografia administrativa relativa, cabeçalho permite reflow com texto 200%/320 px, placar em output semântico. Não é WCAG integral, zoom nativo, leitor de tela ou aceite humano. Logs/hashes e revisão pelo autor em `docs/VALIDACAO-ACESSIBILIDADE-ADMIN.md`; manter revisão independente pendente.
 
