@@ -1,4 +1,18 @@
-# Capacidade retomada — 26/10/2026, unidade local em andamento
+# Capacidade integrada no banco — 26/10/2026 05:33UTC-03; CI/preview em andamento
+
+**Git/unidade:** branch codex/capacidade-consultas, material remoto **1c2d3ffa6283e75e6901bfee182c2b8180ddf68f**, base e1d7485, PRdraft21 sobre20 anexado/OPEN/MERGEABLE/sem reviews. Commits C1 1e8b378/C2 0072d27/C3 a82d3a4/lock da3b0b0. Árvores limpas antes desta atualização documental própria; nenhuma alteração humana. Workspace Windows e remoto novo são os mesmos dos registros abaixo; nunca consultar/clonar anterior.
+
+**Provas reutilizáveis:** gate local PASS515unit/104arquivos,5transportes,13PG,22workerd,quatroPDFs/builds/fronteira/segredos; log capacity-gate.log SHA1221bcb7055e493408d5ec60f8662e78cfffd698a92ce806d3b8c40a8b3fc7d0.1000G4 reais descartáveis/100inscrições/11000participações/dez páginas PASS; cálculo puro p95lista210,907/detalhe192,563ms; runtime controlado374,847/369,787ms, não prova planoedge/carga. Validação completa em docs/VALIDACAO-CAPACIDADE.md/ADR019. Não repetir gate515/harness126/SQL inalterado por sessão/docs.
+
+**Banco novo:** migration aplicada UMA vez/reconciliada **20261026082747_paged_confirmed_statistics**,44migrations imutáveis, tipos gerados. Arquivo gerado080026 renomeado para082747 sem alterar corpo; SHA66764a59d7135a043ce43c1d710f219e0d65f18b9ad2c075da43046fcaac67be. Contrato realSupabase17.11 publication.sql+statistics_pages.sql BEGIN/ROLLBACK PASS, prova ignorada capacity-remote-contract.sql SHAb3ab621bf4670e87dbf5a4831cae82753da7a2fce6a7498a9e8cd738675a4b25. Pós-rollback1pessoa/1Auth/1adminativo,0jogos/heads/mapping/participações/recibos/fontes/objetos; dados humanos preservados. AdvisorWARN senha vazada/Pro conhecido,10INFOFKs antigas/índices novos cobertos. Não reaplicar/recriar/bootstrap/usar outrovínculo.
+
+**Próximo EXATO:** CI **40292919217/job121471988935** em1c2d3ff estava in_progress/gate; conferir resultado integral515/338 antes de deploy. Se falhar, diagnóstico focal/log/trace sanitizado, sem novo gate integral automático. Se passar, novo prepare-foundation deHEAD limpo verificado (este checkpoint apenasdocs equivalente), publicar sóWorker existente; smokes de assets/Xsource/privados/projeções públicas/HTMLs/duas browsers, credencialRSA temporária e revogação imediata. Preview ainda72eb9b6/deploymentbaf42899-9e0e-4c1d-9cfe-72ed37b50531/versão4d8be184-c483-4bef-8c29-03c0f61296fb, Access somente responsável/previewsOFF/DO/rate/cofre preservados. **Manifesto72 obsoleto para o novo Worker local**, regenerar. Nenhum DDL/deploy/upload/smoke/credencial local em andamento; apenasCIremota citada. Tokens antigos revogados.
+
+**Cota:** última consulta real30%usados5h/5%semanal, trabalho permitido; consultar de novo entreunidades/anteslongas. Ao85%usados5h: mínima consistência/checkpoint/push e MESMAautomação retomar-preview-base-do-basquete resetefetivo+2. Não presumir horários antigos. Aceites humanos/política pública de agenda/inscritos/StorageHTTP continuam pendentes, sem repetir solicitações. Sem revisão independente/PGmulticonexão/carga/WCAGcompleta/produção. Após capacidade publicada, auditar lacunas de consulta e acessibilidade independentes da política pendente antes de escolher próxima unidade.
+
+---
+
+# Capacidade retomada — 26/10/2026, unidade local em andamento (histórico)
 
 **Objetivo/Git:** plano docs/superpowers/plans/2026-10-26-capacidade-consultas-confirmadas.md/ADR019/VALIDACAO-CAPACIDADE.md. Branch sequencial **codex/capacidade-consultas**, base e1d74851a8634654d08e05dd4693dc13c71f8c59, diagnóstico commit **1e8b378**; próximo material local a salvar abaixo. Só alterações próprias; nenhuma mudança humana observada. Workspace/remoto/serviços são os mesmos descritos nos checkpoints históricos. PR21 ainda não criado; PR20/CI495/338 e preview72eb9b6 reconciliados saudáveis, sem merge/produção.
 
