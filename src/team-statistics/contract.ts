@@ -4,7 +4,7 @@ import { teamsQuerySchema } from "./query-contract";
 const uuid = z.uuid().transform((v) => v.toLowerCase()),
   count = z.number().int().min(0).max(2147483647),
   version = count.min(1);
-export const teamRowSchema = z
+export const teamIdentitySchema = z
   .object({
     registrationId: uuid,
     teamId: uuid,
@@ -12,7 +12,6 @@ export const teamRowSchema = z
     teamName: z.string().min(1).max(120),
     names: z.array(z.string().min(1).max(120)).min(1).max(10000),
     teamNames: z.array(z.string().min(1).max(120)).min(1).max(10000),
-    gamesPlayed: count.min(1).max(10000),
     origin: z
       .object({
         gameId: uuid,
@@ -20,16 +19,19 @@ export const teamRowSchema = z
         publishedAt: z.iso.datetime({ offset: true }),
       })
       .strict(),
-    metrics: z
-      .object({
-        pointsFor: z.number().finite().nonnegative(),
-        pointsAgainst: z.number().finite().nonnegative(),
-        difference: z.number().finite(),
-      })
-      .strict(),
   })
   .strict()
   .refine((r) => r.names.includes(r.name) && r.teamNames.includes(r.teamName));
+export const teamRowSchema = teamIdentitySchema.safeExtend({
+  gamesPlayed: count.min(1).max(10000),
+  metrics: z
+    .object({
+      pointsFor: z.number().finite().nonnegative(),
+      pointsAgainst: z.number().finite().nonnegative(),
+      difference: z.number().finite(),
+    })
+    .strict(),
+});
 export const teamsPageSchema = z
   .object({
     kind: z.literal("confirmed-teams-page-v1"),

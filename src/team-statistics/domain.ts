@@ -4,7 +4,7 @@ import { validateConfirmedFacts } from "../statistics/aggregate";
 import { normalizeStatisticsSearch } from "../statistics/query-contract";
 import { scopesForStageKind } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 import { perGame } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/domain";
-import { teamsQuerySchema } from "./query-contract";
+import { teamsQuerySchema, type TeamsQuery } from "./query-contract";
 import { teamsPageSchema, type TeamsPage, type TeamRow } from "./contract";
 export class TeamCapacityError extends Error {
   constructor() {
@@ -40,9 +40,11 @@ export function validatedTeamSource(input: unknown) {
     },
   };
 }
-export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
-  const { source, coverage } = validatedTeamSource(input),
-    q = teamsQuerySchema.parse(queryInput);
+export function teamRows(
+  checked: ReturnType<typeof validatedTeamSource>,
+  q: Pick<TeamsQuery, "mode" | "scope">,
+): TeamRow[] {
+  const { source } = checked;
   type Appearance = {
     snapshot: (typeof source.games)[number]["snapshot"];
     side: "home" | "away";
@@ -100,6 +102,13 @@ export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
       },
     };
   });
+  return rows;
+}
+export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
+  const checked = validatedTeamSource(input),
+    { source, coverage } = checked,
+    q = teamsQuerySchema.parse(queryInput),
+    rows = teamRows(checked, q);
   const search = normalizeStatisticsSearch(q.search),
     filtered = rows.filter(
       (r) =>

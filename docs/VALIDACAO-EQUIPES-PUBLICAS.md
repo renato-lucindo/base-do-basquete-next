@@ -1,5 +1,15 @@
 # Consulta de equipes confirmadas — evidências
 
+## ET1b — detalhe contextual puro, 26/10/2026 00:29UTC-03
+
+Seleção explícita quando teamId tem duas inscrições; IDs divergentes não escolhem primeira linha. Detalhe sóderiva participantes e jogos publicados da inscrição. Homônimos mantêm IDs próprios,0/00/contexto e aliases, DNP permanece sem linha estatística observada, quem jogou sem ações mantém zero conhecido. Jogos e participantes têm páginas20 independentes e totais antes da paginação; fase sem fatos devolve vazio explícito com identidade jápública.
+
+Coletivos FIBA mantêm partida/origem/versão; Site conserva null, não recebe métricas por soma inferida. Datas e horários continuam os realmente publicados, sem início/fim de vínculo ou equipe atual. Snapshot mínimo de jogo não inclui demais atletas; estatísticas individuais somente da inscrição selecionada.
+
+RED inicial por módulo ausente, sem asserções; primeira implementação3/5 expôs adaptador tratando linha J0 do agregador como estatística de DNP, recusada pelo contrato. Corrigido para null apenas quando nenhum jogo foi disputado, sem alterar o agregador/tableau existente. TypeScript também apontou widening de side na flatMap; retorno tipado corrigido sem cast. GREEN **14cenários novos totais/50composição/6arquivos PASS**, tipos app/Worker/lint/formato PASS. Inclui25jogos/150identidades com páginas independentes e totais corretos, coletivos FIBA/Site, ambiguidades e contexto. Log .preview-artifacts/team-et1-final-composition.log SHA256 **391b6acd72296ba791dfb8ef095fc4027b852e3c86ff83e5b7f908543728397b**.
+
+ET1 estável localmente; ainda sem API/UI/DDL/deploy de equipes. Não repetir gate473/324 do perfil por biblioteca pura: API/vertical ET2–ET4 terão seu próprio gate/CI. Sem claims de carga/capacidade real/WCAG/revisão independente.
+
 ## ET1a — domínio da tabela, 26/10/2026 00:22UTC-03
 
 Contrato/URL fechados para total/per-game, regular/playoffs/all, busca80, ordem whitelist e páginas20. Fonte existente confirmed-statistics-v1 validada/normalizada integralmente antes do filtro. Duas inscrições da mesma equipe, inclusive confronto entre elas, produzem linhas separadas; Jcoletivo conta partida por inscrição e PP/PC/saldo usam placar oficial. Médias dividem somas por partidas; não somam médias de jogadores ou pontos avançados do PDF.

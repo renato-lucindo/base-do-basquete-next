@@ -1,3 +1,13 @@
+# Equipes ET1 puro estável; próximo API read-only — 26/10/2026 00:29 America/Sao_Paulo (UTC-03)
+
+Branch **codex/equipes-publicas**, PRdraft20 sobre19 anexado, base84baf38; tabela material remoto **fc690823e4c585a3e8abf7b65300d7957d663829**, detalhe ET1b pronto para commit/push nesta unidade. Sóalterações próprias; dados/mudanças humanos preservados.14cenários novos/50focais composição/6arquivos PASS, tipos app/Worker/lint/formato PASS; VALIDACAO-EQUIPES-PUBLICAS tem hashes/escopo. Tabela por inscrição/Jcoletivo/placar oficial e detalhe por vínculo explícito, participantes históricos/DNP/0-00/páginas próprias/coletivosFIBA-Site. Ainda SEM API/UI/DDL/deploy de equipes.
+
+**Próximo EXATO ET2:** RED em src/team-statistics/provider.test.ts e testes workerd para GET /api/public/teams/:disputeId e /api/public/teams/:disputeId/:teamId?registrationId=UUID. Provider sóreutiliza RPC pública get_public_statistics_source; params fechados no backend,5MiB/8s,query8192,semAuth/JWT/cookie/SDKno browser. Responder seleção explícita para equipe com duas inscrições; nenhum primeiro vínculo arbitrário. Correlacionar disputa/equipe/inscrição, fontes extras/IDs inválidos,413/429/503 e204? Nunca converter falha técnica em inexistência; sóRPCnull resulta404. SessionStore não participa de GETs públicos. DepoisET3UIconforme plano, gate/CI quando vertical estável.
+
+Preview/CI do **perfil** permanecem84baf38/deploymentca7e528e/versãoa52ba794100%, CI40262045133 SUCCESS473/324; não atribuir a ET1 posterior.43migrations imutáveis/projeto novo/linkautorizado/contagens e proteção nos registros abaixo. Nenhum DDL/deploy/gate/CI/smoke/credencial/processo local ativo. Reutilizar artefatos inalterados; não repetir SQL/harness126/gate por sessão/documentação. Política inscritos/agenda futura e testes humanos adiados continuam pendentes, sem novo pedido. Cota última41%usados5h/62%semanal; conferir entreunidades/anteslongas, aos85%usados checkpoint/push/MESMAautomação resetefetivo+2.
+
+---
+
 # Perfil publicado; próxima unidade equipes confirmadas — 26/10/2026 00:15 America/Sao_Paulo (UTC-03)
 
 **Git/unidade:** checkout sequencial Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, remoto novo https://github.com/renato-lucindo/base-do-basquete-next. Branch atual **codex/equipes-publicas** criada limpa sobre **84baf38151ff833ffafeff71f00aeb1d6513f736**, código de perfil23eede499df2c4c330f9f5303aca4c864ad28b46. PRdraft19 sobre18 preservado; novaPR de equipes ainda não criada. Sóplano/ADR018/checkpoint/validação próprios uncommitted neste momento, sem alterações humanas. Sem merge/principal/produção.
