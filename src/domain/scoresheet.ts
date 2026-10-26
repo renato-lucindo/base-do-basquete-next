@@ -111,7 +111,17 @@ export interface TeamTotal {
   coachStatus: "eligible" | "GD" | "D";
   foulsByPeriod: number[];
 }
-export function aggregate(sheet: Sheet) {
+export type ActionProgress = {
+  event: Entry;
+  teamPoints: number;
+  playerFouls: number | null;
+  playerStatus: PlayerTotal["status"] | null;
+  coachStatus: TeamTotal["coachStatus"];
+};
+export function aggregate(
+  sheet: Sheet,
+  onAction?: (progress: ActionProgress) => void,
+) {
   const players: PlayerTotal[] = sheet.roster.map((s) => ({
     ...s,
     two: 0,
@@ -223,6 +233,13 @@ export function aggregate(sheet: Sheet) {
       own.points += points;
       own.periods[event.period - 1] =
         (own.periods[event.period - 1] ?? 0) + points;
+      onAction?.({
+        event,
+        teamPoints: own.points,
+        playerFouls: player.fouls,
+        playerStatus: player.status,
+        coachStatus: own.coachStatus,
+      });
       continue;
     }
     const foul = parseFoul(event.code, event.target);
@@ -275,6 +292,13 @@ export function aggregate(sheet: Sheet) {
     )
       own.coachStatus = "GD";
     if (coach && own.coachStatus !== "eligible") coach.status = own.coachStatus;
+    onAction?.({
+      event,
+      teamPoints: own.points,
+      playerFouls: player?.fouls ?? null,
+      playerStatus: player?.status ?? null,
+      coachStatus: own.coachStatus,
+    });
   }
   return { players, teams, errors: [...new Set(errors)] };
 }
