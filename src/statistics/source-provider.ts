@@ -29,7 +29,7 @@ export async function readPublicStatisticsSource(
   send: PublicStatisticsSend,
   disputeId: string,
 ): Promise<StatisticsSource | null> {
-  const args: Database["public"]["Functions"]["get_public_statistics_source"]["Args"] =
+  const args: Database["public"]["Functions"]["get_public_statistics_head"]["Args"] =
     { p_dispute_id: disputeId };
   const deadline = AbortSignal.timeout(20000);
   let remaining = 16 * 1024 * 1024;

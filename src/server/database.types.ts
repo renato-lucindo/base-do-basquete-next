@@ -557,6 +557,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      published_statistics_games: {
+        Row: {
+          dispute_id: string;
+          game_id: string;
+          phase: string | null;
+          publication_version: number;
+        };
+        Insert: {
+          dispute_id: string;
+          game_id: string;
+          phase?: string | null;
+          publication_version: number;
+        };
+        Update: {
+          dispute_id?: string;
+          game_id?: string;
+          phase?: string | null;
+          publication_version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "published_statistics_games_game_id_dispute_id_fkey";
+            columns: ["game_id", "dispute_id"];
+            isOneToOne: true;
+            referencedRelation: "games";
+            referencedColumns: ["id", "dispute_id"];
+          },
+        ];
+      };
       registrations: {
         Row: {
           dispute_id: string;
@@ -838,6 +867,14 @@ export type Database = {
       get_public_game: { Args: { p_id: string }; Returns: Json };
       get_public_player_profile: {
         Args: { p_person_id: string };
+        Returns: Json;
+      };
+      get_public_statistics_head: {
+        Args: { p_dispute_id: string };
+        Returns: Json;
+      };
+      get_public_statistics_page: {
+        Args: { p_after?: string; p_dispute_id: string; p_version: number };
         Returns: Json;
       };
       get_public_statistics_source: {
