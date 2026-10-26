@@ -13,6 +13,81 @@ import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
+test("public team list/detail use confirmed source and require explicit registration without session", async () => {
+  const f = await fixture({ statistics: true }),
+    source = JSON.parse(
+      await readFile("tests/fixtures/statistics-source.json", "utf8"),
+    ),
+    team = source.games[0].snapshot.game.home,
+    path = `/api/public/teams/${source.disputeId}`;
+  try {
+    const r = await f.mf.dispatchFetch(
+      origin + path + "?mode=total&scope=all",
+      { headers: { cookie: "__Host-bdb-session=invalid" } },
+    );
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get("set-cookie"), null);
+    const p = await r.json();
+    assert.equal(p.rows.length, 2);
+    assert.equal(p.rows[0].gamesPlayed, 3);
+    assert.equal("games" in p, false);
+    const selection = await f.mf.dispatchFetch(
+      origin + path + `/${team.team.id}`,
+    );
+    assert.equal(selection.status, 200);
+    assert.equal((await selection.json()).kind, "confirmed-team-selection-v1");
+    const detail = await f.mf.dispatchFetch(
+      origin +
+        path +
+        `/${team.team.id}?registrationId=${team.registrationId}&mode=total&scope=all`,
+    );
+    assert.equal(detail.status, 200);
+    const d = await detail.json();
+    assert.equal(d.registrationId, team.registrationId);
+    assert.equal(d.games.total, 3);
+    assert.equal(d.identity.name, "Lobos");
+    assert.equal(
+      d.games.items.some((g) => "facts" in g),
+      false,
+    );
+    assert.equal(
+      f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
+      false,
+    );
+    for (const tail of [
+      "?x=bad",
+      "?page=1&page=2",
+      `/${team.team.id}?registrationId=bad`,
+      `/${team.team.id}?registrationId=${id}`,
+      `/${id}`,
+    ])
+      assert.equal(
+        (await f.mf.dispatchFetch(origin + path + tail)).status,
+        tail.includes(id) ? 404 : 400,
+      );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path + "?q=" + "x".repeat(8193)))
+        .status,
+      414,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path, { method: "POST", body: "{}" }))
+        .status,
+      405,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + "/api/public/teams/bad")).status,
+      400,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + `/api/public/teams/${id}`)).status,
+      404,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
 test("public player career route derives a page without app session, JWT or cookie", async () => {
   const f = await fixture({ playerProfiles: true });
   const source = JSON.parse(

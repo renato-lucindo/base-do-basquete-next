@@ -1,5 +1,6 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
+import { publicTeamsRoute } from "../team-statistics/routes";
 import {
   publicPlayerProfileRoute,
   privatePlayerProfileRoute,
@@ -44,6 +45,11 @@ export default {
         response = jsonResponse({ ok: true });
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
+      else if (
+        url.pathname === "/api/public/teams" ||
+        url.pathname.startsWith("/api/public/teams/")
+      )
+        response = await publicTeamsRoute(request, env, url);
       else if (
         url.pathname === "/api/public/players" ||
         url.pathname.startsWith("/api/public/players/")

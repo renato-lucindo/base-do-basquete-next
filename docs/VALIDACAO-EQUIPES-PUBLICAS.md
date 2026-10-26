@@ -1,5 +1,15 @@
 # Consulta de equipes confirmadas — evidências
 
+## ET2 — adapter/rotas locais, 26/10/2026 00:40UTC-03
+
+GETs públicos específicos de tabela e detalhe, sem SessionStore/Auth. SóUUID canônico da disputa entra em get_public_statistics_source, com chave publicável apenas no Worker,timeout8s/read5MiB. Backend deriva DTO mínimo, correlaciona disputa/equipe/inscrição e recusa query desconhecida/duplicada/IDinválido antes da leitura; limite8192,405/400/404 explícitos. RPCnull significa ausência; falha técnica/JSONruim/fonte contaminada não vira404 nem limpa cookie administrativo.
+
+Leitor de fonte read-only extraído do provider estatístico para reutilização estrita, sem CRUD genérico. RED de capacidade413 demonstrou conversão indevida em503; ambos consumidores agora preservam413 sanitizado e429, demais detalhes técnicos não são expostos. RED deUUID de origem em maiúsculas demonstrou comparação crua inconsistente; header canônico resolve sem ocultar fonte de outra disputa. RED workerd404 antes de registrar as rotas, GREEN após Worker/allowlist de compilação sem novoEnv.
+
+**24focais/4arquivos PASS**, SHA256 .preview-artifacts/team-et2-composition.log **44a552639dd29ccfa8a3eda818808cfc1f9b15b7e578a8e750e550056d9aee14**. **21workerd de composição PASS**, log team-et2-workerd-composition.log SHA256 **58c696fa0e18cf5584818a6969a481bcaede58cc9068650e65f7675cde62fd82**; três públicos focais anteriores também PASS. Tipos app/Worker/lint/formato/buildWorkerPASS. Consulta de docsCF atual e metadata de tipos5.20261026.1 não levou a upgrade de dependências fixadas/configuração/compatibilidade.
+
+Sem novaDDL ou deploy; RPC/43migrations existentes inalteradas, sem repetição de SQL/harness126. API de equipes ainda não está no preview84baf38. BuildWorker local agora contém mudanças posteriores: manifesto/payload84 continuam prova do preview antigo, não devem ser misturados ao Worker local. ET3 páginas/links/browsers pendentes; gate/CI da vertical sóquando estável. Outbound controlado/workerd não equivalem a prova AuthHTTP/Storage reais ou carga.
+
 ## ET1b — detalhe contextual puro, 26/10/2026 00:29UTC-03
 
 Seleção explícita quando teamId tem duas inscrições; IDs divergentes não escolhem primeira linha. Detalhe sóderiva participantes e jogos publicados da inscrição. Homônimos mantêm IDs próprios,0/00/contexto e aliases, DNP permanece sem linha estatística observada, quem jogou sem ações mantém zero conhecido. Jogos e participantes têm páginas20 independentes e totais antes da paginação; fase sem fatos devolve vazio explícito com identidade jápública.

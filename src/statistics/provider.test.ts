@@ -3,6 +3,13 @@ import { SupabaseStatistics } from "./provider";
 import { confirmedManualFixture } from "../../tests/fixtures/statistics-publications";
 import { pubId } from "../../tests/fixtures/publication";
 const config = { url: "https://db.example.test", key: "fixture-publishable" };
+it("capacidade pública413 não vira indisponibilidade genérica", async () => {
+  await expect(
+    new SupabaseStatistics(config, async () =>
+      Response.json({ message: "private capacity detail" }, { status: 413 }),
+    ).getPage(pubId(801), new URLSearchParams()),
+  ).rejects.toMatchObject({ status: 413, code: "source_capacity" });
+});
 function source() {
   return {
     kind: "confirmed-statistics-v1",
