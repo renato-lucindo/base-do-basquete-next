@@ -645,6 +645,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  getGameSheetPreparation(gameId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.getPreparation(accessToken, gameId),
+      ),
+    );
+  }
   getGameSheet(gameId: string) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>

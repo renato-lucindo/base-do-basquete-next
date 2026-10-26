@@ -698,6 +698,33 @@ async function fixture(options = {}) {
           return Response.json(null);
         if (url.pathname === "/rest/v1/rpc/get_game_sheet")
           return Response.json(null);
+        if (url.pathname === "/rest/v1/rpc/get_game_sheet_preparation") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const { p_game_id } = await request.json();
+          return Response.json({
+            gameId: p_game_id,
+            gameVersion: 1,
+            sides: {
+              home: {
+                registrationId: "10000000-0000-4000-8000-000000000002",
+                roster: [],
+                staff: [],
+                previous: null,
+                lastJerseys: {},
+              },
+              away: {
+                registrationId: "10000000-0000-4000-8000-000000000003",
+                roster: [],
+                staff: [],
+                previous: null,
+                lastJerseys: {},
+              },
+            },
+          });
+        }
         if (url.pathname === "/rest/v1/rpc/save_game_sheet") {
           assert.equal(
             request.headers.get("authorization"),
@@ -1366,6 +1393,28 @@ test("sheet routes authorize and validate domain, path correlation, origin and l
     const path = `/api/games/${id}/sheet`;
     assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
     const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const prep = `${origin}${path}/preparation`;
+    assert.equal((await f.mf.dispatchFetch(prep)).status, 401);
+    const context = await f.mf.dispatchFetch(prep, { headers: { cookie } });
+    assert.equal(context.status, 200);
+    assert.equal((await context.json()).gameId, id);
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(prep + "?unexpected=1", {
+          headers: { cookie },
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(prep, {
+          method: "POST",
+          headers: { cookie, origin },
+        })
+      ).status,
+      405,
+    );
     const send = (method, body, extra = {}, suffix = "") =>
       f.mf.dispatchFetch(`${origin}${path}${suffix}`, {
         method,

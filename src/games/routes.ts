@@ -14,6 +14,18 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
   const session = env.SESSIONS.getByName(name),
     root = url.pathname === "/api/games";
   const sheet = /^\/api\/games\/([^/]+)\/sheet$/u.exec(url.pathname);
+  const preparation = /^\/api\/games\/([^/]+)\/sheet\/preparation$/u.exec(
+    url.pathname,
+  );
+  if (preparation) {
+    const id = z.uuid().safeParse(preparation[1]);
+    if (!id.success || url.search) throw badInput();
+    if (request.method !== "GET")
+      throw new HttpError(405, "invalid_method", "Método não permitido.");
+    const r = await session.getGameSheetPreparation(id.data);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
   if (sheet && !url.search) {
     const id = z.uuid().safeParse(sheet[1]);
     if (!id.success) throw badInput();

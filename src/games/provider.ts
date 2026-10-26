@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { preparationContextSchema } from "./preparation-contract";
 import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import { HttpError } from "../server/http";
@@ -55,6 +56,16 @@ export class SupabaseGames {
     if (r.id !== command.game.id || r.version !== command.expectedVersion + 1)
       throw unavailable();
     return r;
+  }
+  async getPreparation(token: string, gameId: string) {
+    const result = await this.checked(
+      preparationContextSchema,
+      "get_game_sheet_preparation",
+      { p_game_id: gameId },
+      token,
+    );
+    if (result.gameId !== gameId) throw unavailable();
+    return result;
   }
   async getSheet(token: string, gameId: string) {
     const r = await this.checked(
@@ -122,7 +133,12 @@ export class SupabaseGames {
       throw unavailable();
     }
     if (response.ok) {
-      const body = await providerJson(response, 1048576);
+      const body = await providerJson(
+        response,
+        name === "get_game_sheet_preparation" ? 4194304 : 1048576,
+      );
+      if (body === null && name === "get_game_sheet_preparation")
+        throw unavailable();
       if (body === null && name !== "get_game_sheet")
         throw new HttpError(404, "context_not_found", "Jogo não encontrado.");
       const r = schema.safeParse(body);
