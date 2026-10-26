@@ -121,6 +121,51 @@ it("valida origens também fora do recorte escolhido", () => {
     }),
   ).toThrow("Origem estatística incompatível");
 });
+it("histórico pagina 20+5 com URL própria sem reduzir jogos ou totais", () => {
+  const s = playerCareerFixture(),
+    row = s.participations[0];
+  s.participations = Array.from({ length: 25 }, (_, i) => {
+    const p = structuredClone(row);
+    p.fact.gameId = pubId(12000 + i);
+    p.fact.registration.registrationId = pubId(13000 + i);
+    p.fact.registration.name = `Inscrição ${String(i).padStart(2, "0")}`;
+    p.game.home = structuredClone(p.fact.registration);
+    return p;
+  });
+  const q = parseProfileQuery(
+    new URLSearchParams("secao=historico&historyPage=2&page=1"),
+  );
+  expect(
+    parseProfileQuery(new URLSearchParams(serializeProfileQuery(q))),
+  ).toEqual(q);
+  const p = buildPlayerProfile(s, q);
+  expect(p.history).toHaveLength(5);
+  expect(p.historyPagination).toEqual({
+    page: 2,
+    pageSize: 20,
+    total: 25,
+    totalPages: 2,
+  });
+  expect(p.query.historyPage).toBe(2);
+  expect(p.games.items).toHaveLength(20);
+  expect(p.games.page).toBe(1);
+  expect(p.statistics.summary?.gamesPlayed).toBe(25);
+  const first = buildPlayerProfile(s, { ...q, historyPage: 1, page: 2 });
+  expect(first.history).toHaveLength(20);
+  expect(
+    new Set(
+      [...first.history, ...p.history].map(
+        (h) => h.registration.registrationId,
+      ),
+    ).size,
+  ).toBe(25);
+  expect(first.games.items).toHaveLength(5);
+  const clamped = buildPlayerProfile(s, { ...q, historyPage: 999 });
+  expect(clamped.query.historyPage).toBe(2);
+  expect(
+    parseProfileQuery(new URLSearchParams("historyPage=-4")).historyPage,
+  ).toBe(1);
+});
 it("honraria fornece identidade com proveniência, sem virar metadado de perfil", () => {
   const s = playerCareerFixture(),
     fact = s.participations[0].fact;

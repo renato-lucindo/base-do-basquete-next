@@ -157,7 +157,11 @@ export function buildPlayerProfile(
     .sort(
       (a, b) =>
         b.context.year - a.context.year ||
-        a.registration.name.localeCompare(b.registration.name),
+        a.registration.name.localeCompare(b.registration.name) ||
+        a.disputeId.localeCompare(b.disputeId) ||
+        a.registration.registrationId.localeCompare(
+          b.registration.registrationId,
+        ),
     );
   const sorted = [...related].sort((a, b) =>
     mostRecent(
@@ -166,11 +170,13 @@ export function buildPlayerProfile(
     ),
   );
   const totalPages = Math.max(1, Math.ceil(sorted.length / 20)),
-    page = Math.min(q.page, totalPages);
+    page = Math.min(q.page, totalPages),
+    historyPages = Math.max(1, Math.ceil(history.length / 20)),
+    historyPage = Math.min(q.historyPage, historyPages);
   return playerProfilePageSchema.parse({
     kind: "confirmed-player-profile-page-v1",
     personId: source.personId,
-    query: { ...q, page },
+    query: { ...q, page, historyPage },
     identity,
     contexts,
     statistics: {
@@ -195,6 +201,12 @@ export function buildPlayerProfile(
       total: sorted.length,
       totalPages,
     },
-    history,
+    history: history.slice((historyPage - 1) * 20, historyPage * 20),
+    historyPagination: {
+      page: historyPage,
+      pageSize: 20,
+      total: history.length,
+      totalPages: historyPages,
+    },
   });
 }

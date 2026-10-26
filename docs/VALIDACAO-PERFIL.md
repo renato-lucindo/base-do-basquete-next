@@ -1,5 +1,9 @@
 # Perfil confirmado — evidências
 
+## P4c1 — paginação pública independente, 25/10/2026 23:48UTC-03
+
+RED observado: histórico com25inscrições retornava25em vez de5na segunda página. Query historyPage e metadados historyPagination separados da página dos jogos;20por página, clamp e ordem determinística por IDs após ano/nome. Totais continuam sobre toda a fonte selecionada, sem depender de nenhuma página. GREEN19focais domínio/provider/carreira e tipos app/Worker PASS. Logs profile-p4c-pagination-red.log e profile-p4c-pagination-green.log em .preview-artifacts. Não altera SQL/serviços nem reaplica migrations. Reutilizar provas anteriores inalteradas; gate consolidado após vertical estável.
+
 ## P4b1 — painel administrativo local, 25/10/2026
 
 Ação Perfil público na linha do atleta, inclusive vínculo histórico, abre conferência dos metadados salvos; guard próprio preserva motivo/envio durante navegação e reautenticação. Campos públicos são apresentados explicitamente, sem nascimento completo/sexo/registro; revisão exige motivo. Comando sóreferencia versões/identidade. ACK incerto mantém comando congelado; ACK conhecido com falha de leitura repete sóGET;409 preserva motivo e exige atualização/conferência. Link público sódepois de existir confirmação. Hook de foco roda após commit para cabeçalho/status/checkbox e retorno ao elenco.

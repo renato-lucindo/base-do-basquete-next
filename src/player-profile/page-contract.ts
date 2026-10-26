@@ -83,12 +83,21 @@ export const playerProfilePageSchema = z
         totalPages: count.min(1),
       })
       .strict(),
-    history: z.array(history).max(10000),
+    history: z.array(history).max(20),
+    historyPagination: z
+      .object({
+        page: count.min(1),
+        pageSize: z.literal(20),
+        total: count,
+        totalPages: count.min(1),
+      })
+      .strict(),
   })
   .strict()
   .superRefine((p, c) => {
     const s = p.statistics,
-      g = p.games;
+      g = p.games,
+      h = p.historyPagination;
     if (
       (s.status === "available") !== (s.summary !== null) ||
       (s.summary?.personId !== undefined &&
@@ -101,6 +110,14 @@ export const playerProfilePageSchema = z
         Math.min(20, Math.max(0, g.total - (g.page - 1) * 20)) ||
       new Set(g.items.map((x) => x.fact.gameId)).size !== g.items.length ||
       g.items.some((x) => x.fact.person.id !== p.personId) ||
+      h.page !== p.query.historyPage ||
+      h.totalPages !== Math.max(1, Math.ceil(h.total / 20)) ||
+      h.page > h.totalPages ||
+      p.history.length !==
+        Math.min(20, Math.max(0, h.total - (h.page - 1) * 20)) ||
+      new Set(
+        p.history.map((x) => x.disputeId + "/" + x.registration.registrationId),
+      ).size !== p.history.length ||
       p.honors.some((x) => x.recipient.personId !== p.personId) ||
       new Set(p.contexts.map((x) => x.disputeId)).size !== p.contexts.length
     )

@@ -22,11 +22,13 @@ export const profileQuerySchema = z
     seasonId: uuid.nullable(),
     disputeId: uuid.nullable(),
     page: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+    historyPage: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
   })
   .strict();
 export type ProfileQuery = z.infer<typeof profileQuerySchema>;
 export function parseProfileQuery(p: URLSearchParams): ProfileQuery {
   const page = Number(p.get("page") ?? 1);
+  const historyPage = Number(p.get("historyPage") ?? 1);
   return profileQuerySchema.parse({
     section: profileQuerySchema.shape.section
       .catch("resumo")
@@ -37,6 +39,8 @@ export function parseProfileQuery(p: URLSearchParams): ProfileQuery {
     seasonId: p.get("seasonId") || null,
     disputeId: p.get("disputeId") || null,
     page: Number.isSafeInteger(page) && page > 0 ? page : 1,
+    historyPage:
+      Number.isSafeInteger(historyPage) && historyPage > 0 ? historyPage : 1,
   });
 }
 export function serializeProfileQuery(input: ProfileQuery): string {
@@ -48,5 +52,6 @@ export function serializeProfileQuery(input: ProfileQuery): string {
   for (const key of ["championshipId", "seasonId", "disputeId"] as const)
     if (q[key]) p.set(key, q[key]);
   if (q.page > 1) p.set("page", String(q.page));
+  if (q.historyPage > 1) p.set("historyPage", String(q.historyPage));
   return p.toString();
 }
