@@ -1,4 +1,20 @@
-# Acessibilidade publicada — 26/10/2026 06:21UTC-03; próxima provaPGnativa
+# Concorrência nativa comprovada — 26/10/2026 06:43UTC-03
+
+**Unidade/Git:** branch codex/concorrencia-postgres/base **0198cd2ec1124ff8058f317d74c2d86aa8ad60cd**, runner/docs próprios até este salvamento; nenhuma mudança humana ou de produto/migration. Plano2026-10-26-concorrencia-postgres-nativo/VALIDACAO-CONCORRENCIA.md. PR23 ainda não criado, sobre22; não houve merge/produção.
+
+**Concluído:** PostgreSQL17.11 nativo emcluster novo isolado127.0.0.1:55439, quatroPIDs/conexões e44migrations. Cinco casos PASS: mesmo comando/ACKúnico; intenção antigaPT409duasvezes; revogação bloqueia e recusaPT403; GETdurantecorreção vêversãoantiga consistente e depois409; doisjogosserializamfonte compartilhada sem perda. Advisorykeys de comando/root e bloqueios via pg_locks/pg_blocking_pids conferidos. Fim4publicações/5versões+recibos+mudanças/44participações/head5. Não modificou produto para fazer passar, nem usoubypass.
+
+**Estado seguro:** stopExit0/portClosedtrue, porta55439 semLISTEN, todosclientes/processos próprios encerrados. Binários oficiais extraídos em .preview-artifacts/pg-native-17.11/pgsql/bin e arquivoZIP340719294bytes preservados ignorados; SHA6eabdf00..., extração1592entradas141MB após verificar21903caminhos. Checksumfornecedor403/EXENotSigned registrados, sem assinatura inventada. Python3.12.3 real C:/Program Files/Python312/python.exe. Três diretórios de dados exclusivamente fictícios em .preview-artifacts/pg-native-run-* encerrados; não excluir recursivamente por retomada. Arquivospyc decompilação foram movidos aoignorado; não commitarbinários.
+
+**Evidências:** relatório native-concurrency.json SHAef4317fed099b38e331deb7a04adaa526d7d2310be382db1f61bdd33ca00b4d6; lognative-concurrency-lock-identities.log SHA817e0276dc3e05e9b47e93e73ca26875a769d0dd0872ddd7356bb308aa7ad92a; runnerSHA9832416ab185237972be66a16b41345f301f221cad4dbdcada3ece50722d4479. Primeira tentativa depreparação falhourolepostgresausente/cleanupseguro, corrigido sóinitdbowner; doisensaios verdes, último verificaidentidadesdoslocks. Reusar essasprovas em vez derodarnovamente por sessão.
+
+**Próximo EXATO:** salvar/secretcheck/PRdraft deprova; nenhum novo gate/deploy necessário para teste/docs. Conferir cota e escolher pequena unidade independente: auditoriaaxe dos estados administrativos existentes (login/contexto/importação/súmula), com plano próprio e fixtures locais, sem teste humano repetido nem publicarpauta/agenda pendentes. CI dedicadaPG e demais corridas ficam como melhorias delimitadas, não alegar cobertura total.
+
+Preview segue **bbcda6a/deploymentb8b61002-25e1-4770-b62f-1ed881eb140e/versão198c0264-762c-4ae8-a230-ae016effcfa8**,CI40297505322SUCCESS515/352,smokes protegidosPASS,tokens753bdc9c/política7cdb4aa7revogados. Worker/cliente idênticos; Supabase44migrations/última20261026082747/dados humanos preservados, sem novaDDL. Sem processos/CI/deploy/upload/smoke/credencial ativos. Última cota75%usados5h/12%semanal, ainda permitia continuar; consultar antes da próxima unidade. Aos85%usados5h não iniciaroutraunidade/gatelongo, checkpoint/push/MESMAautomação resetefetivo+2. Política pública de inscritos/agenda, aceites humanos/StorageHTTP e avaliação assistiva continuam pendentes, sem repetirpedidos. Registros seguintes sãohistóricos.
+
+---
+
+# Acessibilidade publicada — 26/10/2026 06:21UTC-03; próxima provaPGnativa (histórico)
 
 **Git/unidade:** branch codex/acessibilidade-consultas, material remoto **bbcda6a27d3cc921b370a954278e41eac9943e7d**, checkpoint/plano nativo **f57291c**, PRdraft22 sobre21 anexado. Somente documentação própria até este salvamento; mudanças/dados humanos preservados. Plano2026-10-26-acessibilidade-consultas/VALIDACAO-ACESSIBILIDADE.md. Sem merge/principal/produção.
 
