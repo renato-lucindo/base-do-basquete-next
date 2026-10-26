@@ -10,6 +10,7 @@ import { achievementBackendFixture } from "./fixtures/achievement-backend.ts";
 import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
 import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
 import { statisticsRpcBody } from "./fixtures/statistics-rpc.ts";
+import { registrationRemovalOutbound } from "./fixtures/registration-removal-rpc.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -299,6 +300,7 @@ async function fixture(options = {}) {
   const transferResponse = transferBackend(options);
   const achievementResponse = achievementOutbound(options);
   const playerProfileResponse = playerProfileOutbound(options, id);
+  const removalResponse = registrationRemovalOutbound(options);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -332,6 +334,8 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        const removal = await removalResponse(request);
+        if (removal) return removal;
         if (options.playerProfiles) {
           const r = await playerProfileResponse(request);
           if (r) return r;
@@ -417,7 +421,12 @@ async function fixture(options = {}) {
         if (url.pathname === "/auth/v1/user")
           return Response.json({ id, is_anonymous: false });
         if (url.pathname === "/rest/v1/admin_access") {
-          if (options.decisions || options.transfers || options.achievements)
+          if (
+            options.decisions ||
+            options.transfers ||
+            options.achievements ||
+            options.registrationRemovals
+          )
             options.authorizationReads = (options.authorizationReads ?? 0) + 1;
           return Response.json(
             options.denied ||
@@ -1880,6 +1889,95 @@ test("team and registration routes enforce session, context, origin and strict c
       f.calls.filter((c) => c === "/rest/v1/rpc/save_registration").length,
       1,
     );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("registration removal routes correlate context, freeze replay and authorize before body", async () => {
+  const options = { registrationRemovals: true, removalLoseAck: true },
+    f = await fixture(options);
+  const path = `/api/registrations/${id}/removal`,
+    query = `?disputeId=${id}`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + path + query)).status, 401);
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(origin + path, {
+          method: "POST",
+          body: "invalid-json",
+        })
+      ).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (tail = "", method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + tail, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body !== undefined
+          ? { body: typeof body === "string" ? body : JSON.stringify(body) }
+          : {}),
+      });
+    const context = await send(query);
+    assert.equal(context.status, 200);
+    assert.equal((await context.json()).state, "available");
+    const command = {
+      commandId: id,
+      registrationId: id,
+      disputeId: id,
+      expectedVersion: 1,
+    };
+    assert.equal((await send("", "POST", command)).status, 503);
+    const retry = await send("", "POST", command);
+    assert.equal(retry.status, 200);
+    const ack = await retry.json();
+    assert.deepEqual(ack, {
+      state: "removed",
+      id,
+      disputeId: id,
+      deletedVersion: 1,
+    });
+    assert.deepEqual(await (await send(query)).json(), ack);
+    assert.equal(
+      (await send("", "POST", { ...command, expectedVersion: 2 })).status,
+      409,
+    );
+    const other = id.replace(/1$/, "2");
+    assert.equal(
+      (await send("", "POST", { ...command, commandId: other })).status,
+      409,
+    );
+    assert.equal(
+      (await send("", "POST", { ...command, registrationId: other })).status,
+      400,
+    );
+    assert.equal(
+      (await send("", "POST", { ...command, canRemove: true })).status,
+      400,
+    );
+    assert.equal(
+      (await send("", "POST", command, { origin: "https://evil.test" })).status,
+      403,
+    );
+    assert.equal((await send("", "POST", " ".repeat(8193))).status, 413);
+    for (const tail of ["", query + "&extra=x", query + `&disputeId=${id}`])
+      assert.equal((await send(tail)).status, 400);
+    assert.equal((await send(query, "POST", command)).status, 400);
+    assert.equal((await send("", "DELETE")).status, 405);
+    options.denyAuthorizationAt = options.authorizationReads + 1;
+    assert.equal((await send("", "POST", "not-json")).status, 403);
+    delete options.denyAuthorizationAt;
+    assert.equal(
+      f.calls.filter((p) => p === "/rest/v1/rpc/remove_registration").length,
+      4,
+    );
+    assert.equal(JSON.stringify(ack).includes("fixture-access"), false);
   } finally {
     await f.mf.dispose();
   }

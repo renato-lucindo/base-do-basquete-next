@@ -20,6 +20,18 @@ Advisors: nenhum aviso novo de segurança, nem FK nova sem índice; permanecem d
 
 ## Preparação e L1
 
+## L3a local — adapter/Worker/HTTP
+
+Adapter e SessionStore específicos implementados; consulta/ACK limitados a8KiB, correlação de IDs/disputa/versão e recusa de dados privados. 409 distingue dependência, remoção anterior, comando divergente e versão; 404 de função ausente permanece indisponibilidade. JWT fica somente nos cabeçalhos do provedor, erros SQL não são copiados. **Oito testes focais de provider/contrato PASS**; RED anterior observou métodos ausentes. Log `removal-provider-green.log` SHA256 `07ac3a4f42c4a734eb950fe552f676bef9a4a208f423187fc74e73a88f803004`.
+
+GET/POST `/api/registrations/:id/removal` locais validam consulta/corpo/contexto e origem; autorização fresca ocorre antes de ler o corpo de mutação e novamente na operação. Body≤8KiB, identificador do path deve corresponder ao comando, DELETE não é exposto. Workerd focal **2/2 PASS**, incluindo CRUD C2 existente e remoção com ACK perdido/retry, GET de removido, conflitos, CSRF/limites/consulta duplicada e revogação antes de JSON inválido. RED HTTP405 observado antes das rotas; primeiro ensaio GREEN encontrou contador de autorização ausente na nova fixture, corrigido só no mock. Log final `removal-route-green.log` SHA256 `5e0c86632a61d995fc2dc887a8c215265dddd9cd90532e434e17797116677b1e`.
+
+Composição ampliada teve **22/23 PASS**, falhando somente a inicialização do runtime do teste de texto: diretórios temporários Miniflare de cache/DO/rate/email ausentes antes de HTTP/RPC. Focal desse caso **1/1 PASS** sem mudança de código; causa do desaparecimento dos diretórios não determinada. Não marcar o grupo integral PASS nem trocar SDK por essa observação. Logs `removal-http-composition.log` SHA256 `21ba3f494186154a696fb1b018d11817d1b763a4c149334d638de66c9b9a77a1` e `removal-text-transport-isolated.log` SHA256 `e7ffc0aede338650bc914e3b341dc781e232df192979053a122647099eb9f970`.
+
+Build Worker/tipos e lint/formato focais aprovados; HTTP novo ainda sem CI/deploy. UI pendente. O manifesto/payload ignorado03d7ed8 pertence ao preview anterior; Worker local agora inclui rotas novas e exige nova fonte/gate/CI antes de futuro deploy. Demais evidências de arquivos/artefatos inalterados continuam válidas.
+
+## Registro L1 anterior
+
 Consulta no projeto novo confirmou 44 migrations, última `20261026082747`, e os dados humanos: duas equipes/duas inscrições/uma pessoa/um Auth/zero jogos. Foram mapeadas treze FKs de inscrições em onze tabelas, sem cascata. Histórico de regulamento e honrarias mantém links por versão; conferências de texto podem guardar destino em JSON antes do vínculo. O índice/changelog e a documentação atual de RLS foram consultados; falha do leitor web no Markdown foi contornada por HTTP local. Nenhum serviço anterior foi consultado.
 
 Contrato fechado distingue available, blocked e removed, recusa derivados enviados pelo cliente e exige intenção com IDs/contexto/versão positiva. A remoção não incrementa a versão, permitindo inclusive 2147483647. O primeiro RED TS foi ausência do módulo, sem asserções executadas; depois todas as asserções passaram, junto ao contrato C2 existente: quatro testes em dois arquivos.
