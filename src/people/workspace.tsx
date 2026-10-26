@@ -912,7 +912,7 @@ export function MembersWorkspace({
                           <button
                             className="secondary"
                             disabled={disabled}
-                            aria-label={`${r.active ? "Transferir" : "Retornar"} ${r.person.name}`}
+                            aria-label={`${r.active ? "Transferir ou retornar" : "Retornar"} ${r.person.name}`}
                             onClick={() => {
                               if (mayLeave()) {
                                 setEditor(null);

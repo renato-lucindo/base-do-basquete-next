@@ -185,7 +185,10 @@ export async function openTransfer(page: Page) {
     .getByRole("button", { name: "Expandir Lobos", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Transferir Ana Silva", exact: true })
+    .getByRole("button", {
+      name: "Transferir ou retornar Ana Silva",
+      exact: true,
+    })
     .click();
   await expect(
     page.getByLabel("Inscrição de destino", { exact: true }),
