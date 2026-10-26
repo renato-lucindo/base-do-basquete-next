@@ -1,5 +1,15 @@
 # Perfil confirmado — evidências
 
+## Preview protegido — 26/10/2026 00:15UTC-03
+
+**CI40262045133/job121376304356 SUCCESS** sobre23eede499df2c4c330f9f5303aca4c864ad28b46:473unitários/97arquivos,5transportes/13PG/20workerd/4PDFs e **324browsersLinux PASS**. Log profile-ci-40262045133.log SHA256 **870c75067be5373c13cc9bb5ba7ee90f3b5d27e7a58882ede4b5dc4ae0af379d**. Fonte do pacote preparado **84baf38151ff833ffafeff71f00aeb1d6513f736** difere da CI somente em PROGRESSO/plano documentais; verificação git diff registrada antes de preparar. Manifesto SHA256 **47e80b1eedd8c398c056872508dc2269f87433ceb9f4e83e86b76f6f80a19a5b**, Worker **0cecd45de047eb5456f3abba2a75758f55f41e3e0ec079a9e29d3314f681a80b**.
+
+Publicado pelo plugin Cloudflare apenas no Worker base-do-basquete-next-preview/conta16b4a5e0a99a031d28051ebadb4811cc: **deploymentca7e528e-7ec8-4327-b61e-223f3ded503a/versãoa52ba794-7e7a-4765-9b8d-ca0e8f9c2ca0100%**. URL https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/. Previews de versão OFF, namespace0411ac931ca54d289d270606c7e87ef7/rate862073195184/cofre preservados. AppAccess556be918-42ad-44e5-a85f-c2783f65b2ba/política30cc3ab4-9331-4df6-8d13-d840c2652210 somente responsável.
+
+Smoke PASS18assets/hash/Xsource,38GETs privados/12POSTs,health/Authinválido/backend404,4projeções públicas e2browsers. Perfil sem publicação retorna404 explícito e não oferece login interno; ainda há0perfis/0participações públicas no banco verificado, portanto não se inventou conteúdo real para demonstração. Token618f1bde-05cf-4c1a-90ac-c6ea2d9c3e8f e políticaa7c1e3f9-87dd-4628-92e2-009071c429a9 temporários **revogados/reconferidos**; credencial passou apenas criptografada RSA paraTTY/chave privada em memória, processo encerrado. Anônimo302→Access em raiz/atleta.html/API após revogação. Relatório .preview-artifacts/profile-preview-smoke-84baf38.json conserva sóresultados públicos, sem credenciais.
+
+Aceite humano continua pendente, sem novo pedido de teste adiado. Não equivale a produção/merge, uploadStorageHTTP real, revisão independente, carga, corridaPGmulticonexão ou WCAGcompleta. Ao continuar ET1 na branch de equipes, não atribuir este CI/deploy ao código posterior.
+
 ## Gate da vertical — 26/10/2026 00:01UTC-03
 
 Gate consolidado final **PASS**:473unitários/97arquivos,5transportes,13cenários PostgreSQL,20workerd,prova real do runtime com4PDFs,lint/formato/tipos app/Worker/builds/fronteira/segredos601. Log .preview-artifacts/profile-p4-gate.log SHA256 **3d1e9b7275ae440f905fd0f10830384e7515d32ba6f6c6695efae2e94a555c2f**. Sódocumentação posterior a esse gate. CI/preview da vertical ainda pendentes; não atribuir CI estatístico ao perfil. Sem repetir gate por atualização documental.
