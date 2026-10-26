@@ -9,9 +9,55 @@ import { transferFixture, transferId } from "./fixtures/transfers.ts";
 import { achievementBackendFixture } from "./fixtures/achievement-backend.ts";
 import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
 import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
+import { statisticsRpcBody } from "./fixtures/statistics-rpc.ts";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
+
+test("paged public source discards mixed versions and bounds conflict retry in workerd", async () => {
+  const seed = JSON.parse(
+    await readFile("tests/fixtures/statistics-source.json", "utf8"),
+  );
+  const source = {
+    ...seed,
+    games: Array.from({ length: 201 }, (_, i) => {
+      const g = structuredClone(seed.games[0]);
+      g.snapshot.id = `f9500000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`;
+      return g;
+    }),
+  };
+  for (const mode of ["once-conflict", "always-conflict"]) {
+    const f = await fixture({
+      statistics: true,
+      statisticsSource: source,
+      statisticsMode: mode,
+    });
+    try {
+      const response = await f.mf.dispatchFetch(
+        origin + `/api/public/teams/${source.disputeId}?scope=all`,
+      );
+      assert.equal(response.status, mode === "once-conflict" ? 200 : 409);
+      const body = await response.json();
+      if (mode === "once-conflict") {
+        assert.equal(body.version, source.version + 1);
+        assert.ok(body.rows.every((r) => r.gamesPlayed === 2));
+      } else {
+        assert.equal(body.error.code, "source_changed");
+        assert.equal("rows" in body, false);
+      }
+      assert.equal(
+        f.calls.filter((p) => p.endsWith("get_public_statistics_head")).length,
+        2,
+      );
+      assert.equal(
+        f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
+        false,
+      );
+    } finally {
+      await f.mf.dispose();
+    }
+  }
+});
 
 test("public team list/detail use confirmed source and require explicit registration without session", async () => {
   const f = await fixture({ statistics: true }),
@@ -242,6 +288,8 @@ async function fixture(options = {}) {
   const calls = [],
     publicationReceipts = new Map();
   let pdfSource,
+    statisticsHeads = 0,
+    statisticsPages = 0,
     originalBytes,
     reviewDocument,
     reviewVersion = 0;
@@ -290,17 +338,52 @@ async function fixture(options = {}) {
         }
         if (
           options.statistics &&
-          url.pathname === "/rest/v1/rpc/get_public_statistics_source"
+          /^\/rest\/v1\/rpc\/get_public_statistics_(?:head|page)$/u.test(
+            url.pathname,
+          )
         ) {
           assert.equal(request.headers.get("authorization"), null);
           assert.equal(request.headers.get("cookie"), null);
-          const source = JSON.parse(
-            await readFile("tests/fixtures/statistics-source.json", "utf8"),
-          );
+          let source =
+            options.statisticsSource ??
+            JSON.parse(
+              await readFile("tests/fixtures/statistics-source.json", "utf8"),
+            );
+          if (url.pathname.endsWith("_head")) statisticsHeads++;
+          else {
+            statisticsPages++;
+            if (
+              options.statisticsMode === "always-conflict" ||
+              (options.statisticsMode === "once-conflict" &&
+                statisticsPages === 2)
+            )
+              return Response.json(
+                { message: "fixture conflict" },
+                { status: 409 },
+              );
+          }
+          if (
+            options.statisticsMode === "once-conflict" &&
+            statisticsHeads >= 2
+          )
+            source = {
+              ...source,
+              version: source.version + 1,
+              games: source.games.slice(0, 2),
+            };
           const args = await request.json();
-          assert.deepEqual(Object.keys(args), ["p_dispute_id"]);
+          assert.deepEqual(
+            Object.keys(args),
+            url.pathname.endsWith("_head")
+              ? ["p_dispute_id"]
+              : ["p_dispute_id", "p_version", "p_after"],
+          );
           return Response.json(
-            args.p_dispute_id === source.disputeId ? source : null,
+            statisticsRpcBody(
+              args.p_dispute_id === source.disputeId ? source : null,
+              url.pathname,
+              args,
+            ),
           );
         }
         if (options.achievements) {

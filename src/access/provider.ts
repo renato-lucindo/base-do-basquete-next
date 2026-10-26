@@ -157,6 +157,7 @@ export function unavailable() {
 export async function providerJson(
   response: Response,
   maxBytes = 65536,
+  observedBytes?: (size: number) => void,
 ): Promise<unknown> {
   const reader = response.body?.getReader();
   if (!reader) throw unavailable();
@@ -167,6 +168,7 @@ export async function providerJson(
       const { done, value } = await reader.read();
       if (done) break;
       size += value.byteLength;
+      observedBytes?.(size);
       if (size > maxBytes) {
         await reader.cancel().catch(() => undefined);
         throw unavailable();

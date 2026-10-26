@@ -1,5 +1,7 @@
 import { expect, it, vi } from "vitest";
 import { SupabaseStatistics } from "./provider";
+import { statisticsRpcBody } from "../../tests/fixtures/statistics-rpc";
+import { statisticsSourceSchema } from "./source";
 import { confirmedManualFixture } from "../../tests/fixtures/statistics-publications";
 import { pubId } from "../../tests/fixtures/publication";
 const config = { url: "https://db.example.test", key: "fixture-publishable" };
@@ -22,7 +24,14 @@ function source() {
 }
 it("consulta é derivada no servidor, sem JWT/cookie e só envia UUID canônico à RPC", async () => {
   const send = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
-      async () => Response.json(source()),
+      async (url, init) =>
+        Response.json(
+          statisticsRpcBody(
+            statisticsSourceSchema.parse(source()),
+            url,
+            JSON.parse(init.body as string),
+          ),
+        ),
     ),
     db = new SupabaseStatistics(config, send);
   const result = await db.getPage(
@@ -32,9 +41,9 @@ it("consulta é derivada no servidor, sem JWT/cookie e só envia UUID canônico 
   expect(
     result?.rows.find((r) => r.personId === pubId(1))?.metrics.points.value,
   ).toBe(2);
-  expect(send).toHaveBeenCalledTimes(1);
+  expect(send).toHaveBeenCalledTimes(2);
   const [url, init] = send.mock.calls[0];
-  expect(url).toBe(`${config.url}/rest/v1/rpc/get_public_statistics_source`);
+  expect(url).toBe(`${config.url}/rest/v1/rpc/get_public_statistics_head`);
   expect(JSON.parse(init.body as string)).toEqual({ p_dispute_id: pubId(801) });
   const headers = new Headers(init.headers);
   expect(headers.get("apikey")).toBe(config.key);

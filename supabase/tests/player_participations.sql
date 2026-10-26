@@ -1,7 +1,7 @@
 -- Continues publication.sql's isolated transaction. No user data is used or retained.
 select pg_temp.pu_assert((select count(*) from public.published_player_games)=22,'only confirmed participants projected');
 create temporary table player_games_before as select * from public.published_player_games;
-create temporary table player_stats_before as select snapshot from public.published_statistics where dispute_id=pg_temp.pu_id(3);
+create temporary table player_stats_before as select public.get_public_statistics_source(pg_temp.pu_id(3)) as snapshot;
 update public.persons set name='Nome privado atual' where id=pg_temp.pu_id(201);
 update public.teams set name='Equipe privada atual' where id=pg_temp.pu_id(4);
 select pg_temp.pu_assert((select jsonb_agg(snapshot order by person_id,game_id) from public.published_player_games)=(select jsonb_agg(snapshot order by person_id,game_id) from player_games_before),'live cadastre does not change public participation');

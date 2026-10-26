@@ -1,3 +1,15 @@
+# Capacidade retomada — 26/10/2026, unidade local em andamento
+
+**Objetivo/Git:** plano docs/superpowers/plans/2026-10-26-capacidade-consultas-confirmadas.md/ADR019/VALIDACAO-CAPACIDADE.md. Branch sequencial **codex/capacidade-consultas**, base e1d74851a8634654d08e05dd4693dc13c71f8c59, diagnóstico commit **1e8b378**; próximo material local a salvar abaixo. Só alterações próprias; nenhuma mudança humana observada. Workspace/remoto/serviços são os mesmos descritos nos checkpoints históricos. PR21 ainda não criado; PR20/CI495/338 e preview72eb9b6 reconciliados saudáveis, sem merge/produção.
+
+**Concluído local:** RED real no PostgreSQL descartável:706G4 publicados,707 recusado por4MiB, rollback íntegro. Migration própria **20261026080026_paged_confirmed_statistics.sql NÃO APLICADA** remove blob da escrita, preserva ledger e permite1000G4/11000participações/dez páginas;39focais e três cenáriosworkerd PASS, tipos/lint PASS. Runners, dados e hashes em VALIDACAO-CAPACIDADE. Histórico/projeções/fontes preservados no upgrade.43migrations remotas anteriores imutáveis. Nada semeado em serviço; preview/dados humanos intactos; nenhum deploy/DDL/credencial ativo.
+
+**Uncommitted/origem:** implementaçãoC2 e otimizaçãoC3 de parses repetidos são do agente; C3 observou RED de helper ausente, depois60focais de equivalência/guardas manuais/PDF PASS. Benchmark puro posterior passou meta local250ms com1000jogos (p95lista210,907ms/detalhe192,563ms), sem provar planoedge. Salvar em commits separadosC2/C3, conferir segredos, criar draft sobrePR20. **Próximo exato:** completar revisão focal, gate/CI únicos da vertical estável, depois aplicar migration UMA vez no projeto novo, reconciliar versão/tipos/advisors/contrato realBEGIN/ROLLBACK; sóentão preparar preview protegido/smokes. Não declarar DDL/CI/preview novos antes das provas. Cota observada durante unidade23%usados5h/4%semanal; primeiro reset desta janela mudou e será consultado de novo antes de gate/pausa. Não repetir495/338 antigos por sessão; o gate novo é devido a alterações materiais.
+
+Política pública de agenda/inscritos e aceites humanos/pilotoStorageHTTP permanecem pendentes, sem repetir perguntas adiadas. Sem revisor independente, carga, PGmulticonexão ou WCAGcompleta comprovados. Abaixo ficam checkpoints históricos, inclusive horários de reset antigos: não usá-los para novo agendamento.
+
+---
+
 # Pausa por cota — perfil/equipes publicados, próxima capacidade — 26/10/2026 01:18 America/Sao_Paulo (UTC-03)
 
 **Retomada CONFIRMADA:** ferramenta oficial atualizou com sucesso a MESMAautomação retomar-preview-base-do-basquete, ACTIVE, nesta conversa, para **26/10/2026 04:45:26 America/Sao_Paulo(07:45:26UTC)**. Configuração salva reconferida, sem duplicata. Checkpoint remoto **147b29f01a2d7d56566b136a5995daabf21d4d01**, benchmark/documentação **a307f5310fc1abcb17e3d9ba888a62802ca89a72**, ambos confirmados; árvore limpa antes desta confirmação somente documental. Nenhuma unidade/DDL/gate/deploy iniciado após o gatilho. PR20 atualizado com CI/preview/limitação medidos.

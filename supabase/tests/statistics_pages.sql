@@ -1,0 +1,32 @@
+-- After publication.sql, transaction remains open; all writes below roll back.
+reset role;
+create temporary table paged_head_before as select public.get_public_statistics_head(pg_temp.pu_id(3)) as head;
+select pg_temp.pu_assert((select head->>'kind'='confirmed-statistics-head-v1' and head->'gameCount'='2' from paged_head_before),'compact current head');
+select pg_temp.pu_assert((select octet_length(snapshot::text)<1024 and not(snapshot?'games') from public.published_statistics where dispute_id=pg_temp.pu_id(3)),'head does not rebuild full games');
+select pg_temp.pu_error('update public.published_statistics set snapshot=snapshot-''gameCount''','23514');
+select pg_temp.pu_error('update public.published_statistics set snapshot=snapshot||''{"privateReason":"do not expose"}''::jsonb','23514');
+set local role anon;
+select pg_temp.pu_assert(public.get_public_statistics_head(pg_temp.pu_id(999)) is null,'unpublished context absent');
+select pg_temp.pu_assert(jsonb_array_length(public.get_public_statistics_page(pg_temp.pu_id(3),(public.get_public_statistics_head(pg_temp.pu_id(3))->>'version')::integer,null)->'games')=2,'anonymous exact current page');
+select pg_temp.pu_assert(public.get_public_statistics_page(pg_temp.pu_id(3),(public.get_public_statistics_head(pg_temp.pu_id(3))->>'version')::integer,null)->'next'='null','no false continuation');
+select pg_temp.pu_error('select public.get_public_statistics_page(pg_temp.pu_id(3),1,null)','PT409');
+select pg_temp.pu_error('select public.get_public_statistics_page(pg_temp.pu_id(3),0,null)','PT400');
+select pg_temp.pu_error('select private.refresh_confirmed_statistics(pg_temp.pu_id(3))','42501');
+select pg_temp.pu_error('delete from public.published_statistics_games','42501');
+select pg_temp.pu_error('insert into public.published_statistics_games select * from public.published_statistics_games','42501');
+set local role service_role;
+select pg_temp.pu_error('select public.get_public_statistics_head(pg_temp.pu_id(3))','42501');
+select pg_temp.pu_error('select public.get_public_statistics_page(pg_temp.pu_id(3),1,null)','42501');
+select pg_temp.pu_error('select * from public.published_statistics_games','42501');
+reset role;
+-- A correction interleaved between two reads invalidates the old precondition.
+update public.admin_access set enabled=true where user_id=pg_temp.pu_id(98);
+set local role authenticated;
+select public.publish_sheet_game(jsonb_build_object('requestId',pg_temp.pu_id(9900),'gameId',pg_temp.pu_id(8),'gameVersion',(public.get_game(pg_temp.pu_id(8))->>'version')::integer,'basePublicationVersion',2,'source',jsonb_build_object('kind','sheet','baseSheetVersion',(public.get_game_sheet(pg_temp.pu_id(8))->>'version')::integer,'document',jsonb_set(public.get_game_sheet(pg_temp.pu_id(8))->'document','{events,0,code}','"2"')),'reason','Conferência para contrato paginado.','fallback',false));
+reset role;
+select pg_temp.pu_error('select public.get_public_statistics_page(pg_temp.pu_id(3),(select (head->>''version'')::integer from paged_head_before),null)','PT409');
+select pg_temp.pu_assert((select h.version=(select (head->>'version')::integer+1 from paged_head_before) from public.published_statistics h where dispute_id=pg_temp.pu_id(3)),'new current version');
+select pg_temp.pu_assert((select bool_and(p.statistics_version=h.version) from public.published_player_games p join public.published_statistics h using(dispute_id) where p.game_id=pg_temp.pu_id(8)),'player projection follows same compact head');
+select pg_temp.pu_assert((select count(*)=1 from private.statistics_publication_changes where dispute_id=pg_temp.pu_id(3) and version=(public.get_public_statistics_head(pg_temp.pu_id(3))->>'version')::integer),'history remains incremental');
+select pg_temp.pu_assert((select relrowsecurity from pg_class where oid='public.published_statistics_games'::regclass),'public mapping has RLS');
+rollback;

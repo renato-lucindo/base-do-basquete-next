@@ -2,18 +2,29 @@ import { expect, it, vi } from "vitest";
 import { teamStatisticsFixture } from "../../tests/fixtures/team-statistics";
 import { pubId } from "../../tests/fixtures/publication";
 import { SupabaseTeamStatistics } from "./provider";
+import { statisticsRpcBody } from "../../tests/fixtures/statistics-rpc";
 const config = { url: "https://db.example.test", key: "fixture-publishable" };
 it("correlacionaUUID canônico também quando fonte pública usa letras maiúsculas", async () => {
   const s = teamStatisticsFixture();
   s.disputeId = s.disputeId.toUpperCase();
-  const db = new SupabaseTeamStatistics(config, async () => Response.json(s));
+  const db = new SupabaseTeamStatistics(config, async (url, init) =>
+    Response.json(statisticsRpcBody(s, url, JSON.parse(init.body as string))),
+  );
   expect(
     (await db.getDetail(pubId(801), pubId(9), pubId(5), new URLSearchParams()))
       ?.kind,
   ).toBe("confirmed-team-detail-v1");
 });
 it("tabela e detalhe derivam fonte no servidor e sóUUID da disputa chega à RPC pública", async () => {
-  const send = vi.fn(async () => Response.json(teamStatisticsFixture())),
+  const send = vi.fn(async (url: string, init: RequestInit) =>
+      Response.json(
+        statisticsRpcBody(
+          teamStatisticsFixture(),
+          url,
+          JSON.parse(init.body as string),
+        ),
+      ),
+    ),
     db = new SupabaseTeamStatistics(config, send);
   const list = await db.getPage(
     pubId(801).toUpperCase(),
@@ -39,10 +50,12 @@ it("tabela e detalhe derivam fonte no servidor e sóUUID da disputa chega à RPC
     string,
     RequestInit,
   ][]) {
-    expect(url).toBe(`${config.url}/rest/v1/rpc/get_public_statistics_source`);
-    expect(JSON.parse(init.body as string)).toEqual({
-      p_dispute_id: pubId(801),
-    });
+    expect(url).toMatch(/\/rpc\/get_public_statistics_(?:head|page)$/u);
+    expect(JSON.parse(init.body as string)).toEqual(
+      url.endsWith("_head")
+        ? { p_dispute_id: pubId(801) }
+        : { p_dispute_id: pubId(801), p_version: 3, p_after: null },
+    );
     const headers = new Headers(init.headers);
     expect(headers.get("apikey")).toBe(config.key);
     expect(headers.has("authorization") || headers.has("cookie")).toBe(false);
