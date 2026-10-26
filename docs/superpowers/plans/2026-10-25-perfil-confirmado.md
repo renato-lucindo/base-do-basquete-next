@@ -29,15 +29,15 @@ Ruling: iniciar contratos puros em branch codex/perfil-confirmado baseada na cor
 
 ## P3 — domínio de perfil/carreira
 
-- [ ] RED em src/player-profile/domain.test.ts: cinco seções, filtros por edição/campeonato/carreira, todas inscrições, nomes da ocasião, transferências/inativos, DNP versus ausência versus jogou sem ação, percentuais ponderados e denominadores por cobertura.
-- [ ] Reutilizar o núcleo observado de estatísticas; carreira valida cada contexto e não duplica jogo+pessoa. Não somar médias ou substituir ausência por zero. Fases desconhecidas sóall. Se recortes misturarem mínimos de por30 diferentes, pedir seleção de um contexto ou marcar modo inaplicável, sem inventar um mínimo global retroativo.
-- [ ] Nome principal vem do perfil explicitamente publicado; sem ele, usar identidade da última ocasião pública com proveniência, preservando nomes históricos nas linhas. Nenhuma equipe antiga é apresentada como equipe atual. Honrarias e colocações mantêm ano/edição/categoria/origem de confirmação.
+- [x] RED em src/player-profile/domain.test.ts: cinco seções, filtros por edição/campeonato/carreira, todas inscrições, nomes da ocasião, transferências/inativos, DNP versus ausência versus jogou sem ação, percentuais ponderados e denominadores por cobertura.
+- [x] Reutilizar o núcleo observado de estatísticas; carreira valida cada contexto e não duplica jogo+pessoa. Não somar médias ou substituir ausência por zero. Fases desconhecidas sóall. Se recortes misturarem mínimos de por30 diferentes, pedir seleção de um contexto ou marcar modo inaplicável, sem inventar um mínimo global retroativo.
+- [x] Nome principal vem do perfil explicitamente publicado; sem ele, usar identidade da última ocasião pública com proveniência, preservando nomes históricos nas linhas. Nenhuma equipe antiga é apresentada como equipe atual. Honrarias e colocações mantêm ano/edição/categoria/origem de confirmação.
 
 ## P4 — Worker/UI e navegação
 
-- [ ] Testes RED de provider/rotas/workerd, resposta limitada/correlacionada, GET público sem sessão app/chave no cliente e mutação administrativa com authfresh/origem/corpo limitado. Erros não vazam dados do provedor. Adapter tipado e métodos específicos, sem CRUD genérico privilegiado.
-- [ ] atleta.html#personId?contexto&secao com navegação acessível entre Resumo/Estatísticas/Conquistas e honrarias/Jogos/Histórico; voltar/avançar/links profundos. Estatísticas e resultados ligam à identidade estável. Seções vazias sem zeros que pareçam resultados. Jogos e trajetória conservam camisa/equipe/data/hora reais, sem meia-noite inventada.
-- [ ] Confirmação de metadados no percurso administrativo da pessoa: proposta→conferir exposição→confirmar/revisar com motivo→reabrir; edição privada isolada da publicação. Fonte alterada/version409 não descarta edição; ACK perdido congela o comando, ACK conhecido com falhaGET repete sóGET; reautenticação preserva trabalho.
+- [x] Testes RED de provider/rotas/workerd, resposta limitada/correlacionada, GET público sem sessão app/chave no cliente e mutação administrativa com authfresh/origem/corpo limitado. Erros não vazam dados do provedor. Adapter tipado e métodos específicos, sem CRUD genérico privilegiado.
+- [x] atleta.html#personId?contexto&secao com navegação acessível entre Resumo/Estatísticas/Conquistas e honrarias/Jogos/Histórico; voltar/avançar/links profundos. Estatísticas e resultados ligam à identidade estável. Seções vazias sem zeros que pareçam resultados. Jogos e trajetória conservam camisa/equipe/data/hora reais, sem meia-noite inventada.
+- [x] Confirmação de metadados no percurso administrativo da pessoa: proposta→conferir exposição→confirmar/revisar com motivo→reabrir; edição privada isolada da publicação. Fonte alterada/version409 não descarta edição; ACK perdido congela o comando, ACK conhecido com falhaGET repete sóGET; reautenticação preserva trabalho.
 - [ ] Browsers desktop/mobile/teclado/foco/320px/zoom, composição e capturas inspecionadas. Allowlist/manifestos/gates/smoke incluem novoHTML, sem fixtures publicadas. Gate único da vertical estável, CI, preview protegido e revogação de credenciais temporárias. Não pedir novamente testes humanos adiados nem tratar silêncio como aceite.
 
 ## Revisão e continuidade

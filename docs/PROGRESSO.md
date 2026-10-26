@@ -1,3 +1,15 @@
+# Perfil público local estável, CI em andamento — 26/10/2026 00:02 America/Sao_Paulo (UTC-03)
+
+Branch **codex/perfil-confirmado**, material remoto **23eede499df2c4c330f9f5303aca4c864ad28b46**, paginação5d35fc5, base2528a43; PRdraft19 sobre18. Árvore somente com este checkpoint documental e ajustes de plano, sem mudanças humanas. Gate final PASS473unit/97arquivos,5transportes/13PG/20workerd/4PDFs/builds/fronteira/segredos601; composição60browsers e2focais DNP posteriores PASS. Hashes e limitações em VALIDACAO-PERFIL. Página atleta.html, links em resultados/estatísticas, painel privado com detalhes dos snapshots/duas abas/paginação longa completos localmente. Não equivale a aceite humano.
+
+**Próximo EXATO:** conferir **CI40262045133** do material23eede4; estava in_progress, sem resultado atribuído. Se falhar, diagnóstico focal/trace sem repetir gate inteiro automaticamente. Se PASS473 e browsers completos, preparar NOVO manifesto/payload de HEAD limpo (docs equivalentes ao materialCI), publicar somente Worker existente via plugin Cloudflare, conferir Access/previewsOFF/namespace/cofre e executar smoke ampliado: novos assets/atleta.html/38GETs privados/12POSTs/4projeções públicas/2browsers. Credencial efêmera RSA emTTY, revogar token/política imediatamente e confirmar anônimo302. Manifesto antigoe00 não serve ao perfil. Nenhuma credencial/deploy/DDL em andamento; CI citada é único processo remoto pendente.
+
+Banco reconferido43migrations/última20261025221911,1pessoa/1Auth/0perfis/0participações públicas. Não há nova migration/SQL mutante nesta unidade. Preview continua estatísticose00/316098d6/23bfec3d100%, Access556be918/política30cc3ab4 sóresponsável, namespace/rate/cofre preservados. Demais IDs/links/ambiente nos registros abaixo. Sem consulta ao repositório anterior, merge/principal/produção ou dados humanos modificados.
+
+Cota real última leitura **21%usado/79%restante5h,59%usado/41%restante semanal**; conferir entreunidades/anteslongas, limite85%usados5h. Reset5h observado26/10/2026 04:43:26UTC-03 (07:43:26UTC), semanal01/11 03:33:29UTC-03. Automação de retomada anterior jádisparou e não substitui novo agendamento se houver pausa futura; atualizar MESMAautomação resetefetivo+2 quando necessário. Não comprar créditos/plano/resetmanual. Política pública inscritos/agenda futura permanece sem resposta; não inferir aceite nem repetir solicitações humanas adiadas. Aceites/pilotoStorageHTTP real e revisão independente/carga/PGmulticonexão/WCAGcompleta continuam pendentes onde registrados.
+
+---
+
 # Pausa por cota — perfil salvo até painel administrativo local — 25/10/2026 19:59:42 America/Sao_Paulo (UTC-03)
 
 **Retomada CONFIRMADA:** ferramenta oficial atualizou com sucesso a MESMAautomação retomar-preview-base-do-basquete, ACTIVE, nesta conversa, para **25/10/2026 23:42:46 America/Sao_Paulo (26/10 02:42:46UTC)**. Configuração salva reconferida, sem duplicata. Checkpoint remoto **4963118e6c313641d472379f8312f2126fc88f56**, código58f3a7d; árvore limpa antes desta confirmação exclusivamente documental. Nenhuma nova unidade/gate/deploy iniciado após o gatilho.
