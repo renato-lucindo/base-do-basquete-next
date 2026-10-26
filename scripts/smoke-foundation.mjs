@@ -298,7 +298,8 @@ try {
       `${origin}/estatisticas.html#${randomUUID()}?view=simple&scope=all`,
       { waitUntil: "domcontentloaded" },
     );
-    assert.equal(simpleDocument.status(), 200);
+    // Changing only the fragment returns null: the existing verified document is reused.
+    if (simpleDocument) assert.equal(simpleDocument.status(), 200);
     await page
       .getByRole("heading", { name: "Estatísticas de súmula", exact: true })
       .waitFor();
@@ -353,7 +354,7 @@ try {
       ownerLoginPending: true,
     }),
   );
-} catch {
+} catch (error) {
   const diagnostic = currentPage
     ? {
         title: await currentPage.title(),
@@ -368,7 +369,15 @@ try {
         fullPage: true,
       })
       .catch(() => undefined);
-  console.error(JSON.stringify({ success: false, stage, status, diagnostic }));
+  console.error(
+    JSON.stringify({
+      success: false,
+      stage,
+      status,
+      failureType: error instanceof Error ? error.name : "Unknown",
+      diagnostic,
+    }),
+  );
   process.exitCode = 1;
 } finally {
   if (browser) await browser.close();

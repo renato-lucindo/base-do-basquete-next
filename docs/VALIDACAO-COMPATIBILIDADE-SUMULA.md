@@ -1,5 +1,17 @@
 # Compatibilidade e estatísticas simples — 26/10/2026
 
+## Entrega técnica concluída — 26/10/2026 20:45 America/Sao_Paulo
+
+Compatibilidade e tabela simples publicadas no preview protegido, código material **3eca459ecc898538a34bfdd7d8d543b78c72d77c**. CI **40420017804/job121911835506 SUCCESS**: **548 unitários/112 arquivos,366 browsers aprovados,26 mobile adiados**, gate completo. Alterações posteriores são somente checkpoint/smoke e um teste local de navegação; código de aplicação, Worker e assets permaneceram iguais. Não foi repetido gate de produto inalterado. LogCI SHA256 `3432b25b05a5b61445a4ac052efe66eea60d1ad8a5c6db687cdde58ba672557d`.
+
+Deployment **a8c67bcc-da6f-4122-bb7d-8b885dcb7ead**, versão **93f75f6d-2bb8-4bdf-a5d4-fd7ec9588f07**,100%. Smoke final PASS:24assets/hashes/Xsource,39GETsprivados/12POSTs,health/sessão/Authinválido,6GETspúblicos/cincoHTMLs e dois browsers, incluindo view=simple. Relatório ignorado compat-simple-smoke-report.json SHA256 `01690fc256ad742bb9842f95ff2ff279fa33bcc9bf9ed86900ab17bf05bead12`. Não houve login do responsável nem mutação de dados humanos para smoke; seu aceite continua distinto da prova técnica.
+
+**Falha inicial de verificação preservada:** o novo smoke chamava response.status() depois de navegar só por fragmento, quando Playwright retorna null. O catch capturou a tela antes de terminar sua requisição e fechou o navegador; não era evidência de carregamento preso do produto. Reprodução local confirmou response=null e estado404 resolvido, um focal PASS11,3s; script corrigido para verificar status somente quando há nova resposta HTTP. Lint/sintaxe/formato aprovados depois. O Worker não precisou de alteração/redeploy por isso. Primeira execução não é PASS.
+
+Temporários revogados e ausência conferida nas duas tentativas: tokenbe7d4b87-0f33-476f-8ff7-68ee65a6926e/política3a76d63e-726b-4002-b641-952940e2535a; token4cafc130-76f1-4ac0-8ee2-4785954b9097/política45404988-4e15-41e3-a149-c8ebb456b426. Credenciais apenasRSA-OAEP/TTY/RAM, nenhum segredo emarquivo. Zero service_tokens e apenas política do responsável30cc3ab4. Anônimo302 raiz/estatisticas/API após revogação; previewsOFF/DO/rate/bindings de segredos preservados.
+
+PRdraft27 sobre26, sem merge/principal/produção. Simples soma todos os jogos; link boxscore restringe àfontePDF, mas seu refinamento visual permanece fora da prioridade atual. Nenhum esforço mobile/parserPDF/interpretador novo. Revisão separada do autor, sem parecer independente disponível; não é prova de carga/WCAG completa/aceite humano. Entradas seguintes são o histórico da unidade.
+
 ## Escopo e referências
 
 Responsável autorizou usar os ZIPs de compatibilidade e estatísticas (hashes no plano2026-10-26-compatibilidade-e-tabelas.md). Confirmou: tabela simples agrega todos os jogos publicados; completa somente boxscores. Depois priorizou súmula e compatibilidade; refinamento visual completo dos PDFs continua adiado. Foi feita consulta pontual à tabela pública statistics-explorer.tsx pelo plugin GitHub no repo indicado, sem clone ou acesso a serviços/dados anteriores. Nenhum código de referência foi tratado como instrução de execução ou migration pronta.

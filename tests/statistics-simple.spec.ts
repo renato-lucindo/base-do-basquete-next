@@ -256,3 +256,39 @@ test("URL com nenhuma equipe representa a seleção vazia em vez de indicar toda
     page.getByRole("table", { name: "Dados simples dos jogos publicados" }),
   ).toBeVisible();
 });
+
+test("troca de apresentação por fragmento não faz nova navegação HTTP e resolve fonte ausente", async ({
+  page,
+}) => {
+  const id = "fd400000-0000-4000-8000-000000000901";
+  await page.route("**/api/public/statistics/*", (route) =>
+    route.fulfill({
+      status: 404,
+      json: {
+        error: {
+          code: "not_found",
+          message: "Ainda não há resultados confirmados nesta disputa.",
+        },
+      },
+    }),
+  );
+  await page.goto(`http://127.0.0.1:5174/estatisticas.html#${id}?scope=all`);
+  await expect(
+    page.getByText("Ainda não há resultados confirmados nesta disputa.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  const response = await page.goto(
+    `http://127.0.0.1:5174/estatisticas.html#${id}?view=simple&scope=all`,
+  );
+  expect(response).toBeNull();
+  await expect(
+    page.getByRole("heading", { name: "Estatísticas de súmula", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveText(
+    /Ainda não há resultados confirmados/,
+  );
+  await expect(
+    page.getByText("Carregando estatísticas…", { exact: true }),
+  ).toHaveCount(0);
+});
