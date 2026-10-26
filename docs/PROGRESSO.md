@@ -1,4 +1,20 @@
-# Capacidade publicada — 26/10/2026 05:44UTC-03; próxima acessibilidade
+# Acessibilidade local concluída — 26/10/2026; CI/preview pendentes
+
+**Git/unidade:** branch codex/acessibilidade-consultas, material remoto **bbcda6a27d3cc921b370a954278e41eac9943e7d**, base a58270b/PR21; plano4671a80/depsa592576. PRdraft22 sobre21 anexado. Sem mudanças humanas; esta atualização somente documental própria até salvar. Produto: nomes acessíveis incluem siglas visíveis; alvos de links em tabelas≥24×24; paginação do perfil agora nav nomeada. Axe4.14dev e overrideUndici7.30.1 sóna cadeiaMiniflare; audit0 após3alertas reais. Versões diretasWrangler/Miniflare preservadas.
+
+**Evidências:**76browsers composição PASS,14novos/32varredurasdesktop/mobile,0violations; foco/ArrowRight/320px/texto200% computado dobro e captura inspecionados. IncompleteJ/+/- e contraste de células fora da janela horizontal registrados, não suprimidos; sem leitor de tela/zoom nativo/WCAG integral comprovados. Gate local PASS515unit/104arquivos/5transportes/13PG/22workerd/quatroPDFs/builds/fronteira/segredos653, log accessibility-gate.log SHAf27f2542a7ceeb3f553bc28b0dbe16b8d81b8c62e30b721387713d3601c0d5ba. Sem novaDDL; contratos Supabase inalterados mantêm prova anterior. VALIDACAO-ACESSIBILIDADE.md contém detalhes.
+
+**Próximo EXATO:** conferir CI **40297505322/job121487036221** da fontebbcda6a (última consulta in_progress/browsers). Se passar515/352, publicar pacote jápreparado deHEADbbcda6a limpo verificado,24assets/manifestoSHAe9b85a67f5ec8c9b441c6ea5639cd60168fac810cd7b4b31896fd1eccc6d95ce; WorkerSHA840514f603ac4f998bd88a7a3bf87783623352aab7460fb408c2fe209e50990c idêntico ao preview de capacidade. Regenerar pacote se código mudar; este checkpoint/novo plano são apenasdocs. Smokes/Access/RSA/revogação no Worker existente, nunca URLdesprotegida/fixturespublicadas. FalhaCI exige diagnóstico focal, sem novo gate integral automático.
+
+**Serviços:** preview ainda **c2e8734/deployment967aa2ab-cc2b-4b7b-accf-27aecfb1166d/versão56ee0e8f-ad92-4521-a0dc-c786d083c43f100%**; Access somente responsável/previewsOFF/namespace/rate/cofre preservados, tokens/políticas temporários revogados. Supabase44migrations/última20261026082747 imutável; dados humanos preservados. NenhumDDL/deploy/upload/smoke/credencial/servidorlocal ativo; somenteCI citada.
+
+Após acessibilidade publicada, próximo bloco independente é provaPGmulticonexão: **docs/superpowers/plans/2026-10-26-concorrencia-postgres-nativo.md** jáplanejado, ainda sem download/cluster/código/dependência. Binários ausentesPATH; arquivo oficialEDB17.11HEAD200/340719294bytes/semchecksum403; não usar dados/instâncias existentes nem inferir prova a partir dePGlite. Reconciliar cota/disco/ambiente antes e garantir stop de cluster próprio nofinally, sem serviço/sistema global. Esse plano nãoautoriza consulta a banco anterior.
+
+Última cota real57%usados5h/9%semanal, permitia continuar; conferir antes de operação longa. Aos85%usados5h mínima consistência/checkpoint/push/MESMAautomação resetefetivo+2. Não comprar créditos/mudarplano/resetmanual. Política pública de inscritos/agenda e aceites humanos/StorageHTTP seguem pendentes sem repetir perguntas. Sem produção/merge/revisão independente/carga/WCAGcompleta. Abaixo são checkpoints históricos.
+
+---
+
+# Capacidade publicada — 26/10/2026 05:44UTC-03; próxima acessibilidade (histórico)
 
 **Unidade/Git:** codex/capacidade-consultas, material remoto1c2d3ffa6283e75e6901bfee182c2b8180ddf68f, pacote/documentaçãoc2e873468c341ffbe0cda1fa7d303ba1d4b30753, PRdraft21 sobre20 anexado. Esta atualização somente documental própria até salvar; dados/alterações humanas preservados. Plano capacidade/ADR019/VALIDACAO-CAPACIDADE.md contêm todo o histórico. Sem merge/principal/produção.
 
