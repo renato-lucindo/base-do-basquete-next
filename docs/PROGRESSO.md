@@ -1,4 +1,18 @@
-# Capacidade integrada no banco — 26/10/2026 05:33UTC-03; CI/preview em andamento
+# Capacidade publicada — 26/10/2026 05:44UTC-03; próxima acessibilidade
+
+**Unidade/Git:** codex/capacidade-consultas, material remoto1c2d3ffa6283e75e6901bfee182c2b8180ddf68f, pacote/documentaçãoc2e873468c341ffbe0cda1fa7d303ba1d4b30753, PRdraft21 sobre20 anexado. Esta atualização somente documental própria até salvar; dados/alterações humanas preservados. Plano capacidade/ADR019/VALIDACAO-CAPACIDADE.md contêm todo o histórico. Sem merge/principal/produção.
+
+**Concluído:** CI40292919217/job121471988935 SUCCESS515unit/104arquivos/338Linuxbrowsers; gate local5transportes/13PG/22workerd/quatroPDFs/builds/fronteira/segredos PASS.1000G4 reais descartáveis/100inscrições/11000participações/dez páginas, cabeçalho200bytes; equivalência manual/PDF e guardas preservadas. P95 puro211/193ms dentro da meta local250, runtime controlado375/370ms não prova planoedge. Reutilizar provas/harness126; não repetir gate por sessão/docs.
+
+**Serviços:** Supabase44migrations/última20261026082747 imutável, tipos/contrato realBEGIN/ROLLBACK/advisors reconciliados,1pessoa/1Auth/1adminativo e0jogos/heads/mapping/participações/recibos/objetos após rollback. Cloudflarepreview **c2e8734/deployment967aa2ab-cc2b-4b7b-accf-27aecfb1166d/versão56ee0e8f-ad92-4521-a0dc-c786d083c43f100%**, Access sóresponsável/previewsOFF/DO/rate/cofre preservados.24assets/38GETs privados/12POSTs/6leituras públicas/5HTMLs/duas browsers smokePASS. Token03ef1ae8/políticaf740d52f temporários revogados/reconferidos, TTYencerrado, anônimo302. Nenhum DDL/deploy/upload/gate/CI/smoke/credencial/processo ativo.
+
+**Próximo EXATO:** cota real antes da nova unidade; branch sequencial codex/acessibilidade-consultas sobre checkpoint limpo. Ler EXPERIENCIA§Acessibilidade/VALIDACAO§Navegação, fixtures públicas existentes e fontes/layouts; plano próprio para axe-corePlaywright pinado4.14.0 (metadata oficial consultada, ainda NÃO instalado). Acrescentar testes automatizados de rótulos/semântica/contraste/foco/tabelas nos estados públicos representativos desktop/mobile, capturas antes das correções, observarRED e corrigir sem ocultar regras/elementos; registrar incomplete/manual pendentes. Não repetir338fluxos funcionais por retomada, sófocais novos e composição afetada; gate/CI da nova unidade sóquando estável. Nada de novaDDL/política pública de rascunhos/agenda. Documentar próximos arquivos/validações no plano antes de implementar.
+
+Última cota real37%usados5h/6%semanal, permitia continuar; conferir de novo. Ao85%usados5h, mínima operação/checkpoint/push/MESMAautomação resetefetivo+2, sem compra/plano/resetmanual. Aceites humanos/agenda/StorageHTTP adiados continuam pendentes, sem repetição de pedidos; sem revisão independente/carga/PGmulticonexão/WCAGcompleta comprovados. Abaixo são checkpoints históricos.
+
+---
+
+# Capacidade integrada no banco — 26/10/2026 05:33UTC-03; CI/preview em andamento (histórico)
 
 **Git/unidade:** branch codex/capacidade-consultas, material remoto **1c2d3ffa6283e75e6901bfee182c2b8180ddf68f**, base e1d7485, PRdraft21 sobre20 anexado/OPEN/MERGEABLE/sem reviews. Commits C1 1e8b378/C2 0072d27/C3 a82d3a4/lock da3b0b0. Árvores limpas antes desta atualização documental própria; nenhuma alteração humana. Workspace Windows e remoto novo são os mesmos dos registros abaixo; nunca consultar/clonar anterior.
 

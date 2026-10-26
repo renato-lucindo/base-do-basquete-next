@@ -1,5 +1,15 @@
 # Capacidade das fontes confirmadas
 
+## Preview protegido — 26/10/2026 05:44UTC-03
+
+**CI40292919217/job121471988935 SUCCESS515unitários/104arquivos/338browsersLinux** em1c2d3ffa6283e75e6901bfee182c2b8180ddf68f. Log capacity-ci-40292919217.log SHA256 **66981afe72f0918bbdde46e14cc19bdc90594dee907585294f3e0a117d29bdc7**. Pacote deHEAD limpo **c2e873468c341ffbe0cda1fa7d303ba1d4b30753**, sóREADME/PROGRESSO diferentes da fonteCI; manifesto SHA **972ab35577ff64e9381d33dd083ce8bb74facdf66ac3093c09385837757e0c87**, Worker **840514f603ac4f998bd88a7a3bf87783623352aab7460fb408c2fe209e50990c**. Não houve novo gate por documentação.
+
+PluginCloudflare atualizou somente Worker existente base-do-basquete-next-preview/conta16b4a5e0a99a031d28051ebadb4811cc: **deployment967aa2ab-cc2b-4b7b-accf-27aecfb1166d/versão56ee0e8f-ad92-4521-a0dc-c786d083c43f100%**, fontec2e8734. Accessapp556be918-42ad-44e5-a85f-c2783f65b2ba/política30cc3ab4-9331-4df6-8d13-d840c2652210 somente responsável; previewsOFF, namespace/rate/cofre preservados. Nenhum fixture foi publicado e nenhum serviço anterior alterado.
+
+Smoke PASS24assets/hash/Xsource,38GETs privados/12POSTs,6GETs públicos/5HTMLs públicos/duas browsers/health/Authinválido/backend404. Fonte paginada real sem dados devolve ausência correta; o volume1000 foi provado localmente com writerG4/SQL e outbound controlado, não em produção. Credencial efêmera RSA sóciphertext emTTY; **token03ef1ae8-a7f9-4bbd-8147-fbde9a98791b/políticaf740d52f-bace-4d2d-a633-8dbc9a98fc5e deletados e ausência reconferida**, processo encerrado. Anônimo302→Access após revogação em raiz/estatísticas/equipes/API. Relatório capacity-preview-smoke-c2e8734.json SHA256 **0fa1c5a39323433fc3f0187c301a29cb553d0be29f6587144a3a61e8f6f6340f**. ownerLoginPending=true identifica teste humano da versão ainda pendente; não invalida aceite antigo de login nem substitui avaliação funcional adiada.
+
+Capacidade funcional local/publicação técnica concluídas. Permanecem limitações declaradas: CPU/latência/carga do planoedge, PGmulticonexão, revisão independente, avaliação humana e acessibilidade completa. Próxima unidade independente: auditoria automatizada de acessibilidade de consultas confirmadas, sem publicar rascunhos/agenda ou solicitar novamente testes adiados.
+
 ## C3 — gate e integração do banco, 26/10/2026 05:29UTC-03
 
 **Gate consolidado PASS515unitários/104arquivos,5transportes,13PostgreSQL,22workerd,quatroPDFs no runtime, builds/tipos/lint/formato/fronteira/segredos650**, sobre da3b0b0. Log capacity-gate.log SHA256 **1221bcb7055e493408d5ec60f8662e78cfffd698a92ce806d3b8c40a8b3fc7d0**. Não houve gate vermelho a ser omitido; as falhas focais anteriores estão descritas abaixo. Revisão própria verificou RLS/privilégios, versão/cursor, limites de bytes/tentativas, compatibilidade, raiz/ordem e migração contra escritores; acrescentado lock de relação antes da conversão, validado zero/upgrade. Sem subagente/revisor independente disponível; ferramenta de code-review disponível apenas consulta CI, não substitui parecer.
