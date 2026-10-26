@@ -23,3 +23,9 @@ BrowserRED para nova apresentação eF/GD no detalhe antes dos componentes. Cinc
 Antes de mutação:46migrations reais reconciliadas; advisor segurança sóWARN conhecido de [senha vazada](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection), sem contratação. Contagem atual humana58pessoas/4jogos/2súmulas/6inscrições/1adminativo; preservar. Nenhum serviço anterior acessado. Preview continuaa370055/CI40398538486 aprovado; não representa esta correção ainda.
 
 Revisão separada do autor, sem ferramenta de revisor independente disponível. Inspecionados contratos, RLS/grants, branches de datasets, denominadores/DNP, retomada/foco e ausência de dados. Não é parecer independente/carga/WCAGcompleta/aceite humano. Gate, CI, provaSQLreal e nova publicação ainda pendentes nesta entrada.
+
+## Integração real e gate — 26/10/2026 20:23 UTC-03
+
+Gate consolidado e188757 PASS548unit/112arquivos,5transportes/13PG/22workerd/prova4PDFs/builds/tipos/fronteira/segredos691. Exit0 observado, log compat-simple-final-gate.log. Não repetir suite por renomear somente o ledger da migration, sem mudar bytes. Migration47 aplicada uma única vez no projeto novo como **20261026232327_precise_player_matching** (CLI230247renomeada, conteúdo idêntico);46anteriores imutáveis. Contrato player_matching.sql real BEGIN/ROLLBACKPASS, semDML deAuth/admin; consultas finais zero sintéticosfd400000/pessoas e campeonatos. Advisors sóWARN conhecido. Contagem maisrecente59pessoas/4jogos/3súmulas/6inscrições: houve dados externos novos durante trabalho; nenhuma alteração deles pelo agente.
+
+CI e publicação do novo Worker/UI ainda pendentes. Compatibilidade já usa a função nova no banco; escritor/DTO permaneceram iguais, sem alteração nos tipos públicos. Source frontend/Worker local e188757, versão publicada aindaa370055. Nenhum segredo ou credencial criado nesta integração.
