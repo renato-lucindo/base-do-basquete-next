@@ -25,8 +25,6 @@ Dois focais finais de 320 px PASS: tamanho computado efetivamente duplica, pági
 
 Uma primeira seleção de testes S3 usou `--grep '^axe '` e não encontrou casos porque o título completo inclui o arquivo. Foi corrigida para `--grep 'axe '` antes de executar; não é RED de produto. Gate consolidado/CI e publicação protegida desta unidade ainda precisam de resultado observado, registrado abaixo quando disponível. Revisão por autor separada da implementação; ferramenta de revisor independente não disponível nesta sessão. Nada foi integrado à principal/produção.
 
-## Registro S1 preservado
-
 ## Gate da unidade estável
 
 `npm run gate` **PASS**: 515 unitários/104 arquivos, cinco transportes, treze cenários PostgreSQL, 22 workerd e prova dos quatro PDFs fornecidos; lint, formato, tipos, builds, fronteira e segredos (660 arquivos) aprovados. Log `.preview-artifacts/admin-a11y-gate.log` SHA256 `56f2af827664ec64ed10d21416645580b04d8798aea69df080e56a6a2b575846`.
@@ -36,6 +34,18 @@ Composição final focada **24 browsers PASS**, incluindo todas as novas varredu
 Revisão separada do diff pelo próprio autor: nomes visíveis preservados, medidas de base equivalentes a 16 px, mudança de placar apenas semântica e cabeçalho sem ocultar conteúdo. Sem achado crítico adicional nessa revisão; não é parecer independente. Artefatos do banco/harness nativo inalterados mantêm suas provas; não foram executados novamente por sessão. Publicação protegida depende de CI remota aprovada e smokes novos.
 
 ## Histórico S1
+
+## CI e preview protegidos — 26/10/2026
+
+Material **03d7ed868ed9dfc945437c21a980ea8cb9990719**, PR draft **24** sobre 23. CI **40327603169/job121588250376 SUCCESS**: 515 unitários/104 arquivos e **370 browsers Linux**, além dos transportes, PostgreSQL, workerd, quatro PDFs e demais passos do gate. Log `.preview-artifacts/admin-a11y-ci-40327603169.log` SHA256 `33ec40bda879426c9a3968a52fd3a898b62d97e0be0f487c19af0aecbe216a6c`.
+
+Publicação pelo plugin Cloudflare no Worker existente `base-do-basquete-next-preview`, conta `16b4a5e0a99a031d28051ebadb4811cc`: deployment **08840940-5c46-4add-af20-639f054c9d7c**, versão **0ab1457b-23ae-40f2-98ac-0920e655ad8b**, 100%. Manifesto dos 24 assets SHA256 `580086fb8b5efcc0becd2cc2fc10032fa8b10d06b16fd73669f37cdf516782a7`. Backend JS permaneceu idêntico ao preview anterior, SHA256 `840514f603ac4f998bd88a7a3bf87783623352aab7460fb408c2fe209e50990c`; as correções estão na apresentação.
+
+Smokes de hashes/source, 38 GETs privados, doze POSTs, seis leituras públicas, cinco HTMLs públicos, duas sessões de navegador, health, login inválido e backend desconhecido PASS. Relatório `.preview-artifacts/admin-a11y-preview-smoke-03d7ed8.json` SHA256 `ab0ec9c308c9d9386727b73c07cac60b57bd357e7585391fbe90b95465caf369`. Não usa a senha do responsável nem comprova aceite humano ou upload Storage autenticado.
+
+Token efêmero `fef5d023-3db4-4356-ad7d-acc2301da90c` e política `53b2b894-b5aa-425f-b1ee-94f5dc417a7e` **revogados**, ausência conferida. Credencial entregue somente como ciphertext RSA ao processo TTY, chave privada em memória; processo encerrado. Access app `556be918-42ad-44e5-a85f-c2783f65b2ba` conserva apenas política do responsável `30cc3ab4-9331-4df6-8d13-d840c2652210`; anônimo 302 depois da revogação. Previews OFF, namespace `0411ac931ca54d289d270606c7e87ef7` e nomes de secrets preservados, sem ler valores. Nenhum serviço/banco anterior consultado, DDL ou dado humano alterado. Sem processos locais ativos nas portas de teste. Gate e smokes ficam válidos para esses artefatos mesmo após novos commits documentais.
+
+## Evidência histórica S1 preservada
 
 26/10/2026. Branch codex/acessibilidade-administrativa/basec307627. Plano2026-10-26-acessibilidade-administrativa.md; somente testes/fixture, sem alteração de produto, banco ou serviços. Helperaxe extraído do teste público sem alterar tags/asserts/formato dos relatórios.
 
