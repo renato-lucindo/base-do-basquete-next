@@ -5,12 +5,12 @@
   border-top: 2px solid #d9e2ee;
 }
 .competition-workspace h2 {
-  font-size: 24px;
+  font-size: 1.5rem;
   margin: 0;
   overflow-wrap: anywhere;
 }
 .competition-workspace h3 {
-  font-size: 18px;
+  font-size: 1.125rem;
   margin-top: 28px;
 }
 .competition-title,
@@ -33,7 +33,7 @@
 .competition-workspace label {
   display: grid;
   gap: 6px;
-  font-size: 16px;
+  font-size: 1rem;
   min-width: 0;
 }
 .competition-workspace input,
@@ -88,7 +88,7 @@
   margin-bottom: 12px;
 }
 .competition-fields label > span {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #42526b;
 }
 .competition-radio {
@@ -127,7 +127,7 @@
 }
 .competition-list small {
   color: #42526b;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .competition-open {
   background: none;

@@ -2,6 +2,7 @@ import { publishedSheet } from "./fixtures/published-game";
 import { publicationSheetResultSchema } from "../src/publication/data-contract";
 import { publishSheetSchema } from "../src/publication/contract";
 import { test, expect, type Page } from "@playwright/test";
+import { scanAccessibility as scan } from "./fixtures/accessibility";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
 import type { RosterSnapshot } from "../src/people/roster-contract";
@@ -210,6 +211,46 @@ async function relate(page: Page) {
   await page.getByLabel("Relacionar Atleta home 1", { exact: true }).check();
   await page.getByLabel("Relacionar Atleta away 1", { exact: true }).check();
 }
+test("axe súmula na preparação e lançamento por teclado", async ({
+  page,
+}, info) => {
+  await fixture(page);
+  await open(page);
+  await scan(page, info, "admin-sheet-preparation");
+  await relate(page);
+  await page
+    .getByRole("button", {
+      name: "Concluir preparação e lançar ações",
+      exact: true,
+    })
+    .click();
+  const jersey = page.getByLabel("Camisa ou alvo", { exact: true });
+  await expect(jersey).toBeFocused();
+  await jersey.fill("12");
+  await jersey.press("Enter");
+  const action = page.getByLabel("Ação", { exact: true });
+  await expect(action).toBeFocused();
+  await action.fill("2");
+  await action.press("Enter");
+  await expect(jersey).toBeFocused();
+  await expect(
+    page.getByRole("button", { name: "Editar ação 1", exact: true }),
+  ).toBeVisible();
+  await scan(page, info, "admin-sheet-action");
+});
+
+test("axe conferência e publicação manual", async ({ page }, info) => {
+  await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status", { name: "Placar a publicar", exact: true }),
+  ).toContainText("2 × 0");
+  await scan(page, info, "admin-publication-confirm");
+});
+
 test("relaciona pessoas reais, lança por teclado e retoma rascunho sem publicar", async ({
   page,
 }, testInfo) => {

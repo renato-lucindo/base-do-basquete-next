@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { pdfPreparationFixture } from "./fixtures/pdf-preparation";
 import { tid } from "./fixtures/text-import";
+import { scanAccessibility as scan } from "./fixtures/accessibility";
 async function open(page: Page) {
   await page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos/pdfs`,
@@ -12,6 +13,17 @@ async function open(page: Page) {
     .getByRole("button", { name: "Preparar publicação do PDF", exact: true })
     .click();
 }
+test("axe suplemento e autoridade na preparação do PDF", async ({
+  page,
+}, info) => {
+  await pdfPreparationFixture(page);
+  await open(page);
+  await expect(
+    page.getByRole("button", { name: "Salvar preparação", exact: true }),
+  ).toBeVisible();
+  await scan(page, info, "admin-pdf-preparation");
+});
+
 async function selectPlayers(
   page: Page,
   f: Awaited<ReturnType<typeof pdfPreparationFixture>>,

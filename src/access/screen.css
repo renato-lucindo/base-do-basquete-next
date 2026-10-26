@@ -101,12 +101,15 @@ h2 {
 }
 .access-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 .access-title h1 {
   margin-bottom: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .access-empty {
   border: 1px solid #d9e2ee;

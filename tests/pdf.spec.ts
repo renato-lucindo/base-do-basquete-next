@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { pdfFixture, pdfPath } from "./fixtures/pdf";
 import { tid } from "./fixtures/text-import";
 import { readFile } from "node:fs/promises";
+import { scanAccessibility as scan } from "./fixtures/accessibility";
 async function openReview(page: import("@playwright/test").Page) {
   await page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos/pdfs`,
@@ -16,6 +17,21 @@ async function openReview(page: import("@playwright/test").Page) {
     page.getByRole("heading", { name: "Revisão do PDF", exact: true }),
   ).toBeVisible();
 }
+test("axe seleção e revisão de PDF no contexto da disputa", async ({
+  page,
+}, info) => {
+  await pdfFixture(page);
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos/pdfs`,
+  );
+  await expect(
+    page.getByLabel("Selecionar PDFs", { exact: true }),
+  ).toBeVisible();
+  await scan(page, info, "admin-pdf-upload");
+  await openReview(page);
+  await scan(page, info, "admin-pdf-review");
+});
+
 test("lote isola arquivo inválido e retoma revisão salva sem reenviar PDF", async ({
   page,
 }) => {

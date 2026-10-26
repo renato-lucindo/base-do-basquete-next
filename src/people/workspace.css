@@ -4,11 +4,11 @@
   border-top: 1px solid #9caac0;
 }
 .members-workspace h4 {
-  font-size: 20px;
+  font-size: 1.25rem;
   margin: 0;
 }
 .members-workspace h5 {
-  font-size: 18px;
+  font-size: 1.125rem;
   margin: 20px 0 12px;
 }
 .members-workspace .member-checkbox,

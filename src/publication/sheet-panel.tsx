@@ -230,9 +230,11 @@ export function SheetPublicationPanel(p: Props) {
           <h4 ref={heading} tabIndex={-1}>
             Conferir publicação deste jogo
           </h4>
-          <p aria-label="Placar a publicar">
-            {p.game.home.name} {totals.teams.home.points} ×{" "}
-            {totals.teams.away.points} {p.game.away.name}
+          <p>
+            <output aria-label="Placar a publicar">
+              {p.game.home.name} {totals.teams.home.points} ×{" "}
+              {totals.teams.away.points} {p.game.away.name}
+            </output>
           </p>
           <p>
             {state.version
