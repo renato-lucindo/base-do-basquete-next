@@ -2,6 +2,8 @@
 
 Unidade posterior à publicação da acessibilidade, ainda não iniciada. Objetivo da VALIDACAO§Infraestrutura: provar sobreposições reais de transações e locks, além do PostgreSQL WASM de conexão única. Produto/contratos continuam exclusivamente o ZIP e feedback aceito; não consultar banco/repositório anterior. Não alterar o projeto Supabase humano para experimentar concorrência.
 
+**Execução26/10:** N1/N2 e evidências locaisN3 concluídos em3e3c378/PR23 sobre22. Cinco sobreposições reais passaram em17.11/Winx64, chaves/PIDs/bloqueios conferidos, stop0/porta fechada; primeira falha de preparação/limites/proveniência emVALIDACAO-CONCORRENCIA.md. CI dedicada e variante opcional revogação apósauthfresh não executadas. Produto/artefatos idênticos ao previewbbcda6a; sem novo gate/deploy por teste/docs.
+
 ## N1 — ambiente isolado e verificável
 
 - [ ] Reconciliar cota/Git/CI/preview e abrir branch sequencial codex/concorrencia-postgres. Binários PostgreSQL/psql/Docker ausentes doPATH; não usar instâncias/dados existentes. Metadados do fornecedor oficial confirmaram arquivo https://get.enterprisedb.com/postgresql/postgresql-17.11-1-windows-x64-binaries.zip, HTTP200/applicationzip/340719294bytes; checksum .sha256 respondeu403, sem retry em loop ou autorização inventada.
