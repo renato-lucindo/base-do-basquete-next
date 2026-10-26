@@ -34,6 +34,23 @@ it("projects cumulative team points and the third compensated foul then GD from 
     r.totals.players.find((p) => p.rosterEntryId === b.rosterEntryId)?.fouls,
   ).toBe(4);
 });
+it("places foul cells in game chronology even when an earlier quarter is entered later", () => {
+  const s = initialState().sheet.present;
+  s.roster.forEach((p) => (p.played = true));
+  const p = s.roster[0];
+  s.events = [
+    event(p.side, p.jersey, "TC", 3),
+    event(p.side, p.jersey, "P", 1),
+  ];
+  const r = projectSheet(s),
+    player = r.players.find((x) => x.rosterEntryId === p.rosterEntryId)!;
+  expect(player.fouls.map((f) => [f.code, f.period, f.firstHalf])).toEqual([
+    ["P", 1, true],
+    ["Tc", 3, false],
+  ]);
+  expect(r.actions[0].annotation).toBe("Tc (2)");
+  expect(s.events[0].period).toBe(3);
+});
 it("folds every overtime into player Q4 exactly once while team periods remain separate", () => {
   const s = initialState().sheet.present;
   s.periods = 6;

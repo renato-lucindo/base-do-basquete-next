@@ -34,9 +34,9 @@ export function projectSheet(sheet: Sheet) {
     };
   });
   const players = totals.players.map((p) => {
-    const own = sheet.events.filter(
-        (e) => e.side === p.side && e.target === p.jersey,
-      ),
+    const own = sheet.events
+        .filter((e) => e.side === p.side && e.target === p.jersey)
+        .sort((a, b) => a.period - b.period),
       pointsByQuarter = [0, 0, 0, 0];
     for (const e of own)
       if (/^[123]$/u.test(e.code))
