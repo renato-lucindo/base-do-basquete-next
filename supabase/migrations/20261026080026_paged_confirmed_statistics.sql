@@ -1,4 +1,7 @@
 -- Current metadata stays small. The existing immutable, incremental ledger is retained.
+-- Serialize the conversion against result writers, before reading any old head.
+-- No root advisory lock is taken by DDL while a writer waits on this relation.
+lock table public.published_games,public.published_statistics in share row exclusive mode;
 create table public.published_statistics_games (
  game_id uuid not null,dispute_id uuid not null,publication_version integer not null,
  phase text check(phase in('round_robin','knockout')),
