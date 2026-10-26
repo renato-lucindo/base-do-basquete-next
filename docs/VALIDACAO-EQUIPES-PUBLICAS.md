@@ -2,7 +2,7 @@
 
 ## ET4 — gate consolidado local, 26/10/2026 00:58UTC-03
 
-**Gate final PASS495unitários/101arquivos,5transportes,13PostgreSQL,21workerd,4PDFs no runtime,lint/formato/tipos app/Worker/builds/fronteira/segredos634**. Log .preview-artifacts/team-et4-gate.log; SHA será registrado no checkpoint seguinte. Após esta prova somente documentação, sem necessidade de repetir gate. CI e deploy ainda pendentes. Banco reconferido43migrations/última20261025221911,1pessoa/1Auth/0jogos/0perfis/0participações públicas, sem mutação. Sem revisor independente, produção, merge ou aceite humano.
+**Gate final PASS495unitários/101arquivos,5transportes,13PostgreSQL,21workerd,4PDFs no runtime,lint/formato/tipos app/Worker/builds/fronteira/segredos634**. Log .preview-artifacts/team-et4-gate.log SHA256 **c7098177dc052f4490ca4c7941fba66b08ee8c5233f9362a036dd08123e16a56**. Após esta prova somente documentação, sem necessidade de repetir gate. CI40266720462 do materialcfdcaf499ad88b100be277ae3a2351d2725b5068 em andamento; deploy ainda pendente. Banco reconferido43migrations/última20261025221911,1pessoa/1Auth/0jogos/0perfis/0participações públicas, sem mutação. Sem revisor independente, produção, merge ou aceite humano.
 
 ## ET3 — páginas e navegação locais, 26/10/2026 00:54UTC-03
 
