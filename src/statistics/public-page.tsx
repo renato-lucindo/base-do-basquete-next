@@ -659,7 +659,11 @@ export function StatisticsPageView() {
                                 ...r.teamNames,
                               ].join(" / ")}
                             >
-                              {display(r.registrationNames)}
+                              <a
+                                href={`/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`}
+                              >
+                                {display(r.registrationNames)}
+                              </a>
                             </td>
                             <td title={r.jerseys.join(" / ")}>
                               {display(r.jerseys)}
@@ -827,7 +831,11 @@ export function StatisticsPageView() {
                                 </a>
                               </th>
                               <td title={r.registrationNames.join(" / ")}>
-                                {display(r.registrationNames)}
+                                <a
+                                  href={`/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`}
+                                >
+                                  {display(r.registrationNames)}
+                                </a>
                               </td>
                               {data.columns.map((key) => (
                                 <td key={key}>

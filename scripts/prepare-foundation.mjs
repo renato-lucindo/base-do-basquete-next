@@ -17,11 +17,13 @@ const paths = [
   "resultado.html",
   "estatisticas.html",
   "atleta.html",
+  "equipes.html",
+  "equipe.html",
   ...readdirSync("dist-foundation/assets").map((name) => `assets/${name}`),
 ];
 for (const path of paths) {
   if (
-    !/^((?:foundation|resultado|estatisticas|atleta)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
+    !/^((?:foundation|resultado|estatisticas|atleta|equipes|equipe)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
       path,
     )
   )

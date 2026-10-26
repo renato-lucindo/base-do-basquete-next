@@ -171,7 +171,13 @@ try {
     await denied.arrayBuffer();
   }
   stage = "public projection without application authentication";
-  for (const resource of ["games", "achievements", "statistics", "players"]) {
+  for (const resource of [
+    "games",
+    "achievements",
+    "statistics",
+    "players",
+    "teams",
+  ]) {
     const publicMissing = await fetch(
       `${origin}/api/public/${resource}/${randomUUID()}`,
       { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
@@ -185,6 +191,19 @@ try {
         .some((c) => c.startsWith("__Host-bdb-session=")),
     );
   }
+  stage = "public team detail without application authentication";
+  const absentTeam = await fetch(
+    `${origin}/api/public/teams/${randomUUID()}/${randomUUID()}`,
+    { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
+  );
+  assert.equal(absentTeam.status, 404);
+  assert.equal((await absentTeam.json()).error.code, "public_not_found");
+  assert.equal(
+    absentTeam.headers
+      .getSetCookie()
+      .some((c) => c.startsWith("__Host-bdb-session=")),
+    false,
+  );
   const privateModule = await fetch(`${origin}/worker.js`, { headers });
   status = privateModule.status;
   assert.equal(status, 404);
@@ -282,6 +301,19 @@ try {
     await page.getByRole("alert").waitFor();
     assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
     assert.deepEqual(errors, []);
+    for (const path of [
+      `/equipes.html#${randomUUID()}`,
+      `/equipe.html#${randomUUID()}?disputeId=${randomUUID()}`,
+    ]) {
+      stage = `browser ${name} public team ${path.split("#")[0]}`;
+      const doc = await page.goto(origin + path, {
+        waitUntil: "domcontentloaded",
+      });
+      assert.equal(doc.status(), 200);
+      await page.getByRole("alert").waitFor();
+      assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+      assert.deepEqual(errors, []);
+    }
     await context.close();
   }
   console.log(
@@ -300,6 +332,7 @@ try {
       publicProjectionRead: true,
       publicStatisticsRead: true,
       publicPlayerProjectionRead: true,
+      publicTeamReads: 2,
       privatePlayerProfileReads: 2,
       privatePlayerProfileCommands: 1,
       ownerLoginPending: true,

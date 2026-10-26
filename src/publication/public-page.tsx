@@ -89,7 +89,13 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           );
         return (
           <section key={side}>
-            <h3>{r.game[side].name}</h3>
+            <h3>
+              <a
+                href={`/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}`}
+              >
+                {r.game[side].name}
+              </a>
+            </h3>
             <p>
               Capitão: {staff.captain?.name} · Técnico: {staff.coach?.name}
               {staff.captainIsCoach ? " (capitão)" : ""}

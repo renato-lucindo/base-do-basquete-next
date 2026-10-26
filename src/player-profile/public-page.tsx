@@ -249,7 +249,12 @@ function Games({
                 </th>
                 <td>{contextLabel(p.fact.context)}</td>
                 <td>
-                  {p.fact.registration.name} · #{p.fact.jersey}
+                  <a
+                    href={`/equipe.html#${p.fact.registration.team.id}?disputeId=${p.fact.disputeId}&registrationId=${p.fact.registration.registrationId}`}
+                  >
+                    {p.fact.registration.name}
+                  </a>{" "}
+                  · #{p.fact.jersey}
                   <small>{p.fact.registration.team.name}</small>
                 </td>
                 <td>{p.fact.person.name}</td>
@@ -401,7 +406,13 @@ function History({
                 <th scope="row">{contextLabel(h.context)}</th>
                 <td>
                   {h.teamNames.join(" / ")}
-                  <small>{h.registrationNames.join(" / ")}</small>
+                  <small>
+                    <a
+                      href={`/equipe.html#${h.registration.team.id}?disputeId=${h.disputeId}&registrationId=${h.registration.registrationId}`}
+                    >
+                      {h.registrationNames.join(" / ")}
+                    </a>
+                  </small>
                 </td>
                 <td>{h.names.join(" / ")}</td>
                 <td>{h.jerseys.join(" / ")}</td>

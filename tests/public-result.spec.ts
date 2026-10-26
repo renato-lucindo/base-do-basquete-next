@@ -14,6 +14,12 @@ test("resultado liga cada atleta à identidade sem usar camisa como chave", asyn
     await expect(
       page.locator(`a[href="/atleta.html#${p.person.id}"]`),
     ).toBeVisible();
+  for (const side of ["home", "away"] as const)
+    await expect(
+      page.locator(
+        `a[href="/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}"]`,
+      ),
+    ).toBeVisible();
 });
 test("public result opens without application login and shows only published participation", async ({
   page,

@@ -1,5 +1,19 @@
 # Consulta de equipes confirmadas — evidências
 
+## ET4 — gate consolidado local, 26/10/2026 00:58UTC-03
+
+**Gate final PASS495unitários/101arquivos,5transportes,13PostgreSQL,21workerd,4PDFs no runtime,lint/formato/tipos app/Worker/builds/fronteira/segredos634**. Log .preview-artifacts/team-et4-gate.log; SHA será registrado no checkpoint seguinte. Após esta prova somente documentação, sem necessidade de repetir gate. CI e deploy ainda pendentes. Banco reconferido43migrations/última20261025221911,1pessoa/1Auth/0jogos/0perfis/0participações públicas, sem mutação. Sem revisor independente, produção, merge ou aceite humano.
+
+## ET3 — páginas e navegação locais, 26/10/2026 00:54UTC-03
+
+equipes.html por disputa e equipe.html por equipe+disputa+inscrição explícita, com seleção quando ambígua. Lista busca/ordena/pagina antes de devolver20 e alterna totais/médias/escopo; detalhe Resumo/Participantes/Jogos conserva0/00/homônimos/DNP/zero, nomes/datas/fontes e páginas independentes. Estado normalizado de retorno na URL preserva busca/ordem/página sem aceitar URL externa. Browser somente renderiza DTO validado/correlacionado, aborta resposta antiga e restaura foco após o DOM da resposta atual. Sem consultas Auth ou campos live/privados para completar elenco.
+
+RED das páginas/links ausentes observado. **14browsers próprios desktop/mobile PASS** na primeira implementação; depois links de equipes em resultados/estatísticas/perfil/contexto administrativo, Vite/allowlist/manifesto/smoke ampliados. **62browsers de composição PASS**, log .preview-artifacts/team-et3-composition.log SHA256 **bebbdc43a6b4eecba8aa0a534c237a59b257e23b1bcd9d7fc6d8ed25cb2e77fd**. Texto de cobertura de fases esclarecido como fonte da disputa e tooltip por métrica acrescidos depois: **4focais finais PASS**, log team-et3-last-focal.log SHA256 **dbe4c5b3b8cf23b89bab0b8a1d267e3d66e5a10e2384dcc6efb139b9d5036d86**. **7unitários de navegação/provider PASS** incluem recusa de DTO válido com consulta/inscrição trocadas e retorno externo normalizado; não aceitar resposta de outro contexto.
+
+Captura .preview-artifacts/team-public-320-text200-mobile.png inspecionada; SHA256 **e976f9adef0dae770719d8c114246a83ed7cdee9de417525ec6bab6547584eb3**.320px com fonte raiz200% (redimensionamento de texto, não ensaio completo de zoom do navegador), sem overflow global, tabela longa com rolagem/foco próprios. Teclado, back/forward/recarga/retorno, fonte contaminada, vazio e resposta atrasada testados. Tipos app/Worker/lint/formato focais PASS. Não equivale a auditoriaWCAG ou teste assistivo completo.
+
+Self-review da vertical: origem pública/inscrição explícita, campo privado/ID indevido, DNP/0, médias e placar oficial, nomes/contexto recentes sem escolher primeira inscrição, null/413/429/503, race deGET/foco/URL e preservação de histórico. Sem revisor independente disponível. **Gate/CI/preview de equipes ainda pendentes**; não atribuir CI473/324 do perfil a esta UI. Migrations/RPC inalteradas, nenhuma credencial/deploy em andamento.
+
 ## ET2 — adapter/rotas locais, 26/10/2026 00:40UTC-03
 
 GETs públicos específicos de tabela e detalhe, sem SessionStore/Auth. SóUUID canônico da disputa entra em get_public_statistics_source, com chave publicável apenas no Worker,timeout8s/read5MiB. Backend deriva DTO mínimo, correlaciona disputa/equipe/inscrição e recusa query desconhecida/duplicada/IDinválido antes da leitura; limite8192,405/400/404 explícitos. RPCnull significa ausência; falha técnica/JSONruim/fonte contaminada não vira404 nem limpa cookie administrativo.

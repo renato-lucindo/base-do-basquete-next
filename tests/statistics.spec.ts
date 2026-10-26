@@ -16,6 +16,14 @@ test("nome estatístico liga à identidade estável no perfil público", async (
   await expect(
     table.locator(`a[href="/atleta.html#${person.id}"]`).first(),
   ).toBeVisible();
+  const team = f.source.games[0].snapshot.game.home;
+  await expect(
+    table
+      .locator(
+        `a[href="/equipe.html#${team.team.id}?disputeId=${f.source.disputeId}&registrationId=${team.registrationId}"]`,
+      )
+      .first(),
+  ).toBeVisible();
 });
 
 test("comparação resume todas inscrições e destaca melhor/pior sem transformar ausência em empate", async ({
@@ -62,6 +70,9 @@ test("disputa salva oferece estatísticas em outra aba sem substituir edição a
   );
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link).toHaveAttribute("rel", /noopener/u);
+  await expect(
+    page.getByRole("link", { name: "Equipes publicadas", exact: true }),
+  ).toHaveAttribute("href", `/equipes.html#${tid(3)}?scope=all`);
 });
 
 test("seleção por teclado mantém foco após consulta e limita comparação a dois atletas", async ({

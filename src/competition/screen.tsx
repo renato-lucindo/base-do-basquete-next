@@ -550,6 +550,16 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
                 Estatísticas publicadas
               </a>
             )}
+            {context && editor.savedIds.has(context.id) && (
+              <a
+                className="competition-public-link"
+                href={`/equipes.html#${context.id}?scope=all`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Equipes publicadas
+              </a>
+            )}
           </nav>
           {context && editor.savedIds.has(context.id) && (
             <div hidden={tab !== "regulation"}>

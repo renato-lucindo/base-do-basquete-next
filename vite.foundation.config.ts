@@ -12,6 +12,8 @@ export default defineConfig({
         "resultado.html",
         "estatisticas.html",
         "atleta.html",
+        "equipes.html",
+        "equipe.html",
       ],
     },
   },
