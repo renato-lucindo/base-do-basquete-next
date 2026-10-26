@@ -22,8 +22,10 @@
 ## Fechamento
 
 - [x] Gate único quando unidade estável; CI do mesmo código, PRdraft(s) coerentes e checkpoint. Reutilizar provas inalteradas/harness126, semgates por docs/sessão. Preview existente protegido; mudanças SQL exigem prova realBEGIN/ROLLBACK sem DML de admin/humanos; upload/smoke se assets/Worker mudarem, revogar temporários. Não declarar publicado antes de evidência.
-- [ ] Conferir cota entre unidades/anteslongas;85%usados5h mínimo seguro/checkpoint/push/MESMAautomação reset+2. Ao concluir, pausar agendamento. PDFparser, interpretador e mobile adiados; cadastro genérico busca parcial permanece busca, não sugestão automática de identidade.
+- [x] Conferir cota entre unidades/anteslongas;85%usados5h mínimo seguro/checkpoint/push/MESMAautomação reset+2. Ao concluir, pausar agendamento. PDFparser, interpretador e mobile adiados; cadastro genérico busca parcial permanece busca, não sugestão automática de identidade.
 
 Prioridade reafirmada: primeiro súmula e compatibilidade. A apresentação simples e o recorte de fonte são a entrega atual; refinamento visual completo do PDF fica para outra unidade. Evidências em docs/VALIDACAO-COMPATIBILIDADE-SUMULA.md.
 
 Entrega técnica da prioridade atual em26/10/2026: CI40420017804 e preview3eca aprovados,47migrations reconciliadas,smokes e revogação confirmados. A última caixa de controle de cota/encerramento é concluída com automaçãoPAUSED ao finalizar. Aceite humano continua pendente.
+
+Ferramenta oficial confirmou a automação retomar-preview-base-do-basquete emPAUSED após a entrega; sem nova ocorrência agendada.
