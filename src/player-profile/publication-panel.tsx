@@ -4,10 +4,12 @@ import {
   confirmPlayerProfileSchema,
   playerProfileAckSchema,
   playerProfileWorkspaceSchema,
+  playerProfileVersionSchema,
   type ConfirmPlayerProfile,
   type PlayerProfileAck,
   type PlayerProfileWorkspace,
 } from "./contract";
+import type { z } from "zod";
 type Props = {
   personId: string;
   enabled: boolean;
@@ -30,6 +32,33 @@ const labels = {
 } as const;
 const stamp = (s: string) =>
   new Date(s).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+function ProfileFields({
+  person,
+}: {
+  person: PlayerProfileWorkspace["proposal"]["person"];
+}) {
+  return (
+    <dl className="profile-public-fields">
+      {Object.entries(labels).map(([field, label]) => {
+        const value = person[field as keyof typeof labels];
+        return (
+          <div key={field}>
+            <dt>{label}</dt>
+            <dd>
+              {value === null
+                ? "Não informado"
+                : field === "dominantHand"
+                  ? { left: "Esquerda", right: "Direita", both: "Ambidestra" }[
+                      value as "left" | "right" | "both"
+                    ]
+                  : String(value)}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
 export function ProfilePublicationPanel(p: Props) {
   const [view, setView] = useState<PlayerProfileWorkspace | null>(null),
     [busy, setBusy] = useState(false),
@@ -38,14 +67,19 @@ export function ProfilePublicationPanel(p: Props) {
     [checked, setChecked] = useState(false),
     [error, setError] = useState(""),
     [status, setStatus] = useState(""),
-    [offset, setOffset] = useState(0);
+    [offset, setOffset] = useState(0),
+    [versionView, setVersionView] = useState<z.infer<
+      typeof playerProfileVersionSchema
+    > | null>(null);
   const pending = useRef<{
       command: ConfirmPlayerProfile;
       ack: PlayerProfileAck | null;
     } | null>(null),
     alive = useRef(true),
     root = useRef<HTMLElement>(null),
-    focus = useRef<"heading" | "status" | "error" | "check" | null>(null);
+    focus = useRef<
+      "heading" | "status" | "error" | "check" | "snapshot" | null
+    >(null);
   const path = `/api/people/${p.personId}/profile`,
     locked = busy || !!pending.current || !p.enabled;
   const mayLeave = () =>
@@ -75,7 +109,7 @@ export function ProfilePublicationPanel(p: Props) {
       ?.querySelector<HTMLElement>(`[data-profile-focus="${focus.current}"]`)
       ?.focus();
     focus.current = null;
-  }, [view, busy, error, status, review, p.enabled]);
+  }, [view, busy, error, status, review, p.enabled, versionView]);
   useEffect(() => {
     alive.current = true;
     void refresh(0);
@@ -108,12 +142,38 @@ export function ProfilePublicationPanel(p: Props) {
     setError("");
     setChecked(false);
     setReview(false);
+    setVersionView(null);
     try {
       const w = await read(page);
       if (alive.current) {
         setView(w);
         setOffset(page);
         focus.current = "heading";
+      }
+    } catch (e) {
+      if (alive.current) fail(e);
+    } finally {
+      if (alive.current) setBusy(false);
+    }
+  }
+  async function showVersion(version: number) {
+    if (locked) return;
+    setBusy(true);
+    setError("");
+    setVersionView(null);
+    try {
+      const v = await api(
+        `${path}/versions/${version}`,
+        playerProfileVersionSchema,
+      );
+      if (v.personId !== p.personId || v.version !== version)
+        throw new ApiFailure(
+          503,
+          "A resposta não corresponde à confirmação solicitada.",
+        );
+      if (alive.current) {
+        setVersionView(v);
+        focus.current = "snapshot";
       }
     } catch (e) {
       if (alive.current) fail(e);
@@ -258,28 +318,7 @@ export function ProfilePublicationPanel(p: Props) {
           )}
           <section role="region" aria-label="Dados públicos do perfil">
             <h5>Dados que serão publicados</h5>
-            <dl className="profile-public-fields">
-              {Object.entries(labels).map(([field, label]) => {
-                const value =
-                  view.proposal.person[field as keyof typeof labels];
-                return (
-                  <div key={field}>
-                    <dt>{label}</dt>
-                    <dd>
-                      {value === null
-                        ? "Não informado"
-                        : field === "dominantHand"
-                          ? {
-                              left: "Esquerda",
-                              right: "Direita",
-                              both: "Ambidestra",
-                            }[value as "left" | "right" | "both"]
-                          : String(value)}
-                    </dd>
-                  </div>
-                );
-              })}
-            </dl>
+            <ProfileFields person={view.proposal.person} />
           </section>
           <fieldset className="member-editor" disabled={locked}>
             <label>
@@ -351,6 +390,14 @@ export function ProfilePublicationPanel(p: Props) {
                 <li key={h.version}>
                   Confirmação {h.version} · {stamp(h.confirmedAt)} ·{" "}
                   {h.reason || "Primeira publicação"}
+                  <button
+                    type="button"
+                    className="secondary"
+                    disabled={locked}
+                    onClick={() => void showVersion(h.version)}
+                  >
+                    Ver confirmação {h.version}
+                  </button>
                 </li>
               ))}
             </ol>
@@ -371,6 +418,25 @@ export function ProfilePublicationPanel(p: Props) {
               Próximas confirmações
             </button>
           </div>
+          {versionView && (
+            <section
+              role="region"
+              aria-label={`Dados da confirmação ${versionView.version}`}
+            >
+              <h5 tabIndex={-1} data-profile-focus="snapshot">
+                Confirmação {versionView.version}
+              </h5>
+              <p>
+                {stamp(versionView.confirmedAt)} ·{" "}
+                {versionView.reason || "Primeira publicação"}
+              </p>
+              <p>
+                Dados publicados nesta ocasião. A consulta não substitui a
+                proposta atual.
+              </p>
+              <ProfileFields person={versionView.snapshot.person} />
+            </section>
+          )}
         </>
       )}
       {pending.current ? (

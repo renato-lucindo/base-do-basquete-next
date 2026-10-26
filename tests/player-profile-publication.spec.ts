@@ -4,6 +4,76 @@ import {
   openProfilePublication,
   conferProfile,
 } from "./fixtures/player-profile-browser";
+
+test("duas abas recusam versão antiga e preservam motivo até nova conferência", async ({
+  page,
+  context,
+}) => {
+  const f = await profileBrowserFixture(page),
+    other = await context.newPage();
+  await f.attach(other);
+  await openProfilePublication(page);
+  await openProfilePublication(other);
+  await conferProfile(page);
+  await conferProfile(other);
+  await page
+    .getByRole("button", { name: "Publicar perfil", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Perfil confirmado" }),
+  ).toBeVisible();
+  await other
+    .getByRole("button", { name: "Publicar perfil", exact: true })
+    .click();
+  await expect(other.getByRole("alert")).toContainText("O cadastro mudou");
+  await expect(
+    other.getByLabel("Motivo da publicação", { exact: true }),
+  ).toHaveValue("Dados públicos conferidos");
+  expect(f.receipts.size).toBe(1);
+  await other
+    .getByRole("button", { name: "Atualizar dados para conferir", exact: true })
+    .click();
+  await conferProfile(other);
+  await other
+    .getByRole("button", { name: "Confirmar revisão do perfil", exact: true })
+    .click();
+  await expect(
+    other.getByRole("status").filter({ hasText: "Perfil confirmado" }),
+  ).toBeVisible();
+  expect(f.receipts.size).toBe(2);
+  await other.close();
+});
+test("histórico privado longo abre snapshot da ocasião sem mudar a proposta", async ({
+  page,
+}) => {
+  const f = await profileBrowserFixture(page);
+  f.seedHistory(25);
+  await openProfilePublication(page);
+  await expect(
+    page.getByRole("button", { name: "Ver confirmação 25", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Ver confirmação 5", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Próximas confirmações", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Ver confirmação 1", exact: true })
+    .click();
+  const snapshot = page.getByRole("region", {
+    name: "Dados da confirmação 1",
+    exact: true,
+  });
+  await expect(snapshot).toContainText("Biografia confirmada 1");
+  await expect(
+    snapshot.getByRole("heading", { name: "Confirmação 1", exact: true }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("region", { name: "Dados públicos do perfil", exact: true }),
+  ).toContainText("Biografia confirmada 25");
+  expect(f.attempts).toHaveLength(0);
+});
 test("confirma somente metadados salvos, sem expor campos privados na conferência", async ({
   page,
 }) => {

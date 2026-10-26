@@ -131,7 +131,9 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                       <tr key={p.person.id}>
                         <td>{p.jersey}</td>
                         <th scope="row">
-                          {p.person.nickname || p.person.name}
+                          <a href={`/atleta.html#${p.person.id}`}>
+                            {p.person.nickname || p.person.name}
+                          </a>
                           {p.captain ? " · Capitão" : ""}
                         </th>
                         <td>

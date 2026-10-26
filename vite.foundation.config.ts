@@ -7,7 +7,12 @@ export default defineConfig({
   build: {
     outDir: "dist-foundation",
     rollupOptions: {
-      input: ["foundation.html", "resultado.html", "estatisticas.html"],
+      input: [
+        "foundation.html",
+        "resultado.html",
+        "estatisticas.html",
+        "atleta.html",
+      ],
     },
   },
 });

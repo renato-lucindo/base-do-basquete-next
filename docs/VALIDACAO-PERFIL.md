@@ -1,5 +1,19 @@
 # Perfil confirmado — evidências
 
+## Gate da vertical — 26/10/2026 00:01UTC-03
+
+Gate consolidado final **PASS**:473unitários/97arquivos,5transportes,13cenários PostgreSQL,20workerd,prova real do runtime com4PDFs,lint/formato/tipos app/Worker/builds/fronteira/segredos601. Log .preview-artifacts/profile-p4-gate.log SHA256 **3d1e9b7275ae440f905fd0f10830384e7515d32ba6f6c6695efae2e94a555c2f**. Sódocumentação posterior a esse gate. CI/preview da vertical ainda pendentes; não atribuir CI estatístico ao perfil. Sem repetir gate por atualização documental.
+
+## P4b2/P4c — vertical local, 25/10/2026 23:59UTC-03
+
+Página atleta.html com cinco seções, URL por identidade, filtros públicos de campeonato/temporada/disputa, modos/escopos e paginações independentes. Nenhuma consulta ao cadastro privado pelo browser; DTO validado/correlacionado no recebimento, resposta antiga abortada/recusada, inválida não mostra fonte. Somente metadados explicitamente confirmados são opcionais do perfil; nomes/camisas/equipes/datas nas linhas são da ocasião. Sem horários ou equipe atual inferidos. Conquistas separam destinatário individual e colocação contextual de equipe. Links estáveis por pessoa em resultados/estatísticas; entrada/allowlist/smoke preparados, ainda sem deploy.
+
+RED público por página ausente, RED dos links ausentes e do detalhe privado observados. Primeira composição pública8/12: foco era consumido no render sem novo título; corrigido para esperar resposta atual e commit DOM, sem temporizador. Outros dois casos usavam getByLabel com label contendo select/opções; consulta por role/nome acessível corrigiu o teste. GREEN12/12 desktop/mobile. Composição posterior **60/60 browsers PASS**, inclui resultados/estatísticas/painel, duas abas com409 preservando motivo, histórico privado25→20+5 e snapshot da confirmação1 sem substituir proposta25. Log profile-p4-composition.log SHA256 **f39407ebf4664a7a29974925b66e46d2edfb28cb5e665895b13e595f8781a6b1**. Caso adicional RED revelou mensagem de resumo incorreta para DNP; correção e2focais desktop/mobile PASS em profile-dnp-green.log. Não atribuir composição60 ao texto posterior; CI consolidará a vertical.
+
+Captura .preview-artifacts/player-public-320-mobile.png inspecionada: controles, navegação e valores cabem em320px, sem overflow global; tabelas longas têm região rolável focável. Tipos app/Worker e lint focais PASS. Banco reconciliado43migrations/última20261025221911,1pessoa/1Auth/0perfis/0participações públicas, sem novaDDL. Primeiro SELECT de contagem usou nome de tabela inexistente e falhou sem mutação; leitura corrigida persons reconfirmou o estado. Cloudflare deployment316098d6/versão23bfec3d e Access sóresponsável inalterados, sem token temporário novo.
+
+Self-review da integração cobre campos opcionais, aliases/linhagem, DNP/zero, mínimos/fases, paginação sem reduzir totais, resposta obsoleta, ACK conhecido e foco. Sem revisor independente disponível; não equivale a parecer externo. Gate/CI vertical ainda a executar. Aceites humanos e piloto StorageHTTP permanecem pendentes; não repetir testes humanos adiados.
+
 ## P4c1 — paginação pública independente, 25/10/2026 23:48UTC-03
 
 RED observado: histórico com25inscrições retornava25em vez de5na segunda página. Query historyPage e metadados historyPagination separados da página dos jogos;20por página, clamp e ordem determinística por IDs após ano/nome. Totais continuam sobre toda a fonte selecionada, sem depender de nenhuma página. GREEN19focais domínio/provider/carreira e tipos app/Worker PASS. Logs profile-p4c-pagination-red.log e profile-p4c-pagination-green.log em .preview-artifacts. Não altera SQL/serviços nem reaplica migrations. Reutilizar provas anteriores inalteradas; gate consolidado após vertical estável.

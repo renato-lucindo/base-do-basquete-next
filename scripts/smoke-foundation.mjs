@@ -125,6 +125,8 @@ try {
     `/api/pdf-sources/${randomUUID()}/preparation`,
     "/api/people",
     `/api/people/${randomUUID()}`,
+    `/api/people/${randomUUID()}/profile`,
+    `/api/people/${randomUUID()}/profile/versions/1`,
     `/api/roster?registrationId=${randomUUID()}`,
     `/api/roster/${randomUUID()}`,
     `/api/roster/${randomUUID()}/transfer?destinationRegistrationId=${randomUUID()}`,
@@ -152,6 +154,7 @@ try {
     `/api/registrations/${randomUUID()}/withdrawal/preview`,
     `/api/roster/${randomUUID()}/transfer`,
     `/api/roster/${randomUUID()}/transfer/preview`,
+    `/api/people/${randomUUID()}/profile`,
   ]) {
     stage = `private decision command ${path}`;
     const denied = await fetch(`${origin}${path}`, {
@@ -168,7 +171,7 @@ try {
     await denied.arrayBuffer();
   }
   stage = "public projection without application authentication";
-  for (const resource of ["games", "achievements", "statistics"]) {
+  for (const resource of ["games", "achievements", "statistics", "players"]) {
     const publicMissing = await fetch(
       `${origin}/api/public/${resource}/${randomUUID()}`,
       { headers: { ...headers, Cookie: "__Host-bdb-session=invalid" } },
@@ -270,6 +273,15 @@ try {
       .waitFor();
     assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
     assert.deepEqual(errors, []);
+    stage = `browser ${name} public player`;
+    const playerDocument = await page.goto(
+      `${origin}/atleta.html#${randomUUID()}`,
+      { waitUntil: "domcontentloaded" },
+    );
+    assert.equal(playerDocument.status(), 200);
+    await page.getByRole("alert").waitFor();
+    assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+    assert.deepEqual(errors, []);
     await context.close();
   }
   console.log(
@@ -287,6 +299,9 @@ try {
       publicAchievementProjectionRead: true,
       publicProjectionRead: true,
       publicStatisticsRead: true,
+      publicPlayerProjectionRead: true,
+      privatePlayerProfileReads: 2,
+      privatePlayerProfileCommands: 1,
       ownerLoginPending: true,
     }),
   );

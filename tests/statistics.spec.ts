@@ -3,6 +3,21 @@ import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
 
+test("nome estatístico liga à identidade estável no perfil público", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url);
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  const person = f.source.games[0].snapshot.facts.players[0].person;
+  await expect(
+    table.locator(`a[href="/atleta.html#${person.id}"]`).first(),
+  ).toBeVisible();
+});
+
 test("comparação resume todas inscrições e destaca melhor/pior sem transformar ausência em empate", async ({
   page,
 }) => {

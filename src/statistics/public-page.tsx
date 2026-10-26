@@ -642,7 +642,9 @@ export function StatisticsPageView() {
                               />
                             </td>
                             <th scope="row" title={r.names.join(" / ")}>
-                              {display(r.names)}
+                              <a href={`/atleta.html#${r.personId}`}>
+                                {display(r.names)}
+                              </a>
                               {r.nicknames.some((n) => n !== null) && (
                                 <small>
                                   {r.nicknames
@@ -820,7 +822,9 @@ export function StatisticsPageView() {
                           {data.compared.map((r) => (
                             <tr key={`${r.personId}/${r.registrationId}`}>
                               <th scope="row" title={r.names.join(" / ")}>
-                                {display(r.names)}
+                                <a href={`/atleta.html#${r.personId}`}>
+                                  {display(r.names)}
+                                </a>
                               </th>
                               <td title={r.registrationNames.join(" / ")}>
                                 {display(r.registrationNames)}

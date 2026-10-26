@@ -1,6 +1,20 @@
 import { test, expect } from "@playwright/test";
 import { publishedSheet, publishedSite } from "./fixtures/published-game";
 import { pubId } from "./fixtures/publication";
+
+test("resultado liga cada atleta à identidade sem usar camisa como chave", async ({
+  page,
+}) => {
+  const r = publishedSheet();
+  await page.route(`**/api/public/games/${r.id}`, (route) =>
+    route.fulfill({ json: r }),
+  );
+  await page.goto(`http://127.0.0.1:5174/resultado.html#${r.id}`);
+  for (const p of r.facts.players)
+    await expect(
+      page.locator(`a[href="/atleta.html#${p.person.id}"]`),
+    ).toBeVisible();
+});
 test("public result opens without application login and shows only published participation", async ({
   page,
 }, testInfo) => {

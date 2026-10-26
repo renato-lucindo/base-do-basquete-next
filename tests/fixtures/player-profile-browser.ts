@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Page, type Route } from "@playwright/test";
 import { transferBrowserFixture } from "./transfer-browser";
 import { emptyPerson } from "../../src/people/contract";
 import type { PublicPlayerProfile } from "../../src/player-profile/contract";
@@ -25,10 +25,39 @@ export async function profileBrowserFixture(page: Page) {
     reason: string;
   }[] = [];
   const attempts: string[] = [],
-    receipts = new Map<string, { payload: string; ack: unknown }>();
-  await page.route("**/api/people/**/profile**", async (route) => {
+    receipts = new Map<string, { payload: string; ack: unknown }>(),
+    snapshots = new Map<number, PublicPlayerProfile>();
+  function confirm(reason: string) {
+    version++;
+    confirmedPersonVersion = personVersion;
+    history.unshift({
+      version,
+      personVersion,
+      confirmedAt: "2026-10-25T12:00:00Z",
+      actorId: tid(98),
+      reason,
+    });
+    published = {
+      kind: "confirmed-player-profile-v1",
+      personId: pid,
+      version,
+      confirmedAt: "2026-10-25T12:00:00Z",
+      person: { ...person },
+    };
+    snapshots.set(version, structuredClone(published));
+  }
+  const handler = async (route: Route) => {
     const req = route.request();
     if (req.method() === "GET") {
+      const url = new URL(req.url()),
+        detail = url.pathname.match(/\/versions\/(\d+)$/);
+      if (detail) {
+        const n = Number(detail[1]),
+          header = history.find((h) => h.version === n);
+        return route.fulfill({
+          json: { ...header, personId: pid, snapshot: snapshots.get(n) },
+        });
+      }
       if (failRead && version)
         return route.fulfill({
           status: 503,
@@ -46,8 +75,12 @@ export async function profileBrowserFixture(page: Page) {
               ? personVersion !== confirmedPersonVersion
               : false,
             published,
-            history,
-            hasMore: false,
+            history: history.slice(
+              Number(url.searchParams.get("offset") ?? 0),
+              Number(url.searchParams.get("offset") ?? 0) + 20,
+            ),
+            hasMore:
+              history.length > Number(url.searchParams.get("offset") ?? 0) + 20,
           },
         },
       });
@@ -74,28 +107,13 @@ export async function profileBrowserFixture(page: Page) {
           error: { message: "O cadastro mudou. Atualize para conferir." },
         },
       });
-    version++;
-    confirmedPersonVersion = personVersion;
-    history.unshift({
-      version,
-      personVersion,
-      confirmedAt: "2026-10-25T12:00:00Z",
-      actorId: tid(98),
-      reason: c.reason,
-    });
-    published = {
-      kind: "confirmed-player-profile-v1",
-      personId: pid,
-      version,
-      confirmedAt: "2026-10-25T12:00:00Z",
-      person: { ...person },
-    };
+    confirm(c.reason);
     const ack = {
       commandId: c.commandId,
       personId: pid,
       version,
       personVersion,
-      confirmedAt: published.confirmedAt,
+      confirmedAt: published!.confirmedAt,
     };
     receipts.set(c.commandId, { payload, ack });
     if (lose) {
@@ -106,11 +124,23 @@ export async function profileBrowserFixture(page: Page) {
       });
     }
     return route.fulfill({ json: ack });
-  });
+  };
+  await page.route("**/api/people/**/profile**", handler);
   return {
     attempts,
     receipts,
     pid,
+    attach: async (other: Page) => {
+      await transferBrowserFixture(other);
+      await other.route("**/api/people/**/profile**", handler);
+    },
+    seedHistory: (count: number) => {
+      for (let i = 1; i <= count; i++) {
+        personVersion++;
+        person.biography = `Biografia confirmada ${i}`;
+        confirm(i === 1 ? "" : "Histórico sintético");
+      }
+    },
     uncertain: () => {
       lose = true;
     },
