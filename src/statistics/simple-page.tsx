@@ -204,15 +204,48 @@ export function SimpleStatisticsPageView() {
               <label>
                 Equipe
                 <select
-                  value={route.query.teams?.[0] ?? ""}
+                  value={
+                    route.query.teams === null
+                      ? ""
+                      : route.query.teams.length === 0
+                        ? "__none"
+                        : route.query.teams.length > 1
+                          ? "__multiple"
+                          : route.query.teams[0]
+                  }
                   onChange={(e) =>
                     change({
-                      teams: e.target.value ? [e.target.value] : null,
+                      teams:
+                        e.target.value === "__none"
+                          ? []
+                          : e.target.value === "__multiple"
+                            ? route.query.teams
+                            : e.target.value
+                              ? [e.target.value]
+                              : null,
                       search,
                     })
                   }
                 >
                   <option value="">Todas as equipes</option>
+                  {route.query.teams?.length === 0 && (
+                    <option value="__none" disabled>
+                      Nenhuma equipe
+                    </option>
+                  )}
+                  {route.query.teams && route.query.teams.length > 1 && (
+                    <option value="__multiple" disabled>
+                      {route.query.teams.length} equipes selecionadas
+                    </option>
+                  )}
+                  {route.query.teams?.length === 1 &&
+                    !data?.teams.some(
+                      (t) => t.id === route.query.teams![0],
+                    ) && (
+                      <option value={route.query.teams[0]}>
+                        Equipe selecionada sem dados neste recorte
+                      </option>
+                    )}
                   {(data?.teams ?? []).map((t) => (
                     <option key={t.id} value={t.id}>
                       {display(t.names)}

@@ -227,3 +227,32 @@ test("falha simples permite nova consulta sem oferecer tabela de zeros", async (
     page.getByRole("heading", { name: "Jogadores", exact: true }),
   ).toBeFocused();
 });
+
+test("URL com nenhuma equipe representa a seleção vazia em vez de indicar todas", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  await page.goto(f.url + "&team=");
+  await expect(
+    page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
+  ).toBeVisible();
+  const team = page.getByRole("combobox", { name: "Equipe", exact: true });
+  await expect(team).toHaveValue("__none");
+  await team.selectOption("");
+  await expect(
+    page.getByRole("table", { name: "Dados simples dos jogos publicados" }),
+  ).toBeVisible();
+  const home = f.source.games[0].snapshot.game.home.team.id,
+    away = f.source.games[0].snapshot.game.away.team.id;
+  await page.goto(f.url + `&team=${home}&team=${away}`);
+  await expect(team).toHaveValue("__multiple");
+  await page.goto(f.url + "&team=fd400000-0000-4000-8000-000000000999");
+  await expect(
+    page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
+  ).toBeVisible();
+  await expect(team).toHaveValue("fd400000-0000-4000-8000-000000000999");
+  await team.selectOption(home);
+  await expect(
+    page.getByRole("table", { name: "Dados simples dos jogos publicados" }),
+  ).toBeVisible();
+});
