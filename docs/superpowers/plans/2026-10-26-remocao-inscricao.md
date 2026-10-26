@@ -17,22 +17,22 @@
 
 ## L1 — contratos e evidência RED/GREEN
 
-- [ ] `src/teams/removal-contract.test.ts`: comando fechado/IDs/limites; estados available/blocked/removed coerentes; rejeitar derivados e dados privados. Observar ausência inicial antes de implementar `removal-contract.ts`, depois executar todas as asserções.
-- [ ] DTO mínimo de prévia e ACK, enums determinísticos de dependência; prévia available exige blockers vazio e blocked exige ao menos um. Registro removido não recebe cadastro editável nem versão nova inventada.
+- [x] `src/teams/removal-contract.test.ts`: comando fechado/IDs/limites; estados available/blocked/removed coerentes; rejeitar derivados e dados privados. Observar ausência inicial antes de implementar `removal-contract.ts`, depois executar todas as asserções.
+- [x] DTO mínimo de prévia e ACK, enums determinísticos de dependência; prévia available exige blockers vazio e blocked exige ao menos um. Registro removido não recebe cadastro editável nem versão nova inventada.
 
 ## L2 — banco descartável antes de serviço
 
-- [ ] `supabase/tests/registration_removal.sql` e `src/teams/removal-database.test.ts`: RED antes da migration. Criar fixtures próprias sintéticas; preservar dados-base no upgrade. Matriz TS/SQL, papéis/revogação/contexto/versão/replay/capacidade; FKs e referências JSON/históricas.
-- [ ] Gerar migration própria pela CLI fixada, sem editar as 44 anteriores. Tabela privada de remoções/recibos, RLS/grants restritos, helpers de dependência e writer pequeno com locks/Recentes. Trigger de reutilização de ID não admite bypass.
-- [ ] Erro não retira filho/origem/versão pública nem grava recibo; excluir uma inscrição deixa equipe/disputa/irmã. SQLSTATE/ACK e leitura de removido coerentes. Atualização de fingerprint de fontes de contexto invalida prévias anteriores normalmente.
-- [ ] Prova de concorrência nativa focal: gravação de dependência antes/depois da remoção; resultado serializável, sem órfão. Reusar cinco casos nativos antigos não afetados, sem rodá-los por troca de sessão.
-- [ ] Somente depois de unit estável: aplicar uma vez no projeto novo, gerar tipos/reconciliar migration/advisors e contrato real BEGIN/ROLLBACK com IDs fictícios próprios. Exportar prova com cleanup garantido; nunca apagar dados humanos para teste.
+- [x] `supabase/tests/registration_removal.sql` e `src/teams/removal-database.test.ts`: RED antes da migration. Criar fixtures próprias sintéticas; preservar dados-base no upgrade. Matriz TS/SQL, papéis/revogação/contexto/versão/replay/capacidade; FKs e referências JSON/históricas.
+- [x] Gerar migration própria pela CLI fixada, sem editar as 44 anteriores. Tabela privada de remoções/recibos, RLS/grants restritos, helpers de dependência e writer pequeno com locks/Recentes. Trigger de reutilização de ID não admite bypass.
+- [x] Erro não retira filho/origem/versão pública nem grava recibo; excluir uma inscrição deixa equipe/disputa/irmã. SQLSTATE/ACK e leitura de removido coerentes. Atualização de fingerprint de fontes de contexto invalida prévias anteriores normalmente.
+- [x] Prova de concorrência nativa focal: gravação de dependência antes/depois da remoção; resultado serializável, sem órfão. Reusar cinco casos nativos antigos não afetados, sem rodá-los por troca de sessão.
+- [x] Somente depois de unit estável: aplicar uma vez no projeto novo, gerar tipos/reconciliar migration/advisors e contrato real BEGIN/ROLLBACK com IDs fictícios próprios. Exportar prova com cleanup garantido; nunca apagar dados humanos para teste.
 
 ## L3 — fronteira e experiência contextual
 
-- [ ] Adapter/SessionStore/rotas específicas de consulta e comando, testes de Worker e limites de corpo/origem/sessão antes do body. Mesma origem; sem aceite de derivados do browser.
-- [ ] Painel de exclusão na inscrição, texto explícito com nome/disputa/equipe preservada. Bloqueios explicados e retorno à operação histórica existente; confirmar apenas se elegível. Busy, comando congelado, ACK incerto/GET falho, duas abas/409/reauth, foco e 320px.
-- [ ] Remover da lista somente após ACK ou leitura confirmada de removido, atualizar contexto/Recentes e preservar filtros; outros rascunhos continuam íntegros. Sem botão que execute cascata ou exclua equipe global junto.
+- [x] Adapter/SessionStore/rotas específicas de consulta e comando, testes de Worker e limites de corpo/origem/sessão antes do body. Mesma origem; sem aceite de derivados do browser.
+- [x] Painel de exclusão na inscrição, texto explícito com nome/disputa/equipe preservada. Bloqueios explicados e retorno à operação histórica existente; confirmar apenas se elegível. Busy, comando congelado, ACK incerto/GET falho, duas abas/409/reauth, foco e 320px.
+- [x] Remover da lista somente após ACK ou leitura confirmada de removido, atualizar contexto/Recentes e preservar filtros; outros rascunhos continuam íntegros. Sem botão que execute cascata ou exclua equipe global junto.
 
 ## L4 — gate e preview
 

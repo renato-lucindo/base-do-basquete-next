@@ -16,7 +16,22 @@ Após ajuste da fixture, repetidos apenas os três casos nativos afetados, todos
 
 Advisors: nenhum aviso novo de segurança, nem FK nova sem índice; permanecem dez INFO de FKs antigas e 58 INFO de índices sem uso no banco quase vazio. WARN conhecido de [proteção contra senha vazada](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection), sem contratação. Não remover índices por isso.
 
-**Pendente L3:** adapter, Worker/rotas/UI e provas de navegador; não há remoção disponível na aplicação ainda. PR draft25 sobre24, sem CI específica nova nem deploy desta unidade. Preview continua source03d7ed8/deployment08840940-5c46-4add-af20-639f054c9d7c/CI515+370; assets/Worker inalterados. Registros seguintes descrevem etapas anteriores.
+**Estado atual:** L3 adapter/Worker/UI implementados localmente, commits9d98115 e WIP2475ff3; gate consolidado/CI/preview da unidade pendentes. PR draft25 sobre24. Não há remoção publicada ainda. Preview continua source03d7ed8/deployment08840940-5c46-4add-af20-639f054c9d7c/CI515+370. Worker/cliente locais agora mudaram; manifesto antigo não pode ser reutilizado. Registros seguintes descrevem etapas anteriores.
+
+## L3b local — painel e teclado
+
+Painel contextual com conferência autoritativa, bloqueios, nome da inscrição/equipe preservada e confirmação somente quando disponível. Comando congelado no retry incerto; ACK conhecido seguido de falha de leitura recupera só GET. Duas abas/409 exigem nova conferência; reautenticação conserva intenção. Lista, contexto e foco são atualizados somente após ACK ou leitura de remoção confirmada. Não há cascata nem exclusão de registro humano por ferramentas.
+
+Oito RED iniciais antes da UI; primeira execução posterior teve sete PASS e um timeout mobile no login. Trace mostrou interceptação do clique pelo formulário; nova asserção revelou reflow de367px em viewport320px com texto200%, RED nos dois projetos. `overflow-wrap:anywhere` no h1 do login corrigiu a largura sem alterar autorização. Dois focais GREEN, depois **24/24 browsers de composição PASS** (remoção/equipes/a11y administrativo), desktop/mobile. Types e lint focais PASS. Quatro varreduras axe nos estados bloqueado/disponível: zero violations e incomplete; dois browsers dedicados PASS. Isso não prova WCAG completa, zoom nativo ou leitor de tela.
+
+Logs ignorados e SHA256:
+
+- `removal-browser-composition.log`: `211e4551e0225c627c5a3162343ec9d2d608cdf7b230690a45084f1799cccf9d`.
+- `removal-login-reflow-red.log`: `670cbd3ba3e8bd0257eb9b29363e02cd16ce5aaa600ff31b594fbb28873b4817`.
+- `removal-login-reflow-green.log`: `eff19d542c2e5030846518c2a8dde15c86e4ba26ad6ca80cdc5aafd800fd2db1`.
+- `removal-a11y.log`: `557c1ec75e8d74f35dba6dd34d28f9219365d4785c0d9dfc48408967dfb69aa2`.
+
+Formato e segredos674 PASS ao salvar2475ff3. **Gate final não iniciado:** consulta antes dele atingiu85% usados/15% restantes em cinco horas. Gate519 anterior não inclui API/UI posteriores. Próximo passo: gate consolidado único sobre unidade estável, diagnosticar focalmente eventual falha, CI e somente depois pacote novo/preview protegido/smokes/revogação. A26 integral permanece pendente.
 
 ## Preparação e L1
 
