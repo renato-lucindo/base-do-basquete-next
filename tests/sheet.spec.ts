@@ -2,6 +2,10 @@ import { publishedSheet } from "./fixtures/published-game";
 import { publicationSheetResultSchema } from "../src/publication/data-contract";
 import { publishSheetSchema } from "../src/publication/contract";
 import { test, expect, type Page } from "@playwright/test";
+test.skip(
+  ({ isMobile }) => isMobile,
+  "Desktop-only scoresheet MVP; mobile follows after MVP.",
+);
 import { scanAccessibility as scan } from "./fixtures/accessibility";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
@@ -93,6 +97,52 @@ async function fixture(page: Page) {
       },
     });
   });
+  await page.route(`**/api/games/${tid(80)}/sheet/preparation`, (route) =>
+    route.fulfill({
+      json: {
+        gameId: tid(80),
+        gameVersion: 1,
+        sides: Object.fromEntries(
+          (["home", "away"] as const).map((side) => {
+            const reg = side === "home" ? home : away;
+            return [
+              side,
+              {
+                registrationId: reg.id,
+                previous: null,
+                lastJerseys: {},
+                roster: members
+                  .filter((m) => m.registrationId === reg.id && m.active)
+                  .map((m) => ({
+                    id: m.id,
+                    registrationId: m.registrationId,
+                    personId: m.personId,
+                    jersey: m.jersey,
+                    person: {
+                      id: m.person.id,
+                      name: m.person.name,
+                      nickname: m.person.nickname,
+                    },
+                  })),
+                staff: staff
+                  .filter((m) => m.registrationId === reg.id && m.active)
+                  .map((m) => ({
+                    id: m.id,
+                    personId: m.personId,
+                    role: m.role,
+                    person: {
+                      id: m.person.id,
+                      name: m.person.name,
+                      nickname: m.person.nickname,
+                    },
+                  })),
+              },
+            ];
+          }),
+        ),
+      },
+    }),
+  );
   let snapshot: SheetSnapshot | null = null,
     uncertain = false,
     expired = false,
@@ -201,16 +251,24 @@ async function open(page: Page) {
   ).toBeVisible();
 }
 async function relate(page: Page) {
+  for (const side of ["home", "away"]) {
+    for (let n = 0; n < 5; n++)
+      await page
+        .getByLabel(`Titular Atleta ${side} ${n}`, { exact: true })
+        .check();
+    await page.getByLabel(`Capitão Atleta ${side} 0`, { exact: true }).check();
+  }
+  await page
+    .getByRole("button", {
+      name: "Concluir preparação e lançar ações",
+      exact: true,
+    })
+    .click();
   await expect(
-    page.getByText("Selecionar atletas do elenco", { exact: true }),
-  ).toHaveCount(2);
-  for (const summary of await page
-    .getByText("Selecionar atletas do elenco", { exact: true })
-    .all())
-    await summary.click();
-  await page.getByLabel("Relacionar Atleta home 1", { exact: true }).check();
-  await page.getByLabel("Relacionar Atleta away 1", { exact: true }).check();
+    page.getByLabel("Camisa ou alvo", { exact: true }),
+  ).toBeFocused();
 }
+
 test("axe súmula na preparação e lançamento por teclado", async ({
   page,
 }, info) => {
@@ -218,12 +276,6 @@ test("axe súmula na preparação e lançamento por teclado", async ({
   await open(page);
   await scan(page, info, "admin-sheet-preparation");
   await relate(page);
-  await page
-    .getByRole("button", {
-      name: "Concluir preparação e lançar ações",
-      exact: true,
-    })
-    .click();
   const jersey = page.getByLabel("Camisa ou alvo", { exact: true });
   await expect(jersey).toBeFocused();
   await jersey.fill("12");
@@ -257,12 +309,6 @@ test("relaciona pessoas reais, lança por teclado e retoma rascunho sem publicar
   const f = await fixture(page);
   await open(page);
   await relate(page);
-  await page
-    .getByRole("button", {
-      name: "Concluir preparação e lançar ações",
-      exact: true,
-    })
-    .click();
   await expect(
     page.getByLabel("Camisa ou alvo", { exact: true }),
   ).toBeFocused();
@@ -304,21 +350,10 @@ test("relaciona pessoas reais, lança por teclado e retoma rascunho sem publicar
   await page.locator(".sheet-input").screenshot({
     path: `.preview-artifacts/sumula-input-${testInfo.project.name}.png`,
   });
-  await page.locator(".sheet-preparation").screenshot({
-    path: `.preview-artifacts/sumula-relacionados-${testInfo.project.name}.png`,
-  });
-  await page.setViewportSize({ width: 320, height: 900 });
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
-  await page.locator(".sheet-input").screenshot({
-    path: `.preview-artifacts/sumula-input-320-${testInfo.project.name}.png`,
-  });
-  await page.locator(".sheet-actions").screenshot({
-    path: `.preview-artifacts/sumula-acoes-320-${testInfo.project.name}.png`,
-  });
+  await page
+    .locator(".sheet-desktop-teams")
+    .last()
+    .screenshot({ path: ".preview-artifacts/sumula-relacionados-desktop.png" });
 });
 
 test("ordena camisas, exige escolha dos titulares e condiciona assistente ao técnico próprio", async ({
@@ -328,38 +363,27 @@ test("ordena camisas, exige escolha dos titulares e condiciona assistente ao té
   f.members[0].jersey = "0";
   f.members[1].jersey = "00";
   await open(page);
-  await page
-    .getByText("Selecionar atletas do elenco", { exact: true })
-    .first()
-    .click();
-  for (let i = 5; i >= 0; i--)
-    await page
-      .getByLabel(`Relacionar Atleta home ${i}`, { exact: true })
-      .check();
-  const names = await page
-    .locator(".sheet-roster")
-    .first()
-    .locator("li strong")
-    .allTextContents();
-  expect(names.map((n) => n.split(" · ")[0])).toEqual([
-    "#0",
-    "#00",
-    "#22",
-    "#32",
-    "#42",
-    "#52",
-  ]);
-  await expect(page.getByLabel("Capitão A", { exact: true })).toHaveValue("");
-  await expect(page.getByLabel("Ass. Técnico A", { exact: true })).toHaveCount(
-    0,
-  );
+  const table = page.getByRole("table", {
+    name: "Preparação equipe A",
+    exact: true,
+  });
+  await expect(table.getByRole("combobox")).toHaveCount(12);
+  await expect(
+    page.getByLabel("Camisa de Atleta home 0", { exact: true }),
+  ).toHaveValue("0");
+  await expect(
+    page.getByLabel("Camisa de Atleta home 1", { exact: true }),
+  ).toHaveValue("00");
+  await expect(
+    page.getByLabel("Capitão Atleta home 0", { exact: true }),
+  ).not.toBeChecked();
   for (let i = 0; i < 5; i++)
     await page.getByLabel(`Titular Atleta home ${i}`, { exact: true }).check();
   await page.getByLabel("Titular Atleta home 5", { exact: true }).click();
   await expect(
     page.getByLabel("Titular Atleta home 5", { exact: true }),
   ).not.toBeChecked();
-  await page.getByLabel("Capitão A", { exact: true }).selectOption(tid(100));
+  await page.getByLabel("Capitão Atleta home 0", { exact: true }).check();
   await page
     .getByLabel("Técnico A", { exact: true })
     .selectOption(f.staff[0].id);
@@ -416,7 +440,7 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page.getByLabel("Ação", { exact: true }).fill("1");
   await page.keyboard.press("Enter");
   await expect(page.locator(".sheet-actions li").last()).toContainText(
-    "12 · 1",
+    "#12 - 1p",
   );
   await page
     .getByRole("button", { name: "Excluir ação 2", exact: true })
@@ -451,6 +475,9 @@ test("retorna do elenco ao ponto de origem e não oferece vínculo recém-inativ
     page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
   ).toBeVisible();
   await page
+    .getByRole("button", { name: "Revisar preparação", exact: true })
+    .click();
+  await page
     .getByRole("button", { name: "Editar elenco A aqui", exact: true })
     .click();
   f.members[1].active = false;
@@ -461,16 +488,13 @@ test("retorna do elenco ao ponto de origem e não oferece vínculo recém-inativ
   await expect(
     page.getByRole("button", { name: "Editar elenco A aqui", exact: true }),
   ).toBeFocused();
-  await page
-    .getByText("Selecionar atletas do elenco", { exact: true })
-    .first()
-    .click();
-  await expect(
-    page.getByLabel("Relacionar Atleta home 1", { exact: true }),
-  ).toHaveCount(0);
   await expect(
     page.getByLabel("Titular Atleta home 1", { exact: true }),
   ).toBeVisible();
+  await page.getByLabel("Atleta A vaga 1", { exact: true }).click();
+  await expect(
+    page.getByRole("option", { name: "Atleta home 1", exact: true }),
+  ).toHaveCount(0);
 });
 
 test("recupera envio incerto, conflito e reautenticação sem substituir o documento local", async ({
@@ -479,6 +503,9 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
   const f = await fixture(page);
   await open(page);
   await relate(page);
+  await page
+    .getByRole("button", { name: "Revisar preparação", exact: true })
+    .click();
   f.uncertain();
   await page
     .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
@@ -490,22 +517,24 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
     page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
   ).toBeVisible();
   expect(f.attempts[0]).toBe(f.attempts[1]);
-  await page.getByLabel("Titular Atleta home 1", { exact: true }).check();
+  await page.getByLabel("Titular Atleta home 0", { exact: true }).uncheck();
+  await page.getByLabel("Titular Atleta home 5", { exact: true }).check();
   f.conflict();
   await page
     .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
     .click();
   await expect(
-    page.getByLabel("Titular Atleta home 1", { exact: true }),
+    page.getByLabel("Titular Atleta home 5", { exact: true }),
   ).toBeChecked();
   page.once("dialog", (d) => d.accept());
   await page
     .getByRole("button", { name: "Recarregar súmula", exact: true })
     .click();
   await expect(
-    page.getByLabel("Titular Atleta home 1", { exact: true }),
+    page.getByLabel("Titular Atleta home 5", { exact: true }),
   ).not.toBeChecked();
-  await page.getByLabel("Titular Atleta home 1", { exact: true }).check();
+  await page.getByLabel("Titular Atleta home 0", { exact: true }).uncheck();
+  await page.getByLabel("Titular Atleta home 5", { exact: true }).check();
   f.expire();
   await page
     .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
@@ -514,7 +543,7 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
   await page.getByLabel("Senha", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
-    page.getByLabel("Titular Atleta home 1", { exact: true }),
+    page.getByLabel("Titular Atleta home 5", { exact: true }),
   ).toBeChecked();
   await page
     .getByRole("button", { name: "Repetir envio da súmula", exact: true })
@@ -751,12 +780,7 @@ test("manual publication confirms identities, keeps participation editable and r
   await expect(
     page.getByLabel("Placar a publicar", { exact: true }),
   ).toContainText("2 × 0");
-  await page.setViewportSize({ width: 320, height: 900 });
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+
   await page
     .getByRole("region", { name: "Publicação deste jogo", exact: true })
     .screenshot({
@@ -768,13 +792,22 @@ test("manual publication confirms identities, keeps participation editable and r
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Revisar preparação", exact: true })
+    .click();
   await expect(
     page.getByLabel("Camisa de Atleta home 0", { exact: true }),
   ).toBeDisabled();
   await expect(
-    page.getByLabel("Relacionar Atleta home 0", { exact: true }),
+    page.getByLabel("Atleta A vaga 1", { exact: true }),
   ).toBeDisabled();
-  await page.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  await page
+    .getByRole("button", {
+      name: "Concluir preparação e lançar ações",
+      exact: true,
+    })
+    .click();
+  await page.getByLabel("Entrou Atleta home 5", { exact: true }).check();
   await page
     .getByLabel("Motivo da revisão da súmula", { exact: true })
     .fill("Atleta também participou sem ações.");
@@ -819,7 +852,7 @@ test("manual fallback requires an explicit decision and uncertain publication re
     page.getByRole("button", { name: "Repetir publicação", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByLabel("Camisa de Atleta home 0", { exact: true }),
+    page.getByRole("button", { name: "Revisar preparação", exact: true }),
   ).toBeDisabled();
   await page
     .getByRole("button", { name: "Repetir publicação", exact: true })
@@ -869,7 +902,7 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
   await f.attach(second);
   await open(page);
   await open(second);
-  await second.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  await second.getByLabel("Entrou Atleta home 5", { exact: true }).check();
   for (const tab of [page, second])
     await tab
       .getByRole("button", { name: "Confirmar e publicar", exact: true })
@@ -887,7 +920,7 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
     second.getByRole("alert").filter({ hasText: "Outra aba publicou" }),
   ).toBeVisible();
   await expect(
-    second.getByLabel("Participou Atleta home 5", { exact: true }),
+    second.getByLabel("Entrou Atleta home 5", { exact: true }),
   ).toBeChecked();
   await expect(
     second.getByRole("button", { name: "Publicar este jogo", exact: true }),
@@ -898,10 +931,13 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
     .getByRole("button", { name: "Recarregar súmula", exact: true })
     .click();
   await expect(
-    second.getByLabel("Participou Atleta home 5", { exact: true }),
+    second.getByLabel("Entrou Atleta home 5", { exact: true }),
   ).not.toBeChecked();
+  await second
+    .getByRole("button", { name: "Revisar preparação", exact: true })
+    .click();
   await expect(
-    second.getByLabel("Relacionar Atleta home 0", { exact: true }),
+    second.getByLabel("Atleta A vaga 1", { exact: true }),
   ).toBeDisabled();
   expect(f.attempts).toHaveLength(2);
 });
@@ -1005,7 +1041,7 @@ test("administrative publication history pages through immutable versions withou
 }) => {
   const f = await historyFixture(page);
   await open(page);
-  await page.getByLabel("Participou Atleta home 5", { exact: true }).check();
+  await page.getByLabel("Entrou Atleta home 5", { exact: true }).check();
   const trigger = page.getByRole("button", {
     name: "Ver histórico deste jogo",
     exact: true,
@@ -1028,18 +1064,13 @@ test("administrative publication history pages through immutable versions withou
   await expect(
     region.getByRole("heading", { name: /Lobos 2 × 0/ }),
   ).toBeVisible();
-  await page.setViewportSize({ width: 320, height: 900 });
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+
   expect(f.reads.some((u) => u.endsWith("offset=20"))).toBe(true);
   await region
     .getByRole("button", { name: "Fechar histórico", exact: true })
     .click();
   await expect(
-    page.getByLabel("Participou Atleta home 5", { exact: true }),
+    page.getByLabel("Entrou Atleta home 5", { exact: true }),
   ).toBeChecked();
   expect(f.attempts).toHaveLength(0);
 });

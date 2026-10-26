@@ -106,6 +106,7 @@ try {
     `/api/games?disputeId=${randomUUID()}`,
     `/api/games/${randomUUID()}`,
     `/api/games/${randomUUID()}/sheet`,
+    `/api/games/${randomUUID()}/sheet/preparation`,
     `/api/games/${randomUUID()}/publication`,
     `/api/games/${randomUUID()}/publication/versions/1`,
     `/api/games/${randomUUID()}/publication/preparation/${randomUUID()}`,
