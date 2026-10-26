@@ -22,4 +22,24 @@ Logs ignorados: `removal-contract-red.log`, `removal-contract-green.log`, `remov
 
 ## Pendências
 
+## Concorrência nativa focal — L2
+
+**Três casos PASS** em PostgreSQL17.11 nativo, Windows, 26/10/2026 13:49:29–13:49:36 UTC (10:49 UTC-03). Runner novo `docs/evidencias/concurrency/registration_removal.py` reutiliza somente libpq/observação de locks do runner anterior, sem executar novamente seus cinco casos inalterados. Cluster novo em `.preview-artifacts/removal-native-run-c20f8a83/data`, porta127.0.0.1:55440, banco `bdb_disposable_removal`, 45 migrations locais, somente registros sintéticos. Três PIDs distintos: controlador124416, A119040, B116336; são evidência histórica, não alvos futuros.
+
+1. Writer real de jogo retém a raiz antes de inserir; remoção aguarda a chave real. Após COMMIT do jogo, remoção recebe PT409; inscrição permanece e não há recibo de remoção.
+2. Remoção real retém raiz/linha antes de DELETE; writer de jogo aguarda a raiz. Após remoção, jogo recebe PT400; não há jogo órfão nem recibo de jogo.
+3. Mesmo comando de remoção simultâneo: B aguarda a chave exata do comando de A, dois ACKs iguais e um tombstone/recibo.
+
+Barreiras são triggers apenas do cluster descartável; nenhum bypass ou alteração em guardas produtivas. `pg_stat_activity`/`pg_locks`/`pg_blocking_pids` confirmaram quem bloqueava quem e as identidades das chaves. Final: duas remoções, dois jogos (um da fixture, um novo), um recibo de jogo. **stopExitCode0/portClosedtrue**, porta55440 sem LISTEN; clientes/cluster encerrados e arquivos ignorados preservados, sem exclusão recursiva. Isso não comprova todas as corridas, carga, GoTrue ou serviços remotos.
+
+- Runner SHA256 `83bc6cedc73c5f6728e805145ab792c902c2d52530f95545f117156ff47bf3c1`.
+- `.preview-artifacts/removal-native-concurrency.json` SHA256 `27aebd7612b2772f10cade77308c5b332f5841fc8e00371120000cea9de32fe3`.
+- `.preview-artifacts/removal-native-first.log` SHA256 `be2df43979cf94db91ed05d5f983d05c9a6ff067db083c5f7e315b907a13a277`.
+- SQL focal final `.preview-artifacts/removal-db-edges-final.log` SHA256 `be87daf4d11b293c0b4fdc677ebb32609f36c3a752cdd54b0a5e5b011a181d2d`.
+- Migration local SHA256 `ca525c6f32f362474d58dae93a0cb05bbeea09b5f1b02e8fceeb5bea5d93e4af`.
+
+Tipos/lint/formato/segredos focais aprovados no WIP `f0c1758`; não há CI ou gate consolidado novo ainda. Aplicação remota, geração de tipos, contrato real e camada HTTP/UI continuam pendentes. Não aplicar novamente migration só por retomar sessão.
+
+## Pendências após prova nativa
+
 Concorrência nativa focal, referências/versionamento adicionais, gate da unidade estável, aplicação única/tipos/advisors/rollback real; depois adapter/Worker/UI e respectivos browsers/CI/preview. Não há API/UI de remoção disponível. Primeiro recorte não conclui A26 para outras entidades ou arquivamento. Preview continua source03d7ed8/CI515+370; não há motivo para redeploy por este WIP. Provas nativas antigas e artefatos de produto inalterados mantêm suas evidências; não repetir suítes por sessão.
