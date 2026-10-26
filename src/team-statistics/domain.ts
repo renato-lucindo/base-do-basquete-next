@@ -1,6 +1,6 @@
 import { statisticsSourceSchema } from "../statistics/source";
-import { normalizeConfirmedGame } from "../statistics/confirmed-facts";
-import { validateConfirmedFacts } from "../statistics/aggregate";
+import { normalizeParsedConfirmedGame } from "../statistics/confirmed-facts";
+import { validateParsedConfirmedFacts } from "../statistics/aggregate";
 import { normalizeStatisticsSearch } from "../statistics/query-contract";
 import { scopesForStageKind } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 import { perGame } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/domain";
@@ -24,11 +24,11 @@ export function validatedTeamSource(input: unknown) {
   );
   if (registrations.size > 1000) throw new TeamCapacityError();
   const facts = source.games.flatMap(({ snapshot, phase }) =>
-    normalizeConfirmedGame(snapshot).map((f) => ({ ...f, phase })),
+    normalizeParsedConfirmedGame(snapshot).map((f) => ({ ...f, phase })),
   );
   if (new Set(facts.map((f) => f.person.id)).size > 10000)
     throw new TeamCapacityError();
-  validateConfirmedFacts(facts);
+  validateParsedConfirmedFacts(facts);
   return {
     source,
     facts,

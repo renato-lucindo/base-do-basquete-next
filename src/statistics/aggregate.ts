@@ -58,7 +58,14 @@ const unique = <T extends string | null>(values: T[]) =>
 type Observation = { value: number; seconds: number | null };
 
 function validatedFacts(input: unknown): ConfirmedPlayerFact[] {
-  const rows = z.array(confirmedPlayerFactSchema).parse(input);
+  return validateParsedConfirmedFacts(
+    z.array(confirmedPlayerFactSchema).parse(input),
+  );
+}
+/** Cross-row guards for facts already constructed by the validated normalizer. */
+export function validateParsedConfirmedFacts(
+  rows: ConfirmedPlayerFact[],
+): ConfirmedPlayerFact[] {
   const seen = new Set<string>();
   const games = new Map<string, string>();
   const registrationTeams = new Map<string, string>();

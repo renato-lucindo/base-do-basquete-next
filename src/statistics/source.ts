@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { publicResultSchema } from "../publication/pdf-contract";
-import { normalizeConfirmedGame } from "./confirmed-facts";
+import { normalizeParsedConfirmedGame } from "./confirmed-facts";
 import { aggregationOptionsSchema } from "./aggregate";
 import {
   scopesForStageKind,
@@ -59,7 +59,10 @@ export function selectStatisticsFacts(
   // Validate/normalize every publication, including games outside the selected scope.
   const normalized = source.games.map(({ snapshot, phase }) => ({
     phase,
-    facts: normalizeConfirmedGame(snapshot).map((fact) => ({ ...fact, phase })),
+    facts: normalizeParsedConfirmedGame(snapshot).map((fact) => ({
+      ...fact,
+      phase,
+    })),
   }));
   return {
     disputeId: source.disputeId,

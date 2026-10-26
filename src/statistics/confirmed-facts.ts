@@ -77,17 +77,22 @@ export type ConfirmedPlayerFact = z.infer<typeof confirmedPlayerFactSchema>;
 
 /** Only confirmed public snapshots are inputs; this module never reads live identities. */
 export function normalizeConfirmedGame(input: unknown): ConfirmedPlayerFact[] {
-  const game = publicResultSchema.parse(input),
-    base = {
-      normalizationVersion: "confirmed-statistics-v1" as const,
-      gameId: game.id,
-      disputeId: game.disputeId,
-      publicationVersion: game.version,
-      publishedAt: game.publishedAt,
-      context: game.context,
-      source: game.source,
-      phase: null,
-    };
+  return normalizeParsedConfirmedGame(publicResultSchema.parse(input));
+}
+/** Internal pipeline only: the caller has already parsed the entire public result. */
+export function normalizeParsedConfirmedGame(
+  game: z.infer<typeof publicResultSchema>,
+): ConfirmedPlayerFact[] {
+  const base = {
+    normalizationVersion: "confirmed-statistics-v1" as const,
+    gameId: game.id,
+    disputeId: game.disputeId,
+    publicationVersion: game.version,
+    publishedAt: game.publishedAt,
+    context: game.context,
+    source: game.source,
+    phase: null,
+  };
   const rows =
     "origins" in game.facts
       ? game.facts.players.map((p) => {
