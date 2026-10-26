@@ -120,6 +120,7 @@ function validatedFacts(input: unknown): ConfirmedPlayerFact[] {
   }
   return rows;
 }
+export { validatedFacts as validateConfirmedFacts };
 function observedMetrics(
   related: ConfirmedPlayerFact[],
   config: AggregationOptions,
