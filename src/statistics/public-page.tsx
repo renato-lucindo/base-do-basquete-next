@@ -605,7 +605,7 @@ export function StatisticsPageView() {
                               <button
                                 className="statistics-sort"
                                 title={STATISTICS_METRICS[key].name}
-                                aria-label={`Ordenar por ${STATISTICS_METRICS[key].name}`}
+                                aria-label={`Ordenar por ${STATISTICS_METRICS[key].label} (${STATISTICS_METRICS[key].name})`}
                                 onClick={() =>
                                   change({
                                     sort: key,

@@ -171,7 +171,7 @@ function Pager({
   onChange: (n: number) => void;
 }) {
   return (
-    <div className="statistics-actions" aria-label={`Paginação de ${kind}`}>
+    <nav className="statistics-actions" aria-label={`Paginação de ${kind}`}>
       <button
         type="button"
         disabled={page === 1}
@@ -191,7 +191,7 @@ function Pager({
       >
         Próxima
       </button>
-    </div>
+    </nav>
   );
 }
 function Games({
