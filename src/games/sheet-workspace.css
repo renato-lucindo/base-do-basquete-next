@@ -342,14 +342,6 @@
   background: #edf4ff;
   border-color: #3469ac;
 }
-.sheet-delete {
-  padding: 16px;
-  border: 2px solid #a12d2d;
-  margin: 12px 0;
-}
-.sheet-delete button {
-  margin: 8px;
-}
 @media (max-width: 650px) {
   .sheet-input .competition-fields {
     grid-template-columns: 1fr;
@@ -378,4 +370,81 @@
 }
 .sheet-publication button {
   margin: 6px 8px 6px 0;
+}
+
+/* Dense desktop action history: use available width rather than stacking every event. */
+.sheet-history > h4 {
+  margin: 12px 0 6px;
+}
+.sheet-history > p[role="status"] {
+  margin: 6px 0;
+  font-size: 0.875rem;
+  color: #42526b;
+}
+.sheet-history-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  align-items: start;
+  gap: 8px 14px;
+}
+.sheet-history-groups > section {
+  min-width: 0;
+}
+.sheet-history .sheet-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 6px;
+  margin: 0;
+}
+.sheet-history .sheet-actions li {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  padding: 6px 8px;
+  line-height: 1.35;
+  font-size: 0.875rem;
+}
+.sheet-history .sheet-actions li > span {
+  overflow-wrap: anywhere;
+}
+.sheet-history .sheet-actions .competition-actions {
+  gap: 6px;
+  margin: 0;
+}
+.sheet-history .sheet-actions button {
+  padding: 3px 8px;
+  min-height: 30px;
+}
+.game-sheet fieldset.sheet-history-filters,
+.game-sheet fieldset.sheet-input {
+  margin: 8px 0;
+  padding: 10px 12px;
+}
+.game-sheet .sheet-history-filters {
+  gap: 6px 10px;
+  align-items: end;
+}
+.game-sheet .sheet-history-filters fieldset {
+  margin: 0;
+  padding: 4px 7px;
+  flex-wrap: wrap;
+}
+.sheet-input > p {
+  margin: 4px 0 8px;
+  font-size: 0.8125rem;
+  color: #42526b;
+}
+.sheet-delete-dialog {
+  width: min(520px, calc(100vw - 48px));
+}
+.sheet-delete-dialog .competition-actions {
+  justify-content: flex-end;
+}
+.sheet-delete-context {
+  margin: 0 0 8px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }

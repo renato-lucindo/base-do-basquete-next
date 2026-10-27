@@ -117,7 +117,8 @@ export function SheetActionHistory({
           : `${result.total} ações encontradas · página ${result.page + 1}`}
       </p>
       {result.items.length ? (
-        (["points", "fouls"] as const).map((kind) => (
+        <div className="sheet-history-groups">
+          {(["points", "fouls"] as const).filter((kind) => result.items.some((item) => item.kind === kind)).map((kind) => (
           <section
             key={kind}
             aria-label={
@@ -163,7 +164,8 @@ export function SheetActionHistory({
                 ))}
             </ol>
           </section>
-        ))
+        ))}
+        </div>
       ) : (
         <p>
           {actions.length

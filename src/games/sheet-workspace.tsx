@@ -6,6 +6,7 @@ import { editAction, deleteAction } from "../scoresheet/actions";
 import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
+import { AdminDialog } from "../competition/admin-dialog";
 import { projectSheet } from "../scoresheet/projection";
 import {
   preparationContextSchema,
@@ -77,7 +78,7 @@ export function GameSheetWorkspace(props: Props) {
     targetRef = useRef<HTMLInputElement>(null),
     codeRef = useRef<HTMLInputElement>(null),
     periodRef = useRef<HTMLSelectElement>(null),
-    deleteHeading = useRef<HTMLHeadingElement>(null);
+    focusAfterDelete = useRef(false);
   const returningToSide = useRef<Side | null>(null);
   const d = history?.present,
     dirty = !!d && JSON.stringify(d) !== baseline,
@@ -124,7 +125,10 @@ export function GameSheetWorkspace(props: Props) {
     if (error && props.enabled) alert.current?.focus();
   }, [error, props.enabled]);
   useEffect(() => {
-    deleteHeading.current?.focus();
+    if (!deleting && focusAfterDelete.current) {
+      focusAfterDelete.current = false;
+      targetRef.current?.focus();
+    }
   }, [deleting]);
   function report(e: unknown) {
     if (isSessionFailure(e)) props.onSessionLost();
@@ -751,24 +755,36 @@ export function GameSheetWorkspace(props: Props) {
                 onDelete={setDeleting}
               />
             )}
-            {deleting && (
-              <div className="sheet-delete">
-                <h4 ref={deleteHeading} tabIndex={-1}>
-                  Excluir esta ação?
-                </h4>
-                <p>
-                  A participação do atleta será preservada. É possível desfazer
-                  a exclusão.
-                </p>
+            <AdminDialog
+              title="Excluir esta ação?"
+              open={!!deleting}
+              busy={locked}
+              onClose={() => setDeleting(null)}
+              className="sheet-delete-dialog"
+            >
+              {projection?.actions
+                .filter((action) => action.event.id === deleting)
+                .map((action) => (
+                  <p className="sheet-delete-context" key={action.event.id}>
+                    Ação {action.sequence} · {periodLabel(action.event.period)} ·
+                    Equipe {sideName(action.event.side)} · {action.annotation}
+                  </p>
+                ))}
+              <p>
+                A participação do atleta será preservada. É possível desfazer
+                a exclusão.
+              </p>
+              <div className="competition-actions">
                 <button
+                  type="button"
                   disabled={locked}
                   onClick={() => {
-                    if (engine) {
+                    if (engine && deleting) {
                       try {
                         const next = deleteAction(engine, deleting);
                         if (mutate({ ...d, events: next.events })) {
+                          focusAfterDelete.current = true;
                           setDeleting(null);
-                          focusTarget();
                         }
                       } catch (e) {
                         report(e);
@@ -778,11 +794,16 @@ export function GameSheetWorkspace(props: Props) {
                 >
                   Confirmar exclusão da ação
                 </button>
-                <button onClick={() => setDeleting(null)}>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={locked}
+                  onClick={() => setDeleting(null)}
+                >
                   Cancelar exclusão
                 </button>
               </div>
-            )}
+            </AdminDialog>
           </div>
           {snapshot?.confirmed && (
             <label>
