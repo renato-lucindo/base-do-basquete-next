@@ -41,7 +41,7 @@ test.describe("desktop scoresheet MVP", () => {
       expect(second!.x).toBeGreaterThan(first!.x + 20);
       await history.scrollIntoViewIfNeeded();
       await page.screenshot({
-        path: `.preview-artifacts/sheet-history-after-${width}x${height}.png`,
+        path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
         animations: "disabled",
       });
     }

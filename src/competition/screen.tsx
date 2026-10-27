@@ -363,14 +363,16 @@ export function CompetitionWorkspace({
       })),
     )
     .find((d) => d.id === selected);
+  const seasonToRemove = editor?.draft.seasons.find(
+    (season) => season.id === pendingRemoval?.seasonId,
+  );
+  const disputeToRemove = seasonToRemove?.disputes.find(
+    (dispute) => dispute.id === pendingRemoval?.disputeId,
+  );
   const removalDescription =
     pendingRemoval?.kind === "season"
-      ? `Temporada ${editor?.draft.seasons.find((season) => season.id === pendingRemoval.seasonId)?.year ?? ""}: todas as disputas dessa temporada sairão do rascunho.`
-      : `Disputa ${editor?.draft.seasons
-          .find((season) => season.id === pendingRemoval?.seasonId)
-          ?.disputes.find(
-            (dispute) => dispute.id === pendingRemoval?.disputeId,
-          )?.category || "sem categoria"}: remover do rascunho?`;
+      ? `Temporada ${seasonToRemove?.year ?? ""}: todas as disputas dessa temporada sairão do rascunho.`
+      : `Disputa ${disputeToRemove?.category || "sem categoria"}: remover do rascunho?`;
   const compact = enabled && (!editor || tab !== "pdfs");
   useEffect(() => {
     onCompactChange?.(compact);

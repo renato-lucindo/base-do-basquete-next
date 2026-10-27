@@ -474,6 +474,12 @@ export function GameSheetWorkspace(props: Props) {
       () => (engine ? projectSheet(engine) : null),
       [engine],
     );
+  const deletingAction = projection?.actions.find(
+    (action) => action.event.id === deleting,
+  );
+  const deletionLabel = deletingAction
+    ? `Ação ${deletingAction.sequence} · ${periodLabel(deletingAction.event.period)} · Equipe ${sideName(deletingAction.event.side)} · ${deletingAction.annotation}`
+    : "";
   function name(id: string) {
     return (
       snapshot?.participants.find((p) => p.rosterEntryId === id)?.person.name ??
@@ -762,13 +768,7 @@ export function GameSheetWorkspace(props: Props) {
               onClose={() => setDeleting(null)}
               className="sheet-delete-dialog"
             >
-              {projection?.actions
-                .filter((action) => action.event.id === deleting)
-                .map((action) => (
-                  <p className="sheet-delete-context" key={action.event.id}>
-                    {`Ação ${action.sequence} · ${periodLabel(action.event.period)} · Equipe ${sideName(action.event.side)} · ${action.annotation}`}
-                  </p>
-                ))}
+              <p className="sheet-delete-context">{deletionLabel}</p>
               <p>
                 A participação do atleta será preservada. É possível desfazer
                 a exclusão.
