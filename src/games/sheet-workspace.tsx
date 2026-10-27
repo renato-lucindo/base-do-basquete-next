@@ -628,8 +628,8 @@ export function GameSheetWorkspace(props: Props) {
               >
                 <legend>Lançar ações</legend>
                 <p>
-                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
-                  · Alt+Q: escolher período. Alvos B: banco, C: técnico.
+                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
+                  quarto · Alt+Q: escolher período. Alvos B: banco, C: técnico.
                 </p>
                 <div className="competition-fields">
                   <label>
@@ -747,10 +747,10 @@ export function GameSheetWorkspace(props: Props) {
                 <details>
                   <summary>Códigos aceitos</summary>
                   <p>
-                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U, D;
-                    P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco: B1/B2/BC.
-                    Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo indica falta
-                    compensada.
+                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U,
+                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco:
+                    B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo
+                    indica falta compensada.
                   </p>
                 </details>
               </fieldset>
@@ -805,7 +805,9 @@ export function GameSheetWorkspace(props: Props) {
                       Equipe da ação
                       <select
                         value={side}
-                        onChange={(event) => setSide(event.target.value as Side)}
+                        onChange={(event) =>
+                          setSide(event.target.value as Side)
+                        }
                       >
                         <option value="home">A · {props.game.home.name}</option>
                         <option value="away">B · {props.game.away.name}</option>
