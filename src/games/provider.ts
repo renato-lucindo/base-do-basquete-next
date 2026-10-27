@@ -7,6 +7,7 @@ import type { Database } from "../server/database.types";
 import { saveResultSchema } from "../competition/contract";
 import {
   gameListingSchema,
+  venueListingSchema,
   gameSnapshotSchema,
   type SaveGame,
 } from "./contract";
@@ -26,6 +27,17 @@ export class SupabaseGames {
       init: RequestInit,
     ) => Promise<Response> = (url, init) => fetch(url, init),
   ) {}
+  listVenues(token: string, query: string, offset: number) {
+    return this.checked(
+      venueListingSchema,
+      "list_game_venues",
+      {
+        p_query: query,
+        p_offset: offset,
+      },
+      token,
+    );
+  }
   async list(token: string, disputeId: string, query: string, offset: number) {
     const r = await this.checked(
       gameListingSchema,

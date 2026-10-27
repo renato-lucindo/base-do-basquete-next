@@ -389,6 +389,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  listGameVenues(query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.listVenues(accessToken, query, offset),
+      ),
+    );
+  }
   getGame(id: string) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>

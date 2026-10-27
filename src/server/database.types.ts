@@ -925,6 +925,10 @@ export type Database = {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_game_venues: {
+        Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
       list_games: {
         Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;

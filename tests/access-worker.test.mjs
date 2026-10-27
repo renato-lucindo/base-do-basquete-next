@@ -687,6 +687,20 @@ async function fixture(options = {}) {
           }
           return Response.json(result);
         }
+        if (url.pathname === "/rest/v1/rpc/list_game_venues") {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          assert.deepEqual(await request.json(), {
+            p_query: "Azul",
+            p_offset: 20,
+          });
+          return Response.json({
+            items: [{ name: "Ginásio Azul" }],
+            hasMore: false,
+          });
+        }
         if (url.pathname === "/rest/v1/rpc/list_games") {
           assert.equal(
             request.headers.get("authorization"),
@@ -1515,9 +1529,14 @@ test("sheet routes authorize and validate domain, path correlation, origin and l
 });
 
 test("game routes enforce session, fixed RPCs, origin and contextual commands", async () => {
-  const f = await fixture();
+  const options = {},
+    f = await fixture(options);
   try {
-    for (const path of [`/api/games?disputeId=${id}`, `/api/games/${id}`])
+    for (const path of [
+      `/api/games?disputeId=${id}`,
+      `/api/games/${id}`,
+      "/api/games/venues",
+    ])
       assert.equal((await f.mf.dispatchFetch(`${origin}${path}`)).status, 401);
     const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
     const send = (method, path, body, headers = {}) =>
@@ -1536,6 +1555,21 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       200,
     );
     assert.equal((await send("GET", `/api/games/${id}`)).status, 404);
+    const venues = await send("GET", "/api/games/venues?q=Azul&offset=20");
+    assert.equal(venues.status, 200);
+    assert.deepEqual(await venues.json(), {
+      items: [{ name: "Ginásio Azul" }],
+      hasMore: false,
+    });
+    assert.equal((await send("POST", "/api/games/venues", {})).status, 405);
+    for (const path of [
+      "/api/games/venues?q=a&q=b",
+      "/api/games/venues?offset=-1",
+      "/api/games/venues?unknown=x",
+      `/api/games/venues?q=${"x".repeat(161)}`,
+      "/api/games/venues?q=%00",
+    ])
+      assert.equal((await send("GET", path)).status, 400, path);
     const command = {
       commandId: id,
       expectedVersion: 0,
@@ -1593,6 +1627,15 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
     );
     assert.equal(
       f.calls.filter((c) => c === "/rest/v1/rpc/save_game").length,
+      1,
+    );
+    options.denied = true;
+    assert.equal(
+      (await send("GET", "/api/games/venues?q=Azul&offset=20")).status,
+      403,
+    );
+    assert.equal(
+      f.calls.filter((c) => c === "/rest/v1/rpc/list_game_venues").length,
       1,
     );
   } finally {

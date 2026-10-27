@@ -13,6 +13,30 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     );
   const session = env.SESSIONS.getByName(name),
     root = url.pathname === "/api/games";
+  if (url.pathname === "/api/games/venues") {
+    if (request.method !== "GET")
+      throw new HttpError(405, "invalid_method", "Método não permitido.");
+    const text = url.searchParams.get("offset") ?? "0",
+      offset = Number(text),
+      query = url.searchParams.get("q") ?? "";
+    if (
+      [...url.searchParams.keys()].some(
+        (key) =>
+          !["q", "offset"].includes(key) ||
+          url.searchParams.getAll(key).length !== 1,
+      ) ||
+      query.length > 160 ||
+      /[\u0000-\u001f\u007f]/u.test(query) ||
+      !/^\d+$/u.test(text) ||
+      !Number.isSafeInteger(offset) ||
+      offset > 100000
+    )
+      throw badInput();
+    const result = await session.listGameVenues(query, offset);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
   const sheet = /^\/api\/games\/([^/]+)\/sheet$/u.exec(url.pathname);
   const preparation = /^\/api\/games\/([^/]+)\/sheet\/preparation$/u.exec(
     url.pathname,

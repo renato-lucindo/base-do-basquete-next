@@ -69,3 +69,21 @@ export const gameListingSchema = z
   .strict();
 export type GameSnapshot = z.infer<typeof gameSnapshotSchema>;
 export type SaveGame = z.infer<typeof saveGameSchema>;
+export const venueListingSchema = z
+  .object({
+    items: z
+      .array(
+        z
+          .object({
+            name: z
+              .string()
+              .min(1)
+              .max(160)
+              .regex(/^[^\u0000-\u001f\u007f]*$/u),
+          })
+          .strict(),
+      )
+      .max(20),
+    hasMore: z.boolean(),
+  })
+  .strict();

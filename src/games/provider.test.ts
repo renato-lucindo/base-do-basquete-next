@@ -2,6 +2,41 @@ import { describe, it, expect, vi } from "vitest";
 import { SupabaseGames } from "./provider";
 const id = "d1000000-0000-4000-8000-000000000001";
 describe("fixed game server operations", () => {
+  it("lists bounded reusable venues through an administrative RPC", async () => {
+    const send = vi.fn(async () =>
+      Response.json({ items: [{ name: "Ginásio Azul" }], hasMore: false }),
+    );
+    const db = new SupabaseGames(
+      { url: "https://db.example.test", key: "fixture" },
+      send,
+    );
+    expect(await db.listVenues("fixture-jwt", "azul", 20)).toEqual({
+      items: [{ name: "Ginásio Azul" }],
+      hasMore: false,
+    });
+    expect(send).toHaveBeenCalledWith(
+      "https://db.example.test/rest/v1/rpc/list_game_venues",
+      expect.objectContaining({
+        body: JSON.stringify({ p_query: "azul", p_offset: 20 }),
+        headers: expect.objectContaining({
+          Authorization: "Bearer fixture-jwt",
+        }),
+      }),
+    );
+    for (const items of [
+      [{ name: "" }],
+      Array(21).fill({ name: "Azul" }),
+      [{ name: "Azul", private: true }],
+    ]) {
+      const invalid = new SupabaseGames(
+        { url: "https://db.example.test", key: "fixture" },
+        async () => Response.json({ items, hasMore: false }),
+      );
+      await expect(invalid.listVenues("fixture", "", 0)).rejects.toMatchObject({
+        code: "access_unavailable",
+      });
+    }
+  });
   it("explains a regulation assignment conflict instead of reporting a stale game", async () => {
     const db = new SupabaseGames(
       { url: "https://db.example.test", key: "fixture" },
