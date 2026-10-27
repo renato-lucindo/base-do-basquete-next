@@ -263,6 +263,34 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   await expect(page.getByLabel("Ano da temporada 2")).toHaveCount(0);
 });
 
+test("saving a championship shows a dismissible toast without removing the saved status", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  await page
+    .getByRole("button", { name: "Salvar campeonato", exact: true })
+    .click();
+  const toast = page.getByRole("region", { name: "Notificação" });
+  await expect(toast).toContainText("Campeonato salvo");
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.screenshot({
+      path: `dist/ui-ux-captures/competition-toast-after-${viewport.width}x${viewport.height}.png`,
+      animations: "disabled",
+    });
+  }
+  await toast
+    .getByRole("button", { name: "Dispensar notificação" })
+    .click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByTestId("competition-save-state")).toContainText("Salvo");
+});
+
 test("competition is saved and restored with multiple seasons and explicit disputes", async ({
   page,
 }) => {
