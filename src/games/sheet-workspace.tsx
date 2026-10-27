@@ -620,139 +620,141 @@ export function GameSheetWorkspace(props: Props) {
             </>
           )}
           <div hidden={preparationOpen}>
-            <fieldset
-              hidden={!!editing}
-              disabled={locked || !!deleting || !!editing}
-              className="sheet-input"
-            >
-              <legend>Lançar ações</legend>
-              <p>
-                Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
-                · Alt+Q: escolher período. Alvos B: banco, C: técnico.
-              </p>
-              <div className="competition-fields">
-                <label>
-                  Equipe da ação
-                  <select
-                    aria-label="Equipe da ação"
-                    value={side}
-                    onChange={(e) => setSide(e.target.value as Side)}
+            {!editing && (
+              <fieldset
+                hidden={!!editing}
+                disabled={locked || !!deleting || !!editing}
+                className="sheet-input"
+              >
+                <legend>Lançar ações</legend>
+                <p>
+                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
+                  · Alt+Q: escolher período. Alvos B: banco, C: técnico.
+                </p>
+                <div className="competition-fields">
+                  <label>
+                    Equipe da ação
+                    <select
+                      aria-label="Equipe da ação"
+                      value={side}
+                      onChange={(e) => setSide(e.target.value as Side)}
+                    >
+                      <option value="home">A · {props.game.home.name}</option>
+                      <option value="away">B · {props.game.away.name}</option>
+                    </select>
+                  </label>
+                  <label>
+                    Quarto ou prorrogação
+                    <select
+                      aria-label="Quarto ou prorrogação"
+                      ref={periodRef}
+                      value={period}
+                      onChange={(e) => setPeriod(Number(e.target.value))}
+                    >
+                      {Array.from({ length: d.periods }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {periodLabel(i + 1)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Camisa ou alvo
+                    <input
+                      ref={targetRef}
+                      value={target}
+                      maxLength={2}
+                      autoComplete="off"
+                      onChange={(e) => setTarget(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                          e.preventDefault();
+                          if (checkedTarget() !== null) {
+                            setError("");
+                            codeRef.current?.focus();
+                            codeRef.current?.select();
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Ação
+                    <input
+                      ref={codeRef}
+                      value={code}
+                      maxLength={3}
+                      autoComplete="off"
+                      onChange={(e) => setCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                          e.preventDefault();
+                          addAction();
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                <div className="competition-actions">
+                  <button onClick={addAction}>Registrar ação</button>
+                  <button
+                    disabled={!history.past.length || !!editing}
+                    onClick={() => {
+                      const last = history.past.at(-1);
+                      if (last)
+                        setHistory({
+                          present: last,
+                          past: history.past.slice(0, -1),
+                          future: [...history.future, d],
+                        });
+                    }}
                   >
-                    <option value="home">A · {props.game.home.name}</option>
-                    <option value="away">B · {props.game.away.name}</option>
-                  </select>
-                </label>
-                <label>
-                  Quarto ou prorrogação
-                  <select
-                    aria-label="Quarto ou prorrogação"
-                    ref={periodRef}
-                    value={period}
-                    onChange={(e) => setPeriod(Number(e.target.value))}
+                    Desfazer ação ou ajuste
+                  </button>
+                  <button
+                    disabled={!history.future.length || !!editing}
+                    onClick={() => {
+                      const last = history.future.at(-1);
+                      if (last)
+                        setHistory({
+                          present: last,
+                          past: [...history.past, d].slice(-50),
+                          future: history.future.slice(0, -1),
+                        });
+                    }}
                   >
-                    {Array.from({ length: d.periods }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {periodLabel(i + 1)}
+                    Refazer ação ou ajuste
+                  </button>
+                </div>
+                <label>
+                  Períodos da súmula
+                  <select
+                    aria-label="Períodos da súmula"
+                    value={d.periods}
+                    onChange={(e) => {
+                      const periods = Number(e.target.value);
+                      if (mutate({ ...d, periods }))
+                        setPeriod((p) => Math.min(p, periods));
+                    }}
+                  >
+                    {Array.from({ length: 9 }, (_, i) => (
+                      <option key={i + 4} value={i + 4}>
+                        {i + 4} períodos
                       </option>
                     ))}
                   </select>
                 </label>
-                <label>
-                  Camisa ou alvo
-                  <input
-                    ref={targetRef}
-                    value={target}
-                    maxLength={2}
-                    autoComplete="off"
-                    onChange={(e) => setTarget(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                        e.preventDefault();
-                        if (checkedTarget() !== null) {
-                          setError("");
-                          codeRef.current?.focus();
-                          codeRef.current?.select();
-                        }
-                      }
-                    }}
-                  />
-                </label>
-                <label>
-                  Ação
-                  <input
-                    ref={codeRef}
-                    value={code}
-                    maxLength={3}
-                    autoComplete="off"
-                    onChange={(e) => setCode(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                        e.preventDefault();
-                        addAction();
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-              <div className="competition-actions">
-                <button onClick={addAction}>Registrar ação</button>
-                <button
-                  disabled={!history.past.length || !!editing}
-                  onClick={() => {
-                    const last = history.past.at(-1);
-                    if (last)
-                      setHistory({
-                        present: last,
-                        past: history.past.slice(0, -1),
-                        future: [...history.future, d],
-                      });
-                  }}
-                >
-                  Desfazer ação ou ajuste
-                </button>
-                <button
-                  disabled={!history.future.length || !!editing}
-                  onClick={() => {
-                    const last = history.future.at(-1);
-                    if (last)
-                      setHistory({
-                        present: last,
-                        past: [...history.past, d].slice(-50),
-                        future: history.future.slice(0, -1),
-                      });
-                  }}
-                >
-                  Refazer ação ou ajuste
-                </button>
-              </div>
-              <label>
-                Períodos da súmula
-                <select
-                  aria-label="Períodos da súmula"
-                  value={d.periods}
-                  onChange={(e) => {
-                    const periods = Number(e.target.value);
-                    if (mutate({ ...d, periods }))
-                      setPeriod((p) => Math.min(p, periods));
-                  }}
-                >
-                  {Array.from({ length: 9 }, (_, i) => (
-                    <option key={i + 4} value={i + 4}>
-                      {i + 4} períodos
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <details>
-                <summary>Códigos aceitos</summary>
-                <p>
-                  1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U, D;
-                  P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco: B1/B2/BC.
-                  Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo indica falta
-                  compensada.
-                </p>
-              </details>
-            </fieldset>
+                <details>
+                  <summary>Códigos aceitos</summary>
+                  <p>
+                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U, D;
+                    P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco: B1/B2/BC.
+                    Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo indica falta
+                    compensada.
+                  </p>
+                </details>
+              </fieldset>
+            )}
             {projection && (
               <SheetLiveTables
                 document={d}
