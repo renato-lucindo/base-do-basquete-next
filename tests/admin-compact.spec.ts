@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { writeFile } from "node:fs/promises";
 import { gamesFixture } from "./fixtures/games";
+import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { openTextImport, textImportFixture, tid } from "./fixtures/text-import";
 const savedAt = "2026-10-23T19:00:00Z";
 
@@ -167,6 +168,37 @@ for (const width of [1366, 1920]) {
     expect(metrics.pageOverflow).toBe(false);
     await page.screenshot({
       path: `.preview-artifacts/admin-after-importacao-${width}.png`,
+    });
+  });
+}
+
+for (const width of [1366, 1920]) {
+  test(`admin regulamento desktop ${width}`, async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "Escopo desktop");
+    await page.setViewportSize({
+      width,
+      height: width === 1366 ? 768 : 1080,
+    });
+    await regulationBrowserFixture(page);
+    await page.goto(
+      `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
+    );
+    await expect(
+      page.getByRole("heading", {
+        name: "Regulamento da disputa",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.locator(".compact-pilot .regulation")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `.preview-artifacts/admin-after-regulamento-${width}.png`,
     });
   });
 }

@@ -36,3 +36,9 @@
 - Manter **somente a PR #33** como PR de revisão/merge; encerrar #35 e #36 como substituídas, sem merge.
 - Não executar merge na branch base nem alterar banco, dados humanos ou configuração de deploy.
 - Para a área de importação, acrescentar capturas automatizadas e verificação da largura mínima computada no desktop.
+
+## Evidência visual na CI
+
+- O workflow preserva os mesmos gates e publica capturas sintéticas geradas pelos testes de desktop como artefato `evidencias-uiux-desktop-SHA`.
+- Rotas cobertas: Jogos, Equipes e elenco, Regulamento, importação de texto, edição e histórico de súmula e confirmadores já testados; as capturas têm resolução 1366×768 e 1920×1080 quando definida pelo teste.
+- Apenas arquivos `.preview-artifacts/*after*.png` são incluídos no artefato; não há coleta de dados humanos, credenciais ou tráfego autenticado do preview.
