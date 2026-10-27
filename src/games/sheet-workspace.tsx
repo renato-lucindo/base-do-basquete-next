@@ -766,8 +766,8 @@ export function GameSheetWorkspace(props: Props) {
                 Confirma a exclusão da ação selecionada no histórico?
               </p>
               <p>
-                A participação do atleta será preservada. É possível desfazer
-                a exclusão.
+                A participação do atleta será preservada. É possível desfazer a
+                exclusão.
               </p>
               <div className="competition-actions">
                 <button
