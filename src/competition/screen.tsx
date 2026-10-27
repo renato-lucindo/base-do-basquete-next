@@ -854,8 +854,10 @@ export function CompetitionWorkspace({
                     if (!pendingRemoval) return;
                     const removal = pendingRemoval;
                     if (
-                      editor.savedIds.has(removal.seasonId) ||
-                      (removal.disputeId &&
+                      (removal.kind === "season" &&
+                        editor.savedIds.has(removal.seasonId)) ||
+                      (removal.kind === "dispute" &&
+                        !!removal.disputeId &&
                         editor.savedIds.has(removal.disputeId))
                     )
                       return;
