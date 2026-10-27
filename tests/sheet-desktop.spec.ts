@@ -44,7 +44,8 @@ test.describe("desktop scoresheet MVP", () => {
         path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
         animations: "disabled",
       });
-      await items.first().getByRole("button", { name: /Excluir ação/ }).click();
+      const firstAction = items.first();
+      await firstAction.getByRole("button", { name: /Excluir ação/ }).click();
       const dialog = page.getByRole("dialog", {
         name: "Excluir esta ação?",
         exact: true,
