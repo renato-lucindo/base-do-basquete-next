@@ -764,100 +764,104 @@ export function GameSheetWorkspace(props: Props) {
             )}
             {editing && (
               <AdminDialog
-              title="Editar ação"
-              open={!!editing}
-              busy={locked}
-              onClose={() => {
-                setEditing(null);
-                setError("");
-              }}
-              className="sheet-edit-dialog"
-            >
-              {error && (
-                <p
-                  ref={editError}
-                  role="alert"
-                  tabIndex={-1}
-                  className="access-error"
-                >
-                  {error}
-                </p>
-              )}
-              <p>Alterações ficam no rascunho até salvar a súmula.</p>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  addAction();
+                title="Editar ação"
+                open={!!editing}
+                busy={locked}
+                onClose={() => {
+                  setEditing(null);
+                  setError("");
                 }}
+                className="sheet-edit-dialog"
               >
-                <fieldset disabled={locked} className="sheet-edit-fields">
-                  <legend className="sr-only">Dados da ação selecionada</legend>
-                  <label>
-                    Equipe da ação
-                    <select
-                      aria-label="Equipe da ação"
-                      value={side}
-                      onChange={(event) => setSide(event.target.value as Side)}
-                    >
-                      <option value="home">A · {props.game.home.name}</option>
-                      <option value="away">B · {props.game.away.name}</option>
-                    </select>
-                  </label>
-                  <label>
-                    Quarto ou prorrogação
-                    <select
-                      aria-label="Quarto ou prorrogação"
-                      value={period}
-                      onChange={(event) =>
-                        setPeriod(Number(event.target.value))
-                      }
-                    >
-                      {Array.from({ length: d.periods }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {periodLabel(i + 1)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    Camisa ou alvo
-                    <input
-                      autoFocus
-                      aria-label="Camisa ou alvo"
-                      maxLength={2}
-                      autoComplete="off"
-                      value={target}
-                      onChange={(event) => setTarget(event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Ação
-                    <input
-                      aria-label="Ação"
-                      maxLength={3}
-                      autoComplete="off"
-                      value={code}
-                      onChange={(event) => setCode(event.target.value)}
-                    />
-                  </label>
-                </fieldset>
-                <div className="competition-actions">
-                  <button type="submit" disabled={locked}>
-                    Salvar edição da ação
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary"
-                    disabled={locked}
-                    onClick={() => {
-                      setEditing(null);
-                      setError("");
-                    }}
+                {error && (
+                  <p
+                    ref={editError}
+                    role="alert"
+                    tabIndex={-1}
+                    className="access-error"
                   >
-                    Cancelar edição da ação
-                  </button>
-                </div>
-              </form>
+                    {error}
+                  </p>
+                )}
+                <p>Alterações ficam no rascunho até salvar a súmula.</p>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    addAction();
+                  }}
+                >
+                  <fieldset disabled={locked} className="sheet-edit-fields">
+                    <legend className="sr-only">
+                      Dados da ação selecionada
+                    </legend>
+                    <label>
+                      Equipe da ação
+                      <select
+                        aria-label="Equipe da ação"
+                        value={side}
+                        onChange={(event) =>
+                          setSide(event.target.value as Side)
+                        }
+                      >
+                        <option value="home">A · {props.game.home.name}</option>
+                        <option value="away">B · {props.game.away.name}</option>
+                      </select>
+                    </label>
+                    <label>
+                      Quarto ou prorrogação
+                      <select
+                        aria-label="Quarto ou prorrogação"
+                        value={period}
+                        onChange={(event) =>
+                          setPeriod(Number(event.target.value))
+                        }
+                      >
+                        {Array.from({ length: d.periods }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {periodLabel(i + 1)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Camisa ou alvo
+                      <input
+                        autoFocus
+                        aria-label="Camisa ou alvo"
+                        maxLength={2}
+                        autoComplete="off"
+                        value={target}
+                        onChange={(event) => setTarget(event.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Ação
+                      <input
+                        aria-label="Ação"
+                        maxLength={3}
+                        autoComplete="off"
+                        value={code}
+                        onChange={(event) => setCode(event.target.value)}
+                      />
+                    </label>
+                  </fieldset>
+                  <div className="competition-actions">
+                    <button type="submit" disabled={locked}>
+                      Salvar edição da ação
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={locked}
+                      onClick={() => {
+                        setEditing(null);
+                        setError("");
+                      }}
+                    >
+                      Cancelar edição da ação
+                    </button>
+                  </div>
+                </form>
               </AdminDialog>
             )}
             <AdminDialog
