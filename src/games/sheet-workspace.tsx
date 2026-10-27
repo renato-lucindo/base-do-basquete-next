@@ -79,6 +79,7 @@ export function GameSheetWorkspace(props: Props) {
     targetRef = useRef<HTMLInputElement>(null),
     codeRef = useRef<HTMLInputElement>(null),
     periodRef = useRef<HTMLSelectElement>(null),
+    editCodeRef = useRef<HTMLInputElement>(null),
     focusAfterDelete = useRef(false),
     editingRestore = useRef<{
       side: Side;
@@ -398,7 +399,6 @@ export function GameSheetWorkspace(props: Props) {
         } else {
           setCode("");
           focusTarget();
-          setStatus("Ação registrada no rascunho");
         }
       }
     } catch (e) {
@@ -823,11 +823,7 @@ export function GameSheetWorkspace(props: Props) {
                       onKeyDown={(event) => {
                         if (event.key === "Enter" && !event.nativeEvent.isComposing) {
                           event.preventDefault();
-                          event.currentTarget.form?.elements.namedItem("edit-code") instanceof
-                            HTMLInputElement &&
-                            (
-                              event.currentTarget.form.elements.namedItem("edit-code") as HTMLInputElement
-                            ).focus();
+                          editCodeRef.current?.focus();
                         }
                       }}
                     />
@@ -835,6 +831,7 @@ export function GameSheetWorkspace(props: Props) {
                   <label>
                     Ação
                     <input
+                      ref={editCodeRef}
                       name="edit-code"
                       maxLength={3}
                       autoComplete="off"

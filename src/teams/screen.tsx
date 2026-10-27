@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast } from "../competition/admin-toast";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import { RegistrationRemovalPanel } from "./removal-panel";
@@ -399,6 +400,7 @@ export function TeamsWorkspace({
     );
   return (
     <section className="teams-workspace" aria-busy={busy}>
+      <AdminToast message={enabled && !busy && !uncertain && !conflict && !dirty ? status : ""} />
       {removing && (
         <AdminDialog
           title="Excluir inscrição"

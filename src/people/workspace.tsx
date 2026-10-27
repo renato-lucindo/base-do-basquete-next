@@ -28,6 +28,7 @@ import {
 import { PersonFields } from "./person-fields";
 import { PersonPicker } from "./person-picker";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast } from "../competition/admin-toast";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
@@ -720,6 +721,7 @@ export function MembersWorkspace({
     );
   return (
     <section className="members-workspace">
+      <AdminToast message={enabled && !busy && !uncertain && !conflict && !dirty ? status : ""} />
       <div className="competition-title">
         <h4 ref={heading} tabIndex={-1}>
           Elenco de {registration.name}

@@ -5,6 +5,7 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
 import { AdminDialog } from "./admin-dialog";
+import { AdminToast } from "./admin-toast";
 import {
   competitionSchema,
   listingSchema,
@@ -83,6 +84,7 @@ export function CompetitionWorkspace({
   const pdfGuard = useRef<() => boolean>(() => true);
   const regulationGuard = useRef<() => boolean>(() => true);
   const [opening, setOpening] = useState(false);
+  const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [uncertain, setUncertain] = useState(false);
@@ -197,6 +199,7 @@ export function CompetitionWorkspace({
 
   function change(edit: (draft: Competition) => void) {
     if (saving || uncertain) return;
+    setNotice("");
     setEditor((value) => {
       if (!value) return value;
       const draft = structuredClone(value.draft);
@@ -327,6 +330,7 @@ export function CompetitionWorkspace({
         selected,
       );
       setRefresh((n) => n + 1);
+      setNotice("Campeonato salvo");
     } catch (failure) {
       if (isSessionFailure(failure)) {
         onSessionLost();
@@ -382,6 +386,7 @@ export function CompetitionWorkspace({
       className={`competition-workspace${compact ? " compact-pilot" : ""}`}
       aria-busy={opening || saving}
     >
+      <AdminToast message={enabled && !saving && !opening ? notice : ""} />
       {error && (
         <p ref={errorRef} tabIndex={-1} role="alert" className="access-error">
           {error}

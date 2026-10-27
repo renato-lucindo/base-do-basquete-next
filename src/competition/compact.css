@@ -559,3 +559,54 @@
     flex-direction: row;
   }
 }
+
+/* Desktop density refinements for the remaining administrative workspaces. */
+@media (min-width: 1000px) {
+  .access-main.compact-main {
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .access-main.compact-main:has(.game-sheet) {
+    max-width: none;
+  }
+  .compact-pilot :is(.teams-workspace, .games-workspace, .members-workspace) {
+    min-width: 0;
+  }
+  .compact-pilot :is(.games-workspace, .teams-workspace, .members-workspace)
+    > .competition-title {
+    margin: 0 0 8px;
+    gap: 8px 12px;
+  }
+  .compact-pilot :is(.games-workspace, .teams-workspace, .members-workspace)
+    > .competition-title
+    > :is(button, .competition-search) {
+    flex-shrink: 0;
+  }
+  .compact-pilot .admin-data-table :is(th, td) {
+    padding: 6px 9px;
+    line-height: 1.4;
+  }
+  .compact-pilot .admin-data-table tbody tr:hover {
+    background: #f6f8fb;
+  }
+  .compact-pilot .admin-data-table .competition-actions {
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .compact-pilot .competition-context {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+  .compact-pilot .competition-actions {
+    gap: 6px 10px;
+  }
+  .compact-pilot :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+    > :is(h3, h4, h5) {
+    margin-block: 10px 6px;
+  }
+  .compact-pilot :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+    > fieldset {
+    margin-block: 8px;
+  }
+}
