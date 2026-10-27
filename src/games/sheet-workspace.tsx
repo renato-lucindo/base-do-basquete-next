@@ -695,9 +695,7 @@ export function GameSheetWorkspace(props: Props) {
                 </label>
               </div>
               <div className="competition-actions">
-                <button onClick={addAction}>
-                  Registrar ação
-                </button>
+                <button onClick={addAction}>Registrar ação</button>
                 <button
                   disabled={!history.past.length || !!editing}
                   onClick={() => {
@@ -783,8 +781,15 @@ export function GameSheetWorkspace(props: Props) {
               onClose={cancelEditing}
               className="sheet-edit-dialog"
             >
-              <p>Altere os dados da ação selecionada. A mudança ficará no rascunho até salvar.</p>
-              {error && <p role="alert" className="access-error">{error}</p>}
+              <p>
+                Altere os dados da ação selecionada. A mudança ficará no
+                rascunho até salvar.
+              </p>
+              {error && (
+                <p role="alert" className="access-error">
+                  {error}
+                </p>
+              )}
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
@@ -807,7 +812,9 @@ export function GameSheetWorkspace(props: Props) {
                     Quarto ou prorrogação
                     <select
                       value={period}
-                      onChange={(event) => setPeriod(Number(event.target.value))}
+                      onChange={(event) =>
+                        setPeriod(Number(event.target.value))
+                      }
                     >
                       {Array.from({ length: d.periods }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
@@ -825,7 +832,10 @@ export function GameSheetWorkspace(props: Props) {
                       value={target}
                       onChange={(event) => setTarget(event.target.value)}
                       onKeyDown={(event) => {
-                        if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                        if (
+                          event.key === "Enter" &&
+                          !event.nativeEvent.isComposing
+                        ) {
                           event.preventDefault();
                           editCodeRef.current?.focus();
                         }

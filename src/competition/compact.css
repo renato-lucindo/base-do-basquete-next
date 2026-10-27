@@ -573,12 +573,14 @@
   .compact-pilot :is(.teams-workspace, .games-workspace, .members-workspace) {
     min-width: 0;
   }
-  .compact-pilot :is(.games-workspace, .teams-workspace, .members-workspace)
+  .compact-pilot
+    :is(.games-workspace, .teams-workspace, .members-workspace)
     > .competition-title {
     margin: 0 0 8px;
     gap: 8px 12px;
   }
-  .compact-pilot :is(.games-workspace, .teams-workspace, .members-workspace)
+  .compact-pilot
+    :is(.games-workspace, .teams-workspace, .members-workspace)
     > .competition-title
     > :is(button, .competition-search) {
     flex-shrink: 0;
@@ -601,11 +603,13 @@
   .compact-pilot .competition-actions {
     gap: 6px 10px;
   }
-  .compact-pilot :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+  .compact-pilot
+    :is(.regulation, .achievements, .transfer-panel, .profile-publication)
     > :is(h3, h4, h5) {
     margin-block: 10px 6px;
   }
-  .compact-pilot :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+  .compact-pilot
+    :is(.regulation, .achievements, .transfer-panel, .profile-publication)
     > fieldset {
     margin-block: 8px;
   }

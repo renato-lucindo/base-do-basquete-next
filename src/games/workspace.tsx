@@ -289,7 +289,11 @@ export function GamesWorkspace(props: Props) {
   }
   return (
     <section className="games-workspace">
-      <AdminToast message={enabled && !busy && !uncertain && !conflict && !dirty ? status : ""} />
+      <AdminToast
+        message={
+          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+        }
+      />
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Jogos

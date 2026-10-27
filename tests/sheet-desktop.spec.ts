@@ -113,9 +113,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(page.locator(".sheet-actions li")).toContainText(["2p"]);
     const toast = page.getByRole("region", { name: "Notificação" });
     await expect(toast).toContainText("Ação editada no rascunho");
-    await toast
-      .getByRole("button", { name: "Dispensar notificação" })
-      .click();
+    await toast.getByRole("button", { name: "Dispensar notificação" }).click();
     await expect(toast).toHaveCount(0);
   });
 

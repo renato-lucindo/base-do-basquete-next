@@ -400,7 +400,11 @@ export function TeamsWorkspace({
     );
   return (
     <section className="teams-workspace" aria-busy={busy}>
-      <AdminToast message={enabled && !busy && !uncertain && !conflict && !dirty ? status : ""} />
+      <AdminToast
+        message={
+          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+        }
+      />
       {removing && (
         <AdminDialog
           title="Excluir inscrição"

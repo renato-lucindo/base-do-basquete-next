@@ -721,7 +721,11 @@ export function MembersWorkspace({
     );
   return (
     <section className="members-workspace">
-      <AdminToast message={enabled && !busy && !uncertain && !conflict && !dirty ? status : ""} />
+      <AdminToast
+        message={
+          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+        }
+      />
       <div className="competition-title">
         <h4 ref={heading} tabIndex={-1}>
           Elenco de {registration.name}
