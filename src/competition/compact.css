@@ -618,7 +618,7 @@
   }
 }
 
-/* Etapa 3: padrões desktop derivados da identidade Sports Data Minimalism. */
+/* Etapa 3: padrões desktop da identidade Sports Data Minimalism. */
 @media (min-width: 1000px) {
   .compact-pilot {
     --admin-ink: #101827;
@@ -637,14 +637,17 @@
     border-bottom: 2px solid var(--admin-line);
     vertical-align: bottom;
   }
-  .compact-pilot .admin-data-table tbody tr:focus-within,
-  .compact-pilot .admin-data-table tbody tr:hover {
+  .compact-pilot .admin-data-table tbody tr:hover,
+  .compact-pilot .admin-data-table tbody tr:focus-within {
     background: var(--admin-hover);
   }
-  .compact-pilot :is(.admin-data-table, .member-table-scroll, .reg-table) :is(th, td) {
+  .compact-pilot .admin-data-table th,
+  .compact-pilot .admin-data-table td,
+  .compact-pilot .reg-table th,
+  .compact-pilot .reg-table td {
     line-height: 1.45;
   }
-  .compact-pilot :is(.competition-tabs button, .competition-open, .admin-data-table button, .competition-actions button):focus-visible {
+  .compact-pilot :is(button, input, select, textarea, summary):focus-visible {
     outline: 3px solid var(--admin-blue);
     outline-offset: 2px;
   }
@@ -653,10 +656,6 @@
   }
   .compact-pilot .competition-tabs [aria-current="page"] {
     font-weight: 700;
-  }
-  .compact-pilot :is(.competition-workspace, .games-workspace, .teams-workspace, .members-workspace, .regulation) :is(input, select, textarea):focus-visible {
-    outline: 2px solid var(--admin-blue);
-    outline-offset: 2px;
   }
   .compact-pilot .text-import-workspace {
     margin-top: 8px;
@@ -669,13 +668,15 @@
     font-size: 0.875rem;
     font-variant-numeric: tabular-nums;
   }
-  .compact-pilot .text-import-scroll :is(th, td) {
+  .compact-pilot .text-import-scroll th,
+  .compact-pilot .text-import-scroll td {
     min-width: 90px;
     padding: 7px 9px;
     line-height: 1.4;
     border-color: var(--admin-line);
   }
-  .compact-pilot .text-import-scroll :is(td, th):first-child {
+  .compact-pilot .text-import-scroll th:first-child,
+  .compact-pilot .text-import-scroll td:first-child {
     min-width: 145px;
     max-width: 200px;
   }
@@ -684,7 +685,8 @@
     min-width: 220px;
     max-width: 320px;
   }
-  .compact-pilot .text-import-scroll :is(input:not([type="checkbox"]), select) {
+  .compact-pilot .text-import-scroll input:not([type="checkbox"]),
+  .compact-pilot .text-import-scroll select {
     min-height: 36px;
     font-size: 0.875rem;
     padding: 5px 7px;

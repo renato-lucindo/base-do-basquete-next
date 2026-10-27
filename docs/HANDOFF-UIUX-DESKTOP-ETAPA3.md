@@ -25,3 +25,9 @@
 2. Corrigir inconsistências comprovadas em cabeçalhos, formulários, tabelas e fluxos de edição, preservando controles existentes.
 3. Validar foco de diálogos, contraste e reflow 200%; não substituir guards síncronos sem revisão de contrato.
 4. Consolidar feedback de operações sem duplicar avisos nem ocultar erros persistentes.
+
+## Continuidade sem empilhamento de PRs
+- Unificar as implementações das PRs #33, #35 e #36 na branch `codex/ui-ux-desktop` após verificar ancestralidade e commits.
+- Manter **somente a PR #33** como PR de revisão/merge; encerrar #35 e #36 como substituídas quando a consolidação estiver confirmada.
+- Não executar merge na branch base nem alterar banco, dados humanos ou configuração de deploy.
+- Para a área de importação, acrescentar capturas automatizadas e verificação da largura mínima computada no desktop.

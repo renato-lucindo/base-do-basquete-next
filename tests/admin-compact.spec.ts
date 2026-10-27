@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { writeFile } from "node:fs/promises";
 import { gamesFixture } from "./fixtures/games";
-import { tid } from "./fixtures/text-import";
+import { openTextImport, textImportFixture, tid } from "./fixtures/text-import";
 const savedAt = "2026-10-23T19:00:00Z";
 
 for (const width of [1366, 1920])
@@ -130,3 +130,43 @@ for (const width of [1366, 1920])
       }
     });
   }
+
+for (const width of [1366, 1920]) {
+  test(`admin importação compacta desktop ${width}`, async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "Escopo desktop");
+    await page.setViewportSize({
+      width,
+      height: width === 1366 ? 768 : 1080,
+    });
+    await textImportFixture(page);
+    await openTextImport(page);
+    await page
+      .getByLabel("Texto do elenco", { exact: true })
+      .fill("Equipe: Lobos\\n5 - Ana Silva\\n12 - Ricardo Souza");
+    await page
+      .getByRole("button", { name: "Interpretar texto", exact: true })
+      .click();
+    const region = page.getByRole("region", {
+      name: "Tabela de conferência com rolagem horizontal",
+      exact: true,
+    });
+    const table = page.getByRole("table", {
+      name: "Conferência do elenco",
+    });
+    await expect(region).toBeVisible();
+    await expect(table).toBeVisible();
+    const metrics = await table.evaluate((node) => ({
+      compact: !!node.closest(".compact-pilot"),
+      minWidth: getComputedStyle(node).minWidth,
+      pageOverflow:
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    }));
+    expect(metrics.compact).toBe(true);
+    expect(metrics.minWidth).toBe("1220px");
+    expect(metrics.pageOverflow).toBe(false);
+    await page.screenshot({
+      path: `.preview-artifacts/admin-after-importacao-${width}.png`,
+    });
+  });
+}
