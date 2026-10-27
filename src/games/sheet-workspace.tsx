@@ -474,9 +474,6 @@ export function GameSheetWorkspace(props: Props) {
       () => (engine ? projectSheet(engine) : null),
       [engine],
     );
-  const deletingAction = projection?.actions.find(
-    (action) => action.event.id === deleting,
-  );
   function name(id: string) {
     return (
       snapshot?.participants.find((p) => p.rosterEntryId === id)?.person.name ??
@@ -766,7 +763,7 @@ export function GameSheetWorkspace(props: Props) {
               className="sheet-delete-dialog"
             >
               <p className="sheet-delete-context">
-                Ação {deletingAction?.sequence} · {deletingAction?.annotation}
+                Confirma a exclusão da ação selecionada no histórico?
               </p>
               <p>
                 A participação do atleta será preservada. É possível desfazer
