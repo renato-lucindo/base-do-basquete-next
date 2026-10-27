@@ -4,6 +4,7 @@ import { RegulationWorkspace } from "../regulation/workspace";
 import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
+import { AdminDialog } from "./admin-dialog";
 import {
   competitionSchema,
   listingSchema,
@@ -69,6 +70,11 @@ export function CompetitionWorkspace({
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [selected, setSelected] = useState("");
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    kind: "season" | "dispute";
+    seasonId: string;
+    disputeId?: string;
+  } | null>(null);
   const [tab, setTab] = useState<
     "info" | "teams" | "games" | "pdfs" | "regulation"
   >("info");
@@ -204,6 +210,7 @@ export function CompetitionWorkspace({
     targetTab = tab,
   ) {
     const draft = competitionSchema.parse(snapshotWithoutMetadata(snapshot));
+    setPendingRemoval(null);
     setEditor({
       draft,
       version: snapshot.version,
@@ -249,6 +256,7 @@ export function CompetitionWorkspace({
   }
   function start() {
     if (!mayLeave()) return;
+    setPendingRemoval(null);
     const dispute = newDispute();
     const draft: Competition = {
       id: crypto.randomUUID(),
@@ -277,6 +285,7 @@ export function CompetitionWorkspace({
   }
   function back() {
     if (!mayLeave()) return;
+    setPendingRemoval(null);
     setEditor(null);
     setError("");
     setUncertain(false);
@@ -656,8 +665,9 @@ export function CompetitionWorkspace({
                             type="button"
                             className="secondary"
                             onClick={() =>
-                              change((d) => {
-                                d.seasons.splice(si, 1);
+                              setPendingRemoval({
+                                kind: "season",
+                                seasonId: season.id,
                               })
                             }
                           >
@@ -744,8 +754,10 @@ export function CompetitionWorkspace({
                                 type="button"
                                 className="secondary"
                                 onClick={() =>
-                                  change((d) => {
-                                    d.seasons[si].disputes.splice(di, 1);
+                                  setPendingRemoval({
+                                    kind: "dispute",
+                                    seasonId: season.id,
+                                    disputeId: dispute.id,
                                   })
                                 }
                               >
@@ -811,6 +823,74 @@ export function CompetitionWorkspace({
                 )}
               </div>
             </form>
+            <AdminDialog
+              title={
+                pendingRemoval?.kind === "season"
+                  ? "Remover temporada?"
+                  : "Remover disputa?"
+              }
+              open={!!pendingRemoval}
+              busy={saving || uncertain || opening}
+              onClose={() => setPendingRemoval(null)}
+              className="competition-removal-dialog"
+            >
+              <p>
+                {pendingRemoval?.kind === "season"
+                  ? `Temporada ${editor.draft.seasons.find((season) => season.id === pendingRemoval.seasonId)?.year ?? ""}: todas as disputas dessa temporada sairão do rascunho.`
+                  : `Disputa ${editor.draft.seasons
+                      .find((season) => season.id === pendingRemoval?.seasonId)
+                      ?.disputes.find(
+                        (dispute) => dispute.id === pendingRemoval?.disputeId,
+                      )?.category || "sem categoria"}: remover do rascunho?`}
+              </p>
+              <p>
+                Nada será enviado ao servidor até clicar em Salvar campeonato.
+              </p>
+              <div className="competition-actions">
+                <button
+                  type="button"
+                  disabled={saving || uncertain || opening}
+                  onClick={() => {
+                    if (!pendingRemoval) return;
+                    const removal = pendingRemoval;
+                    if (
+                      editor.savedIds.has(removal.seasonId) ||
+                      (removal.disputeId &&
+                        editor.savedIds.has(removal.disputeId))
+                    )
+                      return;
+                    change((draft) => {
+                      const seasonIndex = draft.seasons.findIndex(
+                        (season) => season.id === removal.seasonId,
+                      );
+                      if (seasonIndex < 0) return;
+                      if (removal.kind === "season") {
+                        if (draft.seasons.length > 1)
+                          draft.seasons.splice(seasonIndex, 1);
+                      } else {
+                        const disputes = draft.seasons[seasonIndex].disputes;
+                        const disputeIndex = disputes.findIndex(
+                          (dispute) => dispute.id === removal.disputeId,
+                        );
+                        if (disputeIndex >= 0 && disputes.length > 1)
+                          disputes.splice(disputeIndex, 1);
+                      }
+                    });
+                    setPendingRemoval(null);
+                  }}
+                >
+                  Confirmar remoção
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={saving || uncertain || opening}
+                  onClick={() => setPendingRemoval(null)}
+                >
+                  Cancelar remoção
+                </button>
+              </div>
+            </AdminDialog>
           </div>
           {context && editor.savedIds.has(context.id) && (
             <div hidden={tab !== "teams"}>
