@@ -282,9 +282,7 @@ test("championship save shows a dismissible toast", async ({ page }) => {
       animations: "disabled",
     });
   }
-  await toast
-    .getByRole("button", { name: "Dispensar notificação" })
-    .click();
+  await toast.getByRole("button", { name: "Dispensar notificação" }).click();
   await expect(toast).toHaveCount(0);
   await expect(page.getByTestId("competition-save-state")).toContainText(
     "Salvo",
