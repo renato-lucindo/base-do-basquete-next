@@ -13,6 +13,25 @@ import {
   openTransfer,
 } from "./fixtures/transfer-browser";
 
+test("transferência mantém controles alinhados quando o rótulo da camisa ocupa duas linhas", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await transferBrowserFixture(page);
+  await openTransfer(page);
+  await page.addStyleTag({
+    content:
+      ".compact-pilot .transfer-fields .transfer-destination, .compact-pilot .transfer-fields .transfer-jersey { font-size:18px; }",
+  });
+  const destination = page.getByLabel("Inscrição de destino", { exact: true }),
+    jersey = page.getByLabel("Camisa no destino", { exact: true });
+  await expect(destination).toBeEnabled();
+  const a = await destination.boundingBox(),
+    b = await jersey.boundingBox();
+  expect(Math.abs(a!.y - b!.y)).toBeLessThan(3);
+});
+
 for (const width of [1366, 1920])
   test(`regulamento compacto desktop ${width} expõe regras e campos proporcionais`, async ({
     page,
