@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveTeamSchema, saveRegistrationSchema } from "./contract";
+import { registrationRemovalSchema } from "./removal-contract";
 
 export async function teamsRoute(request: Request, env: Env, url: URL) {
   const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
@@ -12,6 +13,55 @@ export async function teamsRoute(request: Request, env: Env, url: URL) {
       "Entre para acessar a área administrativa.",
     );
   const session = env.SESSIONS.getByName(name);
+  const removal = url.pathname.match(
+    /^\/api\/registrations\/([^/]+)\/removal$/u,
+  );
+  if (removal) {
+    const id = z.uuid().safeParse(removal[1]);
+    if (!id.success) throw badInput();
+    if (request.method === "GET") {
+      if (
+        [...url.searchParams.keys()].some(
+          (key) =>
+            key !== "disputeId" || url.searchParams.getAll(key).length !== 1,
+        )
+      )
+        throw badInput();
+      const dispute = z.uuid().safeParse(url.searchParams.get("disputeId"));
+      if (!dispute.success) throw badInput();
+      const result = await session.getRegistrationRemovalContext(
+        id.data,
+        dispute.data,
+      );
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    if (request.method === "POST") {
+      if (url.search) throw badInput();
+      if (
+        url.origin !== env.APP_ORIGIN ||
+        request.headers.get("origin") !== env.APP_ORIGIN ||
+        request.headers.get("sec-fetch-site") === "cross-site"
+      )
+        throw new HttpError(403, "invalid_origin", "Origem não permitida.");
+      const actor = await session.actor();
+      if (!actor.ok)
+        throw new HttpError(actor.status, actor.code, actor.message);
+      const command = await readMutationJson(
+        request,
+        registrationRemovalSchema,
+        { origin: env.APP_ORIGIN, maxBytes: 8192 },
+      );
+      if (command.registrationId.toLowerCase() !== id.data.toLowerCase())
+        throw badInput();
+      const result = await session.removeRegistration(command);
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    throw new HttpError(405, "invalid_method", "Método não permitido.");
+  }
   const teams =
     url.pathname === "/api/teams" || url.pathname.startsWith("/api/teams/");
   const prefix = teams ? "/api/teams" : "/api/registrations";

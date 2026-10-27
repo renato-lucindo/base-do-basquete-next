@@ -5,6 +5,7 @@ import { MembersWorkspace } from "../people/workspace";
 import { AdminDialog } from "../competition/admin-dialog";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
+import { RegistrationRemovalPanel } from "./removal-panel";
 import {
   teamListingSchema,
   registrationListingSchema,
@@ -39,6 +40,10 @@ export function TeamsWorkspace({
   onSaved,
 }: Props) {
   const [importing, setImporting] = useState(false);
+  const [removing, setRemoving] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  const removalGuard = useRef<() => boolean>(() => true);
   const importGuard = useRef<() => boolean>(() => true);
   const [list, setList] = useState({
     items: [] as RegistrationSnapshot[],
@@ -77,6 +82,7 @@ export function TeamsWorkspace({
       importGuard.current() &&
       membersGuard.current() &&
       withdrawalGuard.current() &&
+      removalGuard.current() &&
       (!(dirty || uncertain || busy) ||
         (!busy &&
           window.confirm(
@@ -100,10 +106,16 @@ export function TeamsWorkspace({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, uncertain]);
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || removing) return;
     if (editor) input.current?.focus();
     else heading.current?.focus();
-  }, [editor?.kind, editor?.command.commandId, enabled, importing]);
+  }, [
+    editor?.kind,
+    editor?.command.commandId,
+    enabled,
+    importing,
+    removing?.id,
+  ]);
   useEffect(() => {
     if (error && enabled) alert.current?.focus();
   }, [error, enabled]);
@@ -387,6 +399,41 @@ export function TeamsWorkspace({
     );
   return (
     <section className="teams-workspace" aria-busy={busy}>
+      {removing && (
+        <AdminDialog
+          title="Excluir inscrição"
+          open={enabled}
+          busy={false}
+          onClose={() => {
+            if (removalGuard.current()) setRemoving(null);
+          }}
+        >
+          <RegistrationRemovalPanel
+            key={removing.id}
+            id={removing.id}
+            name={removing.name}
+            disputeId={disputeId}
+            enabled={enabled}
+            guard={removalGuard}
+            onSessionLost={onSessionLost}
+            onRemoved={() => {
+              setList((old) => ({
+                ...old,
+                items: old.items.filter((r) => r.id !== removing.id),
+              }));
+              setRefresh((v) => v + 1);
+              onSaved();
+            }}
+            onClose={(removed) => {
+              setRemoving(null);
+              if (removed)
+                setStatus(
+                  "Inscrição excluída. A equipe global permanece cadastrada.",
+                );
+            }}
+          />
+        </AdminDialog>
+      )}
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Equipes e elencos
@@ -645,57 +692,76 @@ export function TeamsWorkspace({
                   {r.name}
                 </button>
                 <p className="registration-origin">Equipe: {r.team.name}</p>
-                {expanded === r.id && (
-                  <div className="competition-actions registration-actions">
-                    <button
-                      className="secondary"
-                      disabled={busy || withdrawalLocked}
-                      onClick={() => {
-                        if (!mayLeave()) return;
-                        setFinding(false);
-                        edit({
-                          kind: "registration",
-                          team: r.team,
-                          command: {
-                            commandId: crypto.randomUUID(),
-                            expectedVersion: r.version,
-                            registration: {
-                              id: r.id,
-                              disputeId: r.disputeId,
-                              teamId: r.teamId,
-                              name: r.name,
+                <div className="competition-actions registration-actions">
+                  <button
+                    id={`remove-registration-${r.id}`}
+                    className="secondary"
+                    aria-label={`Excluir inscrição ${r.name}`}
+                    disabled={!enabled || busy || withdrawalLocked}
+                    onClick={() => {
+                      if (!mayLeave()) return;
+                      setEditor(null);
+                      setFinding(false);
+                      setError("");
+                      setStatus("");
+                      setMembersEpoch((v) => v + 1);
+                      setRemoving({ id: r.id, name: r.name });
+                    }}
+                  >
+                    Excluir inscrição
+                  </button>
+                  {expanded === r.id && (
+                    <>
+                      <button
+                        className="secondary"
+                        disabled={busy || withdrawalLocked}
+                        onClick={() => {
+                          if (!mayLeave()) return;
+                          setFinding(false);
+                          edit({
+                            kind: "registration",
+                            team: r.team,
+                            command: {
+                              commandId: crypto.randomUUID(),
+                              expectedVersion: r.version,
+                              registration: {
+                                id: r.id,
+                                disputeId: r.disputeId,
+                                teamId: r.teamId,
+                                name: r.name,
+                              },
                             },
-                          },
-                        });
-                      }}
-                    >
-                      Editar inscrição
-                    </button>
-                    <button
-                      className="secondary"
-                      disabled={busy || withdrawalLocked}
-                      onClick={() => {
-                        if (!mayLeave()) return;
-                        setFinding(false);
-                        edit({
-                          kind: "team",
-                          afterCreate: false,
-                          command: {
-                            commandId: crypto.randomUUID(),
-                            expectedVersion: r.team.version,
-                            team: {
-                              id: r.team.id,
-                              name: r.team.name,
-                              abbreviation: r.team.abbreviation,
+                          });
+                        }}
+                      >
+                        Editar inscrição
+                      </button>
+                      <button
+                        className="secondary"
+                        disabled={busy || withdrawalLocked}
+                        onClick={() => {
+                          if (!mayLeave()) return;
+                          setFinding(false);
+                          edit({
+                            kind: "team",
+                            afterCreate: false,
+                            command: {
+                              commandId: crypto.randomUUID(),
+                              expectedVersion: r.team.version,
+                              team: {
+                                id: r.team.id,
+                                name: r.team.name,
+                                abbreviation: r.team.abbreviation,
+                              },
                             },
-                          },
-                        });
-                      }}
-                    >
-                      Editar equipe global
-                    </button>
-                  </div>
-                )}
+                          });
+                        }}
+                      >
+                        Editar equipe global
+                      </button>
+                    </>
+                  )}
+                </div>
                 <div id={`registration-${r.id}`} hidden={expanded !== r.id}>
                   {expanded === r.id && (
                     <>

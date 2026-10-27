@@ -12,6 +12,11 @@ import {
   type SaveTeam,
   type SaveRegistration,
 } from "./contract";
+import {
+  removalContextSchema,
+  removalResultSchema,
+  type RegistrationRemoval,
+} from "./removal-contract";
 type Functions = Database["public"]["Functions"];
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 export class SupabaseTeams {
@@ -67,12 +72,48 @@ export class SupabaseTeams {
       token,
     );
   }
+  async removalContext(token: string, id: string, disputeId: string) {
+    const value = await this.checked(
+      removalContextSchema,
+      "get_registration_removal_context",
+      { p_registration_id: id, p_dispute_id: disputeId },
+      token,
+      8192,
+    );
+    const context = value.state === "removed" ? value : value.registration;
+    if (
+      context.id.toLowerCase() !== id.toLowerCase() ||
+      context.disputeId.toLowerCase() !== disputeId.toLowerCase()
+    )
+      throw unavailable();
+    return value;
+  }
+  async removeRegistration(token: string, command: RegistrationRemoval) {
+    const value = await this.checked(
+      removalResultSchema,
+      "remove_registration",
+      { p_command: command },
+      token,
+      8192,
+    );
+    if (
+      value.id.toLowerCase() !== command.registrationId.toLowerCase() ||
+      value.disputeId.toLowerCase() !== command.disputeId.toLowerCase() ||
+      value.deletedVersion !== command.expectedVersion
+    )
+      throw unavailable();
+    return value;
+  }
   private async checked<T, N extends keyof Functions>(
     schema: z.ZodType<T>,
     name: N,
     args: Functions[N]["Args"],
     token: string,
+    maxBytes = 1048576,
   ): Promise<T> {
+    const removal =
+      name === "get_registration_removal_context" ||
+      name === "remove_registration";
     let response: Response;
     try {
       response = await this.send(`${this.config.url}/rest/v1/rpc/${name}`, {
@@ -89,7 +130,8 @@ export class SupabaseTeams {
       throw unavailable();
     }
     if (response.ok) {
-      const body = await providerJson(response, 1048576);
+      const body = await providerJson(response, maxBytes);
+      if (body === null && removal) throw unavailable();
       if (body === null)
         throw new HttpError(
           404,
@@ -102,6 +144,21 @@ export class SupabaseTeams {
     }
     if (response.status === 409) {
       const body = await providerJson(response);
+      if (removal) {
+        const cause = z
+          .object({
+            message: z.enum(["registration_in_use", "registration_removed"]),
+          })
+          .safeParse(body);
+        if (cause.success)
+          throw new HttpError(
+            409,
+            cause.data.message,
+            cause.data.message === "registration_in_use"
+              ? "A inscrição possui dependências. Atualize a conferência antes de continuar."
+              : "Esta inscrição já foi excluída. Atualize a conferência.",
+          );
+      }
       const replay = z
         .object({ message: z.literal("idempotency_conflict") })
         .safeParse(body).success;
@@ -113,6 +170,20 @@ export class SupabaseTeams {
           : "O cadastro foi alterado em outra sessão. Recarregue antes de salvar.",
       );
     }
+    if (response.status === 404 && removal) {
+      const body = await providerJson(response);
+      if (
+        z
+          .object({ message: z.literal("registration_not_found") })
+          .safeParse(body).success
+      )
+        throw new HttpError(
+          404,
+          "context_not_found",
+          "Inscrição não encontrada nesta disputa.",
+        );
+      throw unavailable();
+    }
     await response.body?.cancel().catch(() => undefined);
     if (response.status === 401) throw invalidSession();
     if (response.status === 403) throw forbidden();
@@ -120,7 +191,9 @@ export class SupabaseTeams {
       throw new HttpError(
         400,
         "invalid_input",
-        "Revise nome, sigla e destino. Uma inscrição salva não pode trocar de equipe ou disputa.",
+        removal
+          ? "Revise a inscrição, a disputa e a conferência de exclusão."
+          : "Revise nome, sigla e destino. Uma inscrição salva não pode trocar de equipe ou disputa.",
       );
     throw unavailable();
   }

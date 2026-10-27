@@ -1,0 +1,21 @@
+# Remoção de inscrição vazia — integração compacta
+
+27/10/2026, base `60aec12`, branch `codex/inscricao-vazia-compacta`. Primeira entrega autorizada de A26, limitada à inscrição vazia. Nenhum dado humano excluído, nenhum comando de remoção enviado ao serviço real nesta execução.
+
+## Reutilização e contratos
+
+- Migration45 `20261026135708_registration_removal.sql` já aplicada: SHA256 `ca525c6f32f362474d58dae93a0cb05bbeea09b5f1b02e8fceeb5bea5d93e4af` conferido, bytes preservados. Banco permanece com48 migrations, sem DDL nova. Tipos já contêm as RPCs.
+- Plano/provas originais em `docs/VALIDACAO-REMOCAO-INSCRICOES.md` recuperados da branch de origem. Contrato real BEGIN/ROLLBACK e três corridas nativas continuam aplicáveis ao SQL inalterado; não foram reexecutados. Não atribuir essas provas à UI nova ou a carga total.
+- RED na base atual: módulo de contrato ausente; depois quatro testes falharam por métodos do provider ausentes. Portados contratos e adapter, oito testes PASS em431ms (`removal-port-provider-green.log`). Nenhuma cópia integral de telas antigas.
+- Rotas/DO específicos: contexto/correlação, replay congelado, sessão e origem antes do corpo. Um cenário workerd focal PASS em1,07s (`removal-port-worker-green.log`), build/typecheck aprovados.
+
+## Diálogo desktop
+
+- RED real por ação de excluir ausente. Conferência integrada ao `AdminDialog` existente, preservando tabelas e busca. IDs retirados do texto visível; contratos mantêm identidade. Escape respeita intenção pendente, fundo inerte, menu de inscrições não expande a página.
+- Quatro cenários portados PASS em15,3s: histórico bloqueado, inscrição vazia, ACK incerto/conhecido seguido de GET falho, duas abas/version409 e reautenticação. Caso estreito anterior adaptado ao desktop/1366px; mobile explicitamente adiado.
+- Caso novo de Escape/foco/sem expansão e composição com pessoas/equipes: **18/18 PASS em25,7s**, log `.preview-artifacts/removal-port-composition.log`, SHA256 `3de0e762948cb9c9fea887f2257522710d8c25c2f1a4e11cb12a7aec2d1aa462`. Axe focal passou; não comprova WCAG completa. Captura `.preview-artifacts/removal-compact-desktop.png` inspecionada.
+- Lint e tipos focais PASS. Gate consolidado PASS/exit0 em `removal-compact-final-gate.log`, incluindo23workerd, quatroPDFs, builds/fronteira e segredos723. Sem CI/deploy desta integração ainda. A documentação acrescentada durante o gate recebe formato focal antes do commit; nenhuma alteração de produto ocorreu durante a execução.
+
+## Achado independente do release
+
+A captura revelou campo de busca sob os botões da toolbar do piloto em1366px. Corrigir com RED geométrico antes de publicar o piloto. Isso não é falha do contrato de remoção. Fonte606e6f6/CI40450755902 ainda aguardam release e não contêm a remoção; pacote606 existente fica obsoleto se o piloto receber a correção.

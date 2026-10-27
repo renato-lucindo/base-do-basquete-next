@@ -62,6 +62,10 @@ import { SupabaseAccess, type Credentials } from "./provider";
 import { PersistentSession, type SessionRecord } from "./session";
 import { SupabaseCompetitions } from "../competition/provider";
 import { SupabaseTeams } from "../teams/provider";
+import {
+  registrationRemovalSchema,
+  type RegistrationRemoval,
+} from "../teams/removal-contract";
 import { SupabaseGames } from "../games/provider";
 import { SupabasePdfSources } from "../boxscore/provider";
 import { SupabasePdfOriginals } from "../boxscore/storage";
@@ -760,6 +764,23 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.teams.getRegistration(accessToken, id),
+      ),
+    );
+  }
+  getRegistrationRemovalContext(id: string, disputeId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.removalContext(accessToken, id, disputeId),
+      ),
+    );
+  }
+  removeRegistration(command: RegistrationRemoval) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.teams.removeRegistration(
+          accessToken,
+          registrationRemovalSchema.parse(command),
+        ),
       ),
     );
   }
