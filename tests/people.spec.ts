@@ -415,7 +415,7 @@ test("cadastro novo permanece acessível com resultados abertos e preserva nome 
   await expect(
     dialog.getByLabel("Nome da pessoa", { exact: true }),
   ).toHaveValue("Ana");
-  await expect(dialog.getByLabel("Apelido", { exact: true })).toBeHidden();
+  await expect(dialog.getByLabel("Apelido", { exact: true })).toBeVisible();
 });
 
 test("busca de atleta pagina, mantém foco e apresenta dropdown acessível por mouse", async ({
@@ -736,6 +736,247 @@ test("vários atletas podem ficar sem camisa e números informados vêm primeiro
   await expect(rows.first()).toContainText("Carla com zero");
   await expect(rows.filter({ hasText: "Sem camisa" })).toHaveCount(2);
 });
+for (const width of [1366, 1920])
+  test(`pessoa e camisa em formulário aberto e compacto ${width}`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "desktop", "Recorte desktop");
+    const f = await fixture(page);
+    await page.setViewportSize({ width, height: width === 1366 ? 768 : 1080 });
+    await open(page);
+    await newAthlete(page, "Ana Silva", "00");
+    const originalRoster = [...f.roster.values()][0];
+    f.roster.set(id(900), {
+      ...originalRoster,
+      id: id(900),
+      active: false,
+      jersey: "23",
+    });
+    await expect(
+      page.getByRole("button", {
+        name: "Editar camisa de Ana Silva",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
+      .click();
+    const dialog = page.getByRole("dialog");
+    for (const label of [
+      "Apelido",
+      "Altura (cm)",
+      "Peso (kg)",
+      "Data completa de nascimento",
+      "Registro federativo",
+      "Camisa",
+    ])
+      await expect(dialog.getByLabel(label, { exact: true })).toBeVisible();
+    await expect(dialog.locator("details")).toHaveCount(0);
+    const height = await dialog
+      .getByLabel("Altura (cm)", { exact: true })
+      .boundingBox();
+    const weight = await dialog
+      .getByLabel("Peso (kg)", { exact: true })
+      .boundingBox();
+    expect(height!.width).toBeLessThan(200);
+    expect(Math.abs(height!.y - weight!.y)).toBeLessThan(2);
+    await dialog.getByLabel("Altura (cm)", { exact: true }).fill("180.5");
+    await dialog.getByLabel("Camisa", { exact: true }).fill("0");
+    const saveBox = await dialog
+      .getByRole("button", { name: "Salvar pessoa", exact: true })
+      .boundingBox();
+    expect(saveBox!.y + saveBox!.height).toBeLessThanOrEqual(
+      width === 1366 ? 744 : 1056,
+    );
+    const cancelBox = await dialog
+      .getByRole("button", { name: "Cancelar edição", exact: true })
+      .boundingBox();
+    expect(cancelBox!.y + cancelBox!.height).toBeLessThanOrEqual(
+      width === 1366 ? 744 : 1056,
+    );
+    const scan = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(scan.violations).toEqual([]);
+    await page.screenshot({
+      path: `.preview-artifacts/person-compact-${width}.png`,
+      fullPage: true,
+    });
+    await dialog
+      .getByRole("button", { name: "Salvar pessoa", exact: true })
+      .click();
+    await expect(
+      page.getByRole("row").filter({ hasText: "Ana Silva" }),
+    ).toContainText("0");
+    expect([...f.persons.values()][0].heightCm).toBe(180.5);
+    expect([...f.roster.values()][0].jersey).toBe("0");
+    expect(f.roster.get(id(900))!.jersey).toBe("23");
+  });
+
+test("pessoa e camisa retomam falha parcial sem repetir POSTs já confirmados", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Silva", "00");
+  await page
+    .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
+    .click();
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("182");
+  await page.getByLabel("Camisa", { exact: true }).fill("12");
+  let rosterPosts = 0,
+    personPosts = 0,
+    failRead = true;
+  const ids: string[] = [];
+  await page.route("**/api/people", async (route) => {
+    if (route.request().method() === "POST") personPosts++;
+    await route.fallback();
+  });
+  await page.route("**/api/roster", async (route) => {
+    if (route.request().method() === "POST") {
+      rosterPosts++;
+      ids.push(route.request().postDataJSON().commandId);
+      if (rosterPosts === 1)
+        return route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Falha transitória da camisa",
+            },
+          },
+        });
+    }
+    return route.fallback();
+  });
+  await page.route("**/api/roster/*", async (route) => {
+    if (rosterPosts === 2 && failRead) {
+      failRead = false;
+      return route.fulfill({
+        status: 503,
+        json: {
+          error: {
+            code: "access_unavailable",
+            message: "Leitura temporariamente indisponível",
+          },
+        },
+      });
+    }
+    return route.fallback();
+  });
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "dados globais da pessoa já foram salvos",
+  );
+  await expect(
+    page.getByLabel("Nome da pessoa", { exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Leitura temporariamente indisponível",
+  );
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByText("Pessoa salva.", { exact: true })).toBeVisible();
+  expect(personPosts).toBe(1);
+  expect(rosterPosts).toBe(2);
+  expect(ids[0]).toBe(ids[1]);
+  expect([...f.persons.values()][0].heightCm).toBe(182);
+  expect([...f.roster.values()][0].jersey).toBe("12");
+});
+
+test("camisa duplicada preserva pessoa salva e recarrega para corrigir sem recadastro", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Silva", "00");
+  await newAthlete(page, "Bia Silva", "1");
+  await page
+    .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
+    .click();
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("183");
+  await page.getByLabel("Camisa", { exact: true }).fill("1");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "dados globais da pessoa já foram salvos",
+  );
+  page.once("dialog", (d) => d.accept());
+  await page
+    .getByRole("button", { name: "Recarregar cadastro", exact: true })
+    .click();
+  await expect(page.getByLabel("Altura (cm)", { exact: true })).toHaveValue(
+    "183",
+  );
+  await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue("00");
+  await page.getByLabel("Camisa", { exact: true }).fill("0");
+  const version = [...f.persons.values()].find(
+    (p) => p.name === "Ana Silva",
+  )!.version;
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByText("Pessoa salva.", { exact: true })).toBeVisible();
+  expect(
+    [...f.persons.values()].find((p) => p.name === "Ana Silva")!.version,
+  ).toBe(version);
+});
+
+test("reautenticação entre pessoa e camisa preserva a etapa pendente", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Silva", "00");
+  await page
+    .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
+    .click();
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("185");
+  await page.getByLabel("Camisa", { exact: true }).fill("8");
+  let personPosts = 0,
+    rosterPosts = 0;
+  const attempts: string[] = [];
+  await page.route("**/api/people", async (r) => {
+    if (r.request().method() === "POST") personPosts++;
+    return r.fallback();
+  });
+  await page.route("**/api/roster", async (r) => {
+    if (r.request().method() === "POST") {
+      rosterPosts++;
+      attempts.push(r.request().postDataJSON().commandId);
+      if (rosterPosts === 1) f.expire();
+    }
+    return r.fallback();
+  });
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Acesso administrativo", exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("E-mail", { exact: true }).fill("admin@example.test");
+  await page.getByLabel("Senha", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue("8");
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByText("Pessoa salva.", { exact: true })).toBeVisible();
+  expect(personPosts).toBe(1);
+  expect(rosterPosts).toBe(2);
+  expect(attempts[0]).toBe(attempts[1]);
+});
+
 test("envio incerto e conflito mantêm edição e comandos corretos", async ({
   page,
 }) => {
@@ -743,12 +984,12 @@ test("envio incerto e conflito mantêm edição e comandos corretos", async ({
   await open(page);
   await newAthlete(page, "Ana Silva", "00");
   await page
-    .getByRole("button", { name: "Editar camisa de Ana Silva", exact: true })
+    .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
     .click();
   await page.getByLabel("Camisa", { exact: true }).fill("7");
   f.setMode("uncertain");
   await page
-    .getByRole("button", { name: "Salvar vínculo", exact: true })
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
     .click();
   await expect(
     page.getByText("Envio não confirmado", { exact: true }),
@@ -756,16 +997,16 @@ test("envio incerto e conflito mantêm edição e comandos corretos", async ({
   await page
     .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
     .click();
-  await expect(page.getByText("Vínculo salvo.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Pessoa salva.", { exact: true })).toBeVisible();
   expect(f.attempts).toHaveLength(2);
   expect(f.attempts[0]).toBe(f.attempts[1]);
   await page
-    .getByRole("button", { name: "Editar camisa de Ana Silva", exact: true })
+    .getByRole("button", { name: "Editar pessoa Ana Silva", exact: true })
     .click();
   await page.getByLabel("Camisa", { exact: true }).fill("8");
   f.setMode("conflict");
   await page
-    .getByRole("button", { name: "Salvar vínculo", exact: true })
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
     .click();
   await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue("8");
   page.once("dialog", (d) => d.accept());

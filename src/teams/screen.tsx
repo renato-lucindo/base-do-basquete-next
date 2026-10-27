@@ -568,7 +568,10 @@ export function TeamsWorkspace({
             </section>
           )}
           {editor && (
-            <form className="teams-inline" onSubmit={(e) => void save(e)}>
+            <form
+              className="teams-inline compact-team-editor"
+              onSubmit={(e) => void save(e)}
+            >
               <h4>
                 {editor.kind === "team"
                   ? editor.command.expectedVersion

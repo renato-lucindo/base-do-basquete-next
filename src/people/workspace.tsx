@@ -42,6 +42,8 @@ type Editor =
       target: Target;
       originalAthlete: boolean;
       originalCoach: boolean;
+      needsPersonSave: boolean;
+      roster?: { command: SaveRoster; initialJersey: string | null };
     }
   | { kind: "roster"; command: SaveRoster; person: Summary; wasActive: boolean }
   | { kind: "staff"; command: SaveStaff; person: Summary; wasActive: boolean };
@@ -107,11 +109,17 @@ export function MembersWorkspace({
     alert = useRef<HTMLParagraphElement>(null),
     form = useRef<HTMLFormElement>(null),
     search = useRef<HTMLInputElement>(null);
-  const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
-  const acknowledged = useRef<{
-    commandId: string;
-    result: { id: string; version: number };
-  } | null>(null);
+  const jerseyChanged =
+    editor?.kind === "person" &&
+    editor.roster &&
+    editor.roster.initialJersey !== editor.roster.command.entry.jersey;
+  const dirty =
+    !!editor &&
+    (JSON.stringify(editor.command) !== baseline || !!jerseyChanged);
+  const [partialSaved, setPartialSaved] = useState(false);
+  const acknowledged = useRef(
+    new Map<string, { id: string; version: number }>(),
+  );
   useEffect(() => {
     if (!profiling) heading.current?.focus();
   }, [profiling]);
@@ -235,6 +243,8 @@ export function MembersWorkspace({
     };
   }, [enabled, target, query, searchOffset, refresh]);
   function begin(value: Editor) {
+    acknowledged.current.clear();
+    setPartialSaved(false);
     setEditor(value);
     setBaseline(JSON.stringify(value.command));
     setTarget(null);
@@ -266,7 +276,11 @@ export function MembersWorkspace({
     setError("");
     setStatus("");
   }
-  function personEditor(p: PersonSnapshot | undefined, wanted: Target) {
+  function personEditor(
+    p: PersonSnapshot | undefined,
+    wanted: Target,
+    rosterEntry?: RosterSnapshot,
+  ) {
     const draft = p
       ? (() => {
           const { version, savedAt, ...value } = p;
@@ -288,6 +302,28 @@ export function MembersWorkspace({
       target: wanted,
       originalAthlete: !!p?.athlete,
       originalCoach: p?.coach ?? false,
+      needsPersonSave:
+        !p ||
+        p.coach !== draft.coach ||
+        (p.athlete === null) !== (draft.athlete === null),
+      ...(rosterEntry?.active
+        ? {
+            roster: {
+              initialJersey: rosterEntry.jersey,
+              command: {
+                commandId: crypto.randomUUID(),
+                expectedVersion: rosterEntry.version,
+                entry: {
+                  id: rosterEntry.id,
+                  registrationId: rosterEntry.registrationId,
+                  personId: rosterEntry.personId,
+                  jersey: rosterEntry.jersey,
+                  active: true,
+                },
+              },
+            },
+          }
+        : {}),
       command: {
         commandId: crypto.randomUUID(),
         expectedVersion: p?.version ?? 0,
@@ -333,7 +369,11 @@ export function MembersWorkspace({
         },
       });
   }
-  async function usePerson(id: string, wanted: Target) {
+  async function usePerson(
+    id: string,
+    wanted: Target,
+    rosterEntry?: RosterSnapshot,
+  ) {
     setBusy(true);
     setError("");
     try {
@@ -343,7 +383,7 @@ export function MembersWorkspace({
         (wanted === "athlete" && !p.athlete) ||
         (wanted !== "athlete" && !p.coach)
       )
-        personEditor(p, wanted);
+        personEditor(p, wanted, rosterEntry);
       else membership(p, wanted);
     } catch (failure) {
       report(failure);
@@ -393,8 +433,8 @@ export function MembersWorkspace({
     path: string,
     command: SavePerson | SaveRoster | SaveStaff,
   ) {
-    if (acknowledged.current?.commandId === command.commandId)
-      return acknowledged.current.result;
+    const known = acknowledged.current.get(command.commandId);
+    if (known) return known;
     const result = await api(path, saveResultSchema, command);
     const expectedId =
       "person" in command ? command.person.id : command.entry.id;
@@ -403,7 +443,7 @@ export function MembersWorkspace({
       result.version !== command.expectedVersion + 1
     )
       throw new Error("A resposta não corresponde ao cadastro enviado.");
-    acknowledged.current = { commandId: command.commandId, result };
+    acknowledged.current.set(command.commandId, result);
     return result;
   }
   async function save(event?: FormEvent) {
@@ -415,10 +455,15 @@ export function MembersWorkspace({
         : editor.kind === "roster"
           ? saveRosterSchema.safeParse(editor.command)
           : saveStaffSchema.safeParse(editor.command);
-    if (!valid.success) {
+    if (
+      !valid.success ||
+      (editor.kind === "person" &&
+        editor.roster &&
+        !saveRosterSchema.safeParse(editor.roster.command).success)
+    ) {
       setError(
         editor.kind === "person"
-          ? "Revise nome, papéis e dados opcionais da pessoa."
+          ? "Revise os dados da pessoa e a camisa (0, 00 ou 1–99)."
           : "Informe camisa válida: 0, 00 ou 1–99.",
       );
       return;
@@ -428,13 +473,35 @@ export function MembersWorkspace({
     setStatus("");
     try {
       if (editor.kind === "person") {
-        const result = await persist("/api/people", editor.command);
+        const result =
+          editor.needsPersonSave || JSON.stringify(editor.command) !== baseline
+            ? await persist("/api/people", editor.command)
+            : {
+                id: editor.command.person.id,
+                version: editor.command.expectedVersion,
+              };
         const p = await api(`/api/people/${result.id}`, personSnapshotSchema);
         if (p.id !== editor.command.person.id)
           throw new Error("Não foi possível confirmar o cadastro solicitado.");
+        if (editor.roster && jerseyChanged) {
+          const receipt = await persist("/api/roster", editor.roster.command);
+          const row = await api(
+            `/api/roster/${receipt.id}`,
+            rosterSnapshotSchema,
+          );
+          if (
+            row.id !== editor.roster.command.entry.id ||
+            row.personId !== p.id ||
+            row.registrationId !== registration.id
+          )
+            throw new Error(
+              "Não foi possível confirmar a camisa desta inscrição.",
+            );
+        }
         if (editor.target === "none") {
           setEditor(null);
           setStatus("Pessoa salva.");
+          setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
         } else membership(p, editor.target);
@@ -475,6 +542,18 @@ export function MembersWorkspace({
           !(failure instanceof ApiFailure && failure.status === 400),
         );
       report(failure);
+      if (
+        editor.kind === "person" &&
+        jerseyChanged &&
+        acknowledged.current.has(editor.command.commandId)
+      ) {
+        setPartialSaved(true);
+        setError(
+          `Os dados globais da pessoa já foram salvos. Falta concluir a confirmação da camisa nesta inscrição. ${failure instanceof Error ? failure.message : "Tente novamente."}`,
+        );
+        if (!(failure instanceof ApiFailure && failure.status === 409))
+          setUncertain(true);
+      }
     } finally {
       setBusy(false);
     }
@@ -484,15 +563,28 @@ export function MembersWorkspace({
     setBusy(true);
     setError("");
     try {
-      if (editor.kind === "person")
+      if (editor.kind === "person") {
+        const rosterEntry = editor.roster
+          ? await api(
+              `/api/roster/${editor.roster.command.entry.id}`,
+              rosterSnapshotSchema,
+            )
+          : undefined;
+        if (
+          rosterEntry &&
+          (rosterEntry.personId !== editor.command.person.id ||
+            rosterEntry.registrationId !== registration.id)
+        )
+          throw new Error("O vínculo não corresponde a esta inscrição.");
         personEditor(
           await api(
             `/api/people/${editor.command.person.id}`,
             personSnapshotSchema,
           ),
           editor.target,
+          rosterEntry,
         );
-      else if (editor.kind === "roster") {
+      } else if (editor.kind === "roster") {
         const r = await api(
           `/api/roster/${editor.command.entry.id}`,
           rosterSnapshotSchema,
@@ -698,7 +790,13 @@ export function MembersWorkspace({
               className="teams-inline member-editor"
               onSubmit={(e) => void save(e)}
             >
-              <h5>
+              <h4
+                className={
+                  editor.kind === "person" && editor.command.expectedVersion > 0
+                    ? "admin-visually-hidden"
+                    : undefined
+                }
+              >
                 {editor.kind === "person"
                   ? editor.command.expectedVersion
                     ? "Editar cadastro global da pessoa"
@@ -706,17 +804,17 @@ export function MembersWorkspace({
                   : editor.command.entry.active
                     ? "Vínculo na inscrição"
                     : "Encerrar vínculo"}
-              </h5>
+              </h4>
               {editor.kind === "person" &&
                 editor.command.expectedVersion > 0 && (
-                  <p>
+                  <p className="person-editor-note">
                     Este cadastro identifica a mesma pessoa em todas as equipes
                     e funções. Alterações não criam outra identidade.
                   </p>
                 )}
               <fieldset
                 className="competition-form"
-                disabled={disabled || uncertain}
+                disabled={disabled || uncertain || partialSaved}
               >
                 {editor.kind === "person" ? (
                   <>
@@ -733,6 +831,49 @@ export function MembersWorkspace({
                       }
                       contextual={editor.command.disputeId !== null}
                       gender={gender}
+                      contextFields={
+                        editor.roster && (
+                          <div className="person-context-field">
+                            <label htmlFor={`person-jersey-${registration.id}`}>
+                              Camisa
+                            </label>
+                            <input
+                              id={`person-jersey-${registration.id}`}
+                              aria-describedby={`person-jersey-context-${registration.id}`}
+                              name="jersey"
+                              autoComplete="off"
+                              inputMode="numeric"
+                              pattern="00|0|[1-9][0-9]?"
+                              maxLength={2}
+                              value={editor.roster.command.entry.jersey ?? ""}
+                              onChange={(e) =>
+                                setEditor((v) =>
+                                  v?.kind === "person" && v.roster
+                                    ? {
+                                        ...v,
+                                        roster: {
+                                          ...v.roster,
+                                          command: {
+                                            ...v.roster.command,
+                                            entry: {
+                                              ...v.roster.command.entry,
+                                              jersey: e.target.value || null,
+                                            },
+                                          },
+                                        },
+                                      }
+                                    : v,
+                                )
+                              }
+                            />
+                            <small
+                              id={`person-jersey-context-${registration.id}`}
+                            >
+                              Inscrição: {registration.name}
+                            </small>
+                          </div>
+                        )
+                      }
                       change={(person) =>
                         setEditor((v) =>
                           v?.kind === "person"
@@ -822,9 +963,14 @@ export function MembersWorkspace({
                     )}
                   </>
                 )}
+              </fieldset>
+              <div className="competition-actions">
                 <button
                   type="submit"
                   disabled={
+                    disabled ||
+                    uncertain ||
+                    partialSaved ||
                     conflict ||
                     (editor.kind !== "person" && !editor.wasActive) ||
                     (duplicate &&
@@ -836,8 +982,6 @@ export function MembersWorkspace({
                     ? "Salvar pessoa"
                     : "Salvar vínculo"}
                 </button>
-              </fieldset>
-              <div className="competition-actions">
                 {uncertain && (
                   <button
                     type="button"
@@ -847,7 +991,7 @@ export function MembersWorkspace({
                     Repetir o mesmo envio
                   </button>
                 )}
-                {conflict && (
+                {(conflict || partialSaved) && (
                   <button
                     type="button"
                     disabled={busy}
@@ -944,23 +1088,13 @@ export function MembersWorkspace({
                               ? "Transferir ou retornar"
                               : "Retornar ou transferir"}
                           </button>
-                          {r.active && (
-                            <button
-                              className="secondary"
-                              disabled={disabled}
-                              aria-label={`Editar camisa de ${r.person.name}`}
-                              onClick={() => editRoster(r)}
-                            >
-                              Editar camisa
-                            </button>
-                          )}
                           <button
                             className="secondary"
                             disabled={disabled}
                             aria-label={`Editar pessoa ${r.person.name}`}
                             onClick={() => {
                               if (mayLeave())
-                                void usePerson(r.personId, "none");
+                                void usePerson(r.personId, "none", r);
                             }}
                           >
                             Editar pessoa

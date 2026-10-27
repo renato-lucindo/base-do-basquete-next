@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Person } from "./contract";
 export function PersonFields({
   person,
@@ -7,6 +8,7 @@ export function PersonFields({
   contextual,
   gender,
   requiredRole,
+  contextFields,
 }: {
   person: Person;
   change: (person: Person) => void;
@@ -15,23 +17,38 @@ export function PersonFields({
   contextual: boolean;
   gender: "masculino" | "feminino";
   requiredRole: "athlete" | "coach" | null;
+  contextFields?: ReactNode;
 }) {
   const patch = (value: Partial<Person>) => change({ ...person, ...value });
   return (
-    <>
-      <label>
+    <div className="person-fields-grid">
+      <label className="person-name-field">
         Nome da pessoa
         <input
+          name="personName"
+          autoComplete="off"
           required
           maxLength={120}
           value={person.name}
           onChange={(e) => patch({ name: e.target.value })}
         />
       </label>
+      <label className="person-nickname-field">
+        Apelido
+        <input
+          name="nickname"
+          autoComplete="off"
+          maxLength={120}
+          value={person.nickname ?? ""}
+          onChange={(e) => patch({ nickname: e.target.value || null })}
+        />
+      </label>
+      {contextFields}
       <div className="member-role-options">
         <label>
           <input
             type="checkbox"
+            name="athleteRole"
             checked={!!person.athlete}
             disabled={originalAthlete || requiredRole === "athlete"}
             onChange={(e) =>
@@ -51,6 +68,7 @@ export function PersonFields({
         <label>
           <input
             type="checkbox"
+            name="coachRole"
             checked={person.coach}
             disabled={originalCoach || requiredRole === "coach"}
             onChange={(e) => patch({ coach: e.target.checked })}
@@ -58,7 +76,9 @@ export function PersonFields({
           Técnico
         </label>
       </div>
-      <p>Uma pessoa pode atuar como atleta e técnico com o mesmo cadastro.</p>
+      <p className="person-fields-hint person-role-hint">
+        Uma pessoa pode atuar como atleta e técnico com o mesmo cadastro.
+      </p>
       {person.athlete && (
         <fieldset className="member-private">
           <legend>Dados privados do atleta</legend>
@@ -72,6 +92,7 @@ export function PersonFields({
           <label>
             Sexo privado
             <select
+              name="privateSex"
               aria-label="Sexo privado"
               value={person.athlete.sex}
               disabled={contextual}
@@ -89,14 +110,13 @@ export function PersonFields({
               <option value="male">Masculino</option>
             </select>
           </label>
-          <details>
-            <summary>
-              Nascimento completo e registro (opcionais e privados)
-            </summary>
+          <div className="person-private-optional">
             <label>
               Data completa de nascimento
               <input
                 type="date"
+                name="birthDate"
+                autoComplete="off"
                 value={person.athlete.birthDate ?? ""}
                 onChange={(e) => {
                   if (person.athlete)
@@ -112,6 +132,8 @@ export function PersonFields({
             <label>
               Registro federativo
               <input
+                name="federationRegistration"
+                autoComplete="off"
                 maxLength={6}
                 pattern="[0-9]{6}"
                 inputMode="numeric"
@@ -127,18 +149,12 @@ export function PersonFields({
                 }}
               />
             </label>
-          </details>
+          </div>
         </fieldset>
       )}
-      <details>
-        <summary>Dados públicos opcionais</summary>
-        <p>
-          O ano público de nascimento é informado separadamente da data completa
-          privada.
-        </p>
+      <div className="person-public-fields">
         {(
           [
-            ["nickname", "Apelido", 120],
             ["position", "Posição", 80],
             ["originCity", "Cidade de origem", 120],
             ["originState", "Estado de origem", 80],
@@ -147,6 +163,8 @@ export function PersonFields({
           <label key={key}>
             {label}
             <input
+              name={key}
+              autoComplete="off"
               maxLength={max}
               value={person[key] ?? ""}
               onChange={(e) => patch({ [key]: e.target.value || null })}
@@ -160,9 +178,14 @@ export function PersonFields({
             ["weightKg", "Peso (kg)", 1000, 0.1],
           ] as const
         ).map(([key, label, max, min]) => (
-          <label key={key}>
+          <label
+            key={key}
+            className={`person-number-field${key === "publicBirthYear" ? " person-year-field" : ""}`}
+          >
             {label}
             <input
+              name={key}
+              autoComplete="off"
               type="number"
               min={min}
               max={max}
@@ -174,9 +197,10 @@ export function PersonFields({
             />
           </label>
         ))}
-        <label>
+        <label className="person-hand-field">
           Mão dominante
           <select
+            name="dominantHand"
             aria-label="Mão dominante"
             value={person.dominantHand ?? ""}
             onChange={(e) =>
@@ -193,16 +217,21 @@ export function PersonFields({
             <option value="both">Ambas</option>
           </select>
         </label>
-        <label>
+        <label className="person-biography-field">
           Biografia
           <textarea
-            rows={4}
+            name="biography"
+            rows={2}
             maxLength={4000}
             value={person.biography ?? ""}
             onChange={(e) => patch({ biography: e.target.value || null })}
           />
         </label>
-      </details>
-    </>
+      </div>
+      <p className="person-fields-hint">
+        Ano público e data completa privada são informações separadas. Campos
+        opcionais podem ficar vazios.
+      </p>
+    </div>
   );
 }

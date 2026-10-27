@@ -186,6 +186,34 @@ async function addGlobal(page: Page) {
     page.getByLabel("Nome público da inscrição", { exact: true }),
   ).toHaveValue("Lobos Clube");
 }
+test("diálogo de equipe mantém nome largo e sigla curta na mesma linha", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  await fixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar inscrição", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Criar equipe global", exact: true })
+    .click();
+  const name = page.getByLabel("Nome da equipe global", { exact: true }),
+    short = page.getByLabel("Sigla (opcional)", { exact: true });
+  const a = await name.boundingBox(),
+    b = await short.boundingBox();
+  expect(b!.width).toBeLessThanOrEqual(180);
+  expect(Math.abs(a!.y - b!.y)).toBeLessThan(2);
+  await name.fill("Clube de teste");
+  await short.fill("CLT");
+  await page
+    .getByRole("button", { name: "Salvar equipe global", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Nome público da inscrição", { exact: true }),
+  ).toHaveValue("Clube de teste");
+});
+
 test("duas inscrições usam uma equipe global, retomam e isolam disputa", async ({
   page,
 }, info) => {
