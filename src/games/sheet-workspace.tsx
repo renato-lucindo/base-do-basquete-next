@@ -777,20 +777,100 @@ export function GameSheetWorkspace(props: Props) {
             {editing && (
               <AdminDialog
                 title="Editar ação da súmula"
-              open={!!editing}
-              busy={locked}
-              onClose={cancelEditing}
-              className="sheet-edit-dialog"
-            >
-              <p>
-                Altere os dados da ação selecionada. A mudança ficará no
-                rascunho até salvar.
-              </p>
-              {error && (
-                <p role="alert" className="access-error">
-                  {error}
+                open={!!editing}
+                busy={locked}
+                onClose={cancelEditing}
+                className="sheet-edit-dialog"
+              >
+                <p>
+                  Altere os dados da ação selecionada. A mudança ficará no
+                  rascunho até salvar.
                 </p>
-              )}
+                {error && (
+                  <p role="alert" className="access-error">
+                    {error}
+                  </p>
+                )}
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    addAction();
+                  }}
+                >
+                  <fieldset className="sheet-edit-fields" disabled={locked}>
+                    <legend className="sr-only">Dados da ação</legend>
+                    <label>
+                      Equipe da ação
+                      <select
+                        value={side}
+                        onChange={(event) => setSide(event.target.value as Side)}
+                      >
+                        <option value="home">A · {props.game.home.name}</option>
+                        <option value="away">B · {props.game.away.name}</option>
+                      </select>
+                    </label>
+                    <label>
+                      Quarto ou prorrogação
+                      <select
+                        value={period}
+                        onChange={(event) =>
+                          setPeriod(Number(event.target.value))
+                        }
+                      >
+                        {Array.from({ length: d.periods }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {periodLabel(i + 1)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Camisa ou alvo
+                      <input
+                        autoFocus
+                        maxLength={2}
+                        autoComplete="off"
+                        value={target}
+                        onChange={(event) => setTarget(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (
+                            event.key === "Enter" &&
+                            !event.nativeEvent.isComposing
+                          ) {
+                            event.preventDefault();
+                            editCodeRef.current?.focus();
+                          }
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Ação
+                      <input
+                        ref={editCodeRef}
+                        name="edit-code"
+                        maxLength={3}
+                        autoComplete="off"
+                        value={code}
+                        onChange={(event) => setCode(event.target.value)}
+                      />
+                    </label>
+                  </fieldset>
+                  <div className="competition-actions">
+                    <button type="submit" disabled={locked}>
+                      Salvar edição da ação
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={locked}
+                      onClick={cancelEditing}
+                    >
+                      Cancelar edição da ação
+                    </button>
+                  </div>
+                </form>
+              </AdminDialog>
+            )}
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
