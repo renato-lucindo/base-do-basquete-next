@@ -47,25 +47,55 @@ A sessão de chat não dispõe de clone executável: o acesso por Git foi
 bloqueado por DNS, e o Node local é 22, abaixo do mínimo 24.
 O trabalho foi gravado pelo conector GitHub.
 
-As primeiras execuções da CI reprovaram somente na formatação.
-Consultar o run correspondente ao commit final para resultado efetivo.
-Não afirmar sucesso sem conclusão do gate e dos navegadores.
+O código foi validado no commit `5b7985562fc8bc8d8b0004d0f0986315cae1812c`.
+
+- [CI da implementação](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40576476229):
+  gate aprovado; Vitest 573 testes aprovados; Playwright 416 aprovados,
+  68 ignorados, zero falhas.
+- [CI da referência](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40576484455):
+  gate aprovado; Vitest 573 testes aprovados; Playwright 414 aprovados,
+  68 ignorados, zero falhas.
+- A nova cobertura acrescenta dois casos de navegador aprovados.
+  A aprovação automatizada não dispensa aceite visual humano.
+
+As falhas de formatação de execuções intermediárias foram corrigidas.
+A configuração temporária de diagnóstico foi restaurada antes do gate
+aprovado.
 
 ## Capturas
 
-Os testes gravam imagens após a mudança em `dist/ui-ux-captures/`.
-A CI deverá incluí-las no artefato `prototipo-SHA` após sucesso.
+As capturas foram produzidas com a mesma fixture Playwright nas
+resoluções 1366×768 e 1920×1080, usando somente dados sintéticos.
 
-Arquivos:
+**Antes:** branch auxiliar `codex/ui-ux-desktop-baseline`, derivada
+diretamente do commit-base. Modifica somente um teste de captura;
+não altera componentes ou CSS. A
+[execução 40576484455](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40576484455)
+publicou o artefato `prototipo-4e78aef618e459cd535caed0b436e8fa64517c5a`,
+com quatro PNGs:
+
+- `sheet-history-before-1366x768.png`
+- `sheet-history-before-1920x1080.png`
+- `sheet-delete-before-1366x768.png`
+- `sheet-delete-before-1920x1080.png`
+
+**Depois:** commit validado `5b7985562fc8bc8d8b0004d0f0986315cae1812c`.
+A [execução 40576476229](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40576476229)
+publicou `prototipo-5b7985562fc8bc8d8b0004d0f0986315cae1812c`,
+com seis PNGs:
 
 - `sheet-history-after-1366x768.png`
 - `sheet-history-after-1920x1080.png`
+- `sheet-delete-after-1366x768.png`
+- `sheet-delete-after-1920x1080.png`
 - `competition-removal-after-1366x768.png`
 - `competition-removal-after-1920x1080.png`
 
-Capturas anteriores da mesma fixture não foram produzidas neste chat.
-Precisam ser reproduzidas na base citada antes de uma comparação
-antes/depois validada. Não tratar imagens de outro estado como equivalentes.
+As imagens brutas foram conferidas: dez ações passam de dez linhas
+verticais na referência para duas linhas com cinco ações na proposta.
+A exclusão anteriormente revelava uma confirmação expandida abaixo
+do histórico; agora apresenta diálogo modal centralizado. A evidência
+de campeonatos mostra a remoção de disputa também em diálogo.
 
 ## Limites e próximo passo
 
