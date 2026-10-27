@@ -699,6 +699,9 @@
     background: #f6f8fb;
     font-weight: 650;
   }
+  .compact-pilot .text-import-scroll tbody tr:focus-within > td:first-child {
+    box-shadow: inset 3px 0 var(--admin-blue);
+  }
   .compact-pilot .text-import-scroll th:first-child {
     background: #f6f8fb;
   }
