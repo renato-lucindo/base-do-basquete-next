@@ -1,5 +1,11 @@
 # Pessoa, camisa e formulários compactos
 
+## Release final27/10/2026
+
+Fonte **c9fe7e2970eaaa501f0c3f0c5f9dd464b4b4beea**, CI40500316561/job122176089592 **SUCCESS560unit/115arquivos/394browsersPASS/54SKIP**. Fonte de produto3ed preservada; último commit sócorrige a espera do teste e documenta. Deploy5334bd53-262d-459a-b882-2e5ead191549/versão5bb9cff4-caf2-4163-a4a7-e40816eafee0,100%,24assets. Smoke `.preview-artifacts/person-compact-smoke-report.json` SHAb5d5f4a1f4b17ffd4a8983578add6841bf7544dcb5141763f4cb37bef8cce73c: hashes/Xsource/41GETs/13POSTs privados/health/Authinválido/projeções/doisbrowsers PASS.
+
+Token02a7c795-8733-4d8c-9762-03e736c960ab/política493575ab-6ba9-4a31-b8d7-dd86e98d7ab4 revogados; zero tokens e owner único confirmados. Anônimo302raiz/foundation/APIpeople,previewsOFF/DO/rate/cofre preservados. Nenhuma DDL, dado humano ou arquivo humano alterado. Avaliação visual humana continua pendente; registros seguintes são a execução e seus estados intermediários.
+
 27/10/2026, branch `codex/pessoa-camisa-compacta`, base3936e2b. Feedback humano explícito após rejeitar o piloto: expor campos, diminuir largura dos curtos e incorporar camisa a Editar pessoa. Skill web-design-guidelines consultada com fonte oficial atual; continuidade/TDD/plano/verificação aplicados. Nenhum schema, migration, motor disciplinar, parser ou perfil público alterado. `.agents/`/`skills-lock.json` humanos preservados.
 
 ## Composição e comportamento

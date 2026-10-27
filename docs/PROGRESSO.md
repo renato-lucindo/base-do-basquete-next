@@ -1,3 +1,19 @@
+# Pessoa e camisa compactas — preview atualizado27/10/2026 09:10UTC-03
+
+**Pedido entregue:** campos de pessoa/atleta/técnico expostos em colunas proporcionais, altura/peso curtos, nome/sigla de equipe lado a lado. Editar pessoa inclui camisa ativa da inscrição; botão isolado removido. Camisa0/00/null e histórico preservados. Falha parcial de pessoa/vínculo é informada e retomada sem repetir POST confirmado. Ajuste específico solicitado, sem aprovação geral para ampliar identidade a outras áreas.
+
+**Git:** workspace Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, novo remoto https://github.com/renato-lucindo/base-do-basquete-next; branch `codex/pessoa-camisa-compacta`, base3936e2b, produto3edac57, fonte final **c9fe7e2970eaaa501f0c3f0c5f9dd464b4b4beea**, checkpoint anterior37b2b5a. PRdraft30 sobre29, anexada, sem merge/principal/produção. Alterações após produto somente testes/documentação. `.agents/` e `skills-lock.json` humanos preservados/não rastreados; documentação desta execução pertence ao agente.
+
+**Verificação final:** CI **40500316561/job122176089592 SUCCESS**,560unit/115arquivos e **394browsersPASS/54SKIP em6,4min**, todos os passos aprovados. Gate local560/6transportes/13PG/23workerd/4PDFs, SHAe3ddebcd17daf38300aeb8477c92072faf718af95b3d4ea77d44e2cf0e915797.31browsers desktop de composição +1focal de reautenticação entre operações aprovados;6focais de espera/0 versus00 com atraso250ms aprovados. Primeiro run CI3ed teve393PASS/1FAIL por espera incorreta no teste; correção sóde teste/documentação. Reutilizados backend/SQL/harness inalterados, sem repetir gate local pela nova espera.
+
+**Release12:10:26UTC:** https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/, contaCloudflare16b4a5e0a99a031d28051ebadb4811cc/Workerbase-do-basquete-next-preview, deployment **5334bd53-262d-459a-b882-2e5ead191549**, versão **5bb9cff4-caf2-4163-a4a7-e40816eafee0**,100%. Pacotec9/24assets/WorkerSHAdeb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2, backend idêntico a aa7. Smokes24assets/hash/Xsource,health/sessão/Authinválido,41GETs/13POSTs privados,seis consultas públicas/cincoHTMLs/dois browsers PASS. Relatório `.preview-artifacts/person-compact-smoke-report.json`, SHAb5d5f4a1f4b17ffd4a8983578add6841bf7544dcb5141763f4cb37bef8cce73c. Não comprova uso autenticado real do formulário ou aceite humano.
+
+**Proteção/dados:** token02a7c795-8733-4d8c-9762-03e736c960ab e política493575ab-6ba9-4a31-b8d7-dd86e98d7ab4 revogados imediatamente, ausência conferida. Sóowner30cc3ab4/previewsOFF/DO0411ac931ca54d289d270606c7e87ef7/rate862073195184/cofre preservados; anônimo302raiz/foundation/APIpeople após revogação. Credencial RSA emTTY, nunca em disco/log/chat. Processo exit0; nenhum deploy/smoke/credencial/DDL/cluster pendente.48migrations e dados humanos não alterados; sem acesso a projeto/repo anterior, sem novas dependências. Sem nova revisão independente/carga/WCAG completa ou StorageHTTP real comprovados.
+
+**Próximo passo:** responsável recarregar preview e avaliar Editar pessoa/camisa e os campos expostos; feedback gera correção focal. Não ampliar piloto automaticamente nem repetir antigos pedidos de testes adiados. Público/mobile/PDF/parser continuam adiados. Nenhum agendamento novo; automação anterior excluída permanece encerrada. Cota final observada56%usados5h/78%semanal; encerramento por entrega, não por limite. Planos/evidências em `docs/superpowers/plans/2026-10-27-pessoa-camisa-compacta.md`/`docs/VALIDACAO-PESSOA-COMPACTA.md`. Registros abaixo históricos.
+
+---
+
 # Pessoa e camisa compactas — CI final em andamento27/10/2026
 
 **Pedido humano:** campos expostos e proporcionais nos cadastros, camisa dentro de Editar pessoa e retirada do botão isolado. Ajuste específico do piloto; não houve aprovação visual geral para expandir outras áreas. Plano `docs/superpowers/plans/2026-10-27-pessoa-camisa-compacta.md`, evidências `docs/VALIDACAO-PESSOA-COMPACTA.md`.

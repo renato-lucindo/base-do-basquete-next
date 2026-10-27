@@ -1,5 +1,9 @@
 # Ajustes solicitados na avaliação do protótipo
 
+## Feedback27/10 — cadastro exposto e camisa na pessoa
+
+Responsável pediu eliminar expansões desnecessárias em Editar cadastro global, manter campos expostos com larguras proporcionais e trazer camisa para Editar pessoa, retirando sua ação isolada. Implementado no previewc9fe7e2: formulários de pessoa/atleta/técnico em grade, altura/peso curtos, ações na mesma linha e equipe global com nome/sigla lado a lado. Camisa continua vinculada à inscrição ativa, sem reatribuir jogos/histórico. Salvar pessoa e camisa usa comandos existentes e recuperação explícita de falha parcial. Feedback específico não aprova a expansão geral da identidade; desktop prioritário, demais adiamentos preservados.
+
 22/10/2026 — decisão posterior do responsável, complementar ao pacote original preservado. A solicitação não presume aceite final dos três percursos.
 
 ## Súmula: conferência e correção de ações
