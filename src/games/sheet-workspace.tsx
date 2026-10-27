@@ -774,8 +774,9 @@ export function GameSheetWorkspace(props: Props) {
                 onDelete={setDeleting}
               />
             )}
-            <AdminDialog
-              title="Editar ação da súmula"
+            {editing && (
+              <AdminDialog
+                title="Editar ação da súmula"
               open={!!editing}
               busy={locked}
               onClose={cancelEditing}
@@ -868,7 +869,8 @@ export function GameSheetWorkspace(props: Props) {
                   </button>
                 </div>
               </form>
-            </AdminDialog>
+              </AdminDialog>
+            )}
             <AdminDialog
               title="Excluir esta ação?"
               open={!!deleting}

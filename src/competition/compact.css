@@ -585,6 +585,9 @@
     > :is(button, .competition-search) {
     flex-shrink: 0;
   }
+  .compact-pilot .achievements .achievement-source {
+    max-width: 1600px;
+  }
   .compact-pilot .admin-data-table :is(th, td) {
     padding: 6px 9px;
     line-height: 1.4;

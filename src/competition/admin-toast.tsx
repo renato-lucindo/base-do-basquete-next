@@ -20,8 +20,7 @@ export function AdminToast({ message }: { message: string }) {
       aria-atomic="true"
     >
       <div className="admin-toast-text">
-        <strong>Concluído</strong>
-        <span>{message}</span>
+        <strong>Concluído — {message}</strong>
       </div>
       <button
         type="button"
