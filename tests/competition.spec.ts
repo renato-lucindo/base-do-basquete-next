@@ -217,7 +217,10 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   });
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText("Sub-18");
-  for (const [width, height] of [[1366, 768], [1920, 1080]]) {
+  for (const [width, height] of [
+    [1366, 768],
+    [1920, 1080],
+  ]) {
     await page.setViewportSize({ width, height });
     await page.screenshot({
       path: `.preview-artifacts/competition-removal-after-${width}x${height}.png`,
@@ -226,17 +229,25 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   }
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
-  await expect(page.getByLabel("Categoria da disputa 1.2")).toHaveValue("Sub-18");
+  await expect(page.getByLabel("Categoria da disputa 1.2")).toHaveValue(
+    "Sub-18",
+  );
   await page
     .getByRole("button", { name: "Remover disputa 1.2", exact: true })
     .click();
-  await dialog.getByRole("button", { name: "Confirmar remoção", exact: true }).click();
+  await dialog
+    .getByRole("button", { name: "Confirmar remoção", exact: true })
+    .click();
   await expect(page.getByLabel("Categoria da disputa 1.2")).toHaveCount(0);
-  await page.getByRole("button", { name: "Adicionar temporada", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Adicionar temporada", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Remover temporada 2", exact: true })
     .click();
-  const seasonDialog = page.getByRole("dialog", { name: "Remover temporada?" });
+  const seasonDialog = page.getByRole("dialog", {
+    name: "Remover temporada?",
+  });
   await expect(seasonDialog).toBeVisible();
   await seasonDialog
     .getByRole("button", { name: "Cancelar remoção", exact: true })
