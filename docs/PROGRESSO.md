@@ -1,3 +1,21 @@
+# Administração compacta e inscrição vazia — preview publicado27/10/2026 06:00UTC-03
+
+**Entrega:** locais globais/dropdown, diálogo compacto de atleta, piloto Jogos/Equipes e exclusão segura de inscrição vazia publicados em https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/. Fonte **aa7aa49790d2ed309ff593b9e71c119ef48d3782**, CI **40452980411/job122019741946 SUCCESS**:560unit/115arquivos,388browsersPASS/48SKIP. Gate local e provas inalteradas reutilizados, sem repetir suítes nesta retomada. CI da base PR28/job122019733310 também reconciliada com todos os passos aprovados.
+
+**Git/ambiente:** novo repo https://github.com/renato-lucindo/base-do-basquete-next, Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, branch `codex/inscricao-vazia-compacta`, checkpoint anterior06ecf9d sobre materialaa7. PRdraft29 sobre28, abertas/sem merge/principal/produção; nenhum review independente observado. Alterações após material somente documentais. `.agents/` e `skills-lock.json` permanecem alterações humanas não rastreadas/não commitadas; preservar. Documentação desta execução pertence ao agente.
+
+**Deploy08:57:09UTC:** contaCloudflare16b4a5e0a99a031d28051ebadb4811cc, Workerbase-do-basquete-next-preview, deployment **aff9ee39-5793-4399-914a-fa561834f1c8**, versão **18934c23-6b8c-4e85-bc47-2b3a2a91f21d**,100%. WorkerSHA **deb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2**,24assets; pacoteaa7 conferido por hash/fonte. Nenhum fixture/ZIP/PDF humano publicado.
+
+**Smokes PASS:**24assets/hash/Xsource,health/sessão/Authinválido,41GETs privados/13POSTs privados (incluem locais e remoção),seis consultas públicas/cincoHTMLs/dois browsers, incluindo estatística simples. Não autenticam a conta administrativa real nem representam aceite humano. Relatório `.preview-artifacts/admin-compact-smoke-report.json`, SHA **5557486785d80ec5befbd6dbdea9b58bdbeb7af972abc448e8945a9d463bf49c**. Token efêmero **8a4644b9-7a3e-42fc-ad76-f3c54869cd83** e política **0db9c499-1d23-4124-a805-df03e5dc07fb** revogados imediatamente; zero tokens/sóowner30cc3ab4-9331-4df6-8d13-d840c2652210 conferidos. Anônimo302→Access emraiz/foundation/locais/remoção após revogação. PreviewsOFF, DO0411ac931ca54d289d270606c7e87ef7/rate862073195184 e bindings/cofre preservados. RSA emTTY, nenhuma credencial em disco/log/chat; processo exit0. Nenhum deploy/upload/smoke/credencial/DDL/cluster pendente.
+
+**Dados/limites:** nenhuma DDL ou exclusão humana nesta execução. Supabase sóprojeto novo nizmasjddyrhmevvfviz/vínculo link_6adaa8aab5688191b1e7ae1cddc55a82,48migrations imutáveis até20261027001504; contagens5jogos/64pessoas/2locais são a última leitura anterior, não leitura nova nesta retomada. Remoção sóde inscrição vazia, não A26 integral. Público/mobile/PDF/parser/agenda pública continuam adiados. Sem nova revisão independente/carga/WCAG completa/StorageHTTP real comprovados.
+
+**Próximo passo humano:** avaliar composição desktop de Jogos e Equipes e elencos e novos dropdowns; confirmar densidade/rolagem antes de espalhar padrão. Comparações fictícias1366×768/1920×1080 e capturas preservadas em `.preview-artifacts/admin-before-*`/`admin-after-*`. Não repetir pedidos antigos de testes abrangentes adiados nem inferir aceites.
+
+**Fila/agendamento:** robustez/buscas/remoção/matriz concluídas neste recorte; restam validação visual e decisões registradas na matriz. Ferramenta oficial **excluiu com sucesso** a automação `retomar-preview-base-do-basquete` após a entrega. Sem despertares para consultar estado inalterado; retomar por feedback/instrução humana, preservando provas. Cota real: início0%usados5h/70%semanal, após deploy5%usados5h/70%semanal. Encerramento por entrega/dependência humana, não limite; sem compras/plano/reset manual. Registros abaixo são históricos.
+
+---
+
 # Administração compacta e inscrição vazia — checkpoint27/10/2026
 
 **Agendamento confirmado:** ferramenta oficial atualizou com sucesso a automação existente `retomar-preview-base-do-basquete`, ACTIVE, ocorrência única05:54:49UTC-03 em27/10/2026 nesta mesma conversa; prompt inclui checkpoint remoto dadc60f, fonte/pacote/CI e próximo passo. Configuração persistida conferida, sem duplicata. Encerramento antes de qualquer deploy por atingir o gatilho real85%usados.

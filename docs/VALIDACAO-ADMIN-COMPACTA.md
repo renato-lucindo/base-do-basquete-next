@@ -1,5 +1,11 @@
 # Administração compacta — evidências
 
+## Release protegido27/10/2026
+
+Publicado sourceaa7aa49790d2ed309ff593b9e71c119ef48d3782, incluindo remoção segura da PR29, sobre piloto da PR28. CI40452980411/job122019741946 SUCCESS560unit/388browsers; todos os passos da CI base40452977718 também aprovados. Sem alteração de produto após a fonte, sem repetir gate nesta retomada. Deploymentaff9ee39-5793-4399-914a-fa561834f1c8/versão18934c23-6b8c-4e85-bc47-2b3a2a91f21d100%, WorkerSHAdeb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2.
+
+Smokes24assets/hash/Xsource,41GETsprivados/13POSTsprivados,health/sessão/Authinválido,seisconsultaspúblicas/cincoHTMLs/doisbrowsers PASS, incluindo locais/remoção/simples. Relatório ignorado `.preview-artifacts/admin-compact-smoke-report.json` SHA5557486785d80ec5befbd6dbdea9b58bdbeb7af972abc448e8945a9d463bf49c. Token8a4644b9-7a3e-42fc-ad76-f3c54869cd83/política0db9c499-1d23-4124-a805-df03e5dc07fb revogados e ausência confirmada. Somente owner/previewsOFF/DO/rate/cofre preservados; anônimo302raiz/foundation/locais/remoção. Nenhum dado humano alterado, nenhuma credencial persistida. Falta avaliação visual humana para expandir o padrão; execução técnica não equivale a esse aceite. Etapas abaixo são históricas.
+
 ## V1 catálogo e transporte
 
 - RED PostgreSQL: dois casos zero/upgrade falharam pela ausência de `list_game_venues`. Segundo RED demonstrou que uma chave só com marca combinante estreitava indevidamente a validação legada do jogo; corrigido sem mudar o contrato do jogo.

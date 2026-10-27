@@ -1,5 +1,7 @@
 # Fila adicional autorizada — 26/10/2026
 
+**Situação27/10/2026:** itens1–5 concluídos tecnicamente neste recorte; releaseaa7aa49 publicado e protegido, CI560unit/388browsers e smokes novos aprovados. Robustez de cadastro/ACK/busca, inscrição vazia e matriz documentadas. Próxima dependência é validação visual do piloto Jogos/Equipes; não ampliar o padrão sem ela. Automação de retomada excluída após a entrega para não consultar repetidamente decisões humanas pendentes. A ordem abaixo registra a autorização e o trabalho executado.
+
 O responsável pediu ampliar a fila para continuar trabalhando nas próximas janelas caso as tarefas prioritárias terminem. Esta fila complementa o plano de administração compacta; não altera as dependências de validação humana.
 
 ## Ordem de execução
