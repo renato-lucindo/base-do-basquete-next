@@ -617,3 +617,93 @@
     margin-block: 8px;
   }
 }
+
+/* Etapa 3: padrões desktop derivados da identidade Sports Data Minimalism. */
+@media (min-width: 1000px) {
+  .compact-pilot {
+    --admin-ink: #101827;
+    --admin-muted: #2f3b4d;
+    --admin-blue: #075fca;
+    --admin-line: #ccd7e3;
+    --admin-hover: #eef6ff;
+  }
+  .compact-pilot .admin-data-table {
+    color: var(--admin-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-pilot .admin-data-table thead th {
+    color: var(--admin-muted);
+    background: #f6f8fb;
+    border-bottom: 2px solid var(--admin-line);
+    vertical-align: bottom;
+  }
+  .compact-pilot .admin-data-table tbody tr:focus-within,
+  .compact-pilot .admin-data-table tbody tr:hover {
+    background: var(--admin-hover);
+  }
+  .compact-pilot :is(.admin-data-table, .member-table-scroll, .reg-table) :is(th, td) {
+    line-height: 1.45;
+  }
+  .compact-pilot :is(.competition-tabs button, .competition-open, .admin-data-table button, .competition-actions button):focus-visible {
+    outline: 3px solid var(--admin-blue);
+    outline-offset: 2px;
+  }
+  .compact-pilot .competition-tabs {
+    border-bottom: 1px solid var(--admin-line);
+  }
+  .compact-pilot .competition-tabs [aria-current="page"] {
+    font-weight: 700;
+  }
+  .compact-pilot :is(.competition-workspace, .games-workspace, .teams-workspace, .members-workspace, .regulation) :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--admin-blue);
+    outline-offset: 2px;
+  }
+  .compact-pilot .text-import-workspace {
+    margin-top: 8px;
+  }
+  .compact-pilot .text-import-scroll {
+    margin-block: 8px 12px;
+  }
+  .compact-pilot .text-import-scroll table {
+    min-width: 1220px;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-pilot .text-import-scroll :is(th, td) {
+    min-width: 90px;
+    padding: 7px 9px;
+    line-height: 1.4;
+    border-color: var(--admin-line);
+  }
+  .compact-pilot .text-import-scroll :is(td, th):first-child {
+    min-width: 145px;
+    max-width: 200px;
+  }
+  .compact-pilot .text-import-scroll td:nth-last-child(2),
+  .compact-pilot .text-import-scroll td:last-child {
+    min-width: 220px;
+    max-width: 320px;
+  }
+  .compact-pilot .text-import-scroll :is(input:not([type="checkbox"]), select) {
+    min-height: 36px;
+    font-size: 0.875rem;
+    padding: 5px 7px;
+  }
+  .compact-pilot .text-import-scroll tr:focus-within {
+    background: var(--admin-hover);
+  }
+  .compact-pilot .text-import-scroll th {
+    color: var(--admin-muted);
+    background: #f6f8fb;
+    font-weight: 650;
+  }
+  .compact-pilot .text-import-scroll th:first-child {
+    background: #f6f8fb;
+  }
+  .compact-pilot .text-import-scroll td:first-child {
+    background: #fff;
+  }
+  .compact-pilot .text-import-done td:first-child {
+    background: #e8f7f0;
+  }
+}
