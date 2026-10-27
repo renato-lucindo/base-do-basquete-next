@@ -18,6 +18,8 @@
 
 ---
 
+**Retomada confirmada:** ferramenta oficial retornou `Updated automation`/`ACTIVE` para a mesma automação, ocorrência única27/10/2026 00:52:41UTC-03 nesta conversa. Push de `30b614f` confirmado em `origin/codex/admin-compacta`; sem duplicata de agendamento. Arquivos humanos não commitados continuam preservados.
+
 # Compatibilidade e estatísticas de súmula entregues — 26/10/2026 20:45 America/Sao_Paulo
 
 **Prioridade atendida:** compatibilidade de jogadores e consulta pública simples, conforme os dois ZIPs enviados e a confirmação de que a simples soma todos os jogos publicados, enquanto o boxscore considera apenas os jogos com PDF. O refinamento visual completo dos PDFs, mobile e o interpretador continuam adiados. Plano e evidências: docs/superpowers/plans/2026-10-26-compatibilidade-e-tabelas.md e docs/VALIDACAO-COMPATIBILIDADE-SUMULA.md.
