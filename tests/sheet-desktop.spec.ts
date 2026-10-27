@@ -39,7 +39,8 @@ test.describe("desktop scoresheet MVP", () => {
         path: `dist/ui-ux-captures/sheet-history-before-${width}x${height}.png`,
         animations: "disabled",
       });
-      await items.first().getByRole("button", { name: /Excluir ação/ }).click();
+      const firstAction = items.first();
+      await firstAction.getByRole("button", { name: /Excluir ação/ }).click();
       const inline = page.locator(".sheet-delete");
       await expect(inline).toBeVisible();
       await inline.scrollIntoViewIfNeeded();
