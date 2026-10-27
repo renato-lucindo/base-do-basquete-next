@@ -303,6 +303,9 @@ test("cadastro auxiliar mantém o rascunho, retorna foco e permite escolher o jo
   ).toBeVisible();
   const created = [...f.games.values()].find((g) => g.id !== tid(8))!;
   await page
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .click();
+  await page
     .getByRole("button", { name: "Voltar à revisão do PDF", exact: true })
     .click();
   await expect(trigger).toBeFocused();

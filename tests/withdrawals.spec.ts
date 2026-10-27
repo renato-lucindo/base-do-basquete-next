@@ -10,6 +10,9 @@ async function prepare(
     page.getByRole("combobox", { name: "Tipo da ocorrência", exact: true }),
   ).toBeEnabled();
   await page
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .click();
+  await page
     .getByRole("button", { name: "Equipes e elencos", exact: true })
     .click();
   await page
@@ -28,6 +31,9 @@ test("relação e impacto paginados conservam a lista completa da inscrição", 
   await expect(
     page.getByRole("combobox", { name: "Tipo da ocorrência", exact: true }),
   ).toBeEnabled();
+  await page
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .click();
   await page
     .getByRole("button", { name: "Equipes e elencos", exact: true })
     .click();
@@ -519,7 +525,12 @@ test("desistência por inscrição conserva fontes, repete ACK perdido e retoma 
   page,
 }) => {
   const f = await prepare(page, { loseWithdrawalAck: true });
-  await expect(page.getByText(/Lobos × Lobos B/).last()).toBeVisible();
+  await expect(
+    page
+      .locator(".teams-workspace:visible")
+      .getByText(/Lobos × Lobos B/)
+      .last(),
+  ).toBeVisible();
   await preview(page, "exclude_results");
   await page
     .getByRole("button", {
