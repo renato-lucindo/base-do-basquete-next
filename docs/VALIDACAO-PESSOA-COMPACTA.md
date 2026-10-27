@@ -23,3 +23,9 @@
 - **1focal reautenticação entre as duas operações PASS em14s**, `.preview-artifacts/person-combined-reauth.log`, SHA256 **c12d6025789bf94761131f073890d5aef612a8e5f38525d96280367d6d7e6e69**. POST global único, mesmo comando da camisa após login.
 - Falha transitória de vínculo→ACK conhecido→GET falho e camisa duplicada→recarregar foram aprovados; preservam0/00, pessoa sem novo incremento e histórico fictício com camisa23 inalterado. Dois cenários1366/1920 verificam campos visíveis, largura da altura<200px, altura/peso alinhados e ações na viewport. Axe focal aprovado, sem declarar WCAG completa.
 - Tipos e lint focais PASS. Gate consolidado **PASS/exit0**:560unit/115arquivos,6transportes/13PG/23workerd/4PDFs, builds/tipos/fronteira/segredos726. Log `.preview-artifacts/person-compact-final-gate.log`; CI e preview novos pendentes ao encerrar a implementação local. Não repetir prova nativa/contratos remotos por mudança de apresentação; nenhum dado humano foi usado para mutações de teste.
+
+## Gate e CI
+
+Gate local SHA256 **e3ddebcd17daf38300aeb8477c92072faf718af95b3d4ea77d44e2cf0e915797**. Fonte de produto3edac57cedd86d6cbd3ef600a755a8c03876fa8f. CI40498501428/job122169938681 teve gate aprovado, mas browsers393PASS/1FAIL/54SKIP: teste de camisa usava `toContainText("0")`, que também aceitava a linha antiga com00 antes do POST terminar. Estado da fixture era inspecionado prematuramente; não houve falha observada do salvamento da aplicação.
+
+Teste agora aguarda confirmação “Pessoa salva.” e célula exatamente0; atraso simulado250ms no POST de camisa. **6/6focais repetidos PASS em28s**, SHA25668d112b268572c659f89d8a4d9fdb10a8e95f73b26852ac31aa4b9a3eb3d9417, log `.preview-artifacts/person-ci-race-focus.log`. Lint focal aprovado. Nenhum código de produto mudou depois do gate; reutilizar560/SQL/workerd/artefatos. CI final posterior deve ser reconciliada antes do deploy; não atribuir aprovação integral ao primeiro run.

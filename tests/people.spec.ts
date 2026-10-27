@@ -802,12 +802,24 @@ for (const width of [1366, 1920])
       path: `.preview-artifacts/person-compact-${width}.png`,
       fullPage: true,
     });
+    await page.route("**/api/roster", async (route) => {
+      if (route.request().method() === "POST")
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      return route.fallback();
+    });
     await dialog
       .getByRole("button", { name: "Salvar pessoa", exact: true })
       .click();
     await expect(
-      page.getByRole("row").filter({ hasText: "Ana Silva" }),
-    ).toContainText("0");
+      page.getByText("Pessoa salva.", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("row")
+        .filter({ hasText: "Ana Silva" })
+        .getByRole("cell")
+        .first(),
+    ).toHaveText("0");
     expect([...f.persons.values()][0].heightCm).toBe(180.5);
     expect([...f.roster.values()][0].jersey).toBe("0");
     expect(f.roster.get(id(900))!.jersey).toBe("23");
