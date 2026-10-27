@@ -5,6 +5,7 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
+import { AdminDialog } from "../competition/admin-dialog";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -254,12 +255,57 @@ export function GamesWorkspace(props: Props) {
       [...chosen, ...registrations.items].map((r) => [r.id, r]),
     ).values(),
   ];
+  const showDialog = !!editor && !auxiliary && !sheetVisible;
+  const feedback = (
+    <>
+      {error && (
+        <p role="alert" ref={alert} tabIndex={-1} className="access-error">
+          {error}
+        </p>
+      )}
+      <p role="status">
+        {busy
+          ? "Aguarde…"
+          : uncertain
+            ? "Envio não confirmado"
+            : conflict
+              ? "Conflito de versão"
+              : dirty
+                ? "Jogo não salvo"
+                : status}
+      </p>
+    </>
+  );
+  function closeEditor() {
+    if (mayLeave()) {
+      setEditor(null);
+      setStatus("");
+      pending.current = null;
+      setUncertain(false);
+      setConflict(false);
+      setError("");
+    }
+  }
   return (
     <section className="games-workspace">
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Jogos
         </h3>
+        {!editor && !auxiliary && !sheetVisible && (
+          <label className="competition-search">
+            Buscar jogo
+            <input
+              maxLength={120}
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setOffset(0);
+              }}
+            />
+          </label>
+        )}
+
         {props.onImportPdfs && (
           <button
             disabled={busy || auxiliary || sheetVisible}
@@ -300,22 +346,7 @@ export function GamesWorkspace(props: Props) {
           Novo jogo
         </button>
       </div>
-      {error && (
-        <p role="alert" ref={alert} tabIndex={-1} className="access-error">
-          {error}
-        </p>
-      )}
-      <p role="status">
-        {busy
-          ? "Aguarde…"
-          : uncertain
-            ? "Envio não confirmado"
-            : conflict
-              ? "Conflito de versão"
-              : dirty
-                ? "Jogo não salvo"
-                : status}
-      </p>
+      {!showDialog && feedback}
       {auxiliary ? (
         <>
           <button
@@ -354,204 +385,231 @@ export function GamesWorkspace(props: Props) {
           onBack={() => setSheetVisible(false)}
         />
       ) : editor ? (
-        <div className="teams-inline">
-          <h4>{editor.version ? "Editar jogo" : "Novo jogo"}</h4>
-          <p>
-            Horários em America/Sao_Paulo. Data, horário, local e número são
-            opcionais. Salvar a agenda não publica resultado.
-          </p>
-          <fieldset
-            className="competition-form"
-            disabled={busy || uncertain || conflict || decisionLocked}
-          >
-            <legend>Dados do jogo</legend>
-            <label>
-              Buscar inscrições para este jogo
-              <input
-                value={find}
-                maxLength={120}
-                onChange={(e) => {
-                  setFind(e.target.value);
-                  setFindOffset(0);
-                }}
-              />
-            </label>
-            {(["homeRegistrationId", "awayRegistrationId"] as const).map(
-              (key, i) => (
-                <label key={key}>
-                  {i ? "Inscrição visitante" : "Inscrição mandante"}
-                  <select
-                    aria-label={
-                      i ? "Inscrição visitante" : "Inscrição mandante"
-                    }
-                    value={editor.game[key]}
+        <AdminDialog
+          title={editor.version ? "Editar jogo" : "Novo jogo"}
+          open={props.enabled}
+          busy={busy}
+          onClose={closeEditor}
+          className="game-editor-dialog"
+        >
+          {feedback}
+          <div className="teams-inline">
+            <p>
+              Horários em America/Sao_Paulo. Data, horário, local e número são
+              opcionais. Salvar a agenda não publica resultado.
+            </p>
+            <fieldset
+              className="competition-form"
+              disabled={busy || uncertain || conflict || decisionLocked}
+            >
+              <legend>Dados do jogo</legend>
+
+              {(["homeRegistrationId", "awayRegistrationId"] as const).map(
+                (key, i) => (
+                  <label key={key}>
+                    {i ? "Inscrição visitante" : "Inscrição mandante"}
+                    <select
+                      aria-label={
+                        i ? "Inscrição visitante" : "Inscrição mandante"
+                      }
+                      value={editor.game[key]}
+                      onChange={(e) => {
+                        const r = candidates.find(
+                          (r) => r.id === e.target.value,
+                        );
+                        if (r)
+                          setChosen((rows) => [
+                            ...rows.filter((x) => x.id !== r.id),
+                            r,
+                          ]);
+                        change(key, e.target.value);
+                      }}
+                    >
+                      <option value="">Selecione uma inscrição</option>
+                      {candidates.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ),
+              )}
+              <div className="competition-actions game-registration-tools">
+                <label className="game-registration-search">
+                  Buscar inscrições para este jogo
+                  <input
+                    value={find}
+                    maxLength={120}
                     onChange={(e) => {
-                      const r = candidates.find((r) => r.id === e.target.value);
-                      if (r)
-                        setChosen((rows) => [
-                          ...rows.filter((x) => x.id !== r.id),
-                          r,
-                        ]);
-                      change(key, e.target.value);
+                      setFind(e.target.value);
+                      setFindOffset(0);
                     }}
-                  >
-                    <option value="">Selecione uma inscrição</option>
-                    {candidates.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.name} · {r.id.slice(-8)}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </label>
-              ),
-            )}
+                <button
+                  type="button"
+                  disabled={!findOffset}
+                  onClick={() => setFindOffset(Math.max(0, findOffset - 20))}
+                >
+                  Inscrições anteriores
+                </button>
+                <button
+                  type="button"
+                  disabled={!registrations.hasMore}
+                  onClick={() => setFindOffset(findOffset + 20)}
+                >
+                  Mais inscrições
+                </button>
+                <button
+                  ref={auxiliaryTrigger}
+                  type="button"
+                  onClick={() => {
+                    if (occurrenceGuard.current()) setAuxiliary(true);
+                  }}
+                >
+                  Criar ou editar inscrição aqui
+                </button>
+              </div>
+              <label>
+                Data do jogo
+                <input
+                  type="date"
+                  value={editor.game.date ?? ""}
+                  onChange={(e) => change("date", e.target.value || null)}
+                />
+              </label>
+              <label>
+                Horário do jogo
+                <input
+                  type="time"
+                  value={editor.game.time ?? ""}
+                  onChange={(e) => change("time", e.target.value || null)}
+                />
+              </label>
+              <VenuePicker
+                value={editor.game.venue ?? ""}
+                onChange={(value) => change("venue", value || null)}
+                disabled={busy || !props.enabled}
+                onSessionLost={props.onSessionLost}
+              />
+              <label>
+                Número do jogo
+                <input
+                  maxLength={40}
+                  value={editor.game.number ?? ""}
+                  onChange={(e) => change("number", e.target.value || null)}
+                />
+              </label>
+            </fieldset>
             <div className="competition-actions">
               <button
-                type="button"
-                disabled={!findOffset}
-                onClick={() => setFindOffset(Math.max(0, findOffset - 20))}
-              >
-                Inscrições anteriores
-              </button>
-              <button
-                type="button"
-                disabled={!registrations.hasMore}
-                onClick={() => setFindOffset(findOffset + 20)}
-              >
-                Mais inscrições
-              </button>
-              <button
-                ref={auxiliaryTrigger}
-                type="button"
+                disabled={busy || uncertain || conflict || dirty || !savedGame}
                 onClick={() => {
-                  if (occurrenceGuard.current()) setAuxiliary(true);
+                  if (occurrenceGuard.current()) setSheetVisible(true);
                 }}
               >
-                Criar ou editar inscrição aqui
+                Preparar súmula
+              </button>
+              <button
+                disabled={busy || conflict || decisionLocked}
+                onClick={() => void save()}
+              >
+                {uncertain ? "Repetir o mesmo envio" : "Salvar jogo"}
+              </button>
+              {conflict && (
+                <button
+                  disabled={busy}
+                  onClick={() => void load(editor.game.id)}
+                >
+                  Recarregar jogo
+                </button>
+              )}
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => {
+                  if (mayLeave()) {
+                    setEditor(null);
+                    setStatus("");
+                    pending.current = null;
+                    setUncertain(false);
+                    setConflict(false);
+                    setError("");
+                  }
+                }}
+              >
+                Voltar à lista de jogos
               </button>
             </div>
-            <label>
-              Data do jogo
-              <input
-                type="date"
-                value={editor.game.date ?? ""}
-                onChange={(e) => change("date", e.target.value || null)}
-              />
-            </label>
-            <label>
-              Horário do jogo
-              <input
-                type="time"
-                value={editor.game.time ?? ""}
-                onChange={(e) => change("time", e.target.value || null)}
-              />
-            </label>
-            <VenuePicker
-              value={editor.game.venue ?? ""}
-              onChange={(value) => change("venue", value || null)}
-              disabled={busy || !props.enabled}
-              onSessionLost={props.onSessionLost}
-            />
-            <label>
-              Número do jogo
-              <input
-                maxLength={40}
-                value={editor.game.number ?? ""}
-                onChange={(e) => change("number", e.target.value || null)}
-              />
-            </label>
-          </fieldset>
-          <div className="competition-actions">
-            <button
-              disabled={busy || uncertain || conflict || dirty || !savedGame}
-              onClick={() => {
-                if (occurrenceGuard.current()) setSheetVisible(true);
-              }}
-            >
-              Preparar súmula
-            </button>
-            <button
-              disabled={busy || conflict || decisionLocked}
-              onClick={() => void save()}
-            >
-              {uncertain ? "Repetir o mesmo envio" : "Salvar jogo"}
-            </button>
-            {conflict && (
-              <button disabled={busy} onClick={() => void load(editor.game.id)}>
-                Recarregar jogo
-              </button>
-            )}
-            <button
-              className="secondary"
-              disabled={busy}
-              onClick={() => {
-                if (mayLeave()) {
-                  setEditor(null);
-                  setStatus("");
-                  pending.current = null;
-                  setUncertain(false);
-                  setConflict(false);
-                  setError("");
+            {savedGame && (
+              <GameOccurrencePanel
+                key={savedGame.id}
+                game={savedGame}
+                enabled={
+                  props.enabled && !busy && !dirty && !uncertain && !conflict
                 }
-              }}
-            >
-              Voltar à lista de jogos
-            </button>
+                guard={occurrenceGuard}
+                onLockedChange={setDecisionLocked}
+                onSessionLost={props.onSessionLost}
+                onSaved={props.onSaved}
+              />
+            )}
           </div>
-          {savedGame && (
-            <GameOccurrencePanel
-              key={savedGame.id}
-              game={savedGame}
-              enabled={
-                props.enabled && !busy && !dirty && !uncertain && !conflict
-              }
-              guard={occurrenceGuard}
-              onLockedChange={setDecisionLocked}
-              onSessionLost={props.onSessionLost}
-              onSaved={props.onSaved}
-            />
-          )}
-        </div>
+        </AdminDialog>
       ) : (
         <>
-          <label>
-            Buscar jogo
-            <input
-              maxLength={120}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setOffset(0);
-              }}
-            />
-          </label>
           {loading && <p role="status">Carregando jogos…</p>}
-          <ul className="competition-list">
-            {list.items.map((g) => (
-              <li key={g.id}>
-                <button
-                  className="competition-name"
-                  aria-label={`Abrir jogo ${g.home.name} × ${g.away.name}`}
-                  onClick={() => void load(g.id)}
-                >
-                  {g.home.name} × {g.away.name}
-                </button>
-                <p>
-                  {g.date
-                    ? g.date.split("-").reverse().join("/")
-                    : "Data a definir"}
-                  {g.time ? ` · ${g.time}` : " · Horário a definir"}
-                </p>
-                {g.venue && <p>{g.venue}</p>}
-                {g.number && <p>Jogo {g.number}</p>}
-                <p>
-                  {g.state === "finished"
-                    ? "Resultado publicado"
-                    : "Sem resultado"}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <div
+            className="admin-table-scroll"
+            role="region"
+            aria-label="Tabela de jogos"
+            tabIndex={0}
+          >
+            <table className="admin-data-table">
+              <caption className="admin-visually-hidden">
+                Jogos da disputa
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Confronto</th>
+                  <th scope="col">Data</th>
+                  <th scope="col">Horário</th>
+                  <th scope="col">Local</th>
+                  <th scope="col">Nº</th>
+                  <th scope="col">Situação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.items.map((g) => (
+                  <tr key={g.id}>
+                    <td>
+                      <button
+                        className="competition-name"
+                        aria-label={`Abrir jogo ${g.home.name} × ${g.away.name}`}
+                        onClick={() => void load(g.id)}
+                      >
+                        {g.home.name} × {g.away.name}
+                      </button>
+                    </td>
+                    <td className="nowrap">
+                      {g.date
+                        ? g.date.split("-").reverse().join("/")
+                        : "Data a definir"}
+                    </td>
+                    <td className="nowrap">{g.time ?? "A definir"}</td>
+                    <td>{g.venue ?? "A definir"}</td>
+                    <td>{g.number ?? "—"}</td>
+                    <td className="nowrap">
+                      {g.state === "finished"
+                        ? "Resultado publicado"
+                        : "Sem resultado"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {!loading && !list.items.length && (
             <p>Nenhum jogo encontrado nesta disputa.</p>
           )}

@@ -25,7 +25,12 @@ export function VenuePicker({
     [more, setMore] = useState(false),
     [loading, setLoading] = useState(false),
     [error, setError] = useState("");
-  const popupStyle = useAnchoredOptions(input, popup, open && !disabled);
+  const popupStyle = useAnchoredOptions(
+    input,
+    popup,
+    open && !disabled,
+    "above",
+  );
   useEffect(() => {
     if (!open || disabled) return;
     const controller = new AbortController();

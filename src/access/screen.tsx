@@ -9,6 +9,7 @@ import { CompetitionWorkspace } from "../competition/screen";
 
 export function AccessScreen() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -105,11 +106,25 @@ export function AccessScreen() {
       <a className="access-skip" href="#conteudo">
         Pular para o conteúdo
       </a>
-      <header className="access-header">
+      <header
+        className={`access-header${authenticated && compact ? " compact-header" : ""}`}
+      >
         <span>Base do Basquete</span>
         <span className="access-preview">Ambiente de avaliação</span>
+        {authenticated && compact && (
+          <button
+            className="secondary"
+            disabled={saving}
+            onClick={() => void logout()}
+          >
+            Sair
+          </button>
+        )}
       </header>
-      <main id="conteudo" className="access-main">
+      <main
+        id="conteudo"
+        className={`access-main${authenticated && compact ? " compact-main" : ""}`}
+      >
         {loading ? (
           <p role="status">Verificando acesso…</p>
         ) : unavailable ? (
@@ -121,19 +136,25 @@ export function AccessScreen() {
         ) : authenticated ? (
           <section className="access-home">
             <div className="access-title">
-              <h1 ref={headingRef} tabIndex={-1}>
+              <h1
+                ref={headingRef}
+                tabIndex={-1}
+                className={compact ? "admin-visually-hidden" : undefined}
+              >
                 Área administrativa
               </h1>
-              <button disabled={saving} onClick={() => void logout()}>
-                Sair
-              </button>
+              {!compact && (
+                <button disabled={saving} onClick={() => void logout()}>
+                  Sair
+                </button>
+              )}
             </div>
             {error && (
               <p className="access-error" role="alert">
                 {error}
               </p>
             )}
-            <p>Você está conectado.</p>
+            {!compact && <p>Você está conectado.</p>}
           </section>
         ) : (
           <section className="access-card">
@@ -180,6 +201,7 @@ export function AccessScreen() {
             enabled={authenticated}
             guard={workspaceGuard}
             onSessionLost={sessionLost}
+            onCompactChange={setCompact}
           />
         </div>
       </main>

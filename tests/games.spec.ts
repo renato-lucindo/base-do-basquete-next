@@ -135,7 +135,7 @@ test("preserva cadastro do jogo após sessão expirada e bloqueia saída acident
   await page.getByLabel("Local", { exact: true }).fill("Quadra preservada");
   page.once("dialog", (d) => d.dismiss());
   await page
-    .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
     .click();
   await expect(page.getByLabel("Local", { exact: true })).toHaveValue(
     "Quadra preservada",

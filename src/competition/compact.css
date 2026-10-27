@@ -1,0 +1,259 @@
+.admin-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.admin-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.admin-data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+  background: #fff;
+}
+.admin-data-table th,
+.admin-data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #d9e2ee;
+  vertical-align: middle;
+}
+.admin-data-table th {
+  background: #f6f8fb;
+  font-weight: 650;
+  color: #42526b;
+}
+.admin-data-table .competition-name {
+  font: inherit;
+  min-height: 32px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #075fca;
+  text-align: left;
+  font-weight: 600;
+}
+.admin-data-table .nowrap {
+  white-space: nowrap;
+}
+.admin-data-table td {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 1000px) {
+  .access-main.compact-main {
+    max-width: 1680px;
+    padding: 16px 24px 28px;
+  }
+  .access-header.compact-header {
+    padding: 10px 24px;
+    min-height: 56px;
+  }
+  .compact-header .access-preview {
+    margin-left: auto;
+  }
+  .compact-header button {
+    min-height: 34px;
+    padding: 5px 12px;
+  }
+  .compact-main .access-title {
+    margin: 0;
+    min-height: 0;
+  }
+  .compact-main .competition-workspace {
+    margin-top: 0;
+    padding: 12px;
+    border: 1px solid #d9e2ee;
+    background: #fff;
+  }
+  .compact-pilot .competition-context-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+    gap: 12px 24px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .compact-pilot .competition-context-header .competition-title {
+    margin: 0;
+  }
+  .compact-pilot .competition-context-header h2 {
+    font-size: 1.25rem;
+  }
+  .compact-pilot .competition-destination {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .compact-pilot .competition-title {
+    gap: 8px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+  }
+  .compact-pilot .competition-title h3 {
+    margin: 0;
+    margin-right: auto;
+    font-size: 1.125rem;
+  }
+  .compact-pilot input,
+  .compact-pilot select {
+    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot button,
+  .compact-pilot .competition-public-link {
+    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .competition-tabs {
+    gap: 4px;
+    margin: 0 0 10px;
+    padding: 0 0 8px;
+  }
+  .compact-pilot .competition-tabs button,
+  .compact-pilot .competition-public-link {
+    border: 0;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: #42526b;
+  }
+  .compact-pilot .competition-tabs [aria-current="page"] {
+    background: #eef6ff;
+    color: #075fca;
+    border-bottom-color: #075fca;
+  }
+  .compact-pilot .competition-title .competition-search {
+    margin: 0;
+    width: min(300px, 26vw);
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .compact-pilot .competition-title .competition-search input {
+    min-width: 80px;
+  }
+  .compact-pilot .teams-workspace > .teams-help {
+    display: none;
+  }
+  .compact-pilot .teams-workspace > p,
+  .compact-pilot .games-workspace > p {
+    margin: 4px 0 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot p[role="status"]:empty {
+    display: none;
+  }
+  .compact-pilot .teams-workspace > .competition-list > li {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) auto;
+    gap: 4px 16px;
+    padding: 6px 0;
+  }
+  .compact-pilot .teams-workspace > .competition-list > li > div {
+    grid-column: 1/-1;
+  }
+  .compact-pilot
+    .teams-workspace
+    > .competition-list
+    > li
+    > .registration-actions {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .compact-pilot .registration-origin {
+    margin: 0;
+    align-self: center;
+    font-size: 0.875rem;
+    color: #42526b;
+  }
+  .compact-pilot .competition-open {
+    min-height: 32px;
+    padding: 4px 0;
+  }
+  .compact-pilot .members-workspace {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+  .compact-pilot .members-workspace h4 {
+    font-size: 1rem;
+  }
+  .compact-pilot .member-checkbox {
+    min-height: 24px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .member-table-scroll {
+    margin-top: 4px;
+  }
+  .compact-pilot .member-table-scroll caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .compact-pilot .member-table-scroll th,
+  .compact-pilot .member-table-scroll td {
+    padding: 5px 8px;
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+  .compact-pilot .member-table-scroll small {
+    display: inline;
+  }
+  .compact-pilot .member-table-scroll button {
+    min-height: 28px;
+    padding: 3px 7px;
+  }
+  .compact-pilot .member-table-scroll .competition-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .compact-pilot .admin-dialog .competition-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+  }
+  .compact-pilot .admin-dialog .competition-form > legend,
+  .compact-pilot .admin-dialog .competition-form > .competition-actions,
+  .compact-pilot .admin-dialog .competition-form > button {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .member-dialog .competition-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .compact-pilot .admin-dialog .competition-form .competition-search {
+    margin: 0;
+  }
+  .compact-pilot .game-registration-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 300px;
+    font-size: 0.8125rem;
+  }
+  .compact-pilot .game-registration-tools {
+    align-items: end;
+  }
+  .compact-pilot .game-registration-tools button[disabled] {
+    display: none;
+  }
+}

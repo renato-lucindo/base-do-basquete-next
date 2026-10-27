@@ -11,6 +11,7 @@ export function useAnchoredOptions(
   anchor: RefObject<HTMLInputElement | null>,
   menu: RefObject<HTMLDivElement | null>,
   open: boolean,
+  preferred: "above" | "below" = "below",
 ) {
   const [style, setStyle] = useState<CSSProperties>({ visibility: "hidden" });
   useLayoutEffect(() => {
@@ -23,7 +24,8 @@ export function useAnchoredOptions(
       const below = window.innerHeight - rect.bottom - 12,
         above = rect.top - 12;
       const upwards =
-        below < Math.min(options.scrollHeight, 120) && above > below;
+        (preferred === "above" && above >= 120) ||
+        (below < Math.min(options.scrollHeight, 120) && above > below);
       const next: CSSProperties = {
         position: "fixed",
         left: Math.max(8, rect.left),
@@ -49,6 +51,6 @@ export function useAnchoredOptions(
       window.removeEventListener("resize", update);
       document.removeEventListener("scroll", update, true);
     };
-  }, [anchor, menu, open]);
+  }, [anchor, menu, open, preferred]);
   return style;
 }

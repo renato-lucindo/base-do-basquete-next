@@ -3,6 +3,25 @@ import assert from "node:assert/strict";
 import { createFoundationAssets } from "../scripts/foundation-assets.mjs";
 import { uploadFoundation } from "../scripts/cloudflare-foundation-upload.mjs";
 
+test("deployment provenance preserves untracked user skills but blocks uncommitted product changes", async () => {
+  const { blockingWorktreeChanges } =
+    await import("../scripts/deployment-worktree.mjs");
+  assert.deepEqual(
+    blockingWorktreeChanges("?? .agents/\n?? skills-lock.json\n"),
+    [],
+  );
+  assert.deepEqual(
+    blockingWorktreeChanges(
+      " M src/access/screen.tsx\n?? src/new-feature.ts\n?? .agents/\n M skills-lock.json\n",
+    ),
+    [
+      " M src/access/screen.tsx",
+      "?? src/new-feature.ts",
+      " M skills-lock.json",
+    ],
+  );
+});
+
 test("foundation compatibility assets expose only the manifest and preserve bytes/HEAD", async () => {
   const content = Buffer.from("Olá, basquete");
   const serve = createFoundationAssets({

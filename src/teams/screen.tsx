@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
+import { AdminDialog } from "../competition/admin-dialog";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import {
@@ -349,6 +350,26 @@ export function TeamsWorkspace({
       setBusy(false);
     }
   }
+  const feedback = (
+    <>
+      {error && (
+        <p ref={alert} tabIndex={-1} role="alert" className="access-error">
+          {error}
+        </p>
+      )}
+      <p role="status">
+        {busy
+          ? "Salvando…"
+          : uncertain
+            ? "Envio não confirmado"
+            : conflict
+              ? "Conflito de versão"
+              : dirty
+                ? "Não salvo"
+                : status}
+      </p>
+    </>
+  );
   if (importing)
     return (
       <TextImportWorkspace
@@ -370,6 +391,20 @@ export function TeamsWorkspace({
         <h3 ref={heading} tabIndex={-1}>
           Equipes e elencos
         </h3>
+        <label className="competition-search">
+          Buscar inscrição ou equipe
+          <input
+            value={query}
+            maxLength={120}
+            onChange={(e) => {
+              if (!membersGuard.current() || !withdrawalGuard.current()) return;
+              setQuery(e.target.value);
+              setOffset(0);
+              setExpanded("");
+            }}
+          />
+        </label>
+
         <button onClick={add} disabled={busy || withdrawalLocked}>
           Adicionar inscrição
         </button>
@@ -389,210 +424,208 @@ export function TeamsWorkspace({
           Importar equipe e elenco
         </button>
       </div>
-      <p>
+      <p className="teams-help">
         Uma equipe pode ter várias inscrições nesta disputa, com nomes públicos
         e elencos próprios.
       </p>
-      {error && (
-        <p ref={alert} tabIndex={-1} role="alert" className="access-error">
-          {error}
-        </p>
-      )}
-      <p role="status">
-        {busy
-          ? "Salvando…"
-          : uncertain
-            ? "Envio não confirmado"
-            : conflict
-              ? "Conflito de versão"
-              : dirty
-                ? "Não salvo"
-                : status}
-      </p>
-      {finding && !editor && (
-        <section className="teams-inline" aria-label="Localizar equipe global">
-          <h4>Localizar ou criar equipe</h4>
-          <p>
-            Selecione a identidade global. O nome público será definido na
-            inscrição.
-          </p>
-          <label>
-            Buscar equipe global
-            <input
-              value={globalQuery}
-              maxLength={120}
-              onChange={(e) => {
-                setGlobalQuery(e.target.value);
-                setGlobalOffset(0);
-              }}
-            />
-          </label>
-          {globalLoading ? (
-            <p role="status">Buscando equipes…</p>
-          ) : (
-            <>
-              <ul className="competition-list">
-                {globals.items.map((t) => (
-                  <li key={t.id}>
-                    <strong>{t.name}</strong>{" "}
-                    {t.abbreviation && `(${t.abbreviation})`}{" "}
-                    <small>· {t.id.slice(-8)}</small>
-                    <div>
-                      <button
-                        className="secondary"
-                        onClick={() => choose(t)}
-                        aria-label={`Selecionar ${t.name}`}
-                      >
-                        Selecionar equipe
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {!globals.items.length && <p>Nenhuma equipe encontrada.</p>}
-              <Pagination
-                offset={globalOffset}
-                hasMore={globals.hasMore}
-                setOffset={setGlobalOffset}
-              />
-            </>
-          )}
-          <div className="competition-actions">
-            <button
-              onClick={() => {
-                setFinding(false);
-                edit({
-                  kind: "team",
-                  afterCreate: true,
-                  command: {
-                    commandId: crypto.randomUUID(),
-                    expectedVersion: 0,
-                    team: {
-                      id: crypto.randomUUID(),
-                      name: globalQuery,
-                      abbreviation: null,
-                    },
-                  },
-                });
-              }}
+      {!finding && !editor && feedback}
+      {(finding || editor) && (
+        <AdminDialog
+          title={
+            finding
+              ? "Adicionar inscrição"
+              : editor?.kind === "team"
+                ? "Equipe global"
+                : "Inscrição"
+          }
+          open={enabled}
+          busy={busy}
+          onClose={cancel}
+          className="team-editor-dialog"
+        >
+          {feedback}
+          {finding && !editor && (
+            <section
+              className="teams-inline"
+              aria-label="Localizar equipe global"
             >
-              Criar equipe global
-            </button>
-            <button className="secondary" onClick={cancel}>
-              Cancelar
-            </button>
-          </div>
-        </section>
-      )}
-      {editor && (
-        <form className="teams-inline" onSubmit={(e) => void save(e)}>
-          <h4>
-            {editor.kind === "team"
-              ? editor.command.expectedVersion
-                ? "Editar equipe global"
-                : "Nova equipe global"
-              : editor.command.expectedVersion
-                ? "Editar inscrição"
-                : "Nova inscrição"}
-          </h4>
-          {editor.kind === "team" ? (
-            <p>
-              O cadastro global identifica a equipe em todas as disputas.
-              Alterar este nome não altera os nomes públicos das inscrições.
-            </p>
-          ) : (
-            <p>
-              Equipe global: <strong>{editor.team.name}</strong>. O nome público
-              abaixo vale para esta inscrição.
-            </p>
-          )}
-          <fieldset disabled={busy || uncertain} className="competition-form">
-            <label>
-              {editor.kind === "team"
-                ? "Nome da equipe global"
-                : "Nome público da inscrição"}
-              <input
-                ref={input}
-                required
-                maxLength={120}
-                value={
-                  editor.kind === "team"
-                    ? editor.command.team.name
-                    : editor.command.registration.name
-                }
-                onChange={(e) => changeName(e.target.value)}
-              />
-            </label>
-            {editor.kind === "team" && (
+              <h4>Localizar ou criar equipe</h4>
+              <p>
+                Selecione a identidade global. O nome público será definido na
+                inscrição.
+              </p>
               <label>
-                Sigla (opcional)
+                Buscar equipe global
                 <input
-                  maxLength={12}
-                  value={editor.command.team.abbreviation ?? ""}
-                  onChange={(e) =>
-                    setEditor((v) =>
-                      v?.kind === "team"
-                        ? {
-                            ...v,
-                            command: {
-                              ...v.command,
-                              team: {
-                                ...v.command.team,
-                                abbreviation: e.target.value,
-                              },
-                            },
-                          }
-                        : v,
-                    )
-                  }
+                  value={globalQuery}
+                  maxLength={120}
+                  onChange={(e) => {
+                    setGlobalQuery(e.target.value);
+                    setGlobalOffset(0);
+                  }}
                 />
               </label>
-            )}
-            <button type="submit" disabled={conflict}>
-              {editor.kind === "team"
-                ? "Salvar equipe global"
-                : "Salvar inscrição"}
-            </button>
-          </fieldset>
-          <div className="competition-actions">
-            {uncertain && (
-              <button type="button" disabled={busy} onClick={() => void save()}>
-                Repetir o mesmo envio
-              </button>
-            )}
-            {conflict && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void reload()}
+              {globalLoading ? (
+                <p role="status">Buscando equipes…</p>
+              ) : (
+                <>
+                  <ul className="competition-list">
+                    {globals.items.map((t) => (
+                      <li key={t.id}>
+                        <strong>{t.name}</strong>{" "}
+                        <div>
+                          <button
+                            className="secondary"
+                            onClick={() => choose(t)}
+                            aria-label={`Selecionar ${t.name}`}
+                          >
+                            Selecionar equipe
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {!globals.items.length && <p>Nenhuma equipe encontrada.</p>}
+                  <Pagination
+                    offset={globalOffset}
+                    hasMore={globals.hasMore}
+                    setOffset={setGlobalOffset}
+                  />
+                </>
+              )}
+              <div className="competition-actions">
+                <button
+                  onClick={() => {
+                    setFinding(false);
+                    edit({
+                      kind: "team",
+                      afterCreate: true,
+                      command: {
+                        commandId: crypto.randomUUID(),
+                        expectedVersion: 0,
+                        team: {
+                          id: crypto.randomUUID(),
+                          name: globalQuery,
+                          abbreviation: null,
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Criar equipe global
+                </button>
+                <button className="secondary" onClick={cancel}>
+                  Cancelar
+                </button>
+              </div>
+            </section>
+          )}
+          {editor && (
+            <form className="teams-inline" onSubmit={(e) => void save(e)}>
+              <h4>
+                {editor.kind === "team"
+                  ? editor.command.expectedVersion
+                    ? "Editar equipe global"
+                    : "Nova equipe global"
+                  : editor.command.expectedVersion
+                    ? "Editar inscrição"
+                    : "Nova inscrição"}
+              </h4>
+              {editor.kind === "team" ? (
+                <p>
+                  O cadastro global identifica a equipe em todas as disputas.
+                  Alterar este nome não altera os nomes públicos das inscrições.
+                </p>
+              ) : (
+                <p>
+                  Equipe global: <strong>{editor.team.name}</strong>. O nome
+                  público abaixo vale para esta inscrição.
+                </p>
+              )}
+              <fieldset
+                disabled={busy || uncertain}
+                className="competition-form"
               >
-                Recarregar cadastro
-              </button>
-            )}
-            <button
-              type="button"
-              className="secondary"
-              disabled={busy}
-              onClick={cancel}
-            >
-              Cancelar edição
-            </button>
-          </div>
-        </form>
+                <label>
+                  {editor.kind === "team"
+                    ? "Nome da equipe global"
+                    : "Nome público da inscrição"}
+                  <input
+                    ref={input}
+                    required
+                    maxLength={120}
+                    value={
+                      editor.kind === "team"
+                        ? editor.command.team.name
+                        : editor.command.registration.name
+                    }
+                    onChange={(e) => changeName(e.target.value)}
+                  />
+                </label>
+                {editor.kind === "team" && (
+                  <label>
+                    Sigla (opcional)
+                    <input
+                      maxLength={12}
+                      value={editor.command.team.abbreviation ?? ""}
+                      onChange={(e) =>
+                        setEditor((v) =>
+                          v?.kind === "team"
+                            ? {
+                                ...v,
+                                command: {
+                                  ...v.command,
+                                  team: {
+                                    ...v.command.team,
+                                    abbreviation: e.target.value,
+                                  },
+                                },
+                              }
+                            : v,
+                        )
+                      }
+                    />
+                  </label>
+                )}
+                <button type="submit" disabled={conflict}>
+                  {editor.kind === "team"
+                    ? "Salvar equipe global"
+                    : "Salvar inscrição"}
+                </button>
+              </fieldset>
+              <div className="competition-actions">
+                {uncertain && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void save()}
+                  >
+                    Repetir o mesmo envio
+                  </button>
+                )}
+                {conflict && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void reload()}
+                  >
+                    Recarregar cadastro
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy}
+                  onClick={cancel}
+                >
+                  Cancelar edição
+                </button>
+              </div>
+            </form>
+          )}
+        </AdminDialog>
       )}
-      <label className="competition-search">
-        Buscar inscrição ou equipe
-        <input
-          value={query}
-          maxLength={120}
-          onChange={(e) => {
-            if (!membersGuard.current() || !withdrawalGuard.current()) return;
-            setQuery(e.target.value);
-            setOffset(0);
-            setExpanded("");
-          }}
-        />
-      </label>
+
       {loading && <p role="status">Carregando inscrições…</p>}
       {
         <>
@@ -611,13 +644,9 @@ export function TeamsWorkspace({
                 >
                   {r.name}
                 </button>
-                <p>
-                  Equipe global: {r.team.name}
-                  {r.team.abbreviation ? ` · ${r.team.abbreviation}` : ""}{" "}
-                  <small>· Inscrição {r.id.slice(-8)}</small>
-                </p>
-                <div id={`registration-${r.id}`} hidden={expanded !== r.id}>
-                  <div className="competition-actions">
+                <p className="registration-origin">Equipe: {r.team.name}</p>
+                {expanded === r.id && (
+                  <div className="competition-actions registration-actions">
                     <button
                       className="secondary"
                       disabled={busy || withdrawalLocked}
@@ -666,6 +695,8 @@ export function TeamsWorkspace({
                       Editar equipe global
                     </button>
                   </div>
+                )}
+                <div id={`registration-${r.id}`} hidden={expanded !== r.id}>
                   {expanded === r.id && (
                     <>
                       <MembersWorkspace

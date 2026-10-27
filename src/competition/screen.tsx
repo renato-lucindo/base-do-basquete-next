@@ -16,6 +16,7 @@ import {
   type SaveCompetition,
 } from "./contract";
 import "./screen.css";
+import "./compact.css";
 
 type Editor = {
   draft: Competition;
@@ -28,6 +29,7 @@ type Props = {
   enabled: boolean;
   guard: { current: () => boolean };
   onSessionLost: () => void;
+  onCompactChange?: (value: boolean) => void;
 };
 type Pending = { fingerprint: string; command: SaveCompetition };
 const emptyList: CompetitionListing = {
@@ -54,7 +56,12 @@ const currentYear = () =>
     }).format(new Date()),
   );
 
-export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
+export function CompetitionWorkspace({
+  enabled,
+  guard,
+  onSessionLost,
+  onCompactChange,
+}: Props) {
   const [list, setList] = useState(emptyList);
   const [query, setQuery] = useState("");
   const [offset, setOffset] = useState(0);
@@ -347,8 +354,19 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
       })),
     )
     .find((d) => d.id === selected);
+  const compact = !!(
+    enabled &&
+    editor?.version &&
+    (tab === "games" || tab === "teams")
+  );
+  useEffect(() => {
+    onCompactChange?.(compact);
+  }, [compact, onCompactChange]);
   return (
-    <section className="competition-workspace" aria-busy={opening || saving}>
+    <section
+      className={`competition-workspace${compact ? " compact-pilot" : ""}`}
+      aria-busy={opening || saving}
+    >
       {error && (
         <p ref={errorRef} tabIndex={-1} role="alert" className="access-error">
           {error}
@@ -440,62 +458,64 @@ export function CompetitionWorkspace({ enabled, guard, onSessionLost }: Props) {
         </>
       ) : (
         <>
-          <div className="competition-title">
-            <h2>
-              {editor.version
-                ? editor.draft.name || "Campeonato"
-                : "Novo campeonato"}
-            </h2>
-            <button
-              className="secondary"
-              onClick={back}
-              disabled={saving || opening}
-            >
-              Voltar aos campeonatos
-            </button>
-          </div>
-          {context && (
-            <p className="competition-context" aria-live="polite">
-              <strong>Disputa selecionada:</strong> {context.label}
-              {!editor.savedIds.has(context.id) && " · ainda não salva"}
-            </p>
-          )}
-          {editor.version > 0 && (
-            <label className="competition-destination">
-              Disputa de trabalho
-              <select
-                aria-label="Disputa de trabalho"
-                value={selected}
-                onChange={(event) => {
-                  if (!teamsGuard.current()) return;
-                  if (
-                    !gamesGuard.current() ||
-                    !pdfGuard.current() ||
-                    !regulationGuard.current()
-                  )
-                    return;
-                  setSelected(event.target.value);
-                  setRoute(editor.draft.id, event.target.value, tab);
-                }}
+          <div className="competition-context-header">
+            <div className="competition-title">
+              <h2>
+                {editor.version
+                  ? editor.draft.name || "Campeonato"
+                  : "Novo campeonato"}
+              </h2>
+              <button
+                className="secondary"
+                onClick={back}
+                disabled={saving || opening}
               >
-                {contextSource?.seasons.flatMap((s) =>
-                  s.disputes.map((d) => (
-                    <option
-                      key={d.id}
-                      value={d.id}
-                      disabled={!editor.savedIds.has(d.id)}
-                    >
-                      {s.year} ·{" "}
-                      {d.gender === "feminino" ? "Feminino" : "Masculino"} ·{" "}
-                      {d.category}
-                      {d.division ? ` · ${d.division}` : ""}
-                      {!editor.savedIds.has(d.id) ? " · ainda não salva" : ""}
-                    </option>
-                  )),
-                )}
-              </select>
-            </label>
-          )}
+                Voltar aos campeonatos
+              </button>
+            </div>
+            {context && !compact && (
+              <p className="competition-context" aria-live="polite">
+                <strong>Disputa selecionada:</strong> {context.label}
+                {!editor.savedIds.has(context.id) && " · ainda não salva"}
+              </p>
+            )}
+            {editor.version > 0 && (
+              <label className="competition-destination">
+                Disputa de trabalho
+                <select
+                  aria-label="Disputa de trabalho"
+                  value={selected}
+                  onChange={(event) => {
+                    if (!teamsGuard.current()) return;
+                    if (
+                      !gamesGuard.current() ||
+                      !pdfGuard.current() ||
+                      !regulationGuard.current()
+                    )
+                      return;
+                    setSelected(event.target.value);
+                    setRoute(editor.draft.id, event.target.value, tab);
+                  }}
+                >
+                  {contextSource?.seasons.flatMap((s) =>
+                    s.disputes.map((d) => (
+                      <option
+                        key={d.id}
+                        value={d.id}
+                        disabled={!editor.savedIds.has(d.id)}
+                      >
+                        {s.year} ·{" "}
+                        {d.gender === "feminino" ? "Feminino" : "Masculino"} ·{" "}
+                        {d.category}
+                        {d.division ? ` · ${d.division}` : ""}
+                        {!editor.savedIds.has(d.id) ? " · ainda não salva" : ""}
+                      </option>
+                    )),
+                  )}
+                </select>
+              </label>
+            )}
+          </div>
           <nav className="competition-tabs" aria-label="Áreas do campeonato">
             <button
               className="secondary"

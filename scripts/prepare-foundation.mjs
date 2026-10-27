@@ -2,14 +2,17 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
+import { blockingWorktreeChanges } from "./deployment-worktree.mjs";
 
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
   encoding: "utf8",
 }).trim();
-const dirty = execFileSync("git", ["status", "--porcelain"], {
-  encoding: "utf8",
-}).trim();
-if (dirty)
+const dirty = blockingWorktreeChanges(
+  execFileSync("git", ["status", "--porcelain"], {
+    encoding: "utf8",
+  }),
+);
+if (dirty.length)
   throw new Error("Commit the verified unit before preparing a deployment");
 const manifest = {};
 const paths = [

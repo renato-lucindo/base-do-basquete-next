@@ -202,7 +202,7 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
     page.getByRole("status").filter({ hasText: "Inscrição salva" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Equipes e elencos", exact: true }),
+    page.getByRole("button", { name: "Adicionar inscrição", exact: true }),
   ).toBeFocused();
   await page
     .getByRole("button", { name: "Adicionar inscrição", exact: true })
@@ -319,7 +319,9 @@ test("envio incerto repete comando e conflito conserva edição", async ({
     page.getByRole("button", { name: "Salvar inscrição", exact: true }),
   ).toBeDisabled();
   page.once("dialog", (d) => d.dismiss());
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .click();
   await expect(
     page.getByLabel("Nome público da inscrição", { exact: true }),
   ).toHaveValue("Minha edição");
@@ -342,8 +344,8 @@ test("rascunho sobrevive à reautenticação e confirma troca de destino", async
     .fill("Trabalho pendente");
   page.once("dialog", (d) => d.dismiss());
   await page
-    .getByLabel("Disputa de trabalho", { exact: true })
-    .selectOption(other);
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .click();
   await expect(
     page.getByLabel("Disputa de trabalho", { exact: true }),
   ).toHaveValue(dispute);

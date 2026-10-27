@@ -104,6 +104,7 @@ try {
     `/api/registrations?disputeId=${randomUUID()}`,
     `/api/registrations/${randomUUID()}`,
     `/api/games?disputeId=${randomUUID()}`,
+    `/api/games/venues?q=Quadra&offset=0`,
     `/api/games/${randomUUID()}`,
     `/api/games/${randomUUID()}/sheet`,
     `/api/games/${randomUUID()}/sheet/preparation`,
