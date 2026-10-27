@@ -6,6 +6,7 @@ import { GameSheetWorkspace } from "./sheet-workspace";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast, useAdminToast } from "../competition/admin-toast";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -39,6 +40,7 @@ const document = (s: GameSnapshot) =>
     number: s.number,
   });
 export function GamesWorkspace(props: Props) {
+  const { toast, notify, dismiss } = useAdminToast();
   const [list, setList] = useState<{ items: GameSnapshot[]; hasMore: boolean }>(
       { items: [], hasMore: false },
     ),
@@ -229,6 +231,7 @@ export function GamesWorkspace(props: Props) {
       const result = await api("/api/games", saveResultSchema, pending.current);
       accept(await api(`/api/games/${result.id}`, gameSnapshotSchema));
       setStatus("Jogo salvo");
+      notify("Jogo salvo.");
       setEpoch((v) => v + 1);
       props.onSaved();
     } catch (e) {
@@ -288,6 +291,7 @@ export function GamesWorkspace(props: Props) {
   }
   return (
     <section className="games-workspace">
+      <AdminToast toast={toast} onDismiss={dismiss} />
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Jogos

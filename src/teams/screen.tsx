@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast, useAdminToast } from "../competition/admin-toast";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import { RegistrationRemovalPanel } from "./removal-panel";
@@ -39,6 +40,7 @@ export function TeamsWorkspace({
   onSessionLost,
   onSaved,
 }: Props) {
+  const { toast, notify, dismiss } = useAdminToast();
   const [importing, setImporting] = useState(false);
   const [removing, setRemoving] = useState<{ id: string; name: string } | null>(
     null,
@@ -284,6 +286,7 @@ export function TeamsWorkspace({
           setStatus(
             "Equipe global salva. Nomes públicos das inscrições preservados.",
           );
+          notify("Equipe global salva.");
         }
       } else {
         const result = await api(
@@ -301,6 +304,7 @@ export function TeamsWorkspace({
         setUncertain(false);
         setConflict(false);
         setStatus("Inscrição salva.");
+        notify("Inscrição salva.");
       }
       setRefresh((v) => v + 1);
       onSaved();
@@ -399,6 +403,7 @@ export function TeamsWorkspace({
     );
   return (
     <section className="teams-workspace" aria-busy={busy}>
+      <AdminToast toast={toast} onDismiss={dismiss} />
       {removing && (
         <AdminDialog
           title="Excluir inscrição"
@@ -426,10 +431,12 @@ export function TeamsWorkspace({
             }}
             onClose={(removed) => {
               setRemoving(null);
-              if (removed)
+              if (removed) {
                 setStatus(
                   "Inscrição excluída. A equipe global permanece cadastrada.",
                 );
+                notify("Inscrição excluída; equipe global preservada.");
+              }
             }}
           />
         </AdminDialog>

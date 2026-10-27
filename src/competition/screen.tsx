@@ -5,6 +5,7 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
 import { AdminDialog } from "./admin-dialog";
+import { AdminToast, useAdminToast } from "./admin-toast";
 import {
   competitionSchema,
   listingSchema,
@@ -63,6 +64,7 @@ export function CompetitionWorkspace({
   onSessionLost,
   onCompactChange,
 }: Props) {
+  const { toast, notify, dismiss } = useAdminToast();
   const [list, setList] = useState(emptyList);
   const [query, setQuery] = useState("");
   const [offset, setOffset] = useState(0);
@@ -327,6 +329,7 @@ export function CompetitionWorkspace({
         selected,
       );
       setRefresh((n) => n + 1);
+      notify("Campeonato salvo.");
     } catch (failure) {
       if (isSessionFailure(failure)) {
         onSessionLost();
@@ -382,6 +385,7 @@ export function CompetitionWorkspace({
       className={`competition-workspace${compact ? " compact-pilot" : ""}`}
       aria-busy={opening || saving}
     >
+      <AdminToast toast={toast} onDismiss={dismiss} />
       {error && (
         <p ref={errorRef} tabIndex={-1} role="alert" className="access-error">
           {error}
@@ -881,6 +885,11 @@ export function CompetitionWorkspace({
                       }
                     });
                     setPendingRemoval(null);
+                    notify(
+                      removal.kind === "season"
+                        ? "Temporada removida do rascunho."
+                        : "Disputa removida do rascunho.",
+                    );
                   }}
                 >
                   Confirmar remoção

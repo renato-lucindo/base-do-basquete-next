@@ -28,6 +28,7 @@ import {
 import { PersonFields } from "./person-fields";
 import { PersonPicker } from "./person-picker";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast, useAdminToast } from "../competition/admin-toast";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
@@ -88,6 +89,7 @@ export function MembersWorkspace({
   const [candidates, setCandidates] = useState<
     z.infer<typeof personListingSchema>
   >({ items: [], hasMore: false });
+  const { toast, notify, dismiss } = useAdminToast();
   const [history, setHistory] = useState(false),
     [rosterOffset, setRosterOffset] = useState(0),
     [staffOffset, setStaffOffset] = useState(0);
@@ -501,6 +503,7 @@ export function MembersWorkspace({
         if (editor.target === "none") {
           setEditor(null);
           setStatus("Pessoa salva.");
+          notify("Pessoa salva.");
           setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
@@ -523,6 +526,7 @@ export function MembersWorkspace({
         setUncertain(false);
         setConflict(false);
         setStatus("Vínculo salvo.");
+        notify("Vínculo salvo.");
       }
       setRefresh((v) => v + 1);
       onSaved();
@@ -720,6 +724,7 @@ export function MembersWorkspace({
     );
   return (
     <section className="members-workspace">
+      <AdminToast toast={toast} onDismiss={dismiss} />
       <div className="competition-title">
         <h4 ref={heading} tabIndex={-1}>
           Elenco de {registration.name}

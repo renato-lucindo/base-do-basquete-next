@@ -240,6 +240,9 @@ test("unsaved season and dispute removals require a visible modal confirmation",
     .getByRole("button", { name: "Confirmar remoção", exact: true })
     .click();
   await expect(category).toHaveCount(0);
+  await expect(
+    page.getByRole("status").filter({ hasText: "Disputa removida do rascunho" }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Adicionar temporada", exact: true })
     .click();

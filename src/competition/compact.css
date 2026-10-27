@@ -559,3 +559,57 @@
     flex-direction: row;
   }
 }
+
+/* Wider density pass: keep secondary fields visible without oversized cards. */
+@media (min-width: 1000px) {
+  .compact-pilot .teams-workspace > .competition-list > li {
+    grid-template-columns: minmax(200px, 1.2fr) minmax(180px, 1fr) auto;
+    gap: 4px 12px;
+  }
+  .compact-pilot .registration-actions {
+    gap: 6px;
+    align-items: center;
+  }
+  .compact-pilot .registration-actions button {
+    padding: 4px 8px;
+    min-height: 32px;
+  }
+  .compact-pilot .team-editor-dialog .competition-list > li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 6px 0;
+  }
+  .compact-pilot .team-editor-dialog .competition-list > li > div {
+    justify-self: end;
+  }
+  .compact-pilot .games-workspace .admin-data-table th,
+  .compact-pilot .games-workspace .admin-data-table td {
+    padding: 6px 10px;
+  }
+  .compact-pilot .games-workspace .admin-data-table td:first-child {
+    width: 38%;
+  }
+  .compact-pilot .reg-table table {
+    margin: 4px 0;
+  }
+  .compact-pilot .achievement-recipients li {
+    padding-block: 4px;
+  }
+  .compact-pilot .text-import-workspace > p,
+  .compact-pilot .text-import-workspace details {
+    margin-block: 8px;
+  }
+  .compact-pilot .text-import-scroll {
+    margin-block: 8px;
+  }
+  .compact-pilot .text-import-workspace .competition-actions {
+    margin-block: 8px;
+    gap: 8px;
+  }
+  .compact-pilot .text-import-target {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+}

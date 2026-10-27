@@ -111,3 +111,29 @@
   gap: 12px;
   padding: 16px;
 }
+
+@media (min-width: 1000px) {
+  .text-import-workspace {
+    margin-top: 8px;
+  }
+  .text-import-scroll th,
+  .text-import-scroll td {
+    padding: 6px 8px;
+    min-width: 118px;
+    font-size: 0.875rem;
+  }
+  .text-import-scroll caption {
+    padding: 8px;
+  }
+  .text-import-scroll input:not([type="checkbox"]),
+  .text-import-scroll select {
+    min-height: 34px;
+  }
+  .text-import-scroll input[type="checkbox"] {
+    margin: 6px 8px 6px 0;
+  }
+  .text-import-candidate {
+    margin-block: 6px;
+    padding: 8px;
+  }
+}
