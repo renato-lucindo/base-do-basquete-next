@@ -286,7 +286,7 @@ export function TeamsWorkspace({
           setStatus(
             "Equipe global salva. Nomes públicos das inscrições preservados.",
           );
-          notify("Equipe global salva.");
+          notify("Cadastro global da equipe atualizado.");
         }
       } else {
         const result = await api(
@@ -304,7 +304,7 @@ export function TeamsWorkspace({
         setUncertain(false);
         setConflict(false);
         setStatus("Inscrição salva.");
-        notify("Inscrição salva.");
+        notify("Dados da inscrição gravados com sucesso.");
       }
       setRefresh((v) => v + 1);
       onSaved();
@@ -435,7 +435,7 @@ export function TeamsWorkspace({
                 setStatus(
                   "Inscrição excluída. A equipe global permanece cadastrada.",
                 );
-                notify("Inscrição excluída; equipe global preservada.");
+                notify("Exclusão concluída; equipe global preservada.");
               }
             }}
           />

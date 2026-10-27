@@ -444,7 +444,7 @@ export function GameSheetWorkspace(props: Props) {
       );
       accept(s, gameVersion, true);
       setStatus("Rascunho da súmula salvo");
-      notify("Rascunho da súmula salvo.");
+      notify("Alterações da súmula gravadas com sucesso.");
       if (advance) setPreparationOpen(false);
       props.onSaved();
     } catch (e) {
@@ -762,7 +762,8 @@ export function GameSheetWorkspace(props: Props) {
                 onDelete={setDeleting}
               />
             )}
-            <AdminDialog
+            {editing && (
+              <AdminDialog
               title="Editar ação"
               open={!!editing}
               busy={locked}
@@ -857,7 +858,8 @@ export function GameSheetWorkspace(props: Props) {
                   </button>
                 </div>
               </form>
-            </AdminDialog>
+              </AdminDialog>
+            )}
             <AdminDialog
               title="Excluir esta ação?"
               open={!!deleting}

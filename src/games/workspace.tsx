@@ -231,7 +231,7 @@ export function GamesWorkspace(props: Props) {
       const result = await api("/api/games", saveResultSchema, pending.current);
       accept(await api(`/api/games/${result.id}`, gameSnapshotSchema));
       setStatus("Jogo salvo");
-      notify("Jogo salvo.");
+      notify("Alterações da partida gravadas com sucesso.");
       setEpoch((v) => v + 1);
       props.onSaved();
     } catch (e) {

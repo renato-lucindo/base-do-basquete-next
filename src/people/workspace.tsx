@@ -503,7 +503,7 @@ export function MembersWorkspace({
         if (editor.target === "none") {
           setEditor(null);
           setStatus("Pessoa salva.");
-          notify("Pessoa salva.");
+          notify("Dados da pessoa atualizados com sucesso.");
           setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
@@ -526,7 +526,7 @@ export function MembersWorkspace({
         setUncertain(false);
         setConflict(false);
         setStatus("Vínculo salvo.");
-        notify("Vínculo salvo.");
+        notify("Alterações do vínculo registradas.");
       }
       setRefresh((v) => v + 1);
       onSaved();

@@ -329,7 +329,7 @@ export function CompetitionWorkspace({
         selected,
       );
       setRefresh((n) => n + 1);
-      notify("Campeonato salvo.");
+      notify("Alterações do campeonato gravadas com sucesso.");
     } catch (failure) {
       if (isSessionFailure(failure)) {
         onSessionLost();
