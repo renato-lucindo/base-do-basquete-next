@@ -142,7 +142,7 @@ for (const width of [1366, 1920]) {
     await openTextImport(page);
     await page
       .getByLabel("Texto do elenco", { exact: true })
-      .fill("Equipe: Lobos\\n5 - Ana Silva\\n12 - Ricardo Souza");
+      .fill("Equipe: Lobos\n5 - Ana Silva\n12 - Ricardo Souza");
     await page
       .getByRole("button", { name: "Interpretar texto", exact: true })
       .click();
