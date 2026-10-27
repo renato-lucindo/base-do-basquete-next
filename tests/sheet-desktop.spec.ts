@@ -5,6 +5,39 @@ import {
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("baseline edit action stays in the page", async ({ page }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Ação", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    await page
+      .getByRole("button", { name: "Editar ação 1", exact: true })
+      .click();
+    await expect(
+      page.getByRole("group", { name: "Editar ação selecionada" }),
+    ).toBeVisible();
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.locator(".sheet-input").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-edit-before-${viewport.width}x${viewport.height}.png`,
+        animations: "disabled",
+      });
+    }
+  });
+
   test("desktop action history uses horizontal columns at both requested viewports", async ({
     page,
   }) => {
