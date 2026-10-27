@@ -263,9 +263,7 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   await expect(page.getByLabel("Ano da temporada 2")).toHaveCount(0);
 });
 
-test("saving a championship shows a dismissible toast without removing the saved status", async ({
-  page,
-}) => {
+test("championship save shows a dismissible toast", async ({ page }) => {
   await fixture(page);
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
@@ -288,7 +286,9 @@ test("saving a championship shows a dismissible toast without removing the saved
     .getByRole("button", { name: "Dispensar notificação" })
     .click();
   await expect(toast).toHaveCount(0);
-  await expect(page.getByTestId("competition-save-state")).toContainText("Salvo");
+  await expect(page.getByTestId("competition-save-state")).toContainText(
+    "Salvo",
+  );
 });
 
 test("competition is saved and restored with multiple seasons and explicit disputes", async ({
