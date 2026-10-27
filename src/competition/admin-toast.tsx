@@ -33,7 +33,7 @@ export function AdminToast({
       <button
         type="button"
         className="admin-toast-dismiss"
-        aria-label="Dispensar notificação"
+        aria-label="Fechar notificação"
         onClick={onDismiss}
       >
         Fechar
