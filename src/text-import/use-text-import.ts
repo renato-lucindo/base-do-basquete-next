@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { parseRoster } from "./parse";
 import { birthYearFromDate } from "./birth-date";
+import { automaticImportMatch } from "./automatic-match";
 import { reviewIssues } from "./review";
 import {
   textReviewSnapshotSchema,
@@ -249,6 +250,25 @@ export function useTextImport(props: Props) {
           return row;
         const match = found[row.id];
         if (!match) return { ...row, decision: null };
+        const automatic = automaticImportMatch(row, match, {
+          gender: props.gender,
+          registrationId:
+            doc.target.kind === "registration"
+              ? doc.target.registrationId
+              : null,
+        });
+        if (automatic)
+          return {
+            ...row,
+            decision: {
+              kind: "existing" as const,
+              personId: automatic.id,
+              version: automatic.version,
+              approveChanges: false,
+            },
+            rosterId: automatic.roster?.id ?? row.rosterId,
+            rosterVersion: automatic.roster?.version ?? 0,
+          };
         if (match.status !== "new") return { ...row, decision: null };
         return {
           ...row,

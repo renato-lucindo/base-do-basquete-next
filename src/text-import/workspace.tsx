@@ -295,6 +295,11 @@ export function TextImportWorkspace(props: Props) {
             Role a tabela horizontalmente para conferir os demais campos. Use
             Tab e Shift+Tab para percorrer a linha pelo teclado.
           </p>
+          <p>
+            Correspondências seguras já vêm escolhidas. Revise as pendências e
+            confirme o conjunto em “Confirmar selecionados”. Alterações no
+            cadastro global continuam exigindo sua aprovação.
+          </p>
           <ImportTable model={model} canEdit={props.canEdit} />
           <div className="competition-actions">
             <button
