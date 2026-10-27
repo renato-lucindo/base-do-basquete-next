@@ -766,8 +766,7 @@ export function GameSheetWorkspace(props: Props) {
                 .filter((action) => action.event.id === deleting)
                 .map((action) => (
                   <p className="sheet-delete-context" key={action.event.id}>
-                    Ação {action.sequence} · {periodLabel(action.event.period)} ·
-                    Equipe {sideName(action.event.side)} · {action.annotation}
+                    {`Ação ${action.sequence} · ${periodLabel(action.event.period)} · Equipe ${sideName(action.event.side)} · ${action.annotation}`}
                   </p>
                 ))}
               <p>
