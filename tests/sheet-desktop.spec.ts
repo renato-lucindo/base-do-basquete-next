@@ -5,6 +5,52 @@ import {
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("baseline: screenshots of action history and inline confirmation at both desktop viewports", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    for (let i = 0; i < 10; i++) {
+      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+      await page.keyboard.press("Enter");
+      await page.getByLabel("Ação", { exact: true }).fill("1");
+      await page.keyboard.press("Enter");
+    }
+    const history = page.getByRole("region", {
+      name: "Ações de pontos",
+      exact: true,
+    });
+    const items = history.locator(".sheet-actions li");
+    await expect(items).toHaveCount(10);
+    for (const [width, height] of [
+      [1366, 768],
+      [1920, 1080],
+    ]) {
+      await page.setViewportSize({ width, height });
+      await history.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-history-before-${width}x${height}.png`,
+        animations: "disabled",
+      });
+      await items.first().getByRole("button", { name: /Excluir ação/ }).click();
+      const inline = page.locator(".sheet-delete");
+      await expect(inline).toBeVisible();
+      await inline.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-delete-before-${width}x${height}.png`,
+        animations: "disabled",
+      });
+      await page.getByRole("button", { name: "Cancelar exclusão" }).click();
+    }
+  });
+
   test("overtimes stay in player Q4, team periods stay separate and foul borders follow the actual half", async ({
     page,
   }) => {
