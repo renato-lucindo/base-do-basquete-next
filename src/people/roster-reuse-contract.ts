@@ -24,6 +24,19 @@ const registration = z
     version,
   })
   .strict();
+export const rosterReuseSourcesSchema = z
+  .object({
+    items: z
+      .array(
+        registration.extend({
+          athleteCount: z.number().int().min(1).max(2147483647),
+          savedAt: z.iso.datetime({ offset: true }),
+        }),
+      )
+      .max(20),
+    hasMore: z.boolean(),
+  })
+  .strict();
 const targetEntry = z
   .object({
     id: uuid,

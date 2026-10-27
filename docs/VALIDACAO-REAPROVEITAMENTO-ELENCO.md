@@ -27,3 +27,16 @@ Pedido adicional do responsável: não exigir conferir individualmente nomes e r
 ## Próximo
 
 Gate consolidado quando a correção de pré-seleção estiver estável, CI e preview protegido conforme pipeline existente. Depois R2 de reaproveitamento porIDs com banco real descartável e versão/contexto, antes de oferecer cópia na interface. Nenhum dado humano removido/reescrito para testar;48migrations aplicadas permanecem imutáveis.
+
+## R2a: fonte privada local,27/10/2026
+
+Branch sequencial `codex/reaproveitar-elenco-banco`, baseb21f04a. CI40522137547/job122251769759 está verificando **b21f04a** (pré-seleção/visual), não o leitor posterior. Pacote b21/24assets/WorkerSHAdeb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2 preparado de checkout limpo antes de R2. Usá-lo somente se a CI específica aprovar; não reempacotar R2WIP.
+
+- RED real em `.preview-artifacts/roster-reuse-context-red.log`: zero/upgrade falharam na ausência constatada da operação de contexto. Seed válido de origem/destino foi aplicado antes da asserção.
+- CLI fixada2.121.0, help específico lido, criou **20261027143904_roster_reuse_context.sql** apósRED. **Somente local, NÃO APLICADA no Supabase.** As48migrations existentes não mudaram.
+- Reader identifica origens por equipe/temporada/disputa, separaA/B, inclui contagem/ordem de salvamento e páginas20. Contexto contém candidatos porIDs, camisas e elegibilidade derivada, destino atual e fingerprint. Sem nascimento/registro privado noDTO e sem inferência etária pelo nome da categoria. Não grava vínculos.
+- Autorização fresca antes de olhar o contexto, RPCs estreitas e helpers internos sem grants públicos. Lock compartilhado da raiz para leitura consistente, sem adquirir lock de atleta depois da raiz. Writer futuro deverá adquirir atletas antes da raiz.
+- GREEN final: nove testes/2arquivos em4,46s (`roster-reuse-context-composition.log`), dois cenários PostgreSQL do zero/upgrade e sete da prévia. Verificados11candidatos, já incluído preservado, vínculo em outra inscrição/histórico de transferência, conflitos0/00/null, naipe, exclusão de outra equipe/temporada, páginas20+3 e IDs únicos, fingerprint alterado por camisa destino,2000inteiros/2001recusado413, anon/outro usuário/revogação e rollback. Origem e vínculos existentes iguais antes/depois do reader.
+- Tipos completos e ESLint focal aprovados. Sem gate/CI do reader e sem prova remota ou de carga/concorrência multiconexão para ele; não atribuir gate573 à migration nova.
+
+PróximoR2b: RED de writer atômico/recibo por comando, seleção/camisa/contexto/versão/freshAdmin, preservação da origem/destino e G4, antes de nova migrationCLI. Sóaplicar reader/writer ao projeto novo após estabilizar essa unidade; nenhum SQL produtivo executado por simples retomada.
