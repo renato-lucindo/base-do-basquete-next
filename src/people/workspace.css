@@ -3,6 +3,60 @@
   padding-top: 20px;
   border-top: 1px solid #9caac0;
 }
+.person-picker {
+  position: relative;
+}
+.person-search-hint {
+  font-size: 0.875rem;
+  margin: 6px 0 12px;
+  color: #42526b;
+}
+.person-picker-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  border: 1px solid #74839b;
+  background: #fff;
+  box-shadow: 0 4px 12px #17203322;
+  padding: 4px;
+  max-height: min(340px, 40dvh);
+  overflow-y: auto;
+}
+.person-picker-options [role="listbox"] {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.person-picker-options [role="option"] {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-bottom: 1px solid #d9e2ee;
+  border-radius: 0;
+  background: #fff;
+  color: #172033;
+  text-align: left;
+  padding: 6px 8px;
+}
+.person-picker-options [role="option"] small {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #42526b;
+}
+.person-picker-options [role="option"]:hover,
+.person-picker-options [aria-selected="true"] {
+  background: #eef6ff;
+}
+.person-picker-options p {
+  margin: 6px;
+  font-size: 0.875rem;
+}
+.person-picker-options details {
+  padding: 4px 8px;
+}
 .members-workspace h4 {
   font-size: 1.25rem;
   margin: 0;

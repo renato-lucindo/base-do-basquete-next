@@ -1,0 +1,73 @@
+.admin-dialog {
+  width: min(760px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 1px solid #74839b;
+  border-radius: 6px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 12px 48px #17203344;
+  overflow: visible;
+}
+.admin-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.admin-dialog::backdrop {
+  background: #17203366;
+}
+.admin-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #d9e2ee;
+  padding: 12px 16px;
+  flex: none;
+}
+.admin-dialog .admin-dialog-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+.admin-dialog-body {
+  padding: 16px;
+  overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+.admin-dialog .teams-inline {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.admin-dialog .competition-actions {
+  margin-top: 12px;
+}
+.member-dialog-search .admin-dialog-body {
+  overflow: visible;
+}
+.member-dialog-search .competition-actions {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.admin-dialog label {
+  min-width: 0;
+}
+.member-dialog .member-editor > fieldset {
+  gap: 10px;
+}
+.member-dialog .member-editor h5 {
+  margin: 0 0 12px;
+}
+.member-dialog .member-private {
+  padding: 10px;
+  gap: 8px;
+}
+.member-dialog .member-private p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.member-dialog .member-role-options + p {
+  font-size: 0.875rem;
+  margin: 0;
+}

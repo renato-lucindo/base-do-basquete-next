@@ -1,5 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
-import { type PersonSnapshot, type SavePerson } from "../src/people/contract";
+import AxeBuilder from "@axe-core/playwright";
+import {
+  emptyPerson,
+  type PersonSnapshot,
+  type SavePerson,
+} from "../src/people/contract";
 import type { SaveRoster } from "../src/people/roster-contract";
 import type { SaveStaff } from "../src/people/staff-contract";
 const id = (n: number) =>
@@ -234,7 +239,13 @@ async function fixture(page: Page) {
               ),
             })),
         }));
-      return route.fulfill({ json: { items, hasMore: false } });
+      const offset = Number(url.searchParams.get("offset") ?? "0");
+      return route.fulfill({
+        json: {
+          items: items.slice(offset, offset + 20),
+          hasMore: items.length > offset + 20,
+        },
+      });
     }
     const values =
       resource === "roster" ? [...roster.values()] : [...staff.values()];
@@ -292,7 +303,10 @@ async function newAthlete(page: Page, name: string, jersey: string) {
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Criar nova pessoa", exact: true })
+    .getByRole("button", {
+      name: /^(Criar nova pessoa|Cadastrar novo atleta)$/,
+      exact: true,
+    })
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill(name);
   await page
@@ -304,6 +318,256 @@ async function newAthlete(page: Page, name: string, jersey: string) {
     .click();
   await expect(page.getByText("Vínculo salvo.", { exact: true })).toBeVisible();
 }
+
+test("adicionar atleta usa diálogo compacto, busca explícita e seleção por teclado", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop aprovado");
+  const f = await fixture(page);
+  f.persons.set(id(10), {
+    ...emptyPerson(id(10)),
+    coach: true,
+    name: "Ana Silva",
+    nickname: "Aninha",
+    publicBirthYear: 2000,
+    athlete: { sex: "female", birthDate: null, federationRegistration: null },
+    version: 1,
+    savedAt: timestamp,
+  });
+  const queries: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.pathname === "/api/people")
+      queries.push(url.searchParams.get("q") ?? "");
+  });
+  await open(page);
+  const before = await page.evaluate(
+    () => document.documentElement.scrollHeight,
+  );
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Adicionar atleta · Lobos",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  const search = dialog.getByRole("combobox", {
+    name: "Buscar pessoa",
+    exact: true,
+  });
+  await expect(search).toBeFocused();
+  await expect(dialog.getByRole("option")).toHaveCount(0);
+  await search.fill("A");
+  await expect(
+    dialog.getByText("Digite pelo menos 2 caracteres para buscar.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await search.fill("An");
+  await expect(dialog.getByRole("option", { name: /Ana Silva/ })).toBeVisible();
+  expect(queries.every((q) => q.trim().length >= 2)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(
+    before,
+  );
+  await search.press("ArrowDown");
+  await search.press("Enter");
+  await expect(dialog.getByLabel("Camisa", { exact: true })).toBeVisible();
+  await dialog.getByLabel("Camisa", { exact: true }).fill("00");
+  await dialog
+    .getByRole("button", { name: "Salvar vínculo", exact: true })
+    .click();
+  await expect(dialog).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "Adicionar atleta", exact: true }),
+  ).toBeFocused();
+  expect(f.persons.size).toBe(1);
+  await expect(page.getByTestId("roster-row")).toContainText("Ana Silva");
+});
+
+test("cadastro novo permanece acessível com resultados abertos e preserva nome digitado", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop aprovado");
+  const f = await fixture(page);
+  f.persons.set(id(10), {
+    ...emptyPerson(id(10)),
+    coach: true,
+    name: "Ana Silva",
+    version: 1,
+    savedAt: timestamp,
+  });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  await dialog
+    .getByRole("combobox", { name: "Buscar pessoa", exact: true })
+    .fill("Ana");
+  await expect(dialog.getByRole("option", { name: /Ana Silva/ })).toBeVisible();
+  await page.screenshot({
+    path: ".preview-artifacts/member-dialog-before-overlay.png",
+  });
+  await dialog
+    .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+    .click({ timeout: 3000 });
+  await expect(
+    dialog.getByLabel("Nome da pessoa", { exact: true }),
+  ).toHaveValue("Ana");
+  await expect(dialog.getByLabel("Apelido", { exact: true })).toBeHidden();
+});
+
+test("busca de atleta pagina, mantém foco e apresenta dropdown acessível por mouse", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop aprovado");
+  const f = await fixture(page);
+  for (let n = 10; n < 35; n++)
+    f.persons.set(id(n), {
+      ...emptyPerson(id(n)),
+      coach: true,
+      name: `Ana ${String(n).padStart(2, "0")}`,
+      version: 1,
+      savedAt: timestamp,
+    });
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const search = dialog.getByRole("combobox", {
+    name: "Buscar pessoa",
+    exact: true,
+  });
+  await search.fill("Ana");
+  await expect(dialog.getByRole("option")).toHaveCount(20);
+  const scroll = await page.evaluate(() => scrollY);
+  await search.press("ArrowDown");
+  for (let n = 0; n < 19; n++) await search.press("ArrowDown");
+  await expect(search).toHaveAttribute("aria-activedescendant", /19$/);
+  expect(await page.evaluate(() => scrollY)).toBe(scroll);
+  await dialog
+    .getByRole("button", { name: "Próxima página", exact: true })
+    .click();
+  await expect(dialog.getByRole("option")).toHaveCount(5);
+  const popup = await dialog.locator(".person-picker-options").boundingBox();
+  expect(popup!.y).toBeGreaterThanOrEqual(0);
+  expect(popup!.y + popup!.height).toBeLessThanOrEqual(768);
+  const report = await new AxeBuilder({ page })
+    .include("dialog[open]")
+    .analyze();
+  expect(report.violations).toEqual([]);
+  await info.attach("dialog-axe", {
+    body: JSON.stringify({
+      violations: report.violations,
+      incomplete: report.incomplete,
+    }),
+    contentType: "application/json",
+  });
+  await page.screenshot({
+    path: ".preview-artifacts/member-dialog-search-desktop.png",
+  });
+  await dialog.getByRole("option", { name: /^Ana 30/ }).click();
+  await expect(
+    dialog.getByLabel("Nome da pessoa", { exact: true }),
+  ).toHaveValue("Ana 30");
+});
+
+test("busca de pessoa falha e permite tentar novamente dentro do diálogo", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop aprovado");
+  const f = await fixture(page);
+  f.persons.set(id(10), {
+    ...emptyPerson(id(10)),
+    coach: true,
+    name: "Ana Silva",
+    version: 1,
+    savedAt: timestamp,
+  });
+  let fail = true;
+  await page.route(/\/api\/people\?/, (route) => {
+    if (fail) {
+      fail = false;
+      return route.fulfill({
+        status: 503,
+        json: {
+          error: { code: "access_unavailable", message: "Busca indisponível" },
+        },
+      });
+    }
+    return route.fallback();
+  });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const search = dialog.getByRole("combobox", {
+    name: "Buscar pessoa",
+    exact: true,
+  });
+  await search.fill("Ana");
+  await expect(dialog.getByRole("alert")).toContainText("Busca indisponível");
+  await dialog
+    .getByRole("button", { name: "Tentar novamente", exact: true })
+    .click({ timeout: 3000 });
+  await expect(dialog.getByRole("option", { name: /Ana Silva/ })).toBeVisible();
+  await expect(search).toBeFocused();
+});
+
+test("ACK de pessoa seguido de GET falho retoma apenas leitura e não cadastra novamente", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop aprovado");
+  const f = await fixture(page);
+  let reads = 0,
+    posts = 0;
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname === "/api/people" &&
+      request.method() === "POST"
+    )
+      posts++;
+  });
+  await page.route(/\/api\/people\/[0-9a-f-]+$/, (route) => {
+    reads++;
+    return reads === 1
+      ? route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Leitura indisponível",
+            },
+          },
+        })
+      : route.fallback();
+  });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+    .click();
+  await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Nova");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(
+    page.getByText("Envio não confirmado", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByLabel("Camisa", { exact: true })).toBeVisible();
+  expect(posts).toBe(1);
+  expect(reads).toBe(2);
+  expect(f.persons.size).toBe(1);
+});
 test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async ({
   page,
 }, info) => {
@@ -318,8 +582,9 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
     .getByRole("button", { name: "Adicionar técnico", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Usar Ana Silva", exact: true })
-    .click();
+    .getByRole("combobox", { name: "Buscar pessoa", exact: true })
+    .fill("Ana Silva");
+  await page.getByRole("option", { name: /Ana Silva/ }).click();
   await expect(page.getByLabel("Nome da pessoa", { exact: true })).toHaveValue(
     "Ana Silva",
   );
@@ -337,7 +602,10 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
     .getByRole("button", { name: "Adicionar assistente", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Criar nova pessoa", exact: true })
+    .getByRole("button", {
+      name: /^(Criar nova pessoa|Cadastrar novo atleta)$/,
+      exact: true,
+    })
     .click();
   await page
     .getByLabel("Nome da pessoa", { exact: true })
@@ -364,8 +632,9 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Usar Ana Silva", exact: true })
-    .click();
+    .getByRole("combobox", { name: "Buscar pessoa", exact: true })
+    .fill("Ana Silva");
+  await page.getByRole("option", { name: /Ana Silva/ }).click();
   await page.getByLabel("Camisa", { exact: true }).fill("12");
   await page
     .getByRole("button", { name: "Salvar vínculo", exact: true })
@@ -425,7 +694,10 @@ test("homônimos exigem nova identidade explícita sem renomear", async ({
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Criar nova pessoa", exact: true })
+    .getByRole("button", {
+      name: /^(Criar nova pessoa|Cadastrar novo atleta)$/,
+      exact: true,
+    })
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Silva");
   await page
@@ -544,7 +816,10 @@ test("guardas e reautenticação preservam cadastro contextual", async ({
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Criar nova pessoa", exact: true })
+    .getByRole("button", {
+      name: /^(Criar nova pessoa|Cadastrar novo atleta)$/,
+      exact: true,
+    })
     .click();
   await expect(page.getByLabel("Sexo privado", { exact: true })).toHaveValue(
     "female",
@@ -557,7 +832,7 @@ test("guardas e reautenticação preservam cadastro contextual", async ({
     .fill("Trabalho pendente");
   page.once("dialog", (d) => d.dismiss());
   await page
-    .getByRole("button", { name: "Expandir Lobos B", exact: true })
+    .getByRole("button", { name: "Fechar diálogo", exact: true })
     .click();
   await expect(page.getByLabel("Nome da pessoa", { exact: true })).toHaveValue(
     "Trabalho pendente",

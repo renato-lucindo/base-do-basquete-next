@@ -11,6 +11,7 @@
   border: 1px solid #74839b;
   box-shadow: 0 4px 12px #17203322;
   padding: 4px;
+  overflow-y: auto;
 }
 .venue-options [role="listbox"] {
   max-height: 220px;

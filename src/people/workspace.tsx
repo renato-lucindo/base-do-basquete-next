@@ -26,6 +26,8 @@ import {
   type StaffSnapshot,
 } from "./staff-contract";
 import { PersonFields } from "./person-fields";
+import { PersonPicker } from "./person-picker";
+import { AdminDialog } from "../competition/admin-dialog";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
@@ -106,6 +108,10 @@ export function MembersWorkspace({
     form = useRef<HTMLFormElement>(null),
     search = useRef<HTMLInputElement>(null);
   const dirty = !!editor && JSON.stringify(editor.command) !== baseline;
+  const acknowledged = useRef<{
+    commandId: string;
+    result: { id: string; version: number };
+  } | null>(null);
   useEffect(() => {
     if (!profiling) heading.current?.focus();
   }, [profiling]);
@@ -197,13 +203,17 @@ export function MembersWorkspace({
     };
   }, [enabled, registration.id, history, rosterOffset, staffOffset, refresh]);
   useEffect(() => {
-    if (!enabled || !target) return;
+    if (!enabled || !target || query.trim().length < 2) {
+      setCandidates({ items: [], hasMore: false });
+      setSearchLoading(false);
+      return;
+    }
     let active = true;
     const controller = new AbortController();
     setSearchLoading(true);
     const timer = setTimeout(() => {
       void api(
-        `/api/people?q=${encodeURIComponent(query)}&kind=all&offset=${searchOffset}`,
+        `/api/people?q=${encodeURIComponent(query.trim())}&kind=all&offset=${searchOffset}`,
         personListingSchema,
         undefined,
         controller.signal,
@@ -249,6 +259,7 @@ export function MembersWorkspace({
     setEditor(null);
     setTarget(value);
     setQuery("");
+    setCandidates({ items: [], hasMore: false });
     setSearchOffset(0);
     setUncertain(false);
     setConflict(false);
@@ -264,6 +275,7 @@ export function MembersWorkspace({
           return personSchema.parse(value);
         })()
       : emptyPerson(crypto.randomUUID());
+    if (!p) draft.name = query.trim().replace(/\s+/gu, " ");
     if (wanted === "athlete" && !draft.athlete)
       draft.athlete = {
         sex: gender === "feminino" ? "female" : "male",
@@ -377,6 +389,23 @@ export function MembersWorkspace({
       },
     });
   }
+  async function persist(
+    path: string,
+    command: SavePerson | SaveRoster | SaveStaff,
+  ) {
+    if (acknowledged.current?.commandId === command.commandId)
+      return acknowledged.current.result;
+    const result = await api(path, saveResultSchema, command);
+    const expectedId =
+      "person" in command ? command.person.id : command.entry.id;
+    if (
+      result.id !== expectedId ||
+      result.version !== command.expectedVersion + 1
+    )
+      throw new Error("A resposta não corresponde ao cadastro enviado.");
+    acknowledged.current = { commandId: command.commandId, result };
+    return result;
+  }
   async function save(event?: FormEvent) {
     event?.preventDefault();
     if (!editor || busy || conflict) return;
@@ -399,11 +428,7 @@ export function MembersWorkspace({
     setStatus("");
     try {
       if (editor.kind === "person") {
-        const result = await api(
-          "/api/people",
-          saveResultSchema,
-          editor.command,
-        );
+        const result = await persist("/api/people", editor.command);
         const p = await api(`/api/people/${result.id}`, personSnapshotSchema);
         if (p.id !== editor.command.person.id)
           throw new Error("Não foi possível confirmar o cadastro solicitado.");
@@ -415,7 +440,7 @@ export function MembersWorkspace({
         } else membership(p, editor.target);
       } else {
         const path = editor.kind === "roster" ? "/api/roster" : "/api/staff";
-        const result = await api(path, saveResultSchema, editor.command);
+        const result = await persist(path, editor.command);
         const value =
           editor.kind === "roster"
             ? await api(`${path}/${result.id}`, rosterSnapshotSchema)
@@ -517,6 +542,40 @@ export function MembersWorkspace({
     }
   }
   const disabled = busy || !canEdit;
+  const feedback = (
+    <>
+      {error && (
+        <p ref={alert} tabIndex={-1} role="alert" className="access-error">
+          {error}
+        </p>
+      )}
+      {error && target && (
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy}
+          onClick={() => {
+            setError("");
+            setRefresh((value) => value + 1);
+            search.current?.focus();
+          }}
+        >
+          Tentar novamente
+        </button>
+      )}
+      <p role="status">
+        {busy
+          ? "Aguarde…"
+          : uncertain
+            ? "Envio não confirmado"
+            : conflict
+              ? "Conflito de versão"
+              : dirty
+                ? "Não salvo"
+                : status}
+      </p>
+    </>
+  );
   if (profiling)
     return (
       <ProfilePublicationPanel
@@ -591,264 +650,224 @@ export function MembersWorkspace({
           Importar elenco
         </button>
       </div>
-      {error && (
-        <p ref={alert} tabIndex={-1} role="alert" className="access-error">
-          {error}
-        </p>
-      )}
-      <p role="status">
-        {busy
-          ? "Aguarde…"
-          : uncertain
-            ? "Envio não confirmado"
-            : conflict
-              ? "Conflito de versão"
-              : dirty
-                ? "Não salvo"
-                : status}
-      </p>
-      {target && (
-        <section className="teams-inline" aria-label="Localizar pessoa">
-          <h5>Localizar ou criar pessoa</h5>
-          <p>
-            Selecione uma identidade existente ou crie outra pessoa. Nome
-            semelhante não funde cadastros.
-          </p>
-          <label>
-            Buscar pessoa
-            <input
-              ref={search}
-              maxLength={120}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setSearchOffset(0);
-              }}
-            />
-          </label>
-          {searchLoading ? (
-            <p role="status">Buscando pessoas…</p>
-          ) : (
-            <>
-              <ul className="competition-list">
-                {candidates.items.map((p) => (
-                  <li key={p.id}>
-                    <strong>{p.name}</strong>
-                    {p.nickname && ` · ${p.nickname}`}
-                    {p.publicBirthYear && ` · ${p.publicBirthYear}`}
-                    <small> · Identidade {p.id.slice(-8)}</small>
-                    {p.contexts.length ? (
-                      <ul>
-                        {p.contexts.map((c) => (
-                          <li key={`${c.registrationId}-${c.active}`}>
-                            {c.active ? "Vínculo ativo" : "Histórico"}:{" "}
-                            {c.teamName} · {c.year} ·{" "}
-                            {c.gender === "feminino" ? "Feminino" : "Masculino"}{" "}
-                            · {c.category}
-                            {c.division ? ` · ${c.division}` : ""}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>Sem participação registrada.</p>
-                    )}
-                    <button
-                      className="secondary"
-                      disabled={disabled}
-                      aria-label={`Usar ${p.name}`}
-                      onClick={() => void usePerson(p.id, target)}
-                    >
-                      Usar pessoa
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {!candidates.items.length && <p>Nenhuma pessoa encontrada.</p>}
-              <Pages
+      {!target && !editor && feedback}
+      {(target || editor) && (
+        <AdminDialog
+          title={`${target === "athlete" || editor?.kind === "roster" || (editor?.kind === "person" && editor.target === "athlete") ? "Adicionar atleta" : target === "head" ? "Adicionar técnico" : target === "assistant" ? "Adicionar assistente" : "Cadastro de pessoa"} · ${registration.name}`}
+          open={enabled}
+          busy={busy}
+          onClose={cancel}
+          className={`member-dialog${target ? " member-dialog-search" : ""}`}
+        >
+          {feedback}
+          {target && (
+            <section aria-label="Localizar pessoa">
+              <div className="competition-actions">
+                <button
+                  disabled={disabled}
+                  onClick={() => personEditor(undefined, target)}
+                >
+                  {target === "athlete"
+                    ? "Cadastrar novo atleta"
+                    : "Criar nova pessoa"}
+                </button>
+                <button className="secondary" disabled={busy} onClick={cancel}>
+                  Cancelar busca
+                </button>
+              </div>
+              <PersonPicker
+                query={query}
+                onQuery={(value) => {
+                  setQuery(value);
+                  setSearchOffset(0);
+                }}
+                items={candidates.items}
+                loading={searchLoading}
+                disabled={disabled}
                 offset={searchOffset}
                 hasMore={candidates.hasMore}
-                change={setSearchOffset}
+                onPage={setSearchOffset}
+                onUse={(id) => void usePerson(id, target)}
+                inputRef={search}
               />
-            </>
+            </section>
           )}
-          <div className="competition-actions">
-            <button
-              disabled={disabled}
-              onClick={() => personEditor(undefined, target)}
+          {editor && (
+            <form
+              ref={form}
+              className="teams-inline member-editor"
+              onSubmit={(e) => void save(e)}
             >
-              Criar nova pessoa
-            </button>
-            <button className="secondary" disabled={busy} onClick={cancel}>
-              Cancelar busca
-            </button>
-          </div>
-        </section>
-      )}
-      {editor && (
-        <form
-          ref={form}
-          className="teams-inline member-editor"
-          onSubmit={(e) => void save(e)}
-        >
-          <h5>
-            {editor.kind === "person"
-              ? editor.command.expectedVersion
-                ? "Editar cadastro global da pessoa"
-                : "Nova pessoa"
-              : editor.command.entry.active
-                ? "Vínculo na inscrição"
-                : "Encerrar vínculo"}
-          </h5>
-          {editor.kind === "person" && editor.command.expectedVersion > 0 && (
-            <p>
-              Este cadastro identifica a mesma pessoa em todas as equipes e
-              funções. Alterações não criam outra identidade.
-            </p>
-          )}
-          <fieldset
-            className="competition-form"
-            disabled={disabled || uncertain}
-          >
-            {editor.kind === "person" ? (
-              <>
-                <PersonFields
-                  person={editor.command.person}
-                  originalAthlete={editor.originalAthlete}
-                  originalCoach={editor.originalCoach}
-                  requiredRole={
-                    editor.target === "athlete"
-                      ? "athlete"
-                      : editor.target === "none"
-                        ? null
-                        : "coach"
-                  }
-                  contextual={editor.command.disputeId !== null}
-                  gender={gender}
-                  change={(person) =>
-                    setEditor((v) =>
-                      v?.kind === "person"
-                        ? { ...v, command: { ...v.command, person } }
-                        : v,
-                    )
-                  }
-                />
-                {duplicate && (
-                  <label className="member-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={editor.command.confirmHomonym}
-                      onChange={(e) =>
+              <h5>
+                {editor.kind === "person"
+                  ? editor.command.expectedVersion
+                    ? "Editar cadastro global da pessoa"
+                    : "Nova pessoa"
+                  : editor.command.entry.active
+                    ? "Vínculo na inscrição"
+                    : "Encerrar vínculo"}
+              </h5>
+              {editor.kind === "person" &&
+                editor.command.expectedVersion > 0 && (
+                  <p>
+                    Este cadastro identifica a mesma pessoa em todas as equipes
+                    e funções. Alterações não criam outra identidade.
+                  </p>
+                )}
+              <fieldset
+                className="competition-form"
+                disabled={disabled || uncertain}
+              >
+                {editor.kind === "person" ? (
+                  <>
+                    <PersonFields
+                      person={editor.command.person}
+                      originalAthlete={editor.originalAthlete}
+                      originalCoach={editor.originalCoach}
+                      requiredRole={
+                        editor.target === "athlete"
+                          ? "athlete"
+                          : editor.target === "none"
+                            ? null
+                            : "coach"
+                      }
+                      contextual={editor.command.disputeId !== null}
+                      gender={gender}
+                      change={(person) =>
                         setEditor((v) =>
                           v?.kind === "person"
-                            ? {
-                                ...v,
-                                command: {
-                                  ...v.command,
-                                  commandId: crypto.randomUUID(),
-                                  confirmHomonym: e.target.checked,
-                                },
-                              }
+                            ? { ...v, command: { ...v.command, person } }
                             : v,
                         )
                       }
                     />
-                    Confirmo que é outra pessoa com o mesmo nome
-                  </label>
+                    {duplicate && (
+                      <label className="member-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={editor.command.confirmHomonym}
+                          onChange={(e) =>
+                            setEditor((v) =>
+                              v?.kind === "person"
+                                ? {
+                                    ...v,
+                                    command: {
+                                      ...v.command,
+                                      commandId: crypto.randomUUID(),
+                                      confirmHomonym: e.target.checked,
+                                    },
+                                  }
+                                : v,
+                            )
+                          }
+                        />
+                        Confirmo que é outra pessoa com o mesmo nome
+                      </label>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      Pessoa: <strong>{editor.person.name}</strong> · Inscrição:{" "}
+                      {registration.name}
+                    </p>
+                    {editor.kind === "roster" &&
+                      editor.command.entry.active && (
+                        <label>
+                          Camisa
+                          <input
+                            inputMode="numeric"
+                            pattern="00|0|[1-9][0-9]?"
+                            maxLength={2}
+                            value={editor.command.entry.jersey ?? ""}
+                            onChange={(e) =>
+                              setEditor((v) =>
+                                v?.kind === "roster"
+                                  ? {
+                                      ...v,
+                                      command: {
+                                        ...v.command,
+                                        entry: {
+                                          ...v.command.entry,
+                                          jersey: e.target.value || null,
+                                        },
+                                      },
+                                    }
+                                  : v,
+                              )
+                            }
+                          />
+                        </label>
+                      )}
+                    {editor.kind === "staff" && (
+                      <p>
+                        Função:{" "}
+                        {editor.command.entry.role === "head"
+                          ? "Técnico"
+                          : "Ass. Técnico"}
+                      </p>
+                    )}
+                    {!editor.command.entry.active && (
+                      <p>
+                        Encerrar conserva o vínculo anterior no histórico. Esta
+                        operação não transfere automaticamente para outra
+                        inscrição.
+                      </p>
+                    )}
+                    {!editor.wasActive && (
+                      <p>
+                        Este vínculo já foi encerrado e não pode ser reaberto
+                        nesta edição.
+                      </p>
+                    )}
+                  </>
                 )}
-              </>
-            ) : (
-              <>
-                <p>
-                  Pessoa: <strong>{editor.person.name}</strong> · Inscrição:{" "}
-                  {registration.name}
-                </p>
-                {editor.kind === "roster" && editor.command.entry.active && (
-                  <label>
-                    Camisa
-                    <input
-                      inputMode="numeric"
-                      pattern="00|0|[1-9][0-9]?"
-                      maxLength={2}
-                      value={editor.command.entry.jersey ?? ""}
-                      onChange={(e) =>
-                        setEditor((v) =>
-                          v?.kind === "roster"
-                            ? {
-                                ...v,
-                                command: {
-                                  ...v.command,
-                                  entry: {
-                                    ...v.command.entry,
-                                    jersey: e.target.value || null,
-                                  },
-                                },
-                              }
-                            : v,
-                        )
-                      }
-                    />
-                  </label>
+                <button
+                  type="submit"
+                  disabled={
+                    conflict ||
+                    (editor.kind !== "person" && !editor.wasActive) ||
+                    (duplicate &&
+                      editor.kind === "person" &&
+                      !editor.command.confirmHomonym)
+                  }
+                >
+                  {editor.kind === "person"
+                    ? "Salvar pessoa"
+                    : "Salvar vínculo"}
+                </button>
+              </fieldset>
+              <div className="competition-actions">
+                {uncertain && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void save()}
+                  >
+                    Repetir o mesmo envio
+                  </button>
                 )}
-                {editor.kind === "staff" && (
-                  <p>
-                    Função:{" "}
-                    {editor.command.entry.role === "head"
-                      ? "Técnico"
-                      : "Ass. Técnico"}
-                  </p>
+                {conflict && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void reload()}
+                  >
+                    Recarregar cadastro
+                  </button>
                 )}
-                {!editor.command.entry.active && (
-                  <p>
-                    Encerrar conserva o vínculo anterior no histórico. Esta
-                    operação não transfere automaticamente para outra inscrição.
-                  </p>
-                )}
-                {!editor.wasActive && (
-                  <p>
-                    Este vínculo já foi encerrado e não pode ser reaberto nesta
-                    edição.
-                  </p>
-                )}
-              </>
-            )}
-            <button
-              type="submit"
-              disabled={
-                conflict ||
-                (editor.kind !== "person" && !editor.wasActive) ||
-                (duplicate &&
-                  editor.kind === "person" &&
-                  !editor.command.confirmHomonym)
-              }
-            >
-              {editor.kind === "person" ? "Salvar pessoa" : "Salvar vínculo"}
-            </button>
-          </fieldset>
-          <div className="competition-actions">
-            {uncertain && (
-              <button type="button" disabled={busy} onClick={() => void save()}>
-                Repetir o mesmo envio
-              </button>
-            )}
-            {conflict && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => void reload()}
-              >
-                Recarregar cadastro
-              </button>
-            )}
-            <button
-              type="button"
-              className="secondary"
-              disabled={busy}
-              onClick={cancel}
-            >
-              Cancelar edição
-            </button>
-          </div>
-        </form>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy}
+                  onClick={cancel}
+                >
+                  Cancelar edição
+                </button>
+              </div>
+            </form>
+          )}
+        </AdminDialog>
       )}
       <label className="member-checkbox">
         <input
@@ -1041,7 +1060,7 @@ export function MembersWorkspace({
           />
         </>
       )}
-      {error && !conflict && !uncertain && (
+      {error && !target && !editor && !conflict && !uncertain && (
         <button
           className="secondary"
           onClick={() => {

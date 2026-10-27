@@ -75,6 +75,25 @@ export async function gamesFixture(page: Page) {
       });
     }
     if (request.method() === "GET") {
+      if (id === "venues") {
+        const query = (url.searchParams.get("q") ?? "").toLowerCase();
+        const offset = Number(url.searchParams.get("offset") ?? "0");
+        const names = [
+          ...new Set(
+            [...games.values()]
+              .map((g) => g.venue)
+              .filter((v): v is string => !!v),
+          ),
+        ]
+          .filter((name) => name.toLowerCase().includes(query))
+          .sort();
+        return route.fulfill({
+          json: {
+            items: names.slice(offset, offset + 20).map((name) => ({ name })),
+            hasMore: names.length > offset + 20,
+          },
+        });
+      }
       if (id)
         return route.fulfill({
           status: games.has(id) ? 200 : 404,

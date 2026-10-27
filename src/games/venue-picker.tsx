@@ -1,4 +1,5 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useRef } from "react";
+import { useAnchoredOptions } from "../competition/anchored-options";
 import { api, isSessionFailure } from "../competition/api";
 import { venueListingSchema } from "./contract";
 import "./venue-picker.css";
@@ -15,6 +16,8 @@ export function VenuePicker({
   onSessionLost: () => void;
 }) {
   const id = useId();
+  const input = useRef<HTMLInputElement>(null),
+    popup = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false),
     [offset, setOffset] = useState(0),
     [active, setActive] = useState(-1);
@@ -22,6 +25,7 @@ export function VenuePicker({
     [more, setMore] = useState(false),
     [loading, setLoading] = useState(false),
     [error, setError] = useState("");
+  const popupStyle = useAnchoredOptions(input, popup, open && !disabled);
   useEffect(() => {
     if (!open || disabled) return;
     const controller = new AbortController();
@@ -82,9 +86,15 @@ export function VenuePicker({
     setOffset(0);
   }
   return (
-    <label className="venue-picker" htmlFor={id}>
-      Local
+    <div
+      className="venue-picker"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <label htmlFor={id}>Local</label>
       <input
+        ref={input}
         id={id}
         role="combobox"
         aria-expanded={open && !disabled}
@@ -100,10 +110,6 @@ export function VenuePicker({
         value={value}
         disabled={disabled}
         onFocus={() => setOpen(true)}
-        onBlur={(event) => {
-          if (!event.currentTarget.parentElement?.contains(event.relatedTarget))
-            setOpen(false);
-        }}
         onChange={(event) => {
           onChange(event.target.value);
           setOffset(0);
@@ -135,7 +141,7 @@ export function VenuePicker({
         }}
       />
       {open && !disabled && (
-        <div className="venue-options">
+        <div ref={popup} className="venue-options" style={popupStyle}>
           {loading ? (
             <p role="status">Buscando locais…</p>
           ) : error ? (
@@ -185,6 +191,6 @@ export function VenuePicker({
           )}
         </div>
       )}
-    </label>
+    </div>
   );
 }
