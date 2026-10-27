@@ -291,7 +291,9 @@ export function GamesWorkspace(props: Props) {
     <section className="games-workspace">
       <AdminToast
         message={
-          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+          props.enabled && !busy && !uncertain && !conflict && !dirty
+            ? status
+            : ""
         }
       />
       <div className="competition-title">
