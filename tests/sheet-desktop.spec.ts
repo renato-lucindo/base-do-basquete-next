@@ -44,6 +44,18 @@ test.describe("desktop scoresheet MVP", () => {
         path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
         animations: "disabled",
       });
+      await items.first().getByRole("button", { name: /Excluir ação/ }).click();
+      const dialog = page.getByRole("dialog", {
+        name: "Excluir esta ação?",
+        exact: true,
+      });
+      await expect(dialog).toBeVisible();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-delete-after-${width}x${height}.png`,
+        animations: "disabled",
+      });
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
     }
   });
   test("overtimes stay in player Q4, team periods stay separate and foul borders follow the actual half", async ({
