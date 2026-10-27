@@ -1,5 +1,11 @@
 # Ajustes solicitados na avaliação do protótipo
 
+## Feedback27/10 — reaproveitamento de equipe e elenco; auditoria anterior primeiro
+
+Responsável inscreveu a mesma equipe no mesmo campeonato em outra disputa/categoria e precisou inserir todos os atletas novamente, sem sugestão de reaproveitamento. Prioridade crítica: identidade global reutilizada com origem identificada, conferência de jogadores/camisas e vínculos independentes por disputa, preservando o destino já preenchido manualmente. Não confundir preparação da súmula da inscrição com aproveitamento de elenco de outra inscrição.
+
+Antes de implementar, pediu pente fino do GitHub `renato-lucindo/base-do-basquete` e da pasta `C:/Users/12405304716/Documents/Codex/Base do Basquete`. Consulta de código/referências expressamente autorizada agora, sem migração de dados ou acesso a serviços anteriores. Auditoria concluída em `docs/AUDITORIA-REUSO-BASE-ANTERIOR.md`: sugestão/cópia transacional antiga existe, mas deve ser adaptada ao destino já existente e aos contratos atuais. Recursos úteis de estatísticas/UI e regressões a evitar foram mapeados. Nenhum código antigo foi executado ou copiado nesta etapa.
+
 ## Feedback27/10 — cadastro exposto e camisa na pessoa
 
 Responsável pediu eliminar expansões desnecessárias em Editar cadastro global, manter campos expostos com larguras proporcionais e trazer camisa para Editar pessoa, retirando sua ação isolada. Implementado no previewc9fe7e2: formulários de pessoa/atleta/técnico em grade, altura/peso curtos, ações na mesma linha e equipe global com nome/sigla lado a lado. Camisa continua vinculada à inscrição ativa, sem reatribuir jogos/histórico. Salvar pessoa e camisa usa comandos existentes e recuperação explícita de falha parcial. Feedback específico não aprova a expansão geral da identidade; desktop prioritário, demais adiamentos preservados.
