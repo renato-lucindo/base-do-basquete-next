@@ -437,8 +437,19 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page
     .getByRole("button", { name: "Editar ação 1", exact: true })
     .click();
-  await page.getByLabel("Ação", { exact: true }).fill("1");
-  await page.keyboard.press("Enter");
+  const editDialog = page.getByRole("dialog", {
+    name: "Editar ação",
+    exact: true,
+  });
+  await expect(editDialog).toBeVisible();
+  await editDialog.getByLabel("Ação", { exact: true }).fill("1");
+  await editDialog
+    .getByRole("button", { name: "Salvar edição da ação", exact: true })
+    .click();
+  await expect(editDialog).toBeHidden();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Ação editada no rascunho" }),
+  ).toBeVisible();
   await expect(page.locator(".sheet-actions li").last()).toContainText(
     "#12 - 1p",
   );

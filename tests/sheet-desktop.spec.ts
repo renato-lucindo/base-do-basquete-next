@@ -5,6 +5,40 @@ import {
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("editing an event opens a native dialog and Escape preserves the event", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await page.keyboard.press("Enter");
+    const history = page.getByRole("region", {
+      name: "Ações de pontos",
+    });
+    await history.getByRole("button", { name: "Editar ação 1" }).click();
+    const dialog = page.getByRole("dialog", { name: "Editar ação" });
+    await expect(dialog).toBeVisible();
+    await dialog.getByLabel("Ação", { exact: true }).fill("3");
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(history).toContainText("2p");
+    await history.getByRole("button", { name: "Editar ação 1" }).click();
+    await dialog.getByLabel("Ação", { exact: true }).fill("3");
+    await dialog
+      .getByRole("button", { name: "Salvar edição da ação" })
+      .click();
+    await expect(dialog).toBeHidden();
+    await expect(history).toContainText("3p");
+  });
   test("desktop action history uses horizontal columns at both requested viewports", async ({
     page,
   }) => {

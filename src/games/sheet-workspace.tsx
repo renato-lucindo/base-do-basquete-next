@@ -7,6 +7,7 @@ import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast, useAdminToast } from "../competition/admin-toast";
 import { projectSheet } from "../scoresheet/projection";
 import {
   preparationContextSchema,
@@ -62,7 +63,9 @@ export function GameSheetWorkspace(props: Props) {
     [auxiliary, setAuxiliary] = useState<Side | null>(null),
     [candidatesLoading, setCandidatesLoading] = useState(false),
     [preparationOpen, setPreparationOpen] = useState(true);
+  const { toast, notify, dismiss } = useAdminToast();
   const suggested = useRef(false);
+  const editError = useRef<HTMLParagraphElement>(null);
   const [side, setSide] = useState<Side>("home"),
     [period, setPeriod] = useState(1),
     [target, setTarget] = useState(""),
@@ -122,7 +125,8 @@ export function GameSheetWorkspace(props: Props) {
     } else heading.current?.focus();
   }, [props.enabled, auxiliary, !!history, !!context]);
   useEffect(() => {
-    if (error && props.enabled) alert.current?.focus();
+    if (error && props.enabled)
+      (editing ? editError : alert).current?.focus();
   }, [error, props.enabled]);
   useEffect(() => {
     if (!deleting && focusAfterDelete.current) {
@@ -244,7 +248,7 @@ export function GameSheetWorkspace(props: Props) {
     targetRef.current?.select();
   };
   useEffect(() => {
-    if (!props.enabled || auxiliary || locked || deleting || preparationOpen)
+    if (!props.enabled || auxiliary || locked || deleting || editing || preparationOpen)
       return;
     const shortcut = (e: KeyboardEvent) => {
       if (
@@ -361,9 +365,10 @@ export function GameSheetWorkspace(props: Props) {
           events: [...d.events, { id: crypto.randomUUID(), ...patch }],
         };
       if (mutate(next)) {
+        if (editing) notify("Ação editada no rascunho. Salve para persistir.");
         setCode("");
         setEditing(null);
-        focusTarget();
+        if (!editing) focusTarget();
       }
     } catch (e) {
       report(e);
@@ -433,6 +438,7 @@ export function GameSheetWorkspace(props: Props) {
       );
       accept(s, gameVersion, true);
       setStatus("Rascunho da súmula salvo");
+      notify("Rascunho da súmula salvo.");
       if (advance) setPreparationOpen(false);
       props.onSaved();
     } catch (e) {
@@ -462,6 +468,7 @@ export function GameSheetWorkspace(props: Props) {
       );
       setReason("");
       setStatus("Súmula recarregada");
+      notify("Súmula recarregada.");
       setEpoch((v) => v + 1);
     } catch (e) {
       report(e);
@@ -496,7 +503,8 @@ export function GameSheetWorkspace(props: Props) {
           ? "Súmula confirmada; novas alterações ficam privadas até republicar."
           : "Rascunho privado; salvar não publica o resultado."}
       </p>
-      {error && (
+      <AdminToast toast={toast} onDismiss={dismiss} />
+      {error && !editing && (
         <p role="alert" ref={alert} tabIndex={-1} className="access-error">
           {error}
         </p>
@@ -583,10 +591,12 @@ export function GameSheetWorkspace(props: Props) {
             </>
           )}
           <div hidden={preparationOpen}>
-            <fieldset disabled={locked || !!deleting} className="sheet-input">
-              <legend>
-                {editing ? "Editar ação selecionada" : "Lançar ações"}
-              </legend>
+            <fieldset
+              hidden={!!editing}
+              disabled={locked || !!deleting}
+              className="sheet-input"
+            >
+              <legend>Lançar ações</legend>
               <p>
                 Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
                 · Alt+Q: escolher período. Alvos B: banco, C: técnico.
@@ -656,30 +666,19 @@ export function GameSheetWorkspace(props: Props) {
                 </label>
               </div>
               <div className="competition-actions">
-                <button onClick={addAction}>
-                  {editing ? "Salvar edição da ação" : "Registrar ação"}
-                </button>
-                {editing && (
-                  <button
-                    onClick={() => {
-                      setEditing(null);
-                      setCode("");
-                      focusTarget();
-                    }}
-                  >
-                    Cancelar edição da ação
-                  </button>
-                )}
+                <button onClick={addAction}>Registrar ação</button>
                 <button
                   disabled={!history.past.length || !!editing}
                   onClick={() => {
                     const last = history.past.at(-1);
-                    if (last)
+                    if (last) {
                       setHistory({
                         present: last,
                         past: history.past.slice(0, -1),
                         future: [...history.future, d],
                       });
+                      notify("Último ajuste desfeito no rascunho.");
+                    }
                   }}
                 >
                   Desfazer ação ou ajuste
@@ -688,12 +687,14 @@ export function GameSheetWorkspace(props: Props) {
                   disabled={!history.future.length || !!editing}
                   onClick={() => {
                     const last = history.future.at(-1);
-                    if (last)
+                    if (last) {
                       setHistory({
                         present: last,
                         past: [...history.past, d].slice(-50),
                         future: history.future.slice(0, -1),
                       });
+                      notify("Último ajuste refeito no rascunho.");
+                    }
                   }}
                 >
                   Refazer ação ou ajuste
@@ -750,11 +751,105 @@ export function GameSheetWorkspace(props: Props) {
                   setPeriod(event.period);
                   setTarget(event.target);
                   setCode(event.code);
-                  targetRef.current?.focus();
+                  setError("");
                 }}
                 onDelete={setDeleting}
               />
             )}
+            <AdminDialog
+              title="Editar ação"
+              open={!!editing}
+              busy={locked}
+              onClose={() => {
+                setEditing(null);
+                setError("");
+              }}
+              className="sheet-edit-dialog"
+            >
+              {error && (
+                <p
+                  ref={editError}
+                  role="alert"
+                  tabIndex={-1}
+                  className="access-error"
+                >
+                  {error}
+                </p>
+              )}
+              <p>Alterações ficam no rascunho até salvar a súmula.</p>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  addAction();
+                }}
+              >
+                <fieldset disabled={locked} className="sheet-edit-fields">
+                  <legend className="sr-only">Dados da ação selecionada</legend>
+                  <label>
+                    Equipe da ação
+                    <select
+                      aria-label="Equipe da ação"
+                      value={side}
+                      onChange={(event) => setSide(event.target.value as Side)}
+                    >
+                      <option value="home">A · {props.game.home.name}</option>
+                      <option value="away">B · {props.game.away.name}</option>
+                    </select>
+                  </label>
+                  <label>
+                    Quarto ou prorrogação
+                    <select
+                      aria-label="Quarto ou prorrogação"
+                      value={period}
+                      onChange={(event) => setPeriod(Number(event.target.value))}
+                    >
+                      {Array.from({ length: d.periods }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {periodLabel(i + 1)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Camisa ou alvo
+                    <input
+                      autoFocus
+                      aria-label="Camisa ou alvo"
+                      maxLength={2}
+                      autoComplete="off"
+                      value={target}
+                      onChange={(event) => setTarget(event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Ação
+                    <input
+                      aria-label="Ação"
+                      maxLength={3}
+                      autoComplete="off"
+                      value={code}
+                      onChange={(event) => setCode(event.target.value)}
+                    />
+                  </label>
+                </fieldset>
+                <div className="competition-actions">
+                  <button type="submit" disabled={locked}>
+                    Salvar edição da ação
+                  </button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    disabled={locked}
+                    onClick={() => {
+                      setEditing(null);
+                      setError("");
+                    }}
+                  >
+                    Cancelar edição da ação
+                  </button>
+                </div>
+              </form>
+            </AdminDialog>
             <AdminDialog
               title="Excluir esta ação?"
               open={!!deleting}
@@ -780,6 +875,7 @@ export function GameSheetWorkspace(props: Props) {
                         if (mutate({ ...d, events: next.events })) {
                           focusAfterDelete.current = true;
                           setDeleting(null);
+                          notify("Ação excluída do rascunho. Você pode desfazer.");
                         }
                       } catch (e) {
                         report(e);
