@@ -4,6 +4,7 @@ import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
+import { VenuePicker } from "./venue-picker";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -445,14 +446,12 @@ export function GamesWorkspace(props: Props) {
                 onChange={(e) => change("time", e.target.value || null)}
               />
             </label>
-            <label>
-              Local
-              <input
-                maxLength={160}
-                value={editor.game.venue ?? ""}
-                onChange={(e) => change("venue", e.target.value || null)}
-              />
-            </label>
+            <VenuePicker
+              value={editor.game.venue ?? ""}
+              onChange={(value) => change("venue", value || null)}
+              disabled={busy || !props.enabled}
+              onSessionLost={props.onSessionLost}
+            />
             <label>
               Número do jogo
               <input

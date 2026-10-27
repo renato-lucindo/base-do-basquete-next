@@ -24,3 +24,5 @@ Testes focais RED→GREEN de PostgreSQL real (zero/upgrade, RLS/grants, autoriza
 
 - Início: 47 migrations remotas até `20261026232327`, 5 jogos/2 nomes de local/64 pessoas observados em consulta somente leitura. Dados humanos continuam mudando; preservar novidades. Preview permanece na fonte `3eca459`.
 - V1: iniciar teste PostgreSQL de catálogo com jogos preexistentes e salvamento real; ainda sem DDL remota.
+- V1 banco/API concluídos: commits `31b4b47`/`b72fcf8`; migração remota `20261027001504` reconciliada sem mudar bytes. Contratos PostgreSQL/Supabase/adapter/workerd aprovados, detalhes em `docs/VALIDACAO-ADMIN-COMPACTA.md`.
+- V1 interface WIP: combobox e primeiro browser implementados. Falha de referências no pai corrigida e typecheck aprovado; browser ainda pendente. Pausa ao atingir cota real 85% em cinco horas. Não iniciar gate/novo bloco agora.
