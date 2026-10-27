@@ -1,5 +1,23 @@
 # Reaproveitamento de elenco e pré-seleção de identidade
 
+## Estado final deste checkpoint,27/10/2026
+
+Responsável solicitou encerrar após publicação, com reserva semanal baixa. Pré-seleção publicada na fonte **260713c138cc8595322d76102702325d90f08901**, CI **40525486718/job122263790799 SUCCESS**,573unit/117arquivos e413browsersPASS/67SKIP. Release protegido deployment **fc8d9c55-91a2-4454-b7d0-2308888d4c04**, versão64d4ebee-7d47-44ff-a55d-76847c705f24,100%. Smokes24assets/hash/Xsource/41GETs privados/13POSTs privados/health/Auth inválido/projeções/HTMLs/dois browsers aprovados. Relatório `.preview-artifacts/automatic-match-smoke-report.json`, SHA256 **a4f8dd78c4d5582c42bae03499e319e3e8e78c0752d492c4e8652f4459a1b2cf**. Recursos temporários revogados e ausência conferida; owner único/previewsOFF/bindings/anônimo302 preservados. Sem aceite humano ou mutação de dados humanos.
+
+R2a/R2b locais na branch `codex/reaproveitar-elenco-banco`, sobre merge5241860. Migrations **20261027143904_roster_reuse_context.sql** e **20261027145431_roster_reuse_write.sql NÃO APLICADAS**; remoto continua48migrations. Rascunho do writer será salvo comoWIP `[skip ci]`, sem CI/deploy novo. Não há provider/rotas/diálogo integrados: o reaproveitamento direto de outra disputa ainda não está disponível ao responsável. Registros abaixo sobre pendência de CI/deploy da pré-seleção e ausência de writer são históricos, superados por esta seção.
+
+### Writer local e compatibilidade com remoção
+
+- RED real: `roster-reuse-write-red.log`, doisPGzero/upgrade demonstram writer ausente após corrigir somente a fixture da vaga administrativa singleton. CLI2.121.0 gerou migration nova apósRED;48anteriores intocadas.
+- Contrato fechado até200itens,64KiB, confirmação explícita, versões/fingerprint; SQL×TS alinhados, inclusiveUnicode e limites. A execução inicialmente nomeada `roster-reuse-parity-red.log` passou; foi copiada como `roster-reuse-parity-green.log`, **não constituiRED**.
+- Writer deriva elegibilidade, trava atletas antes da raiz, mantém trigger produtivo habilitado, cria apenas novos vínculos, recibo/linhagem imutáveis e replay do mesmo autor. Origem/destino existente/identidades/G4 preservados. Matriz inclui registro em outra inscrição/naipe/camisa/versionamento/contexto/revogação/replay/200itens/limite2000/rollback sem parcial e0/00/null.
+- Onze focais/3arquivos PASS7,05s, log `.preview-artifacts/roster-reuse-final-focused.log`, SHA256 **8bac7ff904b83e0d7bad8ad74c4960e6146b28329e4bc5001fd7f415cb270af3**.
+- Primeiro gate banco **FAIL**574PASS/3FAIL: inventário explícito deFKs na remoção passou a exigir a nova tabela `private.roster_reuse_commands`. Revisão confirmou que os vínculos de origem/destino mantidos pela linhagem já bloqueiam remoção por histórico. Teste não foi afrouxado: acrescentada tabela ao inventário fechado e comprovada recusa409 de ambas inscrições com elenco ativo e também encerrado. Focal5PASS7,33s, SHA256 **e1969c6bcf9a43e31d853818ed1393a81dd2146ef4b01047a07d9e64999025a4** em `.preview-artifacts/roster-reuse-removal-focused.log`.
+- Segundo gate, já iniciado antes do pedido de checkpoint, **PASS/exit0:577unit/119arquivos,6transportes/13PG/23workerd/4PDFs**, builds/tipos/lint/formato/fronteira/segredos744. Log `.preview-artifacts/roster-reuse-bank-final-gate-2.log`, SHA256 **051d6d448022a646c6f16b0937f52d0564a0d5e182c41be756e4fb79dab99179**. Sem CI, prova remota, carga ou concorrência multiconexão desta unidade; gate não valida aceite do fluxo inexistente na UI.
+- Fixtures locais usam Auth/admin fictícios e trocam o singleton administrativo dentro do banco descartável. **Não executar esses seeds inalterados no Supabase remoto.** Próxima prova real deve adaptar produto sintéticoBEGIN/ROLLBACK ao administrador já existente sem inserir/excluir/alterar Auth/admin. Nenhuma migration nova será aplicada durante este encerramento.
+
+Checkpoint completo e próximo passo em `docs/PROGRESSO.md`. Preservar `.agents/` e `skills-lock.json` humanos fora dos commits. Automação permanecePAUSED por encerramento humano, sem novo despertar agendado.
+
 27/10/2026, branch `codex/reaproveitar-elenco`, base `cc02882`. Auditoria do projeto anterior concluída e commitada antes da implementação. Nenhum código antigo executado ou migration antiga copiada. `.agents/` e `skills-lock.json` humanos preservados.
 
 ## R1: prévia pura, ainda sem produto integrado
