@@ -391,14 +391,14 @@ export function TransferPanel(p: Props) {
           void confer();
         }}
       >
-        <fieldset disabled={locked || !p.enabled}>
+        <fieldset className="transfer-fields" disabled={locked || !p.enabled}>
           <legend>Origem e destino</legend>
           <p>
             Origem: {view ? label(p.source.registrationId) : "Carregando…"}. A
             operação abre um período novo e preserva as participações
             anteriores.
           </p>
-          <label>
+          <label className="transfer-destination">
             Inscrição de destino
             <select
               aria-label="Inscrição de destino"
@@ -420,7 +420,7 @@ export function TransferPanel(p: Props) {
               ))}
             </select>
           </label>
-          <label>
+          <label className="transfer-jersey">
             Camisa no destino
             <input
               ref={jerseyField}
@@ -437,7 +437,7 @@ export function TransferPanel(p: Props) {
             Deixe em branco se ainda não definida. As camisas 0 e 00 são
             diferentes.
           </small>
-          <label>
+          <label className="transfer-reason">
             Motivo da transferência ou retorno
             <textarea
               aria-label="Motivo da transferência ou retorno"

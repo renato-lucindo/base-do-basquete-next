@@ -402,7 +402,10 @@ export function RegistrationWithdrawalPanel(p: Props) {
                   · {view.head.reason}
                 </p>
               )}
-              <fieldset disabled={locked || !p.enabled}>
+              <fieldset
+                className="withdrawal-fields"
+                disabled={locked || !p.enabled}
+              >
                 <legend>Tratamento da inscrição</legend>
                 <label>
                   Tratamento dos resultados anteriores
@@ -480,6 +483,7 @@ export function RegistrationWithdrawalPanel(p: Props) {
                 <label>
                   Motivo da desistência ou retorno
                   <textarea
+                    rows={2}
                     minLength={3}
                     maxLength={2000}
                     value={reason}

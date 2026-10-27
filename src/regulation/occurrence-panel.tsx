@@ -408,7 +408,10 @@ export function GameOccurrencePanel(props: Props) {
                     continuar.
                   </p>
                 )}
-              <fieldset disabled={locked || !props.enabled}>
+              <fieldset
+                className="occurrence-fields"
+                disabled={locked || !props.enabled}
+              >
                 <legend>Nova decisão do jogo</legend>
                 <label>
                   Tipo da ocorrência
@@ -525,9 +528,10 @@ export function GameOccurrencePanel(props: Props) {
                     )}
                   </>
                 )}
-                <label>
+                <label className="occurrence-reason">
                   Motivo da ocorrência
                   <textarea
+                    rows={2}
                     value={draft.reason}
                     minLength={3}
                     maxLength={2000}

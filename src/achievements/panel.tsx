@@ -618,7 +618,7 @@ export function AchievementPanel(p: Props) {
               </button>
             </div>
           )}
-          <fieldset disabled={locked}>
+          <fieldset className="achievement-source" disabled={locked}>
             <legend>Sugestão de colocações</legend>
             <label>
               Origem da sugestão

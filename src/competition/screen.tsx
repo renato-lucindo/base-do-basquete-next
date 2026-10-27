@@ -354,11 +354,7 @@ export function CompetitionWorkspace({
       })),
     )
     .find((d) => d.id === selected);
-  const compact = !!(
-    enabled &&
-    editor?.version &&
-    (tab === "games" || tab === "teams")
-  );
+  const compact = enabled && (!editor || tab !== "pdfs");
   useEffect(() => {
     onCompactChange?.(compact);
   }, [compact, onCompactChange]);
@@ -375,25 +371,27 @@ export function CompetitionWorkspace({
       {opening && <p role="status">Abrindo campeonato…</p>}
       {!editor ? (
         <>
-          <div className="competition-title">
+          <div className="competition-title competition-list-toolbar">
             <h2 ref={headingRef} tabIndex={-1}>
               Campeonatos
             </h2>
             <button onClick={start} disabled={opening}>
               Novo campeonato
             </button>
+            <label className="competition-search">
+              Buscar campeonato, ano ou disputa
+              <input
+                value={query}
+                name="competition-search"
+                autoComplete="off"
+                maxLength={120}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setOffset(0);
+                }}
+              />
+            </label>
           </div>
-          <label className="competition-search">
-            Buscar campeonato, ano ou disputa
-            <input
-              value={query}
-              maxLength={120}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                setOffset(0);
-              }}
-            />
-          </label>
           {loading ? (
             <p role="status">Carregando campeonatos…</p>
           ) : (
@@ -593,7 +591,7 @@ export function CompetitionWorkspace({
               />
             </div>
           )}
-          <div hidden={tab !== "info"}>
+          <div className="competition-info" hidden={tab !== "info"}>
             <p role="status" data-testid="competition-save-state">
               {saving
                 ? "Salvando…"
@@ -605,7 +603,10 @@ export function CompetitionWorkspace({
                       ? "Não salvo"
                       : `Salvo${editor.savedAt ? ` em ${formatDate(editor.savedAt)}` : ""}`}
             </p>
-            <form onSubmit={(event) => void save(event)}>
+            <form
+              className="competition-editor-form"
+              onSubmit={(event) => void save(event)}
+            >
               <fieldset
                 disabled={saving || uncertain || opening}
                 className="competition-form"
@@ -615,6 +616,8 @@ export function CompetitionWorkspace({
                   Nome do campeonato
                   <input
                     ref={nameRef}
+                    name="competition-name"
+                    autoComplete="off"
                     required
                     maxLength={120}
                     value={editor.draft.name}
@@ -634,6 +637,8 @@ export function CompetitionWorkspace({
                         <input
                           aria-label={`Ano da temporada ${si + 1}`}
                           type="number"
+                          name={`season-${si + 1}-year`}
+                          autoComplete="off"
                           min={1}
                           max={9999}
                           required
@@ -884,29 +889,47 @@ function CompetitionRows({
   disabled: boolean;
 }) {
   return (
-    <ul className="competition-list">
-      {items.map((item) => (
-        <li key={item.id}>
-          <button
-            className="competition-open"
-            aria-label={`Abrir ${item.name}`}
-            disabled={disabled}
-            onClick={() => open(item.id)}
-          >
-            {item.name}
-          </button>
-          <p>
-            {item.contexts
-              .map(
-                (c) =>
-                  `${c.year} · ${c.gender === "feminino" ? "Feminino" : "Masculino"} · ${c.category}${c.division ? ` · ${c.division}` : ""}`,
-              )
-              .join(" / ")}
-          </p>
-          <small>Último trabalho salvo: {formatDate(item.savedAt)}</small>
-        </li>
-      ))}
-    </ul>
+    <div
+      className="admin-table-scroll"
+      tabIndex={0}
+      role="region"
+      aria-label="Lista de campeonatos"
+    >
+      <table className="admin-data-table" aria-label="Campeonatos">
+        <thead>
+          <tr>
+            <th scope="col">Campeonato</th>
+            <th scope="col">Temporadas e disputas</th>
+            <th scope="col">Último trabalho salvo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.id}>
+              <td>
+                <button
+                  className="competition-open"
+                  aria-label={`Abrir ${item.name}`}
+                  disabled={disabled}
+                  onClick={() => open(item.id)}
+                >
+                  {item.name}
+                </button>
+              </td>
+              <td>
+                {item.contexts
+                  .map(
+                    (c) =>
+                      `${c.year} · ${c.gender === "feminino" ? "Feminino" : "Masculino"} · ${c.category}${c.division ? ` · ${c.division}` : ""}`,
+                  )
+                  .join(" / ")}
+              </td>
+              <td className="nowrap">{formatDate(item.savedAt)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 function formatDate(value: string) {

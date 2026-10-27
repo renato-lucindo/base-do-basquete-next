@@ -46,7 +46,9 @@ test("password form supports keyboard, errors, restore and logout without browse
     page.getByRole("heading", { name: "Área administrativa" }),
   ).toBeFocused();
   await page.reload();
-  await expect(page.getByText("Você está conectado.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Campeonatos", exact: true }),
+  ).toBeVisible();
   expect(
     await page.evaluate(() => ({
       local: localStorage.length,

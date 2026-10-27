@@ -403,16 +403,18 @@ export function RegulationWorkspace({
     );
   return (
     <section className="regulation" ref={panel}>
-      <h2 ref={heading} tabIndex={-1}>
-        Regulamento da disputa
-      </h2>
-      <button
-        type="button"
-        disabled={!view || locked || dirty || !enabled}
-        onClick={() => setShowAchievements(true)}
-      >
-        Colocações e honrarias
-      </button>
+      <div className="competition-title">
+        <h3 ref={heading} tabIndex={-1}>
+          Regulamento da disputa
+        </h3>
+        <button
+          type="button"
+          disabled={!view || locked || dirty || !enabled}
+          onClick={() => setShowAchievements(true)}
+        >
+          Colocações e honrarias
+        </button>
+      </div>
       {dirty && (
         <p>
           Salve as regras ou descarte sua edição antes de abrir as premiações.

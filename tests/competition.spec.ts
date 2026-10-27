@@ -130,6 +130,72 @@ async function create(page: Page) {
     .fill("Adulto");
 }
 
+for (const width of [1366, 1920])
+  test(`campeonato compacto desktop ${width} mantém campos e salvamento acessíveis`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "desktop", "Recorte desktop");
+    await page.setViewportSize({ width, height: width === 1366 ? 768 : 1080 });
+    await fixture(page);
+    await page.goto("http://127.0.0.1:5174/foundation.html");
+    await create(page);
+    await page
+      .getByRole("button", {
+        name: "Adicionar disputa à temporada 1",
+        exact: true,
+      })
+      .click();
+    await page
+      .getByLabel("Categoria da disputa 1.2", { exact: true })
+      .fill("Sub-18");
+    await page.evaluate(() => scrollTo(0, 0));
+    const phase = process.env.ADMIN_CAPTURE_BASELINE ? "before" : "after";
+    await page.screenshot({
+      path: `.preview-artifacts/admin-expansion-${phase}-competition-${width}.png`,
+      fullPage: true,
+    });
+    const year = await page
+      .getByLabel("Ano da temporada 1", { exact: true })
+      .boundingBox();
+    const name = await page
+      .getByLabel("Nome do campeonato", { exact: true })
+      .boundingBox();
+    const save = page.getByRole("button", {
+      name: "Salvar campeonato",
+      exact: true,
+    });
+    const box = await save.boundingBox();
+    expect(year!.width).toBeLessThanOrEqual(150);
+    expect(name!.width).toBeGreaterThan(year!.width * 3);
+    expect(box!.y + box!.height).toBeLessThan(width === 1366 ? 768 : 1080);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      ),
+    ).toBe(false);
+    await save.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByTestId("competition-save-state")).toContainText(
+      "Salvo",
+    );
+    await page.reload();
+    await expect(
+      page.getByLabel("Categoria da disputa 1.2", { exact: true }),
+    ).toHaveValue("Sub-18");
+    await page
+      .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
+      .click();
+    await expect(
+      page.getByRole("table", { name: "Campeonatos", exact: true }).last(),
+    ).toContainText("Liga Regional");
+    await expect(
+      page.getByRole("button", { name: "Sair", exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `.preview-artifacts/admin-expansion-${phase}-listing-${width}.png`,
+    });
+  });
+
 test("competition is saved and restored with multiple seasons and explicit disputes", async ({
   page,
 }) => {

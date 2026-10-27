@@ -404,37 +404,70 @@ export function GamesWorkspace(props: Props) {
             >
               <legend>Dados do jogo</legend>
 
-              {(["homeRegistrationId", "awayRegistrationId"] as const).map(
-                (key, i) => (
-                  <label key={key}>
-                    {i ? "Inscrição visitante" : "Inscrição mandante"}
-                    <select
-                      aria-label={
-                        i ? "Inscrição visitante" : "Inscrição mandante"
-                      }
-                      value={editor.game[key]}
-                      onChange={(e) => {
-                        const r = candidates.find(
-                          (r) => r.id === e.target.value,
-                        );
-                        if (r)
-                          setChosen((rows) => [
-                            ...rows.filter((x) => x.id !== r.id),
-                            r,
-                          ]);
-                        change(key, e.target.value);
-                      }}
-                    >
-                      <option value="">Selecione uma inscrição</option>
-                      {candidates.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ),
-              )}
+              <div className="game-opponents">
+                {(["homeRegistrationId", "awayRegistrationId"] as const).map(
+                  (key, i) => (
+                    <label key={key}>
+                      {i ? "Inscrição visitante" : "Inscrição mandante"}
+                      <select
+                        aria-label={
+                          i ? "Inscrição visitante" : "Inscrição mandante"
+                        }
+                        value={editor.game[key]}
+                        onChange={(e) => {
+                          const r = candidates.find(
+                            (r) => r.id === e.target.value,
+                          );
+                          if (r)
+                            setChosen((rows) => [
+                              ...rows.filter((x) => x.id !== r.id),
+                              r,
+                            ]);
+                          change(key, e.target.value);
+                        }}
+                      >
+                        <option value="">Selecione uma inscrição</option>
+                        {candidates.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ),
+                )}
+              </div>
+
+              <label>
+                Data do jogo
+                <input
+                  type="date"
+                  value={editor.game.date ?? ""}
+                  onChange={(e) => change("date", e.target.value || null)}
+                />
+              </label>
+              <label>
+                Horário do jogo
+                <input
+                  type="time"
+                  value={editor.game.time ?? ""}
+                  onChange={(e) => change("time", e.target.value || null)}
+                />
+              </label>
+              <VenuePicker
+                value={editor.game.venue ?? ""}
+                onChange={(value) => change("venue", value || null)}
+                disabled={busy || !props.enabled}
+                onSessionLost={props.onSessionLost}
+              />
+              <label>
+                Número do jogo
+                <input
+                  maxLength={40}
+                  value={editor.game.number ?? ""}
+                  onChange={(e) => change("number", e.target.value || null)}
+                />
+              </label>
               <div className="competition-actions game-registration-tools">
                 <label className="game-registration-search">
                   Buscar inscrições para este jogo
@@ -471,36 +504,6 @@ export function GamesWorkspace(props: Props) {
                   Criar ou editar inscrição aqui
                 </button>
               </div>
-              <label>
-                Data do jogo
-                <input
-                  type="date"
-                  value={editor.game.date ?? ""}
-                  onChange={(e) => change("date", e.target.value || null)}
-                />
-              </label>
-              <label>
-                Horário do jogo
-                <input
-                  type="time"
-                  value={editor.game.time ?? ""}
-                  onChange={(e) => change("time", e.target.value || null)}
-                />
-              </label>
-              <VenuePicker
-                value={editor.game.venue ?? ""}
-                onChange={(value) => change("venue", value || null)}
-                disabled={busy || !props.enabled}
-                onSessionLost={props.onSessionLost}
-              />
-              <label>
-                Número do jogo
-                <input
-                  maxLength={40}
-                  value={editor.game.number ?? ""}
-                  onChange={(e) => change("number", e.target.value || null)}
-                />
-              </label>
             </fieldset>
             <div className="competition-actions">
               <button

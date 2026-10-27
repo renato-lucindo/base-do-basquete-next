@@ -45,7 +45,7 @@ function ReferenceEditor({
   onChange: (r: Ref) => void;
 }) {
   return (
-    <fieldset>
+    <fieldset className="reg-reference">
       <legend>{label}</legend>
       <label>
         Origem da inscrição
@@ -210,7 +210,7 @@ export function DefinitionEditor({
     });
   return (
     <>
-      <fieldset>
+      <fieldset className="reg-setting">
         <legend>Transferências de atletas</legend>
         <label>
           Transferências entre inscrições
@@ -237,7 +237,7 @@ export function DefinitionEditor({
           passa a valer depois de conferir e salvar o regulamento.
         </p>
       </fieldset>
-      <fieldset>
+      <fieldset className="reg-setting">
         <legend>Regra de W.O.</legend>
         <label className="reg-check">
           <input
@@ -342,7 +342,7 @@ export function DefinitionEditor({
           </>
         )}
       </fieldset>
-      <fieldset>
+      <fieldset className="reg-registrations">
         <legend>Inscrições na organização</legend>
         {registrations.map((r) => {
           const used =
@@ -508,7 +508,7 @@ export function DefinitionEditor({
             </label>
           </fieldset>
           {p.groups.map((g, gi) => (
-            <fieldset key={g.id}>
+            <fieldset className="reg-group" key={g.id}>
               <legend>{g.name || "Grupo"}</legend>
               <label>
                 Nome do grupo
@@ -622,7 +622,7 @@ export function DefinitionEditor({
             .map((n) => {
               const index = d.series.findIndex((a) => a.id === n.id);
               return (
-                <fieldset key={n.id}>
+                <fieldset className="reg-series" key={n.id}>
                   <legend>{n.name || "Confronto"}</legend>
                   <label>
                     Nome do confronto
