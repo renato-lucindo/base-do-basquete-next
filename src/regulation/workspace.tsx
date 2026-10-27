@@ -19,6 +19,7 @@ import {
   type RegulationPreviewResult,
 } from "./view-contract";
 import { DefinitionEditor } from "./definition-editor";
+import { AdminToast } from "../competition/admin-toast";
 import { RegulationProjection } from "./projection";
 import { AchievementPanel } from "../achievements/panel";
 import "./screen.css";
@@ -403,6 +404,7 @@ export function RegulationWorkspace({
     );
   return (
     <section className="regulation" ref={panel}>
+      <AdminToast message={enabled && !busy && !uncertain && !readPending && !dirty ? status : ""} />
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Regulamento da disputa

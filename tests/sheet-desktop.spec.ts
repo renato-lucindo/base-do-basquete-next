@@ -59,6 +59,66 @@ test.describe("desktop scoresheet MVP", () => {
       await expect(dialog).toBeHidden();
     }
   });
+  test("editing actions uses a modal with cancel, save and toast at desktop widths", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Ação", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    const action = page.getByRole("button", {
+      name: "Editar ação 1",
+      exact: true,
+    });
+    const dialog = page.getByRole("dialog", {
+      name: "Editar ação da súmula",
+      exact: true,
+    });
+    await action.click();
+    await expect(dialog).toBeVisible();
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const box = await dialog.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-edit-modal-after-${viewport.width}x${viewport.height}.png`,
+        animations: "disabled",
+      });
+    }
+    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".sheet-actions li")).toContainText(["1p"]);
+    await action.click();
+    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await dialog
+      .getByRole("button", { name: "Salvar edição da ação", exact: true })
+      .click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".sheet-actions li")).toContainText(["2p"]);
+    const toast = page.getByRole("region", { name: "Notificação" });
+    await expect(toast).toContainText("Ação editada no rascunho");
+    await toast
+      .getByRole("button", { name: "Dispensar notificação" })
+      .click();
+    await expect(toast).toHaveCount(0);
+  });
+
   test("overtimes stay in player Q4, team periods stay separate and foul borders follow the actual half", async ({
     page,
   }) => {

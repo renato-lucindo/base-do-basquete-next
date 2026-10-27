@@ -620,7 +620,11 @@ export function GameSheetWorkspace(props: Props) {
             </>
           )}
           <div hidden={preparationOpen}>
-            <fieldset disabled={locked || !!deleting || !!editing} className="sheet-input">
+            <fieldset
+              hidden={!!editing}
+              disabled={locked || !!deleting || !!editing}
+              className="sheet-input"
+            >
               <legend>Lançar ações</legend>
               <p>
                 Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
