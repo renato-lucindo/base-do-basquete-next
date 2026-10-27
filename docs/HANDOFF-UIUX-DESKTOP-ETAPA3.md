@@ -1,12 +1,14 @@
 # UI/UX desktop — etapa 3 (revisão incremental)
 
 ## Referências consultadas
+
 - Figma Make: `Improve Player Profile and Game Details UI`, visual de perfil e detalhes de partida (protótipo de dados fictícios).
 - Especificação visual vinculada ao Make: `plans/identidade-visual-base-do-basquete.md` (Sports Data Minimalism, azul #075FCA, tinta #101827, superfícies brancas, divisores e WCAG AA).
 - Repositório histórico `renato-lucindo/base-do-basquete` está arquivado; não deve ser usado como alvo de commits.
-- Produto ativo: `renato-lucindo/base-do-basquete-next`, continuidade da PR #35.
+- Produto ativo: `renato-lucindo/base-do-basquete-next`, consolidado na PR #33.
 
 ## Recorte implementado
+
 - Estilos somente desktop, `min-width: 1000px`, sobre `.compact-pilot`; sem mudanças no mobile.
 - Estados `:focus-visible` para navegação, ações e campos de formulário; destaque de linha por `:focus-within`.
 - Cabeçalhos de tabelas com contraste mais forte, divisores consistentes e valores tabulares.
@@ -14,6 +16,7 @@
 - Sem mudança em React, API, RLS, banco, regras, validações ou contratos.
 
 ## Limites e validação
+
 - Esta primeira unidade cobre a base visual das tabelas e da importação; **não equivale** à conclusão da padronização de todos os formulários nem à auditoria WCAG.
 - Confirmar montagem real de `.compact-pilot` sobre os fluxos de importação em capturas de 1366×768 e 1920×1080.
 - Conferir casos de tabelas extensas, nomes longos, zoom de 200%, navegação Tab/Shift+Tab e perda de foco.
@@ -21,13 +24,15 @@
 - PR deve continuar draft, sem merge ou deploy.
 
 ## Próximas unidades
+
 1. Conferir por capturas reais a geometria das telas de Campeonatos, Jogos, Equipes, Pessoas e Regulamento, com a mesma fixture antes/depois.
 2. Corrigir inconsistências comprovadas em cabeçalhos, formulários, tabelas e fluxos de edição, preservando controles existentes.
 3. Validar foco de diálogos, contraste e reflow 200%; não substituir guards síncronos sem revisão de contrato.
 4. Consolidar feedback de operações sem duplicar avisos nem ocultar erros persistentes.
 
 ## Continuidade sem empilhamento de PRs
-- Unificar as implementações das PRs #33, #35 e #36 na branch `codex/ui-ux-desktop` após verificar ancestralidade e commits.
-- Manter **somente a PR #33** como PR de revisão/merge; encerrar #35 e #36 como substituídas quando a consolidação estiver confirmada.
+
+- As implementações das PRs #33, #35 e #36 foram unificadas na branch `codex/ui-ux-desktop` após verificar ancestralidade e commits.
+- Manter **somente a PR #33** como PR de revisão/merge; encerrar #35 e #36 como substituídas, sem merge.
 - Não executar merge na branch base nem alterar banco, dados humanos ou configuração de deploy.
 - Para a área de importação, acrescentar capturas automatizadas e verificação da largura mínima computada no desktop.
