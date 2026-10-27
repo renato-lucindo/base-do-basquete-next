@@ -125,8 +125,7 @@ export function GameSheetWorkspace(props: Props) {
     } else heading.current?.focus();
   }, [props.enabled, auxiliary, !!history, !!context]);
   useEffect(() => {
-    if (error && props.enabled)
-      (editing ? editError : alert).current?.focus();
+    if (error && props.enabled) (editing ? editError : alert).current?.focus();
   }, [error, props.enabled]);
   useEffect(() => {
     if (!deleting && focusAfterDelete.current) {
@@ -248,7 +247,14 @@ export function GameSheetWorkspace(props: Props) {
     targetRef.current?.select();
   };
   useEffect(() => {
-    if (!props.enabled || auxiliary || locked || deleting || editing || preparationOpen)
+    if (
+      !props.enabled ||
+      auxiliary ||
+      locked ||
+      deleting ||
+      editing ||
+      preparationOpen
+    )
       return;
     const shortcut = (e: KeyboardEvent) => {
       if (
@@ -801,7 +807,9 @@ export function GameSheetWorkspace(props: Props) {
                     <select
                       aria-label="Quarto ou prorrogação"
                       value={period}
-                      onChange={(event) => setPeriod(Number(event.target.value))}
+                      onChange={(event) =>
+                        setPeriod(Number(event.target.value))
+                      }
                     >
                       {Array.from({ length: d.periods }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
@@ -875,7 +883,9 @@ export function GameSheetWorkspace(props: Props) {
                         if (mutate({ ...d, events: next.events })) {
                           focusAfterDelete.current = true;
                           setDeleting(null);
-                          notify("Ação excluída do rascunho. Você pode desfazer.");
+                          notify(
+                            "Ação excluída do rascunho. Você pode desfazer.",
+                          );
                         }
                       } catch (e) {
                         report(e);

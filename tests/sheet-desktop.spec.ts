@@ -27,15 +27,23 @@ test.describe("desktop scoresheet MVP", () => {
     await history.getByRole("button", { name: "Editar ação 1" }).click();
     const dialog = page.getByRole("dialog", { name: "Editar ação" });
     await expect(dialog).toBeVisible();
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-edit-after-${viewport.width}x${viewport.height}.png`,
+        animations: "disabled",
+      });
+    }
     await dialog.getByLabel("Ação", { exact: true }).fill("3");
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(history).toContainText("2p");
     await history.getByRole("button", { name: "Editar ação 1" }).click();
     await dialog.getByLabel("Ação", { exact: true }).fill("3");
-    await dialog
-      .getByRole("button", { name: "Salvar edição da ação" })
-      .click();
+    await dialog.getByRole("button", { name: "Salvar edição da ação" }).click();
     await expect(dialog).toBeHidden();
     await expect(history).toContainText("3p");
   });
