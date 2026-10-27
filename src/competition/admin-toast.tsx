@@ -12,7 +12,13 @@ export function AdminToast({ message }: { message: string }) {
 
   if (!message || !visible) return null;
   return (
-    <div className="admin-toast" role="region" aria-label="Notificação">
+    <div
+      className="admin-toast"
+      role="region"
+      aria-label="Notificação"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <div className="admin-toast-text">
         <strong>Concluído</strong>
         <span>{message}</span>
