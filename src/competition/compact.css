@@ -138,7 +138,9 @@
   }
   .compact-pilot .competition-title .competition-search {
     margin: 0;
-    width: min(300px, 26vw);
+    width: clamp(280px, 32vw, 420px);
+    max-width: none;
+    flex-shrink: 0;
     font-size: 0.8125rem;
     display: flex;
     align-items: center;
@@ -147,6 +149,8 @@
   }
   .compact-pilot .competition-title .competition-search input {
     min-width: 80px;
+    width: 0;
+    flex: 1;
   }
   .compact-pilot .teams-workspace > .teams-help {
     display: none;
