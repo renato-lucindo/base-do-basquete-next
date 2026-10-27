@@ -12,6 +12,16 @@ O responsável pediu ampliar a fila para continuar trabalhando nas próximas jan
 
 ## Limites e continuidade
 
+## Referências enviadas pelo responsável
+
+- [Protótipo inicial](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/#/publico): referência principal de identidade, hierarquia e composição, adaptada à prioridade de reduzir rolagem vertical.
+- [Base do Basquete de referência](https://github.com/renato-lucindo/base-do-basquete): consulta pontual de interfaces e comportamentos pelo plugin GitHub, autorizada pelo responsável; não clonar, acessar banco/serviços antigos ou transplantar arquitetura/schema.
+- [Carbon](https://github.com/carbon-design-system/carbon): estudar os componentes relevantes de tabelas, toolbar, busca, combobox e densidade antes do piloto. README oficial consultado via GitHub em26/10; ainda não foi feita análise específica desses componentes nesta atualização.
+- [Primer React](https://github.com/primer/react): estudar seleção pesquisável, diálogos, listas de ações, foco e teclado nos componentes relevantes. README oficial consultado via GitHub em26/10; inspeção específica fica para a retomada.
+- Usar as referências de modo coerente com os tokens claros/azuis existentes e a skill local web-design-guidelines. O envio dos links não determina instalar bibliotecas inteiras, misturar temas ou reconstruir a aplicação. Decidir eventual reutilização pequena após verificar código, acessibilidade, licença e custo de integração; preservar contratos e fluxos existentes.
+
+## Limites e continuidade da execução
+
 - Aplicar a identidade piloto às demais telas somente após a validação visual exigida no plano. Aguardar essa validação não impede os itens independentes acima.
 - Público, mobile, PDF, interpretador e novas regras de publicação de agenda/inscritos continuam adiados. Não inferir decisões humanas pendentes nem repetir perguntas já adiadas.
 - Não repetir gates/suítes por troca de janela nem inventar trabalho para consumir cota. Corrigir apenas problemas demonstrados dentro do escopo.
