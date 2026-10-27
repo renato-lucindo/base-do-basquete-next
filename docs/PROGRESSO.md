@@ -1,3 +1,21 @@
+# Pessoa e camisa compactas — CI final em andamento27/10/2026
+
+**Pedido humano:** campos expostos e proporcionais nos cadastros, camisa dentro de Editar pessoa e retirada do botão isolado. Ajuste específico do piloto; não houve aprovação visual geral para expandir outras áreas. Plano `docs/superpowers/plans/2026-10-27-pessoa-camisa-compacta.md`, evidências `docs/VALIDACAO-PESSOA-COMPACTA.md`.
+
+**Git/ambiente:** Windows C:/Users/12405304716/Documents/Codex/Base do Basquete-v1, novo remoto https://github.com/renato-lucindo/base-do-basquete-next; branch `codex/pessoa-camisa-compacta`, base3936e2b/PR29. Produto3edac57cedd86d6cbd3ef600a755a8c03876fa8f, fonte final **c9fe7e2970eaaa501f0c3f0c5f9dd464b4b4beea** sóacrescenta correção de espera no teste/documentação. PRdraft30 anexada sobre29; sem merge/principal/produção. `.agents/` e `skills-lock.json` humanos preservados, não rastreados. Outros arquivos desta unidade são do agente.
+
+**Implementado:** dados globais/papéis/privados e opcionais expostos em colunas, altura/peso curtos, ações na mesma linha e viewport1366/1920; equipe global nome/sigla proporcionais. Camisa ativa da inscrição em Editar pessoa,0/00/null preservados, sem mudar história ou vínculos encerrados. Dois contratos existentes, sem DDL: sópartes alteradas são escritas; ACK por comando, congelamento/recuperação de falha parcial, camisa duplicada/reload/conflito/reauth; alteração sóde camisa não regrava pessoa. Adição implícita de papel continua persistida.
+
+**Verificação:** gate local **PASS/exit0,560unit/115arquivos,6transportes/13PG/23workerd/4PDFs**,SHA **e3ddebcd17daf38300aeb8477c92072faf718af95b3d4ea77d44e2cf0e915797**. Composição31desktopPASS36,8s, focal entre operações1PASS14s, axe e capturas aprovados no recorte. CI inicial40498501428/job122169938681 tevegatePASS, browsers393PASS/1FAIL/54SKIP: `toContainText(0)` aceitava00 e inspecionava fixture antes do segundo POST terminar. Teste espera Pessoa salva/célula exatamente0, com atraso250ms;6focais repetidosPASS28s, sem mudar aplicação. **CI final40500316561/job122176089592/sourcec9fe7e2 aguardando resultado integral**. Não atribuir PASS à primeira CI nem repetir gate/SQL/harness126 por sessão.
+
+**Pacote:** prepare-foundation deHEADc9 rastreado limpo,24assets/WorkerSHA **deb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2** (backend idêntico a aa7). Manifesto/payload c9 devem ser usados após CI; pacotes3ed/aa7 obsoletos para esta entrega. Nenhuma migration/Supabase real ou dado humano alterado.48migrations existentes preservadas.
+
+**Serviços:** preview aindaaa7/deploymentaff9ee39-5793-4399-914a-fa561834f1c8/versão18934c23-6b8c-4e85-bc47-2b3a2a91f21d100%, mesmo Worker/conta/Access/cofre/DO/rate do registro anterior. Preflight confirmouownerúnico, zero tokens,previewsOFF. Nenhum deploy/credencial/gate/browser/DDL/cluster local em andamento; somenteCI final citada. Não extrair segredos nem apagar dados humanos emsmoke.
+
+**Próximo EXATO:** conferir CI final. Se falhar, diagnóstico focal; se aprovar, publicar pacote c9 pelo pluginCloudflare no Worker existente e executar smoke RSA emTTY com política/token efêmeros, revogação imediata, hashes/Xsource e anônimo302. Depois atualizar checkpoint/PR e apresentar ao responsável. Não repetir suites ou pedir confirmação técnica já delegada. A automação anterior foi excluída após a entregaaa7; criar retomada oficial somente seatingir85%usados5h, reset real+2. Cota mais recente41%usados5h/76%semanal, sem compra/plano/reset manual. Registros abaixo são históricos.
+
+---
+
 # Administração compacta e inscrição vazia — preview publicado27/10/2026 06:00UTC-03
 
 **Entrega:** locais globais/dropdown, diálogo compacto de atleta, piloto Jogos/Equipes e exclusão segura de inscrição vazia publicados em https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/. Fonte **aa7aa49790d2ed309ff593b9e71c119ef48d3782**, CI **40452980411/job122019741946 SUCCESS**:560unit/115arquivos,388browsersPASS/48SKIP. Gate local e provas inalteradas reutilizados, sem repetir suítes nesta retomada. CI da base PR28/job122019733310 também reconciliada com todos os passos aprovados.
