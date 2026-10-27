@@ -1,3 +1,15 @@
+# Pré-seleção — CI diagnosticada e alinhamento corrigido27/10/2026
+
+**Git atual:** `codex/reaproveitar-elenco`, produto b21f04a1f5db2c3fb3a008ba89e2dacf020ffe85/PRdraft32 sobre31. Ajuste posterior sóCSS de transferência e regressão de rótulo em duas linhas, com documentação. `.agents/` e `skills-lock.json` humanos preservados. Reader posterior está salvo/pushed em branch separada `codex/reaproveitar-elenco-banco`, commit **b20086c**; migration49 **20261027143904_roster_reuse_context.sql NÃO APLICADA**, contrato/readerzero-upgrade9PASS/focaistypeslint. Não consta no pacote atual.
+
+**CI b21:**40522137547/job122251769759 terminou **FAIL**, gate573PASS e browsers410PASS/2FAIL/66SKIP. Duas falhas eram alinhamento destino/camisa no painel compacto de transferênciaLinux,9,75px. Rótulo quebrado e labels esticados reproduzidos com18px noWindows (RED13,5px). `align-items:end` corrige sem ocultar texto.20focais desktop de administração/transferência PASS33,4s, formato/lint/buildfoundation/fronteiraPASS. Motor/contratos/JS da pré-seleção/backend inalterados depois do gate573; reutilizar essas evidências. NovoCI será disparado porpush desta correção; NÃO publicar b21/pacote antigo. Artefato de trace falhou uma vez porTLS; logs e reprodução fornecem o diagnóstico.
+
+**R2b preservado:** stash local identificado `agent WIP R2b RED before writer migration`, somente `src/people/roster-reuse-contract.ts`, novo `src/people/roster-reuse-write-database.test.ts` e `supabase/tests/roster_reuse_write.sql`. Após corrigir setup da vaga administrativa única em fixture, RED real2casos constatou ausência do writer; nenhuma migration de writer criada ainda. Restaurar somente na branch banco depois de reconciliar esta correção; manter o leitorb20086c. Não perder o stash nem aplicar SQL ao projeto por retomada.
+
+**Próximo exato:** commit/push do ajuste visual focal e conferirCI integral do novoSHA. SePASS, regenerar prepare-foundation deHEAD limpo/buildnovo (24assets,Workerdeb6 inalterado), publicar pelo pluginCloudflare no Worker/Access existente e smoke RSAemTTY/revogar/anônimo302. Depois voltar à branch banco, incorporar correção verificada sem perder leitor, restaurar stashR2b e gerar migrationCLI apósRED para writer/contexto/recibo/atomicidade/G4. Sem DDL/deploy/credencial em andamento; previewc9/5334bd53-262d-459a-b882-2e5ead191549 permanece protegido. Última cota54%usados5h/92%semanal, reset5h27/10 15:56:07UTC-03/semanal02/11 04:45:56UTC-03; automação retomar-administra-o-compactaPAUSED enquanto execução ativa. Aos85%5h/bloqueiosemanal checkpoint/push/MESMAautomação resetefetivo+2. Não repetir suítes/aceites adiados.
+
+---
+
 # ReaproveitamentoR2a local e CI da pré-seleção27/10/2026
 
 **Git atual:** branch `codex/reaproveitar-elenco-banco` sobre **b21f04a1f5db2c3fb3a008ba89e2dacf020ffe85** (pré-seleção), após R1aa4a31c/auditoriacc02882. Reader/candidatos locais implementados em migrationCLI **20261027143904_roster_reuse_context.sql**, NÃO APLICADA no Supabase.48anteriores imutáveis. `.agents/` e `skills-lock.json` humanos preservados; outros arquivos desta unidade do agente. Plano/evidências em reaproveitamento-elenco.

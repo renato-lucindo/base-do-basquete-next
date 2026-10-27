@@ -28,6 +28,16 @@ Pedido adicional do responsável: não exigir conferir individualmente nomes e r
 
 Gate consolidado quando a correção de pré-seleção estiver estável, CI e preview protegido conforme pipeline existente. Depois R2 de reaproveitamento porIDs com banco real descartável e versão/contexto, antes de oferecer cópia na interface. Nenhum dado humano removido/reescrito para testar;48migrations aplicadas permanecem imutáveis.
 
+## CI e correção focal do alinhamento
+
+CI40522137547/job122251769759/sourceb21f04a: gate573 aprovado, browsers **410PASS/2FAIL/66SKIP** em8,4min. As duas falhas são de alinhamento no painel compacto de transferência em1366/1920: diferença9,75px noLinux. Pré-seleção não consta entre as falhas; não atribuir aprovação integral a essaCI.
+
+O grid esticava oslabels; ao quebrar um rótulo, distribuía a altura extra e desalinhava os controles. Reproduzido localmente com rótulos18px: diferença13,5px emRED, `.preview-artifacts/automatic-match-ci-layout-red.log`. A primeira tentativa de reprodução não alterava a fonte pela especificidade doCSS e passou; não foi evidênciaRED. `align-items:end` nofieldset alinha os campos pelas bases sem cortar o rótulo ou fixar altura.
+
+Focal final `tests/admin-expansion.spec.ts tests/transfers.spec.ts --project=desktop`: **20PASS/33,4s**, `.preview-artifacts/automatic-match-ci-layout-green.log`. Formato/lint/buildfoundation/fronteira aprovados. JS/contratos/backend não mudaram depois do gate573; reutilizar essas provas e aguardarCI da fonte corrigida, sem repetir o gate local porCSS/teste. Download do artefatoCI falhou uma vez porTLS; diagnóstico usa logs e reprodução local, não trace baixado.
+
+---
+
 ## R2a: fonte privada local,27/10/2026
 
 Branch sequencial `codex/reaproveitar-elenco-banco`, baseb21f04a. CI40522137547/job122251769759 está verificando **b21f04a** (pré-seleção/visual), não o leitor posterior. Pacote b21/24assets/WorkerSHAdeb6fe60fb000a89c3e2dd373c93eb58369abcbcec8308c266a4fd08cd6d69d2 preparado de checkout limpo antes de R2. Usá-lo somente se a CI específica aprovar; não reempacotar R2WIP.
