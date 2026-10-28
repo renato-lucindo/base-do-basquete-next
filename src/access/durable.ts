@@ -67,6 +67,11 @@ import {
   type RegistrationRemoval,
 } from "../teams/removal-contract";
 import { SupabaseGames } from "../games/provider";
+import { SupabaseOfficiating } from "../games/officiating-provider";
+import {
+  saveGameEditorSchema,
+  type SaveGameEditor,
+} from "../games/officiating-contract";
 import { SupabasePdfSources } from "../boxscore/provider";
 import { SupabasePdfOriginals } from "../boxscore/storage";
 import { extractSupportedPdf } from "../boxscore/extract";
@@ -102,6 +107,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
   private readonly games: SupabaseGames;
+  private readonly officiating: SupabaseOfficiating;
   private readonly publications: SupabasePublications;
   private readonly regulations: SupabaseRegulations;
   private readonly decisions: SupabaseDecisions;
@@ -147,6 +153,10 @@ export class SessionStore extends DurableObject<Env> {
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
     this.games = new SupabaseGames({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
+    this.officiating = new SupabaseOfficiating({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
@@ -397,6 +407,27 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.listVenues(accessToken, query, offset),
+      ),
+    );
+  }
+  listGameOfficials(query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.officiating.list(accessToken, query, offset),
+      ),
+    );
+  }
+  getGameEditor(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.officiating.get(accessToken, id),
+      ),
+    );
+  }
+  saveGameEditor(command: SaveGameEditor) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.officiating.save(accessToken, saveGameEditorSchema.parse(command)),
       ),
     );
   }

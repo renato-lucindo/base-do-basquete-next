@@ -3,6 +3,7 @@ import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveGameSchema } from "./contract";
 import { saveSheetSchema } from "./sheet-contract";
+import { saveGameEditorSchema } from "./officiating-contract";
 export async function gamesRoute(request: Request, env: Env, url: URL) {
   const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
   if (!name)
@@ -13,6 +14,63 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     );
   const session = env.SESSIONS.getByName(name),
     root = url.pathname === "/api/games";
+  if (url.pathname === "/api/games/officials") {
+    if (request.method !== "GET")
+      throw new HttpError(405, "invalid_method", "Método não permitido.");
+    const text = url.searchParams.get("offset") ?? "0",
+      offset = Number(text),
+      query = url.searchParams.get("q") ?? "";
+    if (
+      [...url.searchParams.keys()].some(
+        (k) =>
+          !["q", "offset"].includes(k) ||
+          url.searchParams.getAll(k).length !== 1,
+      ) ||
+      [...query].length > 160 ||
+      /[\u0000-\u001f\u007f]/u.test(query) ||
+      !/^\d+$/u.test(text) ||
+      !Number.isSafeInteger(offset) ||
+      offset > 100000
+    )
+      throw badInput();
+    const result = await session.listGameOfficials(query, offset);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
+  const editor = /^\/api\/games\/([^/]+)\/editor$/u.exec(url.pathname);
+  if (editor) {
+    const id = z.uuid().safeParse(editor[1]);
+    if (!id.success || url.search) throw badInput();
+    if (request.method === "GET") {
+      const result = await session.getGameEditor(id.data);
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    if (request.method === "POST") {
+      if (
+        url.origin !== env.APP_ORIGIN ||
+        request.headers.get("origin") !== env.APP_ORIGIN ||
+        request.headers.get("sec-fetch-site") === "cross-site"
+      )
+        throw new HttpError(403, "invalid_origin", "Origem não permitida.");
+      const actor = await session.actor();
+      if (!actor.ok)
+        throw new HttpError(actor.status, actor.code, actor.message);
+      const command = await readMutationJson(request, saveGameEditorSchema, {
+        origin: env.APP_ORIGIN,
+        maxBytes: 8192,
+      });
+      if (command.game.id.toLowerCase() !== id.data.toLowerCase())
+        throw badInput();
+      const result = await session.saveGameEditor(command);
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    throw new HttpError(405, "invalid_method", "Método não permitido.");
+  }
   if (url.pathname === "/api/games/venues") {
     if (request.method !== "GET")
       throw new HttpError(405, "invalid_method", "Método não permitido.");

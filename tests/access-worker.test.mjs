@@ -11,6 +11,7 @@ import { achievementOutbound } from "./fixtures/achievement-outbound.mjs";
 import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
 import { statisticsRpcBody } from "./fixtures/statistics-rpc.ts";
 import { registrationRemovalOutbound } from "./fixtures/registration-removal-rpc.mjs";
+import { officiatingOutbound } from "./fixtures/officiating-outbound.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
@@ -301,6 +302,7 @@ async function fixture(options = {}) {
   const achievementResponse = achievementOutbound(options);
   const playerProfileResponse = playerProfileOutbound(options, id);
   const removalResponse = registrationRemovalOutbound(options);
+  const officiatingResponse = officiatingOutbound(id);
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -334,6 +336,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (options.officiating) {
+          const r = await officiatingResponse(request);
+          if (r) return r;
+        }
         const removal = await removalResponse(request);
         if (removal) return removal;
         if (options.playerProfiles) {
@@ -1531,6 +1537,106 @@ test("sheet routes authorize and validate domain, path correlation, origin and l
     assert.equal(
       f.calls.filter((c) => c === "/rest/v1/rpc/save_game_sheet").length,
       1,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("officiating editor uses private RPCs and authorizes before mutation body", async () => {
+  const options = { officiating: true },
+    f = await fixture(options);
+  try {
+    const editor = `/api/games/${id}/editor`;
+    for (const path of [editor, "/api/games/officials"])
+      assert.equal((await f.mf.dispatchFetch(origin + path)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (method, path, body, headers = {}) =>
+      f.mf.dispatchFetch(origin + path, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...headers,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    const list = await send(
+      "GET",
+      "/api/games/officials?q=Jo%C3%A3o&offset=20",
+    );
+    assert.equal(list.status, 200);
+    assert.equal((await list.json()).items[0].name, "João");
+    const snapshot = await send("GET", editor);
+    assert.equal(snapshot.status, 200);
+    const initial = await snapshot.json();
+    const command = {
+      commandId: "fd700000-0000-4000-8000-000000000100",
+      expectedVersion: 1,
+      game: Object.fromEntries(
+        [
+          "id",
+          "disputeId",
+          "homeRegistrationId",
+          "awayRegistrationId",
+          "date",
+          "time",
+          "venue",
+          "number",
+        ].map((k) => [k, initial.game[k]]),
+      ),
+      officiating: initial.officiating,
+    };
+    const saved = await send("POST", editor, command);
+    assert.equal(saved.status, 200);
+    assert.deepEqual(await saved.json(), { id, version: 2 });
+    assert.deepEqual(await (await send("POST", editor, command)).json(), {
+      id,
+      version: 2,
+    });
+    assert.equal(
+      (await send("POST", editor, command, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    assert.equal(
+      (
+        await send("POST", editor, {
+          ...command,
+          game: { ...command.game, id: command.commandId },
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (await send("POST", editor, { ...command, extra: "x".repeat(8192) }))
+        .status,
+      413,
+    );
+    for (const path of [
+      "/api/games/officials?q=a&q=b",
+      "/api/games/officials?offset=-1",
+      "/api/games/officials?unknown=x",
+      "/api/games/officials?q=%00",
+      `${editor}?x=1`,
+    ])
+      assert.equal((await send("GET", path)).status, 400, path);
+    assert.equal((await send("POST", "/api/games/officials", {})).status, 405);
+    assert.equal((await send("PUT", editor, command)).status, 405);
+    const writes = f.calls.filter((p) =>
+      p.endsWith("/save_game_editor"),
+    ).length;
+    options.denied = true;
+    const denied = await f.mf.dispatchFetch(origin + editor, {
+      method: "POST",
+      headers: { cookie, origin, "content-type": "application/json" },
+      body: "{",
+    });
+    assert.equal(denied.status, 403);
+    assert.equal(
+      f.calls.filter((p) => p.endsWith("/save_game_editor")).length,
+      writes,
     );
   } finally {
     await f.mf.dispose();
