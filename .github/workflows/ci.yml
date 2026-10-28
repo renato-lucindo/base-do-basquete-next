@@ -43,9 +43,11 @@ jobs:
             fi
           fi
       - run: npm ci --ignore-scripts
+      - name: Secret scanner regression checks
+        run: node --test tests/check-secrets.test.mjs
       - name: Documentation checks
         if: steps.scope.outputs.code == 'false'
-        run: npm run format:check && npm run secrets
+        run: npm run format:check && node scripts/check-secrets.mjs --source-only
       - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
         if: steps.scope.outputs.code == 'true'
       - run: npm run gate
