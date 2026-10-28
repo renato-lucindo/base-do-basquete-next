@@ -18,4 +18,12 @@ CI **40608285174/job122553191652 FAIL** sobre98a6f1c: gate com573unit/117arquivo
 
 ## Próximo passo
 
+### Composição com banco preservado
+
+Junção explícita em branch `codex/uiux-elenco-integracao`, merge **36801c0a492ad62260eb664c56b33e548dcd7e9a**, pais75c7ad2 (banco/checkpoint) e b4a9209 (UI corrigida). Merge sem conflitos; nenhuma integração na principal ou alteração nas branches de origem. Todos os commits daUI e do banco preservados por ancestralidade. Esta branch é integraçãoWIP, não uma novaPR deUI.
+
+Gate consolidado dessa composição **PASS/exit0:577unit/119arquivos,6transportes/13PG/23workerd/4PDFs**, builds/tipos/lint/formato/fronteira/segredos747. Log `.preview-artifacts/uiux-bank-composition-gate.log`, SHA256 **2b45dd27a4c7707b29145cf64b8ea2db31bd1a588ebd7117026a2a3016c02474**. Os40browsers focais anteriores se aplicam às mesmas telas/testes inalterados. Isso não é CI remota da composição nem prova de cópia de elenco no Supabase. Migrations49/50 continuam **não aplicadas**, fonte/writer ainda sem provider/rotas/diálogo.
+
+Publicação deUI deverá usar a fonte daPR33 cujaCI específica aprovar, sem apresentar o reaproveitamento incompleto como funcionalidade disponível. Banco/serviços não serão alterados para publicar CSS/componentes.
+
 Salvar/push da correção na mesmaPR33 e conferir novaCI integral doSHA específico. Gate573 de98a6f1c permanece válido para o código de produto inalterado; não repetir gate local por ajuste somente de teste/documentação. Depois reconciliar e integrar aUI com o bancoWIP em unidade própria, preservando ambas as histórias. Migrations49/50 continuam locais/não aplicadas; nenhum novo deploy ou serviço remoto foi alterado nesta correção.
