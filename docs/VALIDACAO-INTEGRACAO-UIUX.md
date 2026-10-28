@@ -18,6 +18,12 @@ CI **40608285174/job122553191652 FAIL** sobre98a6f1c: gate com573unit/117arquivo
 
 ## Próximo passo
 
+### Zoom nativo automatizado
+
+Prova reproduzível em `docs/evidencias/uiux-native-zoom/README.md`, runner fora da suíte padrão. Fonte da composição5f9a683, frontend idêntico a1e73ae0; **2PASS/11,5s**. Usa perfil temporário Chromium, extensão local restrita a esse perfil e `tabs.setZoom/getZoom=2`. Janelas1366×768 e1920×1080 deram área útil1350×673→675×336 e1904×985→952×492, DPR1→2. Preparação/lançamento, layout, rolagem, edição por teclado e restauração do foco aprovados; não houve viewport reduzida artificialmente nessa prova.
+
+Capturas iniciais por elemento sob zoom recortavam a área errada e não sustentam avaliação visual. Refeitas com CDP da viewport, inspecionadas e preservadas. Log intermediário `.preview-artifacts/native-zoom-viewport.log`, SHA256 **94fb6f3e02d6d5c18ee9184fec00bded11b384a0db5ec2b7de79077149077491**; runner versionado equivalente foi executado depois, sem mudança no produto. Isso complementa os testes de simulação de largura, não comprova aceite humano/WCAG integral. Extensão/fixtures nunca vão para deploy.
+
 ### Composição com banco preservado
 
 Junção explícita em branch `codex/uiux-elenco-integracao`, merge **36801c0a492ad62260eb664c56b33e548dcd7e9a**, pais75c7ad2 (banco/checkpoint) e b4a9209 (UI corrigida). Merge sem conflitos; nenhuma integração na principal ou alteração nas branches de origem. Todos os commits daUI e do banco preservados por ancestralidade. Esta branch é integraçãoWIP, não uma novaPR deUI.
