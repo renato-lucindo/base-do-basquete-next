@@ -363,3 +363,79 @@ test.describe("desktop scoresheet MVP", () => {
     ).toHaveLength(4);
   });
 });
+
+test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  await desktopSheetFixture(page);
+  await openDesktopSheet(page);
+  await chooseFive(page);
+
+  const zoomedViewports = [
+    { width: 683, height: 384, origin: "1366x768" },
+    { width: 960, height: 540, origin: "1920x1080" },
+  ];
+  const inspectTeams = async (phase: string) => {
+    const grid = page.locator(".sheet-desktop-teams").last();
+    const boxes = await grid.locator(".sheet-team-card").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom };
+      }),
+    );
+    expect(boxes).toHaveLength(2);
+    expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom - 1);
+    const overflow = await grid.evaluate(
+      (node) => node.scrollWidth > node.clientWidth + 1,
+    );
+    expect(overflow).toBe(false);
+    await grid.screenshot({
+      path: `.preview-artifacts/sheet-zoom200-${phase}-after-${page.viewportSize()!.width}.png`,
+      animations: "disabled",
+    });
+  };
+
+  for (const viewport of zoomedViewports) {
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
+    await inspectTeams("preparation");
+  }
+
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page
+    .getByRole("button", {
+      name: "Concluir preparação e lançar ações",
+      exact: true,
+    })
+    .click();
+  await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+  await page.keyboard.press("Enter");
+  await page.getByLabel("Ação", { exact: true }).fill("1");
+  await page.keyboard.press("Enter");
+
+  for (const viewport of zoomedViewports) {
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
+    await inspectTeams("live");
+  }
+
+  const edit = page.getByRole("button", {
+    name: "Editar ação 1",
+    exact: true,
+  });
+  await edit.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", {
+    name: "Editar ação da súmula",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(edit).toBeFocused();
+});
