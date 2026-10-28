@@ -378,11 +378,11 @@ test("carregamento e falha de busca mantêm semântica e permitem tentar novamen
   page,
 }) => {
   await gamesFixture(page);
-  let release: (() => void) | undefined;
+  const releases: (() => void)[] = [];
   let fail = true;
   await page.route(/\/api\/games\/officials(?:\?|$)/, async (route) => {
     await new Promise<void>((resolve) => {
-      release = resolve;
+      releases.push(resolve);
     });
     await route
       .fulfill(
@@ -403,24 +403,23 @@ test("carregamento e falha de busca mantêm semântica e permitem tentar novamen
   await open(page);
   const field = page.getByRole("combobox", { name: "Árbitro", exact: true });
   await field.fill("Lento");
-  await expect.poll(() => !!release).toBe(true);
+  await expect.poll(() => releases.length > 0).toBe(true);
   try {
     const scan = await new AxeBuilder({ page })
       .include(".game-editor-dialog")
       .analyze();
     expect(scan.violations).toEqual([]);
   } finally {
-    release?.();
+    releases.shift()?.();
   }
   await expect(page.getByRole("alert")).toContainText(
     "Não foi possível buscar oficiais",
   );
   fail = false;
-  release = undefined;
   await field.press("Escape");
   await field.press("ArrowDown");
-  await expect.poll(() => !!release).toBe(true);
-  release?.();
+  await expect.poll(() => releases.length > 0).toBe(true);
+  releases.shift()?.();
   await expect(
     page.getByRole("option", { name: "Usar novo oficial: Lento", exact: true }),
   ).toBeVisible();
