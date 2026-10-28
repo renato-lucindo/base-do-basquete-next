@@ -18,8 +18,6 @@ Catálogo/vínculos/recibos privados com RLS e sem grants diretos. RPCs administ
 
 Leitura do projeto novo nizmasjddyrhmevvfviz pelo vínculo autorizado: **48migrations,11jogos,167pessoas,18inscrições,1Auth,0objetosStorage** em28/10/2026. São dados humanos, preservados. Não foram executados DDL/DML/fixtures remotos. SQL de prova usa o administrador existente sem DMLAuth/admin; runner descartável cria seu administrador apenas localmente.
 
-## Pendente
-
 ## A2a — adapter local
 
 - Catálogo, leitura de editor num snapshot e salvamento versionado implementados em `src/games/officiating-provider.ts`. Quatro testes novos tiveram RED real e GREEN; composição com provider legado **8/8 PASS**.
