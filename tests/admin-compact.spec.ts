@@ -210,8 +210,8 @@ for (const [width, height] of [
     });
     await scroller.focus();
     await expect(scroller).toBeFocused();
-    await expect(scroller).toHaveCSS("outline-style", "solid");
     await page.keyboard.press("ArrowRight");
+    await expect(scroller).toHaveCSS("outline-style", "solid");
     await expect
       .poll(() => scroller.evaluate((node) => node.scrollLeft))
       .toBeGreaterThan(0);
