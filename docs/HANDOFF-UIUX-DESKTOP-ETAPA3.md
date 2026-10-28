@@ -42,3 +42,15 @@
 - O workflow preserva os mesmos gates e publica capturas sintéticas geradas pelos testes de desktop como artefato `evidencias-uiux-desktop-SHA`.
 - Rotas cobertas: Jogos, Equipes e elenco, Regulamento, importação de texto, edição e histórico de súmula e confirmadores já testados; as capturas têm resolução 1366×768 e 1920×1080 quando definida pelo teste.
 - Apenas arquivos `.preview-artifacts/*after*.png` são incluídos no artefato; não há coleta de dados humanos, credenciais ou tráfego autenticado do preview.
+
+## Continuação pós-consolidação — reflow, foco e importação (27/10/2026)
+
+- O `AdminDialog` e os `AdminToast` já existiam na PR #33; não foram reimplementados.
+- A súmula recebeu reflow de duas para uma coluna em largura CSS estreita em ambiente desktop com ponteiro fino e hover, além de rolagem horizontal local para a tabela ao vivo, foco visível e acesso pelo teclado (`sheet-workspace.css`, `sheet-live-tables.tsx`).
+- A região rolável da importação ganhou indicador explícito de foco em ambientes desktop com mouse (`text-import/workspace.css`).
+- Os testes Playwright de `sheet-desktop.spec.ts` simulam a área útil aproximada de zoom 200% em 1366×768 e 1920×1080 usando viewports 683×384 e 960×540, validando empilhamento de equipes, rolagem, Tab/Shift+Tab em modal e restauração do foco com Escape.
+- `admin-compact.spec.ts` verifica rolagem horizontal por teclado na importação nessas larguras, indicador de foco, tratamento de nome longo e aguarda carregamento estável antes de capturar a conferência.
+- As 22 capturas da execução anteriormente aprovada `40598292003`, commit `0099fad7`, foram baixadas e inspecionadas como referência. Uma delas mostrava estado transitório “Carregando inscrições…”; a espera do teste foi ajustada. **Essas capturas não validam os novos commits.**
+- **Pendente:** obter o resultado de `npm run gate` e `npm run test:e2e` no novo HEAD, verificar as novas imagens e realizar teste de zoom 200% real no navegador. A simulação por viewport não substitui o teste de zoom real, nem comprova WCAG integral.
+- O conector GitHub consultado só expõe consulta de workflow por SHA vinculada a eventos de pull request; o `ci.yml` atual dispara em `push`. Sem ID do novo run, nenhuma aprovação foi presumida.
+- Manter a PR #33 aberta em Draft. Nenhum merge, deployment, migration ou alteração de banco foi solicitado ou feito nesta unidade.
