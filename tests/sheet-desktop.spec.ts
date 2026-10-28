@@ -376,7 +376,7 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
     { width: 683, height: 384, origin: "1366x768" },
     { width: 960, height: 540, origin: "1920x1080" },
   ];
-  const inspectTeams = async (phase: string) => {
+  const inspectTeams = async (phase: string, source: string) => {
     const grid = page.locator(".sheet-desktop-teams").last();
     const boxes = await grid.locator(".sheet-team-card").evaluateAll((nodes) =>
       nodes.map((node) => {
@@ -391,7 +391,7 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
     );
     expect(overflow).toBe(false);
     await grid.screenshot({
-      path: `.preview-artifacts/sheet-zoom200-${phase}-after-${page.viewportSize()!.width}.png`,
+      path: `.preview-artifacts/sheet-zoom200-${phase}-after-${source}.png`,
       animations: "disabled",
     });
   };
@@ -401,7 +401,7 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
       width: viewport.width,
       height: viewport.height,
     });
-    await inspectTeams("preparation");
+    await inspectTeams("preparation", viewport.origin);
   }
 
   await page.setViewportSize({ width: 1366, height: 768 });
@@ -421,7 +421,7 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
       width: viewport.width,
       height: viewport.height,
     });
-    await inspectTeams("live");
+    await inspectTeams("live", viewport.origin);
   }
 
   const edit = page.getByRole("button", {
