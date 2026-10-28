@@ -20,4 +20,14 @@ Leitura do projeto novo nizmasjddyrhmevvfviz pelo vínculo autorizado: **48migra
 
 ## Pendente
 
-Revisão independente/corridas reais PG do novo writer/prova real com rollback e aplicação segura/tipos remotos. Provider/SessionStore/rotas/dropdowns/formulário, testes de interface, gate/CI e publicação. Não declarar arbitragem disponível no preview. Preview segue source1e73ae0/deployment1290ebc0-fedd-4d64-8c7a-e410c80e68d2, sem novo deploy.
+## A2a — adapter local
+
+- Catálogo, leitura de editor num snapshot e salvamento versionado implementados em `src/games/officiating-provider.ts`. Quatro testes novos tiveram RED real e GREEN; composição com provider legado **8/8 PASS**.
+- Saída fechada/página20, nome de RPC fixo, JWT somente servidor, validação antes do envio, correlação do jogo/ACK, homônimo explícito, idempotência e erros sanitizados. RPCs novas ainda não conectadas ao SessionStore/rotas/UI. Tipos gerados do banco remoto não foram alterados artificialmente.
+- `npm run typecheck` aplicação+Worker PASS; lint dos arquivos do adapter e segredos **755arquivos PASS**. Não houve gate ou CI da unidade incompleta.
+- Prova A1 após ordem final de locks: **6/6 PASS**, log `.preview-artifacts/officiating-a1-postlocks.log`, SHA256e8c6a5b1b3270f61b6cbca1ed5bdfd582ab8b7282875d8b53bb40954be607d90.
+- Regressão13PG: SHA2562ef23401a2db17b53c2f431c89dc98e74c1cbc0f9c1b767f214b6e3987b6d2a6. Adapter8focais: `.preview-artifacts/officiating-provider-final.log`, SHA2565cbd8222973480f1f07e1148b77f50662a9bc8389f9b75353bc79c84e3e6f0f9.
+
+## Próxima unidade
+
+Revisão independente/corridas reais PG do novo writer/prova real com rollback e aplicação segura/tipos remotos. SessionStore/rotas/dropdowns/formulário, testes de interface, gate/CI e publicação. Não declarar arbitragem disponível no preview. Preview segue source1e73ae0/deployment1290ebc0-fedd-4d64-8c7a-e410c80e68d2, sem novo deploy.
