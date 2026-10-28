@@ -208,10 +208,11 @@ for (const [width, height] of [
     await scroller.evaluate((node) => {
       node.scrollLeft = 0;
     });
+    await page.keyboard.press("Tab");
     await scroller.focus();
     await expect(scroller).toBeFocused();
-    await page.keyboard.press("ArrowRight");
     await expect(scroller).toHaveCSS("outline-style", "solid");
+    await page.keyboard.press("ArrowRight");
     await expect
       .poll(() => scroller.evaluate((node) => node.scrollLeft))
       .toBeGreaterThan(0);
