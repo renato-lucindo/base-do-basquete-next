@@ -52,7 +52,7 @@ for (const width of [1366, 1920])
                 id: tid(700 + n),
                 name:
                   n === 0
-                    ? "João Pedro de Albuquerque e Silva"
+                    ? "João Pedro de Albuquerque e Silva de Oliveira Fernandes Nascimento"
                     : "Atleta de exemplo " + String(n + 1),
                 nickname: null,
                 publicBirthYear: 2000,
@@ -207,6 +207,7 @@ for (const [width, height] of [
     });
     await scroller.focus();
     await expect(scroller).toBeFocused();
+    await expect(scroller).toHaveCSS("outline-style", "solid");
     await page.keyboard.press("ArrowRight");
     await expect
       .poll(() => scroller.evaluate((node) => node.scrollLeft))
