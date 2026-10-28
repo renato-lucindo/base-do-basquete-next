@@ -117,53 +117,57 @@ export function SheetActionHistory({
           : `${result.total} ações encontradas · página ${result.page + 1}`}
       </p>
       {result.items.length ? (
-        (["points", "fouls"] as const).map((kind) => (
-          <section
-            key={kind}
-            aria-label={
-              kind === "points" ? "Ações de pontos" : "Ações de faltas"
-            }
-          >
-            <h5>{kind === "points" ? "Pontos" : "Faltas"}</h5>
-            <ol className="sheet-actions">
-              {result.items
-                .filter((a) => a.kind === kind)
-                .map((a) => (
-                  <li
-                    key={a.event.id}
-                    className={`sheet-period-${periodColor(a.event.period)}`}
-                  >
-                    <span>
-                      {a.sequence}. {periodLabel(a.event.period)} -{" "}
-                      {a.event.side === "home" ? "A" : "B"} -{" "}
-                      {/^[0-9]/u.test(a.event.target)
-                        ? "#" + a.event.target
-                        : a.event.target === "C"
-                          ? "Técnico"
-                          : "Banco"}{" "}
-                      - {a.annotation}
-                    </span>
-                    <div className="competition-actions">
-                      <button
-                        disabled={disabled}
-                        aria-label={`Editar ação ${a.sequence}`}
-                        onClick={() => onEdit(a)}
+        <div className="sheet-history-groups">
+          {(["points", "fouls"] as const)
+            .filter((kind) => result.items.some((item) => item.kind === kind))
+            .map((kind) => (
+              <section
+                key={kind}
+                aria-label={
+                  kind === "points" ? "Ações de pontos" : "Ações de faltas"
+                }
+              >
+                <h5>{kind === "points" ? "Pontos" : "Faltas"}</h5>
+                <ol className="sheet-actions">
+                  {result.items
+                    .filter((a) => a.kind === kind)
+                    .map((a) => (
+                      <li
+                        key={a.event.id}
+                        className={`sheet-period-${periodColor(a.event.period)}`}
                       >
-                        Editar
-                      </button>
-                      <button
-                        disabled={disabled}
-                        aria-label={`Excluir ação ${a.sequence}`}
-                        onClick={() => onDelete(a.event.id)}
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  </li>
-                ))}
-            </ol>
-          </section>
-        ))
+                        <span>
+                          {a.sequence}. {periodLabel(a.event.period)} -{" "}
+                          {a.event.side === "home" ? "A" : "B"} -{" "}
+                          {/^[0-9]/u.test(a.event.target)
+                            ? "#" + a.event.target
+                            : a.event.target === "C"
+                              ? "Técnico"
+                              : "Banco"}{" "}
+                          - {a.annotation}
+                        </span>
+                        <div className="competition-actions">
+                          <button
+                            disabled={disabled}
+                            aria-label={`Editar ação ${a.sequence}`}
+                            onClick={() => onEdit(a)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            disabled={disabled}
+                            aria-label={`Excluir ação ${a.sequence}`}
+                            onClick={() => onDelete(a.event.id)}
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                </ol>
+              </section>
+            ))}
+        </div>
       ) : (
         <p>
           {actions.length

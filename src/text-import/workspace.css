@@ -111,3 +111,11 @@
   gap: 12px;
   padding: 16px;
 }
+
+/* Keyboard users must be able to locate the horizontally scrollable review. */
+@media (hover: hover) and (pointer: fine) {
+  .text-import-scroll:focus-visible {
+    outline: 3px solid #075fca;
+    outline-offset: 2px;
+  }
+}

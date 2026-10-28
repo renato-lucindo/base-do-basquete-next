@@ -196,6 +196,99 @@ for (const width of [1366, 1920])
     });
   });
 
+test("unsaved season and dispute removals require a visible modal confirmation", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  const addDispute = page.getByRole("button", {
+    name: "Adicionar disputa à temporada 1",
+    exact: true,
+  });
+  const category = page.getByLabel("Categoria da disputa 1.2", {
+    exact: true,
+  });
+  const removeDispute = page.getByRole("button", {
+    name: "Remover disputa 1.2",
+    exact: true,
+  });
+  await addDispute.click();
+  await category.fill("Sub-18");
+  await removeDispute.click();
+  const dialog = page.getByRole("dialog", {
+    name: "Remover disputa?",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("Sub-18");
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.screenshot({
+      path: `dist/ui-ux-captures/competition-removal-after-${viewport.width}x${viewport.height}.png`,
+      animations: "disabled",
+    });
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(category).toHaveValue("Sub-18");
+  await removeDispute.click();
+  await dialog
+    .getByRole("button", { name: "Confirmar remoção", exact: true })
+    .click();
+  await expect(category).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Adicionar temporada", exact: true })
+    .click();
+  const removeSeason = page.getByRole("button", {
+    name: "Remover temporada 2",
+    exact: true,
+  });
+  const seasonDialog = page.getByRole("dialog", {
+    name: "Remover temporada?",
+  });
+  await removeSeason.click();
+  await expect(seasonDialog).toBeVisible();
+  await seasonDialog
+    .getByRole("button", { name: "Cancelar remoção", exact: true })
+    .click();
+  await expect(page.getByLabel("Ano da temporada 2")).toBeVisible();
+  await removeSeason.click();
+  await seasonDialog
+    .getByRole("button", { name: "Confirmar remoção", exact: true })
+    .click();
+  await expect(page.getByLabel("Ano da temporada 2")).toHaveCount(0);
+});
+
+test("championship save shows a dismissible toast", async ({ page }) => {
+  await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  await page
+    .getByRole("button", { name: "Salvar campeonato", exact: true })
+    .click();
+  const toast = page.getByRole("region", { name: "Notificação" });
+  await expect(toast).toContainText("Campeonato salvo");
+  for (const viewport of [
+    { width: 1366, height: 768 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.screenshot({
+      path: `dist/ui-ux-captures/competition-toast-after-${viewport.width}x${viewport.height}.png`,
+      animations: "disabled",
+    });
+  }
+  await toast.getByRole("button", { name: "Dispensar notificação" }).click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByTestId("competition-save-state")).toContainText(
+    "Salvo",
+  );
+});
+
 test("competition is saved and restored with multiple seasons and explicit disputes", async ({
   page,
 }) => {

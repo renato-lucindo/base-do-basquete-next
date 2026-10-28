@@ -6,6 +6,8 @@ import { editAction, deleteAction } from "../scoresheet/actions";
 import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
+import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast } from "../competition/admin-toast";
 import { projectSheet } from "../scoresheet/projection";
 import {
   preparationContextSchema,
@@ -77,7 +79,14 @@ export function GameSheetWorkspace(props: Props) {
     targetRef = useRef<HTMLInputElement>(null),
     codeRef = useRef<HTMLInputElement>(null),
     periodRef = useRef<HTMLSelectElement>(null),
-    deleteHeading = useRef<HTMLHeadingElement>(null);
+    editCodeRef = useRef<HTMLInputElement>(null),
+    focusAfterDelete = useRef(false),
+    editingRestore = useRef<{
+      side: Side;
+      period: number;
+      target: string;
+      code: string;
+    } | null>(null);
   const returningToSide = useRef<Side | null>(null);
   const d = history?.present,
     dirty = !!d && JSON.stringify(d) !== baseline,
@@ -124,7 +133,10 @@ export function GameSheetWorkspace(props: Props) {
     if (error && props.enabled) alert.current?.focus();
   }, [error, props.enabled]);
   useEffect(() => {
-    deleteHeading.current?.focus();
+    if (!deleting && focusAfterDelete.current) {
+      focusAfterDelete.current = false;
+      targetRef.current?.focus();
+    }
   }, [deleting]);
   function report(e: unknown) {
     if (isSessionFailure(e)) props.onSessionLost();
@@ -326,6 +338,30 @@ export function GameSheetWorkspace(props: Props) {
     setTarget(value);
     return value;
   }
+  function beginEditing(event: PersistedSheet["events"][number]) {
+    editingRestore.current = { side, period, target, code };
+    setError("");
+    setEditing(event.id);
+    setSide(event.side);
+    setPeriod(event.period);
+    setTarget(event.target);
+    setCode(event.code);
+  }
+  function finishEditing() {
+    setEditing(null);
+    const previous = editingRestore.current;
+    editingRestore.current = null;
+    if (previous) {
+      setSide(previous.side);
+      setPeriod(previous.period);
+      setTarget(previous.target);
+      setCode(previous.code);
+    }
+  }
+  function cancelEditing() {
+    finishEditing();
+    setError("");
+  }
   function addAction() {
     if (!d || locked) return;
     const value = checkedTarget();
@@ -357,9 +393,13 @@ export function GameSheetWorkspace(props: Props) {
           events: [...d.events, { id: crypto.randomUUID(), ...patch }],
         };
       if (mutate(next)) {
-        setCode("");
-        setEditing(null);
-        focusTarget();
+        if (editing) {
+          finishEditing();
+          setStatus("Ação editada no rascunho");
+        } else {
+          setCode("");
+          focusTarget();
+        }
       }
     } catch (e) {
       report(e);
@@ -483,6 +523,7 @@ export function GameSheetWorkspace(props: Props) {
   }
   return (
     <section className="game-sheet" aria-busy={busy}>
+      <AdminToast message={props.enabled && !auxiliary ? status : ""} />
       <h3 ref={heading} tabIndex={-1}>
         Relacionados e súmula
       </h3>
@@ -579,150 +620,141 @@ export function GameSheetWorkspace(props: Props) {
             </>
           )}
           <div hidden={preparationOpen}>
-            <fieldset disabled={locked || !!deleting} className="sheet-input">
-              <legend>
-                {editing ? "Editar ação selecionada" : "Lançar ações"}
-              </legend>
-              <p>
-                Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4: quarto
-                · Alt+Q: escolher período. Alvos B: banco, C: técnico.
-              </p>
-              <div className="competition-fields">
-                <label>
-                  Equipe da ação
-                  <select
-                    aria-label="Equipe da ação"
-                    value={side}
-                    onChange={(e) => setSide(e.target.value as Side)}
+            {!editing && (
+              <fieldset
+                hidden={!!editing}
+                disabled={locked || !!deleting || !!editing}
+                className="sheet-input"
+              >
+                <legend>Lançar ações</legend>
+                <p>
+                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
+                  quarto · Alt+Q: escolher período. Alvos B: banco, C: técnico.
+                </p>
+                <div className="competition-fields">
+                  <label>
+                    Equipe da ação
+                    <select
+                      aria-label="Equipe da ação"
+                      value={side}
+                      onChange={(e) => setSide(e.target.value as Side)}
+                    >
+                      <option value="home">A · {props.game.home.name}</option>
+                      <option value="away">B · {props.game.away.name}</option>
+                    </select>
+                  </label>
+                  <label>
+                    Quarto ou prorrogação
+                    <select
+                      aria-label="Quarto ou prorrogação"
+                      ref={periodRef}
+                      value={period}
+                      onChange={(e) => setPeriod(Number(e.target.value))}
+                    >
+                      {Array.from({ length: d.periods }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {periodLabel(i + 1)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Camisa ou alvo
+                    <input
+                      ref={targetRef}
+                      value={target}
+                      maxLength={2}
+                      autoComplete="off"
+                      onChange={(e) => setTarget(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                          e.preventDefault();
+                          if (checkedTarget() !== null) {
+                            setError("");
+                            codeRef.current?.focus();
+                            codeRef.current?.select();
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Ação
+                    <input
+                      ref={codeRef}
+                      value={code}
+                      maxLength={3}
+                      autoComplete="off"
+                      onChange={(e) => setCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                          e.preventDefault();
+                          addAction();
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                <div className="competition-actions">
+                  <button onClick={addAction}>Registrar ação</button>
+                  <button
+                    disabled={!history.past.length || !!editing}
+                    onClick={() => {
+                      const last = history.past.at(-1);
+                      if (last)
+                        setHistory({
+                          present: last,
+                          past: history.past.slice(0, -1),
+                          future: [...history.future, d],
+                        });
+                    }}
                   >
-                    <option value="home">A · {props.game.home.name}</option>
-                    <option value="away">B · {props.game.away.name}</option>
-                  </select>
-                </label>
-                <label>
-                  Quarto ou prorrogação
-                  <select
-                    aria-label="Quarto ou prorrogação"
-                    ref={periodRef}
-                    value={period}
-                    onChange={(e) => setPeriod(Number(e.target.value))}
+                    Desfazer ação ou ajuste
+                  </button>
+                  <button
+                    disabled={!history.future.length || !!editing}
+                    onClick={() => {
+                      const last = history.future.at(-1);
+                      if (last)
+                        setHistory({
+                          present: last,
+                          past: [...history.past, d].slice(-50),
+                          future: history.future.slice(0, -1),
+                        });
+                    }}
                   >
-                    {Array.from({ length: d.periods }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {periodLabel(i + 1)}
+                    Refazer ação ou ajuste
+                  </button>
+                </div>
+                <label>
+                  Períodos da súmula
+                  <select
+                    aria-label="Períodos da súmula"
+                    value={d.periods}
+                    onChange={(e) => {
+                      const periods = Number(e.target.value);
+                      if (mutate({ ...d, periods }))
+                        setPeriod((p) => Math.min(p, periods));
+                    }}
+                  >
+                    {Array.from({ length: 9 }, (_, i) => (
+                      <option key={i + 4} value={i + 4}>
+                        {i + 4} períodos
                       </option>
                     ))}
                   </select>
                 </label>
-                <label>
-                  Camisa ou alvo
-                  <input
-                    ref={targetRef}
-                    value={target}
-                    maxLength={2}
-                    autoComplete="off"
-                    onChange={(e) => setTarget(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                        e.preventDefault();
-                        if (checkedTarget() !== null) {
-                          setError("");
-                          codeRef.current?.focus();
-                          codeRef.current?.select();
-                        }
-                      }
-                    }}
-                  />
-                </label>
-                <label>
-                  Ação
-                  <input
-                    ref={codeRef}
-                    value={code}
-                    maxLength={3}
-                    autoComplete="off"
-                    onChange={(e) => setCode(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                        e.preventDefault();
-                        addAction();
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-              <div className="competition-actions">
-                <button onClick={addAction}>
-                  {editing ? "Salvar edição da ação" : "Registrar ação"}
-                </button>
-                {editing && (
-                  <button
-                    onClick={() => {
-                      setEditing(null);
-                      setCode("");
-                      focusTarget();
-                    }}
-                  >
-                    Cancelar edição da ação
-                  </button>
-                )}
-                <button
-                  disabled={!history.past.length || !!editing}
-                  onClick={() => {
-                    const last = history.past.at(-1);
-                    if (last)
-                      setHistory({
-                        present: last,
-                        past: history.past.slice(0, -1),
-                        future: [...history.future, d],
-                      });
-                  }}
-                >
-                  Desfazer ação ou ajuste
-                </button>
-                <button
-                  disabled={!history.future.length || !!editing}
-                  onClick={() => {
-                    const last = history.future.at(-1);
-                    if (last)
-                      setHistory({
-                        present: last,
-                        past: [...history.past, d].slice(-50),
-                        future: history.future.slice(0, -1),
-                      });
-                  }}
-                >
-                  Refazer ação ou ajuste
-                </button>
-              </div>
-              <label>
-                Períodos da súmula
-                <select
-                  aria-label="Períodos da súmula"
-                  value={d.periods}
-                  onChange={(e) => {
-                    const periods = Number(e.target.value);
-                    if (mutate({ ...d, periods }))
-                      setPeriod((p) => Math.min(p, periods));
-                  }}
-                >
-                  {Array.from({ length: 9 }, (_, i) => (
-                    <option key={i + 4} value={i + 4}>
-                      {i + 4} períodos
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <details>
-                <summary>Códigos aceitos</summary>
-                <p>
-                  1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U, D;
-                  P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco: B1/B2/BC.
-                  Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo indica falta
-                  compensada.
-                </p>
-              </details>
-            </fieldset>
+                <details>
+                  <summary>Códigos aceitos</summary>
+                  <p>
+                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U,
+                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco:
+                    B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo
+                    indica falta compensada.
+                  </p>
+                </details>
+              </fieldset>
+            )}
             {projection && (
               <SheetLiveTables
                 document={d}
@@ -740,35 +772,135 @@ export function GameSheetWorkspace(props: Props) {
                 actions={projection.actions}
                 periods={d.periods}
                 disabled={locked || !!editing || !!deleting}
-                onEdit={({ event }) => {
-                  setEditing(event.id);
-                  setSide(event.side);
-                  setPeriod(event.period);
-                  setTarget(event.target);
-                  setCode(event.code);
-                  targetRef.current?.focus();
-                }}
+                onEdit={({ event }) => beginEditing(event)}
                 onDelete={setDeleting}
               />
             )}
-            {deleting && (
-              <div className="sheet-delete">
-                <h4 ref={deleteHeading} tabIndex={-1}>
-                  Excluir esta ação?
-                </h4>
+            {editing && (
+              <AdminDialog
+                title="Editar ação da súmula"
+                open={!!editing}
+                busy={locked}
+                onClose={cancelEditing}
+                className="sheet-edit-dialog"
+              >
                 <p>
-                  A participação do atleta será preservada. É possível desfazer
-                  a exclusão.
+                  Altere os dados da ação selecionada. A mudança ficará no
+                  rascunho até salvar.
                 </p>
+                {error && (
+                  <p role="alert" className="access-error">
+                    {error}
+                  </p>
+                )}
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    addAction();
+                  }}
+                >
+                  <fieldset className="sheet-edit-fields" disabled={locked}>
+                    <legend className="sr-only">Dados da ação</legend>
+                    <label>
+                      Equipe da ação
+                      <select
+                        value={side}
+                        onChange={(event) =>
+                          setSide(event.target.value as Side)
+                        }
+                      >
+                        <option value="home">A · {props.game.home.name}</option>
+                        <option value="away">B · {props.game.away.name}</option>
+                      </select>
+                    </label>
+                    <label>
+                      Quarto ou prorrogação
+                      <select
+                        value={period}
+                        onChange={(event) =>
+                          setPeriod(Number(event.target.value))
+                        }
+                      >
+                        {Array.from({ length: d.periods }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {periodLabel(i + 1)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Camisa ou alvo
+                      <input
+                        autoFocus
+                        maxLength={2}
+                        autoComplete="off"
+                        value={target}
+                        onChange={(event) => setTarget(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (
+                            event.key === "Enter" &&
+                            !event.nativeEvent.isComposing
+                          ) {
+                            event.preventDefault();
+                            editCodeRef.current?.focus();
+                          }
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Ação
+                      <input
+                        ref={editCodeRef}
+                        name="edit-code"
+                        maxLength={3}
+                        autoComplete="off"
+                        value={code}
+                        onChange={(event) => setCode(event.target.value)}
+                      />
+                    </label>
+                  </fieldset>
+                  <div className="competition-actions">
+                    <button type="submit" disabled={locked}>
+                      Salvar edição da ação
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={locked}
+                      onClick={cancelEditing}
+                    >
+                      Cancelar edição da ação
+                    </button>
+                  </div>
+                </form>
+              </AdminDialog>
+            )}
+            <AdminDialog
+              title="Excluir esta ação?"
+              open={!!deleting}
+              busy={locked}
+              onClose={() => setDeleting(null)}
+              className="sheet-delete-dialog"
+            >
+              <p className="sheet-delete-context">
+                Confirma a exclusão da ação selecionada no histórico?
+              </p>
+              <p>
+                A participação do atleta será preservada. É possível desfazer a
+                exclusão.
+              </p>
+              <div className="competition-actions">
                 <button
+                  type="button"
                   disabled={locked}
                   onClick={() => {
-                    if (engine) {
+                    if (engine && deleting) {
                       try {
                         const next = deleteAction(engine, deleting);
                         if (mutate({ ...d, events: next.events })) {
+                          focusAfterDelete.current = true;
                           setDeleting(null);
-                          focusTarget();
+                          setStatus("Ação excluída do rascunho");
                         }
                       } catch (e) {
                         report(e);
@@ -778,11 +910,16 @@ export function GameSheetWorkspace(props: Props) {
                 >
                   Confirmar exclusão da ação
                 </button>
-                <button onClick={() => setDeleting(null)}>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={locked}
+                  onClick={() => setDeleting(null)}
+                >
                   Cancelar exclusão
                 </button>
               </div>
-            )}
+            </AdminDialog>
           </div>
           {snapshot?.confirmed && (
             <label>

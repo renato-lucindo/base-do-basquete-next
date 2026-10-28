@@ -5,6 +5,118 @@ import {
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("desktop action history uses horizontal columns at both requested viewports", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    for (let i = 0; i < 10; i++) {
+      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+      await page.keyboard.press("Enter");
+      await page.getByLabel("Ação", { exact: true }).fill("1");
+      await page.keyboard.press("Enter");
+    }
+    const history = page.getByRole("region", {
+      name: "Ações de pontos",
+      exact: true,
+    });
+    const items = history.locator(".sheet-actions li");
+    await expect(items).toHaveCount(10);
+    for (const [width, height] of [
+      [1366, 768],
+      [1920, 1080],
+    ]) {
+      await page.setViewportSize({ width, height });
+      const first = await items.nth(0).boundingBox();
+      const second = await items.nth(1).boundingBox();
+      expect(first && second).toBeTruthy();
+      expect(Math.abs(first!.y - second!.y)).toBeLessThan(3);
+      expect(second!.x).toBeGreaterThan(first!.x + 20);
+      await history.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
+        animations: "disabled",
+      });
+      const firstAction = items.first();
+      await firstAction.getByRole("button", { name: /Excluir ação/ }).click();
+      const dialog = page.getByRole("dialog", {
+        name: "Excluir esta ação?",
+        exact: true,
+      });
+      await expect(dialog).toBeVisible();
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-delete-after-${width}x${height}.png`,
+        animations: "disabled",
+      });
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
+    }
+  });
+  test("editing actions uses a modal with cancel, save and toast at desktop widths", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", {
+        name: "Concluir preparação e lançar ações",
+        exact: true,
+      })
+      .click();
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    await page.getByLabel("Ação", { exact: true }).fill("1");
+    await page.keyboard.press("Enter");
+    const action = page.getByRole("button", {
+      name: "Editar ação 1",
+      exact: true,
+    });
+    const dialog = page.getByRole("dialog", {
+      name: "Editar ação da súmula",
+      exact: true,
+    });
+    await action.click();
+    await expect(dialog).toBeVisible();
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const box = await dialog.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
+      await page.screenshot({
+        path: `dist/ui-ux-captures/sheet-edit-modal-after-${viewport.width}x${viewport.height}.png`,
+        animations: "disabled",
+      });
+    }
+    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".sheet-actions li")).toContainText(["1p"]);
+    await action.click();
+    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await dialog
+      .getByRole("button", { name: "Salvar edição da ação", exact: true })
+      .click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator(".sheet-actions li")).toContainText(["2p"]);
+    const toast = page.getByRole("region", { name: "Notificação" });
+    await expect(toast).toContainText("Ação editada no rascunho");
+    await toast.getByRole("button", { name: "Dispensar notificação" }).click();
+    await expect(toast).toHaveCount(0);
+  });
+
   test("overtimes stay in player Q4, team periods stay separate and foul borders follow the actual half", async ({
     page,
   }) => {
@@ -250,4 +362,107 @@ test.describe("desktop scoresheet MVP", () => {
         ?.document.participants.filter((p) => p.side === "away" && p.starter),
     ).toHaveLength(4);
   });
+});
+
+test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  await desktopSheetFixture(page);
+  await openDesktopSheet(page);
+  await chooseFive(page);
+
+  const zoomedViewports = [
+    { width: 683, height: 384, origin: "1366x768" },
+    { width: 960, height: 540, origin: "1920x1080" },
+  ];
+  const inspectTeams = async (phase: string, source: string) => {
+    // The live grid stays mounted under `hidden` while preparing the teams.
+    // Inspect the active stage, otherwise zero rectangles pass and its screenshot waits forever.
+    const grid = page.locator(".sheet-desktop-teams:visible");
+    await expect(grid).toHaveCount(1);
+    await expect(grid).toBeVisible();
+    const boxes = await grid.locator(".sheet-team-card").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom };
+      }),
+    );
+    expect(boxes).toHaveLength(2);
+    for (const box of boxes) expect(box.bottom).toBeGreaterThan(box.top);
+    expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom - 1);
+    const overflow = await grid.evaluate(
+      (node) => node.scrollWidth > node.clientWidth + 1,
+    );
+    expect(overflow).toBe(false);
+    await grid.screenshot({
+      path: `.preview-artifacts/sheet-zoom200-${phase}-after-${source}.png`,
+      animations: "disabled",
+    });
+  };
+
+  for (const viewport of zoomedViewports) {
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
+    await inspectTeams("preparation", viewport.origin);
+  }
+
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page
+    .getByRole("button", {
+      name: "Concluir preparação e lançar ações",
+      exact: true,
+    })
+    .click();
+  await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
+  await page.keyboard.press("Enter");
+  await page.getByLabel("Ação", { exact: true }).fill("1");
+  await page.keyboard.press("Enter");
+
+  for (const viewport of zoomedViewports) {
+    await page.setViewportSize({
+      width: viewport.width,
+      height: viewport.height,
+    });
+    await inspectTeams("live", viewport.origin);
+    if (viewport.width === 683) {
+      const scroller = page.getByRole("region", {
+        name: "Súmula da equipe A com rolagem horizontal",
+        exact: true,
+      });
+      await scroller.evaluate((node) => {
+        node.scrollLeft = 0;
+      });
+      await scroller.focus();
+      await expect(scroller).toBeFocused();
+      await page.keyboard.press("ArrowRight");
+      await expect
+        .poll(() => scroller.evaluate((node) => node.scrollLeft))
+        .toBeGreaterThan(0);
+    }
+  }
+
+  const edit = page.getByRole("button", {
+    name: "Editar ação 1",
+    exact: true,
+  });
+  await edit.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", {
+    name: "Editar ação da súmula",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  const focusIsInsideDialog = () =>
+    dialog.evaluate((node) => node.contains(document.activeElement));
+  await expect.poll(focusIsInsideDialog).toBe(true);
+  await page.keyboard.press("Tab");
+  await expect.poll(focusIsInsideDialog).toBe(true);
+  await page.keyboard.press("Shift+Tab");
+  await expect.poll(focusIsInsideDialog).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(edit).toBeFocused();
 });

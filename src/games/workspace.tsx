@@ -6,6 +6,7 @@ import { GameSheetWorkspace } from "./sheet-workspace";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
 import { AdminDialog } from "../competition/admin-dialog";
+import { AdminToast } from "../competition/admin-toast";
 import {
   registrationListingSchema,
   type RegistrationSnapshot,
@@ -288,6 +289,19 @@ export function GamesWorkspace(props: Props) {
   }
   return (
     <section className="games-workspace">
+      <AdminToast
+        message={
+          props.enabled &&
+          !sheetVisible &&
+          !auxiliary &&
+          !busy &&
+          !uncertain &&
+          !conflict &&
+          !dirty
+            ? status
+            : ""
+        }
+      />
       <div className="competition-title">
         <h3 ref={heading} tabIndex={-1}>
           Jogos

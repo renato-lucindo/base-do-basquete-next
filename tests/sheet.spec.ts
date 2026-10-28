@@ -437,17 +437,34 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page
     .getByRole("button", { name: "Editar ação 1", exact: true })
     .click();
+  const editDialog = page.getByRole("dialog", {
+    name: "Editar ação da súmula",
+    exact: true,
+  });
+  await expect(editDialog).toBeVisible();
+  await expect(editDialog).toContainText("rascunho até salvar");
   await page.getByLabel("Ação", { exact: true }).fill("1");
   await page.keyboard.press("Enter");
+  await expect(editDialog).toBeHidden();
   await expect(page.locator(".sheet-actions li").last()).toContainText(
     "#12 - 1p",
   );
   await page
     .getByRole("button", { name: "Excluir ação 2", exact: true })
     .click();
-  await expect(
-    page.getByRole("heading", { name: "Excluir esta ação?", exact: true }),
-  ).toBeFocused();
+  const deleteDialog = page.getByRole("dialog", {
+    name: "Excluir esta ação?",
+    exact: true,
+  });
+  await expect(deleteDialog).toBeVisible();
+  await expect(deleteDialog).toContainText("A participação do atleta");
+  await page.keyboard.press("Escape");
+  await expect(deleteDialog).toBeHidden();
+  await expect(page.locator(".sheet-actions li")).toHaveCount(2);
+  await page
+    .getByRole("button", { name: "Excluir ação 2", exact: true })
+    .click();
+  await expect(deleteDialog).toBeVisible();
   await page
     .getByRole("button", { name: "Confirmar exclusão da ação", exact: true })
     .click();

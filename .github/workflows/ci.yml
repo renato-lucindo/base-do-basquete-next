@@ -20,6 +20,13 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-uiux-desktop-${{ github.sha }}
+          path: .preview-artifacts/*after*.png
+          if-no-files-found: warn
+          include-hidden-files: true
+      - uses: actions/upload-artifact@v4
         with:
           name: prototipo-${{ github.sha }}
           path: dist

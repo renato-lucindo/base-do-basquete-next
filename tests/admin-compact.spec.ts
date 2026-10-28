@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
 import { writeFile } from "node:fs/promises";
 import { gamesFixture } from "./fixtures/games";
-import { tid } from "./fixtures/text-import";
+import { regulationBrowserFixture } from "./fixtures/regulation-browser";
+import { openTextImport, textImportFixture, tid } from "./fixtures/text-import";
 const savedAt = "2026-10-23T19:00:00Z";
 
 for (const width of [1366, 1920])
@@ -51,7 +52,7 @@ for (const width of [1366, 1920])
                 id: tid(700 + n),
                 name:
                   n === 0
-                    ? "João Pedro de Albuquerque e Silva"
+                    ? "João Pedro de Albuquerque e Silva de Oliveira Fernandes Nascimento"
                     : "Atleta de exemplo " + String(n + 1),
                 nickname: null,
                 publicBirthYear: 2000,
@@ -130,3 +131,125 @@ for (const width of [1366, 1920])
       }
     });
   }
+
+for (const width of [1366, 1920]) {
+  test(`admin importação compacta desktop ${width}`, async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "Escopo desktop");
+    await page.setViewportSize({
+      width,
+      height: width === 1366 ? 768 : 1080,
+    });
+    await textImportFixture(page);
+    await openTextImport(page);
+    await page
+      .getByLabel("Texto do elenco", { exact: true })
+      .fill("Equipe: Lobos\n5 - Ana Silva\n12 - Ricardo Souza");
+    await page
+      .getByRole("button", { name: "Interpretar texto", exact: true })
+      .click();
+    const region = page.getByRole("region", {
+      name: "Tabela de conferência com rolagem horizontal",
+      exact: true,
+    });
+    const table = page.getByRole("table", {
+      name: "Conferência do elenco",
+    });
+    await expect(region).toBeVisible();
+    await expect(table).toBeVisible();
+    await expect(
+      page.getByText("Carregando inscrições…", { exact: true }),
+    ).toBeHidden();
+    const metrics = await table.evaluate((node) => ({
+      compact: !!node.closest(".compact-pilot"),
+      minWidth: getComputedStyle(node).minWidth,
+      pageOverflow:
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    }));
+    expect(metrics.compact).toBe(true);
+    expect(metrics.minWidth).toBe("1220px");
+    expect(metrics.pageOverflow).toBe(false);
+    await page.screenshot({
+      path: `.preview-artifacts/admin-after-importacao-${width}.png`,
+    });
+  });
+}
+
+for (const [width, height] of [
+  [683, 384],
+  [960, 540],
+]) {
+  test(`importação permanece navegável com zoom equivalente a 200% em ${width}px`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "desktop", "Apenas desktop");
+    await page.setViewportSize({ width, height });
+    await textImportFixture(page);
+    await openTextImport(page);
+    await page
+      .getByLabel("Texto do elenco", { exact: true })
+      .fill("Equipe: Lobos\\n5 - Ana Silva\\n12 - Ricardo Souza");
+    await page
+      .getByRole("button", { name: "Interpretar texto", exact: true })
+      .click();
+    const scroller = page.getByRole("region", {
+      name: "Tabela de conferência com rolagem horizontal",
+      exact: true,
+    });
+    await expect(scroller).toBeVisible();
+    const geometry = await scroller.evaluate((node) => ({
+      scrollable: node.scrollWidth > node.clientWidth + 1,
+      pageOverflow:
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth + 1,
+    }));
+    expect(geometry.scrollable).toBe(true);
+    expect(geometry.pageOverflow).toBe(false);
+    await scroller.evaluate((node) => {
+      node.scrollLeft = 0;
+    });
+    await page.keyboard.press("Tab");
+    await scroller.focus();
+    await expect(scroller).toBeFocused();
+    await expect(scroller).toHaveCSS("outline-style", "solid");
+    await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(() => scroller.evaluate((node) => node.scrollLeft))
+      .toBeGreaterThan(0);
+    await scroller.screenshot({
+      path: `.preview-artifacts/admin-import-zoom200-after-${width}.png`,
+      animations: "disabled",
+    });
+  });
+}
+
+for (const width of [1366, 1920]) {
+  test(`admin regulamento desktop ${width}`, async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop", "Escopo desktop");
+    await page.setViewportSize({
+      width,
+      height: width === 1366 ? 768 : 1080,
+    });
+    await regulationBrowserFixture(page);
+    await page.goto(
+      `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
+    );
+    await expect(
+      page.getByRole("heading", {
+        name: "Regulamento da disputa",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.locator(".compact-pilot .regulation")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <=
+          document.documentElement.clientWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `.preview-artifacts/admin-after-regulamento-${width}.png`,
+    });
+  });
+}

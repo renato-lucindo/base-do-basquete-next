@@ -72,7 +72,12 @@ export function SheetLiveTables({
         {(["home", "away"] as const).map((side) => {
           const letter = side === "home" ? "A" : "B";
           return (
-            <section className="sheet-team-card" key={side}>
+            <section
+              className="sheet-team-card"
+              key={side}
+              tabIndex={0}
+              aria-label={`Súmula da equipe ${letter} com rolagem horizontal`}
+            >
               <h4>
                 Equipe {letter} · {game[side].name}
               </h4>
