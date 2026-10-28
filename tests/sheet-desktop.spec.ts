@@ -422,6 +422,21 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
       height: viewport.height,
     });
     await inspectTeams("live", viewport.origin);
+    if (viewport.width === 683) {
+      const scroller = page.getByRole("region", {
+        name: "Súmula da equipe A com rolagem horizontal",
+        exact: true,
+      });
+      await scroller.evaluate((node) => {
+        node.scrollLeft = 0;
+      });
+      await scroller.focus();
+      await expect(scroller).toBeFocused();
+      await page.keyboard.press("ArrowRight");
+      await expect
+        .poll(() => scroller.evaluate((node) => node.scrollLeft))
+        .toBeGreaterThan(0);
+    }
   }
 
   const edit = page.getByRole("button", {
