@@ -49,6 +49,61 @@ function fixture() {
 }
 
 describe("persistent administrative session", () => {
+  it("does not turn a committed command into failure when diagnostics fail", async () => {
+    const f = fixture();
+    await f.create().create(credentials);
+    const session = new PersistentSession(
+      f.store,
+      f.provider,
+      key,
+      () => 1000,
+      () => {
+        throw Error("fixture logger unavailable");
+      },
+    );
+    await expect(
+      session.runAuthorized(async () => ({ saved: true }), "game.save"),
+    ).resolves.toEqual({ saved: true });
+  });
+  it("observes queue, fresh authority and data stages without recording identities or credentials", async () => {
+    const f = fixture();
+    await f.create().create(credentials);
+    const samples: unknown[] = [];
+    const session = new PersistentSession(
+      f.store,
+      f.provider,
+      key,
+      () => 1000,
+      (sample) => samples.push(sample),
+    );
+    expect(
+      await session.runAuthorized(async () => ({ saved: true }), "game.save"),
+    ).toEqual({ saved: true });
+    await expect(
+      session.runAuthorized(async () => {
+        throw new HttpError(409, "version_conflict", "Conflict");
+      }, "sheet.save"),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(samples).toHaveLength(2);
+    expect(samples[0]).toEqual({
+      operation: "game.save",
+      queueMs: expect.any(Number),
+      authorityMs: expect.any(Number),
+      dataMs: expect.any(Number),
+      outcome: "ok",
+    });
+    expect(samples[1]).toMatchObject({
+      operation: "sheet.save",
+      outcome: "error",
+    });
+    for (const value of [
+      actor.id,
+      "fixture-access",
+      "fixture-refresh",
+      "fixture-password",
+    ])
+      expect(JSON.stringify(samples)).not.toContain(value);
+  });
   it("runs data operations with rotated authority inside the queue and closes before the next operation", async () => {
     const f = fixture();
     const session = f.create();
@@ -102,6 +157,7 @@ describe("persistent administrative session", () => {
     expect(f.provider.refresh).toHaveBeenCalledTimes(1);
     expect(f.provider.authorize).toHaveBeenLastCalledWith(
       "fixture-rotated-access",
+      actor.id,
     );
     expect(await f.create().actor()).toEqual(actor);
   });

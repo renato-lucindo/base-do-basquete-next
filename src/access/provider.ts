@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { HttpError } from "../server/http";
 import type { Tables } from "../server/database.types";
+import { invalidSession } from "./vault";
 
 export type Credentials = { email: string; password: string };
 export type Tokens = {
@@ -64,30 +65,53 @@ export class SupabaseAccess {
     };
   }
 
-  async authorize(accessToken: string): Promise<Actor> {
+  async authorize(accessToken: string, sealedActorId?: string): Promise<Actor> {
     const headers = { Authorization: `Bearer ${accessToken}` };
-    const user = userSchema.safeParse(
-      await providerJson(await this.request("/auth/v1/user", { headers }, 401)),
-    );
-    if (!user.success) throw unavailable();
-    if (user.data.is_anonymous) throw forbidden();
-    const rows = adminSchema.safeParse(
-      await providerJson(
-        await this.request(
-          `/rest/v1/admin_access?select=user_id,enabled&user_id=eq.${user.data.id}`,
-          { headers },
-          503,
+    const identity = async () => {
+      const user = userSchema.safeParse(
+        await providerJson(
+          await this.request("/auth/v1/user", { headers }, 401),
         ),
-      ),
-    );
+      );
+      if (!user.success) throw unavailable();
+      if (user.data.is_anonymous) throw forbidden();
+      return user.data;
+    };
+    const permission = (actorId: string) =>
+      this.request(
+        `/rest/v1/admin_access?select=user_id,enabled&user_id=eq.${actorId}`,
+        { headers },
+        503,
+      ).then((response) => providerJson(response));
+    let user: z.infer<typeof userSchema>;
+    let permissionBody: unknown;
+    if (sealedActorId !== undefined) {
+      if (!z.uuid().safeParse(sealedActorId).success) throw invalidSession();
+      // The hint is only from the encrypted session; both upstream checks are
+      // still fresh, use the same JWT and must succeed. No permission cache.
+      const [auth, admin] = await Promise.allSettled([
+        identity(),
+        permission(sealedActorId),
+      ]);
+      if (auth.status === "rejected") throw auth.reason;
+      user = auth.value;
+      if (user.id !== sealedActorId) throw invalidSession();
+      if (admin.status === "rejected") throw admin.reason;
+      permissionBody = admin.value;
+    } else {
+      // During login there is no trusted identity yet.
+      user = await identity();
+      permissionBody = await permission(user.id);
+    }
+    const rows = adminSchema.safeParse(permissionBody);
     if (!rows.success) throw unavailable();
     if (
       rows.data.length !== 1 ||
-      rows.data[0].user_id !== user.data.id ||
+      rows.data[0].user_id !== user.id ||
       !rows.data[0].enabled
     )
       throw forbidden();
-    return { id: user.data.id };
+    return { id: user.id };
   }
 
   async signOut(accessToken: string): Promise<void> {

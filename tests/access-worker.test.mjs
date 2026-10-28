@@ -16,6 +16,55 @@ import { officiatingOutbound } from "./fixtures/officiating-outbound.mjs";
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
+test("fresh parallel authority checks finish before data and still reject revocation in workerd", async () => {
+  const options = { officiating: true };
+  const f = await fixture(options);
+  let releaseIdentity;
+  let permissionStarted;
+  const identityGate = new Promise((resolve) => {
+    releaseIdentity = resolve;
+  });
+  const permissionGate = new Promise((resolve) => {
+    permissionStarted = resolve;
+  });
+  try {
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    options.identityGate = identityGate;
+    options.onAdminRead = permissionStarted;
+    const before = f.calls.length;
+    const response = f.mf.dispatchFetch(`${origin}/api/games/${id}/editor`, {
+      headers: { cookie },
+    });
+    let timeout;
+    try {
+      const parallel = await Promise.race([
+        permissionGate.then(() => true),
+        new Promise((resolve) => {
+          timeout = setTimeout(() => resolve(false), 1000);
+        }),
+      ]);
+      assert.equal(parallel, true);
+      assert.equal(
+        f.calls.slice(before).some((p) => p.includes("/rpc/")),
+        false,
+      );
+    } finally {
+      clearTimeout(timeout);
+      releaseIdentity();
+    }
+    assert.equal((await response).status, 200);
+    options.denied = true;
+    const denied = await f.mf.dispatchFetch(
+      `${origin}/api/games/${id}/editor`,
+      { headers: { cookie } },
+    );
+    assert.equal(denied.status, 403);
+  } finally {
+    releaseIdentity();
+    await f.mf.dispose();
+  }
+});
+
 test("paged public source discards mixed versions and bounds conflict retry in workerd", async () => {
   const seed = JSON.parse(
     await readFile("tests/fixtures/statistics-source.json", "utf8"),
@@ -424,9 +473,12 @@ async function fixture(options = {}) {
                 : 900,
           });
         }
-        if (url.pathname === "/auth/v1/user")
+        if (url.pathname === "/auth/v1/user") {
+          if (options.identityGate) await options.identityGate;
           return Response.json({ id, is_anonymous: false });
+        }
         if (url.pathname === "/rest/v1/admin_access") {
+          options.onAdminRead?.();
           if (
             options.decisions ||
             options.transfers ||

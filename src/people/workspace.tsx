@@ -175,7 +175,7 @@ export function MembersWorkspace({
       );
   }
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || importing) return;
     let active = true;
     const controller = new AbortController();
     setLoading(true);
@@ -210,7 +210,15 @@ export function MembersWorkspace({
       active = false;
       controller.abort();
     };
-  }, [enabled, registration.id, history, rosterOffset, staffOffset, refresh]);
+  }, [
+    enabled,
+    registration.id,
+    history,
+    rosterOffset,
+    staffOffset,
+    refresh,
+    importing,
+  ]);
   useEffect(() => {
     if (!enabled || !target || query.trim().length < 2) {
       setCandidates({ items: [], hasMore: false });
