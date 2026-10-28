@@ -504,3 +504,8 @@
     min-width: 820px;
   }
 }
+
+.game-sheet .sheet-team-card:focus-visible {
+  outline: 3px solid #075fca;
+  outline-offset: 2px;
+}
