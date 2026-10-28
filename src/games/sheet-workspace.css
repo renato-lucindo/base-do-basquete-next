@@ -490,3 +490,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Keep each team readable when desktop users zoom to 200% (narrow CSS viewport). */
+@media (max-width: 999px) {
+  .game-sheet .sheet-desktop-teams {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .game-sheet .sheet-team-card:has(.sheet-live-table),
+  .game-sheet .sheet-team-score {
+    overflow-x: auto;
+  }
+  .game-sheet .sheet-live-table {
+    min-width: 820px;
+  }
+}
