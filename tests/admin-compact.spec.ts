@@ -172,6 +172,52 @@ for (const width of [1366, 1920]) {
   });
 }
 
+for (const [width, height] of [
+  [683, 384],
+  [960, 540],
+]) {
+  test(`importação permanece navegável com zoom equivalente a 200% em ${width}px`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "desktop", "Apenas desktop");
+    await page.setViewportSize({ width, height });
+    await textImportFixture(page);
+    await openTextImport(page);
+    await page
+      .getByLabel("Texto do elenco", { exact: true })
+      .fill("Equipe: Lobos\\n5 - Ana Silva\\n12 - Ricardo Souza");
+    await page
+      .getByRole("button", { name: "Interpretar texto", exact: true })
+      .click();
+    const scroller = page.getByRole("region", {
+      name: "Tabela de conferência com rolagem horizontal",
+      exact: true,
+    });
+    await expect(scroller).toBeVisible();
+    const geometry = await scroller.evaluate((node) => ({
+      scrollable: node.scrollWidth > node.clientWidth + 1,
+      pageOverflow:
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth + 1,
+    }));
+    expect(geometry.scrollable).toBe(true);
+    expect(geometry.pageOverflow).toBe(false);
+    await scroller.evaluate((node) => {
+      node.scrollLeft = 0;
+    });
+    await scroller.focus();
+    await expect(scroller).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect
+      .poll(() => scroller.evaluate((node) => node.scrollLeft))
+      .toBeGreaterThan(0);
+    await scroller.screenshot({
+      path: `.preview-artifacts/admin-import-zoom200-after-${width}.png`,
+      animations: "disabled",
+    });
+  });
+}
+
 for (const width of [1366, 1920]) {
   test(`admin regulamento desktop ${width}`, async ({ page }, info) => {
     test.skip(info.project.name !== "desktop", "Escopo desktop");
