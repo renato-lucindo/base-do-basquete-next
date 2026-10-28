@@ -377,7 +377,11 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
     { width: 960, height: 540, origin: "1920x1080" },
   ];
   const inspectTeams = async (phase: string, source: string) => {
-    const grid = page.locator(".sheet-desktop-teams").last();
+    // The live grid stays mounted under `hidden` while preparing the teams.
+    // Inspect the active stage, otherwise zero rectangles pass and its screenshot waits forever.
+    const grid = page.locator(".sheet-desktop-teams:visible");
+    await expect(grid).toHaveCount(1);
+    await expect(grid).toBeVisible();
     const boxes = await grid.locator(".sheet-team-card").evaluateAll((nodes) =>
       nodes.map((node) => {
         const rect = node.getBoundingClientRect();
@@ -385,6 +389,7 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
       }),
     );
     expect(boxes).toHaveLength(2);
+    for (const box of boxes) expect(box.bottom).toBeGreaterThan(box.top);
     expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom - 1);
     const overflow = await grid.evaluate(
       (node) => node.scrollWidth > node.clientWidth + 1,
