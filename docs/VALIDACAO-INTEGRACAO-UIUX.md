@@ -26,4 +26,12 @@ Gate consolidado dessa composição **PASS/exit0:577unit/119arquivos,6transporte
 
 Publicação deUI deverá usar a fonte daPR33 cujaCI específica aprovar, sem apresentar o reaproveitamento incompleto como funcionalidade disponível. Banco/serviços não serão alterados para publicar CSS/componentes.
 
+### Conferência populada na evidência de importação
+
+Inspeção da captura `admin-import-zoom200-after-683.png` encontrou apenas cabeçalho: o teste novo usava caracteres literais de barra invertida+n em vez de quebras de linha. A interpretação tinha zero atletas; as asserções de overflow/foco passavam sem conferir conteúdo. Isso é lacuna dafixture/teste, não defeito novo do interpretador.
+
+Acrescentadas exigências de duas linhas e nomes reais nos campos. **RED2FAIL** porzero linhas, `.preview-artifacts/uiux-import-zoom-red.log`, SHA256 **bfa4b1b955647a0c471959dcd4b22ed0362cd561f60b9ca7a6688f3fbc819569**. Corrigida apenas entrada com `join("\n")` e espera do carregamento; **GREEN2PASS/6,4s**, log `.preview-artifacts/uiux-import-zoom-green.log`, SHA256 **8ceeec945ba375c20eec740d0c1f7a63cc2a9a528d79b76ca621332ddac3572f**. Captura inspecionada mostra Ana Silva e Ricardo Souza, com dados sintéticos, campos e rolagem horizontal. Formato/lint/diffcheckPASS. Parser/matching/produto continuam inalterados.
+
+Este ajuste posterior somente de teste precisa deCI própria antes de atribuir aprovação aoHEAD final; gate de produto573/composto577 permanece válido para os arquivos inalterados. Manifesto preparado deb4a9209 torna-se obsoleto para identificar o novoHEAD; regenerar antes de release dafonte final.
+
 Salvar/push da correção na mesmaPR33 e conferir novaCI integral doSHA específico. Gate573 de98a6f1c permanece válido para o código de produto inalterado; não repetir gate local por ajuste somente de teste/documentação. Depois reconciliar e integrar aUI com o bancoWIP em unidade própria, preservando ambas as histórias. Migrations49/50 continuam locais/não aplicadas; nenhum novo deploy ou serviço remoto foi alterado nesta correção.

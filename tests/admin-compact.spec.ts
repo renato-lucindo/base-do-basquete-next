@@ -188,7 +188,9 @@ for (const [width, height] of [
     await openTextImport(page);
     await page
       .getByLabel("Texto do elenco", { exact: true })
-      .fill("Equipe: Lobos\\n5 - Ana Silva\\n12 - Ricardo Souza");
+      .fill(
+        ["Equipe: Lobos", "5 - Ana Silva", "12 - Ricardo Souza"].join("\n"),
+      );
     await page
       .getByRole("button", { name: "Interpretar texto", exact: true })
       .click();
@@ -197,6 +199,16 @@ for (const [width, height] of [
       exact: true,
     });
     await expect(scroller).toBeVisible();
+    await expect(scroller.locator("tbody tr")).toHaveCount(2);
+    await expect(
+      scroller.getByLabel("Nome, linha 2", { exact: true }),
+    ).toHaveValue("Ana Silva");
+    await expect(
+      scroller.getByLabel("Nome, linha 3", { exact: true }),
+    ).toHaveValue("Ricardo Souza");
+    await expect(
+      page.getByText("Carregando inscrições…", { exact: true }),
+    ).toBeHidden();
     const geometry = await scroller.evaluate((node) => ({
       scrollable: node.scrollWidth > node.clientWidth + 1,
       pageOverflow:
