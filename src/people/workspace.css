@@ -1,0 +1,190 @@
+.members-workspace {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #9caac0;
+}
+.person-picker {
+  position: relative;
+}
+.person-search-hint {
+  font-size: 0.875rem;
+  margin: 6px 0 12px;
+  color: #42526b;
+}
+.person-picker-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  border: 1px solid #74839b;
+  background: #fff;
+  box-shadow: 0 4px 12px #17203322;
+  padding: 4px;
+  max-height: min(340px, 40dvh);
+  overflow-y: auto;
+}
+.person-picker-options [role="listbox"] {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.person-picker-options [role="option"] {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-bottom: 1px solid #d9e2ee;
+  border-radius: 0;
+  background: #fff;
+  color: #172033;
+  text-align: left;
+  padding: 6px 8px;
+}
+.person-picker-options [role="option"] small {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #42526b;
+}
+.person-picker-options [role="option"]:hover,
+.person-picker-options [aria-selected="true"] {
+  background: #eef6ff;
+}
+.person-picker-options p {
+  margin: 6px;
+  font-size: 0.875rem;
+}
+.person-picker-options details {
+  padding: 4px 8px;
+}
+.members-workspace h4 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.members-workspace h5 {
+  font-size: 1.125rem;
+  margin: 20px 0 12px;
+}
+.members-workspace .member-checkbox,
+.member-role-options label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.members-workspace input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex-shrink: 0;
+}
+.member-role-options {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.member-editor > fieldset {
+  display: grid;
+  gap: 16px;
+}
+.member-private {
+  border: 1px solid #9caac0;
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+.member-private > legend {
+  font-weight: 600;
+  padding-inline: 8px;
+}
+.member-editor details {
+  padding-block: 12px;
+  border-block: 1px solid #d9e2ee;
+}
+.member-editor summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-block: 10px;
+  font-weight: 600;
+}
+.member-editor details label {
+  margin-block: 12px;
+}
+.member-editor textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  font: inherit;
+  border: 1px solid #74839b;
+  border-radius: 3px;
+}
+.member-editor button {
+  justify-self: start;
+}
+.member-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+.member-table-scroll table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  text-align: left;
+}
+.member-table-scroll caption {
+  text-align: left;
+  font-weight: 600;
+  padding-block: 12px;
+}
+.member-table-scroll th,
+.member-table-scroll td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #d9e2ee;
+  vertical-align: top;
+}
+.member-table-scroll th:first-child {
+  width: 64px;
+  white-space: nowrap;
+}
+.member-table-scroll td:nth-child(2) {
+  min-width: 140px;
+  overflow-wrap: anywhere;
+}
+.member-table-scroll td:nth-child(3) {
+  width: 55%;
+}
+.member-table-scroll small {
+  display: block;
+}
+.members-workspace .competition-list li {
+  overflow-wrap: anywhere;
+}
+.profile-publication {
+  overflow-wrap: anywhere;
+}
+.profile-public-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.profile-public-fields dt {
+  font-weight: 600;
+}
+.profile-public-fields dd {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+}
+.profile-publication textarea {
+  width: 100%;
+  min-height: 90px;
+}
+.profile-publication button {
+  max-width: 100%;
+  white-space: normal;
+}
+@media (max-width: 500px) {
+  .profile-public-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

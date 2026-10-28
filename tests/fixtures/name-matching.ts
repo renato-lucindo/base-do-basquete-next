@@ -1,0 +1,18 @@
+export const nameCases = [
+  ["Joao Silva", "Joao Pereira", false],
+  ["Joao", "Joao Silva", false],
+  ["Alexandre Xis", "Alexandre Yps", false],
+  ["Joao Silva", "Carlos Silva", false],
+  ["Joao Silva", "Joaquim Silva", false],
+  ["Luke Silva", "Luka Silva", true],
+  ["Guilherme Cruz Santo", "Guilherme Cruz Santos", true],
+  ["  Zorvílio D'Ávila ", "ZORVILIO D-AVILA", true],
+  ["João da Silva", "Joao Silva", true],
+  ["Joao Carlos Silva", "Joao Marcos Silva", false],
+  ["Ana", "Ana", true],
+  ["Ana", "Ane", false],
+  ["J Silva", "Joao Silva", false],
+  ["", "", false],
+  ["---", "...", false],
+  ["a".repeat(121), "a".repeat(121), false],
+] as const;

@@ -1,0 +1,336 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFile, readdir } from "node:fs/promises";
+import { PGlite } from "@electric-sql/pglite";
+
+// Platform fixture only. The same SQL contract also runs on Supabase's real
+// auth.uid(), auth.users and API roles before this unit is considered integrated.
+import { platform } from "./fixtures/database-platform.ts";
+const migrations = await Promise.all(
+  (await readdir("supabase/migrations"))
+    .filter((name) => name.endsWith(".sql"))
+    .sort()
+    .map((name) => readFile(`supabase/migrations/${name}`, "utf8")),
+);
+const contract = await readFile("supabase/tests/admin_access.sql", "utf8");
+const competitionContract = await readFile(
+  "supabase/tests/competition.sql",
+  "utf8",
+);
+const teamsContract = await readFile("supabase/tests/teams.sql", "utf8");
+const peopleContract = await readFile("supabase/tests/people.sql", "utf8");
+const rosterContract = await readFile("supabase/tests/roster.sql", "utf8");
+const staffContract = await readFile("supabase/tests/staff.sql", "utf8");
+const importFieldsContract = await readFile(
+  "supabase/tests/import_fields.sql",
+  "utf8",
+);
+
+const textReviewContract = await readFile(
+  "supabase/tests/text_review.sql",
+  "utf8",
+);
+
+const textConfirmContract = await readFile(
+  "supabase/tests/text_confirm.sql",
+  "utf8",
+);
+const gamesContract = await readFile("supabase/tests/games.sql", "utf8");
+test("G4 upgrade preserves an existing G2 sheet draft without publishing it", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((m) =>
+      m.includes("-- G4b manual publication:"),
+    );
+    assert.ok(boundary > 0);
+    for (const m of migrations.slice(0, boundary)) await db.exec(m);
+    const contract = await readFile("supabase/tests/publication.sql", "utf8");
+    await db.exec(contract.slice(0, contract.indexOf("set local role anon;")));
+    await db.exec(
+      `set local role authenticated;set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098';select public.save_game_sheet(jsonb_build_object('requestId',pg_temp.pu_id(900),'gameId',pg_temp.pu_id(8),'gameVersion',1,'baseVersion',0,'document',pg_temp.pu_doc(),'confirm',false,'reason',''));reset role;`,
+    );
+    const query = "select public.get_game_sheet(pg_temp.pu_id(8)) as sheet";
+    const before = (await db.query(query)).rows;
+    for (const m of migrations.slice(boundary)) await db.exec(m);
+    assert.deepEqual((await db.query(query)).rows, before);
+    assert.equal(
+      (
+        await db.query(
+          "select count(*)::integer as n from public.published_games",
+        )
+      ).rows[0].n,
+      0,
+    );
+    await db.exec("rollback;");
+  } finally {
+    await db.close();
+  }
+});
+test("G4 sheet publication is atomic, versioned, private by default and preserves confirmed identities", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(await readFile("supabase/tests/publication.sql", "utf8"));
+  } finally {
+    await db.close();
+  }
+});
+test("G4 final sheet helper enforces closure and keeps privileged computations private", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(
+      await readFile("supabase/tests/publication_final.sql", "utf8"),
+    );
+  } finally {
+    await db.close();
+  }
+});
+test("G3 PDF review retargets without reupload and revalidates roster, game and versions", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(await readFile("supabase/tests/pdf_review.sql", "utf8"));
+  } finally {
+    await db.close();
+  }
+});
+test("G3 PDF source preparation and private Storage policies recover incomplete upload intents", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const m of migrations) await db.exec(m);
+    await db.exec(await readFile("supabase/tests/pdf_sources.sql", "utf8"));
+  } finally {
+    await db.close();
+  }
+});
+test("G2 upgrade preserves G1 schedules and does not fabricate sheets or results", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((sql) =>
+      sql.includes("-- G2: private draft sheet"),
+    );
+    assert.ok(boundary > 0);
+    for (const migration of migrations.slice(0, boundary))
+      await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('f4000000-0000-4000-8000-000000000001','Existing G1');
+      insert into public.seasons(id,championship_id,year) values('f4000000-0000-4000-8000-000000000002','f4000000-0000-4000-8000-000000000001',2026);
+      insert into public.disputes(id,season_id,gender,category) values('f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000002','masculino','Adulto');
+      insert into public.teams(id,name) values('f4000000-0000-4000-8000-000000000004','Existing');
+      insert into public.registrations(id,dispute_id,team_id,name) values('f4000000-0000-4000-8000-000000000005','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000004','Home'),('f4000000-0000-4000-8000-000000000006','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000004','Away');
+      insert into public.games(id,dispute_id,home_registration_id,away_registration_id,scheduled_date,venue) values('f4000000-0000-4000-8000-000000000007','f4000000-0000-4000-8000-000000000003','f4000000-0000-4000-8000-000000000005','f4000000-0000-4000-8000-000000000006','2026-10-23','Preserved');`);
+    const q =
+      "select public.get_game('f4000000-0000-4000-8000-000000000007') as game";
+    const before = (await db.query(q)).rows;
+    for (const migration of migrations.slice(boundary))
+      await db.exec(migration);
+    assert.deepEqual((await db.query(q)).rows, before);
+    assert.equal(
+      (
+        await db.query(
+          "select public.get_game_sheet('f4000000-0000-4000-8000-000000000007') as sheet",
+        )
+      ).rows[0].sheet,
+      null,
+    );
+    await db.exec(await readFile("supabase/tests/game_sheet.sql", "utf8"));
+    assert.deepEqual((await db.query(q)).rows, before);
+  } finally {
+    await db.close();
+  }
+});
+test("G2 persisted sheet preserves identities, occasion jerseys, drafts and authorization", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations) await db.exec(migration);
+    await db.exec(await readFile("supabase/tests/game_sheet.sql", "utf8"));
+    assert.equal(
+      (await db.query("select count(*)::int as count from public.game_sheets"))
+        .rows[0].count,
+      0,
+    );
+  } finally {
+    await db.close();
+  }
+});
+test("G1 games enforce contextual registration, schedule, versions and access", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations) await db.exec(migration);
+    await db.exec(gamesContract);
+    assert.equal(
+      (await db.query("select count(*)::int as count from public.games"))
+        .rows[0].count,
+      0,
+      "fixtures rolled back",
+    );
+  } finally {
+    await db.close();
+  }
+});
+
+test("C4 upgrade preserves existing C3 people, private details and numbered rosters", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    const boundary = migrations.findIndex((sql) =>
+      sql.includes("-- C4: nullable contextual jerseys"),
+    );
+    assert.ok(boundary > 0);
+    for (const migration of migrations.slice(0, boundary))
+      await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('b1000000-0000-4000-8000-000000000001','Existing C3');
+   insert into public.seasons(id,championship_id,year) values('b1000000-0000-4000-8000-000000000002','b1000000-0000-4000-8000-000000000001',2026);
+   insert into public.disputes(id,season_id,gender,category) values('b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000002','feminino','Adulto');
+   insert into public.teams(id,name) values('b1000000-0000-4000-8000-000000000004','Existing');
+   insert into public.registrations(id,dispute_id,team_id,name) values('b1000000-0000-4000-8000-000000000005','b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000004','Existing A');
+   insert into public.persons(id,name,nickname,position) values('b1000000-0000-4000-8000-000000000006','Existing athlete','Nickname','Armador / Ala');
+   insert into private.athletes(person_id,sex,birth_date,federation_registration) values('b1000000-0000-4000-8000-000000000006','female','2000-02-29','000123');
+   insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey) values('b1000000-0000-4000-8000-000000000007','b1000000-0000-4000-8000-000000000005','b1000000-0000-4000-8000-000000000003','b1000000-0000-4000-8000-000000000006','00');`);
+    const query =
+      "select public.get_person('b1000000-0000-4000-8000-000000000006') as person, public.get_roster_entry('b1000000-0000-4000-8000-000000000007') as roster";
+    const before = await db.query(query);
+    for (const migration of migrations.slice(boundary))
+      await db.exec(migration);
+    assert.deepEqual((await db.query(query)).rows, before.rows);
+    assert.deepEqual(
+      (await db.query("select birth_year from private.athletes")).rows,
+      [{ birth_year: null }],
+    );
+  } finally {
+    await db.close();
+  }
+});
+
+test("migrations from zero enforce the shared SQL access contract", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations)
+      await db.exec(`begin;\n${migration}\ncommit;`);
+    await db.exec(contract);
+    await db.exec(competitionContract);
+    await db.exec(teamsContract);
+    await db.exec(peopleContract);
+    await db.exec(rosterContract);
+    await db.exec(staffContract);
+    await db.exec(importFieldsContract);
+    await db.exec(textReviewContract);
+    await db.exec(textConfirmContract);
+    const { rows } = await db.query(
+      "select count(*)::int as count from auth.users",
+    );
+    assert.equal(rows[0].count, 0, "test identities rolled back");
+  } finally {
+    await db.close();
+  }
+});
+
+test("upgrade preserves an existing administrator and enforces new defaults", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    await db.exec(migrations[0]);
+    await db.exec(`
+      insert into auth.users values ('10000000-0000-4000-8000-000000000003');
+      insert into public.admin_access(user_id) values ('10000000-0000-4000-8000-000000000003');
+    `);
+    for (const migration of migrations.slice(1)) await db.exec(migration);
+    const { rows } = await db.query(
+      "select user_id, enabled from public.admin_access",
+    );
+    assert.deepEqual(rows, [
+      { user_id: "10000000-0000-4000-8000-000000000003", enabled: true },
+    ]);
+    await db.exec("delete from public.admin_access; delete from auth.users;");
+    await db.exec(contract);
+    await db.exec(competitionContract);
+    await db.exec(teamsContract);
+    await db.exec(peopleContract);
+    await db.exec(rosterContract);
+    await db.exec(staffContract);
+    await db.exec(importFieldsContract);
+    await db.exec(textReviewContract);
+    await db.exec(textConfirmContract);
+  } finally {
+    await db.close();
+  }
+});
+
+test("C2 upgrade and rolled-back fixtures preserve saved C1 data", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations.slice(0, 4)) await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('40000000-0000-4000-8000-000000000001','Existing');
+      insert into public.seasons(id,championship_id,year) values('40000000-0000-4000-8000-000000000002','40000000-0000-4000-8000-000000000001',2026);
+      insert into public.disputes(id,season_id,gender,category) values('40000000-0000-4000-8000-000000000003','40000000-0000-4000-8000-000000000002','feminino','Adulto');`);
+    const before = await db.query(
+      "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
+    );
+    for (const migration of migrations.slice(4)) await db.exec(migration);
+    await db.exec(teamsContract);
+    await db.exec(peopleContract);
+    await db.exec(rosterContract);
+    await db.exec(staffContract);
+    await db.exec(importFieldsContract);
+    await db.exec(textReviewContract);
+    await db.exec(textConfirmContract);
+    const after = await db.query(
+      "select public.get_competition('40000000-0000-4000-8000-000000000001') as data",
+    );
+    assert.deepEqual(after.rows, before.rows);
+    assert.deepEqual(
+      (await db.query("select count(*)::int as count from public.teams")).rows,
+      [{ count: 0 }],
+    );
+  } finally {
+    await db.close();
+  }
+});
+
+test("C3 upgrade preserves C2 registrations and their global identity", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations.slice(0, 5)) await db.exec(migration);
+    await db.exec(`insert into public.championships(id,name) values('70000000-0000-4000-8000-000000000001','Existing');
+   insert into public.seasons(id,championship_id,year) values('70000000-0000-4000-8000-000000000002','70000000-0000-4000-8000-000000000001',2026);
+   insert into public.disputes(id,season_id,gender,category) values('70000000-0000-4000-8000-000000000003','70000000-0000-4000-8000-000000000002','masculino','Adulto');
+   insert into public.teams(id,name) values('70000000-0000-4000-8000-000000000004','Team');
+   insert into public.registrations(id,dispute_id,team_id,name) values('70000000-0000-4000-8000-000000000005','70000000-0000-4000-8000-000000000003','70000000-0000-4000-8000-000000000004','Team B');`);
+    const before = await db.query(
+      "select public.get_registration('70000000-0000-4000-8000-000000000005') as data",
+    );
+    for (const migration of migrations.slice(5)) await db.exec(migration);
+    await db.exec(peopleContract);
+    await db.exec(rosterContract);
+    await db.exec(staffContract);
+    await db.exec(importFieldsContract);
+    await db.exec(textReviewContract);
+    await db.exec(textConfirmContract);
+    assert.deepEqual(
+      (
+        await db.query(
+          "select public.get_registration('70000000-0000-4000-8000-000000000005') as data",
+        )
+      ).rows,
+      before.rows,
+    );
+    assert.deepEqual(
+      (await db.query("select count(*)::int as count from public.persons"))
+        .rows,
+      [{ count: 0 }],
+    );
+  } finally {
+    await db.close();
+  }
+});

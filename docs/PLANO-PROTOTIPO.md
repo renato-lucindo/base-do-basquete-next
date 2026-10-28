@@ -6,11 +6,13 @@ Objetivo: apresentar os três percursos completos com dados fictícios e estados
 
 ## Unidades
 
-- [ ] U1 — preservar/verificar pacote, iniciar repositório independente e plano; verificar ferramentas e acessos reais.
-- [ ] U2 — protótipo de campeonato/disputas numa página, importação por texto com prévia editável e elencos expandidos. Arquivos: `src/competition/`, `src/prototype/`, `src/app.tsx`. Testar camisa 0/00, repetida, inválida, linha pendente e identidade ambígua; salvar não publica e visitar não muda Recentes.
-- [ ] U3 — espaço de PDFs: destinos diferentes, criação/associação contextual, erro isolado, duplicidade, nova tentativa, rascunho e publicação individual. Arquivos: `src/import/`. Fixture demonstrativa explicitamente simulada; integração do extrator real pertence à etapa 4. Testar revalidação de destino e falha entre sucessos.
-- [ ] U4 — jogo/súmula, relacionados, participação sem ações, códigos e períodos usando motor do pacote; desfazer/refazer, rascunho, conflito persistente até recarga, publicar/corrigir com motivo e prévia. Arquivos: `src/scoresheet/`, `src/domain/`. Testar conflito duas vezes e preservação da publicação anterior.
+- [x] U1 — preservar/verificar pacote, iniciar repositório independente e plano; verificar ferramentas e acessos reais.
+- [x] U2 — protótipo de campeonato/disputas numa página, importação por texto com prévia editável e elencos expandidos. Arquivos: `src/competition/`, `src/prototype/`, `src/app.tsx`. Testar camisa 0/00, repetida, inválida, linha pendente e identidade ambígua; salvar não publica e visitar não muda Recentes.
+- [x] U3 — espaço de PDFs: destinos diferentes, criação/associação contextual, erro isolado, duplicidade, nova tentativa, rascunho e publicação individual. Arquivos: `src/import/`. Fixture demonstrativa explicitamente simulada; integração do extrator real pertence à etapa 4. Testar revalidação de destino e falha entre sucessos.
+- [x] U4 — jogo/súmula, relacionados, participação sem ações, códigos e períodos usando motor do pacote; desfazer/refazer, rascunho, conflito persistente até recarga, publicar/corrigir com motivo e prévia. Arquivos: `src/scoresheet/`, `src/domain/`. Testar conflito duas vezes e preservação da publicação anterior.
 - [ ] U5 — gate consolidado, revisão, percursos desktop/celular/teclado e composições; issue e PR de apresentação, checkpoint e espera pela validação humana. Arquivos: `tests/`, `docs/VALIDACAO-PROTOTIPO.md`, `.github/workflows/`.
+
+U5: preview remoto protegido e CI aprovados; issue #1 e PR draft #2 criados. Feedback de 22/10 da súmula, incluindo ciclo de teclado, atalhos e Capitão/Técnico/Ass. Técnico, aplicado conforme `docs/AJUSTES-DE-EXPERIENCIA.md`, incluindo opções finais e cinco titulares, com gate e 30 cenários de navegador aprovados. Capturas da súmula atualizadas e demais composições reutilizadas. O responsável autorizou seguir à fundação real após avaliar e orientar os refinamentos. Roteiro de avaliação permanece aberto para observações; avançar à etapa 2 sem tratar essa autorização como aceite de produção.
 
 Antes de cada unidade e operação longa: consultar cota real. Gatilho do responsável: <=15% restante na janela de 5h. Checkpoint em `docs/PROGRESSO.md` e retomada oficial nesta conversa em reset +2 minutos; janela semanal também respeitada. Não criar agendamento enquanto não houver razão real de retomada.
 

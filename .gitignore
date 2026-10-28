@@ -1,5 +1,8 @@
 node_modules/
 dist/
+dist-foundation/
+.worker-artifacts/
+.preview-artifacts/
 .env
 .env.*
 !.env.example
@@ -9,4 +12,5 @@ test-results/
 playwright-report/
 *.log
 BASE-DO-BASQUETE-ARQUITETURA-20261022.zip
+IMPORTADOR-DE-EQUIPES-20261023.zip
 especificacao/**/node_modules/

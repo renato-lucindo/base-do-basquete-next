@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "base-do-basquete-next-preview",
+  "main": "src/server/worker.ts",
+  "compatibility_date": "2026-10-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist-foundation",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "run_worker_first": true,
+  },
+  "vars": {
+    "APP_ORIGIN": "https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+    "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
+  },
+  "secrets": {
+    "required": ["SUPABASE_PUBLISHABLE_KEY", "SESSION_ENCRYPTION_KEY"],
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "SESSIONS", "class_name": "SessionStore" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionStore"] }],
+  "ratelimits": [
+    {
+      "name": "LOGIN_LIMITER",
+      "namespace_id": "862073195184",
+      "simple": { "limit": 10, "period": 60 },
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+    "redact_query_string": true,
+  },
+}

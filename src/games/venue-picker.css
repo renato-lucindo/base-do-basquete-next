@@ -1,0 +1,40 @@
+.venue-picker {
+  position: relative;
+}
+.venue-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #74839b;
+  box-shadow: 0 4px 12px #17203322;
+  padding: 4px;
+  overflow-y: auto;
+}
+.venue-options [role="listbox"] {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.venue-options [role="option"] {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #172033;
+  padding: 6px 8px;
+  min-height: 36px;
+  overflow-wrap: anywhere;
+}
+.venue-options [role="option"]:hover,
+.venue-options [aria-selected="true"] {
+  background: #eef6ff;
+  color: #075fca;
+}
+.venue-options p {
+  font-size: 14px;
+  margin: 6px;
+}

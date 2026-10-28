@@ -1,0 +1,76 @@
+.team-public-page {
+  max-width: 1200px;
+}
+.team-navigation {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.team-navigation a {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #74839b;
+  border-radius: 4px;
+  background: #fff;
+  color: #075fca;
+}
+.team-navigation a[aria-current="page"] {
+  background: #e2edff;
+  border-color: #075fca;
+  font-weight: 700;
+}
+.team-provenance {
+  color: #42526b;
+  font-size: 0.875rem;
+}
+.team-selection {
+  list-style: none;
+  padding: 0;
+}
+.team-selection li {
+  padding: 12px 0;
+  border-bottom: 1px solid #d9e2ee;
+}
+.team-selection a {
+  display: inline-block;
+  padding: 8px 0;
+}
+.team-selection small {
+  display: block;
+  color: #42526b;
+}
+.team-summary {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-top: 1px solid #d9e2ee;
+  border-bottom: 1px solid #d9e2ee;
+  padding: 16px 0;
+}
+.team-summary dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.team-public-page .statistics-scroll details {
+  min-width: 210px;
+  white-space: normal;
+}
+.team-public-page .statistics-scroll dl {
+  display: grid;
+  gap: 10px;
+}
+.team-public-page .statistics-scroll dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.team-public-page button {
+  overflow-wrap: anywhere;
+}
+.team-public-page .statistics-scroll th[scope="row"] a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 24px;
+  min-height: 24px;
+}

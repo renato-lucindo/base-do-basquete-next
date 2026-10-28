@@ -1,0 +1,200 @@
+.admin-dialog {
+  width: min(760px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 1px solid #74839b;
+  border-radius: 6px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 12px 48px #17203344;
+  overflow: visible;
+}
+.admin-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.admin-dialog::backdrop {
+  background: #17203366;
+}
+.admin-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #d9e2ee;
+  padding: 12px 16px;
+  flex: none;
+}
+.admin-dialog .admin-dialog-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+.admin-dialog-body {
+  padding: 16px;
+  overflow-y: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+.admin-dialog .teams-inline {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.admin-dialog .competition-actions {
+  margin-top: 12px;
+}
+.member-dialog-search .admin-dialog-body {
+  overflow: visible;
+}
+.member-dialog-search .competition-actions {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.admin-dialog label {
+  min-width: 0;
+}
+.member-dialog .member-editor > fieldset {
+  gap: 10px;
+  margin-bottom: 0;
+}
+.member-dialog .member-editor h5 {
+  margin: 0 0 12px;
+}
+.member-dialog .member-editor > h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.member-dialog .member-private {
+  padding: 10px;
+  gap: 8px;
+}
+.member-dialog .member-private p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.member-dialog .member-role-options + p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+.member-dialog {
+  width: min(960px, calc(100vw - 48px));
+}
+.member-dialog .person-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+.member-dialog .person-fields-grid > label,
+.member-dialog .person-public-fields > label {
+  grid-column: span 2;
+  font-size: 0.8125rem;
+  gap: 4px;
+  max-width: none;
+}
+.member-dialog .person-fields-grid .person-name-field {
+  grid-column: span 4;
+}
+.member-dialog .person-fields-grid .person-context-field,
+.member-dialog .person-public-fields .person-number-field {
+  grid-column: span 1;
+}
+.member-dialog .person-fields-grid .member-role-options {
+  grid-column: span 5;
+  gap: 20px;
+}
+.member-dialog
+  .person-fields-grid:not(:has(.person-context-field))
+  > .member-role-options {
+  grid-column: 1/-1;
+}
+.member-dialog .person-fields-grid .member-role-options label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  font-size: 0.875rem;
+}
+.member-dialog .person-fields-hint {
+  grid-column: 1/-1;
+  margin: 0;
+  color: #42526b;
+  font-size: 0.75rem;
+}
+.member-dialog .person-private-optional,
+.member-dialog .person-public-fields {
+  display: contents;
+}
+.member-dialog .person-fields-grid .member-private {
+  grid-column: 1/-1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 6px 10px 10px;
+  margin: 0;
+}
+.member-dialog .member-private p {
+  grid-column: 1/-1;
+  font-size: 0.75rem;
+}
+.member-dialog .member-private label {
+  font-size: 0.8125rem;
+  gap: 4px;
+}
+.member-dialog .person-public-fields .person-hand-field {
+  grid-column: span 2;
+}
+.member-dialog .person-public-fields .person-year-field {
+  grid-column: span 2;
+}
+.member-dialog .person-public-fields .person-biography-field {
+  grid-column: 1/-1;
+}
+.member-dialog .person-fields-grid input,
+.member-dialog .person-fields-grid select {
+  min-height: 34px;
+  padding: 5px 8px;
+  font-size: 0.875rem;
+}
+.member-dialog .person-fields-grid input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+}
+.member-dialog .person-role-hint {
+  display: none;
+}
+.member-dialog .person-editor-note {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  color: #42526b;
+}
+.member-dialog .admin-dialog-body > p[role="status"] {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+}
+.member-dialog .person-fields-grid textarea {
+  padding: 6px 8px;
+}
+.member-dialog .person-context-field small {
+  font-size: 0.6875rem;
+  overflow-wrap: anywhere;
+}
+.member-dialog .person-context-field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+}
+.admin-dialog .compact-team-editor > fieldset,
+.compact-pilot .admin-dialog .compact-team-editor > .competition-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 160px);
+  gap: 10px 12px;
+}
+.admin-dialog .compact-team-editor > fieldset > label {
+  max-width: none;
+  margin: 0;
+  font-size: 0.875rem;
+}
+.admin-dialog .compact-team-editor > fieldset > button {
+  grid-column: 1/-1;
+}

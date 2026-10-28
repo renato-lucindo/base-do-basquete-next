@@ -1,0 +1,714 @@
+.admin-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.admin-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.admin-data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+  background: #fff;
+}
+.admin-data-table th,
+.admin-data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #d9e2ee;
+  vertical-align: middle;
+}
+.admin-data-table th {
+  background: #f6f8fb;
+  font-weight: 650;
+  color: #42526b;
+}
+.admin-data-table .competition-name {
+  font: inherit;
+  min-height: 32px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: #075fca;
+  text-align: left;
+  font-weight: 600;
+}
+.admin-data-table .nowrap {
+  white-space: nowrap;
+}
+.admin-data-table td {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 1000px) {
+  .access-main.compact-main {
+    max-width: 1680px;
+    padding: 16px 24px 28px;
+  }
+  .access-header.compact-header {
+    padding: 10px 24px;
+    min-height: 56px;
+  }
+  .compact-header .access-preview {
+    margin-left: auto;
+  }
+  .compact-header button {
+    min-height: 34px;
+    padding: 5px 12px;
+  }
+  .compact-main .access-title {
+    margin: 0;
+    min-height: 0;
+  }
+  .compact-main .competition-workspace {
+    margin-top: 0;
+    padding: 12px;
+    border: 1px solid #d9e2ee;
+    background: #fff;
+  }
+  .compact-pilot .competition-context-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+    gap: 12px 24px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .compact-pilot .competition-context-header .competition-title {
+    margin: 0;
+  }
+  .compact-pilot .competition-context-header h2 {
+    font-size: 1.25rem;
+  }
+  .compact-pilot .competition-destination {
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .compact-pilot .competition-title {
+    gap: 8px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+  }
+  .compact-pilot .competition-title h3 {
+    margin: 0;
+    margin-right: auto;
+    font-size: 1.125rem;
+  }
+  .compact-pilot input,
+  .compact-pilot select {
+    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot button,
+  .compact-pilot .competition-public-link {
+    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .competition-tabs {
+    gap: 4px;
+    margin: 0 0 10px;
+    padding: 0 0 8px;
+  }
+  .compact-pilot .competition-tabs button,
+  .compact-pilot .competition-public-link {
+    border: 0;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: #42526b;
+  }
+  .compact-pilot .competition-tabs [aria-current="page"] {
+    background: #eef6ff;
+    color: #075fca;
+    border-bottom-color: #075fca;
+  }
+  .compact-pilot .competition-title .competition-search {
+    margin: 0;
+    width: clamp(280px, 32vw, 420px);
+    max-width: none;
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .compact-pilot .competition-title .competition-search input {
+    min-width: 80px;
+    width: 0;
+    flex: 1;
+  }
+  .compact-pilot .teams-workspace > .teams-help {
+    display: none;
+  }
+  .compact-pilot .teams-workspace > p,
+  .compact-pilot .games-workspace > p {
+    margin: 4px 0 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot p[role="status"]:empty {
+    display: none;
+  }
+  .compact-pilot .teams-workspace > .competition-list > li {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr) auto;
+    gap: 4px 16px;
+    padding: 6px 0;
+  }
+  .compact-pilot .teams-workspace > .competition-list > li > div {
+    grid-column: 1/-1;
+  }
+  .compact-pilot
+    .teams-workspace
+    > .competition-list
+    > li
+    > .registration-actions {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .compact-pilot .registration-origin {
+    margin: 0;
+    align-self: center;
+    font-size: 0.875rem;
+    color: #42526b;
+  }
+  .compact-pilot .competition-open {
+    min-height: 32px;
+    padding: 4px 0;
+  }
+  .compact-pilot .members-workspace {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+  .compact-pilot .members-workspace h4 {
+    font-size: 1rem;
+  }
+  .compact-pilot .member-checkbox {
+    min-height: 24px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .member-table-scroll {
+    margin-top: 4px;
+  }
+  .compact-pilot .member-table-scroll caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .compact-pilot .member-table-scroll th,
+  .compact-pilot .member-table-scroll td {
+    padding: 5px 8px;
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+  .compact-pilot .member-table-scroll small {
+    display: inline;
+  }
+  .compact-pilot .member-table-scroll button {
+    min-height: 28px;
+    padding: 3px 7px;
+  }
+  .compact-pilot .member-table-scroll .competition-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .compact-pilot .admin-dialog .competition-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+  }
+  .compact-pilot .admin-dialog .competition-form > legend,
+  .compact-pilot .admin-dialog .competition-form > .competition-actions,
+  .compact-pilot .admin-dialog .competition-form > button {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .member-dialog .competition-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .compact-pilot .admin-dialog .competition-form .competition-search {
+    margin: 0;
+  }
+  .compact-pilot .game-registration-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 300px;
+    font-size: 0.8125rem;
+  }
+  .compact-pilot .game-registration-tools {
+    align-items: end;
+  }
+  .compact-pilot .game-registration-tools button[disabled] {
+    display: none;
+  }
+
+  .compact-pilot .competition-list-toolbar {
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) auto minmax(300px, 440px);
+    gap: 12px;
+  }
+  .compact-pilot .competition-list-toolbar h2 {
+    font-size: 1.25rem;
+  }
+  .compact-pilot .competition-list-toolbar .competition-search {
+    width: auto;
+    font-size: 0.75rem;
+    white-space: normal;
+  }
+  .compact-pilot > section > h3 {
+    margin: 14px 0 6px;
+    font-size: 0.9375rem;
+  }
+  .compact-pilot .competition-info > p {
+    margin: 6px 0 10px;
+    font-size: 0.8125rem;
+  }
+  .compact-pilot .competition-editor-form > fieldset > label {
+    max-width: 720px;
+  }
+  .compact-pilot .competition-editor-form label {
+    font-size: 0.8125rem;
+    gap: 4px;
+  }
+  .compact-pilot .competition-editor-form legend {
+    font-size: 0.8125rem;
+    margin-bottom: 4px;
+  }
+  .compact-pilot .competition-season {
+    margin: 10px 0;
+    padding: 8px 10px;
+  }
+  .compact-pilot .competition-season > .competition-title {
+    margin: 0 0 4px;
+  }
+  .compact-pilot .competition-season > .competition-title > label {
+    width: 120px;
+  }
+  .compact-pilot .competition-dispute {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px 16px;
+    margin: 8px 0;
+    padding: 6px 8px 8px;
+  }
+  .compact-pilot .competition-dispute .competition-fields {
+    grid-template-columns: minmax(140px, 180px) minmax(160px, 1fr) minmax(
+        100px,
+        180px
+      );
+    gap: 12px;
+    margin: 0;
+  }
+  .compact-pilot .competition-dispute .competition-radio {
+    min-height: 34px;
+    gap: 6px;
+  }
+  .compact-pilot .competition-editor-form .competition-radio input {
+    width: 18px;
+    height: 18px;
+    min-height: 18px;
+    padding: 0;
+  }
+  .compact-pilot .competition-save {
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+
+  .compact-pilot .regulation {
+    font-size: 0.875rem;
+  }
+  .compact-pilot .regulation h3 {
+    margin: 10px 0 6px;
+    font-size: 1rem;
+  }
+  .compact-pilot .regulation > .competition-title {
+    margin-bottom: 6px;
+  }
+  .compact-pilot .regulation > .competition-title h3 {
+    margin: 0;
+  }
+  .compact-pilot .regulation p {
+    margin: 6px 0;
+  }
+  .compact-pilot .regulation fieldset {
+    margin: 8px 0;
+    padding: 8px 12px;
+  }
+  .compact-pilot .regulation label {
+    font-size: 0.8125rem;
+    gap: 4px;
+    margin: 6px 0;
+  }
+  .compact-pilot .regulation .reg-editor {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 16px;
+  }
+  .compact-pilot .reg-editor > * {
+    grid-column: 1/-1;
+    min-width: 0;
+  }
+  .compact-pilot .reg-editor > .reg-setting {
+    grid-column: span 1;
+    margin: 0;
+    align-self: start;
+  }
+  .compact-pilot .regulation .reg-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+  }
+  .compact-pilot .regulation input[type="number"] {
+    max-width: 160px;
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-pilot .regulation .reg-check {
+    min-height: 28px;
+    margin: 2px 0;
+  }
+  .compact-pilot .regulation .reg-check input {
+    width: 18px;
+    min-height: 18px;
+    height: 18px;
+    padding: 0;
+  }
+  .compact-pilot .reg-registrations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 4px 16px;
+  }
+  .compact-pilot .reg-actions {
+    margin: 6px 0;
+  }
+  .compact-pilot .reg-table {
+    margin: 8px 0;
+  }
+  .compact-pilot .reg-table :is(th, td) {
+    padding: 6px 8px;
+  }
+  .compact-pilot :is(.reg-review, .reg-projection, .achievement-confirmed) {
+    margin: 10px 0;
+    padding: 10px;
+  }
+  .compact-pilot .reg-editor > button {
+    justify-self: start;
+  }
+  .compact-pilot .reg-phase {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+  }
+  .compact-pilot .reg-phase > * {
+    grid-column: 1/-1;
+    min-width: 0;
+  }
+  .compact-pilot .reg-phase > label {
+    max-width: 640px;
+  }
+  .compact-pilot .reg-phase > .reg-group {
+    grid-column: span 1;
+  }
+  .compact-pilot .reg-group > .reg-check {
+    display: inline-flex;
+    margin-right: 16px;
+  }
+  .compact-pilot .regulation .reg-series {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 320px);
+    gap: 4px 16px;
+  }
+  .compact-pilot .reg-series > :is(p, div, button) {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .reg-series > button {
+    justify-self: start;
+  }
+  .compact-pilot .achievements .achievement-source {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 6px 16px;
+  }
+  .compact-pilot .achievement-source > button {
+    grid-column: 1/-1;
+    justify-self: start;
+  }
+  .compact-pilot .achievement-positions {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px 16px;
+  }
+  .compact-pilot .achievements > h2 {
+    margin: 8px 0;
+    font-size: 1.125rem;
+  }
+  .compact-pilot .transfer-panel .transfer-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px;
+    align-items: end;
+    gap: 8px 16px;
+    max-width: 960px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border: 1px solid #9caac0;
+  }
+  .compact-pilot .transfer-fields > :is(p, small, button, .transfer-reason) {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .transfer-fields label {
+    font-size: 0.8125rem;
+    gap: 4px;
+  }
+  .compact-pilot .transfer-reason textarea {
+    min-height: 64px;
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .profile-publication .profile-public-fields {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin: 8px 0;
+    font-size: 0.8125rem;
+  }
+  .compact-pilot .profile-publication .profile-public-fields > div:last-child {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .profile-publication dd {
+    margin-top: 4px;
+  }
+  .compact-pilot .profile-publication h5 {
+    margin: 8px 0;
+    font-size: 0.9375rem;
+  }
+  .compact-pilot .profile-publication p {
+    margin: 8px 0;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .profile-publication .member-editor {
+    max-width: 960px;
+    padding: 10px 12px;
+    border: 1px solid #9caac0;
+  }
+  .compact-pilot .profile-publication textarea {
+    min-height: 64px;
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .regulation .occurrence-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 4px 16px;
+  }
+  .compact-pilot
+    .occurrence-fields
+    > :is(p, div, button, .reg-check, .occurrence-reason) {
+    grid-column: 1/-1;
+  }
+  .compact-pilot .occurrence-fields > button {
+    justify-self: start;
+  }
+  .compact-pilot :is(.occurrence-fields, .withdrawal-fields) textarea {
+    min-height: 64px;
+    padding: 6px 8px;
+    font-size: 0.875rem;
+  }
+  .compact-pilot .withdrawal-fields > label:not(.reg-check) {
+    max-width: 720px;
+  }
+  .compact-pilot .game-editor-dialog {
+    width: min(960px, calc(100vw - 48px));
+  }
+  .compact-pilot .game-editor-dialog .competition-form {
+    grid-template-columns: 150px 120px minmax(0, 1fr) 100px;
+    gap: 8px 12px;
+  }
+  .compact-pilot .game-opponents {
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .compact-pilot .game-editor-dialog label {
+    font-size: 0.8125rem;
+    gap: 4px;
+  }
+  .compact-pilot .game-editor-dialog .teams-inline > p {
+    margin: 0 0 10px;
+    font-size: 0.8125rem;
+  }
+  .compact-pilot .game-editor-dialog .game-registration-search {
+    flex-direction: row;
+  }
+}
+
+/* Desktop density refinements for the remaining administrative workspaces. */
+@media (min-width: 1000px) {
+  .access-main.compact-main {
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .access-main.compact-main:has(.game-sheet) {
+    max-width: none;
+  }
+  .compact-pilot :is(.teams-workspace, .games-workspace, .members-workspace) {
+    min-width: 0;
+  }
+  .compact-pilot
+    :is(.games-workspace, .teams-workspace, .members-workspace)
+    > .competition-title {
+    margin: 0 0 8px;
+    gap: 8px 12px;
+  }
+  .compact-pilot
+    :is(.games-workspace, .teams-workspace, .members-workspace)
+    > .competition-title
+    > :is(button, .competition-search) {
+    flex-shrink: 0;
+  }
+  .compact-pilot .achievements .achievement-source {
+    max-width: 1600px;
+  }
+  .compact-pilot .admin-data-table :is(th, td) {
+    padding: 6px 9px;
+    line-height: 1.4;
+  }
+  .compact-pilot .admin-data-table tbody tr:hover {
+    background: #f6f8fb;
+  }
+  .compact-pilot .admin-data-table .competition-actions {
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .compact-pilot .competition-context {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+  .compact-pilot .competition-actions {
+    gap: 6px 10px;
+  }
+  .compact-pilot
+    :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+    > :is(h3, h4, h5) {
+    margin-block: 10px 6px;
+  }
+  .compact-pilot
+    :is(.regulation, .achievements, .transfer-panel, .profile-publication)
+    > fieldset {
+    margin-block: 8px;
+  }
+}
+
+/* Etapa 3: padrões desktop da identidade Sports Data Minimalism. */
+@media (min-width: 1000px) {
+  .compact-pilot {
+    --admin-ink: #101827;
+    --admin-muted: #2f3b4d;
+    --admin-blue: #075fca;
+    --admin-line: #ccd7e3;
+    --admin-hover: #eef6ff;
+  }
+  .compact-pilot .admin-data-table {
+    color: var(--admin-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-pilot .admin-data-table thead th {
+    color: var(--admin-muted);
+    background: #f6f8fb;
+    border-bottom: 2px solid var(--admin-line);
+    vertical-align: bottom;
+  }
+  .compact-pilot .admin-data-table tbody tr:hover,
+  .compact-pilot .admin-data-table tbody tr:focus-within {
+    background: var(--admin-hover);
+  }
+  .compact-pilot .admin-data-table th,
+  .compact-pilot .admin-data-table td,
+  .compact-pilot .reg-table th,
+  .compact-pilot .reg-table td {
+    line-height: 1.45;
+  }
+  .compact-pilot :is(button, input, select, textarea, summary):focus-visible {
+    outline: 3px solid var(--admin-blue);
+    outline-offset: 2px;
+  }
+  .compact-pilot .competition-tabs {
+    border-bottom: 1px solid var(--admin-line);
+  }
+  .compact-pilot .competition-tabs [aria-current="page"] {
+    font-weight: 700;
+  }
+  .compact-pilot .text-import-workspace {
+    margin-top: 8px;
+  }
+  .compact-pilot .text-import-scroll {
+    margin-block: 8px 12px;
+  }
+  .compact-pilot .text-import-scroll table {
+    min-width: 1220px;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-pilot .text-import-scroll th,
+  .compact-pilot .text-import-scroll td {
+    min-width: 90px;
+    padding: 7px 9px;
+    line-height: 1.4;
+    border-color: var(--admin-line);
+  }
+  .compact-pilot .text-import-scroll th:first-child,
+  .compact-pilot .text-import-scroll td:first-child {
+    min-width: 145px;
+    max-width: 200px;
+  }
+  .compact-pilot .text-import-scroll td:nth-last-child(2),
+  .compact-pilot .text-import-scroll td:last-child {
+    min-width: 220px;
+    max-width: 320px;
+  }
+  .compact-pilot .text-import-scroll input:not([type="checkbox"]),
+  .compact-pilot .text-import-scroll select {
+    min-height: 36px;
+    font-size: 0.875rem;
+    padding: 5px 7px;
+  }
+  .compact-pilot .text-import-scroll tr:focus-within {
+    background: var(--admin-hover);
+  }
+  .compact-pilot .text-import-scroll th {
+    color: var(--admin-muted);
+    background: #f6f8fb;
+    font-weight: 650;
+  }
+  .compact-pilot .text-import-scroll tbody tr:focus-within > td:first-child {
+    box-shadow: inset 3px 0 var(--admin-blue);
+  }
+  .compact-pilot .text-import-scroll th:first-child {
+    background: #f6f8fb;
+  }
+  .compact-pilot .text-import-scroll td:first-child {
+    background: #fff;
+  }
+  .compact-pilot .text-import-done td:first-child {
+    background: #e8f7f0;
+  }
+}
