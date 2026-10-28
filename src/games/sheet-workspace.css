@@ -492,7 +492,7 @@
 }
 
 /* Keep each team readable when desktop users zoom to 200% (narrow CSS viewport). */
-@media (max-width: 999px) {
+@media (max-width: 999px) and (hover: hover) and (pointer: fine) {
   .game-sheet .sheet-desktop-teams {
     grid-template-columns: minmax(0, 1fr);
   }
