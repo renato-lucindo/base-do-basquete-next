@@ -19,3 +19,7 @@ Escolha reversível: consultar identidade e permissão em paralelo usando exclus
 5. Gate/CI sobre unidade estável, preview protegido com smokes/revogação e checkpoint de evidências/limites. Reutilizar evidências inalteradas; nenhuma migration prevista nesta correção.
 
 Se as medições mostrarem que a fila ou POST/GET continuam dominantes, registrar a limitação e tratar em unidade coerente seguinte, sem declarar a lentidão inteira resolvida por uma melhoria parcial.
+
+## Estado da entrega
+
+Correção inicial integrada pela PR41 e publicada na fontef1513c9, com gate588unit/25workerd e CI443browsersPASS/93SKIP, revisão automática sem apontamentos e smoke protegido/revogação. Detalhes, hashes e limitações em docs/VALIDACAO-DESEMPENHO-SALVAMENTOS.md. A etapa de observação end-to-end autenticada continua pendente; não é suprida pelo benchmark controlado nem pelo smoke sem sessão da aplicação.
