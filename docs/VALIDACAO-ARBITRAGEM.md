@@ -29,3 +29,20 @@ Leitura do projeto novo nizmasjddyrhmevvfviz pelo vínculo autorizado: **48migra
 ## Próxima unidade
 
 Revisão independente/corridas reais PG do novo writer/prova real com rollback e aplicação segura/tipos remotos. SessionStore/rotas/dropdowns/formulário, testes de interface, gate/CI e publicação. Não declarar arbitragem disponível no preview. Preview segue source1e73ae0/deployment1290ebc0-fedd-4d64-8c7a-e410c80e68d2, sem novo deploy.
+
+## A1/A2 reais e A3 em validação — execução após autorização de retomada
+
+Migration aplicada uma vez pelo plugin: **20261028163429_game_officiating.sql**, SHA256c9010f2ae15b20a706ca1509d0f6a39677a825205e486bb58c772b9f19ea481c, arquivo CLI renomeado para versão remota sem mudar bytes. Contrato real BEGIN/ROLLBACK PASS sem DMLAuth/admin; após rollback0oficiais/atribuições/recibos e0fixtures.49migrations remotas,12jogos/168pessoas/18inscrições/1Auth humanos preservados. Tipos gerados pelo plugin. SQL SHA2563a0d7399e6179ee1f77891334264e8e841b75619a1d231c7297a041f201823a7; resultado ignorado `.preview-artifacts/officiating-real-proof.json` SHA2567cd3c9dd33a2dedebbef4a9554906d59af6be08fa42629886c024ffcc0390a52.
+
+Advisors: INFO RLS semPolicy nas três tabelas privadas semgrants é deny-all intencional, como Local existente; aviso conhecido de senha vazada/Pro, sem nova contratação. Índices cobrem todas as novas FKs. Sem revisão independente/carga/corridaPG multiconexão comprovadas desta unidade.
+
+Rotas/SessionStore no3f409b9: dois workerd focais PASS após RED405→200, incluindo contrato antigo. Autoridade fresca antes de body/origem/8KiB/queries/ID. UI10browsers composiçãoPASS; expansão6PASS/3FAIL, locator e peso do título corrigidos,3focaisPASS. DensidadeRED260,5px por herança de `.teams-inline fieldset`; seletor local corrigido, dois layouts1366/1920PASS com seção<=220px e título igual Dados do jogo. Capturas finais inspecionadas. Ainda pendentes composição final, gate/CI e deploy; registros de pendência acima são históricos.
+
+## A3 — fechamento local
+
+Quinze cenários desktop novos abrangem vazio/opcional, persistência/reutilização, pessoa única, homônimo confirmado, seis funções, limpeza intermediária/de grupo com confirmação, consulta paginada/teclado, campos não selecionados, ACK conhecido+GET falho, reautenticação+ACK incerto,409 e dois tamanhos desktop. Sem novos testes mobile neste recorte.
+
+- Composição final com Jogos/Local/decisões:30/31PASS; única falha na fixture de duas abas que só interceptava o endpoint legado. Fixture estendida ao editor versionado compartilhando o mesmo jogo/escala; focal do cenárioPASS, sem mudar comportamento de produto/timeout. Outros30casos aplicam-se a código inalterado.
+- Descobertos/fixados por RED→GREEN: foco após seleção paginada reabria popup (ordem de foco/fechamento corrigida); ícone textual× gerava análise de rótulo inconclusiva (SVG decorativo com aria-hidden/label explícito); estado de carregamento referenciava listbox ausente (agora existe durante carregamento/erro, aria-busy). Três focais finais teclado/axe/carregamentoPASS.
+- Axe sem violações/inconclusivos no formulário vazio/dropdown carregado; estado de carregamento sem violações. Não equivale a auditoria WCAG completa/leitor de tela. Capturas1366×768 e1920×1080 inspecionadas, títulos Dados do jogo/Arbitragem com16px/700 e últimas funções/ações visíveis. Sem altura fixa escondendo conteúdo.
+- Revisão estática pelo próprio autor usando Web Interface Guidelines; sem ferramenta/subagente de revisão independente disponível. Busca limitada20, cancelamento de resposta antiga, foco/contraste/teclado, nomes de controles e proteção de alterações revisados. Gate consolidado e CI serão executados sobre o material estável seguinte, sem reutilizar resultado da main como se validasse esta unidade.

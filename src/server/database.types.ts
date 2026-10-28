@@ -812,6 +812,7 @@ export type Database = {
       };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
+      get_game_editor: { Args: { p_id: string }; Returns: Json };
       get_game_occurrence_state: {
         Args: { p_game_id: string; p_offset?: number };
         Returns: Json;
@@ -925,6 +926,10 @@ export type Database = {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_game_officials: {
+        Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
       list_game_venues: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;
@@ -989,6 +994,7 @@ export type Database = {
       save_achievement_draft: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };
       save_game: { Args: { p_command: Json }; Returns: Json };
+      save_game_editor: { Args: { p_command: Json }; Returns: Json };
       save_game_occurrence: { Args: { p_command: Json }; Returns: Json };
       save_game_sheet: { Args: { p_command: Json }; Returns: Json };
       save_pdf_publication_preparation: {

@@ -45,6 +45,12 @@ it("reads the editor in one snapshot and correlates its game without extending l
   expect(
     await new SupabaseOfficiating(config, send).get("fixture", game.id),
   ).toEqual(body);
+  expect(
+    await new SupabaseOfficiating(config, send).get(
+      "fixture",
+      game.id.toUpperCase(),
+    ),
+  ).toEqual(body);
   expect(send).toHaveBeenCalledWith(
     `${config.url}/rest/v1/rpc/get_game_editor`,
     expect.objectContaining({ body: JSON.stringify({ p_id: game.id }) }),

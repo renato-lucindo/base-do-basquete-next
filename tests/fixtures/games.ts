@@ -2,14 +2,24 @@ import type { Page } from "@playwright/test";
 import { textImportFixture, tid } from "./text-import";
 import { saveGameSchema, type GameSnapshot } from "../../src/games/contract";
 import { saveRegistrationSchema } from "../../src/teams/contract";
+import {
+  emptyOfficiating,
+  officiatingSchema,
+  officialRoles,
+  saveGameEditorSchema,
+  type GameEditorSnapshot,
+} from "../../src/games/officiating-contract";
 export async function gamesFixture(page: Page) {
   await textImportFixture(page);
   const savedAt = "2026-10-23T19:00:00Z",
     games = new Map<string, GameSnapshot>(),
     receipts = new Map<string, unknown>();
+  const officials = new Map<string, { id: string; name: string }>(),
+    scales = new Map<string, GameEditorSnapshot["officiating"]>();
   let uncertain = false,
     conflict = false,
-    expired = false;
+    expired = false,
+    failEditorRead = false;
   const attempts: string[] = [];
   const team = {
     id: tid(4),
@@ -75,6 +85,38 @@ export async function gamesFixture(page: Page) {
       });
     }
     if (request.method() === "GET") {
+      if (url.pathname.endsWith("/editor") && failEditorRead) {
+        failEditorRead = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Leitura indisponível depois do ACK.",
+            },
+          },
+        });
+      }
+      if (id === "officials") {
+        const fold = (s: string) =>
+          s
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/gu, "")
+            .toLowerCase();
+        const query = fold(url.searchParams.get("q") ?? ""),
+          offset = Number(url.searchParams.get("offset") ?? 0);
+        const items = [...officials.values()]
+          .filter((o) => fold(o.name).includes(query))
+          .sort(
+            (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
+          );
+        return route.fulfill({
+          json: {
+            items: items.slice(offset, offset + 20),
+            hasMore: items.length > offset + 20,
+          },
+        });
+      }
       if (id === "venues") {
         const query = (url.searchParams.get("q") ?? "").toLowerCase();
         const offset = Number(url.searchParams.get("offset") ?? "0");
@@ -97,7 +139,14 @@ export async function gamesFixture(page: Page) {
       if (id)
         return route.fulfill({
           status: games.has(id) ? 200 : 404,
-          json: games.get(id) ?? {
+          json: (games.has(id)
+            ? url.pathname.endsWith("/editor")
+              ? {
+                  game: games.get(id),
+                  officiating: scales.get(id) ?? emptyOfficiating(),
+                }
+              : games.get(id)
+            : null) ?? {
             error: {
               code: "context_not_found",
               message: "Jogo não encontrado.",
@@ -114,7 +163,9 @@ export async function gamesFixture(page: Page) {
         },
       });
     }
-    const command = saveGameSchema.parse(request.postDataJSON());
+    const command = url.pathname.endsWith("/editor")
+      ? saveGameEditorSchema.parse(request.postDataJSON())
+      : saveGameSchema.parse(request.postDataJSON());
     attempts.push(command.commandId);
     if (receipts.has(command.commandId))
       return route.fulfill({ json: receipts.get(command.commandId) });
@@ -144,6 +195,42 @@ export async function gamesFixture(page: Page) {
         home: registration(g.homeRegistrationId),
         away: registration(g.awayRegistrationId),
       };
+    if ("officiating" in command) {
+      const incoming = officiatingSchema.parse(command.officiating);
+      for (const selection of Object.values(incoming)) {
+        if (
+          selection?.kind === "new" &&
+          !selection.confirmHomonym &&
+          [...officials.values()].some(
+            (o) => o.name.toLowerCase() === selection.name.toLowerCase(),
+          )
+        )
+          return route.fulfill({
+            status: 409,
+            json: {
+              error: {
+                code: "official_homonym_confirmation_required",
+                message:
+                  "Há um oficial com esse nome. Confirme se é outra pessoa.",
+              },
+            },
+          });
+      }
+      const scale: GameEditorSnapshot["officiating"] = {
+        ...emptyOfficiating(),
+      };
+      for (const role of officialRoles) {
+        const selection = incoming[role];
+        if (!selection) continue;
+        if (selection.kind === "new")
+          officials.set(selection.id, {
+            id: selection.id,
+            name: selection.name,
+          });
+        scale[role] = officials.get(selection.id)!;
+      }
+      scales.set(g.id, scale);
+    }
     games.set(g.id, snapshot);
     const result = { id: g.id, version: snapshot.version };
     receipts.set(command.commandId, result);
@@ -163,6 +250,8 @@ export async function gamesFixture(page: Page) {
   });
   return {
     games,
+    officials,
+    scales,
     registrations,
     attempts,
     expire: () => {
@@ -174,6 +263,9 @@ export async function gamesFixture(page: Page) {
     },
     conflict: () => {
       conflict = true;
+    },
+    failNextEditorRead: () => {
+      failEditorRead = true;
     },
   };
 }

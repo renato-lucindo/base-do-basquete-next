@@ -3,6 +3,7 @@ import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import { saveResultSchema } from "../competition/contract";
 import { HttpError } from "../server/http";
+import type { Database } from "../server/database.types";
 import {
   gameEditorSnapshotSchema,
   officialListingSchema,
@@ -10,8 +11,11 @@ import {
   type SaveGameEditor,
 } from "./officiating-contract";
 
-// Closed, versioned RPCs; generated remote Database types stay unchanged until migration rollout.
-type Rpc = "list_game_officials" | "save_game_editor" | "get_game_editor";
+type Functions = Pick<
+  Database["public"]["Functions"],
+  "list_game_officials" | "save_game_editor" | "get_game_editor"
+>;
+type Rpc = keyof Functions;
 export class SupabaseOfficiating {
   async get(token: string, id: string) {
     if (!z.uuid().safeParse(id).success)
@@ -22,7 +26,7 @@ export class SupabaseOfficiating {
       { p_id: id },
       token,
     );
-    if (result.game.id !== id) throw unavailable();
+    if (result.game.id.toLowerCase() !== id.toLowerCase()) throw unavailable();
     return result;
   }
   constructor(
@@ -63,19 +67,16 @@ export class SupabaseOfficiating {
       token,
     );
     if (
-      result.id !== command.game.id ||
+      result.id.toLowerCase() !== command.game.id.toLowerCase() ||
       result.version !== command.expectedVersion + 1
     )
       throw unavailable();
     return result;
   }
-  private async call<T>(
+  private async call<T, N extends Rpc>(
     schema: z.ZodType<T>,
-    name: Rpc,
-    args:
-      | { p_query: string; p_offset: number }
-      | { p_command: SaveGameEditor }
-      | { p_id: string },
+    name: N,
+    args: Functions[N]["Args"],
     token: string,
   ): Promise<T> {
     let response: Response;

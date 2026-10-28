@@ -89,6 +89,7 @@ export const officiatingSnapshotSchema = z
 export const gameEditorSnapshotSchema = z
   .object({ game: gameSnapshotSchema, officiating: officiatingSnapshotSchema })
   .strict();
+export type GameEditorSnapshot = z.infer<typeof gameEditorSnapshotSchema>;
 export const officialListingSchema = z
   .object({
     items: z

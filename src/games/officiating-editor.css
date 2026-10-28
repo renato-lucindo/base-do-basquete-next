@@ -1,0 +1,96 @@
+.game-editor-dialog .officiating-section {
+  display: block;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid #c5d1df;
+  min-width: 0;
+}
+.officiating-section > legend {
+  font-weight: 700;
+}
+.officiating-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.game-editor-dialog .officiating-column {
+  display: block;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.officiating-column > legend {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.official-picker {
+  position: relative;
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.official-picker > label {
+  margin: 0;
+}
+.official-input {
+  display: flex;
+  min-width: 0;
+}
+.official-input > input {
+  width: 100%;
+  min-width: 0;
+}
+.official-input > input:disabled {
+  background: #f4f6f8;
+  color: #596579;
+}
+.official-input > .official-clear {
+  flex: none;
+  width: 28px;
+  min-width: 28px;
+  padding: 2px;
+  border-left: 0;
+}
+.official-options {
+  z-index: 60;
+  padding: 4px;
+  background: white;
+  color: #172033;
+  border: 1px solid #74839b;
+  box-shadow: 0 4px 12px #17203322;
+  overflow-y: auto;
+}
+.official-options [role="listbox"] {
+  max-height: 210px;
+  overflow-y: auto;
+}
+.official-options [role="option"] {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  background: white;
+  color: #172033;
+  overflow-wrap: anywhere;
+}
+.official-options [role="option"]:hover,
+.official-options [aria-selected="true"] {
+  background: #eef6ff;
+  color: #075fca;
+}
+.official-options p {
+  margin: 6px;
+  font-size: 0.8125rem;
+}
+.official-pages {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
