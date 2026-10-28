@@ -156,6 +156,9 @@ for (const width of [1366, 1920]) {
     });
     await expect(region).toBeVisible();
     await expect(table).toBeVisible();
+    await expect(
+      page.getByText("Carregando inscrições…", { exact: true }),
+    ).toBeHidden();
     const metrics = await table.evaluate((node) => ({
       compact: !!node.closest(".compact-pilot"),
       minWidth: getComputedStyle(node).minWidth,
