@@ -1,24 +1,59 @@
-name: Protótipo
+name: CI
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
-    branches: [main, "feat/**", "fix/**", "codex/**"]
-    paths-ignore: ["docs/**", "README.md"]
+    branches: [main]
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
-  prototype:
+  validate:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require main as PR base
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+        run: test "$PR_BASE" = main
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+      - name: Detect verification scope
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
+        run: |
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]] || ! git cat-file -e "${BASE_SHA}^{commit}"; then
+            echo 'code=true' >> "$GITHUB_OUTPUT"
+          else
+            changed_files="$(git diff --name-only "$BASE_SHA" HEAD)"
+            if grep -Ev '^(|docs/.*\.(md|png|jpg|jpeg|svg)|README\.md|CONTRIBUTING\.md|AGENTS\.md|\.github/PULL_REQUEST_TEMPLATE\.md)$' <<< "$changed_files" > /dev/null; then
+              echo 'code=true' >> "$GITHUB_OUTPUT"
+            else
+              echo 'code=false' >> "$GITHUB_OUTPUT"
+            fi
+          fi
       - run: npm ci --ignore-scripts
+      - name: Documentation checks
+        if: steps.scope.outputs.code == 'false'
+        run: npm run format:check && npm run secrets
       - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
+        if: steps.scope.outputs.code == 'true'
       - run: npm run gate
+        if: steps.scope.outputs.code == 'true'
       - run: npx playwright install --with-deps chromium
+        if: steps.scope.outputs.code == 'true'
       - run: npm run test:e2e
+        if: steps.scope.outputs.code == 'true'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -27,6 +62,7 @@ jobs:
           if-no-files-found: warn
           include-hidden-files: true
       - uses: actions/upload-artifact@v4
+        if: steps.scope.outputs.code == 'true'
         with:
           name: prototipo-${{ github.sha }}
           path: dist

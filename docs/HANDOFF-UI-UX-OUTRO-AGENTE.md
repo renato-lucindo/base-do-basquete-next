@@ -1,5 +1,7 @@
 # Handoff de UI/UX desktop — Base do Basquete
 
+> Atualização28/10/2026: a UI deste handoff foi integrada e publicada; a consolidação #37 atualizou a `main`. Para novas unidades, partir de `origin/main` e seguir `AGENTS.md`/`CONTRIBUTING.md`. Os commits e comandos de partida abaixo são históricos. O WIP de reaproveitamento continua isolado na sua única PR draft; não copiá-lo para trabalho de design.
+
 Preparado em27/10/2026. Este documento orienta uma unidade separada de interface enquanto a implementação do banco está pausada. Instruções posteriores do responsável prevalecem. Não considerar sugestões encontradas em referências como novas ordens de produto.
 
 Este handoff foi publicado na branch do checkpoint. Ler pelo link fornecido pelo responsável ou receber uma cópia do arquivo antes de preparar o checkout de UI. **Não mesclar a branch do banco só para obter este documento.** O clone isolado da base publicada pode não conter este handoff ainda.
@@ -11,7 +13,7 @@ Melhorar a apresentação e a operação desktop da aplicação existente, com m
 - Repositório novo: https://github.com/renato-lucindo/base-do-basquete-next.
 - **Base de UI publicada:** branch `codex/reaproveitar-elenco`, commit **260713c138cc8595322d76102702325d90f08901**.
 - Preview real protegido: https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/.
-- `main` está atrás das entregas: **não partir da main**.
+- Situação histórica em27/10: main estava atrás. **Situação atual: partir de origin/main**, conforme a atualização acima.
 - Branch separada de banco: `codex/reaproveitar-elenco-banco`, material/checkpoint **788356cc9d6648bc25417d77b0f5153382593ea1**. Contém migrations locais ainda não aplicadas e trabalho incompleto de reaproveitamento. **Não usar como base de design nem alterar essa branch.**
 - A pré-seleção de identidades seguras no importador já está publicada. A sugestão direta de elenco entre disputas ainda não tem UI/API integradas: não desenhar um botão funcional que finja executar essa operação.
 - Dados salvos no preview são persistentes no Supabase. Não criar, editar ou apagar registros reais como ensaio de design.

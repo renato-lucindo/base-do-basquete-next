@@ -1,6 +1,10 @@
 # Base do Basquete — nova implementação
 
-Projeto novo, especificado exclusivamente pelo pacote de 22/10/2026 em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/`. Nenhum repositório ou banco anterior foi consultado.
+Projeto e banco novos, especificados pelo pacote de22/10/2026 em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/` e pelos ajustes posteriores autorizados. O projeto anterior foi consultado estaticamente como referência sob autorização; seu banco e seus serviços não são usados.
+
+## Desenvolvimento e continuidade
+
+Seguimos GitHub Flow: branches curtas de `main`, uma PR por unidade de volta à `main`, CI e integração antes da próxima unidade dependente. Leia [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) e o início de [docs/PROGRESSO.md](docs/PROGRESSO.md) antes de trabalhar. A consolidação histórica está registrada em [docs/CONSOLIDACAO-PRS.md](docs/CONSOLIDACAO-PRS.md). Integrar código não aplica migrations nem publica serviços automaticamente.
 
 A primeira entrega é um protótipo navegável com dados fictícios para avaliar os três percursos de `docs/EXPERIENCIA.md` do pacote. Após avaliação e feedback incremental, o responsável autorizou a fundação real; o preview fictício permanece disponível.
 
