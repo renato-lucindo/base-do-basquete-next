@@ -450,6 +450,13 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
     exact: true,
   });
   await expect(dialog).toBeVisible();
+  const focusIsInsideDialog = () =>
+    dialog.evaluate((node) => node.contains(document.activeElement));
+  await expect.poll(focusIsInsideDialog).toBe(true);
+  await page.keyboard.press("Tab");
+  await expect.poll(focusIsInsideDialog).toBe(true);
+  await page.keyboard.press("Shift+Tab");
+  await expect.poll(focusIsInsideDialog).toBe(true);
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
   await expect(edit).toBeFocused();
