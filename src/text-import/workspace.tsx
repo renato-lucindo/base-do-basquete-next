@@ -96,6 +96,7 @@ export function TextImportWorkspace(props: Props) {
     };
   }, [props.enabled, props.disputeId, offset, !!model.state]);
   useEffect(() => {
+    if (model.busy) return;
     setRoster([]);
     setRosterComplete(false);
     if (!props.enabled || !registrationId) return;
@@ -135,7 +136,7 @@ export function TextImportWorkspace(props: Props) {
       active = false;
       controller.abort();
     };
-  }, [props.enabled, registrationId, model.state?.results.length]);
+  }, [props.enabled, registrationId, model.state?.results.length, model.busy]);
   const used = new Set(
     model.state?.document.rows.flatMap((r) =>
       r.decision ? [r.decision.personId] : [],
