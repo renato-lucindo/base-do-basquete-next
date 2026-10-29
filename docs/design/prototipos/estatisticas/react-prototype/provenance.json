@@ -1,0 +1,95 @@
+{
+  "archive": "../referencias/tabelas-estatisticas-jogadores-equipes.zip",
+  "archiveSha256": "911da2936809f0756e0fbd3d37d109215ac9f7a9398fcbb982116e794937531c",
+  "sources": [
+    {
+      "entry": "referencias/app/components/statistics-explorer.tsx",
+      "local": "upstream/statistics-explorer.tsx",
+      "sha256": "e1bc2aa5900307e7587781eb6c6808db33d76333456034afd4498298a4651cdd"
+    },
+    {
+      "entry": "referencias/app/components/scrollable-table.tsx",
+      "local": "upstream/scrollable-table.tsx",
+      "sha256": "7f17fe0c649a2bcb36dafcb5c91eca4bd6f439d0a3159d11a689571e7ef3bce2"
+    },
+    {
+      "entry": "referencias/app/components/resource-state.tsx",
+      "local": "upstream/resource-state.tsx",
+      "sha256": "ad59e84d44c77537705dea1ce0750f7a384183a4dbaa3221d7502278923b04ed"
+    },
+    {
+      "entry": "referencias/app/modules/statistics/table-controls.ts",
+      "local": "upstream/table-controls.ts",
+      "sha256": "94b429a7dc7e28037c706659e26d9207edc3a360fc189a8f7cffc93a38ce83c2"
+    },
+    {
+      "entry": "referencias/app/components/boxscore-statistics.css",
+      "local": "upstream/boxscore-statistics.css",
+      "sha256": "502c5ce7b7c113314002aa0959b2e747bb622154771f45b42c70aef3c111df35"
+    },
+    {
+      "entry": "referencias/app/components/boxscore-statistics-explorer.tsx",
+      "local": "upstream/boxscore-statistics-explorer.tsx",
+      "sha256": "5b5a640ce8ad96326f90d591b4d0e7a2d9ef44f04f76b1c9ccab3ea759e260f0"
+    }
+  ],
+  "runtimeComponents": [
+    "upstream/scrollable-table.tsx",
+    "upstream/resource-state.tsx",
+    "adapted/scoresheet-statistics-table.tsx",
+    "adapted/table-controls.ts",
+    "adapted/metric-cell.tsx",
+    "adapted/tooltip.tsx",
+    "adapted/team-filter.tsx",
+    "adapted/column-picker.tsx"
+  ],
+  "adapted": [
+    {
+      "file": "upstream/scrollable-table.tsx",
+      "sha256": "7f17fe0c649a2bcb36dafcb5c91eca4bd6f439d0a3159d11a689571e7ef3bce2",
+      "kind": "original-unchanged"
+    },
+    {
+      "file": "upstream/resource-state.tsx",
+      "sha256": "ad59e84d44c77537705dea1ce0750f7a384183a4dbaa3221d7502278923b04ed",
+      "kind": "original-unchanged"
+    },
+    {
+      "file": "adapted/scoresheet-statistics-table.tsx",
+      "sha256": "d2218c48b0eea8bd2d52aaac9bf138842bd58e5d3b4cad8cdf8ad103a3dc6d81",
+      "kind": "extracted-and-adapted"
+    },
+    {
+      "file": "adapted/table-controls.ts",
+      "sha256": "9a271838de07a348de3dc717664757abb9f44a9fae94eee87c8cb378aae23436",
+      "kind": "original-functions-extracted"
+    },
+    {
+      "file": "adapted/metric-cell.tsx",
+      "sha256": "fd349b3f50754bee77814c42ad2f48b2358e515dcd5e87dbebb19edcdcb00a3f",
+      "kind": "integration"
+    },
+    {
+      "file": "adapted/tooltip.tsx",
+      "sha256": "65b868852e96e23e8f3de16c882bb4e57b7b044e7b370a3ac8edffb37826ff1a",
+      "kind": "integration"
+    },
+    {
+      "file": "adapted/team-filter.tsx",
+      "sha256": "01cb6d433bba69e1f557ad93c9ec0d43b6194c93ce07ff4167f5ab9e2b2f3452",
+      "kind": "extracted-and-adapted"
+    },
+    {
+      "file": "adapted/column-picker.tsx",
+      "sha256": "89df43c1dd5e6f80cb4afe9ccd7388a7ade009ac0ac86853291e85917628f6b8",
+      "kind": "extracted-and-adapted"
+    }
+  ],
+  "build": {
+    "htmlSha256": "1abb3193882df0ab5565e7d23877cd42fb7f4a04e2301780ffa6dd9fb2f52046",
+    "htmlBytes": 294351,
+    "reactVersion": "19.3.0",
+    "reactDomVersion": "19.3.0",
+    "esbuildVersion": "0.28.2"
+  }
+}

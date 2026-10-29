@@ -1,0 +1,38 @@
+[
+  {
+    "name": "sumula",
+    "width": 1440,
+    "height": 900,
+    "firstRowY": 365,
+    "visibleRows": 20,
+    "pageWidth": 1440,
+    "htmlSha256": "d2834c27512a570a55a50feedc084c43c757647d40033cc9e787293ea4e76a70"
+  },
+  {
+    "name": "sumula",
+    "width": 390,
+    "height": 844,
+    "firstRowY": 390,
+    "visibleRows": 9,
+    "pageWidth": 390,
+    "htmlSha256": "d2834c27512a570a55a50feedc084c43c757647d40033cc9e787293ea4e76a70"
+  },
+  {
+    "name": "estatisticas",
+    "width": 1440,
+    "height": 900,
+    "firstRowY": 268.5,
+    "visibleRows": 16,
+    "pageWidth": 1440,
+    "htmlSha256": "1abb3193882df0ab5565e7d23877cd42fb7f4a04e2301780ffa6dd9fb2f52046"
+  },
+  {
+    "name": "estatisticas",
+    "width": 390,
+    "height": 844,
+    "firstRowY": 418.5,
+    "visibleRows": 11,
+    "pageWidth": 390,
+    "htmlSha256": "1abb3193882df0ab5565e7d23877cd42fb7f4a04e2301780ffa6dd9fb2f52046"
+  }
+]

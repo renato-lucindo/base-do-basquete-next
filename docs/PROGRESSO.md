@@ -1,3 +1,17 @@
+# Design público — súmula e estatísticas,29/10/2026
+
+**Unidade independente:** branch `codex/design-publico`, worktree `C:/Users/12405304716/.codex/worktrees/design-publico/Base do Basquete-v1`, base `origin/main` **4bc93c68c758db4caaa2a77045efb39277a2bc7e**. Fontes, HTMLs autocontidos, ZIP r6 original, capturas e contrato de integração em [docs/design](design/README.md). A PR desta branch identifica o SHA final e a CI correspondente; não atribuir a esta unidade evidências das PRs38/44 ou da aplicação publicada.
+
+**Pedido atendido no protótipo:** prioridade aos atletas na primeira tela, removendo títulos/placar redundantes e compactando períodos/contexto/controles. Mantidos quartos, códigos de faltas com LL/cores/tempos, CAP simples à direita, exclusão em vermelho/negrito, 0/00, ausência e totais coerentes. Primeira linha da súmula365px no desktop e390px no celular; estatísticas269px e419px. Padrão permanente em [PADROES.md](design/PADROES.md), referenciado por CONTRIBUTING; critério geométrico e verificações dos dois protótipos incorporados à CI.
+
+**Evidências e limites:** [validação da unidade](design/VALIDACAO.md), 32grupos da súmula, cinco testes de regras de estatísticas, percurso React/teclado/toque/axe e quatro medidas de hierarquia aprovados localmente. CI remota somente após abertura da PR; consultar seu SHA e resultado reais. Gate consolidado e resultado final ficam na descrição da PR, sem declarar aprovação antecipada. Não há revisão independente ou aceite humano da revisão visual final.
+
+**Serviços e mudanças alheias:** nenhum deploy, banco, publicação ou rota do produto alterado nesta unidade. Checkout original/PR38 e worktree/PR44 preservados. A automação de retomada deste chat está PAUSED durante o trabalho ativo. Próximo: revisar os artefatos na única PR para main; implementação nas rotas reais e integração Git dependem de autorização própria. Os checkpoints seguintes são históricos de outras unidades e não representam execução deste agente.
+
+**Sincronização desta branch:** origin/main **7740a5a7fe55f556f26d485ec0567486f54c5c28**, contendo a PR44 já integrada por outra unidade, incorporada por merge explícito para resolver o checkpoint concorrente. Fontes dos dois protótipos inalteradas; evidências locais e os passos gate/design da CI82f permanecem válidos para esses artefatos. A CI da composição deve ser conferida pelo novo SHA da PR45. Os registros de ambas as unidades abaixo foram preservados integralmente; nenhuma publicação desta unidade de design.
+
+---
+
 # Jogador e camisa no mesmo diálogo —29/10/2026
 
 **Retomada vigente29/10/2026:** janela real reiniciada (0%usados5h/58%semanal na entrada;16%/60% na última consulta). Mesmo worktree/branch `codex/jogador-camisa-unica`, base main4bc93c6, PR44única; árvore estava limpa em be6221da13927654869393219b0df99e1db0b107. CIc4e40811684052/job123243206691 confirmouSUCCESS; não comprova a correção posterior. Mudanças humanas/PR38 preservadas.

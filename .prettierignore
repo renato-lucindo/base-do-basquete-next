@@ -11,3 +11,14 @@ worker-configuration.d.ts
 
 # Local runtime probes and screenshots are generated evidence.
 **/.preview-artifacts/
+
+# Immutable inputs retained from the supplied design package (hashes checked).
+docs/design/prototipos/estatisticas/react-prototype/upstream/
+docs/design/prototipos/estatisticas/app.js
+# Self-contained outputs are generated from reviewed sources.
+docs/design/prototipos/sumula/Sumula do jogo publicado.html
+docs/design/prototipos/estatisticas/react-prototype/preview.html
+docs/design/prototipos/estatisticas/Estatisticas de atletas.html
+# Generated browser reports are local diagnostics, excluded from Git.
+docs/design/prototipos/sumula/verification*.json
+docs/design/prototipos/estatisticas/react-prototype/verification.json
