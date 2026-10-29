@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#075fca" />
+    <meta
+      name="description"
+      content="Protótipo da súmula pública de uma partida da Base do Basquete, com dados fictícios."
+    />
+    <title>Súmula do jogo · Base do Basquete</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+    <div class="prototype" role="region" aria-label="Aviso de protótipo">
+      <div class="wrap">
+        <span>Protótipo para avaliação</span><span>Dados fictícios</span>
+      </div>
+    </div>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">b.</span
+          ><span>Base do Basquete</span>
+        </div>
+        <span class="public-label">Consulta pública</span>
+      </div>
+    </header>
+    <main id="conteudo" class="wrap" tabindex="-1">
+      <nav class="breadcrumb" aria-label="Localização">
+        <span>Campeonatos</span><span aria-hidden="true">/</span
+        ><span>Copa da Base</span><span aria-hidden="true">/</span
+        ><span aria-current="page">Súmula</span>
+      </nav>
+      <section class="game-context" aria-label="Dados da partida">
+        <h1 class="sr-only">Súmula de Pinheiros e Paulistano</h1>
+        <strong id="game-context-label">Jogo 24</strong>
+        <p>27/10/2026 · 19h30 · Ginásio Henrique Villaboim</p>
+      </section>
+      <section class="period-section" aria-label="Parciais">
+        <div
+          id="periods"
+          class="period-scroll"
+          role="region"
+          aria-label="Parciais da partida"
+          tabindex="0"
+        ></div>
+      </section>
+      <div class="teams-heading">
+        <h2 class="sr-only">Estatísticas das equipes</h2>
+        <div
+          id="period-filter"
+          class="period-filter"
+          role="group"
+          aria-label="Período das estatísticas"
+        ></div>
+      </div>
+      <div id="teams" class="teams-grid"></div>
+      <section class="legend" aria-labelledby="legend-title">
+        <h2 id="legend-title">Legenda</h2>
+        <dl>
+          <div>
+            <dt><strong>* Titular</strong></dt>
+            <dd>Nome em negrito e asterisco</dd>
+          </div>
+          <div>
+            <dt><span class="captain">CAP</span></dt>
+            <dd>Capitão da equipe</dd>
+          </div>
+          <div>
+            <dt>PTS</dt>
+            <dd>Pontos totais</dd>
+          </div>
+          <div>
+            <dt>2P / 3P</dt>
+            <dd>Cestas de dois / três pontos</dd>
+          </div>
+          <div>
+            <dt>LL</dt>
+            <dd>Lances livres convertidos</dd>
+          </div>
+          <div>
+            <dt>F</dt>
+            <dd>Faltas cometidas</dd>
+          </div>
+        </dl>
+      </section>
+      <details class="demo-controls">
+        <summary>Cenários do protótipo</summary>
+        <div class="demo-inner">
+          <p>Explore variações da mesma partida com dados fictícios.</p>
+          <div
+            class="demo-buttons"
+            role="group"
+            aria-label="Cenário da partida"
+          >
+            <button type="button" data-scenario="overtime" aria-pressed="true">
+              Com prorrogação</button
+            ><button
+              type="button"
+              data-scenario="regulation"
+              aria-pressed="false"
+            >
+              Sem prorrogação</button
+            ><button type="button" data-scenario="missing" aria-pressed="false">
+              Dados não informados</button
+            ><button
+              type="button"
+              data-scenario="no-free-throws"
+              aria-pressed="false"
+            >
+              Sem tentativas de LL
+            </button>
+          </div>
+          <p
+            class="scenario-feedback"
+            role="status"
+            aria-live="polite"
+            id="scenario-feedback"
+          ></p>
+        </div>
+      </details>
+    </main>
+    <footer class="wrap footer">
+      <span>Base do Basquete</span><span>Protótipo · 2026</span>
+    </footer>
+    <dialog
+      id="foul-dialog"
+      aria-labelledby="foul-dialog-title"
+      aria-describedby="foul-player"
+    >
+      <div class="dialog-header">
+        <h2 id="foul-dialog-title">Faltas do atleta</h2>
+        <button id="close-dialog" class="close-dialog" type="button" autofocus>
+          Fechar
+        </button>
+      </div>
+      <div id="foul-content"></div>
+    </dialog>
+    <noscript
+      ><p class="wrap">
+        Ative o JavaScript para consultar as tabelas e os detalhes desta
+        demonstração.
+      </p></noscript
+    >
+  </body>
+</html>

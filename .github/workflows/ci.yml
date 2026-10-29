@@ -54,6 +54,19 @@ jobs:
         if: steps.scope.outputs.code == 'true'
       - run: npx playwright install --with-deps chromium
         if: steps.scope.outputs.code == 'true'
+      - run: npm run design:verify
+        if: steps.scope.outputs.code == 'true'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.scope.outputs.code == 'true'
+        with:
+          name: design-publico-${{ github.sha }}
+          path: |
+            docs/design/.preview-artifacts/
+            docs/design/prototipos/sumula/*.png
+            docs/design/prototipos/sumula/verification*.json
+            docs/design/prototipos/estatisticas/react-prototype/*.png
+            docs/design/prototipos/estatisticas/react-prototype/verification.json
+          include-hidden-files: true
       - run: npm run test:e2e
         if: steps.scope.outputs.code == 'true'
       - uses: actions/upload-artifact@v4

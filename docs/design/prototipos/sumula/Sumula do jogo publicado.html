@@ -1,0 +1,2245 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#075fca" />
+    <meta
+      name="description"
+      content="Protótipo da súmula pública de uma partida da Base do Basquete, com dados fictícios."
+    />
+    <title>Súmula do jogo · Base do Basquete</title>
+    <link rel="icon" href="data:," />
+    <style>:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #172033;
+  background: #fff;
+  font-synthesis: none;
+  --blue: #075fca;
+  --muted: #526176;
+  --line: #dce4ee;
+  --surface: #f4f8fd;
+  --active: #f1f6fd;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button,
+a,
+summary,
+[tabindex] {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+button {
+  border-radius: 5px;
+}
+.wrap {
+  width: calc(100% - 96px);
+  max-width: 1280px;
+  margin-inline: auto;
+  min-width: 0;
+}
+.skip {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  padding: 10px 16px;
+  z-index: 20;
+  background: #fff;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+}
+.skip:focus {
+  top: 8px;
+}
+.prototype {
+  font-size: 10px;
+  background: #eef6ff;
+  color: #285785;
+  border-bottom: 1px solid #dbe8f9;
+}
+.prototype .wrap {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 5px;
+}
+.site-header {
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+}
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 28px;
+  display: grid;
+  place-items: center;
+  line-height: 28px;
+  padding-bottom: 4px;
+}
+.public-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 11px;
+  font-size: 11px;
+  color: var(--muted);
+  padding-block: 22px;
+}
+.breadcrumb [aria-hidden] {
+  color: #748398;
+}
+.page-heading {
+  padding-bottom: 20px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
+  font-weight: 650;
+}
+.competition {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.competition strong {
+  font-weight: 500;
+  color: #34445c;
+}
+.competition [aria-hidden] {
+  color: #748398;
+}
+.game-summary {
+  padding: 20px 0 24px;
+  border-block: 1px solid var(--line);
+}
+.game-eyebrow {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.game-eyebrow > span {
+  margin-inline: 5px;
+}
+.scoreboard {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 34px;
+  max-width: 760px;
+  margin: 12px auto 16px;
+}
+.score-team h2 {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+  line-height: 1.3;
+}
+.home-team {
+  text-align: right;
+}
+.away-team {
+  text-align: left;
+}
+.team-abbreviation {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+.score-center {
+  text-align: center;
+  min-width: 212px;
+}
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -1.8px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+}
+.score-divider {
+  font-size: 25px;
+  font-weight: 400;
+  color: #6b7a8e;
+  letter-spacing: 0;
+}
+.game-status {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.game-status > span[aria-hidden] {
+  margin-inline: 4px;
+}
+.game-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.period-section {
+  padding-top: 22px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+.section-heading h2,
+.teams-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.section-heading > span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.period-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  isolation: isolate;
+}
+.period-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 360px;
+  font-variant-numeric: tabular-nums;
+}
+.period-table th,
+.period-table td {
+  text-align: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 6px;
+}
+.period-table thead th {
+  background: var(--surface);
+  font-weight: 500;
+  font-size: 11px;
+  color: #33415c;
+  padding-block: 8px;
+}
+.period-table th:first-child {
+  width: 150px;
+  text-align: left;
+  padding-left: 14px;
+}
+.period-table tbody th {
+  font-size: 12px;
+  font-weight: 500;
+  background: #fff;
+}
+.period-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.period-table tr > :last-child {
+  border-right: 0;
+}
+.period-points {
+  display: block;
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 550;
+}
+.period-fouls {
+  display: block;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.period-table .period-total {
+  background: var(--active);
+  color: var(--blue);
+}
+.period-total .period-points {
+  font-weight: 700;
+}
+.period-note {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.period-table .overtime {
+  background: #f9fbfe;
+}
+.teams-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+.teams-heading > p {
+  font-size: 11px;
+  color: var(--muted);
+}
+.teams-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+}
+.team-section {
+  min-width: 0;
+  max-width: 100%;
+}
+.team-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.team-heading h3 {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+}
+.team-heading > p {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+}
+.table-scroll {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  isolation: isolate;
+  scrollbar-width: thin;
+  scrollbar-color: #b0bfd1 #f4f8fd;
+}
+.roster-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 500px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.jersey-col {
+  width: 36px;
+}
+.stat-col {
+  width: 48px;
+}
+.roster-table th,
+.roster-table td {
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  padding: 5px 9px;
+  text-align: right;
+  vertical-align: middle;
+  background: #fff;
+}
+.roster-table tr > :last-child {
+  border-right: 0;
+}
+.roster-table thead th {
+  height: 36px;
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 500;
+  color: #33415c;
+  white-space: nowrap;
+}
+.roster-table .jersey-cell {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  padding-inline: 4px;
+}
+.roster-table .athlete-cell {
+  position: sticky;
+  left: 36px;
+  z-index: 2;
+  text-align: left;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 400;
+  border-right: 1px solid #c3d1e2;
+}
+.roster-table thead .athlete-cell {
+  font-size: 11px;
+  font-weight: 500;
+}
+.roster-table thead .jersey-cell,
+.roster-table thead .athlete-cell {
+  z-index: 3;
+  background: var(--surface);
+}
+.athlete-name {
+  font-weight: 400;
+}
+.starter .athlete-name {
+  font-weight: 700;
+}
+.starter-symbol {
+  font-weight: 700;
+  color: #34445c;
+  white-space: nowrap;
+}
+.captain {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+  color: #18528f;
+  background: #edf5ff;
+  border: 1px solid #c9dbf3;
+  border-radius: 3px;
+  line-height: 15px;
+  padding: 0 4px;
+  vertical-align: 1px;
+  margin-left: 5px;
+  white-space: nowrap;
+}
+.roster-table tbody tr:hover > * {
+  background: #f8fafd;
+}
+.roster-table .points-cell {
+  color: #1557a4;
+  background: var(--active);
+  font-weight: 600;
+}
+.roster-table thead .points-cell {
+  background: #eaf2fd;
+  color: #1557a4;
+}
+.roster-table tbody tr:hover > .points-cell {
+  background: #eaf2fd;
+}
+.roster-table .did-not-play > * {
+  color: #65758a;
+  background: #fafbfd;
+}
+.roster-table .did-not-play .athlete-name {
+  color: #65758a;
+}
+.roster-table .foul-cell {
+  padding: 2px 5px;
+}
+.foul-button {
+  min-width: 32px;
+  min-height: 34px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-decoration: underline;
+  text-decoration-color: #acb9ca;
+  text-underline-offset: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.foul-button:hover {
+  border-color: #b9cce4;
+  background: #eef5fe;
+  color: var(--blue);
+}
+.foul-button.discipline {
+  color: #923a1b;
+  background: #fff5ed;
+  border-color: #e6bda4;
+  text-decoration: none;
+  font-weight: 650;
+}
+.foul-button.discipline:hover {
+  background: #ffebdc;
+  border-color: #bf784d;
+}
+.roster-table tfoot th,
+.roster-table tfoot td {
+  font-weight: 600;
+  background: #f4f8fd;
+  border-bottom: 0;
+  border-top: 1px solid #c9d6e7;
+  height: 52px;
+}
+.roster-table tfoot .total-label {
+  padding-left: 10px;
+  text-align: left;
+  font-size: 12px;
+}
+.roster-table .total-free {
+  white-space: normal;
+  font-size: 12px;
+  padding-inline: 3px;
+}
+.total-free small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: #526176;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+.staff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  color: var(--muted);
+  font-size: 11px;
+  padding-top: 10px;
+}
+.staff dt {
+  display: inline;
+  font-weight: 400;
+}
+.staff dd {
+  display: inline;
+  margin: 0;
+  color: #34445c;
+  font-weight: 500;
+}
+.staff > div {
+  display: block;
+}
+.staff dt:after {
+  content: ": ";
+}
+.staff {
+  margin: 0;
+}
+.scroll-hint {
+  display: none;
+}
+.legend {
+  padding-top: 24px;
+}
+.legend > h2 {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.legend dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px 24px;
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.legend dl > div {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+}
+.legend dt {
+  font-weight: 600;
+  color: #3e4e64;
+  flex: none;
+}
+.legend dd {
+  margin: 0;
+  line-height: 1.6;
+}
+.legend .captain {
+  margin: 0;
+}
+.legend-notes {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid #e7edf4;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+  display: grid;
+  gap: 3px;
+}
+.legend-notes strong {
+  font-weight: 600;
+  color: #34445c;
+}
+.demo-controls {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+}
+.demo-controls summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 13px 0;
+  color: var(--muted);
+}
+.demo-inner {
+  padding: 2px 0 16px;
+  color: var(--muted);
+}
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.demo-buttons button {
+  border: 1px solid #becbdc;
+  background: #fff;
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 11px;
+}
+.demo-buttons button[aria-pressed="true"] {
+  color: var(--blue);
+  border-color: #89addd;
+  background: #f1f6fd;
+}
+.scenario-feedback:not(:empty) {
+  margin-top: 10px;
+}
+.footer {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-block: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--muted);
+}
+dialog {
+  width: min(410px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #bdccdf;
+  border-radius: 6px;
+  color: #172033;
+  box-shadow: 0 12px 48px #17203326;
+}
+dialog::backdrop {
+  background: #172d4b45;
+}
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.dialog-header h2 {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.3px;
+}
+.close-dialog {
+  background: #fff;
+  border: 1px solid #bccbdd;
+  min-height: 36px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #34445c;
+}
+.close-dialog:hover {
+  background: #f1f6fd;
+}
+.dialog-athlete {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.dialog-team {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.foul-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-block: 1px solid var(--line);
+  padding: 12px 0;
+  margin-top: 16px;
+  gap: 16px;
+}
+.foul-summary strong {
+  font-size: 25px;
+  font-weight: 650;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.foul-summary span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.foul-breakdown {
+  margin: 0;
+  padding: 8px 0;
+}
+.foul-breakdown > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.foul-breakdown dt {
+  color: var(--muted);
+}
+.foul-breakdown dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.discipline-status {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #f4f8fd;
+  font-size: 11px;
+  color: #34445c;
+}
+.discipline-status.alert {
+  color: #843418;
+  background: #fff4eb;
+  border: 1px solid #e8c4ad;
+}
+.missing-note {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 16px 0 6px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.period-scroll {
+  position: relative;
+}
+.roster-table tfoot .total-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid #c3d1e2;
+}
+.competition [aria-hidden],
+.breadcrumb [aria-hidden],
+.score-divider {
+  color: var(--muted);
+}
+@media (max-width: 1199px) {
+  .teams-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .wrap {
+    width: calc(100% - 64px);
+  }
+  .legend dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .wrap {
+    width: calc(100% - 32px);
+  }
+  .header-inner {
+    height: 60px;
+  }
+  .brand {
+    font-size: 16px;
+    gap: 8px;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    font-size: 26px;
+  }
+  .public-label {
+    font-size: 10px;
+  }
+  .breadcrumb {
+    font-size: 10px;
+    gap: 8px;
+    padding-block: 19px;
+  }
+  .page-heading {
+    padding-bottom: 18px;
+  }
+  h1 {
+    font-size: 25px;
+  }
+  .competition {
+    font-size: 11px;
+    gap: 5px 7px;
+    margin-top: 8px;
+  }
+  .game-summary {
+    padding: 17px 0 18px;
+  }
+  .game-eyebrow {
+    font-size: 10px;
+  }
+  .scoreboard {
+    gap: 10px;
+    margin: 15px auto 15px;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .score-team h2 {
+    font-size: 17px;
+    letter-spacing: -0.35px;
+    overflow-wrap: anywhere;
+  }
+  .team-abbreviation {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+  .score-center {
+    min-width: 122px;
+  }
+  .score {
+    font-size: 36px;
+    gap: 8px;
+    letter-spacing: -1px;
+  }
+  .score-divider {
+    font-size: 18px;
+  }
+  .game-status {
+    font-size: 10px;
+    margin-top: 7px;
+  }
+  .game-meta {
+    font-size: 11px;
+    gap: 3px 6px;
+  }
+  .game-meta > span:last-child {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  .game-meta > span:nth-last-child(2) {
+    display: none;
+  }
+  .section-heading {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .section-heading > span {
+    font-size: 10px;
+  }
+  .period-section {
+    padding-top: 19px;
+  }
+  .period-table {
+    min-width: 354px;
+  }
+  .period-table th:first-child {
+    width: 91px;
+    padding-left: 10px;
+  }
+  .period-table th,
+  .period-table td {
+    padding: 9px 3px;
+  }
+  .period-table thead th {
+    font-size: 10px;
+  }
+  .period-table tbody th {
+    font-size: 11px;
+  }
+  .period-points {
+    font-size: 15px;
+  }
+  .period-fouls {
+    font-size: 9px;
+  }
+  .period-note {
+    font-size: 10px;
+  }
+  .teams-heading {
+    display: block;
+    margin: 23px 0 14px;
+  }
+  .teams-heading > p {
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  .team-heading h3 {
+    font-size: 17px;
+  }
+  .team-heading {
+    margin-bottom: 6px;
+  }
+  .team-heading > p {
+    font-size: 10px;
+  }
+  .scroll-hint {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 0 0 8px;
+  }
+  .scroll-hint span:last-child {
+    white-space: nowrap;
+    color: #34445c;
+  }
+  .roster-table .athlete-cell {
+    font-size: 12px;
+    padding-inline: 8px;
+  }
+  .roster-table th,
+  .roster-table td {
+    min-height: 46px;
+    height: 46px;
+  }
+  .roster-table .foul-button {
+    min-height: 36px;
+    min-width: 34px;
+  }
+  .roster-table tfoot > * {
+    height: 56px;
+  }
+  .staff {
+    font-size: 10px;
+    display: grid;
+    gap: 3px;
+  }
+  .legend {
+    padding-top: 23px;
+  }
+  .legend dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 15px;
+    font-size: 10px;
+  }
+  .legend-notes {
+    font-size: 10px;
+    gap: 6px;
+  }
+  .footer {
+    font-size: 9px;
+  }
+  dialog {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+@media print {
+  .prototype,
+  .demo-controls,
+  .scroll-hint,
+  dialog {
+    display: none;
+  }
+  .wrap {
+    width: 100%;
+  }
+  .teams-grid {
+    display: block;
+  }
+  .team-section {
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+  .table-scroll,
+  .period-scroll {
+    overflow: visible;
+  }
+  .roster-table {
+    min-width: 0;
+  }
+  .site-header {
+    margin-bottom: 12px;
+  }
+  .footer {
+    margin-top: 20px;
+  }
+  button {
+    border: 0 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+  }
+}
+/* Consulta por quarto — revisão 2 */
+.teams-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 12px;
+  margin-top: 22px;
+}
+.period-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  background: #eef1f5;
+  border-radius: 6px;
+  padding: 3px;
+  max-width: 100%;
+  width: max-content;
+}
+.period-filter button {
+  font-size: 11px;
+  line-height: 20px;
+  font-weight: 500;
+  padding: 5px 10px;
+  min-height: 32px;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: #34445c;
+}
+.period-filter button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--blue);
+  box-shadow: 0 1px 3px #0d74fc1f;
+}
+.period-filter button:hover {
+  color: var(--blue);
+}
+.period-table thead th:not(:first-child) {
+  padding: 0;
+}
+.period-link {
+  font: inherit;
+  min-height: 34px;
+  width: 100%;
+  padding: 8px 3px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  white-space: nowrap;
+}
+.period-link:hover {
+  color: var(--blue);
+  background: #eaf2fd;
+}
+.period-link[aria-pressed="true"] {
+  font-weight: 650;
+  color: var(--blue);
+}
+.period-table .selected-period {
+  background: #eaf2fd;
+  color: #1557a4;
+}
+@media (max-width: 600px) {
+  .teams-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .period-filter {
+    width: max-content;
+  }
+  .period-filter button {
+    font-size: 11px;
+    padding: 6px 8px;
+    min-height: 34px;
+  }
+}
+/* Revisão 3: destaque tipográfico e códigos da súmula */
+.roster-table .foul-cell {
+  padding: 0;
+}
+.roster-table .foul-button {
+  width: 100%;
+  min-height: 43px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.roster-table .foul-button.discipline,
+.roster-table .foul-button.discipline:hover {
+  color: #b42318;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-decoration: none;
+}
+.discipline-status.alert {
+  color: #b42318;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 0;
+}
+.foul-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 16px 0 8px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.foul-codes li {
+  margin: 0;
+  padding: 0;
+}
+.foul-codes abbr {
+  text-decoration: none;
+  cursor: help;
+}
+@media (max-width: 600px) {
+  .roster-table .foul-button {
+    min-height: 45px;
+  }
+}
+/* Revisão 4: CAP à direita e registros completos da súmula */
+.captain {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+}
+.athlete-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.athlete-text {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.athlete-line > .captain {
+  flex: none;
+  margin-left: auto;
+}
+.foul-halves {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+.foul-half {
+  border: 1.5px solid #8290a4;
+  border-radius: 3px;
+  padding: 10px;
+  min-width: 0;
+}
+.foul-half h3 {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.foul-half .foul-codes {
+  padding: 0;
+  gap: 10px;
+  font-size: 20px;
+  line-height: 1.5;
+}
+.foul-codes abbr {
+  display: inline-block;
+  min-width: 28px;
+  white-space: nowrap;
+}
+.foul-codes sub {
+  font-size: 12px;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+  bottom: -0.25em;
+  margin-left: 1px;
+}
+.quarter-red {
+  color: #b42318;
+}
+.quarter-blue {
+  color: #075fca;
+}
+
+/* Revisão 5: jogadores como informação principal */
+.header-inner {
+  height: 48px;
+}
+.breadcrumb {
+  padding-block: 10px;
+}
+.game-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 18px;
+  padding: 2px 0 8px;
+  max-width: 760px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.game-context strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #172033;
+}
+.game-context p {
+  margin: 0;
+}
+.period-section {
+  padding-top: 0;
+  max-width: 760px;
+}
+.period-table thead th {
+  padding-block: 0;
+}
+.period-link {
+  min-height: 28px;
+  padding-block: 4px;
+}
+.period-table th,
+.period-table td {
+  padding-block: 7px;
+}
+.period-points {
+  display: inline;
+  font-size: 14px;
+  line-height: 18px;
+}
+.period-fouls {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  line-height: 13px;
+  border: 1px solid #ccd8e7;
+  border-radius: 2px;
+  padding: 0 2px;
+  margin: 0 0 0 5px;
+  background: #f6f8fb;
+  color: #526176;
+}
+.teams-heading {
+  margin: 10px 0 10px;
+  justify-content: flex-end;
+}
+.team-heading {
+  margin-bottom: 6px;
+}
+.team-heading h3 {
+  font-size: 16px;
+}
+.period-filter button {
+  min-height: 30px;
+  padding-block: 4px;
+}
+@media (max-width: 600px) {
+  .header-inner {
+    height: 44px;
+  }
+  .breadcrumb {
+    padding-block: 8px;
+  }
+  .game-context {
+    gap: 3px 10px;
+    padding-bottom: 8px;
+    font-size: 10px;
+  }
+  .game-context p {
+    flex-basis: 100%;
+  }
+  .period-table th,
+  .period-table td {
+    padding-block: 6px;
+  }
+  .period-points {
+    font-size: 13px;
+  }
+  .period-fouls {
+    margin-left: 3px;
+    font-size: 8px;
+    line-height: 12px;
+    padding-inline: 1px;
+  }
+  .teams-heading {
+    margin: 9px 0;
+    justify-content: flex-start;
+  }
+  .period-filter button {
+    min-height: 30px;
+    padding-block: 4px;
+  }
+  .team-heading h3 {
+    font-size: 16px;
+  }
+}
+</style>
+    <script>/* Fixtures fictícias. Nenhuma consulta a serviços do produto. */
+(() => {
+  const athlete = (
+    jersey,
+    name,
+    starter,
+    captain,
+    two,
+    three,
+    free,
+    fouls,
+    extra = {},
+  ) => ({
+    jersey,
+    name,
+    starter,
+    captain,
+    played: true,
+    two,
+    three,
+    free,
+    points: 2 * two + 3 * three + free,
+    fouls,
+    personal: fouls,
+    technical: 0,
+    unsportsmanlike: 0,
+    disqualifying: 0,
+    status: "eligible",
+    ...extra,
+  });
+  const bench = (jersey, name) => ({
+    jersey,
+    name,
+    starter: false,
+    captain: false,
+    played: false,
+    two: null,
+    three: null,
+    free: null,
+    points: null,
+    fouls: null,
+    personal: null,
+    technical: null,
+    unsportsmanlike: null,
+    disqualifying: null,
+    status: null,
+  });
+  const game = {
+    championship: "Copa da Base",
+    season: 2026,
+    category: "Sub-19 masculino",
+    number: "024",
+    date: "27/10/2026",
+    time: "19h30",
+    venue: "Ginásio Henrique Villaboim",
+    scenario: "overtime",
+    overtime: true,
+    home: {
+      name: "Pinheiros",
+      abbreviation: "PIN",
+      points: 88,
+      periods: [19, 21, 17, 19, 12],
+      foulsByPeriod: [3, 4, 4, 5, 2],
+      freeTaken: 24,
+      coach: "Ricardo Moreira",
+      assistant: "André Lima",
+      players: [
+        athlete("0", "Rafael Andrade", true, false, 2, 1, 1, 1),
+        bench("00", "Bruno Nascimento"),
+        athlete(
+          "4",
+          "Matheus Henrique de Oliveira Santos",
+          true,
+          false,
+          5,
+          2,
+          4,
+          3,
+        ),
+        athlete("7", "Pedro Augusto Silva", true, false, 4, 3, 2, 2),
+        athlete("11", "João Pedro Almeida", true, true, 6, 2, 5, 4),
+        athlete("14", "Gabriel Nascimento", true, false, 3, 1, 3, 5, {
+          personal: 4,
+          technical: 0,
+          unsportsmanlike: 1,
+          status: "five",
+          eliminationPeriod: 3,
+        }),
+        athlete("17", "Miguel Moreira", false, false, 0, 0, 0, 0),
+        athlete("21", "Arthur Ribeiro", false, false, 1, 0, 2, 2),
+        bench("22", "Henrique Carvalho"),
+        athlete("35", "Lucas Ferreira", false, false, 1, 0, 0, 1),
+      ],
+    },
+    away: {
+      name: "Paulistano",
+      abbreviation: "PAU",
+      points: 83,
+      periods: [18, 20, 20, 18, 7],
+      foulsByPeriod: [4, 3, 5, 4, 2],
+      freeTaken: 20,
+      coach: "Marcos Azevedo",
+      assistant: "Renato Barbosa",
+      players: [
+        athlete("0", "Rafael Costa", true, false, 5, 1, 2, 3),
+        bench("00", "Caio Henrique"),
+        athlete("5", "Felipe Araújo", true, false, 4, 2, 2, 2),
+        athlete("8", "Davi Rodrigues", true, false, 3, 1, 2, 3),
+        athlete("10", "Enzo Martins", true, false, 4, 1, 3, 4),
+        athlete("12", "Thiago Lima", true, false, 2, 2, 1, 2),
+        athlete("13", "Lucas Gabriel dos Santos", false, true, 3, 1, 1, 3, {
+          personal: 1,
+          technical: 2,
+          status: "GD",
+          eliminationPeriod: 3,
+        }),
+        athlete("18", "Bernardo Souza", false, false, 2, 0, 2, 1),
+        athlete("21", "Vicente Teixeira", false, false, 0, 0, 0, 0),
+        bench("23", "Gustavo Oliveira"),
+      ],
+    },
+  };
+  // Registros fictícios explícitos por quarto: [2P, 3P, LL], códigos de faltas e presença.
+  const records = {
+    home: {
+      0: {
+        shots: [
+          [1, 0, 0],
+          [0, 1, 0],
+          [0, 0, 0],
+          [1, 0, 1],
+          [0, 0, 0],
+        ],
+        fouls: ["", "P", "", "", ""],
+        active: [1, 1, 1, 1, 0],
+      },
+      4: {
+        shots: [
+          [1, 1, 1],
+          [2, 0, 1],
+          [1, 1, 0],
+          [1, 0, 1],
+          [0, 0, 1],
+        ],
+        fouls: ["P", "", "P", "P", ""],
+        active: [1, 1, 1, 1, 1],
+      },
+      7: {
+        shots: [
+          [1, 0, 0],
+          [1, 1, 1],
+          [1, 1, 0],
+          [0, 0, 1],
+          [1, 1, 0],
+        ],
+        fouls: ["", "P", "", "P", ""],
+        active: [1, 1, 1, 1, 1],
+      },
+      11: {
+        shots: [
+          [1, 1, 1],
+          [1, 0, 1],
+          [1, 0, 1],
+          [1, 1, 1],
+          [2, 0, 1],
+        ],
+        fouls: ["P", "P", "P", "", "P"],
+        active: [1, 1, 1, 1, 1],
+      },
+      14: {
+        shots: [
+          [1, 0, 1],
+          [0, 1, 1],
+          [1, 0, 0],
+          [1, 0, 1],
+          [0, 0, 0],
+        ],
+        fouls: ["P", "P", "U", "PP", ""],
+        active: [1, 1, 1, 1, 0],
+      },
+      17: {
+        shots: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+        ],
+        fouls: ["", "", "", "", ""],
+        active: [0, 1, 0, 1, 0],
+      },
+      21: {
+        shots: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [1, 0, 0],
+          [0, 0, 1],
+          [0, 0, 1],
+        ],
+        fouls: ["", "", "", "P", "P"],
+        active: [0, 0, 1, 1, 1],
+      },
+      35: {
+        shots: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [1, 0, 0],
+          [0, 0, 0],
+        ],
+        fouls: ["", "", "P", "", ""],
+        active: [0, 0, 1, 1, 0],
+      },
+    },
+    away: {
+      0: {
+        shots: [
+          [2, 0, 0],
+          [1, 1, 0],
+          [1, 0, 1],
+          [1, 0, 1],
+          [0, 0, 0],
+        ],
+        fouls: ["P", "P", "P", "", ""],
+        active: [1, 1, 1, 1, 0],
+      },
+      5: {
+        shots: [
+          [1, 1, 0],
+          [1, 0, 1],
+          [1, 0, 0],
+          [1, 1, 0],
+          [0, 0, 1],
+        ],
+        fouls: ["P", "", "P", "", ""],
+        active: [1, 1, 1, 1, 1],
+      },
+      8: {
+        shots: [
+          [1, 0, 1],
+          [0, 0, 1],
+          [1, 1, 0],
+          [1, 0, 0],
+          [0, 0, 0],
+        ],
+        fouls: ["P", "", "P", "P", ""],
+        active: [1, 1, 1, 1, 0],
+      },
+      10: {
+        shots: [
+          [1, 0, 1],
+          [1, 1, 0],
+          [1, 0, 1],
+          [1, 0, 1],
+          [0, 0, 0],
+        ],
+        fouls: ["P", "P", "", "P", "P"],
+        active: [1, 1, 1, 1, 1],
+      },
+      12: {
+        shots: [
+          [0, 1, 0],
+          [1, 0, 0],
+          [1, 0, 0],
+          [0, 0, 1],
+          [0, 1, 0],
+        ],
+        fouls: ["", "P", "P", "", ""],
+        active: [1, 1, 1, 1, 1],
+      },
+      13: {
+        shots: [
+          [0, 0, 0],
+          [1, 0, 1],
+          [1, 1, 0],
+          [1, 0, 0],
+          [0, 0, 0],
+        ],
+        fouls: ["", "", "P", "TT", ""],
+        active: [0, 1, 1, 1, 0],
+      },
+      18: {
+        shots: [
+          [0, 0, 0],
+          [0, 0, 1],
+          [0, 0, 0],
+          [1, 0, 0],
+          [1, 0, 1],
+        ],
+        fouls: ["", "", "", "", "P"],
+        active: [0, 1, 0, 1, 1],
+      },
+      21: {
+        shots: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+        ],
+        fouls: ["", "", "", "", ""],
+        active: [0, 1, 1, 0, 0],
+      },
+    },
+  };
+  // LL concedidos por cada falta, na mesma ordem de records.fouls. Zero significa sem LL.
+  const penalties = {
+    home: {
+      0: [[], [0], [], [], []],
+      4: [[1], [], [0], [1], []],
+      7: [[], [2], [], [2], []],
+      11: [[2], [2], [0], [], [1]],
+      14: [[0], [2], [2], [2, 0], []],
+      17: [[], [], [], [], []],
+      21: [[], [], [], [0], [2]],
+      35: [[], [], [1], [], []],
+    },
+    away: {
+      0: [[2], [2], [0], [], []],
+      5: [[0], [], [0], [], []],
+      8: [[1], [], [0], [3], []],
+      10: [[1], [2], [], [3], [2]],
+      12: [[], [2], [2], [], []],
+      13: [[], [], [0], [1, 1], []],
+      18: [[], [], [], [], [2]],
+      21: [[], [], [], [], []],
+    },
+  };
+  const numeric = [
+    "two",
+    "three",
+    "free",
+    "points",
+    "fouls",
+    "personal",
+    "technical",
+    "unsportsmanlike",
+    "disqualifying",
+  ];
+  function seedQuarters(result) {
+    for (const side of ["home", "away"]) {
+      const team = result[side];
+      team.freeTakenByPeriod =
+        side === "home" ? [4, 6, 2, 8, 4] : [3, 6, 3, 5, 3];
+      for (const player of team.players) {
+        const record = records[side][player.jersey];
+        player.quarters = Array.from({ length: 5 }, (_, i) => {
+          const played = Boolean(record?.active[i]);
+          const status =
+            player.status === null
+              ? null
+              : player.eliminationPeriod === undefined ||
+                  i >= player.eliminationPeriod
+                ? player.status
+                : "eligible";
+          if (!played)
+            return {
+              played: false,
+              codes: [],
+              foulEvents: [],
+              ...Object.fromEntries(numeric.map((key) => [key, null])),
+              status,
+            };
+          const [two, three, free] = record.shots[i],
+            codes = [...record.fouls[i]];
+          const awarded = penalties[side][player.jersey][i];
+          if (awarded.length !== codes.length)
+            throw Error("Fixture sem penalidade explícita para cada falta.");
+          const foulEvents = codes.map((kind, j) => ({
+            kind,
+            period: i,
+            freeThrows: awarded[j],
+            compensated: false,
+          }));
+          const count = (code) => codes.filter((c) => c === code).length;
+          return {
+            played,
+            codes,
+            foulEvents,
+            two,
+            three,
+            free,
+            points: 2 * two + 3 * three + free,
+            fouls: codes.length,
+            personal: count("P"),
+            technical: count("T"),
+            unsportsmanlike: count("U"),
+            disqualifying: count("D"),
+            status,
+          };
+        });
+      }
+    }
+  }
+  function mergeOvertime(result) {
+    result.overtime = false;
+    for (const team of [result.home, result.away]) {
+      for (const key of ["periods", "foulsByPeriod", "freeTakenByPeriod"])
+        team[key] = [...team[key].slice(0, 3), team[key][3] + team[key][4]];
+      for (const player of team.players) {
+        const a = player.quarters[3],
+          b = player.quarters[4],
+          played = a.played || b.played;
+        const merged = {
+          played,
+          codes: [...a.codes, ...b.codes],
+          foulEvents: [...a.foulEvents, ...b.foulEvents].map((event) => ({
+            ...event,
+            period: 3,
+          })),
+          status: b.status,
+          ...Object.fromEntries(
+            numeric.map((key) => [
+              key,
+              played ? (a[key] ?? 0) + (b[key] ?? 0) : null,
+            ]),
+          ),
+        };
+        player.quarters = [...player.quarters.slice(0, 3), merged];
+      }
+    }
+  }
+  const create = (scenario) => {
+    const result = structuredClone(game);
+    result.scenario = scenario;
+    seedQuarters(result);
+    if (scenario === "regulation") {
+      mergeOvertime(result);
+    }
+    if (scenario === "missing") {
+      result.home.freeTaken = null;
+      result.home.freeTakenByPeriod.fill(null);
+      const player = result.home.players.find((p) => p.jersey === "21");
+      for (const key of [
+        "fouls",
+        "personal",
+        "technical",
+        "unsportsmanlike",
+        "disqualifying",
+        "status",
+      ])
+        player[key] = null;
+      for (const quarter of player.quarters)
+        for (const key of [
+          "fouls",
+          "personal",
+          "technical",
+          "unsportsmanlike",
+          "disqualifying",
+          "status",
+          "codes",
+          "foulEvents",
+        ])
+          quarter[key] = null;
+      result.away.foulsByPeriod = [null, null, null, null, null];
+    }
+    if (scenario === "no-free-throws") {
+      mergeOvertime(result);
+      for (const team of [result.home, result.away]) {
+        team.freeTaken = 0;
+        team.freeTakenByPeriod.fill(0);
+        for (const player of team.players.filter((p) => p.played)) {
+          player.free = 0;
+          player.points = 2 * player.two + 3 * player.three;
+          for (const quarter of player.quarters.filter((q) => q.played)) {
+            quarter.free = 0;
+            quarter.points = 2 * quarter.two + 3 * quarter.three;
+            for (const event of quarter.foulEvents) {
+              if (event.freeThrows > 0) {
+                event.compensated = true;
+                event.freeThrows = 0;
+              }
+            }
+          }
+        }
+        team.points = team.players.reduce((sum, p) => sum + (p.points ?? 0), 0);
+        team.periods = team.periods.map((_, i) =>
+          team.players.reduce((sum, p) => sum + (p.quarters[i].points ?? 0), 0),
+        );
+      }
+    }
+    return result;
+  };
+  const total = (team, key) => {
+    const players = team.players.filter((p) => p.played);
+    return players.some((p) => p[key] === null)
+      ? null
+      : players.reduce((sum, p) => sum + p[key], 0);
+  };
+  const periodView = (team, index) =>
+    index === "all"
+      ? team
+      : {
+          ...team,
+          points: team.periods[Number(index)],
+          freeTaken: team.freeTakenByPeriod[Number(index)],
+          players: team.players.map((p) => ({
+            ...p,
+            ...p.quarters[Number(index)],
+          })),
+        };
+  window.ScoresheetData = Object.freeze({ create, total, periodView });
+})();
+</script>
+
+  </head>
+  <body>
+    <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+    <div class="prototype" role="region" aria-label="Aviso de protótipo">
+      <div class="wrap">
+        <span>Protótipo para avaliação</span><span>Dados fictícios</span>
+      </div>
+    </div>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">b.</span
+          ><span>Base do Basquete</span>
+        </div>
+        <span class="public-label">Consulta pública</span>
+      </div>
+    </header>
+    <main id="conteudo" class="wrap" tabindex="-1">
+      <nav class="breadcrumb" aria-label="Localização">
+        <span>Campeonatos</span><span aria-hidden="true">/</span
+        ><span>Copa da Base</span><span aria-hidden="true">/</span
+        ><span aria-current="page">Súmula</span>
+      </nav>
+      <section class="game-context" aria-label="Dados da partida">
+        <h1 class="sr-only">Súmula de Pinheiros e Paulistano</h1>
+        <strong id="game-context-label">Jogo 24</strong>
+        <p>27/10/2026 · 19h30 · Ginásio Henrique Villaboim</p>
+      </section>
+      <section class="period-section" aria-label="Parciais">
+        <div
+          id="periods"
+          class="period-scroll"
+          role="region"
+          aria-label="Parciais da partida"
+          tabindex="0"
+        ></div>
+      </section>
+      <div class="teams-heading">
+        <h2 class="sr-only">Estatísticas das equipes</h2>
+        <div
+          id="period-filter"
+          class="period-filter"
+          role="group"
+          aria-label="Período das estatísticas"
+        ></div>
+      </div>
+      <div id="teams" class="teams-grid"></div>
+      <section class="legend" aria-labelledby="legend-title">
+        <h2 id="legend-title">Legenda</h2>
+        <dl>
+          <div>
+            <dt><strong>* Titular</strong></dt>
+            <dd>Nome em negrito e asterisco</dd>
+          </div>
+          <div>
+            <dt><span class="captain">CAP</span></dt>
+            <dd>Capitão da equipe</dd>
+          </div>
+          <div>
+            <dt>PTS</dt>
+            <dd>Pontos totais</dd>
+          </div>
+          <div>
+            <dt>2P / 3P</dt>
+            <dd>Cestas de dois / três pontos</dd>
+          </div>
+          <div>
+            <dt>LL</dt>
+            <dd>Lances livres convertidos</dd>
+          </div>
+          <div>
+            <dt>F</dt>
+            <dd>Faltas cometidas</dd>
+          </div>
+        </dl>
+      </section>
+      <details class="demo-controls">
+        <summary>Cenários do protótipo</summary>
+        <div class="demo-inner">
+          <p>Explore variações da mesma partida com dados fictícios.</p>
+          <div
+            class="demo-buttons"
+            role="group"
+            aria-label="Cenário da partida"
+          >
+            <button type="button" data-scenario="overtime" aria-pressed="true">
+              Com prorrogação</button
+            ><button
+              type="button"
+              data-scenario="regulation"
+              aria-pressed="false"
+            >
+              Sem prorrogação</button
+            ><button type="button" data-scenario="missing" aria-pressed="false">
+              Dados não informados</button
+            ><button
+              type="button"
+              data-scenario="no-free-throws"
+              aria-pressed="false"
+            >
+              Sem tentativas de LL
+            </button>
+          </div>
+          <p
+            class="scenario-feedback"
+            role="status"
+            aria-live="polite"
+            id="scenario-feedback"
+          ></p>
+        </div>
+      </details>
+    </main>
+    <footer class="wrap footer">
+      <span>Base do Basquete</span><span>Protótipo · 2026</span>
+    </footer>
+    <dialog
+      id="foul-dialog"
+      aria-labelledby="foul-dialog-title"
+      aria-describedby="foul-player"
+    >
+      <div class="dialog-header">
+        <h2 id="foul-dialog-title">Faltas do atleta</h2>
+        <button id="close-dialog" class="close-dialog" type="button" autofocus>
+          Fechar
+        </button>
+      </div>
+      <div id="foul-content"></div>
+    </dialog>
+    <noscript
+      ><p class="wrap">
+        Ative o JavaScript para consultar as tabelas e os detalhes desta
+        demonstração.
+      </p></noscript
+    >
+  <script>(() => {
+  "use strict";
+  const { create, total, periodView } = window.ScoresheetData;
+  let game = create("overtime"),
+    selectedPeriod = "all",
+    trigger = null;
+  const dialog = document.querySelector("#foul-dialog");
+  const escape = (value) =>
+    String(value).replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char],
+    );
+  const show = (value) => (value === null ? "—" : String(value));
+  const percentage = (made, taken) =>
+    made === null || taken === null || taken === 0
+      ? "—"
+      : `${((made / taken) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  const ordered = (players) =>
+    [...players].sort(
+      (a, b) =>
+        Number(a.jersey) - Number(b.jersey) ||
+        a.jersey.length - b.jersey.length,
+    );
+  const missing = (value, name) =>
+    value === null
+      ? `<span role="img" aria-label="${escape(name)} não informado">—</span>`
+      : value;
+  const periodLabel = (value) =>
+    value === "all"
+      ? "Jogo todo"
+      : Number(value) < 4
+        ? `${Number(value) + 1}º quarto`
+        : `${Number(value) - 3}ª prorrogação`;
+  const periodShort = (value) =>
+    value === "all"
+      ? "Jogo todo"
+      : Number(value) < 4
+        ? `${Number(value) + 1}º Q`
+        : `${Number(value) - 3}ª PR`;
+  const view = (side) => periodView(game[side], selectedPeriod);
+  const metric = (player, key, label) =>
+    player.played
+      ? missing(player[key], label)
+      : '<span role="img" aria-label="Não entrou neste recorte">—</span>';
+  function renderPeriodFilter() {
+    document.querySelector("#period-filter").innerHTML = [
+      "all",
+      ...game.home.periods.map((_, i) => String(i)),
+    ]
+      .map(
+        (value) =>
+          `<button type="button" data-period="${value}" aria-pressed="${selectedPeriod === value}" aria-label="${periodShort(value)}: ${periodLabel(value)}">${periodShort(value)}</button>`,
+      )
+      .join("");
+  }
+  function renderPeriods() {
+    const columns = game.home.periods
+      .map(
+        (_, i) =>
+          `<th scope="col" class="${i > 3 ? "overtime " : ""}${selectedPeriod === String(i) ? "selected-period" : ""}"><button type="button" class="period-link" data-period="${i}" aria-pressed="${selectedPeriod === String(i)}" aria-label="${periodShort(String(i))}: ${periodLabel(String(i))}">${periodShort(String(i))}</button></th>`,
+      )
+      .join("");
+    const row = (team) =>
+      `<tr><th scope="row">${escape(team.name)}</th>${team.periods.map((points, i) => `<td class="${i > 3 ? "overtime " : ""}${selectedPeriod === String(i) ? "selected-period" : ""}"><span class="period-points">${missing(points, "Pontuação do quarto")}</span><span class="period-fouls" title="Faltas no quarto">${team.foulsByPeriod[i] === null ? '<span role="img" aria-label="Faltas do quarto não informadas">F—</span>' : `F${team.foulsByPeriod[i]}`}</span></td>`).join("")}<td class="period-total"><span class="period-points">${team.points}</span><span class="sr-only"> pontos no total</span></td></tr>`;
+    document.querySelector("#periods").innerHTML =
+      `<table class="period-table"><caption class="sr-only">Pontos e faltas de cada equipe por quarto. Selecione um cabeçalho para consultar o recorte das equipes.</caption><thead><tr><th scope="col">Equipe</th>${columns}<th scope="col" class="period-total"><button type="button" class="period-link" data-period="all" aria-pressed="${selectedPeriod === "all"}" aria-label="Total: jogo todo">Total</button></th></tr></thead><tbody>${row(game.home)}${row(game.away)}</tbody></table>`;
+  }
+  function renderTeam(side) {
+    const team = view(side);
+    const rows = ordered(team.players)
+      .map((player) => {
+        const status = !player.played
+          ? "Não entrou neste recorte"
+          : player.starter
+            ? "Titular no jogo"
+            : "Reserva que participou";
+        const foulLabel =
+          player.fouls === null
+            ? `Detalhar faltas não informadas de ${player.name}`
+            : `Detalhar ${player.fouls} ${player.fouls === 1 ? "falta" : "faltas"} de ${player.name}`;
+        const hasDiscipline = ["five", "GD", "D"].includes(player.status);
+        return `<tr data-jersey="${player.jersey}" data-played="${player.played}" class="${player.starter ? "starter" : ""} ${player.played ? "" : "did-not-play"}"><td class="jersey-cell">${player.jersey}</td><th scope="row" class="athlete-cell"><span class="athlete-line"><span class="athlete-text"><span class="athlete-name">${escape(player.name)}</span>${player.starter ? '<span class="starter-symbol" aria-hidden="true"> *</span>' : ""}</span>${player.captain ? '<span class="captain" role="img" aria-label="Capitão">CAP</span>' : ""}</span><span class="sr-only">. ${status}.</span></th><td class="points-cell">${metric(player, "points", "Pontos")}</td><td>${metric(player, "two", "Cestas de dois")}</td><td>${metric(player, "three", "Cestas de três")}</td><td>${metric(player, "free", "Lances livres")}</td><td class="foul-cell">${player.played ? `<button type="button" class="foul-button${hasDiscipline ? " discipline" : ""}" data-foul-side="${side}" data-foul-jersey="${player.jersey}" aria-label="${escape(foulLabel)}. ${periodLabel(selectedPeriod)}${hasDiscipline ? ". Há situação disciplinar registrada" : ""}" aria-haspopup="dialog">${show(player.fouls)}</button>` : '<span role="img" aria-label="Não entrou neste recorte">—</span>'}</td></tr>`;
+      })
+      .join("");
+    const free = total(team, "free");
+    return `<section class="team-section" data-team="${side}" aria-labelledby="team-${side}"><div class="team-heading"><h3 id="team-${side}">${escape(team.name)}</h3></div><p class="scroll-hint"><span>Deslize para ver todas as estatísticas</span><span aria-hidden="true">2P · 3P · LL · F</span></p><div class="table-scroll" role="region" aria-label="Estatísticas de ${escape(team.name)}: ${periodLabel(selectedPeriod)}" tabindex="0"><table class="roster-table"><caption class="sr-only">Atletas e estatísticas de ${escape(team.name)}: ${periodLabel(selectedPeriod)}. Titulares do jogo identificados por negrito e asterisco. CAP identifica o capitão.</caption><colgroup><col class="jersey-col"><col><col class="stat-col"><col class="stat-col"><col class="stat-col"><col class="stat-col"><col class="stat-col"></colgroup><thead><tr><th scope="col" class="jersey-cell">Nº</th><th scope="col" class="athlete-cell">Atleta</th><th scope="col" class="points-cell"><abbr title="Pontos totais">PTS</abbr></th><th scope="col"><abbr title="Cestas de dois pontos convertidas">2P</abbr></th><th scope="col"><abbr title="Cestas de três pontos convertidas">3P</abbr></th><th scope="col"><abbr title="Lances livres convertidos">LL</abbr></th><th scope="col"><abbr title="Faltas cometidas">F</abbr></th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th scope="row" colspan="2" class="total-label">Total da equipe</th><td class="points-cell">${team.points}</td><td>${missing(total(team, "two"), "Total de cestas de dois")}</td><td>${missing(total(team, "three"), "Total de cestas de três")}</td><td class="total-free" aria-label="Lances livres: ${show(free)} convertidos, ${show(team.freeTaken)} tentados; aproveitamento ${percentage(free, team.freeTaken)}"><span>${show(free)}/${show(team.freeTaken)}</span><small>${percentage(free, team.freeTaken)}</small></td><td>${missing(total(team, "fouls"), "Total de faltas dos atletas")}</td></tr></tfoot></table></div><dl class="staff"><div><dt>Técnico</dt><dd>${escape(team.coach)}</dd></div><div><dt>Auxiliar</dt><dd>${escape(team.assistant)}</dd></div></dl></section>`;
+  }
+  function renderTeams() {
+    const scrolls = Object.fromEntries(
+      [...document.querySelectorAll(".team-section")].map((section) => [
+        section.dataset.team,
+        section.querySelector(".table-scroll").scrollLeft,
+      ]),
+    );
+    document.querySelector("#teams").innerHTML =
+      renderTeam("home") + renderTeam("away");
+    document
+      .querySelectorAll(".team-section")
+      .forEach(
+        (section) =>
+          (section.querySelector(".table-scroll").scrollLeft =
+            scrolls[section.dataset.team] || 0),
+      );
+  }
+  function render() {
+    document.querySelector("#game-context-label").textContent =
+      game.stage || `Jogo ${Number(game.number)}`;
+    renderPeriodFilter();
+    renderPeriods();
+    renderTeams();
+  }
+  function selectPeriod(value, source) {
+    if (
+      value !== "all" &&
+      (!/^\d+$/.test(value) || Number(value) >= game.home.periods.length)
+    )
+      return;
+    selectedPeriod = value;
+    const fromHeader = source.closest("#periods");
+    renderPeriods();
+    renderTeams();
+    document
+      .querySelectorAll("#period-filter [data-period]")
+      .forEach((button) =>
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.period === value),
+        ),
+      );
+    if (fromHeader)
+      document
+        .querySelector(`#periods [data-period="${value}"]`)
+        .focus({ preventScroll: true });
+  }
+  function renderFoulEvents(events) {
+    if (!events?.length) return "";
+    const names = {
+      P: "Falta pessoal",
+      T: "Falta técnica",
+      U: "Falta antidesportiva",
+      D: "Falta desqualificante",
+    };
+    const groups = [
+      ["first", "1º tempo", (event) => event.period < 2],
+      ["second", "2º tempo", (event) => event.period >= 2 && event.period < 4],
+      ["overtime", "Prorrogação", (event) => event.period >= 4],
+    ];
+    const item = (event) => {
+      const penalty = event.compensated
+        ? "c"
+        : event.freeThrows === null
+          ? "?"
+          : event.freeThrows > 0
+            ? String(event.freeThrows)
+            : "";
+      const penaltyName = event.compensated
+        ? "Penalidade compensada"
+        : event.freeThrows === null
+          ? "Penalidade não informada"
+          : event.freeThrows === 0
+            ? "Sem lances livres"
+            : `${event.freeThrows} ${event.freeThrows === 1 ? "lance livre" : "lances livres"} de penalidade`;
+      const title = `${names[event.kind]} · ${penaltyName} · ${periodLabel(String(event.period))}`;
+      return `<li class="${event.period === 0 || event.period === 2 ? "quarter-red" : "quarter-blue"}" data-foul-period="${event.period}" data-free-throws="${event.freeThrows}" data-compensated="${event.compensated}"><abbr title="${title}"><span class="foul-kind">${event.kind}</span>${penalty ? `<sub>${penalty}</sub>` : ""}</abbr><span class="sr-only"> — ${title}.</span></li>`;
+    };
+    return `<div class="foul-halves">${groups
+      .map(([key, label, includes]) => {
+        const entries = events.filter(includes);
+        return entries.length
+          ? `<section class="foul-half" data-half="${key}" aria-labelledby="foul-half-${key}"><h3 id="foul-half-${key}">${label}</h3><ol class="foul-codes" aria-label="Faltas do ${label}">${entries.map(item).join("")}</ol></section>`
+          : "";
+      })
+      .join("")}</div>`;
+  }
+  function openFouls(button) {
+    const team = view(button.dataset.foulSide),
+      player = team.players.find((p) => p.jersey === button.dataset.foulJersey);
+    const state =
+      {
+        five: "Excluído por cinco faltas",
+        GD: "Desqualificado (GD)",
+        D: "Desqualificado (D)",
+      }[player.status] || "";
+    const events =
+      player.fouls === null
+        ? null
+        : selectedPeriod === "all"
+          ? player.quarters.flatMap((quarter) => quarter.foulEvents || [])
+          : player.foulEvents;
+    document.querySelector("#foul-content").innerHTML =
+      `<p id="foul-player" class="dialog-athlete">${escape(player.name)}</p><p class="dialog-team">${escape(team.name)} · Camisa ${player.jersey}${player.captain ? " · Capitão" : ""}${selectedPeriod === "all" ? "" : ` · ${periodLabel(selectedPeriod)}`}</p><div class="foul-summary"><span>Faltas</span><strong>${show(player.fouls)}</strong></div>${player.fouls === null ? '<p class="missing-note">Faltas não informadas.</p>' : renderFoulEvents(events)}${state ? `<p class="discipline-status alert">${state}</p>` : ""}`;
+    trigger = button;
+    dialog.showModal();
+  }
+  document.querySelector("main").addEventListener("click", (event) => {
+    const periodButton = event.target.closest("[data-period]");
+    if (periodButton) {
+      selectPeriod(periodButton.dataset.period, periodButton);
+      return;
+    }
+    const foulButton =
+      event.target.closest("[data-foul-side]") ||
+      event.target.closest(".foul-cell")?.querySelector("[data-foul-side]");
+    if (foulButton) openFouls(foulButton);
+  });
+  document
+    .querySelector("#close-dialog")
+    .addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    if (event.target !== dialog) return;
+    const r = dialog.getBoundingClientRect();
+    if (
+      event.clientX < r.left ||
+      event.clientX > r.right ||
+      event.clientY < r.top ||
+      event.clientY > r.bottom
+    )
+      dialog.close();
+  });
+  dialog.addEventListener("close", () => {
+    if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+  });
+  document.querySelectorAll("[data-scenario]").forEach((button) =>
+    button.addEventListener("click", () => {
+      game = create(button.dataset.scenario);
+      selectedPeriod = "all";
+      render();
+      document
+        .querySelectorAll("[data-scenario]")
+        .forEach((item) =>
+          item.setAttribute("aria-pressed", String(item === button)),
+        );
+      document.querySelector("#scenario-feedback").textContent =
+        `Cenário: ${button.textContent}.`;
+    }),
+  );
+  render();
+  window.scoresheetPrototype = Object.freeze({
+    snapshot: () => structuredClone(game),
+    view: (side) => structuredClone(view(side)),
+    selectedPeriod: () => selectedPeriod,
+    total,
+    percentage,
+  });
+})();
+</script></body>
+</html>

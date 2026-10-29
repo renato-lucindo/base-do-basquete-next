@@ -1,3 +1,15 @@
+# Design público — súmula e estatísticas,29/10/2026
+
+**Unidade independente:** branch `codex/design-publico`, worktree `C:/Users/12405304716/.codex/worktrees/design-publico/Base do Basquete-v1`, base `origin/main` **4bc93c68c758db4caaa2a77045efb39277a2bc7e**. Fontes, HTMLs autocontidos, ZIP r6 original, capturas e contrato de integração em [docs/design](design/README.md). A PR desta branch identifica o SHA final e a CI correspondente; não atribuir a esta unidade evidências das PRs38/44 ou da aplicação publicada.
+
+**Pedido atendido no protótipo:** prioridade aos atletas na primeira tela, removendo títulos/placar redundantes e compactando períodos/contexto/controles. Mantidos quartos, códigos de faltas com LL/cores/tempos, CAP simples à direita, exclusão em vermelho/negrito, 0/00, ausência e totais coerentes. Primeira linha da súmula365px no desktop e390px no celular; estatísticas269px e419px. Padrão permanente em [PADROES.md](design/PADROES.md), referenciado por CONTRIBUTING; critério geométrico e verificações dos dois protótipos incorporados à CI.
+
+**Evidências e limites:** [validação da unidade](design/VALIDACAO.md), 32grupos da súmula, cinco testes de regras de estatísticas, percurso React/teclado/toque/axe e quatro medidas de hierarquia aprovados localmente. CI remota somente após abertura da PR; consultar seu SHA e resultado reais. Gate consolidado e resultado final ficam na descrição da PR, sem declarar aprovação antecipada. Não há revisão independente ou aceite humano da revisão visual final.
+
+**Serviços e mudanças alheias:** nenhum deploy, banco, publicação ou rota do produto alterado nesta unidade. Checkout original/PR38 e worktree/PR44 preservados. A automação de retomada deste chat está PAUSED durante o trabalho ativo. Próximo: revisar os artefatos na única PR para main; implementação nas rotas reais e integração Git dependem de autorização própria. Os checkpoints seguintes são históricos de outras unidades e não representam execução deste agente.
+
+---
+
 # Retornos de jogo e súmula — unidade de fluxo,28/10/2026
 
 **CHECKPOINT DE COTA,28/10/2026 21:25 America/Sao_Paulo:**85%usados/15%restantes5h,42%usados/58%restantes semanal, ordinaryUsageAllowedtrue. Reset real5h **28/10/2026 23:27:59UTC-03 (29/10 02:27:59UTC)**; programar MESMAautomação `retomar-administra-o-compacta` para **28/10/2026 23:29:59UTC-03 (29/10 02:29:59UTC)**. Reset semanal04/11/2026 08:24:53UTC-03. Não iniciar deploy/gate/outra unidade ao atingir o gatilho.
