@@ -1,4 +1,20 @@
-# Salvamentos — correção inicial publicada,28/10/2026
+# Retornos de jogo e súmula — unidade de fluxo,28/10/2026
+
+**Pedido vigente:** procurar erros de percurso, começando pelo retorno à lista depois de salvar jogo. Branch `codex/retornos-fluxos`, material **a44a3a83b1291782eb3f4a6b233d0ccc727f9f5b**, base main **58f65e5a78f1b29cce2c6e6d26fb451e8ee3e526**, worktree `C:/Users/12405304716/.codex/worktrees/uiux-validation/Base do Basquete-v1`. Uma [PR43 para main](https://github.com/renato-lucindo/base-do-basquete-next/pull/43), anexada. Este registro é posterior ao material; recuperar HEAD pelo Git. Preservar WIPPR38 e alterações humanas `.agents/`/skills-lock.json no checkout original, sem incorporar migrations de reaproveitamento.
+
+**Mudança:** retorno à lista explícito no cabeçalho fixo do cadastro; súmula com retorno aos dados ou direto à lista no topo. Mantém confirmação de descarte, busy/reautenticação, busca, foco e preparação salva. O botão do jogo já existia no rodapé na captura local1366; ausência total não foi reproduzida. A falta de retorno direto na súmula foi reproduzida RED→GREEN. Demais caminhos de importador/cadastro contextual/inscrições/arbitragem conferidos sem novo defeito reproduzível. Sem SQL/contratoHTTP/DDL/DML ou dados humanos alterados.
+
+**Evidências:** `docs/VALIDACAO-RETORNOS-FLUXOS.md`;55cenários desktop distintos aprovados por composição/reexecuções sequenciais. A primeira composição não foi integralmente verde: um texto esperado incorreto no teste e cinco ENOENT de traces após duas execuções sobrepostas; registros preservados, focais posteriores verdes. Gate materiala44a3a8 **PASS588unit/120arquivos,6transportes/13PG/25workerd/4PDFs**, tipos/builds/fronteira/segredos767. `.preview-artifacts/flow-final-gate.log` SHA256**ed79b70f8e8db7a3fa73f987f7accbd75075e614d27d9ef218dd252a21400804**/exit0. Capturas1366/1920 com fixtures; não auditoria autenticada do responsável. Reutilizar artefatos inalterados, sem gate local por este registro.
+
+**CI/release no momento deste registro:** CI40791830806/job123178666225 em andamento no materiala44; revisão automática também em andamento. Não atribuir aprovação até consultar resultado. A CI do HEAD documental seguinte substitui a anterior; consultar checks/pareceres e metadados finais na PR43 antes de continuar. Preview ainda **f1513c97267b94032b64ac2c9257fa3685d3eb20**, deployment57149662-d30d-47e8-a52a-fc7572aafeff/versãob4782ef4-1bd0-49ca-a0a0-0c22ab15a728. Pacote ignoradoa44 obsoleto se HEAD mudar: regenerar `prepare-foundation` de HEADlimpo usando builds válidos. Access responsável/previewsOFF/DO/cofre conferidos; zero tokens temporários. Nenhum deploy/credencial/processo local em andamento. Supabase49migrations imutáveis, não acessado nesta unidade.
+
+**Próximo exato:** aguardar CI/revisão do HEAD atual da PR43; se falhar, diagnosticar focalmente, sem repetir gate por sessão. Após aprovação, integrar na main, regenerar pacote da fonte verificada, publicar somente Worker/Access existentes e smoke de hashes/rotas/duas telas sem escrita humana; revogar imediatamente quaisquer credenciais efêmeras e confirmar anônimo302. Registrar resultados finais e fonte/deployment na descrição da PR43, referência de release deste checkpoint. Não abrir nova unidade/PR empilhada. A automação existente continuaPAUSED durante execução ativa.
+
+**Cota real observada:**68%usados/32%restantes5h e40%usados/60%restantes semanal, reset5h28/10/2026 23:27:58 America/Sao_Paulo (29/10 02:27:58UTC); semanal04/11/2026 08:24:53UTC-03. Aos85%usados: operação mínima/checkpoint/push seguro e MESMAautomação resetefetivo+2. Nenhum reset/crédito comprado.
+
+---
+
+# Salvamentos — correção inicial publicada,28/10/2026 (histórico)
 
 **Estado atual,19:04 America/Sao_Paulo (22:04UTC):** correção da espera comum em jogos/súmula/importador publicada no preview e integrada pela [PR41](https://github.com/renato-lucindo/base-do-basquete-next/pull/41). Fonte CI/preview **f1513c97267b94032b64ac2c9257fa3685d3eb20**, material **0bd78a2c15614b574596e5da3c7977bd0a648a87**, merge main **f7e1fc9d839c7a1f96e55057782bf45f350aed00**. Este registro documental parte da main limpa na branch `codex/registro-desempenho-salvamentos`; consultar git log/PR para seu SHA final. Os registros seguintes são históricos.
 
