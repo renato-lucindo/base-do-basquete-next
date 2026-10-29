@@ -107,6 +107,7 @@ test("adicionar filtro foca a métrica e permite remover filtro ainda incompleto
 }) => {
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url);
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();
@@ -196,6 +197,7 @@ test("MIN oculta por30 preserva coluna e remove filtro/ordem incompatíveis", as
     page.getByRole("combobox", { name: "Ordenar por", exact: true }),
   ).toHaveValue("points");
   const columns = page.getByRole("group", { name: "Colunas visíveis" });
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page.getByText("Personalizar colunas", { exact: true }).click();
   await expect(
     columns.getByLabel("Minutos (MIN)", { exact: true }),
@@ -246,6 +248,7 @@ test("busca/filtros por teclado, equipes vazias e líderes antes da página têm
   await expect(
     page.getByRole("status").filter({ hasText: "3 participações" }),
   ).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();
@@ -284,7 +287,9 @@ test("amostra insuficiente difere de ausência sem esconder atleta e filtros nã
     page.getByLabel("Amostra insuficiente", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByText("—", { exact: true }).first()).toBeVisible();
+  await page.getByText("Fonte e cobertura dos dados", { exact: true }).click();
   await expect(page.getByText(/Mínimo para o cálculo por 30/u)).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();

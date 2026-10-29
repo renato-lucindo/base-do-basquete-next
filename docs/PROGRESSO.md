@@ -1,3 +1,17 @@
+# Implementação pública — súmula e estatísticas reais, 29/10/2026
+
+**Unidade atual:** `codex/implementacao-publica`, worktree exclusivo `C:/Users/12405304716/.codex/worktrees/implementacao-publica/Base do Basquete-v1`; base `origin/main` **11b547af6c6f0a051736c4489e37c0630d3805c2**, já contendo a PR45 aprovada e integrada. Uma PR desta implementação para `main` deve permanecer aberta para revisão, sem merge nem deploy. Recuperar HEAD/CI remotos da PR após push: não confundir com CI da PR45.
+
+**Implementação:** `resultado.html` usa a projeção pública efetiva para exibir contexto, parciais, faltas coletivas quando disponíveis, atletas com 0/00 distintos, titular, CAP, pontuação, faltas, totais, comissão, legenda e detalhe acessível de faltas. `estatisticas.html` conecta os controles de consulta, equipes, modo, mínimo, colunas, filtros, ordenação, empates e estados de erro/vazio às projeções públicas; preserva precisão de ranking, sem contar faltas técnicas/antidesportivas duas vezes. Rolagem horizontal permanece dentro das tabelas e identificação do atleta fixa. Não há dados de demonstração na interface real.
+
+**Provas locais:** Playwright nas rotas reais com API simulada, desktop 1440×900 e mobile 390×844: **38/38 PASS** nos testes focais de súmula, estatísticas e hierarquia, incluindo nome longo, modal/foco/Escape, rolagem interna e ausência de overflow da página. Capturas ignoradas em `.preview-artifacts/{resultado-real,resultado-detalhe,estatisticas-real}-{desktop,mobile}.png`. Na fixture, primeira linha da súmula a 375px/417px (5/5 atletas visíveis) e estatísticas a 340px/465px (12/20 e 8/20 visíveis). Essas provas com fixture não certificam integração com dados humanos reais.
+
+**Limitações confirmadas da fonte pública:** a projeção de publicação não disponibiliza eventos de falta por período/horário, lances livres de penalidade nem estatísticas individuais por período. A interface informa a cobertura incompleta e evita simular esses detalhes. O total de faltas, as tentativas de LL e os marcadores de faltas coletivas dependem de campos realmente publicados; ausência não é convertida em zero. Não foi executada migration, DDL, seed, edição de dados reais ou deploy; preview e serviços permanecem como estavam. Checkout original e `.agents/`/`skills-lock.json` humanos, PR38 e suas migrations permanecem preservados.
+
+**Validação e próximos passos:** gate consolidado local da implementação **PASS** em 29/10/2026: lint, formatação, tipos/Wrangler, 588 testes Vitest/120 arquivos, 6 transportes, 13 testes PostgreSQL, builds Vite/foundation, Worker dry-run, 25 testes de acesso, PDF runtime, fronteira cliente/servidor e segredos. O build informa apenas o aviso preexistente de import dinâmico `staff-contract`. Registrar SHA final/CI remota na PR depois do push; conferir `git diff --check`, abrir a PR única e mantê-la aberta para revisão. O texto abaixo preserva o histórico de design e outras unidades.
+
+---
+
 # Design público — súmula e estatísticas,29/10/2026
 
 **Unidade independente:** branch `codex/design-publico`, worktree `C:/Users/12405304716/.codex/worktrees/design-publico/Base do Basquete-v1`, base `origin/main` **4bc93c68c758db4caaa2a77045efb39277a2bc7e**. Fontes, HTMLs autocontidos, ZIP r6 original, capturas e contrato de integração em [docs/design](design/README.md). A PR desta branch identifica o SHA final e a CI correspondente; não atribuir a esta unidade evidências das PRs38/44 ou da aplicação publicada.

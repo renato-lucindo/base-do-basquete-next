@@ -62,10 +62,31 @@ export function selectStatisticsFacts(
   const normalized = source.games.map(({ snapshot, phase }) => ({
     phase,
     boxscore: snapshot.source.kind === "pdf",
-    facts: normalizeParsedConfirmedGame(snapshot).map((fact) => ({
-      ...fact,
-      phase,
-    })),
+    facts: normalizeParsedConfirmedGame(snapshot).map((fact) => {
+      // Public leaderboard fields are projected from the same published game.
+      // Career snapshots keep their historical SQL-compatible shape.
+      const player =
+        "origins" in snapshot.facts
+          ? null
+          : snapshot.facts.players.find(
+              (p) => p.person.id === fact.person.id && p.side === fact.side,
+            );
+      return {
+        ...fact,
+        phase,
+        teamPoints: snapshot.facts.teams[fact.side].points,
+        technicalFouls: player
+          ? player.played
+            ? player.technical
+            : null
+          : null,
+        unsportsmanlikeFouls: player
+          ? player.played
+            ? player.unsportsmanlike
+            : null
+          : null,
+      };
+    }),
   }));
   const eligible = normalized.filter((g) => dataset === "all" || g.boxscore);
   return {

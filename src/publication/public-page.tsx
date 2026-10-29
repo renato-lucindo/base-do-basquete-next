@@ -2,216 +2,356 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "../competition/api";
 import { publicResultSchema, type PublicResult } from "./pdf-contract";
-const sourceName = (kind: "pdf" | "sheet" | undefined) =>
-  kind === "sheet" ? "Súmula manual" : kind === "pdf" ? "PDF" : "Não informado";
-const minute = (seconds: number) =>
-  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+
+type Side = "home" | "away";
+type Player = PublicResult["facts"]["players"][number];
+const sides: Side[] = ["home", "away"];
+const periodName = (i: number) => (i < 4 ? `Q${i + 1}` : `PR${i - 3}`);
+const prettyNumber = (s: string | null) =>
+  s ? s.replace(/^0+(?=\d)/u, "") || "0" : null;
+const date = (s: string | null) => s?.split("-").reverse().join("/") ?? null;
+const stat = (v: number | null) => (v === null ? "—" : v);
+function playerFouls(p: Player): number | null {
+  if (!p.played) return null;
+  if ("fouls" in p) return p.fouls;
+  return p.advanced?.foulsCommitted ?? null;
+}
+function playerStatus(p: Player) {
+  if ("status" in p && p.status !== "eligible")
+    return p.status === "excluded" ? "5F" : p.status;
+  return null;
+}
+
 export function PublicGameView({ result: r }: { result: PublicResult }) {
-  const periods = r.facts.teams.home.periods,
-    advanced = "origins" in r.facts ? r.facts : null;
+  const [selected, setSelected] = useState<Player | null>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const opener = useRef<HTMLButtonElement | null>(null);
+  const periods = r.facts.teams.home.periods;
+  useEffect(() => {
+    if (!selected) return;
+    closeButton.current?.focus();
+    const esc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setSelected(null);
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeButton.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", esc);
+    return () => {
+      window.removeEventListener("keydown", esc);
+      opener.current?.focus();
+    };
+  }, [selected]);
+
   return (
     <article className="public-game">
-      <h2>
-        {r.game.home.name} {r.facts.teams.home.points} ×{" "}
-        {r.facts.teams.away.points} {r.game.away.name}
-      </h2>
-      <p>
-        {r.context.name} · {r.context.year} · {r.context.gender} ·{" "}
-        {r.context.category}
+      <div className="public-game-context">
+        <span>
+          {prettyNumber(r.game.number)
+            ? `Jogo ${prettyNumber(r.game.number)}`
+            : r.context.category}
+        </span>
+        {r.game.date && <span>{date(r.game.date)}</span>}
+        {r.game.time && <span>{r.game.time}</span>}
+        {r.game.venue && <span>{r.game.venue}</span>}
+      </div>
+      <div className="public-score-label">
+        {r.context.name} · {r.context.year} · {r.context.category}
         {r.context.division ? ` · ${r.context.division}` : ""}
-      </p>
-      {(r.game.date || r.game.time || r.game.venue) && (
-        <p>
-          {r.game.date?.split("-").reverse().join("/")}
-          {r.game.time ? ` · ${r.game.time}` : ""}
-          {r.game.venue ? ` · ${r.game.venue}` : ""}
-        </p>
-      )}
-      <p>
-        {r.source.kind === "sheet"
-          ? "Súmula manual"
-          : r.source.format === "BASKETBALL_SITE"
-            ? "Boxscore Basketball Site"
-            : "Boxscore FIBA"}
-      </p>
-      {advanced && (
-        <p>
-          Placar: {sourceName(advanced.origins.scorePoints.kind)} · Períodos:{" "}
-          {sourceName(advanced.origins.periodScores?.kind)} · Estatísticas
-          avançadas: {sourceName(advanced.origins.playerAdvanced?.kind)}
-        </p>
-      )}
-      <p className="public-table-hint">
-        Deslize as tabelas para consultar todas as colunas.
-      </p>
+      </div>
       {periods ? (
         <div
           className="public-scroll public-periods"
           role="region"
-          aria-label="Pontuação por período"
+          aria-label="Parciais e placar final"
           tabIndex={0}
         >
           <table>
             <thead>
               <tr>
-                <th>Equipe</th>
+                <th scope="col">Equipe</th>
                 {periods.map((_, i) => (
-                  <th key={i}>{i < 4 ? `Q${i + 1}` : `OT${i - 3}`}</th>
+                  <th key={i} scope="col">
+                    {periodName(i)}
+                  </th>
                 ))}
+                <th scope="col">Total</th>
               </tr>
             </thead>
             <tbody>
-              {(["home", "away"] as const).map((side) => (
+              {sides.map((side) => (
                 <tr key={side}>
                   <th scope="row">{r.game[side].name}</th>
                   {r.facts.teams[side].periods?.map((n, i) => (
-                    <td key={i}>{n}</td>
+                    <td key={i}>
+                      <strong>{n}</strong>
+                      {"foulsByPeriod" in r.facts.teams[side] && (
+                        <small
+                          aria-label={
+                            String(r.facts.teams[side].foulsByPeriod[i]) +
+                            " faltas coletivas no " +
+                            periodName(i)
+                          }
+                          title={
+                            "Faltas coletivas: " +
+                            r.facts.teams[side].foulsByPeriod[i]
+                          }
+                        >
+                          F {r.facts.teams[side].foulsByPeriod[i]}
+                        </small>
+                      )}
+                    </td>
                   ))}
+                  <td className="public-final-score">
+                    {r.facts.teams[side].points}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       ) : (
-        <p>Períodos não informados.</p>
+        <div className="public-score-fallback" role="status">
+          {r.game.home.name} {r.facts.teams.home.points} ×{" "}
+          {r.facts.teams.away.points} {r.game.away.name}
+          <small>Parciais indisponíveis na publicação.</small>
+        </div>
       )}
-      {(["home", "away"] as const).map((side) => {
-        const rows = r.facts.players
+      <div
+        className="public-period-select"
+        aria-label="Recorte das estatísticas individuais"
+      >
+        <span>Atletas ·</span>
+        <strong>Jogo todo</strong>
+        <span
+          className="public-muted"
+          title="A projeção pública não registra números individuais por período."
+        >
+          Por quarto: sem dados publicados
+        </span>
+      </div>
+      <div className="public-rosters">
+        {sides.map((side) => {
+          const rows = r.facts.players
             .filter((p) => p.side === side)
             .sort(
               (a, b) =>
                 Number(a.jersey) - Number(b.jersey) ||
                 a.jersey.length - b.jersey.length,
-            ),
-          staff = r.staff[side],
-          hasAdvanced = rows.some(
-            (p) => "advanced" in p && p.advanced !== null,
+            );
+          const coach = r.staff[side];
+          const total = (key: "points" | "two" | "three" | "free") =>
+            rows.reduce((n, p) => n + (p.played ? p[key] : 0), 0);
+          const knownFouls = rows.every(
+            (p) => !p.played || playerFouls(p) !== null,
           );
-        return (
-          <section key={side}>
-            <h3>
-              <a
-                href={`/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}`}
+          const sumFouls = knownFouls
+            ? rows.reduce((n, p) => n + (playerFouls(p) ?? 0), 0)
+            : null;
+          const teamFacts = r.facts.teams[side];
+          const freeMade =
+            "freeMade" in teamFacts ? teamFacts.freeMade : total("free");
+          const freeTaken =
+            "freeTaken" in teamFacts
+              ? teamFacts.freeTaken
+              : rows.every(
+                    (p) =>
+                      !p.played || ("advanced" in p && p.advanced !== null),
+                  )
+                ? rows.reduce(
+                    (n, p) =>
+                      n +
+                      ("advanced" in p
+                        ? (p.advanced?.freeThrows.attempted ?? 0)
+                        : 0),
+                    0,
+                  )
+                : null;
+          return (
+            <section key={side} className="public-roster">
+              <h2>
+                <a
+                  href={`/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}`}
+                >
+                  {r.game[side].name}
+                </a>
+              </h2>
+              <div
+                className="public-scroll public-athletes"
+                role="region"
+                aria-label={`Participações de ${r.game[side].name}`}
+                tabIndex={0}
               >
-                {r.game[side].name}
-              </a>
-            </h3>
-            <p>
-              Capitão: {staff.captain?.name} · Técnico: {staff.coach?.name}
-              {staff.captainIsCoach ? " (capitão)" : ""}
-              {staff.assistant
-                ? ` · Ass. Técnico: ${staff.assistant.name}`
-                : ""}
-            </p>
-            <div
-              className="public-scroll"
-              role="region"
-              aria-label={`Participações de ${r.game[side].name}`}
-              tabIndex={0}
-            >
-              <table>
-                <caption>Participações e estatísticas publicadas</caption>
-                <thead>
-                  <tr>
-                    <th>Camisa</th>
-                    <th>Atleta</th>
-                    <th>Participação</th>
-                    <th>PTS</th>
-                    <th>2PC</th>
-                    <th>3PC</th>
-                    <th>LLC</th>
-                    <th>F</th>
-                    {r.source.kind === "sheet" && <th>GD</th>}
-                    {hasAdvanced && (
-                      <>
-                        <th>MIN</th>
-                        <th>PTS avançados</th>
-                        <th>REB</th>
-                        <th>AST</th>
-                      </>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((p) => {
-                    const a = "advanced" in p ? p.advanced : null;
-                    return (
-                      <tr key={p.person.id}>
-                        <td>{p.jersey}</td>
-                        <th scope="row">
-                          <a href={`/atleta.html#${p.person.id}`}>
-                            {p.person.nickname || p.person.name}
-                          </a>
-                          {p.captain ? " · Capitão" : ""}
+                <table aria-label="Participações e estatísticas publicadas">
+                  <thead>
+                    <tr>
+                      <th scope="col">Nº</th>
+                      <th scope="col">Atleta</th>
+                      {(["PTS", "2P", "3P", "LL", "F"] as const).map((k) => (
+                        <th
+                          scope="col"
+                          title={
+                            k === "PTS"
+                              ? "Pontos"
+                              : k === "LL"
+                                ? "Lances livres convertidos"
+                                : k === "F"
+                                  ? "Faltas cometidas"
+                                  : `Cestas de ${k[0]} convertidas`
+                          }
+                          key={k}
+                        >
+                          {k}
                         </th>
-                        <td>
-                          {p.played
-                            ? p.starter
-                              ? "Titular"
-                              : "Participou"
-                            : "Não participou"}
-                        </td>
-                        <td>{p.played ? p.points : "—"}</td>
-                        <td>{p.played ? p.two : "—"}</td>
-                        <td>{p.played ? p.three : "—"}</td>
-                        <td>{p.played ? p.free : "—"}</td>
-                        <td>
-                          {p.played
-                            ? "fouls" in p
-                              ? p.fouls
-                              : (a?.foulsCommitted ?? "—")
-                            : "—"}
-                        </td>
-                        {r.source.kind === "sheet" && (
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((p) => {
+                      const fouls = playerFouls(p);
+                      const status = playerStatus(p);
+                      return (
+                        <tr
+                          key={p.person.id}
+                          className={status ? "public-excluded" : undefined}
+                        >
+                          <td className="public-jersey">{p.jersey}</td>
+                          <th scope="row">
+                            <div className="public-athlete-name">
+                              <a
+                                href={`/atleta.html#${p.person.id}`}
+                                className={p.starter ? "public-starter" : ""}
+                              >
+                                {p.person.nickname || p.person.name}
+                                {p.starter ? " *" : ""}
+                              </a>
+                              {p.captain && <small title="Capitão">CAP</small>}
+                            </div>
+                            {status && (
+                              <span className="public-status">{status}</span>
+                            )}
+                          </th>
+                          <td>{p.played ? p.points : "—"}</td>
+                          <td>{p.played ? p.two : "—"}</td>
+                          <td>{p.played ? p.three : "—"}</td>
+                          <td>{p.played ? p.free : "—"}</td>
                           <td>
-                            {p.played && "status" in p
-                              ? p.status === "GD" || p.status === "D"
-                                ? p.status
-                                : "0"
-                              : "—"}
+                            {fouls === null ? (
+                              "—"
+                            ) : fouls === 0 ? (
+                              "0"
+                            ) : (
+                              <button
+                                className="public-foul-button"
+                                title={`Ver cobertura de faltas de ${p.person.name}`}
+                                aria-label={`${fouls} faltas, detalhes de ${p.person.name}`}
+                                onClick={(e) => {
+                                  opener.current = e.currentTarget;
+                                  setSelected(p);
+                                }}
+                              >
+                                {fouls}
+                              </button>
+                            )}
                           </td>
-                        )}
-                        {hasAdvanced && (
-                          <>
-                            <td>
-                              {a && p.played ? minute(a.secondsPlayed) : "—"}
-                            </td>
-                            <td>{a?.points ?? "—"}</td>
-                            <td>{a?.rebounds ?? "—"}</td>
-                            <td>{a?.assists ?? "—"}</td>
-                          </>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th colSpan={2} scope="row">
+                        Total
+                      </th>
+                      <td>{total("points")}</td>
+                      <td>{total("two")}</td>
+                      <td>{total("three")}</td>
+                      <td>{total("free")}</td>
+                      <td>{stat(sumFouls)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div className="public-free-throws">
+                LL da equipe:{" "}
+                {freeTaken === null
+                  ? `${freeMade} convertidos · tentativas não informadas`
+                  : `${freeMade}/${freeTaken} · ${freeTaken ? `${((100 * freeMade) / freeTaken).toFixed(1).replace(".", ",")}%` : "—"}`}
+              </div>
+              <div className="public-staff">
+                <strong>Comissão técnica</strong>
+                <span>
+                  Técnico: {coach.coach?.name ?? "—"}
+                  {coach.captainIsCoach ? " (capitão)" : ""}
+                </span>
+                {coach.assistant && (
+                  <span>Assistente: {coach.assistant.name}</span>
+                )}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+      <p className="public-legend">
+        * Titular · CAP Capitão · 5F Exclusão por faltas · GD/D Desqualificação
+        · — Não participou ou dado sem cobertura. Faltas detalhadas por período
+        e penalidades não constam na projeção publicada.
+      </p>
+      {selected && (
+        <div
+          className="public-dialog-backdrop"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setSelected(null);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="public-foul-title"
+            className="public-foul-dialog"
+          >
+            <div className="public-dialog-head">
+              <h2 id="public-foul-title">Faltas · {selected.person.name}</h2>
+              <button ref={closeButton} onClick={() => setSelected(null)}>
+                Fechar
+              </button>
             </div>
-          </section>
-        );
-      })}
-      {advanced?.origins.scorePoints.kind === "sheet" &&
-        advanced.origins.playerAdvanced?.kind === "pdf" && (
-          <p>
-            Os pontos oficiais vêm da súmula manual. Os pontos avançados e
-            minutos vêm do PDF e mantêm sua cobertura própria.
-          </p>
-        )}
+            <p>
+              <strong>{playerFouls(selected)}</strong> faltas registradas no
+              jogo.
+            </p>
+            {"technical" in selected && (
+              <p>
+                Técnicas (T): {selected.technical} · Antidesportivas (U):{" "}
+                {selected.unsportsmanlike}
+              </p>
+            )}
+            <p>
+              Os eventos por período, os horários e os lances livres de
+              penalidade não estão disponíveis nesta publicação.
+            </p>
+          </div>
+        </div>
+      )}
     </article>
   );
 }
 export function PublicGamePage() {
-  const [id, setId] = useState(() => location.hash.slice(1)),
-    [result, setResult] = useState<PublicResult | null>(null),
-    [error, setError] = useState(""),
-    [loading, setLoading] = useState(true),
-    [epoch, setEpoch] = useState(0);
-  const heading = useRef<HTMLHeadingElement>(null),
-    alert = useRef<HTMLParagraphElement>(null);
+  const [id, setId] = useState(() => location.hash.slice(1));
+  const [result, setResult] = useState<PublicResult | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [epoch, setEpoch] = useState(0);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const alert = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
-    const change = () => setId(location.hash.slice(1));
-    window.addEventListener("hashchange", change);
-    return () => window.removeEventListener("hashchange", change);
+    const read = () => setId(location.hash.slice(1));
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
   }, []);
   useEffect(() => {
     let active = true;
@@ -261,19 +401,19 @@ export function PublicGamePage() {
       <a
         className="access-skip"
         href="#conteudo"
-        onClick={(event) => {
-          event.preventDefault();
+        onClick={(e) => {
+          e.preventDefault();
           document.getElementById("conteudo")?.focus();
         }}
       >
         Pular para o conteúdo
       </a>
       <header className="access-header">
-        <span>Base do Basquete</span>
-        <span className="access-preview">Ambiente de avaliação</span>
+        <a href="/foundation.html">Base do Basquete</a>
+        <span className="access-preview">Resultados publicados</span>
       </header>
       <main id="conteudo" tabIndex={-1} className="access-main public-result">
-        <h1 tabIndex={-1} ref={heading}>
+        <h1 className="public-screen-title" tabIndex={-1} ref={heading}>
           Resultado publicado
         </h1>
         {loading && <p role="status">Carregando resultado…</p>}
