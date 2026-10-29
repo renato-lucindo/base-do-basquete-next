@@ -345,6 +345,7 @@ export function GamesWorkspace(props: Props) {
   );
   function closeEditor() {
     if (mayLeave()) {
+      setSheetVisible(false);
       setEditor(null);
       setStatus("");
       pending.current = null;
@@ -467,6 +468,7 @@ export function GamesWorkspace(props: Props) {
           onSessionLost={props.onSessionLost}
           onSaved={props.onSaved}
           onBack={() => setSheetVisible(false)}
+          onBackToGames={closeEditor}
         />
       ) : editor ? (
         <AdminDialog
@@ -474,6 +476,7 @@ export function GamesWorkspace(props: Props) {
           open={props.enabled}
           busy={busy}
           onClose={closeEditor}
+          closeLabel="Voltar à lista de jogos"
           className="game-editor-dialog"
         >
           {feedback}
@@ -634,22 +637,6 @@ export function GamesWorkspace(props: Props) {
                   Recarregar jogo
                 </button>
               )}
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={() => {
-                  if (mayLeave()) {
-                    setEditor(null);
-                    setStatus("");
-                    pending.current = null;
-                    setUncertain(false);
-                    setConflict(false);
-                    setError("");
-                  }
-                }}
-              >
-                Voltar à lista de jogos
-              </button>
             </div>
             {savedGame && (
               <GameOccurrencePanel

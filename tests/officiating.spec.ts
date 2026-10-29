@@ -72,7 +72,7 @@ test("fechar o diálogo sem salvar não cadastra oficiais", async ({ page }) => 
     .click();
   page.once("dialog", (dialog) => dialog.accept());
   await page
-    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   expect(f.games.size).toBe(0);
   expect(f.officials.size).toBe(0);
