@@ -1,6 +1,23 @@
 .game-sheet {
   min-width: 0;
 }
+.sheet-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 8px 0;
+  background: #fff;
+  border-bottom: 1px solid #d9e1ec;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.sheet-navigation h3,
+.sheet-navigation .competition-actions {
+  margin: 0;
+}
 .access-main:has(.game-sheet) {
   max-width: 1560px;
   padding-top: 20px;

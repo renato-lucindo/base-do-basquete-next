@@ -10,7 +10,7 @@ async function prepare(
     page.getByRole("combobox", { name: "Tipo da ocorrência", exact: true }),
   ).toBeEnabled();
   await page
-    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Equipes e elencos", exact: true })
@@ -32,7 +32,7 @@ test("relação e impacto paginados conservam a lista completa da inscrição", 
     page.getByRole("combobox", { name: "Tipo da ocorrência", exact: true }),
   ).toBeEnabled();
   await page
-    .getByRole("button", { name: "Fechar diálogo", exact: true })
+    .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Equipes e elencos", exact: true })
