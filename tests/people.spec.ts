@@ -251,6 +251,12 @@ async function fixture(page: Page) {
       resource === "roster" ? [...roster.values()] : [...staff.values()];
     if (itemId) {
       const r = values.find((v) => v.id === itemId)!;
+      if (!r)
+        return error(
+          404,
+          "context_not_found",
+          "Pessoa ou vínculo não encontrado.",
+        );
       return route.fulfill({ json: snapshot(r, r.version) });
     }
     const activeOnly = url.searchParams.get("activeOnly") !== "0";
@@ -309,15 +315,39 @@ async function newAthlete(page: Page, name: string, jersey: string) {
     })
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill(name);
+  await page.getByLabel("Camisa", { exact: true }).fill(jersey);
   await page
     .getByRole("button", { name: "Salvar pessoa", exact: true })
     .click();
-  await page.getByLabel("Camisa", { exact: true }).fill(jersey);
-  await page
-    .getByRole("button", { name: "Salvar vínculo", exact: true })
-    .click();
   await expect(page.getByText("Vínculo salvo.", { exact: true })).toBeVisible();
 }
+
+test("novo atleta informa camisa no primeiro diálogo e salva cadastro e elenco de uma vez", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Cadastro Único", "00");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(f.persons.size).toBe(1);
+  expect(f.roster.size).toBe(1);
+  expect([...f.roster.values()][0].jersey).toBe("00");
+  await page
+    .getByRole("button", {
+      name: "Editar pessoa Ana Cadastro Único",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue("00");
+  await page.getByLabel("Camisa", { exact: true }).fill("0");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(f.persons.size).toBe(1);
+  expect([...f.roster.values()][0].jersey).toBe("0");
+});
 
 test("adicionar atleta usa diálogo compacto, busca explícita e seleção por teclado", async ({
   page,
@@ -563,10 +593,11 @@ test("ACK de pessoa seguido de GET falho retoma apenas leitura e não cadastra n
   await page
     .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
     .click();
-  await expect(page.getByLabel("Camisa", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(posts).toBe(1);
   expect(reads).toBe(2);
   expect(f.persons.size).toBe(1);
+  expect(f.roster.size).toBe(1);
 });
 test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async ({
   page,
@@ -700,6 +731,7 @@ test("homônimos exigem nova identidade explícita sem renomear", async ({
     })
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Silva");
+  await page.getByLabel("Camisa", { exact: true }).fill("2");
   await page
     .getByRole("button", { name: "Salvar pessoa", exact: true })
     .click();
@@ -712,14 +744,11 @@ test("homônimos exigem nova identidade explícita sem renomear", async ({
   await page
     .getByRole("button", { name: "Salvar pessoa", exact: true })
     .click();
-  await page.getByLabel("Camisa", { exact: true }).fill("2");
-  await page
-    .getByRole("button", { name: "Salvar vínculo", exact: true })
-    .click();
   expect([...f.persons.values()].map((p) => p.name)).toEqual([
     "Ana Silva",
     "Ana Silva",
   ]);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(new Set([...f.roster.values()].map((r) => r.personId)).size).toBe(2);
 });
 
@@ -1104,6 +1133,256 @@ test("guardas e reautenticação preservam cadastro contextual", async ({
   await page
     .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
     .click();
-  await expect(page.getByLabel("Camisa", { exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(f.persons.size).toBe(1);
+  expect(f.roster.size).toBe(1);
 });
+
+test("cadastro único permite camisa vazia e recupera falha do vínculo sem repetir pessoa", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Sem Camisa", "");
+  expect([...f.roster.values()][0].jersey).toBeNull();
+  let peoplePosts = 0,
+    rosterPosts = 0,
+    failRead = true;
+  const rosterCommands: string[] = [];
+  await page.route("**/api/people", async (r) => {
+    if (r.request().method() === "POST") peoplePosts++;
+    return r.fallback();
+  });
+  await page.route("**/api/roster", async (r) => {
+    if (r.request().method() === "POST") {
+      rosterPosts++;
+      rosterCommands.push(r.request().postDataJSON().commandId);
+      if (rosterPosts === 1)
+        return r.fulfill({
+          status: 503,
+          json: {
+            error: { code: "access_unavailable", message: "Falha ao vincular" },
+          },
+        });
+    }
+    return r.fallback();
+  });
+  await page.route("**/api/roster/*", async (r) => {
+    if (rosterPosts === 2 && failRead) {
+      failRead = false;
+      return r.fulfill({
+        status: 503,
+        json: {
+          error: {
+            code: "access_unavailable",
+            message: "Leitura do vínculo indisponível",
+          },
+        },
+      });
+    }
+    return r.fallback();
+  });
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+    .click();
+  await page.getByLabel("Nome da pessoa", { exact: true }).fill("Bia Vínculo");
+  await page.getByLabel("Camisa", { exact: true }).fill("00");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "dados globais da pessoa já foram salvos",
+  );
+  await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue("00");
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Leitura do vínculo indisponível",
+  );
+  await page
+    .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(peoplePosts).toBe(1);
+  expect(rosterPosts).toBe(2);
+  expect(rosterCommands[0]).toBe(rosterCommands[1]);
+  expect(f.persons.size).toBe(2);
+  expect(f.roster.size).toBe(2);
+});
+
+test("camisa repetida no novo cadastro permite recarregar e corrigir sem duplicar pessoa", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "Recorte desktop");
+  const f = await fixture(page);
+  await open(page);
+  await newAthlete(page, "Ana Existente", "1");
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+    .click();
+  await page.getByLabel("Nome da pessoa", { exact: true }).fill("Bia Nova");
+  await page.getByLabel("Camisa", { exact: true }).fill("1");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("camisa repetida");
+  const person = [...f.persons.values()].find((p) => p.name === "Bia Nova")!;
+  page.once("dialog", (d) => d.accept());
+  await page
+    .getByRole("button", { name: "Recarregar cadastro", exact: true })
+    .click();
+  await expect(page.getByLabel("Nome da pessoa", { exact: true })).toHaveValue(
+    "Bia Nova",
+  );
+  await page.getByLabel("Camisa", { exact: true }).fill("0");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(f.persons.size).toBe(2);
+  expect(f.persons.get(person.id)!.version).toBe(person.version);
+  expect(
+    [...f.roster.values()].find((r) => r.personId === person.id)!.jersey,
+  ).toBe("0");
+});
+
+for (const [committed, expireDuringReload, failReadDuringReload] of [
+  [true, false, false],
+  [true, true, false],
+  [false, false, false],
+  [false, true, false],
+  [true, false, true],
+  [false, false, true],
+]) {
+  test(`recarga recupera vínculo ${committed ? "comitado" : "não comitado"} sem ACK${expireDuringReload ? " com reautenticação" : failReadDuringReload ? " após falha de leitura" : ""}`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "desktop", "Recorte desktop");
+    const f = await fixture(page);
+    let peoplePosts = 0;
+    const rosterCommands: SaveRoster[] = [];
+    await page.route("**/api/people", async (r) => {
+      if (r.request().method() === "POST") peoplePosts++;
+      return r.fallback();
+    });
+    await page.route("**/api/roster", async (r) => {
+      if (r.request().method() === "POST") {
+        rosterCommands.push(r.request().postDataJSON());
+        if (rosterCommands.length === 1) {
+          if (committed) f.setMode("uncertain");
+          else
+            return r.fulfill({
+              status: 503,
+              json: {
+                error: {
+                  code: "access_unavailable",
+                  message: "Resposta indisponível",
+                },
+              },
+            });
+        }
+      }
+      return r.fallback();
+    });
+    await open(page);
+    await page
+      .getByRole("button", { name: "Adicionar atleta", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+      .click();
+    await page
+      .getByLabel("Nome da pessoa", { exact: true })
+      .fill("Ana ACK perdido");
+    await page.getByLabel("Camisa", { exact: true }).fill("00");
+    await page
+      .getByRole("button", { name: "Salvar pessoa", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toContainText(
+      "dados globais da pessoa já foram salvos",
+    );
+    expect(f.roster.size).toBe(committed ? 1 : 0);
+    const original = rosterCommands[0];
+    if (expireDuringReload || failReadDuringReload) {
+      let expireRead = true;
+      await page.route(`**/api/roster/${original.entry.id}`, (r) => {
+        if (expireRead) {
+          expireRead = false;
+          return r.fulfill({
+            status: expireDuringReload ? 401 : 503,
+            json: {
+              error: {
+                code: expireDuringReload
+                  ? "invalid_session"
+                  : "access_unavailable",
+                message: "Falha na leitura durante recarga",
+              },
+            },
+          });
+        }
+        return r.fallback();
+      });
+    }
+    page.once("dialog", (d) => d.accept());
+    await page
+      .getByRole("button", { name: "Recarregar cadastro", exact: true })
+      .click();
+    if (failReadDuringReload) {
+      await expect(page.getByRole("alert")).toContainText(
+        "Falha na leitura durante recarga",
+      );
+      await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue(
+        "00",
+      );
+      page.once("dialog", (d) => d.accept());
+      await page
+        .getByRole("button", { name: "Recarregar cadastro", exact: true })
+        .click();
+    }
+    if (expireDuringReload) {
+      await expect(page.getByLabel("Senha", { exact: true })).toBeVisible();
+      await page
+        .getByLabel("E-mail", { exact: true })
+        .fill("admin@example.test");
+      await page.getByLabel("Senha", { exact: true }).fill("fixture-password");
+      await page.getByRole("button", { name: "Entrar", exact: true }).click();
+      await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue(
+        "00",
+      );
+      await page
+        .getByRole("button", { name: "Repetir o mesmo envio", exact: true })
+        .click();
+    } else {
+      await expect(
+        page.getByLabel("Nome da pessoa", { exact: true }),
+      ).toBeEnabled();
+      await expect(page.getByLabel("Camisa", { exact: true })).toHaveValue(
+        "00",
+      );
+      await page
+        .getByRole("button", { name: "Salvar pessoa", exact: true })
+        .click();
+    }
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    expect(peoplePosts).toBe(1);
+    expect(rosterCommands).toHaveLength(
+      committed && !expireDuringReload ? 1 : 2,
+    );
+    expect(
+      rosterCommands.every(
+        (c) => JSON.stringify(c) === JSON.stringify(original),
+      ),
+    ).toBe(true);
+    expect(f.persons.size).toBe(1);
+    expect(f.roster.size).toBe(1);
+    expect(f.roster.get(original.entry.id)!.version).toBe(1);
+  });
+}
