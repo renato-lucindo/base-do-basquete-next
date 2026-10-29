@@ -1,3 +1,13 @@
+# Integração de reaproveitamento de elenco — PR #38 Draft, 29/10/2026
+
+**Unidade ativa:** branch `codex/reaproveitar-elenco-banco` na [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38). Interface de reaproveitamento de atletas integrada ao cadastro de elencos, com origens paginadas, candidatos elegíveis, escolha inicialmente desmarcada, confirmação explícita, preservação de `0`/`00`, 409 com atualização de contexto e recuperação de resposta incerta sem duplicar o comando. Worker autenticado e privado com `GET /api/roster/reuse/sources`, `GET /api/roster/reuse/context` e `POST /api/roster/reuse`, provider Supabase e escrita transacional com recibos/fingerprint. Comissão técnica/faltas v2 anteriormente commitadas preservadas.
+
+**Prova local material:** `npm run gate` **PASS/exit 0**: 607 Vitest/125 arquivos, 6 transportes, 13 PostgreSQL, 26 workerd, 1 PDF runtime, lint, formato, tipos, builds, fronteiras e segredos/849 arquivos. Log `.preview-artifacts/roster-reuse-final-gate.log` SHA256 `9124B31B4FFAB686F09720DFD80BBE2119462A4302D55C4B9C88AE2FB24F6EAD`. Focais de SQL/provider 7 PASS/3 arquivos, Playwright desktop 5 PASS (1366×768 e 1920×1080), `npm run test:access` 26 PASS, `npm run design:verify` PASS. Evidências detalhadas em [VALIDACAO-REAPROVEITAMENTO-ELENCO.md](VALIDACAO-REAPROVEITAMENTO-ELENCO.md). Testes com mock no navegador e PostgreSQL descartável não representam operação autenticada com banco remoto.
+
+**Bloqueios da integração estável:** 3 migrations locais **NÃO APLICADAS** (`20261027143904_roster_reuse_context.sql`, `20261027145431_roster_reuse_write.sql`, `20261029143000_sheet_staff_v2.sql`), sem aceite humano, sem revisão independente/segurança e sem validação remota autenticada. Manter **Draft** e não fazer merge, deploy ou DDL/DML remoto. Próximo passo: publicar o commit apenas na PR #38, reconciliar a CI do novo SHA e registrar resultado, preservando arquivos humanos `.agents/` e `skills-lock.json`.
+
+---
+
 # Comissão técnica e faltas na súmula — WIP na PR #38, 29/10/2026
 
 **Unidade ativa:** `codex/reaproveitar-elenco-banco` no repositório `renato-lucindo/base-do-basquete-next`, usando a [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) existente, aberta como Draft. Implementação de comissão técnica identificada no commit `780e0ed`, com `origin/main` `11b547a` incorporada por merge explícito `0b6f33d`. A branch também preserva o WIP anterior de reaproveitamento de elenco; a unidade composta ainda não está pronta para integração estável.

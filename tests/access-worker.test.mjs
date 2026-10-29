@@ -16,6 +16,42 @@ import { officiatingOutbound } from "./fixtures/officiating-outbound.mjs";
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
+test("roster reuse routes reject anonymous reads, forged posts and invalid queries in workerd", async () => {
+  const f = await fixture({});
+  try {
+    for (const path of [
+      `/api/roster/reuse/sources?targetRegistrationId=${id}`,
+      `/api/roster/reuse/context?sourceRegistrationId=${id}&targetRegistrationId=${id}`,
+    ]) {
+      const response = await f.mf.dispatchFetch(origin + path);
+      assert.equal(response.status, 401);
+    }
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    for (const path of [
+      `/api/roster/reuse/sources?targetRegistrationId=${id}&offset=-1`,
+      `/api/roster/reuse/sources?targetRegistrationId=${id}&offset=0&offset=20`,
+      `/api/roster/reuse/context?sourceRegistrationId=invalid&targetRegistrationId=${id}`,
+    ]) {
+      const response = await f.mf.dispatchFetch(origin + path, {
+        headers: { cookie },
+      });
+      assert.equal(response.status, 400);
+    }
+    const forged = await f.mf.dispatchFetch(`${origin}/api/roster/reuse`, {
+      method: "POST",
+      headers: {
+        cookie,
+        origin: "https://another.example.test",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ commandId: id }),
+    });
+    assert.equal(forged.status, 403);
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
 test("fresh parallel authority checks finish before data and still reject revocation in workerd", async () => {
   const options = { officiating: true };
   const f = await fixture(options);

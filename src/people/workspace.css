@@ -3,6 +3,46 @@
   padding-top: 20px;
   border-top: 1px solid #9caac0;
 }
+.roster-reuse-controls {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+.roster-reuse-controls > label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 340px;
+  min-width: 0;
+}
+.roster-reuse-controls select {
+  width: 100%;
+  min-height: 42px;
+  min-width: 0;
+}
+.roster-reuse-table table {
+  table-layout: fixed;
+}
+.roster-reuse-table th:first-child,
+.roster-reuse-table td:first-child {
+  width: 72px;
+}
+.roster-reuse-table th:nth-child(2),
+.roster-reuse-table td:nth-child(2) {
+  width: 42%;
+}
+.roster-reuse-table th:nth-child(3),
+.roster-reuse-table td:nth-child(3) {
+  width: 120px;
+}
+.roster-reuse-table input:not([type="checkbox"]) {
+  width: 100%;
+  max-width: 95px;
+  min-width: 0;
+}
+.roster-reuse-table td {
+  overflow-wrap: anywhere;
+}
 .person-picker {
   position: relative;
 }
