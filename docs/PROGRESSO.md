@@ -4,7 +4,9 @@
 
 **Prova local material:** `npm run gate` **PASS/exit 0**: 607 Vitest/125 arquivos, 6 transportes, 13 PostgreSQL, 26 workerd, 1 PDF runtime, lint, formato, tipos, builds, fronteiras e segredos/849 arquivos. Log `.preview-artifacts/roster-reuse-final-gate.log` SHA256 `9124B31B4FFAB686F09720DFD80BBE2119462A4302D55C4B9C88AE2FB24F6EAD`. Focais de SQL/provider 7 PASS/3 arquivos, Playwright desktop 5 PASS (1366×768 e 1920×1080), `npm run test:access` 26 PASS, `npm run design:verify` PASS. Evidências detalhadas em [VALIDACAO-REAPROVEITAMENTO-ELENCO.md](VALIDACAO-REAPROVEITAMENTO-ELENCO.md). Testes com mock no navegador e PostgreSQL descartável não representam operação autenticada com banco remoto.
 
-**Bloqueios da integração estável:** 3 migrations locais **NÃO APLICADAS** (`20261027143904_roster_reuse_context.sql`, `20261027145431_roster_reuse_write.sql`, `20261029143000_sheet_staff_v2.sql`), sem aceite humano, sem revisão independente/segurança e sem validação remota autenticada. Manter **Draft** e não fazer merge, deploy ou DDL/DML remoto. Próximo passo: publicar o commit apenas na PR #38, reconciliar a CI do novo SHA e registrar resultado, preservando arquivos humanos `.agents/` e `skills-lock.json`.
+**CI remota do material:** commit `f6405970d62632bd581b236c4f6be9764639627a` publicado na PR #38 e validado pelo workflow [40951002124](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40951002124), job `validate` **SUCCESS**, com gate, `design:verify` e Playwright E2E **467 PASS / 107 SKIP** (29/10/2026). O checkpoint documental posterior não altera o material comprovado.
+
+**Bloqueios da integração estável:** 3 migrations locais **NÃO APLICADAS** (`20261027143904_roster_reuse_context.sql`, `20261027145431_roster_reuse_write.sql`, `20261029143000_sheet_staff_v2.sql`), sem aceite humano, sem revisão independente/segurança e sem validação remota autenticada. Manter **Draft** e não fazer merge, deploy ou DDL/DML remoto. Próximo passo: revisão independente, plano de migrations e prova autenticada em ambiente autorizado, preservando arquivos humanos `.agents/` e `skills-lock.json`.
 
 ---
 
