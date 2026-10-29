@@ -1,5 +1,14 @@
 # Reaproveitamento de elenco e pré-seleção de identidade
 
+## Aplicação autorizada no Supabase — 29/10/2026
+
+Três migrations aplicadas com sucesso no `base-do-basquete-next-dev`, conforme confirmação explícita do responsável; remoto passou de 49 para **52**. Versões reais `20261029221031_roster_reuse_context`, `20261029221048_roster_reuse_write`, `20261029221056_sheet_staff_v2`; SQL conferido integralmente contra o commit aprovado `fe80274`. Arquivos locais renomeados para corresponder ao histórico, sem alterar SQL aplicado ou as 49 migrations anteriores. Mapa completo no [plano](PLANO-MIGRATIONS-PR38.md).
+
+- Catálogo real: wrappers públicos `security invoker` com EXECUTE só para `authenticated`; motores privados sem EXECUTE para papéis API; busca de schema vazia; recibos/linhagem com RLS, política restritiva e trigger de imutabilidade. Advisor posterior sem achados novos: 1 WARN/4 INFO preexistentes.
+- Comparações agregadas antes/depois e após os testes idênticas: 18 súmulas, 17 publicações atuais, 20 versões históricas, 252 vínculos e 171 pessoas. Admin/IDs Auth inalterados, sem consultar senhas ou hashes de credenciais.
+- Script `supabase/tests/pr38_remote_checks.sql` real **PASS**: fatos v1/v2 iguais, cesta no rascunho v2 sem técnico, confirmação incompleta e falta sem técnico recusadas; anônimo e identidade ausente bloqueados; administrador existente passa pela autorização e recebe erro de entrada inválida nas três RPCs. Sem seed, DML ou alteração de Auth/admin; encerramento em ROLLBACK. Papéis/claims são controlados no SQL: esta prova não representa login/sessão HTTP real.
+- Focais locais de upgrade/motor/contexto/writer/provider: **9 PASS/5 arquivos**, incluindo validação do script remoto no PostgreSQL descartável. `npm run test:db`: **13 PASS** do zero/upgrade após reconciliação; formato/lint/diff/segredos aprovados. 52 nomes/versões locais coincidem com o histórico remoto, mantendo as 49 anteriores. Gate/CI aprovados de `fe80274` continuam prova do SQL inalterado; a CI da reconciliação será registrada na PR pelo novo SHA. Permanecem pendentes percurso HTTP/Worker autenticado, aceite e integração. Nenhum deploy, merge ou publicação nesta aplicação de DDL.
+
 ## Preparação para integração — 29/10/2026
 
 - A suspeita registrada na PR foi reproduzida: `npx vitest run src/games/sheet-engine-database.test.ts` falhou ao comparar uma cesta de dois pontos no rascunho v2 sem técnico/capitão (TypeScript aceita, SQL recusava). A migration v2, confirmada ainda não aplicada no remoto, passa a processar cestas antes da autoria da comissão e mantém a verificação de participação/exclusão v2. Faltas continuam exigindo técnico elegível.

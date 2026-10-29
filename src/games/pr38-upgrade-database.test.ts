@@ -8,9 +8,9 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
   try {
     await db.exec(platform);
     const pending = [
-      "20261027143904_roster_reuse_context.sql",
-      "20261027145431_roster_reuse_write.sql",
-      "20261029143000_sheet_staff_v2.sql",
+      "20261029221031_roster_reuse_context.sql",
+      "20261029221048_roster_reuse_write.sql",
+      "20261029221056_sheet_staff_v2.sql",
     ];
     const names = (await readdir("supabase/migrations"))
       .filter((name) => name.endsWith(".sql"))
@@ -124,6 +124,20 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
       ]),
     ).rejects.toThrow("incomplete_sheet");
     await db.exec("rollback to savepoint incomplete_confirmation");
+    expect((await historical()).rows).toEqual(before);
+    // Exercise the seed-free remote checks inside this disposable fixture too.
+    const remoteChecks = await readFile(
+      "supabase/tests/pr38_remote_checks.sql",
+      "utf8",
+    );
+    await db.exec(
+      remoteChecks
+        .replace(/^begin;$/mu, "savepoint remote_checks;")
+        .replace(
+          /^rollback;$/mu,
+          "rollback to savepoint remote_checks; release savepoint remote_checks;",
+        ),
+    );
     expect((await historical()).rows).toEqual(before);
     await db.exec("rollback");
   } finally {

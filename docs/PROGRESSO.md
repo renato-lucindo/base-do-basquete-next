@@ -1,3 +1,17 @@
+# Migrations aplicadas — PR #38 Draft, 29/10/2026
+
+**Autorização e unidade:** responsável confirmou explicitamente a aplicação das três migrations no projeto `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`), conforme plano. Mesma branch `codex/reaproveitar-elenco-banco` / PR #38, base `11b547a`, material aprovado `fe80274fedebe39e23a4039ef0df869979a263ec`, CI [40959245003](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40959245003) **SUCCESS** com 608 Vitest/126 arquivos e 467 Playwright PASS/107 SKIP. Esta etapa reconcilia nomes e acrescenta uma verificação SQL, sem mudar SQL aplicado; recuperar HEAD final por `git log` e conferir seu check `validate` na PR.
+
+**Execução real:** 3 migrations aplicadas com sucesso, remoto **49 → 52**. Mapa original → versão real: `20261027143904 → 20261029221031` (contexto), `20261027145431 → 20261029221048` (escrita), `20261029143000 → 20261029221056` (súmula v2). Conteúdo registrado integralmente igual ao aprovado. Só os nomes locais foram reconciliados; as 49 anteriores e todo SQL aplicado são imutáveis. Grants, RLS, triggers e motores privados conferidos; advisors sem achados novos (1 WARN/4 INFO preexistentes).
+
+**Preservação e provas:** contagens/assinaturas iguais antes/depois e após os testes: 18 súmulas, 17 publicações, 20 versões históricas, 252 vínculos, 171 pessoas, singleton administrativo e IDs Auth. Nenhum DML de produto/Auth/admin, senha ou dado humano alterado. `pr38_remote_checks.sql` real PASS com ROLLBACK para fatos v1/v2, rascunho, confirmação incompleta e papéis/autorização; uso de claims DB explicitamente separado de login HTTP. Focais locais de upgrade/motor/writer PASS (4 testes/3 arquivos), incluindo o script remoto sem seeds. Ensaio/schema/fontes anteriores comprovados reaproveitados; CI do novo HEAD deve ser conferida após publicação. Serviço publicado e proteção do preview não alterados; nenhum deploy/merge/publicação.
+
+**Checks da reconciliação:** focais 9 PASS/5 arquivos (upgrade/motor/contexto/writer/provider), 13 cenários `npm run test:db` PASS do zero/upgrade, ESLint/formato/diff/segredos aprovados. Histórico local de 52 arquivos coincide com as 52 versões/nomes remotos; 49 entradas anteriores preservadas. SQL de produto inalterado: demais provas do gate anterior reaproveitadas; CI da composição final na mesma PR.
+
+**Próximo exato:** publicar na mesma PR e conferir CI; depois validar percurso HTTP/Worker com sessão real em ambiente isolado autorizado e obter aceite para integração. PR permanece Draft por essa prova pendente, não por migrations ausentes. Sem agente revisor independente disponível; revisão própria e limites documentados. Arquivos humanos `.agents/` e `skills-lock.json` preservados. Mapa e evidências em [PLANO-MIGRATIONS-PR38.md](PLANO-MIGRATIONS-PR38.md) e [VALIDACAO-REAPROVEITAMENTO-ELENCO.md](VALIDACAO-REAPROVEITAMENTO-ELENCO.md).
+
+---
+
 # Preparação para integração — PR #38 Draft, 29/10/2026
 
 **Unidade ativa:** mesma branch `codex/reaproveitar-elenco-banco`, base `origin/main` `11b547af6c6f0a051736c4489e37c0630d3805c2`; material publicado **`e72b8af158805ece1e0248bf34296af08ad08c34`** na [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38). Checkpoint posterior altera somente documentação; recuperar o HEAD por `git log`. Acesso local restabelecido. Mudanças humanas `.agents/` e `skills-lock.json` preservadas fora do commit.

@@ -1,8 +1,26 @@
 # Aplicação controlada das migrations da PR #38
 
-Preparação em 29/10/2026 na branch `codex/reaproveitar-elenco-banco`. Este plano não representa aplicação remota nem autorização para DDL, deploy ou publicação de dados. O SHA final e a CI ficam na PR #38 e no checkpoint.
+Plano preparado e executado em 29/10/2026 na branch `codex/reaproveitar-elenco-banco`, após autorização explícita do responsável para aplicar as três migrations no projeto de desenvolvimento. O SHA final e a CI ficam na PR #38 e no checkpoint. Deploy e publicação não foram executados.
 
-## Estado observado
+## Execução autorizada — resultado
+
+As três aplicações pela ferramenta oficial retornaram sucesso em 29/10/2026, entre 19:10:31 e 19:10:56 America/Sao_Paulo. Histórico remoto passou de 49 para **52 migrations**. SQL registrado em cada migration conferido integralmente com o material aprovado `fe80274`; nomes locais reconciliados com as versões reais, sem alterar SQL:
+
+| Arquivo original                          | Versão real / arquivo reconciliado        |
+| ----------------------------------------- | ----------------------------------------- |
+| `20261027143904_roster_reuse_context.sql` | `20261029221031_roster_reuse_context.sql` |
+| `20261027145431_roster_reuse_write.sql`   | `20261029221048_roster_reuse_write.sql`   |
+| `20261029143000_sheet_staff_v2.sql`       | `20261029221056_sheet_staff_v2.sql`       |
+
+As 49 migrations anteriores permanecem imutáveis. Motores v1/v2 privados, wrappers `security invoker`, grants efetivos, `search_path` vazio, RLS/negação restritiva e triggers de imutabilidade conferidos no catálogo real. Advisor posterior manteve exatamente os avisos preexistentes descritos abaixo; nenhum achado novo dessas migrations.
+
+Comparação agregada antes/depois: 18 súmulas, 17 publicações atuais, 20 versões históricas, 252 vínculos e 171 pessoas com contagens e assinaturas idênticas. Singleton administrativo e IDs Auth também inalterados; nenhuma senha/hash de credencial foi consultada. Definições anteriores das duas funções preservadas como referência local ignorada em `.preview-artifacts/pr38-pre-migration-functions.sql`, sem representar backup completo do banco.
+
+`supabase/tests/pr38_remote_checks.sql` executado no projeto real: **PASS** para cesta v2 sem técnico, paridade de fatos v1/v2, recusa de confirmação incompleta, falta sem técnico, anônimo, ausência de identidade e rejeição de comandos inválidos após autorização do administrador existente. Script sem seed/DML, sempre encerrado com `ROLLBACK`; autorização DB exercitada por `SET LOCAL` de papéis/claims, não por login HTTP. Assinaturas dos dados reconferidas depois, iguais ao baseline. O mesmo script também é validado no ensaio PGlite.
+
+**Pendente:** percurso real HTTP/Worker com sessão administrativa e dados sintéticos em ambiente isolado autorizado, seguido de aceite antes da integração. Nenhum deploy, publicação ou merge foi executado por essa autorização de DDL.
+
+## Baseline observado antes da execução
 
 Projeto configurado: `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`). Consulta MCP de migrations em 29/10 confirmou **49 aplicadas**, incluindo `20261028163429_game_officiating`, e ausência das três abaixo. Consulta somente de catálogo confirmou ausência de `compute_sheet_facts_v1`, `compute_sheet_facts_v2`, RPCs de reaproveitamento e tabela de recibos. Nenhuma alteração remota foi executada.
 
