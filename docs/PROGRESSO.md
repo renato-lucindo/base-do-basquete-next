@@ -1,3 +1,15 @@
+# Comissão técnica e faltas na súmula — WIP na PR #38, 29/10/2026
+
+**Unidade ativa:** `codex/reaproveitar-elenco-banco` no repositório `renato-lucindo/base-do-basquete-next`, usando a [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) existente, aberta como Draft. Implementação de comissão técnica identificada no commit `780e0ed`, com `origin/main` `11b547a` incorporada por merge explícito `0b6f33d`. A branch também preserva o WIP anterior de reaproveitamento de elenco; a unidade composta ainda não está pronta para integração estável.
+
+**Resultado local:** técnico e assistente são escolhidos por jogo entre treinadores elegíveis, com prevenção de pessoa duplicada e assistente sem técnico. Faltas C/B por pessoa, D do assistente com B2 vinculado no técnico e lances livres únicos, sucessão por assistente/capitão/outro atleta indicado, autoria estável nas correções, contadores e marcas visíveis na súmula desktop; leitura de documentos v1 preservada. Regras implementadas em TypeScript e na migration SQL v2, com validação de salvar e confirmar sem transformar fatos históricos publicados. Migrations ainda não aplicadas: `20261027143904_roster_reuse_context.sql`, `20261027145431_roster_reuse_write.sql` e `20261029143000_sheet_staff_v2.sql`.
+
+**Verificação e limites:** `npm run gate` local **PASS** sobre o código material `0b6f33d` (604 testes Vitest/124 arquivos, 6 transportes, 13 cenários PostgreSQL, 25 workerd, 1 PDF runtime, tipos, lint, formato, builds, fronteira e segredos). Playwright desktop **28 PASS**, com capturas 1366×768, 1920×1080 e zoom 200% em `.preview-artifacts/`; log `.preview-artifacts/sheet-staff-gate.log`. Revisão focal de autoria/sucessão/SQL realizada sem nova alteração material. Essas provas são locais; a CI remota do SHA a publicar deve ser conferida depois do push. Reaproveitamento de elenco permanece WIP em UI, API e integração real; testes reais de DDL no projeto remoto, aceite humano e revisão independente não foram realizados.
+
+**Preservação e próximo passo:** mudanças humanas não rastreadas `.agents/` e `skills-lock.json` foram mantidas fora dos commits. Publicar o branch na mesma PR #38, descrever ambos os escopos, conferir CI do SHA atualizado e manter Draft. Não houve deploy, DDL remoto, alteração de dados humanos nem merge na `main` nesta unidade. A CI antiga da PR #38 (`acc1120`) não comprova o código novo; somente a CI do commit publicado poderá fazê-lo.
+
+---
+
 # Design público — súmula e estatísticas,29/10/2026
 
 **Unidade independente:** branch `codex/design-publico`, worktree `C:/Users/12405304716/.codex/worktrees/design-publico/Base do Basquete-v1`, base `origin/main` **4bc93c68c758db4caaa2a77045efb39277a2bc7e**. Fontes, HTMLs autocontidos, ZIP r6 original, capturas e contrato de integração em [docs/design](design/README.md). A PR desta branch identifica o SHA final e a CI correspondente; não atribuir a esta unidade evidências das PRs38/44 ou da aplicação publicada.
@@ -239,7 +251,6 @@ Responsável enviou o handoff da outraIA e depois ordenou **“Comece”**, reto
 **Próximo passo exato, somente após retomada humana:** consultar cota real primeiro; reconciliar Git/CI/serviços e ler plano `docs/superpowers/plans/2026-10-27-reaproveitamento-elenco.md` e validação. Revisar bordas do writer e preparar prova realBEGIN/ROLLBACK usando o administrador existente **sem DML em Auth/admin**: fixtures locais trocam a vaga singleton administrativa, portanto **NÃO podem ser executadas inalteradas no remoto**. Inspecionar exclusivamente projeto novo/vínculo link_6adaa8aab5688191b1e7ae1cddc55a82/orgbase-do-basquete jniqbaccwwhabzokjvfu/projeto nizmasjddyrhmevvfviz antes de qualquer DDL. Só então aplicar49/50 uma vez quando seguro, reconciliar versões/tipos/advisors/prova de rollback; seguir provider/Worker/diálogo de reaproveitamentoR3. Validação esperada: origem e dados humanos intactos, novos vínculos confirmados porIDs, conflitos tratados e nenhuma seleção manual redundante. Reutilizar gate577/CI573+413/smokes de artefatos inalterados; não repetir por troca de sessão/documentação.
 
 **Limitações preservadas:** auditoria estática do projeto anterior documentada antes da implementação; nenhum código antigo executado/serviço antigo acessado. Aceites humanos e política pública pendentes não são aprovação. PDF/parser/mobile/público seguem adiados; revisão independente, carga e StorageHTTP real não foram comprovados. Bundles com exclusão rejeitada continuam ignorados/preservados.
-
 
 # Consolidação da versão estável e continuidade — 28/10/2026
 
