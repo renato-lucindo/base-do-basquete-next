@@ -365,12 +365,46 @@
   }
 }
 @media (max-width: 480px) {
+  .statistics-page {
+    min-width: 0;
+    padding: 5px 10px 20px;
+  }
   .statistics-page > h1 {
     font-size: 1.13rem;
-    margin-right: 9px;
+    margin: 2px 8px 5px 0;
+  }
+  .statistics-page > nav {
+    margin-bottom: 5px;
   }
   .statistics-quickbar {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+    padding: 5px;
+  }
+  .statistics-quickbar > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .statistics-page .statistics-quickbar input:not([type="checkbox"]),
+  .statistics-page .statistics-quickbar select,
+  .statistics-page .statistics-popover summary,
+  .statistics-page .statistics-search-action {
+    min-width: 0;
+    min-height: 32px;
+  }
+  .statistics-page .statistics-quickbar select {
+    max-width: 100%;
+  }
+  .statistics-page .statistics-popover summary {
+    overflow-wrap: anywhere;
+    padding: 5px 7px;
+  }
+  .statistics-advanced {
+    margin-top: 3px;
+  }
+  .statistics-page .statistics-advanced > summary {
+    min-height: 32px;
+    padding: 5px 7px;
   }
   .statistics-quickbar > label:first-child {
     grid-column: 1 / 5;

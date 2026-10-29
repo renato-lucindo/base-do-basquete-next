@@ -26,7 +26,7 @@ async function fixture(page: import("@playwright/test").Page) {
     url: `http://127.0.0.1:5174/estatisticas.html#${source.disputeId}?view=simple&scope=all`,
   };
 }
-test("súmula apresenta totais e PTS/J juntos, sem estatísticas que a fonte não fornece", async ({
+test("súmula apresenta totais e PPJ juntos, sem estatísticas que a fonte não fornece", async ({
   page,
 }) => {
   const f = await fixture(page);
@@ -43,10 +43,10 @@ test("súmula apresenta totais e PTS/J juntos, sem estatísticas que a fonte nã
     "Equipe",
     "J",
     "PTS",
-    "PTS/J",
-    "2PC",
-    "3PC",
-    "LLC",
+    "PPJ",
+    "2P",
+    "3P",
+    "LL",
     "F",
     "GD",
   ]);
@@ -86,7 +86,7 @@ test("súmula compartilha pesquisa e ordenação; boxscore restringe a amostra a
   await page.getByLabel("Buscar atleta ou equipe").fill("Atleta de comparação");
   await page.getByRole("button", { name: "Buscar", exact: true }).click();
   await page
-    .getByRole("button", { name: "Ordenar por PTS/J", exact: true })
+    .getByRole("button", { name: "Ordenar por PPJ", exact: true })
     .click();
   await expect(page).toHaveURL(/view=simple/);
   await expect(page).toHaveURL(/sort=pointsPerGame/);
@@ -121,11 +121,11 @@ test("súmula compartilha pesquisa e ordenação; boxscore restringe a amostra a
         }),
       })
       .getByRole("cell")
-      .nth(3),
+      .nth(2),
   ).toHaveText("1");
 });
 
-test("resultado de súmula mostra faltas e disciplina sem transformar DNP em zero", async ({
+test("resultado de súmula mantém faltas e DNP sem inventar coluna de disciplina", async ({
   page,
 }) => {
   const { confirmedManualFixture } =
@@ -146,15 +146,17 @@ test("resultado de súmula mostra faltas e disciplina sem transformar DNP em zer
   await expect(
     table.getByRole("columnheader", { name: "F", exact: true }),
   ).toBeVisible();
+  // A súmula aprovada exibe o status disciplinar junto ao atleta, quando publicado.
   await expect(
     table.getByRole("columnheader", { name: "GD", exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   const row = table.getByRole("row").filter({
     has: page.getByRole("link", {
       name: "Reserva sem participação",
       exact: true,
     }),
   });
+  await expect(row.getByRole("cell").nth(1)).toHaveText("—");
   await expect(row.getByRole("cell").nth(2)).toHaveText("—");
   await expect(
     table.getByRole("columnheader", { name: "MIN", exact: true }),

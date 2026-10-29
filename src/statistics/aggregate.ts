@@ -136,6 +136,21 @@ function observedMetrics(
   const isLeaderboard = config.presentation === "public-leaderboard";
   const available = (value: number | null) =>
     formatMetric(value, isLeaderboard);
+  // The public leaderboard compares exact ratios and rounds only in the UI.
+  const average = (total: number, games: number) =>
+    isLeaderboard ? (games > 0 ? total / games : null) : perGame(total, games);
+  const shootingPercentage = (made: number, attempts: number) =>
+    isLeaderboard
+      ? attempts > 0
+        ? (100 * made) / attempts
+        : null
+      : percentage(made, attempts);
+  const per30 = (total: number, seconds: number) =>
+    isLeaderboard
+      ? seconds >= config.minimumSeconds
+        ? (total * 1800) / seconds
+        : null
+      : normalizePer30(total, seconds, config.minimumSeconds);
   const played = related.filter((r) => r.played),
     advanced = played.flatMap((r) =>
       r.advanced ? [r.advanced.statistics] : [],
@@ -251,7 +266,7 @@ function observedMetrics(
           r.scoring ? [r.scoring.points] : [],
         );
         cell = available(
-          perGame(
+          average(
             scoring.reduce((sum, n) => sum + n, 0),
             played.length === scoring.length ? played.length : 0,
           ),
@@ -290,7 +305,7 @@ function observedMetrics(
               : "freeThrows";
         cell = advanced.length
           ? available(
-              percentage(
+              shootingPercentage(
                 advanced.reduce((sum, a) => sum + a[key].made, 0),
                 advanced.reduce((sum, a) => sum + a[key].attempted, 0),
               ),
@@ -314,7 +329,7 @@ function observedMetrics(
           )
             cell = available(total);
           else if (config.mode === "per-game" || metric === "plusMinus")
-            cell = available(perGame(total, observed.length));
+            cell = available(average(total, observed.length));
           else {
             const seconds = observed.reduce(
               (sum, o) => sum + (o.seconds ?? 0),
@@ -323,9 +338,7 @@ function observedMetrics(
             cell =
               seconds < config.minimumSeconds
                 ? { status: "insufficient-sample", value: null }
-                : available(
-                    normalizePer30(total, seconds, config.minimumSeconds),
-                  );
+                : available(per30(total, seconds));
           }
         }
       }

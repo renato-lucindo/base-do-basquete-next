@@ -27,7 +27,9 @@ test("axe: estatísticas e escolha de colunas", async ({ page }, info) => {
     await expect(button).toHaveAccessibleName(new RegExp(escaped, "u"));
   }
   await scan(page, info, "statistics");
-  const columns = page.getByText("Personalizar colunas", { exact: true });
+  const columns = page
+    .locator(".statistics-quickbar .statistics-popover > summary")
+    .filter({ hasText: /^Colunas$/u });
   await expect(columns).toBeVisible();
   await columns.click();
   await expect(

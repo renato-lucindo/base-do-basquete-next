@@ -155,8 +155,14 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           const teamFacts = r.facts.teams[side];
           const freeMade =
             "freeMade" in teamFacts ? teamFacts.freeMade : total("free");
-          const freeTaken =
-            "freeTaken" in teamFacts
+          // A manual score and PDF shot attempts may disagree by design.
+          // Only show shooting percentage when makes and attempts share a source.
+          const manualPdfScore =
+            "origins" in r.facts &&
+            r.facts.origins.scorePoints.kind === "sheet";
+          const freeTaken = manualPdfScore
+            ? null
+            : "freeTaken" in teamFacts
               ? teamFacts.freeTaken
               : rows.every(
                     (p) =>
