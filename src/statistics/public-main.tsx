@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { SimpleStatisticsPageView } from "./simple-page";
 import { createRoot } from "react-dom/client";
 import { StatisticsPageView } from "./public-page";
-import "../access/screen.css";
-import "./screen.css";
+import "../public-ui/legacy.css";
+import "./legacy.css";
+import "./reference.css";
 function StatisticsPresentation() {
   const read = () =>
     new URLSearchParams(window.location.hash.split("?")[1] ?? "").get(

@@ -38,6 +38,11 @@ export const confirmedPlayerFactSchema = z
     played: z.boolean(),
     starter: z.boolean(),
     captain: z.boolean(),
+    // Legacy indexed career facts predate these public fields. Missing coverage
+    // remains unknown; it must not be interpreted as a zero.
+    teamPoints: count.optional(),
+    technicalFouls: count.nullable().optional(),
+    unsportsmanlikeFouls: count.nullable().optional(),
     scoring: z
       .object({
         origin,

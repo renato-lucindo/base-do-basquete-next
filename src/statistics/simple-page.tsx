@@ -386,7 +386,7 @@ export function SimpleStatisticsPageView() {
                   </button>
                 </nav>
                 <p className="simple-statistics-note">
-                  J conta apenas quem entrou. PTS/J usa os jogos com pontuação
+                  J conta apenas quem entrou. PPJ usa os jogos com pontuação
                   conhecida. “—” indica dado não informado; GD considera somente
                   jogos com situação disciplinar registrada. Jogos sem fase
                   confirmada aparecem em Todos os jogos.

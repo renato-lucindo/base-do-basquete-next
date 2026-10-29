@@ -21,6 +21,7 @@ export const aggregationOptionsSchema = z
   .object({
     mode: z.enum(["total", "per-game", "per-30"]),
     minimumSeconds: z.number().int().min(1).max(2147483647),
+    presentation: z.literal("public-leaderboard").optional(),
   })
   .strict();
 export type AggregationOptions = z.infer<typeof aggregationOptionsSchema>;
@@ -45,11 +46,11 @@ export interface StatisticsRow {
   metrics: Record<StatisticsMetric, MetricCell>;
 }
 const unavailable = (): MetricCell => ({ status: "unavailable", value: null });
-function available(value: number | null): MetricCell {
+function formatMetric(value: number | null, exact = false): MetricCell {
   if (value === null) return unavailable();
   if (!Number.isFinite(value)) throw Error("Resultado estatístico inválido.");
-  const rounded = Math.round(value * 10) / 10;
-  return { status: "available", value: Object.is(rounded, -0) ? 0 : rounded };
+  const n = exact ? value : Math.round(value * 10) / 10;
+  return { status: "available", value: Object.is(n, -0) ? 0 : n };
 }
 const unique = <T extends string | null>(values: T[]) =>
   [...new Set(values)].sort((a, b) =>
@@ -132,6 +133,24 @@ function observedMetrics(
   related: ConfirmedPlayerFact[],
   config: AggregationOptions,
 ): Pick<StatisticsRow, "gamesPlayed" | "coverage" | "metrics"> {
+  const isLeaderboard = config.presentation === "public-leaderboard";
+  const available = (value: number | null) =>
+    formatMetric(value, isLeaderboard);
+  // The public leaderboard compares exact ratios and rounds only in the UI.
+  const average = (total: number, games: number) =>
+    isLeaderboard ? (games > 0 ? total / games : null) : perGame(total, games);
+  const shootingPercentage = (made: number, attempts: number) =>
+    isLeaderboard
+      ? attempts > 0
+        ? (100 * made) / attempts
+        : null
+      : percentage(made, attempts);
+  const per30 = (total: number, seconds: number) =>
+    isLeaderboard
+      ? seconds >= config.minimumSeconds
+        ? (total * 1800) / seconds
+        : null
+      : normalizePer30(total, seconds, config.minimumSeconds);
   const played = related.filter((r) => r.played),
     advanced = played.flatMap((r) =>
       r.advanced ? [r.advanced.statistics] : [],
@@ -142,6 +161,12 @@ function observedMetrics(
         seconds = a?.secondsPlayed ?? null;
       let value: number | null = null;
       switch (metric) {
+        case "technicalFouls":
+          value = r.technicalFouls ?? null;
+          break;
+        case "unsportsmanlikeFouls":
+          value = r.unsportsmanlikeFouls ?? null;
+          break;
         case "twoMade":
         case "threeMade":
         case "freeMade":
@@ -221,16 +246,37 @@ function observedMetrics(
     (Object.keys(STATISTICS_METRICS) as StatisticsMetric[]).map((metric) => {
       let cell: MetricCell;
       if (metric === "games") cell = available(played.length);
-      else if (metric === "pointsPerGame") {
+      else if (metric === "pointsShare") {
+        const scored = played.filter((r) => r.scoring !== null);
+        const denominator = scored.reduce(
+          (sum, r) => sum + (r.teamPoints ?? 0),
+          0,
+        );
+        cell =
+          scored.length === played.length &&
+          scored.every((r) => r.teamPoints !== undefined) &&
+          denominator > 0
+            ? available(
+                (100 * scored.reduce((sum, r) => sum + r.scoring!.points, 0)) /
+                  denominator,
+              )
+            : unavailable();
+      } else if (metric === "pointsPerGame") {
         const scoring = played.flatMap((r) =>
           r.scoring ? [r.scoring.points] : [],
         );
         cell = available(
-          perGame(
+          average(
             scoring.reduce((sum, n) => sum + n, 0),
-            scoring.length,
+            played.length === scoring.length ? played.length : 0,
           ),
         );
+      } else if (metric === "fiveFouls") {
+        const known = played.filter((r) => r.discipline !== null);
+        cell =
+          known.length === played.length
+            ? available(known.filter((r) => r.discipline === "excluded").length)
+            : unavailable();
       } else if (metric === "disqualifications") {
         const known = played.filter((r) => r.discipline !== null);
         cell = known.length
@@ -259,7 +305,7 @@ function observedMetrics(
               : "freeThrows";
         cell = advanced.length
           ? available(
-              percentage(
+              shootingPercentage(
                 advanced.reduce((sum, a) => sum + a[key].made, 0),
                 advanced.reduce((sum, a) => sum + a[key].attempted, 0),
               ),
@@ -269,12 +315,21 @@ function observedMetrics(
         let observed = observations(metric);
         if (config.mode === "per-30" && metric !== "plusMinus")
           observed = observed.filter((o) => o.seconds !== null);
-        if (!observed.length) cell = unavailable();
+        if (
+          !observed.length ||
+          (["technicalFouls", "unsportsmanlikeFouls"].includes(metric) &&
+            observed.length !== played.length)
+        )
+          cell = unavailable();
         else {
           const total = observed.reduce((sum, o) => sum + o.value, 0);
-          if (config.mode === "total") cell = available(total);
+          if (
+            config.mode === "total" ||
+            (metric === "points" && config.mode === "per-game" && isLeaderboard)
+          )
+            cell = available(total);
           else if (config.mode === "per-game" || metric === "plusMinus")
-            cell = available(perGame(total, observed.length));
+            cell = available(average(total, observed.length));
           else {
             const seconds = observed.reduce(
               (sum, o) => sum + (o.seconds ?? 0),
@@ -283,9 +338,7 @@ function observedMetrics(
             cell =
               seconds < config.minimumSeconds
                 ? { status: "insufficient-sample", value: null }
-                : available(
-                    normalizePer30(total, seconds, config.minimumSeconds),
-                  );
+                : available(per30(total, seconds));
           }
         }
       }

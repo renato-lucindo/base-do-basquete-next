@@ -47,6 +47,7 @@ export function buildStatisticsPage(
     all = aggregateConfirmedStatistics(selected.facts, {
       mode: query.mode,
       minimumSeconds: selected.minimumSeconds,
+      presentation: "public-leaderboard",
     });
   const searched = all.filter(
     (r) =>
@@ -110,12 +111,27 @@ export function buildStatisticsPage(
       .filter((r) => r.metrics[metric].value === best)
       .map(rowRef);
   }
+  const ranked = sorted.map((row, index) => ({
+    ...row,
+    rank:
+      value(row) === null
+        ? null
+        : index > 0 && value(row) === value(sorted[index - 1])
+          ? 0
+          : index + 1,
+  }));
+  for (let i = 0, previous = 1; i < ranked.length; i++) {
+    const rank = ranked[i].rank;
+    if (rank === 0) ranked[i].rank = previous;
+    else if (rank !== null) previous = rank;
+  }
   const totalPages = Math.max(1, Math.ceil(sorted.length / 20)),
     page = Math.min(query.page, totalPages);
   const comparisonSummaries = query.compare.length
     ? aggregateComparedStatistics(selected.facts, query.compare, {
         mode: query.mode,
         minimumSeconds: selected.minimumSeconds,
+        presentation: "public-leaderboard",
       })
     : [];
   const comparisonStates = Object.fromEntries(
@@ -148,7 +164,7 @@ export function buildStatisticsPage(
     pageSize: 20 as const,
     total: sorted.length,
     totalPages,
-    rows: sorted.slice((page - 1) * 20, page * 20),
+    rows: ranked.slice((page - 1) * 20, page * 20),
     compared: query.compare.flatMap((id) =>
       all.filter((r) => r.personId === id),
     ),
