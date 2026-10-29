@@ -67,6 +67,11 @@ import {
   type RegistrationRemoval,
 } from "../teams/removal-contract";
 import { SupabaseGames } from "../games/provider";
+import { SupabaseOfficiating } from "../games/officiating-provider";
+import {
+  saveGameEditorSchema,
+  type SaveGameEditor,
+} from "../games/officiating-contract";
 import { SupabasePdfSources } from "../boxscore/provider";
 import { SupabasePdfOriginals } from "../boxscore/storage";
 import { extractSupportedPdf } from "../boxscore/extract";
@@ -102,6 +107,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly competitions: SupabaseCompetitions;
   private readonly teams: SupabaseTeams;
   private readonly games: SupabaseGames;
+  private readonly officiating: SupabaseOfficiating;
   private readonly publications: SupabasePublications;
   private readonly regulations: SupabaseRegulations;
   private readonly decisions: SupabaseDecisions;
@@ -150,6 +156,10 @@ export class SessionStore extends DurableObject<Env> {
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
+    this.officiating = new SupabaseOfficiating({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.textImport = new SupabaseTextImport({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -183,6 +193,11 @@ export class SessionStore extends DurableObject<Env> {
         key: env.SUPABASE_PUBLISHABLE_KEY,
       }),
       env.SESSION_ENCRYPTION_KEY,
+      Date.now,
+      (timing) =>
+        console.info(
+          JSON.stringify({ kind: "private_operation_timing", ...timing }),
+        ),
     );
   }
 
@@ -271,8 +286,15 @@ export class SessionStore extends DurableObject<Env> {
   }
   listRoster(registrationId: string, activeOnly: boolean, offset: number) {
     return safely(() =>
-      this.session.runAuthorized(({ accessToken }) =>
-        this.people.listRoster(accessToken, registrationId, activeOnly, offset),
+      this.session.runAuthorized(
+        ({ accessToken }) =>
+          this.people.listRoster(
+            accessToken,
+            registrationId,
+            activeOnly,
+            offset,
+          ),
+        "roster.list",
       ),
     );
   }
@@ -321,8 +343,9 @@ export class SessionStore extends DurableObject<Env> {
   }
   getTextReview(id: string) {
     return safely(() =>
-      this.session.runAuthorized(({ accessToken }) =>
-        this.textImport.get(accessToken, id),
+      this.session.runAuthorized(
+        ({ accessToken }) => this.textImport.get(accessToken, id),
+        "import.review",
       ),
     );
   }
@@ -345,11 +368,13 @@ export class SessionStore extends DurableObject<Env> {
   }
   confirmTextRow(command: ConfirmTextRow) {
     return safely(() =>
-      this.session.runAuthorized(({ accessToken }) =>
-        this.textImport.confirm(
-          accessToken,
-          confirmTextRowSchema.parse(command),
-        ),
+      this.session.runAuthorized(
+        ({ accessToken }) =>
+          this.textImport.confirm(
+            accessToken,
+            confirmTextRowSchema.parse(command),
+          ),
+        "import.confirm",
       ),
     );
   }
@@ -397,6 +422,33 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.listVenues(accessToken, query, offset),
+      ),
+    );
+  }
+  listGameOfficials(query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.officiating.list(accessToken, query, offset),
+      ),
+    );
+  }
+  getGameEditor(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(
+        ({ accessToken }) => this.officiating.get(accessToken, id),
+        "game.read",
+      ),
+    );
+  }
+  saveGameEditor(command: SaveGameEditor) {
+    return safely(() =>
+      this.session.runAuthorized(
+        ({ accessToken }) =>
+          this.officiating.save(
+            accessToken,
+            saveGameEditorSchema.parse(command),
+          ),
+        "game.save",
       ),
     );
   }
@@ -665,8 +717,9 @@ export class SessionStore extends DurableObject<Env> {
   }
   getGameSheet(gameId: string) {
     return safely(() =>
-      this.session.runAuthorized(({ accessToken }) =>
-        this.games.getSheet(accessToken, gameId),
+      this.session.runAuthorized(
+        ({ accessToken }) => this.games.getSheet(accessToken, gameId),
+        "sheet.read",
       ),
     );
   }
@@ -741,8 +794,10 @@ export class SessionStore extends DurableObject<Env> {
   }
   saveGameSheet(command: SaveSheet) {
     return safely(() =>
-      this.session.runAuthorized(({ accessToken }) =>
-        this.games.saveSheet(accessToken, saveSheetSchema.parse(command)),
+      this.session.runAuthorized(
+        ({ accessToken }) =>
+          this.games.saveSheet(accessToken, saveSheetSchema.parse(command)),
+        "sheet.save",
       ),
     );
   }

@@ -5,6 +5,20 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
+import {
+  OfficiatingEditor,
+  emptyOfficialNames,
+  type OfficialNames,
+} from "./officiating-editor";
+import {
+  emptyOfficiating,
+  officialRoles,
+  gameEditorSnapshotSchema,
+  saveGameEditorSchema,
+  type SaveGameEditor,
+  type GameEditorSnapshot,
+  type Officiating,
+} from "./officiating-contract";
 import { AdminDialog } from "../competition/admin-dialog";
 import { AdminToast } from "../competition/admin-toast";
 import {
@@ -13,9 +27,7 @@ import {
 } from "../teams/contract";
 import {
   gameListingSchema,
-  gameSnapshotSchema,
   gameSchema,
-  saveGameSchema,
   type GameSnapshot,
   type SaveGame,
 } from "./contract";
@@ -50,6 +62,8 @@ export function GamesWorkspace(props: Props) {
   const [editor, setEditor] = useState<{
       game: SaveGame["game"];
       version: number;
+      officiating: Officiating;
+      officialNames: OfficialNames;
     } | null>(null),
     [baseline, setBaseline] = useState(""),
     [busy, setBusy] = useState(false),
@@ -65,7 +79,8 @@ export function GamesWorkspace(props: Props) {
     [find, setFind] = useState(""),
     [findOffset, setFindOffset] = useState(0),
     [auxiliary, setAuxiliary] = useState(false);
-  const pending = useRef<SaveGame | null>(null),
+  const pending = useRef<SaveGameEditor | null>(null),
+    knownAck = useRef<{ id: string; version: number } | null>(null),
     sheetGuard = useRef<() => boolean>(() => true),
     auxGuard = useRef<() => boolean>(() => true),
     occurrenceGuard = useRef<() => boolean>(() => true),
@@ -76,7 +91,13 @@ export function GamesWorkspace(props: Props) {
   const [savedGame, setSavedGame] = useState<GameSnapshot | null>(null),
     [decisionLocked, setDecisionLocked] = useState(false),
     [sheetVisible, setSheetVisible] = useState(false);
-  const dirty = !!editor && JSON.stringify(editor.game) !== baseline;
+  const dirty =
+    !!editor &&
+    JSON.stringify({
+      game: editor.game,
+      officiating: editor.officiating,
+      officialNames: editor.officialNames,
+    }) !== baseline;
   function mayLeave() {
     return (
       !busy &&
@@ -183,15 +204,31 @@ export function GamesWorkspace(props: Props) {
     findOffset,
     epoch,
   ]);
-  function accept(s: GameSnapshot) {
+  function accept(snapshot: GameEditorSnapshot) {
+    const s = snapshot.game;
     if (s.disputeId !== props.disputeId)
       throw Error("Este jogo pertence a outra disputa.");
     const g = document(s);
     setSavedGame(s);
-    setEditor({ game: g, version: s.version });
+    const names = emptyOfficialNames(),
+      officiating = emptyOfficiating() as Officiating;
+    for (const role of officialRoles) {
+      const official = snapshot.officiating[role];
+      if (official) {
+        names[role] = official.name;
+        officiating[role] = { kind: "existing", id: official.id };
+      }
+    }
+    setEditor({
+      game: g,
+      version: s.version,
+      officiating,
+      officialNames: names,
+    });
     setChosen([s.home, s.away]);
-    setBaseline(JSON.stringify(g));
+    setBaseline(JSON.stringify({ game: g, officiating, officialNames: names }));
     pending.current = null;
+    knownAck.current = null;
     setUncertain(false);
     setConflict(false);
   }
@@ -200,7 +237,7 @@ export function GamesWorkspace(props: Props) {
     setBusy(true);
     setError("");
     try {
-      accept(await api(`/api/games/${id}`, gameSnapshotSchema));
+      accept(await api(`/api/games/${id}/editor`, gameEditorSnapshotSchema));
       setStatus("Jogo salvo");
     } catch (e) {
       report(e);
@@ -210,11 +247,24 @@ export function GamesWorkspace(props: Props) {
   }
   async function save() {
     if (!editor || busy || conflict) return;
-    const parsed = saveGameSchema.safeParse(
+    if (
+      !pending.current &&
+      officialRoles.some(
+        (role) =>
+          editor.officialNames[role].trim() && !editor.officiating[role],
+      )
+    ) {
+      setError(
+        "Selecione um oficial da lista ou escolha Usar novo oficial para cada nome digitado.",
+      );
+      return;
+    }
+    const parsed = saveGameEditorSchema.safeParse(
       pending.current ?? {
         commandId: crypto.randomUUID(),
         expectedVersion: editor.version,
         game: editor.game,
+        officiating: editor.officiating,
       },
     );
     if (!parsed.success) {
@@ -227,16 +277,32 @@ export function GamesWorkspace(props: Props) {
     setBusy(true);
     setError("");
     try {
-      const result = await api("/api/games", saveResultSchema, pending.current);
-      accept(await api(`/api/games/${result.id}`, gameSnapshotSchema));
+      const result =
+        knownAck.current ??
+        (await api(
+          `/api/games/${editor.game.id}/editor`,
+          saveResultSchema,
+          pending.current,
+        ));
+      knownAck.current = result;
+      accept(
+        await api(`/api/games/${result.id}/editor`, gameEditorSnapshotSchema),
+      );
       setStatus("Jogo salvo");
       setEpoch((v) => v + 1);
       props.onSaved();
     } catch (e) {
-      if (e instanceof ApiFailure && [400, 409].includes(e.status)) {
+      if (
+        !knownAck.current &&
+        e instanceof ApiFailure &&
+        [400, 409].includes(e.status)
+      ) {
         pending.current = null;
         setUncertain(false);
-        setConflict(e.status === 409);
+        setConflict(
+          e.status === 409 &&
+            e.code !== "official_homonym_confirmation_required",
+        );
       } else setUncertain(true);
       report(e);
     } finally {
@@ -279,9 +345,11 @@ export function GamesWorkspace(props: Props) {
   );
   function closeEditor() {
     if (mayLeave()) {
+      setSheetVisible(false);
       setEditor(null);
       setStatus("");
       pending.current = null;
+      knownAck.current = null;
       setUncertain(false);
       setConflict(false);
       setError("");
@@ -346,6 +414,8 @@ export function GamesWorkspace(props: Props) {
                 venue: null,
                 number: null,
               },
+              officiating: emptyOfficiating(),
+              officialNames: emptyOfficialNames(),
             });
             setBaseline("");
             setSavedGame(null);
@@ -355,6 +425,7 @@ export function GamesWorkspace(props: Props) {
             setUncertain(false);
             setConflict(false);
             pending.current = null;
+            knownAck.current = null;
           }}
         >
           Novo jogo
@@ -397,6 +468,7 @@ export function GamesWorkspace(props: Props) {
           onSessionLost={props.onSessionLost}
           onSaved={props.onSaved}
           onBack={() => setSheetVisible(false)}
+          onBackToGames={closeEditor}
         />
       ) : editor ? (
         <AdminDialog
@@ -404,6 +476,7 @@ export function GamesWorkspace(props: Props) {
           open={props.enabled}
           busy={busy}
           onClose={closeEditor}
+          closeLabel="Voltar à lista de jogos"
           className="game-editor-dialog"
         >
           {feedback}
@@ -519,6 +592,24 @@ export function GamesWorkspace(props: Props) {
                 </button>
               </div>
             </fieldset>
+            <OfficiatingEditor
+              slots={editor.officiating}
+              names={editor.officialNames}
+              disabled={
+                busy ||
+                uncertain ||
+                conflict ||
+                decisionLocked ||
+                !props.enabled
+              }
+              onSessionLost={props.onSessionLost}
+              onChange={(officiating, officialNames) => {
+                setEditor((s) =>
+                  s ? { ...s, officiating, officialNames } : s,
+                );
+                setStatus("");
+              }}
+            />
             <div className="competition-actions">
               <button
                 disabled={busy || uncertain || conflict || dirty || !savedGame}
@@ -532,7 +623,11 @@ export function GamesWorkspace(props: Props) {
                 disabled={busy || conflict || decisionLocked}
                 onClick={() => void save()}
               >
-                {uncertain ? "Repetir o mesmo envio" : "Salvar jogo"}
+                {uncertain
+                  ? knownAck.current
+                    ? "Recuperar jogo salvo"
+                    : "Repetir o mesmo envio"
+                  : "Salvar jogo"}
               </button>
               {conflict && (
                 <button
@@ -542,22 +637,6 @@ export function GamesWorkspace(props: Props) {
                   Recarregar jogo
                 </button>
               )}
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={() => {
-                  if (mayLeave()) {
-                    setEditor(null);
-                    setStatus("");
-                    pending.current = null;
-                    setUncertain(false);
-                    setConflict(false);
-                    setError("");
-                  }
-                }}
-              >
-                Voltar à lista de jogos
-              </button>
             </div>
             {savedGame && (
               <GameOccurrencePanel

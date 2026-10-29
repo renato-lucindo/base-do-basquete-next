@@ -43,15 +43,30 @@ jobs:
             fi
           fi
       - run: npm ci --ignore-scripts
+      - name: Secret scanner regression checks
+        run: node --test tests/check-secrets.test.mjs
       - name: Documentation checks
         if: steps.scope.outputs.code == 'false'
-        run: npm run format:check && npm run secrets
+        run: npm run format:check && node scripts/check-secrets.mjs --source-only
       - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
         if: steps.scope.outputs.code == 'true'
       - run: npm run gate
         if: steps.scope.outputs.code == 'true'
       - run: npx playwright install --with-deps chromium
         if: steps.scope.outputs.code == 'true'
+      - run: npm run design:verify
+        if: steps.scope.outputs.code == 'true'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.scope.outputs.code == 'true'
+        with:
+          name: design-publico-${{ github.sha }}
+          path: |
+            docs/design/.preview-artifacts/
+            docs/design/prototipos/sumula/*.png
+            docs/design/prototipos/sumula/verification*.json
+            docs/design/prototipos/estatisticas/react-prototype/*.png
+            docs/design/prototipos/estatisticas/react-prototype/verification.json
+          include-hidden-files: true
       - run: npm run test:e2e
         if: steps.scope.outputs.code == 'true'
       - uses: actions/upload-artifact@v4

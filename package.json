@@ -25,7 +25,9 @@
     "build:worker": "tsc --noEmit -p tsconfig.worker.json && wrangler deploy --dry-run --outdir .worker-artifacts",
     "test:access": "npm run build:worker && node --test tests/access-worker.test.mjs",
     "types:check": "wrangler types --include-runtime false --strict-vars false --check",
-    "test:pdf-runtime": "wrangler deploy --dry-run --config tests/fixtures/pdf-worker.wrangler.jsonc --outdir ../../.preview-artifacts/pdf-worker && node --test tests/pdf-runtime.test.mjs"
+    "test:pdf-runtime": "wrangler deploy --dry-run --config tests/fixtures/pdf-worker.wrangler.jsonc --outdir ../../.preview-artifacts/pdf-worker && node --test tests/pdf-runtime.test.mjs",
+    "design:build": "node docs/design/build.cjs",
+    "design:verify": "node docs/design/verify.cjs"
   },
   "dependencies": {
     "react": "19.3.0",
@@ -47,6 +49,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "esbuild": "0.28.2",
     "eslint": "10.13.0",
     "miniflare": "5.20261019.2-beta",
     "prettier": "3.9.10",

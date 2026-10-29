@@ -13,11 +13,13 @@ const walk = (path) =>
   readdirSync(path, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? walk(join(path, e.name)) : [join(path, e.name)],
   );
-files.push(
-  ...walk("dist"),
-  ...walk("dist-foundation"),
-  ...walk(".worker-artifacts"),
-);
+// Documentation-only CI has no build outputs; the default gate remains strict.
+if (!process.argv.includes("--source-only"))
+  files.push(
+    ...walk("dist"),
+    ...walk("dist-foundation"),
+    ...walk(".worker-artifacts"),
+  );
 const patterns = [
   [
     "private-key",

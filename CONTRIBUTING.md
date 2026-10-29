@@ -21,6 +21,8 @@ Se existir WIP ou alteração alheia, reconciliar antes. Não usar `reset --hard
 
 ## Implementar e verificar
 
+- Nas interfaces e nos protótipos, siga [os padrões de hierarquia](docs/design/PADROES.md). Comece pela informação que a pessoa veio consultar e confira a primeira tela em desktop e celular. As referências navegáveis e os comandos de validação estão em [docs/design](docs/design/README.md).
+
 - Commits pequenos, coerentes e com descrição do efeito. `feat:`, `fix:`, `test:` e `docs:` são convenções úteis, sem exigir uma ferramenta adicional.
 - Durante a edição, rode apenas verificações pertinentes. Quando a unidade estabilizar: `npm run gate` e os browsers afetados; CI consolida a composição no SHA da PR.
 - Node24+ e lockfile existente: `npm ci --ignore-scripts`. A aplicação real local usa `npm run dev:foundation`; Vite isolado não fornece a API do Worker. Testes de interface usam fixtures próprias, não dados humanos do preview.

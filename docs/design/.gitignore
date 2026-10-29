@@ -1,0 +1,6 @@
+**/.preview-artifacts/
+prototipos/sumula/*.png
+prototipos/sumula/verification*.json
+prototipos/estatisticas/react-prototype/*.png
+prototipos/estatisticas/react-prototype/verification.json
+prototipos/estatisticas/react-prototype/preview.html

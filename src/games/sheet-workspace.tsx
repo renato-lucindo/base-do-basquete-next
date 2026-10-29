@@ -38,6 +38,7 @@ type Props = {
   onSessionLost: () => void;
   onSaved: () => void;
   onBack: () => void;
+  onBackToGames: () => void;
 };
 type History = {
   present: PersistedSheet;
@@ -584,9 +585,29 @@ export function GameSheetWorkspace(props: Props) {
   return (
     <section className="game-sheet" aria-busy={busy}>
       <AdminToast message={props.enabled && !auxiliary ? status : ""} />
-      <h3 ref={heading} tabIndex={-1}>
-        Relacionados e súmula
-      </h3>
+      <div className="sheet-navigation">
+        <h3 ref={heading} tabIndex={-1}>
+          Relacionados e súmula
+        </h3>
+        <div className="competition-actions">
+          <button
+            className="secondary"
+            disabled={busy}
+            onClick={() => {
+              if (mayLeave()) props.onBack();
+            }}
+          >
+            Voltar aos dados do jogo
+          </button>
+          <button
+            className="secondary"
+            disabled={busy}
+            onClick={props.onBackToGames}
+          >
+            Voltar à lista de jogos
+          </button>
+        </div>
+      </div>
       <p>
         {props.game.home.name} × {props.game.away.name}.{" "}
         {snapshot?.confirmed
@@ -1057,14 +1078,6 @@ export function GameSheetWorkspace(props: Props) {
               onClick={() => void reload()}
             >
               Recarregar súmula
-            </button>
-            <button
-              disabled={busy}
-              onClick={() => {
-                if (mayLeave()) props.onBack();
-              }}
-            >
-              Voltar aos dados do jogo
             </button>
           </div>
           <SheetPublicationPanel

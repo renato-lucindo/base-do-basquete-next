@@ -3,6 +3,7 @@ import { regulationBrowserFixture } from "./regulation-browser";
 import { decisionBackend } from "./decisions.mjs";
 import { SupabaseDecisions } from "../../src/regulation/decision-provider";
 import { tid } from "./text-import";
+import { emptyOfficiating } from "../../src/games/officiating-contract";
 export async function decisionBrowserFixture(
   page: Page,
   options: Record<string, boolean | number | undefined> = {},
@@ -233,8 +234,17 @@ export async function decisionBrowserFixture(
     addTab: async (target: Page) => {
       await f.addTab(target);
       await attach(target);
-      await target.route(new RegExp(`/api/games/${tid(8)}$`), (route) =>
-        route.fulfill({ json: f.games.get(tid(8)) }),
+      await target.route(
+        new RegExp(`/api/games/${tid(8)}(?:/editor)?$`),
+        (route) =>
+          route.fulfill({
+            json: route.request().url().endsWith("/editor")
+              ? {
+                  game: f.games.get(tid(8)),
+                  officiating: f.scales.get(tid(8)) ?? emptyOfficiating(),
+                }
+              : f.games.get(tid(8)),
+          }),
       );
     },
   };

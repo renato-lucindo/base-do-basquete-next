@@ -114,6 +114,10 @@ export function MembersWorkspace({
     editor?.kind === "person" &&
     editor.roster &&
     editor.roster.initialJersey !== editor.roster.command.entry.jersey;
+  const rosterNeedsSave =
+    editor?.kind === "person" &&
+    editor.roster &&
+    (editor.roster.command.expectedVersion === 0 || jerseyChanged);
   const dirty =
     !!editor &&
     (JSON.stringify(editor.command) !== baseline || !!jerseyChanged);
@@ -121,6 +125,7 @@ export function MembersWorkspace({
   const acknowledged = useRef(
     new Map<string, { id: string; version: number }>(),
   );
+  const unconfirmed = useRef(new Set<string>());
   useEffect(() => {
     if (!profiling) heading.current?.focus();
   }, [profiling]);
@@ -175,7 +180,7 @@ export function MembersWorkspace({
       );
   }
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || importing) return;
     let active = true;
     const controller = new AbortController();
     setLoading(true);
@@ -210,7 +215,15 @@ export function MembersWorkspace({
       active = false;
       controller.abort();
     };
-  }, [enabled, registration.id, history, rosterOffset, staffOffset, refresh]);
+  }, [
+    enabled,
+    registration.id,
+    history,
+    rosterOffset,
+    staffOffset,
+    refresh,
+    importing,
+  ]);
   useEffect(() => {
     if (!enabled || !target || query.trim().length < 2) {
       setCandidates({ items: [], hasMore: false });
@@ -245,6 +258,7 @@ export function MembersWorkspace({
   }, [enabled, target, query, searchOffset, refresh]);
   function begin(value: Editor) {
     acknowledged.current.clear();
+    unconfirmed.current.clear();
     setPartialSaved(false);
     setEditor(value);
     setBaseline(JSON.stringify(value.command));
@@ -324,7 +338,24 @@ export function MembersWorkspace({
               },
             },
           }
-        : {}),
+        : wanted === "athlete"
+          ? {
+              roster: {
+                initialJersey: null,
+                command: {
+                  commandId: crypto.randomUUID(),
+                  expectedVersion: 0,
+                  entry: {
+                    id: crypto.randomUUID(),
+                    registrationId: registration.id,
+                    personId: draft.id,
+                    jersey: null,
+                    active: true,
+                  },
+                },
+              },
+            }
+          : {}),
       command: {
         commandId: crypto.randomUUID(),
         expectedVersion: p?.version ?? 0,
@@ -436,16 +467,25 @@ export function MembersWorkspace({
   ) {
     const known = acknowledged.current.get(command.commandId);
     if (known) return known;
-    const result = await api(path, saveResultSchema, command);
-    const expectedId =
-      "person" in command ? command.person.id : command.entry.id;
-    if (
-      result.id !== expectedId ||
-      result.version !== command.expectedVersion + 1
-    )
-      throw new Error("A resposta não corresponde ao cadastro enviado.");
-    acknowledged.current.set(command.commandId, result);
-    return result;
+    unconfirmed.current.add(command.commandId);
+    try {
+      const result = await api(path, saveResultSchema, command);
+      const expectedId =
+        "person" in command ? command.person.id : command.entry.id;
+      if (
+        result.id !== expectedId ||
+        result.version !== command.expectedVersion + 1
+      )
+        throw new Error("A resposta não corresponde ao cadastro enviado.");
+      acknowledged.current.set(command.commandId, result);
+      unconfirmed.current.delete(command.commandId);
+      return result;
+    } catch (failure) {
+      // A validation rejection is definitive; transport failures can hide a commit.
+      if (failure instanceof ApiFailure && failure.status === 400)
+        unconfirmed.current.delete(command.commandId);
+      throw failure;
+    }
   }
   async function save(event?: FormEvent) {
     event?.preventDefault();
@@ -484,7 +524,7 @@ export function MembersWorkspace({
         const p = await api(`/api/people/${result.id}`, personSnapshotSchema);
         if (p.id !== editor.command.person.id)
           throw new Error("Não foi possível confirmar o cadastro solicitado.");
-        if (editor.roster && jerseyChanged) {
+        if (editor.roster && rosterNeedsSave) {
           const receipt = await persist("/api/roster", editor.roster.command);
           const row = await api(
             `/api/roster/${receipt.id}`,
@@ -499,9 +539,11 @@ export function MembersWorkspace({
               "Não foi possível confirmar a camisa desta inscrição.",
             );
         }
-        if (editor.target === "none") {
+        if (editor.target === "none" || editor.roster) {
           setEditor(null);
-          setStatus("Pessoa salva.");
+          setStatus(
+            editor.target === "athlete" ? "Vínculo salvo." : "Pessoa salva.",
+          );
           setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
@@ -545,7 +587,7 @@ export function MembersWorkspace({
       report(failure);
       if (
         editor.kind === "person" &&
-        jerseyChanged &&
+        rosterNeedsSave &&
         acknowledged.current.has(editor.command.commandId)
       ) {
         setPartialSaved(true);
@@ -565,15 +607,35 @@ export function MembersWorkspace({
     setError("");
     try {
       if (editor.kind === "person") {
-        const rosterEntry = editor.roster
-          ? await api(
-              `/api/roster/${editor.roster.command.entry.id}`,
-              rosterSnapshotSchema,
-            )
-          : undefined;
+        let rosterEntry: RosterSnapshot | undefined;
+        const command = editor.roster?.command;
+        if (
+          command &&
+          (command.expectedVersion > 0 ||
+            acknowledged.current.has(command.commandId) ||
+            unconfirmed.current.has(command.commandId))
+        ) {
+          const path = `/api/roster/${command.entry.id}`;
+          try {
+            rosterEntry = await api(path, rosterSnapshotSchema);
+          } catch (failure) {
+            if (!(
+              command.expectedVersion === 0 &&
+              unconfirmed.current.has(command.commandId) &&
+              failure instanceof ApiFailure &&
+              failure.status === 404 &&
+              failure.code === "context_not_found"
+            ))
+              throw failure;
+            // A read can precede a delayed commit. Replay the original intent first.
+            await persist("/api/roster", command);
+            rosterEntry = await api(path, rosterSnapshotSchema);
+          }
+        }
         if (
           rosterEntry &&
-          (rosterEntry.personId !== editor.command.person.id ||
+          (rosterEntry.id !== command?.entry.id ||
+            rosterEntry.personId !== editor.command.person.id ||
             rosterEntry.registrationId !== registration.id)
         )
           throw new Error("O vínculo não corresponde a esta inscrição.");

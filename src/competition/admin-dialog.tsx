@@ -8,6 +8,7 @@ export function AdminDialog({
   onClose,
   children,
   className = "",
+  closeLabel,
 }: {
   title: string;
   open: boolean;
@@ -15,6 +16,7 @@ export function AdminDialog({
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  closeLabel?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null),
     id = useId();
@@ -58,9 +60,9 @@ export function AdminDialog({
           className="secondary"
           disabled={busy}
           onClick={onClose}
-          aria-label="Fechar diálogo"
+          aria-label={closeLabel ?? "Fechar diálogo"}
         >
-          Fechar
+          {closeLabel ?? "Fechar"}
         </button>
       </header>
       <div className="admin-dialog-body">{children}</div>

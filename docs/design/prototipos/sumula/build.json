@@ -1,0 +1,10 @@
+{
+  "output": "Sumula do jogo publicado.html",
+  "sha256": "d2834c27512a570a55a50feedc084c43c757647d40033cc9e787293ea4e76a70",
+  "sources": {
+    "index.html": "332dd3da2ec051295dd17ad0f77c174a56d701e364efedc6c5a9d02191ef164f",
+    "styles.css": "1d3a2406a9e10106544055636ca13d2eac8236a619ceecb2502a169a0d1b063b",
+    "data.js": "dc6e0f93759fb0234ed2c1f09e2db8e142fe1baaef9fbcc106963d4d0cb6007b",
+    "app.js": "ac7f44d528f2e4902c83b0c98a45e50cf60d0053cf34ca5c7f7b21dd115339eb"
+  }
+}
