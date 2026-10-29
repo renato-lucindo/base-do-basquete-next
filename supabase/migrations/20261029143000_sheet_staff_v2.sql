@@ -72,6 +72,16 @@ begin
   for e in select value from jsonb_array_elements(d->'events') with ordinality q(value,ordinal)
      order by (value->>'period')::integer, ordinal loop
     side:=e->>'side'; target:=e->>'target';code:=e->>'code';kind:=left(code,1);
+    -- TS handles player baskets before staff attribution, including unfinished drafts.
+    -- Keep v2 exclusions checked here: the legacy projection cannot see staff fouls.
+    if code in ('1','2','3') then
+      select value into p from jsonb_array_elements(d->'participants')
+        where value->>'side'=side and value->>'jersey'=target;
+      ps:=player_state->(p->>'rosterEntryId');
+      if ps is null or not (ps->>'played')::boolean or ps->>'status'<>'eligible'
+        then raise sqlstate 'PT400' using message='invalid_sheet_player';end if;
+      continue;
+    end if;
     active:=current_coach->>side; st:=d->'staff'->side;
     assistant:=coalesce(st->>'assistantStaffEntryId','');
     captain:=coalesce(st->>'captainRosterEntryId','');

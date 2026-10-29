@@ -287,7 +287,30 @@ it("PostgreSQL agrees with the supplied engine on draft event sequences and coac
           };
         }),
     );
+    const unassignedV2 = emptyPersistedSheet(2);
+    unassignedV2.participants = base.participants;
+    const unassignedSequences: PersistedSheet["events"][] = [
+      [],
+      [playerEvent(1, "0", "2")],
+      [
+        playerEvent(1, "0", "1"),
+        { ...playerEvent(2, "00", "3"), side: "away" },
+        playerEvent(3, "00", "2", 2),
+      ],
+    ];
+    for (const events of unassignedSequences)
+      expect(() =>
+        validatePersistedSheet({ ...unassignedV2, events }),
+      ).not.toThrow();
     const cases = [
+      ...unassignedSequences.map((events) => ({
+        document: unassignedV2,
+        events,
+      })),
+      // Fouls still require an identified eligible coach, even in drafts.
+      ...[playerEvent(1, "0", "P"), staffEvent(1, "C", "B1", id(7))].map(
+        (event) => ({ document: unassignedV2, events: [event] }),
+      ),
       ...v2Sequences.map((events) => ({ document: v2, events })),
       ...captainSequences.map((events) => ({ document: captainV2, events })),
       ...randomV2.map((events) => ({ document: v2, events })),
