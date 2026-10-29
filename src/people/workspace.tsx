@@ -125,6 +125,7 @@ export function MembersWorkspace({
   const acknowledged = useRef(
     new Map<string, { id: string; version: number }>(),
   );
+  const unconfirmed = useRef(new Set<string>());
   useEffect(() => {
     if (!profiling) heading.current?.focus();
   }, [profiling]);
@@ -257,6 +258,7 @@ export function MembersWorkspace({
   }, [enabled, target, query, searchOffset, refresh]);
   function begin(value: Editor) {
     acknowledged.current.clear();
+    unconfirmed.current.clear();
     setPartialSaved(false);
     setEditor(value);
     setBaseline(JSON.stringify(value.command));
@@ -465,16 +467,25 @@ export function MembersWorkspace({
   ) {
     const known = acknowledged.current.get(command.commandId);
     if (known) return known;
-    const result = await api(path, saveResultSchema, command);
-    const expectedId =
-      "person" in command ? command.person.id : command.entry.id;
-    if (
-      result.id !== expectedId ||
-      result.version !== command.expectedVersion + 1
-    )
-      throw new Error("A resposta não corresponde ao cadastro enviado.");
-    acknowledged.current.set(command.commandId, result);
-    return result;
+    unconfirmed.current.add(command.commandId);
+    try {
+      const result = await api(path, saveResultSchema, command);
+      const expectedId =
+        "person" in command ? command.person.id : command.entry.id;
+      if (
+        result.id !== expectedId ||
+        result.version !== command.expectedVersion + 1
+      )
+        throw new Error("A resposta não corresponde ao cadastro enviado.");
+      acknowledged.current.set(command.commandId, result);
+      unconfirmed.current.delete(command.commandId);
+      return result;
+    } catch (failure) {
+      // A validation rejection is definitive; transport failures can hide a commit.
+      if (failure instanceof ApiFailure && failure.status === 400)
+        unconfirmed.current.delete(command.commandId);
+      throw failure;
+    }
   }
   async function save(event?: FormEvent) {
     event?.preventDefault();
@@ -596,18 +607,35 @@ export function MembersWorkspace({
     setError("");
     try {
       if (editor.kind === "person") {
-        const rosterEntry =
-          editor.roster &&
-          (editor.roster.command.expectedVersion > 0 ||
-            acknowledged.current.has(editor.roster.command.commandId))
-            ? await api(
-                `/api/roster/${editor.roster.command.entry.id}`,
-                rosterSnapshotSchema,
-              )
-            : undefined;
+        let rosterEntry: RosterSnapshot | undefined;
+        const command = editor.roster?.command;
+        if (
+          command &&
+          (command.expectedVersion > 0 ||
+            acknowledged.current.has(command.commandId) ||
+            unconfirmed.current.has(command.commandId))
+        ) {
+          const path = `/api/roster/${command.entry.id}`;
+          try {
+            rosterEntry = await api(path, rosterSnapshotSchema);
+          } catch (failure) {
+            if (!(
+              command.expectedVersion === 0 &&
+              unconfirmed.current.has(command.commandId) &&
+              failure instanceof ApiFailure &&
+              failure.status === 404 &&
+              failure.code === "context_not_found"
+            ))
+              throw failure;
+            // A read can precede a delayed commit. Replay the original intent first.
+            await persist("/api/roster", command);
+            rosterEntry = await api(path, rosterSnapshotSchema);
+          }
+        }
         if (
           rosterEntry &&
-          (rosterEntry.personId !== editor.command.person.id ||
+          (rosterEntry.id !== command?.entry.id ||
+            rosterEntry.personId !== editor.command.person.id ||
             rosterEntry.registrationId !== registration.id)
         )
           throw new Error("O vínculo não corresponde a esta inscrição.");
