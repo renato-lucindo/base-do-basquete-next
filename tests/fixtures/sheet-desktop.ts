@@ -2,11 +2,16 @@ import type { Page } from "@playwright/test";
 import { gamesFixture } from "./games";
 import { tid } from "./text-import";
 import type { PreparationContext } from "../../src/games/preparation-contract";
+import { gameSnapshotSchema } from "../../src/games/contract";
 import {
   saveSheetSchema,
   type SheetSnapshot,
 } from "../../src/games/sheet-contract";
-export async function desktopSheetFixture(page: Page, count = 11) {
+export async function desktopSheetFixture(
+  page: Page,
+  count = 11,
+  withStaff = false,
+) {
   const f = await gamesFixture(page),
     savedAt = "2026-10-26T18:00:00Z",
     home = f.registrations.get(tid(5))!,
@@ -28,12 +33,26 @@ export async function desktopSheetFixture(page: Page, count = 11) {
     version: 1,
     savedAt,
   };
-  f.games.set(game.id, game);
+  f.games.set(game.id, gameSnapshotSchema.parse(game));
   const side = (which: 0 | 1) => ({
     registrationId: which ? away.id : home.id,
     previous: null,
     lastJerseys: {},
-    staff: [],
+    staff: withStaff
+      ? Array.from({ length: 3 }, (_, i) => {
+          const personId = tid(600 + which * 10 + (i === 2 ? 0 : i));
+          return {
+            id: tid(300 + which * 10 + i),
+            personId,
+            role: (i === 1 ? "head" : "assistant") as "head" | "assistant",
+            person: {
+              id: personId,
+              name: `Treinador ${which ? "B" : "A"} ${i === 2 ? 1 : i + 1}`,
+              nickname: null,
+            },
+          };
+        })
+      : [],
     roster: Array.from({ length: count }, (_, i) => ({
       id: tid(100 + which * 100 + i),
       registrationId: which ? away.id : home.id,
@@ -80,10 +99,27 @@ export async function desktopSheetFixture(page: Page, count = 11) {
           person: m.person,
         };
       }),
-      staff: {
-        home: { captain: null, coach: null, assistant: null },
-        away: { captain: null, coach: null, assistant: null },
-      },
+      staff: Object.fromEntries(
+        (["home", "away"] as const).map((s) => {
+          const selected = c.document.staff[s];
+          const roster = context.sides[s].roster;
+          const staff = context.sides[s].staff;
+          return [
+            s,
+            {
+              captain:
+                roster.find((r) => r.id === selected.captainRosterEntryId)
+                  ?.person ?? null,
+              coach:
+                staff.find((r) => r.id === selected.coachStaffEntryId)
+                  ?.person ?? null,
+              assistant:
+                staff.find((r) => r.id === selected.assistantStaffEntryId)
+                  ?.person ?? null,
+            },
+          ];
+        }),
+      ) as SheetSnapshot["staff"],
     };
     return r.fulfill({
       json: {
@@ -120,7 +156,7 @@ export async function desktopSheetFixture(page: Page, count = 11) {
 }
 export async function openDesktopSheet(page: Page) {
   await page.goto(
-    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+    `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
     .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })

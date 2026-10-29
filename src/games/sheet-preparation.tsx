@@ -412,7 +412,13 @@ export function SheetPreparation({
                       </option>
                     )}
                   {c.staff
-                    .filter((s) => s.role === "head")
+                    .filter(
+                      (s) =>
+                        s.personId !==
+                        c.staff.find(
+                          (a) => a.id === staff.assistantStaffEntryId,
+                        )?.personId,
+                    )
                     .map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.person.name}
@@ -444,7 +450,12 @@ export function SheetPreparation({
                         </option>
                       )}
                     {c.staff
-                      .filter((s) => s.role === "assistant")
+                      .filter(
+                        (s) =>
+                          s.personId !==
+                          c.staff.find((a) => a.id === staff.coachStaffEntryId)
+                            ?.personId,
+                      )
                       .map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.person.name}

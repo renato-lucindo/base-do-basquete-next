@@ -5,6 +5,7 @@ export type Side = z.infer<typeof sideSchema>;
 const id = z.number().int().positive().safe();
 export const rosterSchema = z.object({
   rosterEntryId: id,
+  actorId: z.uuid().optional(),
   registrationId: id,
   side: sideSchema,
   jersey: z.string().regex(/^(00|0|[1-9][0-9]?)$/),
@@ -16,8 +17,10 @@ export const eventSchema = z.object({
   id: z.uuid(),
   side: sideSchema,
   period: z.number().int().min(1).max(12),
-  target: z.string().regex(/^(00|0|[1-9][0-9]?|B|C)$/),
+  target: z.string().regex(/^(00|0|[1-9][0-9]?|B|C|AT)$/),
   code: z.string().max(3),
+  actorId: z.uuid().optional(),
+  successorId: z.uuid().optional(),
 });
 export type Entry = z.infer<typeof eventSchema>;
 export const teamStaffSchema = z.object({
@@ -28,6 +31,7 @@ export const teamStaffSchema = z.object({
 });
 export type TeamStaff = z.infer<typeof teamStaffSchema>;
 export const documentSchema = z.object({
+  formatVersion: z.literal(2).optional(),
   rulesVersion: z.literal("FIBA_2024"),
   periods: z.number().int().min(4).max(12),
   roster: z.array(rosterSchema).min(2).max(24),
@@ -65,8 +69,10 @@ export function parseFoul(code: string, target: string): Foul | null {
     target === "B"
       ? kind !== "B"
       : target === "C"
-        ? !["C", "D"].includes(kind)
-        : ["B", "C"].includes(kind)
+        ? !["B", "C", "D"].includes(kind)
+        : target === "AT"
+          ? kind !== "D"
+          : ["B", "C"].includes(kind)
   )
     return null;
   // B2 is a bench disqualification penalty, not a second technical.
@@ -89,6 +95,7 @@ export function periodColor(period: number): "red" | "blue" {
 
 export interface PlayerTotal {
   rosterEntryId: number;
+  actorId?: string;
   side: Side;
   jersey: string;
   two: number;
@@ -109,7 +116,15 @@ export interface TeamTotal {
   coachC: number;
   coachB: number;
   coachStatus: "eligible" | "GD" | "D";
+  activeCoachId?: string | null;
+  staffPeople?: Record<string, StaffPersonTotal>;
   foulsByPeriod: number[];
+}
+export interface StaffPersonTotal {
+  b: number;
+  c: number;
+  status: "eligible" | "GD" | "D";
+  marks: { id: string; code: string; period: number; consequence?: boolean }[];
 }
 export type ActionProgress = {
   event: Entry;
@@ -146,6 +161,31 @@ export function aggregate(
   });
   const teams = { home: team(), away: team() };
   const errors: string[] = [];
+  const identified = sheet.formatVersion === 2;
+  const assignments = {
+    home: { coach: "", assistant: "", captain: "" },
+    away: { coach: "", assistant: "", captain: "" },
+  };
+  if (identified) {
+    for (const side of ["home", "away"] as const) {
+      const staff = sheet.staff?.[side];
+      if (!staff) {
+        errors.push("Comissão técnica ausente.");
+        continue;
+      }
+      const captain =
+        sheet.roster.find((p) => p.rosterEntryId === staff.captainId)
+          ?.actorId ?? "";
+      const coach = staff.coachName || captain;
+      assignments[side] = { captain, coach, assistant: staff.assistantName };
+      const people: Record<string, StaffPersonTotal> = {};
+      for (const personId of [coach, staff.assistantName, captain])
+        if (personId && !people[personId])
+          people[personId] = { b: 0, c: 0, status: "eligible", marks: [] };
+      teams[side].staffPeople = people;
+      teams[side].activeCoachId = coach || null;
+    }
+  }
   for (const side of ["home", "away"] as const) {
     const roster = sheet.roster.filter((s) => s.side === side);
     if (roster.filter((slot) => slot.starter).length > 5)
@@ -165,6 +205,12 @@ export function aggregate(
         errors.push(
           "Capitão como técnico não admite técnico próprio ou assistente.",
         );
+      if (
+        identified &&
+        staff.assistantName &&
+        (!staff.coachName || staff.assistantName === staff.coachName)
+      )
+        errors.push("Assistente exige técnico próprio distinto.");
       if (
         sheet.coachPlayer[side] !==
         (staff.captainIsCoach ? staff.captainId : null)
@@ -202,7 +248,7 @@ export function aggregate(
     const opponent = teams[event.side === "home" ? "away" : "home"];
     if (
       event.period > sheet.periods ||
-      (!player && !["B", "C"].includes(event.target))
+      (!player && !["B", "C", "AT"].includes(event.target))
     ) {
       errors.push("Camisa ou período inválido.");
       continue;
@@ -243,15 +289,17 @@ export function aggregate(
       continue;
     }
     const foul = parseFoul(event.code, event.target);
-    if (!foul) {
+    if (
+      !foul ||
+      (!identified &&
+        (event.target === "AT" || (event.target === "C" && foul.kind === "B")))
+    ) {
       errors.push(`Código inválido: ${event.code}.`);
       continue;
     }
     if (player) {
       if (player.status !== "eligible") {
-        errors.push(
-          `Há falta posterior à exclusão de #${player.jersey}. Use B para uma ocorrência de banco.`,
-        );
+        errors.push(`Há falta posterior à exclusão de #${player.jersey}.`);
         continue;
       }
     }
@@ -272,9 +320,147 @@ export function aggregate(
               ? "excluded"
               : "eligible";
     } else {
-      if (foul.kind === "C") own.coachC++;
-      if (foul.kind === "B" && event.code !== "B2") own.coachB++;
-      if (foul.kind === "D") own.coachStatus = "D";
+      if (!identified) {
+        if (foul.kind === "C") own.coachC++;
+        if (foul.kind === "B" && event.code !== "B2") own.coachB++;
+        if (foul.kind === "D") own.coachStatus = "D";
+      }
+    }
+    if (identified) {
+      const people = own.staffPeople ?? {};
+      const assignment = assignments[event.side];
+      const active = own.activeCoachId;
+      if (!active) {
+        errors.push("Indique um técnico elegível antes do lançamento.");
+        continue;
+      }
+      const activeState = people[active];
+      if (!activeState) {
+        errors.push("Identidade do técnico inválida.");
+        continue;
+      }
+      const staffEvent =
+        event.target === "C" || event.target === "AT" || event.target === "B";
+      if (event.target === "B")
+        errors.push(
+          "Banco legado não pode receber novos lançamentos na súmula v2.",
+        );
+      if (staffEvent) {
+        const expected = event.target === "AT" ? assignment.assistant : active;
+        if (
+          !event.actorId ||
+          event.actorId !== expected ||
+          !people[expected] ||
+          (event.target === "AT" &&
+            (expected === active || people[expected].status !== "eligible"))
+        )
+          errors.push(
+            "Autoria incompatível com o técnico ou assistente responsável.",
+          );
+        if (event.target === "AT" && foul.kind !== "D")
+          errors.push("O assistente recebe apenas D.");
+        if (event.target === "C" && foul.kind === "B" && event.code === "B2")
+          errors.push(
+            "B2 é consequência vinculada à desqualificação do assistente.",
+          );
+        const recipient = people[event.actorId ?? ""];
+        if (recipient) {
+          recipient.marks.push({
+            id: event.id,
+            code: event.code,
+            period: event.period,
+          });
+          if (event.target === "AT") {
+            recipient.status = "D";
+            activeState.marks.push({
+              id: event.id,
+              code: "B2",
+              period: event.period,
+              consequence: true,
+            });
+          } else {
+            if (foul.kind === "C") recipient.c++;
+            if (foul.kind === "B" && event.code !== "B2") recipient.b++;
+            if (foul.kind === "D") recipient.status = "D";
+            if (
+              recipient.status !== "D" &&
+              (recipient.c >= 2 || recipient.c + recipient.b >= 3)
+            )
+              recipient.status = "GD";
+          }
+        }
+      }
+      const coachPlayer = players.find(
+        (p) => p.side === event.side && p.actorId === active,
+      );
+      if (
+        coachPlayer &&
+        (coachPlayer.status === "D" ||
+          coachPlayer.status === "GD" ||
+          coachPlayer.status === "excluded")
+      )
+        activeState.status = coachPlayer.status === "D" ? "D" : "GD";
+      if (
+        activeState.status !== "D" &&
+        coachPlayer &&
+        coachPlayer.technical + coachPlayer.unsportsmanlike > 0 &&
+        (activeState.c > 0 || activeState.b >= 2)
+      )
+        activeState.status = "GD";
+      if (coachPlayer && activeState.status !== "eligible")
+        coachPlayer.status = activeState.status;
+      if (activeState.status !== "eligible") {
+        const eligible = (id: string) =>
+          !!id &&
+          id !== active &&
+          (!people[id] || people[id].status === "eligible") &&
+          (!players.some((p) => p.actorId === id) ||
+            players.some(
+              (p) =>
+                p.side === event.side &&
+                p.actorId === id &&
+                p.status === "eligible" &&
+                sheet.roster.find((r) => r.actorId === id)?.played,
+            ));
+        const automatic = [assignment.assistant, assignment.captain].find(
+          eligible,
+        );
+        if (automatic && event.successorId)
+          errors.push(
+            "Sucessão automática não admite indicação de outro atleta.",
+          );
+        const successor =
+          automatic ??
+          (event.successorId &&
+          eligible(event.successorId) &&
+          players.some(
+            (p) => p.side === event.side && p.actorId === event.successorId,
+          )
+            ? event.successorId
+            : "");
+        if (!successor)
+          errors.push(
+            "Indique explicitamente outro atleta elegível para assumir como técnico.",
+          );
+        else {
+          if (!people[successor])
+            people[successor] = { b: 0, c: 0, status: "eligible", marks: [] };
+          own.activeCoachId = successor;
+        }
+      } else if (event.successorId)
+        errors.push("Sucessão só é permitida após impedimento do técnico.");
+      const current = people[own.activeCoachId ?? ""];
+      own.coachB = current?.b ?? 0;
+      own.coachC = current?.c ?? 0;
+      own.coachStatus = current?.status ?? activeState.status;
+      onAction?.({
+        event,
+        teamPoints: own.points,
+        playerFouls: player?.fouls ?? null,
+        playerStatus: player?.status ?? null,
+        coachStatus: own.coachStatus,
+      });
+      continue;
     }
     const coach = players.find(
       (p) => p.rosterEntryId === sheet.coachPlayer[event.side],

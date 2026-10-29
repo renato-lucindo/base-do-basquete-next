@@ -143,7 +143,9 @@ export function SheetActionHistory({
                             ? "#" + a.event.target
                             : a.event.target === "C"
                               ? "Técnico"
-                              : "Banco"}{" "}
+                              : a.event.target === "AT"
+                                ? "Ass. Técnico"
+                                : "Banco"}{" "}
                           - {a.annotation}
                         </span>
                         <div className="competition-actions">
