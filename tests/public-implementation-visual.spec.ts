@@ -87,7 +87,7 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
   const frame = await table.evaluate((node) => {
     const rows = [...node.querySelectorAll("tbody tr")];
     const first = rows[0].getBoundingClientRect();
-    const scroll = node.closest(".statistics-scroll")!;
+    const scroll = node.closest(".statistics-table-wrap")!;
     return {
       firstY: first.y,
       visible: rows.filter(
@@ -137,7 +137,7 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
   if (info.project.name === "mobile") {
     expect(frame.scrollable).toBe(true);
     const scrolled = await table.evaluate((node) => {
-      const region = node.closest(".statistics-scroll")!;
+      const region = node.closest(".statistics-table-wrap")!;
       const rank = node.querySelector("tbody .statistics-position")!;
       const player = node.querySelector("tbody .statistics-player")!;
       const rankWidth = rank.getBoundingClientRect().width;
@@ -146,7 +146,15 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
         .querySelector("tbody .statistics-player")!
         .getBoundingClientRect().left;
       region.scrollLeft = 200;
+      const pinned = node
+        .querySelector("tbody .statistics-player")!
+        .getBoundingClientRect().left;
+      region.scrollLeft = 300;
+      const pinnedAgain = node
+        .querySelector("tbody .statistics-player")!
+        .getBoundingClientRect().left;
       return {
+        pinnedOffset: Math.abs(pinnedAgain - pinned),
         scroll: region.scrollLeft,
         rankWidth,
         stickyLeft,
@@ -158,7 +166,8 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
       };
     });
     expect(scrolled.scroll).toBeGreaterThan(0);
-    expect(Math.abs(scrolled.rankWidth - scrolled.stickyLeft)).toBeLessThan(1);
-    expect(scrolled.playerOffset).toBeLessThan(2);
+    expect(scrolled.stickyLeft).toBe(0);
+    expect(scrolled.pinnedOffset).toBeLessThan(1);
+    expect(scrolled.playerOffset).toBeLessThanOrEqual(scrolled.rankWidth + 1);
   }
 });

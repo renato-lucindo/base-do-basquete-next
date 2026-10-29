@@ -1,317 +1,1406 @@
-.public-result {
-  max-width: 1480px;
+/* Estilos dos protótipos aprovados, isolados das telas administrativas. */
+.public-site.scoresheet-public {
+  min-height: 100vh;
   min-width: 0;
-  overflow-wrap: anywhere;
-  padding-top: 10px;
-}
-.public-screen-title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-.public-game {
-  min-width: 0;
-  color: #182d46;
-}
-.public-game-context {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 22px;
-  align-items: center;
-  margin: 7px 0 6px;
-  font-size: 0.91rem;
-  font-weight: 600;
-}
-.public-score-label {
-  color: #536578;
-  font-size: 0.78rem;
-  margin-bottom: 8px;
-}
-.public-scroll {
-  max-width: 100%;
-  overflow: auto;
   background: #fff;
-  border: 1px solid #d8e1ec;
-  border-radius: 3px;
 }
-.public-scroll:focus-visible {
-  outline: 3px solid #065fc4;
-  outline-offset: 1px;
-}
-.public-periods table {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-}
-.public-periods th,
-.public-periods td {
-  border-bottom: 1px solid #e4e9f0;
-  padding: 5px 12px;
-  text-align: center;
-  white-space: nowrap;
-}
-.public-periods th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: #f0f5fb;
-  text-align: left;
-  min-width: 128px;
-}
-.public-periods thead th {
-  background: #f0f5fb;
-  font-size: 0.78rem;
-  color: #50627b;
-}
-.public-periods td small {
-  display: block;
-  font-size: 0.64rem;
-  color: #586d84;
-  font-weight: 500;
-}
-.public-final-score {
-  color: #073e84;
-  font-size: 1.15rem;
-  font-weight: 800;
-  background: #e8f1ff;
-}
-.public-score-fallback {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-weight: 700;
-  border-block: 1px solid #d7e0e9;
-  padding: 8px 0;
-}
-.public-score-fallback small,
-.public-muted {
-  color: #596e84;
-  font-weight: 400;
-  font-size: 0.8rem;
-}
-.public-period-select {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  margin: 12px 0 8px;
-  font-size: 0.85rem;
-}
-.public-period-select strong {
-  background: #0a55ab;
-  color: #fff;
-  border-radius: 3px;
-  padding: 5px 11px;
-}
-.public-rosters {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  align-items: start;
-}
-.public-roster {
-  min-width: 0;
-}
-.public-roster h2 {
-  margin: 0 0 5px;
-  font-size: 1rem;
-  line-height: 1.35;
-}
-.public-roster h2 a {
-  color: #124d90;
-}
-.public-athletes table {
-  border-collapse: collapse;
-  width: 100%;
-  font-variant-numeric: tabular-nums;
-}
-.public-athletes th,
-.public-athletes td {
-  padding: 6px 7px;
-  border-bottom: 1px solid #e4eaf1;
-  text-align: right;
-  white-space: nowrap;
-  font-size: 0.81rem;
-}
-.public-athletes thead th {
-  background: #eaf1f9;
-  color: #273d58;
-}
-.public-athletes tr:nth-child(even) td {
-  background: #fafcff;
-}
-.public-athletes thead th:nth-child(2),
-.public-athletes tbody th {
-  text-align: left;
-}
-.public-athletes tbody th {
-  position: sticky;
-  left: 36px;
-  background: #fff;
-  min-width: 160px;
-  max-width: 230px;
-  z-index: 1;
-  white-space: normal;
-}
-.public-athletes tbody tr:nth-child(even) th {
-  background: #fafcff;
-}
-.public-athletes tbody td:first-child,
-.public-athletes thead th:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 2;
-  background: #fff;
-  text-align: center;
-  min-width: 36px;
-}
-.public-athletes thead th:first-child,
-.public-athletes thead th:nth-child(2) {
-  background: #eaf1f9;
-  z-index: 3;
-}
-.public-athletes thead th:nth-child(2) {
-  position: sticky;
-  left: 36px;
-}
-.public-athletes tfoot th,
-.public-athletes tfoot td {
-  background: #e6f0fc;
-  color: #103f7c;
-  font-weight: 800;
-}
-.public-athlete-name {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  line-height: 1.25;
-}
-.public-athlete-name a {
-  color: #153b6c;
-  overflow-wrap: anywhere;
-  min-width: 0;
-}
-.public-athlete-name small {
-  font-size: 0.64rem;
-  font-weight: 800;
-  color: #51647a;
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-.public-starter {
-  font-weight: 800;
-}
-.public-excluded .public-status {
-  color: #b12934;
-  font-weight: 800;
-  font-size: 0.7rem;
-}
-.public-foul-button {
-  color: #0b4f9c;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px dashed #0b4f9c;
-  border-radius: 0;
-  font: inherit;
-  font-weight: 700;
-  min-height: 28px;
-  min-width: 28px;
+.public-site.scoresheet-public button {
+  min-height: 0;
   padding: 0;
+  border: 0;
+  background: transparent;
+}
+.public-site.scoresheet-public a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Fonte: docs/design/prototipos/sumula/styles.css */
+.public-site.scoresheet-public {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #172033;
+  background: #fff;
+  font-synthesis: none;
+  --blue: #075fca;
+  --muted: #526176;
+  --line: #dce4ee;
+  --surface: #f4f8fd;
+  --active: #f1f6fd;
+}
+.public-site.scoresheet-public * {
+  box-sizing: border-box;
+}
+.public-site.scoresheet-public {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.public-site.scoresheet-public button {
+  font: inherit;
+  color: inherit;
   cursor: pointer;
 }
-.public-excluded .public-foul-button,
-.public-excluded .public-status {
-  color: #b12934;
-  font-weight: 800;
+.public-site.scoresheet-public button,
+.public-site.scoresheet-public a,
+.public-site.scoresheet-public summary,
+.public-site.scoresheet-public [tabindex] {
+  -webkit-tap-highlight-color: transparent;
 }
-.public-free-throws {
-  font-size: 0.76rem;
-  color: #4a5d73;
-  padding: 6px 2px;
+.public-site.scoresheet-public button:focus-visible,
+.public-site.scoresheet-public a:focus-visible,
+.public-site.scoresheet-public summary:focus-visible,
+.public-site.scoresheet-public [tabindex]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
 }
-.public-staff {
-  border-top: 1px solid #e1e8f0;
-  padding: 7px 1px;
+.public-site.scoresheet-public h1,
+.public-site.scoresheet-public h2,
+.public-site.scoresheet-public h3,
+.public-site.scoresheet-public p {
+  margin: 0;
+}
+.public-site.scoresheet-public button {
+  border-radius: 5px;
+}
+.public-site.scoresheet-public .wrap {
+  width: calc(100% - 96px);
+  max-width: 1280px;
+  margin-inline: auto;
+  min-width: 0;
+}
+.public-site.scoresheet-public .skip {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  padding: 10px 16px;
+  z-index: 20;
+  background: #fff;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+}
+.public-site.scoresheet-public .skip:focus {
+  top: 8px;
+}
+.public-site.scoresheet-public .prototype {
+  font-size: 0.625rem;
+  background: #eef6ff;
+  color: #285785;
+  border-bottom: 1px solid #dbe8f9;
+}
+.public-site.scoresheet-public .prototype .wrap {
+  display: flex;
+  justify-content: space-between;
+  padding-block: 5px;
+}
+.public-site.scoresheet-public .site-header {
+  border-bottom: 1px solid var(--line);
+}
+.public-site.scoresheet-public .header-inner {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.public-site.scoresheet-public .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: -0.5px;
+}
+.public-site.scoresheet-public .brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 1.75rem;
+  display: grid;
+  place-items: center;
+  line-height: 28px;
+  padding-bottom: 4px;
+}
+.public-site.scoresheet-public .public-label {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.public-site.scoresheet-public .breadcrumb {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
-  font-size: 0.78rem;
+  align-items: center;
+  gap: 11px;
+  font-size: 0.6875rem;
+  color: var(--muted);
+  padding-block: 22px;
 }
-.public-staff strong {
-  width: 100%;
-  color: #254362;
+.public-site.scoresheet-public .breadcrumb [aria-hidden] {
+  color: #748398;
 }
-.public-legend {
+.public-site.scoresheet-public .page-heading {
+  padding-bottom: 20px;
+}
+.public-site.scoresheet-public h1 {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  letter-spacing: -0.8px;
+  font-weight: 650;
+}
+.public-site.scoresheet-public .competition {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 9px;
   font-size: 0.75rem;
-  color: #586d84;
-  margin: 8px 0;
-  max-width: 1000px;
+  color: var(--muted);
 }
-.public-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: #0a193d99;
+.public-site.scoresheet-public .competition strong {
+  font-weight: 500;
+  color: #34445c;
+}
+.public-site.scoresheet-public .competition [aria-hidden] {
+  color: #748398;
+}
+.public-site.scoresheet-public .game-summary {
+  padding: 20px 0 24px;
+  border-block: 1px solid var(--line);
+}
+.public-site.scoresheet-public .game-eyebrow {
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .game-eyebrow > span {
+  margin-inline: 5px;
+}
+.public-site.scoresheet-public .scoreboard {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 34px;
+  max-width: 760px;
+  margin: 12px auto 16px;
+}
+.public-site.scoresheet-public .score-team h2 {
+  font-size: 1.5625rem;
+  font-weight: 650;
+  letter-spacing: -0.6px;
+  line-height: 1.3;
+}
+.public-site.scoresheet-public .home-team {
+  text-align: right;
+}
+.public-site.scoresheet-public .away-team {
+  text-align: left;
+}
+.public-site.scoresheet-public .team-abbreviation {
+  font-size: 0.625rem;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+.public-site.scoresheet-public .score-center {
+  text-align: center;
+  min-width: 212px;
+}
+.public-site.scoresheet-public .score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -1.8px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+}
+.public-site.scoresheet-public .score-divider {
+  font-size: 1.5625rem;
+  font-weight: 400;
+  color: #6b7a8e;
+  letter-spacing: 0;
+}
+.public-site.scoresheet-public .game-status {
+  font-size: 0.6875rem;
+  color: var(--muted);
+  margin-top: 9px;
+}
+.public-site.scoresheet-public .game-status > span[aria-hidden] {
+  margin-inline: 4px;
+}
+.public-site.scoresheet-public .game-meta {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 14px;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
 }
-.public-foul-dialog {
-  width: min(460px, 100%);
-  background: #fff;
-  border-radius: 7px;
-  padding: 18px;
-  box-shadow: 0 12px 38px #0003;
+.public-site.scoresheet-public .period-section {
+  padding-top: 22px;
 }
-.public-dialog-head {
+.public-site.scoresheet-public .section-heading {
   display: flex;
   justify-content: space-between;
-  align-items: start;
   gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
 }
-.public-dialog-head h2 {
-  font-size: 1.1rem;
-  margin: 3px 0 8px;
+.public-site.scoresheet-public .section-heading h2,
+.public-site.scoresheet-public .teams-heading h2 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.2px;
 }
-.public-dialog-head button {
-  color: #124d90;
+.public-site.scoresheet-public .section-heading > span {
+  color: var(--muted);
+  font-size: 0.6875rem;
+}
+.public-site.scoresheet-public .period-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  isolation: isolate;
+}
+.public-site.scoresheet-public .period-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 360px;
+  font-variant-numeric: tabular-nums;
+}
+.public-site.scoresheet-public .period-table th,
+.public-site.scoresheet-public .period-table td {
+  text-align: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 6px;
+}
+.public-site.scoresheet-public .period-table thead th {
+  background: var(--surface);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  color: #33415c;
+  padding-block: 8px;
+}
+.public-site.scoresheet-public .period-table th:first-child {
+  width: 150px;
+  text-align: left;
+  padding-left: 14px;
+}
+.public-site.scoresheet-public .period-table tbody th {
+  font-size: 0.75rem;
+  font-weight: 500;
   background: #fff;
-  border: 1px solid #7a8ca2;
-  padding: 8px;
-  cursor: pointer;
-  flex: 0 0 auto;
+}
+.public-site.scoresheet-public .period-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.public-site.scoresheet-public .period-table tr > :last-child {
+  border-right: 0;
+}
+.public-site.scoresheet-public .period-points {
+  display: block;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  font-weight: 550;
+}
+.public-site.scoresheet-public .period-fouls {
+  display: block;
+  font-size: 0.625rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.public-site.scoresheet-public .period-table .period-total {
+  background: var(--active);
+  color: var(--blue);
+}
+.public-site.scoresheet-public .period-total .period-points {
+  font-weight: 700;
+}
+.public-site.scoresheet-public .period-note {
+  font-size: 0.625rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.public-site.scoresheet-public .period-table .overtime {
+  background: #f9fbfe;
+}
+.public-site.scoresheet-public .teams-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+.public-site.scoresheet-public .teams-heading > p {
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .teams-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+}
+.public-site.scoresheet-public .team-section {
+  min-width: 0;
+  max-width: 100%;
+}
+.public-site.scoresheet-public .team-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.public-site.scoresheet-public .team-heading h3 {
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+}
+.public-site.scoresheet-public .team-heading > p {
+  font-size: 0.625rem;
+  color: var(--muted);
+  text-align: right;
+}
+.public-site.scoresheet-public .table-scroll {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  isolation: isolate;
+  scrollbar-width: thin;
+  scrollbar-color: #b0bfd1 #f4f8fd;
+}
+.public-site.scoresheet-public .roster-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 500px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.public-site.scoresheet-public .jersey-col {
+  width: 36px;
+}
+.public-site.scoresheet-public .stat-col {
+  width: 48px;
+}
+.public-site.scoresheet-public .roster-table th,
+.public-site.scoresheet-public .roster-table td {
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  padding: 5px 9px;
+  text-align: right;
+  vertical-align: middle;
+  background: #fff;
+}
+.public-site.scoresheet-public .roster-table tr > :last-child {
+  border-right: 0;
+}
+.public-site.scoresheet-public .roster-table thead th {
+  height: 36px;
+  background: var(--surface);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #33415c;
   white-space: nowrap;
 }
-@media (max-width: 820px) {
-  .public-rosters {
+.public-site.scoresheet-public .roster-table .jersey-cell {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--muted);
+  padding-inline: 4px;
+}
+.public-site.scoresheet-public .roster-table .athlete-cell {
+  position: sticky;
+  left: 36px;
+  z-index: 2;
+  text-align: left;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  border-right: 1px solid #c3d1e2;
+}
+.public-site.scoresheet-public .roster-table thead .athlete-cell {
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+.public-site.scoresheet-public .roster-table thead .jersey-cell,
+.public-site.scoresheet-public .roster-table thead .athlete-cell {
+  z-index: 3;
+  background: var(--surface);
+}
+.public-site.scoresheet-public .athlete-name {
+  font-weight: 400;
+}
+.public-site.scoresheet-public .starter .athlete-name {
+  font-weight: 700;
+}
+.public-site.scoresheet-public .starter-symbol {
+  font-weight: 700;
+  color: #34445c;
+  white-space: nowrap;
+}
+.public-site.scoresheet-public .captain {
+  display: inline-block;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+  color: #18528f;
+  background: #edf5ff;
+  border: 1px solid #c9dbf3;
+  border-radius: 3px;
+  line-height: 15px;
+  padding: 0 4px;
+  vertical-align: 1px;
+  margin-left: 5px;
+  white-space: nowrap;
+}
+.public-site.scoresheet-public .roster-table tbody tr:hover > * {
+  background: #f8fafd;
+}
+.public-site.scoresheet-public .roster-table .points-cell {
+  color: #1557a4;
+  background: var(--active);
+  font-weight: 600;
+}
+.public-site.scoresheet-public .roster-table thead .points-cell {
+  background: #eaf2fd;
+  color: #1557a4;
+}
+.public-site.scoresheet-public .roster-table tbody tr:hover > .points-cell {
+  background: #eaf2fd;
+}
+.public-site.scoresheet-public .roster-table .did-not-play > * {
+  color: #65758a;
+  background: #fafbfd;
+}
+.public-site.scoresheet-public .roster-table .did-not-play .athlete-name {
+  color: #65758a;
+}
+.public-site.scoresheet-public .roster-table .foul-cell {
+  padding: 2px 5px;
+}
+.public-site.scoresheet-public .foul-button {
+  min-width: 32px;
+  min-height: 34px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.75rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-decoration: underline;
+  text-decoration-color: #acb9ca;
+  text-underline-offset: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.public-site.scoresheet-public .foul-button:hover {
+  border-color: #b9cce4;
+  background: #eef5fe;
+  color: var(--blue);
+}
+.public-site.scoresheet-public .foul-button.discipline {
+  color: #923a1b;
+  background: #fff5ed;
+  border-color: #e6bda4;
+  text-decoration: none;
+  font-weight: 650;
+}
+.public-site.scoresheet-public .foul-button.discipline:hover {
+  background: #ffebdc;
+  border-color: #bf784d;
+}
+.public-site.scoresheet-public .roster-table tfoot th,
+.public-site.scoresheet-public .roster-table tfoot td {
+  font-weight: 600;
+  background: #f4f8fd;
+  border-bottom: 0;
+  border-top: 1px solid #c9d6e7;
+  height: 52px;
+}
+.public-site.scoresheet-public .roster-table tfoot .total-label {
+  padding-left: 10px;
+  text-align: left;
+  font-size: 0.75rem;
+}
+.public-site.scoresheet-public .roster-table .total-free {
+  white-space: normal;
+  font-size: 0.75rem;
+  padding-inline: 3px;
+}
+.public-site.scoresheet-public .total-free small {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: #526176;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+.public-site.scoresheet-public .staff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  padding-top: 10px;
+}
+.public-site.scoresheet-public .staff dt {
+  display: inline;
+  font-weight: 400;
+}
+.public-site.scoresheet-public .staff dd {
+  display: inline;
+  margin: 0;
+  color: #34445c;
+  font-weight: 500;
+}
+.public-site.scoresheet-public .staff > div {
+  display: block;
+}
+.public-site.scoresheet-public .staff dt:after {
+  content: ": ";
+}
+.public-site.scoresheet-public .staff {
+  margin: 0;
+}
+.public-site.scoresheet-public .scroll-hint {
+  display: none;
+}
+.public-site.scoresheet-public .legend {
+  padding-top: 24px;
+}
+.public-site.scoresheet-public .legend > h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.public-site.scoresheet-public .legend dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px 24px;
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .legend dl > div {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+}
+.public-site.scoresheet-public .legend dt {
+  font-weight: 600;
+  color: #3e4e64;
+  flex: none;
+}
+.public-site.scoresheet-public .legend dd {
+  margin: 0;
+  line-height: 1.6;
+}
+.public-site.scoresheet-public .legend .captain {
+  margin: 0;
+}
+.public-site.scoresheet-public .legend-notes {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid #e7edf4;
+  font-size: 0.6875rem;
+  color: var(--muted);
+  line-height: 1.7;
+  display: grid;
+  gap: 3px;
+}
+.public-site.scoresheet-public .legend-notes strong {
+  font-weight: 600;
+  color: #34445c;
+}
+.public-site.scoresheet-public .demo-controls {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 0.6875rem;
+}
+.public-site.scoresheet-public .demo-controls summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 13px 0;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .demo-inner {
+  padding: 2px 0 16px;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.public-site.scoresheet-public .demo-buttons button {
+  border: 1px solid #becbdc;
+  background: #fff;
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 0.6875rem;
+}
+.public-site.scoresheet-public .demo-buttons button[aria-pressed="true"] {
+  color: var(--blue);
+  border-color: #89addd;
+  background: #f1f6fd;
+}
+.public-site.scoresheet-public .scenario-feedback:not(:empty) {
+  margin-top: 10px;
+}
+.public-site.scoresheet-public .footer {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-block: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.625rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public dialog {
+  width: min(410px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #bdccdf;
+  border-radius: 6px;
+  color: #172033;
+  box-shadow: 0 12px 48px #17203326;
+}
+.public-site.scoresheet-public dialog::backdrop {
+  background: #172d4b45;
+}
+.public-site.scoresheet-public .dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.public-site.scoresheet-public .dialog-header h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.3px;
+}
+.public-site.scoresheet-public .close-dialog {
+  background: #fff;
+  border: 1px solid #bccbdd;
+  min-height: 36px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  color: #34445c;
+}
+.public-site.scoresheet-public .close-dialog:hover {
+  background: #f1f6fd;
+}
+.public-site.scoresheet-public .dialog-athlete {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.public-site.scoresheet-public .dialog-team {
+  font-size: 0.6875rem;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.public-site.scoresheet-public .foul-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-block: 1px solid var(--line);
+  padding: 12px 0;
+  margin-top: 16px;
+  gap: 16px;
+}
+.public-site.scoresheet-public .foul-summary strong {
+  font-size: 1.5625rem;
+  font-weight: 650;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.public-site.scoresheet-public .foul-summary span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .foul-breakdown {
+  margin: 0;
+  padding: 8px 0;
+}
+.public-site.scoresheet-public .foul-breakdown > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 6px 0;
+  font-size: 0.75rem;
+}
+.public-site.scoresheet-public .foul-breakdown dt {
+  color: var(--muted);
+}
+.public-site.scoresheet-public .foul-breakdown dd {
+  margin: 0;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.public-site.scoresheet-public .discipline-status {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #f4f8fd;
+  font-size: 0.6875rem;
+  color: #34445c;
+}
+.public-site.scoresheet-public .discipline-status.alert {
+  color: #843418;
+  background: #fff4eb;
+  border: 1px solid #e8c4ad;
+}
+.public-site.scoresheet-public .missing-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding: 16px 0 6px;
+}
+.public-site.scoresheet-public .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.public-site.scoresheet-public .period-scroll {
+  position: relative;
+}
+.public-site.scoresheet-public .roster-table tfoot .total-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid #c3d1e2;
+}
+.public-site.scoresheet-public .competition [aria-hidden],
+.public-site.scoresheet-public .breadcrumb [aria-hidden],
+.public-site.scoresheet-public .score-divider {
+  color: var(--muted);
+}
+@media (max-width: 1199px) {
+  .public-site.scoresheet-public .teams-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 9px;
+    gap: 28px;
   }
-  .public-roster h2 {
-    margin-top: 4px;
+  .public-site.scoresheet-public .wrap {
+    width: calc(100% - 64px);
+  }
+  .public-site.scoresheet-public .legend dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-@media (max-width: 500px) {
-  .public-result {
-    padding: 8px 10px;
+@media (max-width: 600px) {
+  .public-site.scoresheet-public .wrap {
+    width: calc(100% - 32px);
   }
-  .public-periods th,
-  .public-periods td {
-    padding: 4px 7px;
+  .public-site.scoresheet-public .header-inner {
+    height: 60px;
   }
-  .public-athletes tbody th {
-    min-width: 145px;
+  .public-site.scoresheet-public .brand {
+    font-size: 1rem;
+    gap: 8px;
   }
-  .public-game-context {
-    gap: 3px 10px;
-    font-size: 0.82rem;
+  .public-site.scoresheet-public .brand-mark {
+    width: 30px;
+    height: 30px;
+    font-size: 1.625rem;
   }
-  .public-muted {
+  .public-site.scoresheet-public .public-label {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .breadcrumb {
+    font-size: 0.625rem;
+    gap: 8px;
+    padding-block: 19px;
+  }
+  .public-site.scoresheet-public .page-heading {
+    padding-bottom: 18px;
+  }
+  .public-site.scoresheet-public h1 {
+    font-size: 1.5625rem;
+  }
+  .public-site.scoresheet-public .competition {
+    font-size: 0.6875rem;
+    gap: 5px 7px;
+    margin-top: 8px;
+  }
+  .public-site.scoresheet-public .game-summary {
+    padding: 17px 0 18px;
+  }
+  .public-site.scoresheet-public .game-eyebrow {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .scoreboard {
+    gap: 10px;
+    margin: 15px auto 15px;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .public-site.scoresheet-public .score-team h2 {
+    font-size: 1.0625rem;
+    letter-spacing: -0.35px;
+    overflow-wrap: anywhere;
+  }
+  .public-site.scoresheet-public .team-abbreviation {
+    font-size: 0.5625rem;
+    margin-bottom: 4px;
+  }
+  .public-site.scoresheet-public .score-center {
+    min-width: 122px;
+  }
+  .public-site.scoresheet-public .score {
+    font-size: 2.25rem;
+    gap: 8px;
+    letter-spacing: -1px;
+  }
+  .public-site.scoresheet-public .score-divider {
+    font-size: 1.125rem;
+  }
+  .public-site.scoresheet-public .game-status {
+    font-size: 0.625rem;
+    margin-top: 7px;
+  }
+  .public-site.scoresheet-public .game-meta {
+    font-size: 0.6875rem;
+    gap: 3px 6px;
+  }
+  .public-site.scoresheet-public .game-meta > span:last-child {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  .public-site.scoresheet-public .game-meta > span:nth-last-child(2) {
+    display: none;
+  }
+  .public-site.scoresheet-public .section-heading {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .public-site.scoresheet-public .section-heading > span {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .period-section {
+    padding-top: 19px;
+  }
+  .public-site.scoresheet-public .period-table {
+    min-width: 354px;
+  }
+  .public-site.scoresheet-public .period-table th:first-child {
+    width: 91px;
+    padding-left: 10px;
+  }
+  .public-site.scoresheet-public .period-table th,
+  .public-site.scoresheet-public .period-table td {
+    padding: 9px 3px;
+  }
+  .public-site.scoresheet-public .period-table thead th {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .period-table tbody th {
+    font-size: 0.6875rem;
+  }
+  .public-site.scoresheet-public .period-points {
+    font-size: 0.9375rem;
+  }
+  .public-site.scoresheet-public .period-fouls {
+    font-size: 0.5625rem;
+  }
+  .public-site.scoresheet-public .period-note {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .teams-heading {
+    display: block;
+    margin: 23px 0 14px;
+  }
+  .public-site.scoresheet-public .teams-heading > p {
+    font-size: 0.625rem;
+    margin-top: 4px;
+  }
+  .public-site.scoresheet-public .team-heading h3 {
+    font-size: 1.0625rem;
+  }
+  .public-site.scoresheet-public .team-heading {
+    margin-bottom: 6px;
+  }
+  .public-site.scoresheet-public .team-heading > p {
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .scroll-hint {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.625rem;
+    color: var(--muted);
+    padding: 0 0 8px;
+  }
+  .public-site.scoresheet-public .scroll-hint span:last-child {
+    white-space: nowrap;
+    color: #34445c;
+  }
+  .public-site.scoresheet-public .roster-table .athlete-cell {
+    font-size: 0.75rem;
+    padding-inline: 8px;
+  }
+  .public-site.scoresheet-public .roster-table th,
+  .public-site.scoresheet-public .roster-table td {
+    min-height: 46px;
+    height: 46px;
+  }
+  .public-site.scoresheet-public .roster-table .foul-button {
+    min-height: 36px;
+    min-width: 34px;
+  }
+  .public-site.scoresheet-public .roster-table tfoot > * {
+    height: 56px;
+  }
+  .public-site.scoresheet-public .staff {
+    font-size: 0.625rem;
+    display: grid;
+    gap: 3px;
+  }
+  .public-site.scoresheet-public .legend {
+    padding-top: 23px;
+  }
+  .public-site.scoresheet-public .legend dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 15px;
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .legend-notes {
+    font-size: 0.625rem;
+    gap: 6px;
+  }
+  .public-site.scoresheet-public .footer {
+    font-size: 0.5625rem;
+  }
+  .public-site.scoresheet-public dialog {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site.scoresheet-public * {
+    scroll-behavior: auto !important;
+  }
+}
+@media print {
+  .public-site.scoresheet-public .prototype,
+  .public-site.scoresheet-public .demo-controls,
+  .public-site.scoresheet-public .scroll-hint,
+  .public-site.scoresheet-public dialog {
+    display: none;
+  }
+  .public-site.scoresheet-public .wrap {
     width: 100%;
   }
+  .public-site.scoresheet-public .teams-grid {
+    display: block;
+  }
+  .public-site.scoresheet-public .team-section {
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+  .public-site.scoresheet-public .table-scroll,
+  .public-site.scoresheet-public .period-scroll {
+    overflow: visible;
+  }
+  .public-site.scoresheet-public .roster-table {
+    min-width: 0;
+  }
+  .public-site.scoresheet-public .site-header {
+    margin-bottom: 12px;
+  }
+  .public-site.scoresheet-public .footer {
+    margin-top: 20px;
+  }
+  .public-site.scoresheet-public button {
+    border: 0 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+  }
+}
+/* Consulta por quarto — revisão 2 */
+.public-site.scoresheet-public .teams-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 12px;
+  margin-top: 22px;
+}
+.public-site.scoresheet-public .period-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  background: #eef1f5;
+  border-radius: 6px;
+  padding: 3px;
+  max-width: 100%;
+  width: max-content;
+}
+.public-site.scoresheet-public .period-filter button {
+  font-size: 0.6875rem;
+  line-height: 20px;
+  font-weight: 500;
+  padding: 5px 10px;
+  min-height: 32px;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: #34445c;
+}
+.public-site.scoresheet-public .period-filter button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--blue);
+  box-shadow: 0 1px 3px #0d74fc1f;
+}
+.public-site.scoresheet-public .period-filter button:hover {
+  color: var(--blue);
+}
+.public-site.scoresheet-public .period-table thead th:not(:first-child) {
+  padding: 0;
+}
+.public-site.scoresheet-public .period-link {
+  font: inherit;
+  min-height: 34px;
+  width: 100%;
+  padding: 8px 3px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  white-space: nowrap;
+}
+.public-site.scoresheet-public .period-link:hover {
+  color: var(--blue);
+  background: #eaf2fd;
+}
+.public-site.scoresheet-public .period-link[aria-pressed="true"] {
+  font-weight: 650;
+  color: var(--blue);
+}
+.public-site.scoresheet-public .period-table .selected-period {
+  background: #eaf2fd;
+  color: #1557a4;
+}
+@media (max-width: 600px) {
+  .public-site.scoresheet-public .teams-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .public-site.scoresheet-public .period-filter {
+    width: max-content;
+  }
+  .public-site.scoresheet-public .period-filter button {
+    font-size: 0.6875rem;
+    padding: 6px 8px;
+    min-height: 34px;
+  }
+}
+/* Revisão 3: destaque tipográfico e códigos da súmula */
+.public-site.scoresheet-public .roster-table .foul-cell {
+  padding: 0;
+}
+.public-site.scoresheet-public .roster-table .foul-button {
+  width: 100%;
+  min-height: 43px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.public-site.scoresheet-public .roster-table .foul-button.discipline,
+.public-site.scoresheet-public .roster-table .foul-button.discipline:hover {
+  color: #b42318;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-decoration: none;
+}
+.public-site.scoresheet-public .discipline-status.alert {
+  color: #b42318;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 0;
+}
+.public-site.scoresheet-public .foul-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 16px 0 8px;
+  margin: 0;
+  font-size: 1.1875rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.public-site.scoresheet-public .foul-codes li {
+  margin: 0;
+  padding: 0;
+}
+.public-site.scoresheet-public .foul-codes abbr {
+  text-decoration: none;
+  cursor: help;
+}
+@media (max-width: 600px) {
+  .public-site.scoresheet-public .roster-table .foul-button {
+    min-height: 45px;
+  }
+}
+/* Revisão 4: CAP à direita e registros completos da súmula */
+.public-site.scoresheet-public .captain {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+}
+.public-site.scoresheet-public .athlete-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.public-site.scoresheet-public .athlete-text {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.public-site.scoresheet-public .athlete-line > .captain {
+  flex: none;
+  margin-left: auto;
+}
+.public-site.scoresheet-public .foul-halves {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+.public-site.scoresheet-public .foul-half {
+  border: 1.5px solid #8290a4;
+  border-radius: 3px;
+  padding: 10px;
+  min-width: 0;
+}
+.public-site.scoresheet-public .foul-half h3 {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.public-site.scoresheet-public .foul-half .foul-codes {
+  padding: 0;
+  gap: 10px;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+.public-site.scoresheet-public .foul-codes abbr {
+  display: inline-block;
+  min-width: 28px;
+  white-space: nowrap;
+}
+.public-site.scoresheet-public .foul-codes sub {
+  font-size: 0.75rem;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+  bottom: -0.25em;
+  margin-left: 1px;
+}
+.public-site.scoresheet-public .quarter-red {
+  color: #b42318;
+}
+.public-site.scoresheet-public .quarter-blue {
+  color: #075fca;
+}
+
+/* Revisão 5: jogadores como informação principal */
+.public-site.scoresheet-public .header-inner {
+  height: 48px;
+}
+.public-site.scoresheet-public .breadcrumb {
+  padding-block: 10px;
+}
+.public-site.scoresheet-public .game-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 18px;
+  padding: 2px 0 8px;
+  max-width: 760px;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+.public-site.scoresheet-public .game-context strong {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #172033;
+}
+.public-site.scoresheet-public .game-context p {
+  margin: 0;
+}
+.public-site.scoresheet-public .period-section {
+  padding-top: 0;
+  max-width: 760px;
+}
+.public-site.scoresheet-public .period-table thead th {
+  padding-block: 0;
+}
+.public-site.scoresheet-public .period-link {
+  min-height: 28px;
+  padding-block: 4px;
+}
+.public-site.scoresheet-public .period-table th,
+.public-site.scoresheet-public .period-table td {
+  padding-block: 7px;
+}
+.public-site.scoresheet-public .period-points {
+  display: inline;
+  font-size: 0.875rem;
+  line-height: 18px;
+}
+.public-site.scoresheet-public .period-fouls {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.5625rem;
+  line-height: 13px;
+  border: 1px solid #ccd8e7;
+  border-radius: 2px;
+  padding: 0 2px;
+  margin: 0 0 0 5px;
+  background: #f6f8fb;
+  color: #526176;
+}
+.public-site.scoresheet-public .teams-heading {
+  margin: 10px 0 10px;
+  justify-content: flex-end;
+}
+.public-site.scoresheet-public .team-heading {
+  margin-bottom: 6px;
+}
+.public-site.scoresheet-public .team-heading h3 {
+  font-size: 1rem;
+}
+.public-site.scoresheet-public .period-filter button {
+  min-height: 30px;
+  padding-block: 4px;
+}
+@media (max-width: 600px) {
+  .public-site.scoresheet-public .header-inner {
+    height: 44px;
+  }
+  .public-site.scoresheet-public .breadcrumb {
+    padding-block: 8px;
+  }
+  .public-site.scoresheet-public .game-context {
+    gap: 3px 10px;
+    padding-bottom: 8px;
+    font-size: 0.625rem;
+  }
+  .public-site.scoresheet-public .game-context p {
+    flex-basis: 100%;
+  }
+  .public-site.scoresheet-public .period-table th,
+  .public-site.scoresheet-public .period-table td {
+    padding-block: 6px;
+  }
+  .public-site.scoresheet-public .period-points {
+    font-size: 0.8125rem;
+  }
+  .public-site.scoresheet-public .period-fouls {
+    margin-left: 3px;
+    font-size: 0.5rem;
+    line-height: 12px;
+    padding-inline: 1px;
+  }
+  .public-site.scoresheet-public .teams-heading {
+    margin: 9px 0;
+    justify-content: flex-start;
+  }
+  .public-site.scoresheet-public .period-filter button {
+    min-height: 30px;
+    padding-block: 4px;
+  }
+  .public-site.scoresheet-public .team-heading h3 {
+    font-size: 1rem;
+  }
+}
+
+.public-site.scoresheet-public .team-heading h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+}
+.public-site.scoresheet-public .period-heading {
+  display: block;
+  min-height: 28px;
+  padding: 4px 3px;
+}
+.public-site.scoresheet-public .discipline-label {
+  color: #b42318;
+  font-weight: 700;
+}
+.public-site.scoresheet-public .period-filter button:disabled {
+  opacity: 0.55;
+  cursor: help;
+}
+.public-site.scoresheet-public .footer {
+  margin-top: 24px;
+}
+
+.public-site.scoresheet-public .header-inner {
+  height: auto;
+  min-height: 48px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.public-site.scoresheet-public .brand {
+  min-width: 0;
+  max-width: 100%;
+}
+.public-site.scoresheet-public .brand > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.public-site.scoresheet-public .brand-mark {
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .public-site.scoresheet-public .header-inner {
+    min-height: 44px;
+  }
+}
+
+.public-site.scoresheet-public.public-game {
+  min-height: 0;
 }
