@@ -12,6 +12,8 @@ Capturas novas com dados fictícios, sem sessão humana: `.preview-artifacts/flo
 
 ## Verificação focal
 
+- Conferência final após salvar uma súmula longa reproduziu retorno fora da tela, mesmo com botões no topo (`flow-scroll-red.log`: viewport ratio0). Barra de retorno passa a acompanhar a rolagem, sem esconder o formulário ou criar uma segunda cópia dos botões. O cenário de salvar/voltar/reabrir agora verifica visibilidade imediatamente após salvar, sem rolar artificialmente para o topo. O gate anterior não valida essa alteração CSS posterior; novo gate/CI são necessários.
+
 - RED inicial:1PASS/1FAIL, botão direto da súmula ausente. O cenário do cadastro já passava, documentando que o retorno existia.
 - Três cenários novos finais PASS: retorno visível1366/1920, busca e foco preservados, confirmação de descarte uma vez, preparação salva mantida após voltar/reabrir, somente um POST de súmula.
 - Primeira composição52:46PASS/6FAIL. Um teste novo procurava texto de status incorreto, corrigido para o texto real. Cinco testes de súmula tiveram ENOENT ao fechar traces porque outra execução Playwright iniciou sobre o mesmo diretório de saída; erro operacional do agente, não atribuído ao produto. A composição inicial não é integralmente PASS.

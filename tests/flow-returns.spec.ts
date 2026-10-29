@@ -126,7 +126,6 @@ test("saved preparation returns through game data and list without losing the sa
   await expect(
     page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
   ).toBeVisible();
-  await page.evaluate(() => window.scrollTo(0, 0));
   const data = page.getByRole("button", {
     name: "Voltar aos dados do jogo",
     exact: true,
