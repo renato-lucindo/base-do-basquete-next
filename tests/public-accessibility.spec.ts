@@ -127,6 +127,10 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   expect(
     await sort.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
   ).toBeGreaterThanOrEqual(font * 2);
+  const searchAction = page.locator(".statistics-search-action");
+  expect(
+    await searchAction.evaluate((el) => el.scrollWidth - el.clientWidth),
+  ).toBeLessThanOrEqual(1);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(320);

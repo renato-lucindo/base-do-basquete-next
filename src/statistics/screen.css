@@ -135,8 +135,8 @@
   .statistics-position {
   position: sticky;
   left: 0;
-  width: 48px;
-  min-width: 48px;
+  width: 60px;
+  min-width: 60px;
   text-align: center;
   z-index: 3;
   background: #f0f5fa;
@@ -145,7 +145,7 @@
   table[aria-label="Estatísticas dos atletas"]
   .statistics-player {
   position: sticky;
-  left: 48px;
+  left: 60px;
   width: 230px;
   min-width: 180px;
   max-width: 230px;
@@ -398,6 +398,11 @@
   .statistics-page .statistics-popover summary {
     overflow-wrap: anywhere;
     padding: 5px 7px;
+  }
+  .statistics-page .statistics-search-action {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    padding-inline: 3px;
   }
   .statistics-advanced {
     margin-top: 3px;

@@ -138,12 +138,18 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
     expect(frame.scrollable).toBe(true);
     const scrolled = await table.evaluate((node) => {
       const region = node.closest(".statistics-scroll")!;
+      const rank = node.querySelector("tbody .statistics-position")!;
+      const player = node.querySelector("tbody .statistics-player")!;
+      const rankWidth = rank.getBoundingClientRect().width;
+      const stickyLeft = parseFloat(getComputedStyle(player).left);
       const before = node
         .querySelector("tbody .statistics-player")!
         .getBoundingClientRect().left;
       region.scrollLeft = 200;
       return {
         scroll: region.scrollLeft,
+        rankWidth,
+        stickyLeft,
         playerOffset: Math.abs(
           node
             .querySelector("tbody .statistics-player")!
@@ -152,6 +158,7 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
       };
     });
     expect(scrolled.scroll).toBeGreaterThan(0);
+    expect(Math.abs(scrolled.rankWidth - scrolled.stickyLeft)).toBeLessThan(1);
     expect(scrolled.playerOffset).toBeLessThan(2);
   }
 });
