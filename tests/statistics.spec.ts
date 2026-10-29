@@ -251,7 +251,7 @@ test("busca/filtros por teclado, equipes vazias e líderes antes da página têm
   await search.fill("joao");
   await search.press("Enter");
   await expect(
-    page.getByRole("status").filter({ hasText: "3 registros por equipe" }),
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
   ).toBeVisible();
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
@@ -280,7 +280,7 @@ test("busca/filtros por teclado, equipes vazias e líderes antes da página têm
     .getByRole("checkbox", { name: "Todas as equipes", exact: true })
     .check();
   await expect(
-    page.getByRole("status").filter({ hasText: "3 registros por equipe" }),
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
   ).toBeVisible();
 });
 test("amostra insuficiente difere de ausência sem esconder atleta e filtros não usam valor fictício", async ({
@@ -367,4 +367,37 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
     path: `.preview-artifacts/statistics-${test.info().project.name}-320.png`,
     fullPage: true,
   });
+});
+
+test("filtro em edição resiste à confirmação tardia da navegação de busca", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url);
+  await page
+    .getByRole("table", { name: "Estatísticas dos atletas", exact: true })
+    .waitFor();
+  const search = page.getByLabel("Buscar atleta ou equipe", { exact: true });
+  await search.fill("joao");
+  await search.press("Enter");
+  await expect(
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
+  ).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
+  await page
+    .getByRole("button", { name: "Adicionar filtro", exact: true })
+    .click();
+  const value = page.getByLabel("Valor do filtro 1", { exact: true });
+  await value.fill("3");
+  // Multiple queued fragment notifications can observe the same current URL.
+  await page.evaluate(() =>
+    window.dispatchEvent(new HashChangeEvent("hashchange")),
+  );
+  await expect(value).toHaveValue("3");
+  await page
+    .getByRole("button", { name: "Aplicar consulta", exact: true })
+    .click();
+  await expect(
+    page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
+  ).toBeVisible();
 });

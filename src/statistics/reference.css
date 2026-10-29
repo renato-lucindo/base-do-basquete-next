@@ -1674,3 +1674,12 @@
 .public-site.statistics-public .column-picker {
   max-width: 100%;
 }
+
+/* Preserve column sizing with larger fallback fonts; descriptions may wrap. */
+.public-site.statistics-public .table-legend dl > div,
+.public-site.statistics-public .table-legend dd {
+  min-width: 0;
+}
+.public-site.statistics-public .table-legend dd {
+  overflow-wrap: anywhere;
+}

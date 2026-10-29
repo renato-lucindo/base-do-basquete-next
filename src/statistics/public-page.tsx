@@ -107,6 +107,7 @@ export function StatisticsPageView() {
     [showTeam, setShowTeam] = useState(
       () => sessionStorage.getItem("statistics-team-column") !== "hidden",
     );
+  const latestRoute = useRef(route);
   const form = useRef<HTMLFormElement>(null),
     resultHeading = useRef<HTMLHeadingElement>(null),
     focusResult = useRef(false),
@@ -120,6 +121,13 @@ export function StatisticsPageView() {
   useEffect(() => {
     const read = () => {
       const next = location();
+      if (
+        next.id === latestRoute.current.id &&
+        serializeStatisticsQuery(next.query).toString() ===
+          serializeStatisticsQuery(latestRoute.current.query).toString()
+      )
+        return;
+      latestRoute.current = next;
       setRoute(next);
       setDraft(next.query);
       setShare(false);
@@ -144,7 +152,13 @@ export function StatisticsPageView() {
       controller.signal,
     )
       .then((next) => {
-        if (controller.signal.aborted) return;
+        if (
+          controller.signal.aborted ||
+          latestRoute.current.id !== route.id ||
+          serializeStatisticsQuery(latestRoute.current.query).toString() !==
+            serialized
+        )
+          return;
         const requested = parseStatisticsQuery(new URLSearchParams(serialized));
         if (
           next.disputeId !== route.id ||
@@ -188,6 +202,11 @@ export function StatisticsPageView() {
     if (!route.id || (validate && !form.current?.reportValidity())) return;
     const normalized = parseStatisticsQuery(serializeStatisticsQuery(next));
     focusResult.current = focus;
+    // Commit the query before the browser delivers its queued fragment event.
+    // A later notification for this same query must not replace an edited draft.
+    const nextRoute = { id: route.id, query: normalized };
+    latestRoute.current = nextRoute;
+    setRoute(nextRoute);
     setDraft(normalized);
     const hash = `#${route.id}?${serializeStatisticsQuery(normalized)}`;
     if (window.location.hash === hash) {

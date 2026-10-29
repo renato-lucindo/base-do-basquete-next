@@ -181,3 +181,21 @@ test("colunas padrão acompanham largura até uma escolha manual", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(table.getByRole("columnheader")).toHaveCount(15);
 });
+
+test("320px e texto ampliado suportam a fonte de fallback do Linux", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto(f.url);
+  await page
+    .getByRole("table", { name: "Estatísticas dos atletas", exact: true })
+    .waitFor();
+  await page.addStyleTag({
+    content:
+      "html {font-size:200% !important;} .public-site, .public-site * {font-family:Arial !important;}",
+  });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    320,
+  );
+});
