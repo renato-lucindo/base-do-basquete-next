@@ -1,4 +1,18 @@
-# Retornos de jogo e súmula — unidade de fluxo,28/10/2026
+# Jogador e camisa no mesmo diálogo —29/10/2026
+
+**Unidade atual:** `codex/jogador-camisa-unica`, criada de origin/main **4bc93c68c758db4caaa2a77045efb39277a2bc7e**, no worktree `C:/Users/12405304716/.codex/worktrees/uiux-validation/Base do Basquete-v1`; recuperar SHA material/checkpoint por git log. Pedido direto: incluir camisa no primeiro popup de criar/editar jogador e eliminar a segunda etapa ao salvar. Uma PR desta unidade diretamente para main, sem incorporar PR38/WIP nem mudanças humanas do checkout original.
+
+**Implementado localmente:** novo atleta mostra camisa junto aos dados da pessoa, preservando branco/0/00; salvar conclui cadastro e vínculo no mesmo diálogo. Recibos e etapas independentes permanecem: ACK conhecido não repete POSTs, sucesso parcial preserva intenção, recarga de vínculo ainda não criado recupera a pessoa sem procurar UUID inexistente. Edição existente/comissão/guardas preservadas. Sem schema/migration/contratoHTTP/banco real alterado. Todos os arquivos desta unidade são do agente.
+
+**Evidências atuais:** RED campo ausente→GREEN;18browsers desktop finaisPASS, mais homônimo mobile focalPASS. Uma asserção antiga de homônimo foi sincronizada ao fechamento do diálogo após o novo salvamento completo; falha inicial registrada. Logs e alcance em `docs/VALIDACAO-JOGADOR-CAMISA-UNICA.md`. Gate/CI da nova fonte ainda precisam de resultado; não alegar aprovação usando a unidade anterior. Próximo: gate único da fonte estável, CI/revisão da PR única, merge e pacote próprio/preview protegido/smokes/revogação. Registrar resultados finais na descrição da PR como referência de release deste checkpoint. Não repetir gate local por troca de sessão/docs.
+
+**Reconciliação anterior:** PR43 integrada/main4bc93c6, CI40806962558/job123228104181 SUCCESS588unit/446browsers/96SKIP. Retornos já publicados na fonte **6fb488f694f96568c5d5af586b7777fa94c72cea**, deployment **7bc3b5ff-cb4e-438d-a171-881bf367be11**, versão **33408afd-ae26-472f-8394-cbb2014bea05**,100%; registro final remoto na PR43. Preview dessa fonte permanece ativo até esta unidade ser verificada. Access sóresponsável/previewsOFF/DO/rate/cofre preservados; temporários anteriores revogados. Não há deploy/DDL/credencial/processo ativo no momento deste registro. Supabase49migrations imutáveis, não acessado; PR38 e migrations de reaproveitamento NÃO incorporadas/aplicadas. Checkout original com alterações humanas intacto.
+
+**Cota real inicial/unidade:** última consulta71%usados/29%restantes5h,55%usados/45%restantes semanal. Reset5h29/10/2026 **04:30:03 America/Sao_Paulo (07:30:03UTC)**; semanal04/11/2026 08:24:53UTC-03. Aos85%usados: operação mínima consistente/checkpoint/push e MESMAautomação `retomar-administra-o-compacta` resetREAL+2, sem duplicata; atualmentePAUSED desde conclusão anterior. Decisões reversíveis jáautorizadas. Demais demandas não pertencem a esta unidade.
+
+---
+
+# Retornos de jogo e súmula — unidade de fluxo,28/10/2026 (histórico)
 
 **CHECKPOINT DE COTA,28/10/2026 21:25 America/Sao_Paulo:**85%usados/15%restantes5h,42%usados/58%restantes semanal, ordinaryUsageAllowedtrue. Reset real5h **28/10/2026 23:27:59UTC-03 (29/10 02:27:59UTC)**; programar MESMAautomação `retomar-administra-o-compacta` para **28/10/2026 23:29:59UTC-03 (29/10 02:29:59UTC)**. Reset semanal04/11/2026 08:24:53UTC-03. Não iniciar deploy/gate/outra unidade ao atingir o gatilho.
 

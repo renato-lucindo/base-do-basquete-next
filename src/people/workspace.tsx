@@ -114,6 +114,10 @@ export function MembersWorkspace({
     editor?.kind === "person" &&
     editor.roster &&
     editor.roster.initialJersey !== editor.roster.command.entry.jersey;
+  const rosterNeedsSave =
+    editor?.kind === "person" &&
+    editor.roster &&
+    (editor.roster.command.expectedVersion === 0 || jerseyChanged);
   const dirty =
     !!editor &&
     (JSON.stringify(editor.command) !== baseline || !!jerseyChanged);
@@ -332,7 +336,24 @@ export function MembersWorkspace({
               },
             },
           }
-        : {}),
+        : wanted === "athlete"
+          ? {
+              roster: {
+                initialJersey: null,
+                command: {
+                  commandId: crypto.randomUUID(),
+                  expectedVersion: 0,
+                  entry: {
+                    id: crypto.randomUUID(),
+                    registrationId: registration.id,
+                    personId: draft.id,
+                    jersey: null,
+                    active: true,
+                  },
+                },
+              },
+            }
+          : {}),
       command: {
         commandId: crypto.randomUUID(),
         expectedVersion: p?.version ?? 0,
@@ -492,7 +513,7 @@ export function MembersWorkspace({
         const p = await api(`/api/people/${result.id}`, personSnapshotSchema);
         if (p.id !== editor.command.person.id)
           throw new Error("Não foi possível confirmar o cadastro solicitado.");
-        if (editor.roster && jerseyChanged) {
+        if (editor.roster && rosterNeedsSave) {
           const receipt = await persist("/api/roster", editor.roster.command);
           const row = await api(
             `/api/roster/${receipt.id}`,
@@ -507,9 +528,11 @@ export function MembersWorkspace({
               "Não foi possível confirmar a camisa desta inscrição.",
             );
         }
-        if (editor.target === "none") {
+        if (editor.target === "none" || editor.roster) {
           setEditor(null);
-          setStatus("Pessoa salva.");
+          setStatus(
+            editor.target === "athlete" ? "Vínculo salvo." : "Pessoa salva.",
+          );
           setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
@@ -553,7 +576,7 @@ export function MembersWorkspace({
       report(failure);
       if (
         editor.kind === "person" &&
-        jerseyChanged &&
+        rosterNeedsSave &&
         acknowledged.current.has(editor.command.commandId)
       ) {
         setPartialSaved(true);
@@ -573,12 +596,15 @@ export function MembersWorkspace({
     setError("");
     try {
       if (editor.kind === "person") {
-        const rosterEntry = editor.roster
-          ? await api(
-              `/api/roster/${editor.roster.command.entry.id}`,
-              rosterSnapshotSchema,
-            )
-          : undefined;
+        const rosterEntry =
+          editor.roster &&
+          (editor.roster.command.expectedVersion > 0 ||
+            acknowledged.current.has(editor.roster.command.commandId))
+            ? await api(
+                `/api/roster/${editor.roster.command.entry.id}`,
+                rosterSnapshotSchema,
+              )
+            : undefined;
         if (
           rosterEntry &&
           (rosterEntry.personId !== editor.command.person.id ||
