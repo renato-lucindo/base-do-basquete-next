@@ -22,3 +22,7 @@ Fonte: pacote preservado, feedback explícito do responsável e evidências em `
 ## Próxima decisão
 
 Release, defeitos comprovados de cadastro/busca e inscrição vazia concluídos neste recorte conforme `docs/FILA-RETOMADA-ADMIN.md`. Mobile, público, PDF e interpretador continuam adiados. Se restarem apenas decisões humanas, registrar e pausar; não repetir gates ou inventar atividades para consumir cota.
+
+## Atualização de escopo — 30/10/2026
+
+Por decisão explícita do responsável, **tempos debitados na súmula (FUT-001)** passam a ser **priorizados para o MVP**, com implementação pendente. Comando, limites por metade, cores por quarto e decisões necessárias estão no [roadmap](ROADMAP.md#fut-001--tempos-debitados-na-súmula). Planejar em unidade própria, respeitando o sequenciamento das PRs ativas. Recordes da Carreira (FUT-002) permanecem pós-MVP.

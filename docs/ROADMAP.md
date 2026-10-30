@@ -6,13 +6,13 @@ O escopo e as pendências estão em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md); a exec
 
 Concluir o MVP exige validar os percursos do escopo vigente, resolver bloqueios e obter os aceites aplicáveis. Funcionalidade adiada não vira automaticamente pós-MVP: preserve sua classificação e decisão originais até o responsável alterá-las explicitamente.
 
-## Objetivos candidatos pós-MVP
+## Objetivos registrados
 
-Ideias registradas pelo responsável em 29/10/2026, fora do MVP e sem execução autorizada. A ordem dos IDs não representa prioridade.
+A ordem dos IDs não representa prioridade. O identificador original é preservado mesmo quando um objetivo muda de fase. Cada entrada informa seu escopo e status atuais.
 
 ### FUT-001 — Tempos debitados na súmula
 
-**Status:** Ideia. **Origem:** pedido do responsável em 29/10/2026; autorizado somente o registro no roadmap.
+**Status:** Priorizada para o MVP; implementação pendente. **Origem:** pedido de 29/10/2026. **Decisão do responsável em 30/10/2026:** incluir os pedidos de tempo no MVP, deixando de ser exclusivamente pós-MVP. Esta atualização registra a prioridade; não inicia a implementação nem altera as PRs ativas.
 
 **Objetivo e benefício:** registrar o minuto de cada tempo debitado por equipe na súmula, com entrada rápida por teclado e identificação do quarto.
 
