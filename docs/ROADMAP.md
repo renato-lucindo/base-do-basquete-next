@@ -46,6 +46,23 @@ Exemplo ilustrativo fornecido pelo responsável, sem validação de datas ou dad
 
 **Dependências e pontos para o planejamento futuro:** identidade histórica do jogador, jogos e estatísticas publicados elegíveis, cobertura por métrica e data de nascimento utilizável para calcular idade. Dados ausentes não viram zero nem idade estimada. Definir métricas elegíveis e fontes comparáveis, desempate e posições em empates (o exemplo usa posições sequenciais), tratamento de menos de cinco atuações e apresentação de idade indisponível. Preservar correções de resultados e evitar duplicar o mesmo jogo por suas diferentes fontes/versões. Não expor data de nascimento privada para calcular a idade no navegador.
 
+### FUT-003 — Equipes e elencos em duas colunas
+
+**Status:** Ideia pós-MVP, com direção de interface definida; implementação não iniciada. **Origem e decisão:** conversa com o responsável em 30/10/2026. Registro no roadmap, sem priorização para o MVP.
+
+**Objetivo e benefício:** abrir o elenco ao lado da lista administrativa de equipes, facilitando a troca de equipe e evitando que a expansão do elenco alongue a página.
+
+**Comportamento definido:**
+
+- Desktop: duas colunas sem sobreposição; aproximadamente 30% da largura para equipes à esquerda e 70% para o elenco à direita. Ajustar ao espaço disponível e à legibilidade.
+- Clicar em uma equipe destaca sua inscrição e mostra o elenco correspondente no painel direito; selecionar outra troca o conteúdo do painel mantendo a lista visível.
+- Antes da seleção, mostrar “Selecione uma equipe para ver o elenco”.
+- Com edição pendente, confirmar descarte antes de trocar de equipe, preservando as proteções atuais de salvamento.
+- No celular ou quando a largura não comportar as colunas, mostrar somente o elenco selecionado com “Voltar às equipes”; ao retornar, restaurar busca e posição da lista.
+- Manter os diálogos existentes de cadastro e edição.
+
+**Dependências e aceite futuro:** adaptar a expansão atual da inscrição sem alterar identidade global, vínculos ou contratos de persistência; preservar busca, paginação, foco, teclado e guardas de edição/salvamento. Validar 1366×768, 1920×1080, celular, zoom e nomes longos; dimensionar o ponto de mudança de layout pela legibilidade do conteúdo.
+
 Ao registrar novas ideias, use:
 
 | Campo        | Conteúdo                                                        |
