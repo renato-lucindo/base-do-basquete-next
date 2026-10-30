@@ -30,7 +30,9 @@ Ideias registradas pelo responsável em 29/10/2026, fora do MVP e sem execução
 
 **Objetivo e benefício:** mostrar as cinco maiores atuações individuais de cada estatística válida da carreira, como o career high da NBA, permitindo consultar o confronto de origem.
 
-**Comportamento solicitado:** seção “Recordes da Carreira” no perfil do jogador, com ranking próprio por estatística, incluindo pontos, assistências, rebotes e outras métricas válidas disponíveis. Cada atuação deve identificar e referenciar seu confronto. Estrutura sugerida pelo responsável para pontos:
+**Comportamento solicitado:** seção “Recordes da Carreira” no perfil do jogador, com ranking próprio por estatística, incluindo pontos, assistências, rebotes e outras métricas válidas disponíveis. Cada atuação deve identificar e referenciar seu confronto. Ao clicar no elemento associado a uma atuação, abrir a página do jogo em que ela ocorreu. O elemento clicável (célula, link, ação ou outro) será definido com o responsável no planejamento futuro; não fixar essa escolha agora. Complemento registrado em 30/10/2026.
+
+Estrutura sugerida pelo responsável para pontos:
 
 | Pos. | PTS | Ano  | Idade    | Campeonato |
 | ---- | --- | ---- | -------- | ---------- |
