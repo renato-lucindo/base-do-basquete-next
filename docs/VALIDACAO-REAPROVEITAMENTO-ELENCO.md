@@ -6,7 +6,7 @@
 - Falha real pós-deploy reproduzida: a URL principal e `GET /api/competitions/:id` retornavam **404 HTML da Cloudflare**, apesar do deployment 100%. A configuração `workers_dev:false` desativou a rota `workers.dev`; `GET /workers/scripts/.../subdomain` confirmou `enabled:false`.
 - Reativação controlada via API `POST /accounts/.../workers/scripts/base-do-basquete-next-preview/subdomain` com `enabled:true` e `previews_enabled:false` retornou **200**. A raiz voltou a **HTTP 302** para login Cloudflare Access. `wrangler.jsonc` passa a ter `workers_dev:true` para preservar a rota em publicações futuras.
 - **Limite da prova:** o navegador autenticado anteriormente foi redirecionado a novo login Cloudflare Access após recarga. Não foi possível conferir visualmente o botão nem completar a operação real de reaproveitamento com sessão administrativa/Supabase Auth; nenhum vínculo ou pessoa foi alterado. Localmente, o código de `6e5319a` contém o botão adjacente a `Importar elenco`. CI de `6e5319a`: [41066478266](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41066478266), SUCCESS.
-- A PR permanece **Draft** enquanto faltam validação autenticada, aceite e CI do SHA que inclui o ajuste de configuração. Nenhum deploy em produção, DDL ou reaplicação de migrations.
+- O ajuste `4165e38` passou na [CI 41070667174](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41070667174), incluindo gate, design e Playwright. A PR permanece **Draft** enquanto faltam validação autenticada e aceite. Nenhum deploy em produção, DDL ou reaplicação de migrations.
 
 ## Diagnóstico da ausência do botão no preview — 30/10/2026
 
