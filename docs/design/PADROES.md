@@ -1,32 +1,33 @@
-# Hierarquia das interfaces
+# Padrões comuns de UI/UX
 
-Padrão solicitado pelo responsável em 29/10/2026, aplicável às próximas páginas e protótipos da Base do Basquete. As referências desta unidade são a súmula pública e a página de estatísticas r6 fornecida pelo responsável.
+Aplicam-se às áreas pública e administrativa da Base do Basquete Next. Leia também [PUBLICO.md](PUBLICO.md) ou [ADMIN.md](ADMIN.md); regras específicas dos protótipos de súmula e estatísticas permanecem em [INTEGRACAO.md](INTEGRACAO.md).
 
 ## Prioridade da primeira tela
 
-Antes de desenhar, identifique a informação principal e o primeiro dado útil. Nesta unidade são os atletas e seus números. Cabeçalho, contexto e controles devem ajudar a chegar a essa informação.
+- Identifique a principal tarefa e o primeiro dado útil antes de projetar. Contexto, filtros e controles devem ajudar a encontrá-lo.
+- Tema claro, azul como destaque, linguagem visual sóbria, tabelas, listas, divisores e alinhamento consistente. Consulte tokens e componentes reais; sugestões externas não substituem identidade aprovada.
+- Aproveite a largura desktop para reduzir rolagem e espaços vazios. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.
+- Compactar nunca autoriza texto ilegível, alvos pequenos, omissão de contexto necessário ou etapas escondidas. Prefira hierarquia por proximidade, tamanho, peso e contraste.
+- Rótulos em português brasileiro natural; siglas recebem explicação acessível também por teclado e toque.
 
-- Evite repetir o contexto já presente no breadcrumb. Preserve um h1 acessível quando retirar o título visível.
-- Não repita o placar em um resumo grande se ele já está na tabela de períodos.
-- Na súmula, mantenha fase eliminatória ou número do jogo sem zeros à esquerda, data/hora e local numa faixa compacta acima dos períodos.
-- Prefira divisórias e agrupamento por proximidade. Não envolva tudo em cartões ou reserve grandes áreas para títulos.
-- Use hierarquia de tamanho, peso e contraste. Informação secundária continua legível; compactar não autoriza diminuir nomes até ficarem ilegíveis.
-- Evite explicações permanentes para ações intuitivas. Siglas têm tooltip acessível e legenda ao final; erros, dados ausentes e estados que exigem ação continuam explícitos onde necessário.
+## Tabelas e ações
 
-## Tabelas e controles
+- Identificação e nomes são prioritários; alinhamento, cabeçalhos, ordenação e filtros previsíveis. A rolagem horizontal, se necessária, deve ser interna à tabela; a página não pode transbordar.
+- Filtros, busca, colunas e ações ficam próximos dos dados. Quando houver muitas opções, usar combobox/autocomplete com pesquisa, estado vazio, seleção clara e teclado. Não exibir catálogo inteiro ao abrir por padrão.
+- Campos essenciais visíveis; recolher apenas os secundários quando houver benefício concreto. Rótulos persistentes e erros associados ao campo.
+- Diálogos/popovers com foco inicial apropriado, Escape quando aplicável e retorno do foco. Não esconder ação essencial apenas no hover; feedback com estados de salvamento, erro e confirmação.
+- Preservar contexto de navegação e filtros compartilháveis na URL quando possível, sem expor dados privados. Evitar virtualização e dependências extras sem prova da necessidade.
 
-Nomes e identificação são prioritários. A rolagem horizontal fica dentro da tabela, com a identificação fixa. A página não deve transbordar.
+## Acessibilidade e responsividade
 
-Filtros, seletor de colunas e recorte por quarto ficam próximos da tabela. Mantenha estados selecionados claros, teclado, toque, fechamento por Escape e retorno de foco nos detalhes.
+- Meta **WCAG 2.2 AA**: semântica HTML, nomes acessíveis, ordem lógica, teclado, foco visível e não encoberto, contraste real medido, leitura de erros, reflow/zoom e redução de movimento.
+- Cor e hover nunca são os únicos meios de comunicar estado. Alvos principais confortáveis (referência de projeto: 44×44 px), sem impor essa dimensão a todas as células de tabela.
+- Verificar desktops **1366×768** e **1920×1080**; em trabalho público/responsivo, **390×844**, zoom 200% e reflow em 320 CSS px. Simular nomes longos, erros, estados vazios e menus/diálogos abertos.
 
-Na súmula, a tabela de períodos é compacta e tem o placar final na coluna Total. Faltas coletivas aparecem em pequenos marcadores F com quantidade, próximos dos pontos, com nome acessível. O recorte por quarto altera os números dos atletas e os detalhes de suas faltas, preservando o resultado final da partida.
+## Evidências proporcionais
 
-CAP é texto simples na extremidade direita da identificação. Faltas relevantes usam fonte vermelha e negrita, sem balão. No detalhe, cada código acompanha o número de LL da penalidade, a cor do período e o contorno do tempo correspondente.
+Defina o que o usuário deve alcançar e como comprovar antes de editar. Mudança textual pede revisão de linguagem; componente pede estados/foco/teclado; fluxo ou navegação pede percurso completo nas resoluções relevantes. Registrar ambiente, comando, SHA e limites.
 
-## Como verificar
+O comando npm run design:verify verifica os **protótipos específicos** de súmula/estatísticas; seus limites geométricos e provas estão em [VALIDACAO.md](VALIDACAO.md). Não generalizar seus números para toda tela. Inspeção visual, ferramentas automatizadas e axe complementam, mas não comprovam aceite humano nem conformidade integral à WCAG.
 
-Para estas duas páginas, o teste automatizado usa 1440×900 e 390×844: a primeira linha de atletas aparece até a metade da altura disponível, pelo menos oito linhas completas estão visíveis e não há rolagem horizontal da página. A contagem desktop da súmula inclui as duas tabelas; confira visualmente a densidade de cada equipe.
-
-Este é um critério concreto destas telas, não uma regra para remover etapas necessárias em outros fluxos. Em páginas novas, defina o dado ou a ação principal e registre seu critério de visibilidade antes da implementação. Valide novamente com nomes longos, dados ausentes, filtros e detalhes abertos. Não obtenha densidade ocultando contexto indispensável ou reduzindo os alvos de interação.
-
-Execute `npm run design:verify` e inspecione as capturas produzidas em `docs/design/.preview-artifacts/`. Automação e axe complementam a avaliação visual; não comprovam aceite humano nem uma auditoria completa de acessibilidade.
+O [índice](README.md) documenta o uso das skills e como tratar divergências.

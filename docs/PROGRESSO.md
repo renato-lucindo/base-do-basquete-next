@@ -1,3 +1,9 @@
+# Sincronização local da documentação — 29/10/2026
+
+PR #47 integrada na main em `89a1b9f` e incorporada por merge explícito nesta branch `codex/reaproveitar-elenco-banco`, preservando integralmente o WIP da PR #38. Conflito apenas no checkpoint, resolvido mantendo os dois históricos. Instalação pessoal de skills e lock preservados em `C:/Users/12405304716/Documents/Codex/Base-do-Basquete-local-skills-backup-20261029-232142`; skill web-design-guidelines restaurada localmente e ui-ux-pro-max passa a usar a versão rastreada da main. Nenhum serviço, banco ou deploy alterado. Sincronização somente local, sem push; a CI anterior não valida este novo merge. Próximo passo da PR #38 permanece a prova HTTP autenticada e o aceite de integração registrados abaixo.
+
+---
+
 # Migrations aplicadas — PR #38 Draft, 29/10/2026
 
 **Autorização e unidade:** responsável confirmou explicitamente a aplicação das três migrations no projeto `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`), conforme plano. Mesma branch `codex/reaproveitar-elenco-banco` / PR #38, base `11b547a`, material aprovado `fe80274fedebe39e23a4039ef0df869979a263ec`, CI [40959245003](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40959245003) **SUCCESS** com 608 Vitest/126 arquivos e 467 Playwright PASS/107 SKIP. Esta etapa reconcilia nomes e acrescenta uma verificação SQL, sem mudar SQL aplicado; recuperar HEAD final por `git log` e conferir seu check `validate` na PR.
@@ -47,6 +53,20 @@
 **Verificação e limites:** `npm run gate` local **PASS** sobre o código material `0b6f33d` (604 testes Vitest/124 arquivos, 6 transportes, 13 cenários PostgreSQL, 25 workerd, 1 PDF runtime, tipos, lint, formato, builds, fronteira e segredos). Playwright desktop **28 PASS**, com capturas 1366×768, 1920×1080 e zoom 200% em `.preview-artifacts/`; log `.preview-artifacts/sheet-staff-gate.log`. Revisão focal de autoria/sucessão/SQL realizada sem nova alteração material. Essas provas são locais; a CI remota do SHA a publicar deve ser conferida depois do push. Reaproveitamento de elenco permanece WIP em UI, API e integração real; testes reais de DDL no projeto remoto, aceite humano e revisão independente não foram realizados.
 
 **Preservação e próximo passo:** mudanças humanas não rastreadas `.agents/` e `skills-lock.json` foram mantidas fora dos commits. Publicar o branch na mesma PR #38, descrever ambos os escopos, conferir CI do SHA atualizado e manter Draft. Não houve deploy, DDL remoto, alteração de dados humanos nem merge na `main` nesta unidade. A CI antiga da PR #38 (`acc1120`) não comprova o código novo; somente a CI do commit publicado poderá fazê-lo.
+
+---
+
+# Organização documental de UI/UX — unidade independente, 29/10/2026
+
+**Unidade:** branch codex/documentacao-uiux em worktree isolado, criada de origin/main 11b547a. Documentação de UI/UX organizada por regras comuns, Público e Administração; fluxo das skills, critérios proporcionais de validação e referências para protótipos registrados em docs/design. Cinco arquivos de feedback/plano/handoff históricos foram movidos para historico/documentacao e as referências localizadas foram corrigidas. Os relatórios de validação, contratos, scripts, protótipos e este checkpoint permanecem em docs por uso operacional.
+
+**Situação desta unidade no registro:** PR #47 aberta para `main` no repositório `renato-lucindo/base-do-basquete-next`. A revisão automática identificou um P2 nos testes vendorizados da skill; o ajuste preserva os testes aplicáveis ao projeto e remove testes/fixtures que exigiam ferramentas não distribuídas. A CI remota do novo SHA e a resolução do apontamento devem ser conferidas antes da integração. Nenhum merge ou deploy declarado neste checkpoint. A composição exige gate completo na CI por incluir scripts Python e workflow. Os arquivos não rastreados .agents/ e skills-lock.json do checkout original são do responsável e permaneceram intocados. A cópia MIT da skill foi conferida e seus exemplos de execução e testes foram adaptados ao repositório; a outra skill permanece instalada/consultada localmente.
+
+**Verificação local desta composição:** `npm run format:check` PASS; `npm run gate` PASS (588 unitários/120 arquivos, 6 transportes, 13 banco, 25 Worker, 1 PDF, lint, tipos, builds, fronteira cliente e scanner de segredos sobre 905 arquivos); verificador de 78 links relativos em 21 Markdown PASS; `git diff --check` PASS. `ui-ux-pro-max` MIT preparada em `.agents/skills/` a partir de commit `28b3b8d`, com hashes original e adaptado em `docs/design/SKILLS.md` e pesquisa de teste executada. `web-design-guidelines` mantida como referência/instalação local devido à ausência de licença de redistribuição identificada na coleção. `historico/documentacao/` passou a constar na filtragem documental da CI. Nenhum deploy, DDL, mudança de produto ou acesso a dados humanos.
+
+**Correção focal da revisão:** `python -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q` PASS (141 testes) após adaptar caminhos e snapshots e retirar testes e fixtures exclusivos de manutenção upstream. A CI passou a executar essa suíte para impedir regressão. A formatação local passou novamente; gate e navegador dependem da CI atualizada, que ainda deve ser observada no SHA final.
+
+**Próximo passo:** conferir CI, revisão e conversas da PR #47 no SHA final, resolver os apontamentos com evidência e integrar conforme proteção da `main`. Nenhum deploy, migração, alteração de dados ou operação sobre serviços do produto.
 
 ---
 

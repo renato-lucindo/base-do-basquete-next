@@ -36,7 +36,7 @@ jobs:
             echo 'code=true' >> "$GITHUB_OUTPUT"
           else
             changed_files="$(git diff --name-only "$BASE_SHA" HEAD)"
-            if grep -Ev '^(|docs/.*\.(md|png|jpg|jpeg|svg)|README\.md|CONTRIBUTING\.md|AGENTS\.md|\.github/PULL_REQUEST_TEMPLATE\.md)$' <<< "$changed_files" > /dev/null; then
+            if grep -Ev '^(|docs/.*\.(md|png|jpg|jpeg|svg)|historico/documentacao/.*\.(md|png|jpg|jpeg|svg)|README\.md|CONTRIBUTING\.md|AGENTS\.md|\.github/PULL_REQUEST_TEMPLATE\.md)$' <<< "$changed_files" > /dev/null; then
               echo 'code=true' >> "$GITHUB_OUTPUT"
             else
               echo 'code=false' >> "$GITHUB_OUTPUT"
@@ -50,6 +50,9 @@ jobs:
         run: npm run format:check && node scripts/check-secrets.mjs --source-only
       - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
         if: steps.scope.outputs.code == 'true'
+      - name: Validate vendored UI/UX skill
+        if: steps.scope.outputs.code == 'true'
+        run: python3 -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q
       - run: npm run gate
         if: steps.scope.outputs.code == 'true'
       - run: npx playwright install --with-deps chromium
