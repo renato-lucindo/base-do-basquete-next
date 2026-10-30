@@ -1226,20 +1226,11 @@ export function MembersWorkspace({
           <div className="competition-title">
             <h5>Comissão técnica</h5>
             <div className="competition-actions">
-              <button
-                disabled={
-                  disabled ||
-                  staff.items.some((s) => s.active && s.role === "head")
-                }
-                onClick={() => chooseTarget("head")}
-              >
+              <button disabled={disabled} onClick={() => chooseTarget("head")}>
                 Adicionar técnico
               </button>
               <button
-                disabled={
-                  disabled ||
-                  staff.items.some((s) => s.active && s.role === "assistant")
-                }
+                disabled={disabled}
                 onClick={() => chooseTarget("assistant")}
               >
                 Adicionar assistente
