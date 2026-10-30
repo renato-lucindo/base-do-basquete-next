@@ -1,3 +1,15 @@
+# Organização documental de UI/UX — unidade independente, 29/10/2026
+
+**Unidade:** branch codex/documentacao-uiux em worktree isolado, criada de origin/main 11b547a. Documentação de UI/UX organizada por regras comuns, Público e Administração; fluxo das skills, critérios proporcionais de validação e referências para protótipos registrados em docs/design. Cinco arquivos de feedback/plano/handoff históricos foram movidos para historico/documentacao e as referências localizadas foram corrigidas. Os relatórios de validação, contratos, scripts, protótipos e este checkpoint permanecem em docs por uso operacional.
+
+**Situação desta unidade no registro:** alterações locais em preparação para PR, sem CI remota observada neste momento e sem declaração de integração. A PR, SHA final e a CI devem ser verificados antes de integrar. A composição exige gate completo na CI por incluir scripts Python e workflow. Os arquivos não rastreados .agents/ e skills-lock.json do checkout original são do responsável e permaneceram intocados. A cópia MIT da skill de origem foi conferida e adaptada somente nos caminhos dos exemplos do SKILL.md; a outra skill permanece instalada/consultada localmente.
+
+**Verificação local desta composição:** `npm run format:check` PASS; `npm run gate` PASS (588 unitários/120 arquivos, 6 transportes, 13 banco, 25 Worker, 1 PDF, lint, tipos, builds, fronteira cliente e scanner de segredos sobre 905 arquivos); verificador de 78 links relativos em 21 Markdown PASS; `git diff --check` PASS. `ui-ux-pro-max` MIT preparada em `.agents/skills/` a partir de commit `28b3b8d`, com hashes original e adaptado em `docs/design/SKILLS.md` e pesquisa de teste executada. `web-design-guidelines` mantida como referência/instalação local devido à ausência de licença de redistribuição identificada na coleção. `historico/documentacao/` passou a constar na filtragem documental da CI. Nenhum deploy, DDL, mudança de produto ou acesso a dados humanos.
+
+**Próximo passo:** revisar documentos e links na PR, conferir CI do SHA correspondente e concluir o aceite. Nenhum deploy, migração, alteração de dados ou operação sobre serviços do produto.
+
+---
+
 # Design público — súmula e estatísticas,29/10/2026
 
 **Unidade independente:** branch `codex/design-publico`, worktree `C:/Users/12405304716/.codex/worktrees/design-publico/Base do Basquete-v1`, base `origin/main` **4bc93c68c758db4caaa2a77045efb39277a2bc7e**. Fontes, HTMLs autocontidos, ZIP r6 original, capturas e contrato de integração em [docs/design](design/README.md). A PR desta branch identifica o SHA final e a CI correspondente; não atribuir a esta unidade evidências das PRs38/44 ou da aplicação publicada.

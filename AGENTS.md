@@ -14,3 +14,5 @@ Leia `CONTRIBUTING.md` e a abertura atual de `docs/PROGRESSO.md` antes de editar
 - Ao medir cota, use a ferramenta real. O gatilho do responsável é15%restante na janela5h; siga o procedimento de checkpoint/retomada documentado, sem inventar horários ou consumir resets/créditos.
 
 Padrão atual e comandos estão em `CONTRIBUTING.md`. A limpeza histórica dePRs está documentada em `docs/CONSOLIDACAO-PRS.md`.
+
+Nas tarefas de UI/UX, seguir [docs/design/README.md](docs/design/README.md), `docs/design/PADROES.md` e `PUBLICO.md` ou `ADMIN.md` conforme a área. O índice descreve o uso das skills e a precedência das decisões; histórico arquivado não tem autoridade sobre as regras vigentes.

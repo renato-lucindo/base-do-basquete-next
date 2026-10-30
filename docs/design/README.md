@@ -1,4 +1,30 @@
-# Protótipos públicos para implementação
+# Design — índice e fluxo de agentes
+
+## Leitura obrigatória por tarefa
+
+- [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
+- [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
+- [ADMIN.md](ADMIN.md): fluxos, cadastros, tabelas, combobox, diálogos e feedback.
+- [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
+- [VALIDACAO.md](VALIDACAO.md): evidência e limites dos protótipos.
+
+## Hierarquia de decisões
+
+Decisões explícitas do responsável > segurança, privacidade e contratos do domínio aplicáveis > padrões vigentes (comuns + área) > protótipos aprovados para a tela > recomendações de skills. As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`. Registre e resolva divergências sem mudar publicação, segurança ou domínio por conveniência visual.
+
+## Fluxo de trabalho dos agentes
+
+1. **Entender:** identificar a tarefa e o primeiro dado útil, ler o padrão da área, consultar o estado real no Next e limitar o escopo ao MVP.
+2. **Projetar:** usar `ui-ux-pro-max` para pesquisar recomendações específicas de fluxo, componentes e hierarquia; preservar identidade, decisões e componentes já existentes.
+3. **Implementar:** cuidar desde o início de teclado, leitor de tela, foco, erro, carregamento, vazio, densidade e zoom.
+4. **Revisar:** usar `web-design-guidelines` sobre arquivos de UI alterados, buscar diretrizes atualizadas da fonte indicada pela skill antes da revisão e registrar achados por arquivo/linha.
+5. **Verificar:** revisão **proporcional** à mudança (texto, componente ou fluxo), com tamanhos de tela/estados afetados, testes pertinentes, capturas quando necessário e evidência de SHA/resultado/limites. Axe não substitui inspeção manual nem comprova WCAG integral.
+
+**Skills e instalação híbrida:** consulte [SKILLS.md](SKILLS.md) para origem, licença, versão, hashes e execução. `ui-ux-pro-max` está versionada com catálogos e scripts; `web-design-guidelines` continua por instalação local ou consulta à fonte, pois não foi comprovada licença de redistribuição da coleção. Preservar instalações pessoais e `skills-lock.json` de outros checkouts, sem alegar revisão não executada.
+
+---
+
+## Protótipos públicos para implementação
 
 Esta unidade reúne duas referências navegáveis com dados fictícios: a súmula pública revisada e a página de estatísticas r6 enviada pelo responsável, com cabeçalho e controles compactados. A implementação nas rotas reais será uma unidade posterior.
 

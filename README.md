@@ -4,6 +4,8 @@ Projeto e banco novos, especificados pelo pacote de22/10/2026 em `especificacao/
 
 ## Desenvolvimento e continuidade
 
+Para mudanças de UI/UX, consulte o [índice documental](docs/README.md), os [padrões de design](docs/design/PADROES.md) e as regras específicas da área pública ou administrativa.
+
 Seguimos GitHub Flow: branches curtas de `main`, uma PR por unidade de volta à `main`, CI e integração antes da próxima unidade dependente. Leia [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) e o início de [docs/PROGRESSO.md](docs/PROGRESSO.md) antes de trabalhar. A consolidação histórica está registrada em [docs/CONSOLIDACAO-PRS.md](docs/CONSOLIDACAO-PRS.md). Integrar código não aplica migrations nem publica serviços automaticamente.
 
 A primeira entrega é um protótipo navegável com dados fictícios para avaliar os três percursos de `docs/EXPERIENCIA.md` do pacote. Após avaliação e feedback incremental, o responsável autorizou a fundação real; o preview fictício permanece disponível.
@@ -26,7 +28,7 @@ Node 24 ou superior. `npm ci --ignore-scripts` e `npm run dev` (http://localhost
 
 ## Acompanhar
 
-- `docs/PLANO-PROTOTIPO.md`: unidade e critérios.
+- `historico/documentacao/PLANO-PROTOTIPO.md`: unidade e critérios.
 - `docs/PROGRESSO.md`: checkpoint e próximo passo.
 - `docs/VALIDACAO-PROTOTIPO.md`: roteiro e evidências da apresentação.
 - `docs/decisoes/001-prototipo-local.md`: limites e evolução para o monólito full-stack.
