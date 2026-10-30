@@ -487,9 +487,8 @@ export function GamesWorkspace(props: Props) {
           {feedback}
           <div className="teams-inline">
             <p>
-              Horários em America/Sao_Paulo. A duração inclui os intervalos e
-              usa os horários reais, mesmo quando o jogo termina no dia
-              seguinte. Salvar não publica o resultado.
+              Horários reais em America/Sao_Paulo. Salvar não publica o
+              resultado.
             </p>
             <fieldset
               className="competition-form"

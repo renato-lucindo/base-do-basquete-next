@@ -6,6 +6,8 @@ O escopo e as pendências estão em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md); a exec
 
 Concluir o MVP exige validar os percursos do escopo vigente, resolver bloqueios e obter os aceites aplicáveis. Funcionalidade adiada não vira automaticamente pós-MVP: preserve sua classificação e decisão originais até o responsável alterá-las explicitamente.
 
+A unidade [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) contempla no MVP os **pedidos de tempo por equipe na súmula v2**, com registro, histórico, correção e limites por período/prorrogação, além dos horários reais de início e término do jogo para calcular a duração incluindo intervalos. A implementação segue em validação e depende das migrations versionadas e do teste HTTP autenticado antes da integração.
+
 ## Objetivos candidatos pós-MVP
 
 Espaço para ideias futuras, sem execução autorizada. Ainda não há objetivos cadastrados nesta lista. Não foram inventadas funcionalidades nem transferidas pendências do MVP para cá.
