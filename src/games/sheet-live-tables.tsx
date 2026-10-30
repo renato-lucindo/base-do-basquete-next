@@ -1,4 +1,4 @@
-import { periodLabel } from "../domain/scoresheet";
+import { periodColor, periodLabel } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import type { projectSheet } from "../scoresheet/projection";
@@ -83,6 +83,29 @@ export function SheetLiveTables({
               <h4>
                 Equipe {letter} · {game[side].name}
               </h4>
+              {d.formatVersion === 2 && (
+                <p aria-label={`Tempos debitados da equipe ${letter}`}>
+                  <strong>Tempos debitados: </strong>
+                  {d.events.filter((e) => e.side === side && e.target === "TO")
+                    .length
+                    ? d.events
+                        .filter((e) => e.side === side && e.target === "TO")
+                        .map((e) => (
+                          <span
+                            key={e.id}
+                            className={
+                              periodColor(e.period) === "red"
+                                ? "sheet-ink-red"
+                                : "sheet-ink-blue"
+                            }
+                            title={`${periodLabel(e.period)} · minuto ${e.code} decorrido`}
+                          >
+                            {periodLabel(e.period)}: {e.code}′{" "}
+                          </span>
+                        ))
+                    : "Nenhum"}
+                </p>
+              )}
               <table
                 className="sheet-live-table"
                 aria-label={`Súmula equipe ${letter}`}

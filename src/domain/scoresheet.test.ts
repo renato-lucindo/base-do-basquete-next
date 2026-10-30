@@ -309,7 +309,124 @@ describe("keyboard transcription", () => {
       ),
     ).not.toThrow();
   });
-  it("validates multi-overtime scores and keeps original colors", () => {
+  it("records v2 timeouts per team and per half without changing scores or fouls", () => {
+    const v2: Sheet = {
+      ...base,
+      formatVersion: 2,
+      staff: {
+        home: {
+          captainId: null,
+          captainIsCoach: false,
+          coachName: "Coach Home",
+          assistantName: "",
+        },
+        away: {
+          captainId: null,
+          captainIsCoach: false,
+          coachName: "Coach Away",
+          assistantName: "",
+        },
+      },
+    };
+    const timeouts = [
+      entry("home", "1", 1, "TO"),
+      entry("home", "10", 2, "TO"),
+      entry("away", "5", 1, "TO"),
+      entry("home", "8", 3, "TO"),
+      entry("home", "9", 4, "TO"),
+      entry("home", "10", 4, "TO"),
+    ];
+    const valid = { ...v2, events: [...timeouts, entry("home", "3", 2)] };
+    expect(() => validateSheet(valid)).not.toThrow();
+    const result = aggregate(valid);
+    expect(result.teams.home.points).toBe(3);
+    expect(result.teams.home.freeConceded).toBe(0);
+    expect(result.teams.home.foulsByPeriod).toEqual([0, 0, 0, 0]);
+
+    const fourthFirst = [...timeouts, entry("home", "7", 2, "TO")];
+    expect(() => validateSheet({ ...v2, events: fourthFirst })).toThrow(
+      "primeiro tempo",
+    );
+    expect(() =>
+      validateSheet({
+        ...v2,
+        events: [...timeouts, entry("home", "7", 4, "TO")],
+      }),
+    ).toThrow("segundo tempo");
+    const moved = [
+      ...timeouts.slice(0, 3),
+      entry("home", "9", 4, "TO"),
+      entry("home", "9", 4, "TO"),
+      entry("home", "10", 4, "TO"),
+    ];
+    expect(() => validateSheet({ ...v2, events: moved })).toThrow(
+      "últimos dois minutos",
+    );
+    expect(() =>
+      validateSheet({ ...v2, events: timeouts.slice(0, 5) }),
+    ).not.toThrow();
+    expect(() =>
+      validateSheet({ ...v2, events: timeouts.slice(0, 4) }),
+    ).not.toThrow();
+    // Removal restores the quota; the other team has independent allowances.
+    expect(() =>
+      validateSheet({
+        ...v2,
+        events: [...timeouts, entry("away", "2", 1, "TO")],
+      }),
+    ).not.toThrow();
+    expect(() =>
+      validateSheet({ ...base, events: [entry("home", "2", 1, "TO")] }),
+    ).toThrow();
+  });
+
+  it("allows one timeout per overtime and rejects missing or invalid minutes", () => {
+    const v2: Sheet = {
+      ...base,
+      formatVersion: 2,
+      periods: 6,
+      staff: {
+        home: {
+          captainId: null,
+          captainIsCoach: false,
+          coachName: "Coach Home",
+          assistantName: "",
+        },
+        away: {
+          captainId: null,
+          captainIsCoach: false,
+          coachName: "Coach Away",
+          assistantName: "",
+        },
+      },
+    };
+    const allowed = [entry("home", "5", 5, "TO"), entry("home", "1", 6, "TO")];
+    expect(() => validateSheet({ ...v2, events: allowed })).not.toThrow();
+    expect(() =>
+      validateSheet({
+        ...v2,
+        events: [...allowed, entry("home", "4", 5, "TO")],
+      }),
+    ).toThrow("prorrogação");
+    for (const minute of ["0", "11", "", "1.5", "P1"]) {
+      expect(() =>
+        validateSheet({ ...v2, events: [entry("home", minute, 1, "TO")] }),
+      ).toThrow();
+    }
+    expect(() =>
+      validateSheet({ ...v2, events: [entry("home", "6", 5, "TO")] }),
+    ).toThrow();
+    expect(() =>
+      validateSheet({
+        ...v2,
+        events: [
+          { ...entry("home", "3", 1, "TO"), actorId: crypto.randomUUID() },
+        ],
+      }),
+    ).toThrow();
+  });
+
+  it("validates multi-overtime scores and alternates colors by period", () => {
     const sheet = {
       ...base,
       periods: 6,
@@ -327,7 +444,7 @@ describe("keyboard transcription", () => {
       "blue",
       "red",
       "blue",
-      "blue",
+      "red",
       "blue",
     ]);
     expect(() =>

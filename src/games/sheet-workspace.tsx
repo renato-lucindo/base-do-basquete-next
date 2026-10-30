@@ -359,12 +359,14 @@ export function GameSheetWorkspace(props: Props) {
     const value = target.trim().toUpperCase();
     if (
       !d ||
-      (!(d.formatVersion === 2 ? ["C", "AT"] : ["B", "C"]).includes(value) &&
+      (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C"]).includes(
+        value,
+      ) &&
         !d.participants.some((p) => p.side === side && p.jersey === value))
     ) {
       setError(
         d?.formatVersion === 2
-          ? "Escolha uma camisa, C para técnico ou AT para assistente."
+          ? "Escolha uma camisa, C para técnico, AT para assistente ou TO para pedido de tempo."
           : "Escolha uma camisa, B para banco ou C para técnico.",
       );
       return null;
@@ -712,7 +714,7 @@ export function GameSheetWorkspace(props: Props) {
                   Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
                   quarto · Alt+Q: escolher período.{" "}
                   {d.formatVersion === 2
-                    ? "C: técnico · AT: assistente."
+                    ? "C: técnico · AT: assistente · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5)."
                     : "B: banco · C: técnico."}
                 </p>
                 <div className="competition-fields">
@@ -763,7 +765,9 @@ export function GameSheetWorkspace(props: Props) {
                     />
                   </label>
                   <label>
-                    Ação
+                    {target.trim().toUpperCase() === "TO"
+                      ? "Minuto decorrido (1–10, OT: 1–5)"
+                      : "Ação"}
                     <input
                       ref={codeRef}
                       value={code}
@@ -954,7 +958,9 @@ export function GameSheetWorkspace(props: Props) {
                       />
                     </label>
                     <label>
-                      Ação
+                      {target.trim().toUpperCase() === "TO"
+                        ? "Minuto decorrido (1–10, OT: 1–5)"
+                        : "Ação"}
                       <input
                         ref={editCodeRef}
                         name="edit-code"

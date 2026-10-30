@@ -44,7 +44,8 @@ export const persistedSheetSchema = z
     const fail = (message: string) => ctx.addIssue({ code: "custom", message });
     for (const event of d.events) {
       if (
-        (!d.formatVersion && (event.actorId || event.successorId)) ||
+        (!d.formatVersion &&
+          (event.target === "TO" || event.actorId || event.successorId)) ||
         (d.formatVersion === 2 &&
           event.actorId &&
           event.target !== "C" &&

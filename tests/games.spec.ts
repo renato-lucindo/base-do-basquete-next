@@ -223,3 +223,34 @@ test("repete a mesma intenção e mantém edição até recarga explícita de co
     "Servidor atualizado",
   );
 });
+test("registra horários reais, calcula duração com virada do dia e recupera a edição", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  await open(page);
+  await page
+    .getByLabel("Início real do jogo (data e hora)")
+    .fill("2026-10-30T23:15");
+  await page
+    .getByLabel("Término real do jogo (data e hora)")
+    .fill("2026-10-31T00:50");
+  await expect(
+    page.getByRole("status").filter({ hasText: "1h 35min" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Jogo salvo" }),
+  ).toBeVisible();
+  expect([...f.games.values()][0]).toMatchObject({
+    startAt: "2026-10-30T23:15",
+    endAt: "2026-10-31T00:50",
+  });
+  await page.reload();
+  await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await expect(
+    page.getByLabel("Início real do jogo (data e hora)"),
+  ).toHaveValue("2026-10-30T23:15");
+  await expect(
+    page.getByLabel("Término real do jogo (data e hora)"),
+  ).toHaveValue("2026-10-31T00:50");
+});

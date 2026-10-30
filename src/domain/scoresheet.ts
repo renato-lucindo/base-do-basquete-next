@@ -17,7 +17,7 @@ export const eventSchema = z.object({
   id: z.uuid(),
   side: sideSchema,
   period: z.number().int().min(1).max(12),
-  target: z.string().regex(/^(00|0|[1-9][0-9]?|B|C|AT)$/),
+  target: z.string().regex(/^(00|0|[1-9][0-9]?|B|C|AT|TO)$/),
   code: z.string().max(3),
   actorId: z.uuid().optional(),
   successorId: z.uuid().optional(),
@@ -90,7 +90,7 @@ export function periodLabel(period: number): string {
   return period <= 4 ? `Q${period}` : `OT${period - 4}`;
 }
 export function periodColor(period: number): "red" | "blue" {
-  return period === 1 || period === 3 ? "red" : "blue";
+  return period % 2 === 1 ? "red" : "blue";
 }
 
 export interface PlayerTotal {
@@ -240,6 +240,10 @@ export function aggregate(
     errors.push("Atleta duplicado.");
   if (new Set(sheet.events.map((e) => e.id)).size !== sheet.events.length)
     errors.push("Lançamento duplicado.");
+  const timeouts = {
+    home: { first: 0, second: 0, late: 0, extra: {} as Record<number, number> },
+    away: { first: 0, second: 0, late: 0, extra: {} as Record<number, number> },
+  };
   for (const event of [...sheet.events].sort((a, b) => a.period - b.period)) {
     const player = players.find(
       (p) => p.side === event.side && p.jersey === event.target,
@@ -248,9 +252,46 @@ export function aggregate(
     const opponent = teams[event.side === "home" ? "away" : "home"];
     if (
       event.period > sheet.periods ||
-      (!player && !["B", "C", "AT"].includes(event.target))
+      (!player && !["B", "C", "AT", "TO"].includes(event.target))
     ) {
       errors.push("Camisa ou período inválido.");
+      continue;
+    }
+    if (event.target === "TO") {
+      const minute = Number(event.code);
+      if (
+        !identified ||
+        !/^(?:[1-9]|10)$/.test(event.code) ||
+        minute > (event.period > 4 ? 5 : 10) ||
+        event.actorId ||
+        event.successorId
+      ) {
+        errors.push(
+          "Pedido de tempo inválido: informe o minuto decorrido do período.",
+        );
+        continue;
+      }
+      const quota = timeouts[event.side];
+      if (event.period <= 2) {
+        if (++quota.first > 2)
+          errors.push("Máximo de dois tempos por equipe no primeiro tempo.");
+      } else if (event.period <= 4) {
+        if (++quota.second > 3)
+          errors.push("Máximo de três tempos por equipe no segundo tempo.");
+        if (event.period === 4 && minute >= 9 && ++quota.late > 2)
+          errors.push("Máximo de dois tempos nos últimos dois minutos do Q4.");
+      } else {
+        quota.extra[event.period] = (quota.extra[event.period] ?? 0) + 1;
+        if (quota.extra[event.period] > 1)
+          errors.push("Máximo de um tempo por prorrogação.");
+      }
+      onAction?.({
+        event,
+        teamPoints: own.points,
+        playerFouls: null,
+        playerStatus: null,
+        coachStatus: own.coachStatus,
+      });
       continue;
     }
     if (

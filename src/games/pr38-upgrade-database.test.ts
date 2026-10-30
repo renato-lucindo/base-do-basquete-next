@@ -15,7 +15,9 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
     const names = (await readdir("supabase/migrations"))
       .filter((name) => name.endsWith(".sql"))
       .sort();
-    for (const name of names.filter((name) => !pending.includes(name)))
+    for (const name of names.filter(
+      (name) => !pending.includes(name) && name < "20261030140000",
+    ))
       await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     // This fixture mutates Auth/admin only in the disposable PGlite database.
     const fixture = await readFile("supabase/tests/publication.sql", "utf8");
@@ -52,6 +54,11 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
       ).rows,
     ).toEqual([{ no_v1_rename: true, no_v2: true, no_receipts: true }]);
     await upgrade();
+    for (const name of [
+      "20261030140000_sheet_timeouts.sql",
+      "20261030141000_game_actual_times.sql",
+    ])
+      await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     expect((await historical()).rows).toEqual(before);
 
     // Public entry points enforce the actual role boundary, not just SQL text.
@@ -84,9 +91,12 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
     // Save the reproduced draft through the public RPC after upgrading.
     const draft = {
       ...(
-        await db.query<{ document: Record<string, unknown> }>(
-          "select pg_temp.pu_doc() as document",
-        )
+        await db.query<{
+          document: Record<string, unknown> & {
+            events: unknown[];
+            periods: number;
+          };
+        }>("select pg_temp.pu_doc() as document")
       ).rows[0].document,
       formatVersion: 2,
       staff: Object.fromEntries(
@@ -139,8 +149,146 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
         ),
     );
     expect((await historical()).rows).toEqual(before);
+    // FUT-001: use the same v2 facts engine that publication and drafts invoke.
+    const timeout = (side: "home" | "away", period: number, code: string) => ({
+      id: crypto.randomUUID(),
+      side,
+      period,
+      target: "TO",
+      code,
+    });
+    const doc = (events: unknown[]) => ({
+      ...draft,
+      events: [...draft.events, ...events],
+    });
+    const timeoutFacts = (events: unknown[], periods = draft.periods) =>
+      db.query<{
+        facts: { teams: { home: { points: number; freeConceded: number } } };
+      }>("select private.compute_sheet_facts_v2($1::jsonb) as facts", [
+        JSON.stringify({ ...doc(events), periods }),
+      ]);
+    const validTimes = [
+      timeout("home", 1, "1"),
+      timeout("home", 2, "10"),
+      timeout("away", 2, "6"),
+      timeout("home", 3, "8"),
+      timeout("home", 4, "9"),
+      timeout("home", 4, "10"),
+    ];
+    const facts = (await timeoutFacts(validTimes)).rows[0].facts;
+    expect(facts.teams.home.points).toBe(2);
+    expect(facts.teams.home.freeConceded).toBe(0);
+    const rejectTimeout = async (
+      events: unknown[],
+      periods = draft.periods,
+      error = "invalid_sheet_timeout",
+    ) => {
+      await db.exec("savepoint invalid_timeout");
+      try {
+        await expect(timeoutFacts(events, periods)).rejects.toThrow(error);
+      } finally {
+        await db.exec("rollback to savepoint invalid_timeout");
+        await db.exec("release savepoint invalid_timeout");
+      }
+    };
+    await rejectTimeout([...validTimes, timeout("home", 1, "3")]);
+    await rejectTimeout([...validTimes, timeout("home", 4, "7")]);
+    await rejectTimeout([
+      timeout("home", 4, "9"),
+      timeout("home", 4, "9"),
+      timeout("home", 4, "10"),
+    ]);
+    await rejectTimeout([timeout("home", 5, "6")], 5);
+    await rejectTimeout([timeout("home", 1, "0")]);
+    await rejectTimeout([timeout("home", 1, "11")]);
+    await rejectTimeout(
+      [{ ...timeout("home", 1, "4"), actorId: crypto.randomUUID() }],
+      4,
+      "invalid_sheet",
+    );
+    // Quarter-specific overtime allowance; no transfer between extra periods.
+    const extra = {
+      ...doc([timeout("home", 5, "5"), timeout("home", 6, "1")]),
+      periods: 6,
+    };
+    await db.query("select private.compute_sheet_facts_v2($1::jsonb)", [
+      JSON.stringify(extra),
+    ]);
+    await db.exec("savepoint invalid_overtime");
+    try {
+      await expect(
+        db.query("select private.compute_sheet_facts_v2($1::jsonb)", [
+          JSON.stringify({
+            ...extra,
+            events: [...extra.events, timeout("home", 5, "4")],
+          }),
+        ]),
+      ).rejects.toThrow("invalid_sheet_timeout");
+    } finally {
+      await db.exec("rollback to savepoint invalid_overtime");
+      await db.exec("release savepoint invalid_overtime");
+    }
+
+    // The actual timestamps must round-trip through the same editor RPC as the UI.
+    await db.exec("set local role authenticated");
+    await db.exec(
+      "set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098'",
+    );
+    const game = {
+      id: "f9200000-0000-4000-8000-000000000009",
+      disputeId: "f9200000-0000-4000-8000-000000000003",
+      homeRegistrationId: "f9200000-0000-4000-8000-000000000005",
+      awayRegistrationId: "f9200000-0000-4000-8000-000000000006",
+      date: null,
+      time: null,
+      venue: null,
+      number: null,
+      startAt: "2026-10-30T23:15",
+      endAt: "2026-10-31T00:50",
+    };
+    const officiating = Object.fromEntries(
+      ["referee", "umpire1", "umpire2", "scorer", "timer", "shotClock"].map(
+        (role) => [role, null],
+      ),
+    );
+    const editorCommand = {
+      commandId: "f9200000-0000-4000-8000-000000000901",
+      expectedVersion: 1,
+      game,
+      officiating,
+    };
+    const savedGame = await db.query<{ result: { version: number } }>(
+      "select public.save_game_editor($1::jsonb) as result",
+      [JSON.stringify(editorCommand)],
+    );
+    expect(savedGame.rows[0].result.version).toBe(2);
+    expect(
+      (
+        await db.query<{
+          editor: { game: { startAt: string; endAt: string } };
+        }>("select public.get_game_editor($1::uuid) as editor", [game.id])
+      ).rows[0].editor.game,
+    ).toMatchObject({ startAt: game.startAt, endAt: game.endAt });
+    await db.exec("savepoint invalid_duration");
+    try {
+      await expect(
+        db.query("select public.save_game_editor($1::jsonb)", [
+          JSON.stringify({
+            ...editorCommand,
+            commandId: "f9200000-0000-4000-8000-000000000902",
+            expectedVersion: 2,
+            game: { ...game, endAt: "2026-10-30T23:00" },
+          }),
+        ]),
+      ).rejects.toThrow("invalid_game_time");
+    } finally {
+      await db.exec("rollback to savepoint invalid_duration");
+      await db.exec("release savepoint invalid_duration");
+    }
+    await db.exec("reset role");
+    expect((await historical()).rows).toEqual(before);
     await db.exec("rollback");
   } finally {
     await db.close();
   }
-}, 20000);
+}, 40000);

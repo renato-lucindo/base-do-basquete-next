@@ -28,6 +28,7 @@ import {
 import {
   gameListingSchema,
   gameSchema,
+  durationMinutes,
   type GameSnapshot,
   type SaveGame,
 } from "./contract";
@@ -48,6 +49,8 @@ const document = (s: GameSnapshot) =>
     awayRegistrationId: s.awayRegistrationId,
     date: s.date,
     time: s.time,
+    startAt: s.startAt,
+    endAt: s.endAt,
     venue: s.venue,
     number: s.number,
   });
@@ -411,6 +414,8 @@ export function GamesWorkspace(props: Props) {
                 awayRegistrationId: "",
                 date: null,
                 time: null,
+                startAt: null,
+                endAt: null,
                 venue: null,
                 number: null,
               },
@@ -482,8 +487,10 @@ export function GamesWorkspace(props: Props) {
           {feedback}
           <div className="teams-inline">
             <p>
-              Horários em America/Sao_Paulo. Data, horário, local e número são
-              opcionais. Salvar a agenda não publica resultado.
+              Horários em America/Sao_Paulo. Registre o início e o término reais
+              para calcular a duração, inclusive em jogos que terminam no dia
+              seguinte. A agenda pode ser diferente do horário real. Salvar não
+              publica resultado.
             </p>
             <fieldset
               className="competition-form"
@@ -541,6 +548,30 @@ export function GamesWorkspace(props: Props) {
                   onChange={(e) => change("time", e.target.value || null)}
                 />
               </label>
+              <label>
+                Início real do jogo (data e hora)
+                <input
+                  type="datetime-local"
+                  value={editor.game.startAt ?? ""}
+                  onChange={(e) => change("startAt", e.target.value || null)}
+                />
+              </label>
+              <label>
+                Término real do jogo (data e hora)
+                <input
+                  type="datetime-local"
+                  value={editor.game.endAt ?? ""}
+                  onChange={(e) => change("endAt", e.target.value || null)}
+                />
+              </label>
+              <p role="status">
+                Duração total (inclui intervalos):{" "}
+                {durationMinutes(editor.game.startAt, editor.game.endAt) ===
+                null
+                  ? "Informe início e término reais válidos, com duração de até 24 horas."
+                  : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h ${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
+                . O horário da agenda não é utilizado no cálculo.
+              </p>
               <VenuePicker
                 value={editor.game.venue ?? ""}
                 onChange={(value) => change("venue", value || null)}

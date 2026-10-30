@@ -6,6 +6,66 @@ import {
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("v2 timeouts follow keyboard flow, limits, colors and persist across reload", async ({
+    page,
+  }) => {
+    const fixture = await desktopSheetFixture(page, 11, true);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    await page.getByLabel("Períodos da súmula").selectOption("5");
+    const add = async (period: number, minute: string) => {
+      await page
+        .getByLabel("Quarto ou prorrogação", { exact: true })
+        .selectOption(String(period));
+      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TO");
+      await page.keyboard.press("Enter");
+      await page.getByLabel(/Minuto decorrido/).fill(minute);
+      await page.keyboard.press("Enter");
+    };
+    await add(1, "3");
+    await add(2, "8");
+    await add(3, "5");
+    await add(4, "9");
+    await add(5, "4");
+    const times = page.getByLabel("Tempos debitados da equipe A");
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expect(times).toContainText("Q1: 3′");
+      await expect(times).toContainText("Q2: 8′");
+      await expect(times).toContainText("Q4: 9′");
+      await expect(times).toContainText("OT1: 4′");
+      await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
+      await expect(times.locator(".sheet-ink-blue")).toHaveCount(2);
+    }
+    await add(2, "7");
+    await expect(page.getByRole("alert")).toContainText(
+      "Máximo de dois tempos por equipe no primeiro tempo",
+    );
+    await add(5, "6");
+    await expect(page.getByRole("alert")).toContainText(
+      "Pedido de tempo inválido",
+    );
+    await page
+      .getByRole("button", { name: "Salvar rascunho da súmula" })
+      .click();
+    expect(
+      fixture.snapshot()?.document.events.filter((e) => e.target === "TO"),
+    ).toHaveLength(5);
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .click();
+    await page.getByRole("button", { name: "Preparar súmula" }).click();
+    await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
+      "OT1: 4′",
+    );
+  });
   test("desktop action history uses horizontal columns at both requested viewports", async ({
     page,
   }) => {
