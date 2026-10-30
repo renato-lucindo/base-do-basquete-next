@@ -8,7 +8,7 @@
 
 **Stack:** stack existente; nenhum serviço, credencial ou dependência nova para o núcleo.
 
-**Especificação:** especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/{ESCOPO,CONTRATOS,ARQUITETURA,VALIDACAO,EXPERIENCIA}.md; docs/decisoes/012-regulamento-declarativo.md; docs/AJUSTES-DE-EXPERIENCIA.md. ZIPs preservados são a única fonte do produto. Repositório/serviços anteriores proibidos.
+**Especificação:** especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/{ESCOPO,CONTRATOS,ARQUITETURA,VALIDACAO,EXPERIENCIA}.md; docs/decisoes/012-regulamento-declarativo.md; historico/documentacao/AJUSTES-DE-EXPERIENCIA.md. ZIPs preservados são a única fonte do produto. Repositório/serviços anteriores proibidos.
 
 ## Restrições e revisão
 
