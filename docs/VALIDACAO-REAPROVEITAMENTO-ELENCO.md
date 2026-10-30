@@ -1,5 +1,13 @@
 # Reaproveitamento de elenco e pré-seleção de identidade
 
+## Correção do preview Cloudflare — 30/10/2026
+
+- Publicado o commit `6e5319a` da PR #38 no Worker `base-do-basquete-next-preview`. Deployment `56ac3878-0fa0-4fb6-a727-167e53b96a62`, versão `4cd73b0d-2e53-493a-a41e-dff9cacbf6d4`, **100% de tráfego**, confirmado por Wrangler e API Cloudflare.
+- Falha real pós-deploy reproduzida: a URL principal e `GET /api/competitions/:id` retornavam **404 HTML da Cloudflare**, apesar do deployment 100%. A configuração `workers_dev:false` desativou a rota `workers.dev`; `GET /workers/scripts/.../subdomain` confirmou `enabled:false`.
+- Reativação controlada via API `POST /accounts/.../workers/scripts/base-do-basquete-next-preview/subdomain` com `enabled:true` e `previews_enabled:false` retornou **200**. A raiz voltou a **HTTP 302** para login Cloudflare Access. `wrangler.jsonc` passa a ter `workers_dev:true` para preservar a rota em publicações futuras.
+- **Limite da prova:** o navegador autenticado anteriormente foi redirecionado a novo login Cloudflare Access após recarga. Não foi possível conferir visualmente o botão nem completar a operação real de reaproveitamento com sessão administrativa/Supabase Auth; nenhum vínculo ou pessoa foi alterado. Localmente, o código de `6e5319a` contém o botão adjacente a `Importar elenco`. CI de `6e5319a`: [41066478266](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41066478266), SUCCESS.
+- A PR permanece **Draft** enquanto faltam validação autenticada, aceite e CI do SHA que inclui o ajuste de configuração. Nenhum deploy em produção, DDL ou reaplicação de migrations.
+
 ## Diagnóstico da ausência do botão no preview — 30/10/2026
 
 - Tela enviada pelo responsável: elenco da LUSB exibe **Importar elenco**, mas não **Reaproveitar atletas**. Comparação do código confirmou que a fonte da PR #38 inclui o botão e o painel em src/people/workspace.tsx e src/people/roster-reuse-panel.tsx, introduzidos em f640597; origin/main não os inclui.
