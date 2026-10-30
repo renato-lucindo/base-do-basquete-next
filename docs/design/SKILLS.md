@@ -9,7 +9,7 @@ As regras do produto estão em [PADROES](PADROES.md), [Público](PUBLICO.md) e [
 - Commit de origem: `28b3b8dee8c976df4fa3e94aed4e092ad43fcb03`.
 - SHA-256 do `SKILL.md` original: `88aadd21220542083a455e373bd162ffe7843266a71f06f4d837bb3b34f9c9c7`.
 - SHA-256 do `SKILL.md` adaptado ao repositório: `c163d66640836e58d537a383b48a14c95fb515ecc4db675d1585b923d3ea0e27`.
-- Adaptação local: os exemplos de comando usam `.agents/skills/ui-ux-pro-max/scripts/search.py` a partir da raiz do projeto, porque a variável `CLAUDE_PLUGIN_ROOT` não aponta para a cópia versionada. Os demais catálogos, scripts, testes e a licença foram preservados. Pesquisas pontuais com Python 3:
+- Adaptação local: os exemplos de comando usam `.agents/skills/ui-ux-pro-max/scripts/search.py` a partir da raiz do projeto, porque a variável `CLAUDE_PLUGIN_ROOT` não aponta para a cópia versionada. Os catálogos, scripts de consulta e a licença foram preservados. Testes upstream que dependiam de ferramentas de manutenção não distribuídas (atualização de catálogos e avaliação de relevância) foram retirados com suas fixtures exclusivas. Os testes de snapshots e dos caminhos documentados foram adaptados para este repositório; os demais testes permanecem. A CI executa `python3 -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q`. Pesquisas pontuais com Python 3:
 
 ```powershell
 python .agents/skills/ui-ux-pro-max/scripts/search.py "keyboard focus accessible" --domain ux

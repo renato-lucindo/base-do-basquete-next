@@ -50,6 +50,9 @@ jobs:
         run: npm run format:check && node scripts/check-secrets.mjs --source-only
       - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
         if: steps.scope.outputs.code == 'true'
+      - name: Validate vendored UI/UX skill
+        if: steps.scope.outputs.code == 'true'
+        run: python3 -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q
       - run: npm run gate
         if: steps.scope.outputs.code == 'true'
       - run: npx playwright install --with-deps chromium
