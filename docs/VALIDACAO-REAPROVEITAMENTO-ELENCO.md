@@ -1,5 +1,12 @@
 # Reaproveitamento de elenco e pré-seleção de identidade
 
+## Diagnóstico da ausência do botão no preview — 30/10/2026
+
+- Tela enviada pelo responsável: elenco da LUSB exibe **Importar elenco**, mas não **Reaproveitar atletas**. Comparação do código confirmou que a fonte da PR #38 inclui o botão e o painel em src/people/workspace.tsx e src/people/roster-reuse-panel.tsx, introduzidos em f640597; origin/main não os inclui.
+- Consulta **somente leitura** ao Wrangler: deployment mais recente 48f23c3f-20a4-43c8-be88-b9ec0f7337df (29/10/2026, 11:38:08 UTC), versão 023a2f1e-ad98-42db-bc6a-deeed36458de com 100% do tráfego; anotação de origem 11266c483b89eb189a02fdb3aee0735804cf. Em 11266c4, o componente contém **Importar elenco**, mas não o botão ou o arquivo do painel; f640597 não é ancestral desse commit. Logo, a ausência resulta de **versão publicada anterior à funcionalidade**, não de falha demonstrada na interface da PR.
+- HEAD da PR #38 530963ffa0901042431d858a78d1e754dc5a10e2 com check [validate SUCCESS](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/40995663191). O HEAD remoto do preview retorna HTTP 302 pelo Cloudflare Access sem sessão; não houve inspeção autenticada nem ensaio remoto do novo fluxo.
+- **Resolução pendente:** disponibilizar a versão da PR em ambiente **isolado e com publicação explicitamente autorizada** e sessão administrativa legítima; então executar validação HTTP com Supabase Auth real e dados sintéticos descartáveis, preservando os registros humanos. Proibição vigente de deploy/DDL/publicação de dados permanece; nenhuma dessas ações foi executada. PR continua Draft, aguardando prova e aceite.
+
 ## Retomada e integração HTTP/Workerd isolada — 29/10/2026
 
 - Teste novo em `tests/access-worker.test.mjs` com `tests/fixtures/roster-reuse-outbound.mjs`: HTTP executado pelo **Worker real em Miniflare/Workerd**, com login da aplicação, sessão em Durable Object e RPCs Supabase substituídas por respostas e estado sintéticos. Exercita GET anônimo `401`, seleção de origem/contexto, camisas `0` e `00` distintas, CSRF `403`, gravação com ACK perdido `503` e replay do mesmo comando/recibo/IDs sem duplicação, comando reutilizado com conteúdo diferente `409`, contexto novo obsoleto `409`, replay anterior após mudança de contexto, revogação de acesso antes de chegar às RPCs, origem e vínculo preexistente preservados.
