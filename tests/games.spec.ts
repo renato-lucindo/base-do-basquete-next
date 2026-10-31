@@ -20,7 +20,7 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   const f = await fixture(page);
   await open(page);
   await page.getByLabel("Data do jogo", { exact: true }).fill("2026-11-15");
-  await page.getByLabel("Horário do jogo", { exact: true }).fill("15:30");
+  await page.getByLabel("Hora de início", { exact: true }).fill("15:30");
   await page.getByLabel("Local", { exact: true }).fill("Quadra preservada");
   await page
     .getByRole("button", {
@@ -49,7 +49,7 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
     "2026-11-15",
   );
-  await expect(page.getByLabel("Horário do jogo", { exact: true })).toHaveValue(
+  await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
     "15:30",
   );
   await expect(page.getByLabel("Local", { exact: true })).toHaveValue(
@@ -228,15 +228,29 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
 }) => {
   const f = await fixture(page);
   await open(page);
-  await page
-    .getByLabel("Início real do jogo (data e hora)")
-    .fill("2026-10-30T23:15");
-  await page
-    .getByLabel("Término real do jogo (data e hora)")
-    .fill("2026-10-31T00:47");
+  await expect(page.locator('input[type="datetime-local"]')).toHaveCount(0);
+  await expect(page.locator('input[type="date"]')).toHaveCount(1);
+  await expect(page.locator('input[type="time"]')).toHaveCount(2);
+  await expect(
+    page.getByLabel("Hora de início", { exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByLabel("Hora de fim", { exact: true })).toBeDisabled();
+  await page.getByLabel("Data do jogo", { exact: true }).fill("2026-10-30");
+  await page.getByLabel("Hora de início", { exact: true }).fill("23:15");
+  await page.getByLabel("Hora de fim", { exact: true }).fill("00:47");
   await expect(
     page.getByRole("status").filter({ hasText: "1h32min" }),
   ).toBeVisible();
+  for (const [width, height] of [
+    [1366, 768],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect(page.getByLabel("Hora de fim", { exact: true })).toBeVisible();
+    await page.screenshot({
+      path: `.preview-artifacts/jogos-horarios-${width}.png`,
+    });
+  }
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Jogo salvo" }),
@@ -247,10 +261,27 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
   });
   await page.reload();
   await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
+    "2026-10-30",
+  );
+  await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
+    "23:15",
+  );
+  await expect(page.getByLabel("Hora de fim", { exact: true })).toHaveValue(
+    "00:47",
+  );
+  await page.getByLabel("Data do jogo", { exact: true }).fill("2026-11-01");
   await expect(
-    page.getByLabel("Início real do jogo (data e hora)"),
-  ).toHaveValue("2026-10-30T23:15");
+    page.getByRole("status").filter({ hasText: "1h32min" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
-    page.getByLabel("Término real do jogo (data e hora)"),
-  ).toHaveValue("2026-10-31T00:47");
+    page.getByRole("status").filter({ hasText: "Jogo salvo" }),
+  ).toBeVisible();
+  expect([...f.games.values()][0]).toMatchObject({
+    date: "2026-11-01",
+    time: "23:15",
+    startAt: "2026-11-01T23:15",
+    endAt: "2026-11-02T00:47",
+  });
 });
