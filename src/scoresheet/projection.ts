@@ -8,7 +8,7 @@ import {
 export type AnnotatedAction = {
   event: Entry;
   sequence: number;
-  kind: "points" | "fouls";
+  kind: "points" | "fouls" | "timeouts";
   annotation: string;
 };
 export function projectSheet(sheet: Sheet) {
@@ -16,16 +16,27 @@ export function projectSheet(sheet: Sheet) {
     totals = aggregate(sheet, (p) => progress.set(p.event.id, p));
   const actions: AnnotatedAction[] = sheet.events.map((event, i) => {
     const p = progress.get(event.id),
-      kind = /^[123]$/u.test(event.code) ? "points" : "fouls";
+      kind =
+        event.target === "TO"
+          ? "timeouts"
+          : /^[123]$/u.test(event.code)
+            ? "points"
+            : "fouls";
     const code =
-      kind === "points" ? event.code + "p" : event.code.replace(/C$/u, "c");
+      kind === "timeouts"
+        ? `TO · minuto ${event.code} decorrido`
+        : kind === "points"
+          ? event.code + "p"
+          : event.code.replace(/C$/u, "c");
     const status = p?.playerStatus ?? p?.coachStatus;
     const count =
-      kind === "points"
-        ? p?.teamPoints
-        : status === "GD" || status === "D"
-          ? status
-          : p?.playerFouls;
+      kind === "timeouts"
+        ? null
+        : kind === "points"
+          ? p?.teamPoints
+          : status === "GD" || status === "D"
+            ? status
+            : p?.playerFouls;
     return {
       event,
       sequence: i + 1,
@@ -45,7 +56,7 @@ export function projectSheet(sheet: Sheet) {
       ...p,
       pointsByQuarter,
       fouls: own
-        .filter((e) => !/^[123]$/u.test(e.code))
+        .filter((e) => e.target !== "TO" && !/^[123]$/u.test(e.code))
         .map((e) => ({
           id: e.id,
           code: e.code.replace(/C$/u, "c"),

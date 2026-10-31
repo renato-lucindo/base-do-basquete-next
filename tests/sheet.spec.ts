@@ -238,7 +238,7 @@ async function fixture(page: Page) {
 }
 async function open(page: Page) {
   await page.goto(
-    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+    `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
     .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })

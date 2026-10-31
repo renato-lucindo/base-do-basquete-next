@@ -31,6 +31,7 @@ import { AdminDialog } from "../competition/admin-dialog";
 import { AdminToast } from "../competition/admin-toast";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
+import { RosterReusePanel } from "./roster-reuse-panel";
 import { TextImportWorkspace } from "../text-import/workspace";
 import type { RegistrationSnapshot } from "../teams/contract";
 import "./workspace.css";
@@ -73,6 +74,8 @@ export function MembersWorkspace({
   onSaved,
 }: Props) {
   const [importing, setImporting] = useState(false);
+  const [reusing, setReusing] = useState(false);
+  const reuseGuard = useRef<() => boolean>(() => true);
   const [profiling, setProfiling] = useState<string | null>(null);
   const profileGuard = useRef<() => boolean>(() => true);
   const [transferring, setTransferring] = useState<RosterSnapshot | null>(null);
@@ -132,6 +135,7 @@ export function MembersWorkspace({
   function mayLeave() {
     return (
       importGuard.current() &&
+      reuseGuard.current() &&
       transferGuard.current() &&
       profileGuard.current() &&
       (!(busy || dirty || uncertain) ||
@@ -781,6 +785,21 @@ export function MembersWorkspace({
         onClose={() => setImporting(false)}
       />
     );
+  if (reusing)
+    return (
+      <RosterReusePanel
+        key={registration.id}
+        registration={registration}
+        enabled={enabled && canEdit}
+        guard={reuseGuard}
+        onSessionLost={onSessionLost}
+        onSaved={() => {
+          setRefresh((v) => v + 1);
+          onSaved();
+        }}
+        onClose={() => setReusing(false)}
+      />
+    );
   return (
     <section className="members-workspace">
       <AdminToast
@@ -808,6 +827,18 @@ export function MembersWorkspace({
           }}
         >
           Importar elenco
+        </button>
+        <button
+          disabled={disabled}
+          onClick={() => {
+            if (!mayLeave()) return;
+            setEditor(null);
+            setTarget(null);
+            setError("");
+            setReusing(true);
+          }}
+        >
+          Reaproveitar atletas
         </button>
       </div>
       {!target && !editor && feedback}
@@ -1195,20 +1226,11 @@ export function MembersWorkspace({
           <div className="competition-title">
             <h5>Comissão técnica</h5>
             <div className="competition-actions">
-              <button
-                disabled={
-                  disabled ||
-                  staff.items.some((s) => s.active && s.role === "head")
-                }
-                onClick={() => chooseTarget("head")}
-              >
+              <button disabled={disabled} onClick={() => chooseTarget("head")}>
                 Adicionar técnico
               </button>
               <button
-                disabled={
-                  disabled ||
-                  staff.items.some((s) => s.active && s.role === "assistant")
-                }
+                disabled={disabled}
                 onClick={() => chooseTarget("assistant")}
               >
                 Adicionar assistente

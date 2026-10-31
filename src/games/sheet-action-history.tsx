@@ -9,7 +9,7 @@ const defaults = (): HistoryQuery => ({
   mode: "recent",
   periods: Array.from({ length: 12 }, (_, i) => i + 1),
   sides: ["home", "away"],
-  kinds: ["points", "fouls"],
+  kinds: ["points", "fouls", "timeouts"],
   order: "entry",
   page: 0,
 });
@@ -73,14 +73,18 @@ export function SheetActionHistory({
         </fieldset>
         <fieldset>
           <legend>Tipo</legend>
-          {(["points", "fouls"] as const).map((kind) => (
+          {(["points", "fouls", "timeouts"] as const).map((kind) => (
             <label key={kind}>
               <input
                 type="checkbox"
                 checked={q.kinds.includes(kind)}
                 onChange={() => toggle("kinds", kind)}
               />
-              {kind === "points" ? "Pontos" : "Faltas"}
+              {kind === "points"
+                ? "Pontos"
+                : kind === "timeouts"
+                  ? "Pedidos de tempo"
+                  : "Faltas"}
             </label>
           ))}
         </fieldset>
@@ -118,16 +122,26 @@ export function SheetActionHistory({
       </p>
       {result.items.length ? (
         <div className="sheet-history-groups">
-          {(["points", "fouls"] as const)
+          {(["points", "fouls", "timeouts"] as const)
             .filter((kind) => result.items.some((item) => item.kind === kind))
             .map((kind) => (
               <section
                 key={kind}
                 aria-label={
-                  kind === "points" ? "Ações de pontos" : "Ações de faltas"
+                  kind === "points"
+                    ? "Ações de pontos"
+                    : kind === "timeouts"
+                      ? "Pedidos de tempo"
+                      : "Ações de faltas"
                 }
               >
-                <h5>{kind === "points" ? "Pontos" : "Faltas"}</h5>
+                <h5>
+                  {kind === "points"
+                    ? "Pontos"
+                    : kind === "timeouts"
+                      ? "Pedidos de tempo"
+                      : "Faltas"}
+                </h5>
                 <ol className="sheet-actions">
                   {result.items
                     .filter((a) => a.kind === kind)
@@ -141,9 +155,13 @@ export function SheetActionHistory({
                           {a.event.side === "home" ? "A" : "B"} -{" "}
                           {/^[0-9]/u.test(a.event.target)
                             ? "#" + a.event.target
-                            : a.event.target === "C"
-                              ? "Técnico"
-                              : "Banco"}{" "}
+                            : a.event.target === "TO"
+                              ? "Equipe"
+                              : a.event.target === "C"
+                                ? "Técnico"
+                                : a.event.target === "AT"
+                                  ? "Ass. Técnico"
+                                  : "Banco"}{" "}
                           - {a.annotation}
                         </span>
                         <div className="competition-actions">

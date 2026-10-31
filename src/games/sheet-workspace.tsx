@@ -1,8 +1,9 @@
 import { SheetPublicationPanel } from "../publication/sheet-panel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
-import { periodLabel, type Side } from "../domain/scoresheet";
-import { editAction, deleteAction } from "../scoresheet/actions";
+import { aggregate, periodLabel, type Side } from "../domain/scoresheet";
+import { deleteAction } from "../scoresheet/actions";
+import { authorAction } from "./sheet-event-author";
 import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
@@ -69,6 +70,7 @@ export function GameSheetWorkspace(props: Props) {
     [period, setPeriod] = useState(1),
     [target, setTarget] = useState(""),
     [code, setCode] = useState(""),
+    [successor, setSuccessor] = useState(""),
     [editing, setEditing] = useState<string | null>(null),
     [deleting, setDeleting] = useState<string | null>(null);
   const pending = useRef<SaveSheet | null>(null),
@@ -92,6 +94,35 @@ export function GameSheetWorkspace(props: Props) {
   const d = history?.present,
     dirty = !!d && JSON.stringify(d) !== baseline,
     locked = busy || uncertain || conflict || publicationLocked;
+  const eligibleSuccessors = useMemo(() => {
+    if (!d || d.formatVersion !== 2) return [];
+    const editIndex = editing
+      ? d.events.findIndex((event) => event.id === editing)
+      : -1;
+    const events =
+      editIndex < 0
+        ? d.events
+        : d.events.filter(
+            (event, index) =>
+              index !== editIndex &&
+              (event.period < period ||
+                (event.period === period && index < editIndex)),
+          );
+    const state = aggregate(toEngineSheet({ ...d, events }));
+    if (state.errors.length) return [];
+    const currentCoach = state.teams[side].activeCoachId;
+    return d.participants.filter(
+      (participant) =>
+        participant.side === side &&
+        participant.played &&
+        participant.rosterEntryId !== currentCoach &&
+        state.players.some(
+          (player) =>
+            player.actorId === participant.rosterEntryId &&
+            player.status === "eligible",
+        ),
+    );
+  }, [d, editing, period, side]);
   function mayLeave() {
     return (
       !busy &&
@@ -160,7 +191,7 @@ export function GameSheetWorkspace(props: Props) {
     )
       throw Error("Os dados não correspondem a este jogo.");
     const document = validatePersistedSheet(
-      s?.document ?? emptyPersistedSheet(),
+      s?.document ?? emptyPersistedSheet(2),
     );
     setHistory({ present: document, past: [], future: [] });
     setBaseline(JSON.stringify(document));
@@ -328,11 +359,15 @@ export function GameSheetWorkspace(props: Props) {
     const value = target.trim().toUpperCase();
     if (
       !d ||
-      (!["B", "C"].includes(value) &&
+      (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C"]).includes(
+        value,
+      ) &&
         !d.participants.some((p) => p.side === side && p.jersey === value))
     ) {
       setError(
-        "Escolha a camisa de um relacionado desta equipe, B para banco ou C para técnico.",
+        d?.formatVersion === 2
+          ? "Escolha uma camisa, C para técnico, AT para assistente ou TO para pedido de tempo."
+          : "Escolha uma camisa, B para banco ou C para técnico.",
       );
       return null;
     }
@@ -347,9 +382,11 @@ export function GameSheetWorkspace(props: Props) {
     setPeriod(event.period);
     setTarget(event.target);
     setCode(event.code);
+    setSuccessor(event.successorId ?? "");
   }
   function finishEditing() {
     setEditing(null);
+    setSuccessor("");
     const previous = editingRestore.current;
     editingRestore.current = null;
     if (previous) {
@@ -376,13 +413,13 @@ export function GameSheetWorkspace(props: Props) {
     try {
       let next: PersistedSheet;
       if (editing) {
-        const engine = editAction(toEngineSheet(d), editing, patch);
+        const revised = authorAction(d, patch, editing, successor || null);
         next = {
           ...d,
-          events: engine.events,
-          participants: d.participants.map((p, i) => ({
+          events: d.events.map((e) => (e.id === editing ? revised : e)),
+          participants: d.participants.map((p) => ({
             ...p,
-            played: engine.roster[i].played,
+            played: p.played || (p.side === side && p.jersey === value),
           })),
         };
       } else
@@ -391,7 +428,10 @@ export function GameSheetWorkspace(props: Props) {
           participants: d.participants.map((p) =>
             p.side === side && p.jersey === value ? { ...p, played: true } : p,
           ),
-          events: [...d.events, { id: crypto.randomUUID(), ...patch }],
+          events: [
+            ...d.events,
+            authorAction(d, patch, null, successor || undefined),
+          ],
         };
       if (mutate(next)) {
         if (editing) {
@@ -399,6 +439,7 @@ export function GameSheetWorkspace(props: Props) {
           setStatus("Ação editada no rascunho");
         } else {
           setCode("");
+          setSuccessor("");
           focusTarget();
         }
       }
@@ -521,6 +562,27 @@ export function GameSheetWorkspace(props: Props) {
         : undefined) ??
       "Atleta relacionado"
     );
+  }
+  function staffName(id: string) {
+    for (const s of sides) {
+      const current = context?.sides[s].staff.find(
+        (person) => person.id === id,
+      );
+      if (current) return current.person.name;
+      if (snapshot) {
+        for (const role of ["coach", "assistant"] as const) {
+          const staffId =
+            role === "coach"
+              ? snapshot.document.staff[s].coachStaffEntryId
+              : snapshot.document.staff[s].assistantStaffEntryId;
+          if (staffId === id && snapshot.staff[s][role])
+            return snapshot.staff[s][role].name;
+        }
+      }
+    }
+    return d?.participants.some((person) => person.rosterEntryId === id)
+      ? name(id)
+      : "Responsável não identificado";
   }
   return (
     <section className="game-sheet" aria-busy={busy}>
@@ -650,7 +712,10 @@ export function GameSheetWorkspace(props: Props) {
                 <legend>Lançar ações</legend>
                 <p>
                   Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
-                  quarto · Alt+Q: escolher período. Alvos B: banco, C: técnico.
+                  quarto · Alt+Q: escolher período.{" "}
+                  {d.formatVersion === 2
+                    ? "C: técnico · AT: assistente · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5)."
+                    : "B: banco · C: técnico."}
                 </p>
                 <div className="competition-fields">
                   <label>
@@ -700,7 +765,9 @@ export function GameSheetWorkspace(props: Props) {
                     />
                   </label>
                   <label>
-                    Ação
+                    {target.trim().toUpperCase() === "TO"
+                      ? "Minuto decorrido (1–10, OT: 1–5)"
+                      : "Ação"}
                     <input
                       ref={codeRef}
                       value={code}
@@ -716,6 +783,25 @@ export function GameSheetWorkspace(props: Props) {
                     />
                   </label>
                 </div>
+                {d.formatVersion === 2 &&
+                  /Indique explicitamente outro atleta elegível/u.test(
+                    error,
+                  ) && (
+                    <label className="sheet-successor-choice">
+                      Indique o atleta que assumirá como técnico
+                      <select
+                        value={successor}
+                        onChange={(e) => setSuccessor(e.target.value)}
+                      >
+                        <option value="">Selecione o sucessor</option>
+                        {eligibleSuccessors.map((p) => (
+                          <option key={p.rosterEntryId} value={p.rosterEntryId}>
+                            {p.jersey} · {name(p.rosterEntryId)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                 <div className="competition-actions">
                   <button onClick={addAction}>Registrar ação</button>
                   <button
@@ -769,9 +855,11 @@ export function GameSheetWorkspace(props: Props) {
                   <summary>Códigos aceitos</summary>
                   <p>
                     1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U,
-                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C. Banco:
-                    B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC. C no sufixo
-                    indica falta compensada.
+                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C.{" "}
+                    {d.formatVersion === 2
+                      ? "Técnico: B1/BC, C1/CC ou D/D1/D2/D3/DC. Assistente: D/D1/D2/D3/DC (B2 automática vinculada)."
+                      : "Banco: B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC."}{" "}
+                    C no sufixo indica falta compensada.
                   </p>
                 </details>
               </fieldset>
@@ -784,6 +872,7 @@ export function GameSheetWorkspace(props: Props) {
                 period={period}
                 name={name}
                 staffNames={snapshot?.staff}
+                staffName={staffName}
                 disabled={locked}
                 onPlayed={(id, played) => changeParticipant(id, { played })}
               />
@@ -869,7 +958,9 @@ export function GameSheetWorkspace(props: Props) {
                       />
                     </label>
                     <label>
-                      Ação
+                      {target.trim().toUpperCase() === "TO"
+                        ? "Minuto decorrido (1–10, OT: 1–5)"
+                        : "Ação"}
                       <input
                         ref={editCodeRef}
                         name="edit-code"
@@ -880,6 +971,30 @@ export function GameSheetWorkspace(props: Props) {
                       />
                     </label>
                   </fieldset>
+                  {d.formatVersion === 2 &&
+                    (successor ||
+                      /Indique explicitamente outro atleta elegível/u.test(
+                        error,
+                      )) && (
+                      <label className="sheet-successor-choice">
+                        Atleta sucessor, quando capitão e assistente estiverem
+                        impedidos
+                        <select
+                          value={successor}
+                          onChange={(event) => setSuccessor(event.target.value)}
+                        >
+                          <option value="">Selecione o sucessor</option>
+                          {eligibleSuccessors.map((p) => (
+                            <option
+                              key={p.rosterEntryId}
+                              value={p.rosterEntryId}
+                            >
+                              {p.jersey} · {name(p.rosterEntryId)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
                   <div className="competition-actions">
                     <button type="submit" disabled={locked}>
                       Salvar edição da ação

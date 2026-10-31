@@ -26,6 +26,7 @@ const staffSchema = z
   .strict();
 export const persistedSheetSchema = z
   .object({
+    formatVersion: z.literal(2).optional(),
     rulesVersion: z.literal("FIBA_2024"),
     periods: z.number().int().min(4).max(12),
     participants: z.array(participantSchema).max(24),
@@ -41,6 +42,17 @@ export const persistedSheetSchema = z
   .strict()
   .superRefine((d, ctx) => {
     const fail = (message: string) => ctx.addIssue({ code: "custom", message });
+    for (const event of d.events) {
+      if (
+        (!d.formatVersion &&
+          (event.target === "TO" || event.actorId || event.successorId)) ||
+        (d.formatVersion === 2 &&
+          event.actorId &&
+          event.target !== "C" &&
+          event.target !== "AT")
+      )
+        fail("Autoria de comissão técnica incompatível com o lançamento.");
+    }
     if (
       new Set(d.participants.map((p) => p.rosterEntryId)).size !==
       d.participants.length
@@ -144,13 +156,14 @@ export const sheetSnapshotSchema = z
         s.participants.length,
   );
 export type SheetSnapshot = z.infer<typeof sheetSnapshotSchema>;
-export function emptyPersistedSheet(): PersistedSheet {
+export function emptyPersistedSheet(formatVersion?: 2): PersistedSheet {
   const staff = () => ({
     captainRosterEntryId: null,
     coachStaffEntryId: null,
     assistantStaffEntryId: null,
   });
   return {
+    ...(formatVersion ? { formatVersion } : {}),
     rulesVersion: "FIBA_2024",
     periods: 4,
     participants: [],
@@ -175,10 +188,12 @@ export function toEngineSheet(d: PersistedSheet): Sheet {
     assistantName: d.staff[side].assistantStaffEntryId ?? "",
   });
   return {
+    ...(d.formatVersion ? { formatVersion: d.formatVersion } : {}),
     rulesVersion: d.rulesVersion,
     periods: d.periods,
     roster: d.participants.map((p, i) => ({
       rosterEntryId: i + 1,
+      actorId: p.rosterEntryId,
       registrationId: p.side === "home" ? 1 : 2,
       side: p.side,
       jersey: p.jersey,

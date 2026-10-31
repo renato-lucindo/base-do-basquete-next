@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { rosterEntrySchema } from "./roster-contract";
 const uuid = z.uuid().transform((v) => v.toLowerCase());
-const version = z.number().int().min(1).max(2147483646);
+const version = z.number().int().min(1).max(2147483647);
 export const REUSE_LIMIT = 200;
 export const reuseEligibilitySchema = z.enum([
   "eligible",
@@ -22,6 +22,19 @@ const registration = z
     year: z.number().int().min(1).max(9999),
     division: z.string().max(80).nullable(),
     version,
+  })
+  .strict();
+export const rosterReuseSourcesSchema = z
+  .object({
+    items: z
+      .array(
+        registration.extend({
+          athleteCount: z.number().int().min(1).max(2147483647),
+          savedAt: z.iso.datetime({ offset: true }),
+        }),
+      )
+      .max(20),
+    hasMore: z.boolean(),
   })
   .strict();
 const targetEntry = z
@@ -127,3 +140,30 @@ export const applyRosterReuseSchema = z
       ),
   );
 export type ApplyRosterReuse = z.infer<typeof applyRosterReuseSchema>;
+export const rosterReuseResultSchema = z
+  .object({
+    commandId: uuid,
+    sourceRegistrationId: uuid,
+    targetRegistrationId: uuid,
+    items: z
+      .array(
+        z
+          .object({
+            sourceEntryId: uuid,
+            personId: uuid,
+            newEntryId: uuid,
+            version: z.literal(1),
+          })
+          .strict(),
+      )
+      .min(1)
+      .max(REUSE_LIMIT),
+  })
+  .strict()
+  .refine(
+    (r) =>
+      r.sourceRegistrationId !== r.targetRegistrationId &&
+      new Set(r.items.map((i) => i.sourceEntryId)).size === r.items.length &&
+      new Set(r.items.map((i) => i.personId)).size === r.items.length &&
+      new Set(r.items.map((i) => i.newEntryId)).size === r.items.length,
+  );

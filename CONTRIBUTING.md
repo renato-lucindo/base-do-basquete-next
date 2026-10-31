@@ -46,10 +46,20 @@ Integração Git, aplicação de migration e deploy são ações distintas. Veri
 
 WIP de reaproveitamento de elencos foi preservado fora da consolidação inicial da `main`; sua situação fica no checkpoint. Para retomá-lo, incorporar a `main` por merge explícito, revisar o diff restante e manter **uma** PRdraft para essa unidade. Não executar migrations locais como parte de atualização de Git.
 
-Em troca de agente, entregar branch/PR/SHA, evidências, mudanças alheias e próximo passo. Em pausa por cota, seguir o procedimento do responsável em `docs/PROGRESSO.md`; não estimar porcentagens, programar duplicatas ou comprar créditos.
+Em troca de agente, entregar branch/PR/SHA, evidências, mudanças alheias e próximo passo. Em pausa por cota, seguir o procedimento permanente abaixo; não estimar porcentagens, programar duplicatas ou comprar créditos.
 
 ## Referências
 
 - [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)
 - [Proteção de branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
 - `docs/CONSOLIDACAO-PRS.md`: inventário e destino das PRs históricas.
+
+## Checkpoint, histórico e objetivos futuros
+
+Mantenha `docs/PROGRESSO.md` como resumo atual das unidades ativas, substituindo entradas superadas. Preserve evidências e contexto único em `historico/progresso/`; o histórico não é leitura obrigatória nem autorização. Detalhes permanecem nos relatórios de validação e PRs. Consulte `docs/ROADMAP.md` ao planejar escopo: ideias pós-MVP só entram em execução por decisão explícita do responsável.
+
+### Cota e retomada
+
+Use a ferramenta real para consultar a janela de 5h e o saldo semanal. Ao atingir 15% restante na janela de 5h, não inicie outra unidade ou gate: conclua a operação mínima segura, registre checkpoint e preserve o trabalho na branch da unidade. Não invente horários, compre créditos ou consuma resets manuais.
+
+Quando houver autorização vigente para retomada automática, atualize a mesma automação desta conversa para o reset efetivamente observado mais dois minutos; não crie duplicatas. Confirme o agendamento pela ferramenta oficial e registre o identificador e o horário no checkpoint. Ao retomar, confira cota e estado real; se o reset não ocorreu ou outra janela impedir, use o próximo reset aplicável observado. Pause a automação ao concluir a unidade. Sem autorização de agendamento, registre o próximo passo para retomada humana.

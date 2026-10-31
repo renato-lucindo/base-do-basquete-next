@@ -226,8 +226,39 @@
 .sheet-coach-fouls {
   padding: 5px;
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
   min-height: 29px;
+}
+.sheet-staff-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.sheet-staff-identity {
+  min-width: 160px;
+}
+.sheet-acting-coach,
+.sheet-staff-status {
+  margin-left: 6px;
+  padding: 1px 4px;
+  border: 1px solid #a7b4c5;
+  border-radius: 3px;
+}
+.sheet-acting-coach {
+  color: #07599b;
+  background: #e9f4ff;
+}
+.sheet-staff-status {
+  color: #a02432;
+}
+.sheet-successor-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
 }
 .sheet-foul-mark {
   display: inline-block;

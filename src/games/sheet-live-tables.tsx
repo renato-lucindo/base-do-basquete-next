@@ -1,4 +1,4 @@
-import { periodLabel } from "../domain/scoresheet";
+import { periodColor, periodLabel } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import type { projectSheet } from "../scoresheet/projection";
@@ -12,6 +12,7 @@ export function SheetLiveTables({
   disabled,
   onPlayed,
   staffNames,
+  staffName,
 }: {
   document: PersistedSheet;
   projection: Projection;
@@ -21,6 +22,7 @@ export function SheetLiveTables({
   disabled: boolean;
   onPlayed: (id: string, played: boolean) => void;
   staffNames?: SheetSnapshot["staff"];
+  staffName: (id: string) => string;
 }) {
   return (
     <>
@@ -81,6 +83,29 @@ export function SheetLiveTables({
               <h4>
                 Equipe {letter} · {game[side].name}
               </h4>
+              {d.formatVersion === 2 && (
+                <p aria-label={`Tempos debitados da equipe ${letter}`}>
+                  <strong>Tempos debitados: </strong>
+                  {d.events.filter((e) => e.side === side && e.target === "TO")
+                    .length
+                    ? d.events
+                        .filter((e) => e.side === side && e.target === "TO")
+                        .map((e) => (
+                          <span
+                            key={e.id}
+                            className={
+                              periodColor(e.period) === "red"
+                                ? "sheet-ink-red"
+                                : "sheet-ink-blue"
+                            }
+                            title={`${periodLabel(e.period)} · minuto ${e.code} decorrido`}
+                          >
+                            {periodLabel(e.period)}: {e.code}′{" "}
+                          </span>
+                        ))
+                    : "Nenhum"}
+                </p>
+              )}
               <table
                 className="sheet-live-table"
                 aria-label={`Súmula equipe ${letter}`}
@@ -201,26 +226,98 @@ export function SheetLiveTables({
                 </tbody>
               </table>
               <div className="sheet-coach-fouls">
-                {(["C", "B"] as const).map((target) => (
-                  <div key={target}>
-                    <span>
-                      {target === "C"
-                        ? `Técnico: ${staffNames?.[side].coach?.name ?? (d.staff[side].captainRosterEntryId ? name(d.staff[side].captainRosterEntryId!) : "Não informado")}`
-                        : "Banco"}{" "}
+                {d.formatVersion === 2 ? (
+                  (() => {
+                    const team = p.totals.teams[side];
+                    const assigned = d.staff[side];
+                    const coachId =
+                      assigned.coachStaffEntryId ??
+                      assigned.captainRosterEntryId;
+                    const people = team.staffPeople ?? {};
+                    const ids = [
+                      coachId,
+                      assigned.assistantStaffEntryId,
+                      ...Object.keys(people),
+                    ]
+                      .filter((id): id is string => !!id)
+                      .filter((id, index, all) => all.indexOf(id) === index)
+                      .filter(
+                        (id) =>
+                          id === coachId ||
+                          id === assigned.assistantStaffEntryId ||
+                          id === team.activeCoachId ||
+                          !!people[id]?.marks.length ||
+                          (people[id]?.status !== "eligible" && !!people[id]),
+                      );
+                    return (
+                      <>
+                        {ids.map((id) => {
+                          const state = people[id];
+                          const role =
+                            id === coachId
+                              ? "Técnico"
+                              : id === assigned.assistantStaffEntryId
+                                ? "Ass. Técnico"
+                                : id === assigned.captainRosterEntryId
+                                  ? "Capitão"
+                                  : "Sucessor";
+                          return (
+                            <div key={id} className="sheet-staff-line">
+                              <span className="sheet-staff-identity">
+                                {role}: {staffName(id)}
+                                {id && team.activeCoachId === id && (
+                                  <strong className="sheet-acting-coach">
+                                    Técnico em exercício
+                                  </strong>
+                                )}
+                                {state?.status !== "eligible" &&
+                                  state?.status && (
+                                    <strong className="sheet-staff-status">
+                                      {state.status}
+                                    </strong>
+                                  )}
+                              </span>
+                              {state?.marks.map((mark) => (
+                                <span
+                                  key={mark.id + mark.code}
+                                  className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${mark.period <= 2 ? "sheet-first-half" : ""}`}
+                                  title={`${periodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
+                                >
+                                  {mark.code.replace(/C$/u, "c")}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </>
+                    );
+                  })()
+                ) : (
+                  <div className="sheet-staff-line">
+                    <span className="sheet-staff-identity">
+                      Técnico:{" "}
+                      {staffNames?.[side].coach?.name ??
+                        (d.staff[side].captainRosterEntryId
+                          ? name(d.staff[side].captainRosterEntryId!)
+                          : "Não informado")}
                     </span>
                     {d.events
-                      .filter((e) => e.side === side && e.target === target)
+                      .filter(
+                        (e) =>
+                          e.side === side &&
+                          (e.target === "C" || e.target === "B"),
+                      )
                       .map((e) => (
                         <span
                           key={e.id}
                           className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${e.period <= 2 ? "sheet-first-half" : ""}`}
-                          title={periodLabel(e.period)}
+                          title={`${periodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
                         >
                           {e.code.replace(/C$/u, "c")}
                         </span>
                       ))}
                   </div>
-                ))}
+                )}
               </div>
             </section>
           );

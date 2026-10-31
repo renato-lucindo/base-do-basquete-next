@@ -1,10 +1,71 @@
 import { test, expect } from "@playwright/test";
+import { tid } from "./fixtures/text-import";
 import {
   desktopSheetFixture,
   openDesktopSheet,
   chooseFive,
 } from "./fixtures/sheet-desktop";
 test.describe("desktop scoresheet MVP", () => {
+  test("v2 timeouts follow keyboard flow, limits, colors and persist across reload", async ({
+    page,
+  }) => {
+    const fixture = await desktopSheetFixture(page, 11, true);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    await page.getByLabel("Períodos da súmula").selectOption("5");
+    const add = async (period: number, minute: string) => {
+      await page
+        .getByLabel("Quarto ou prorrogação", { exact: true })
+        .selectOption(String(period));
+      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TO");
+      await page.keyboard.press("Enter");
+      await page.getByLabel(/Minuto decorrido/).fill(minute);
+      await page.keyboard.press("Enter");
+    };
+    await add(1, "3");
+    await add(2, "8");
+    await add(3, "5");
+    await add(4, "9");
+    await add(5, "4");
+    const times = page.getByLabel("Tempos debitados da equipe A");
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expect(times).toContainText("Q1: 3′");
+      await expect(times).toContainText("Q2: 8′");
+      await expect(times).toContainText("Q4: 9′");
+      await expect(times).toContainText("OT1: 4′");
+      await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
+      await expect(times.locator(".sheet-ink-blue")).toHaveCount(2);
+    }
+    await add(2, "7");
+    await expect(page.getByRole("alert")).toContainText(
+      "Máximo de dois tempos por equipe no primeiro tempo",
+    );
+    await add(5, "6");
+    await expect(page.getByRole("alert")).toContainText(
+      "Pedido de tempo inválido",
+    );
+    await page
+      .getByRole("button", { name: "Salvar rascunho da súmula" })
+      .click();
+    expect(
+      fixture.snapshot()?.document.events.filter((e) => e.target === "TO"),
+    ).toHaveLength(5);
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .click();
+    await page.getByRole("button", { name: "Preparar súmula" }).click();
+    await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
+      "OT1: 4′",
+    );
+  });
   test("desktop action history uses horizontal columns at both requested viewports", async ({
     page,
   }) => {
@@ -188,6 +249,13 @@ test.describe("desktop scoresheet MVP", () => {
     await add("away", 2, "P");
     await add("away", 3, "TC");
     await add("away", 3, "U2");
+    await expect(page.getByRole("alert")).toContainText(
+      "Indique explicitamente outro atleta elegível",
+    );
+    await page
+      .getByLabel("Indique o atleta que assumirá como técnico")
+      .selectOption(tid(201));
+    await page.getByRole("button", { name: "Registrar ação" }).click();
     const fouls = b
       .getByRole("row")
       .filter({
@@ -253,6 +321,127 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       page.getByLabel("Titular Jogador A 1", { exact: true }),
     ).toBeChecked();
+  });
+
+  test("game roles accept either registered role, reject duplicate persons and persist linked D/B2", async ({
+    page,
+  }) => {
+    const f = await desktopSheetFixture(page, 11, true);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    const coach = page.getByLabel("Técnico A", { exact: true });
+    await coach.selectOption(tid(300)); // Registered as assistant.
+    const assistant = page.getByLabel("Ass. Técnico A", { exact: true });
+    await expect(assistant.locator(`option[value="${tid(302)}"]`)).toHaveCount(
+      0,
+    );
+    await expect(assistant.locator(`option[value="${tid(300)}"]`)).toHaveCount(
+      0,
+    );
+    await assistant.selectOption(tid(301)); // Registered as head.
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    const add = async (target: string, code: string) => {
+      await page.getByLabel("Equipe da ação").selectOption("home");
+      await page.getByLabel("Camisa ou alvo").fill(target);
+      await page.keyboard.press("Enter");
+      await page.getByLabel("Ação", { exact: true }).fill(code);
+      await page.keyboard.press("Enter");
+    };
+    await add("C", "B1");
+    await add("AT", "D2");
+    const staff = page
+      .locator(".sheet-desktop-teams:visible .sheet-team-card")
+      .first()
+      .locator(".sheet-coach-fouls");
+    await expect(staff).toContainText("Treinador A 1");
+    await expect(staff).toContainText("Treinador A 2");
+    await expect(staff).toContainText("B1");
+    await expect(staff).toContainText("B2");
+    await expect(staff).toContainText("D2");
+    await expect(staff).toContainText("Técnico em exercício");
+    await expect(page.locator(".sheet-actions li")).toHaveCount(2);
+    await page.getByRole("button", { name: "Desfazer ação ou ajuste" }).click();
+    await expect(staff).not.toContainText("B2");
+    await page.getByRole("button", { name: "Refazer ação ou ajuste" }).click();
+    await expect(staff).toContainText("B2");
+    await page
+      .getByRole("button", { name: "Salvar rascunho da súmula" })
+      .click();
+    expect(f.snapshot()?.document.formatVersion).toBe(2);
+    expect(f.snapshot()?.document.events).toMatchObject([
+      { target: "C", actorId: tid(300), code: "B1" },
+      { target: "AT", actorId: tid(301), code: "D2" },
+    ]);
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .click();
+    await page.getByRole("button", { name: "Preparar súmula" }).click();
+    await page.getByRole("button", { name: "Revisar preparação" }).click();
+    await expect(page.getByLabel("Técnico A", { exact: true })).toHaveValue(
+      tid(300),
+    );
+    await expect(
+      page.getByLabel("Ass. Técnico A", { exact: true }),
+    ).toHaveValue(tid(301));
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    await expect(page.locator(".sheet-coach-fouls").first()).toContainText(
+      "Treinador A 1",
+    );
+  });
+
+  test("a disqualified coach passes the role to the assistant without transferring prior fouls", async ({
+    page,
+  }) => {
+    const f = await desktopSheetFixture(page, 11, true);
+    await openDesktopSheet(page);
+    await chooseFive(page);
+    await page.getByLabel("Técnico A", { exact: true }).selectOption(tid(301));
+    await page
+      .getByLabel("Ass. Técnico A", { exact: true })
+      .selectOption(tid(300));
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    const add = async (code: string) => {
+      await page.getByLabel("Equipe da ação").selectOption("home");
+      await page.getByLabel("Camisa ou alvo").fill("C");
+      await page.keyboard.press("Enter");
+      await page.getByLabel("Ação", { exact: true }).fill(code);
+      await page.keyboard.press("Enter");
+    };
+    await add("C1");
+    await add("D2");
+    await add("B1");
+    const staff = page
+      .locator(".sheet-desktop-teams:visible .sheet-team-card")
+      .first()
+      .locator(".sheet-coach-fouls");
+    await expect(staff).toContainText("Técnico em exercício");
+    await expect(staff).toContainText("Treinador A 1");
+    await expect(staff).toContainText("Treinador A 2");
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await expect(staff).toBeVisible();
+      expect((await staff.boundingBox())!.width).toBeLessThan(viewport.width);
+    }
+    await page
+      .getByRole("button", { name: "Salvar rascunho da súmula" })
+      .click();
+    expect(
+      f.snapshot()?.document.events.map((e) => [e.actorId, e.code]),
+    ).toEqual([
+      [tid(301), "C1"],
+      [tid(301), "D2"],
+      [tid(300), "B1"],
+    ]);
   });
 
   test.skip(

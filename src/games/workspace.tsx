@@ -3,6 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
+import { changeGameTime, gameTimeFields } from "./time-fields";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
 import {
@@ -28,6 +29,7 @@ import {
 import {
   gameListingSchema,
   gameSchema,
+  durationMinutes,
   type GameSnapshot,
   type SaveGame,
 } from "./contract";
@@ -48,6 +50,8 @@ const document = (s: GameSnapshot) =>
     awayRegistrationId: s.awayRegistrationId,
     date: s.date,
     time: s.time,
+    startAt: s.startAt,
+    endAt: s.endAt,
     venue: s.venue,
     number: s.number,
   });
@@ -317,6 +321,13 @@ export function GamesWorkspace(props: Props) {
     setEditor((s) => (s ? { ...s, game: { ...s.game, [key]: value } } : s));
     setStatus("");
   }
+  function changeTime(field: "date" | "start" | "end", value: string) {
+    if (busy || uncertain || conflict) return;
+    setEditor((s) =>
+      s ? { ...s, game: changeGameTime(s.game, field, value) } : s,
+    );
+    setStatus("");
+  }
   const candidates = [
     ...new Map(
       [...chosen, ...registrations.items].map((r) => [r.id, r]),
@@ -411,6 +422,8 @@ export function GamesWorkspace(props: Props) {
                 awayRegistrationId: "",
                 date: null,
                 time: null,
+                startAt: null,
+                endAt: null,
                 venue: null,
                 number: null,
               },
@@ -482,8 +495,7 @@ export function GamesWorkspace(props: Props) {
           {feedback}
           <div className="teams-inline">
             <p>
-              Horários em America/Sao_Paulo. Data, horário, local e número são
-              opcionais. Salvar a agenda não publica resultado.
+              Horários em America/Sao_Paulo. Salvar não publica o resultado.
             </p>
             <fieldset
               className="competition-form"
@@ -525,22 +537,46 @@ export function GamesWorkspace(props: Props) {
                 )}
               </div>
 
-              <label>
-                Data do jogo
-                <input
-                  type="date"
-                  value={editor.game.date ?? ""}
-                  onChange={(e) => change("date", e.target.value || null)}
-                />
-              </label>
-              <label>
-                Horário do jogo
-                <input
-                  type="time"
-                  value={editor.game.time ?? ""}
-                  onChange={(e) => change("time", e.target.value || null)}
-                />
-              </label>
+              <div className="game-actual-times">
+                <label>
+                  Data do jogo
+                  <input
+                    type="date"
+                    value={gameTimeFields(editor.game).date}
+                    onChange={(e) => changeTime("date", e.target.value)}
+                  />
+                </label>
+                <label>
+                  Hora de início
+                  <input
+                    type="time"
+                    value={gameTimeFields(editor.game).start}
+                    disabled={!gameTimeFields(editor.game).date}
+                    onChange={(e) => changeTime("start", e.target.value)}
+                  />
+                </label>
+                <label>
+                  Hora de fim
+                  <input
+                    type="time"
+                    value={gameTimeFields(editor.game).end}
+                    disabled={
+                      !gameTimeFields(editor.game).date ||
+                      !gameTimeFields(editor.game).start
+                    }
+                    onChange={(e) => changeTime("end", e.target.value)}
+                  />
+                </label>
+                <p role="status">
+                  Duração total (inclui intervalos):{" "}
+                  {durationMinutes(editor.game.startAt, editor.game.endAt) ===
+                  null
+                    ? "Informe a hora de fim para calcular."
+                    : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
+                  . Se o fim for anterior ao início, será considerado no dia
+                  seguinte.
+                </p>
+              </div>
               <VenuePicker
                 value={editor.game.venue ?? ""}
                 onChange={(value) => change("venue", value || null)}
