@@ -16,7 +16,7 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
       .filter((name) => name.endsWith(".sql"))
       .sort();
     for (const name of names.filter(
-      (name) => !pending.includes(name) && name < "20261030140000",
+      (name) => !pending.includes(name) && name < "20261031004320",
     ))
       await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     // This fixture mutates Auth/admin only in the disposable PGlite database.
@@ -55,8 +55,8 @@ it("rehearses PR38 after the remote baseline, rolls DDL back and preserves v1 pu
     ).toEqual([{ no_v1_rename: true, no_v2: true, no_receipts: true }]);
     await upgrade();
     for (const name of [
-      "20261030140000_sheet_timeouts.sql",
-      "20261030141000_game_actual_times.sql",
+      "20261031004320_sheet_timeouts.sql",
+      "20261031005230_game_actual_times.sql",
     ])
       await db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
     expect((await historical()).rows).toEqual(before);

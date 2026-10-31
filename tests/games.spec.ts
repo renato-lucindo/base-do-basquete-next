@@ -233,9 +233,9 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
     .fill("2026-10-30T23:15");
   await page
     .getByLabel("Término real do jogo (data e hora)")
-    .fill("2026-10-31T00:50");
+    .fill("2026-10-31T00:47");
   await expect(
-    page.getByRole("status").filter({ hasText: "1h 35min" }),
+    page.getByRole("status").filter({ hasText: "1h32min" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
@@ -243,7 +243,7 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
   ).toBeVisible();
   expect([...f.games.values()][0]).toMatchObject({
     startAt: "2026-10-30T23:15",
-    endAt: "2026-10-31T00:50",
+    endAt: "2026-10-31T00:47",
   });
   await page.reload();
   await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
@@ -252,5 +252,5 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
   ).toHaveValue("2026-10-30T23:15");
   await expect(
     page.getByLabel("Término real do jogo (data e hora)"),
-  ).toHaveValue("2026-10-31T00:50");
+  ).toHaveValue("2026-10-31T00:47");
 });

@@ -582,7 +582,7 @@ export function GamesWorkspace(props: Props) {
                   {durationMinutes(editor.game.startAt, editor.game.endAt) ===
                   null
                     ? "Informe início e término reais válidos, com duração de até 24 horas."
-                    : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h ${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
+                    : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
                   . O horário da agenda não é utilizado no cálculo.
                 </p>
               </div>
