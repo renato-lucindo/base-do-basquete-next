@@ -1,6 +1,6 @@
 # Reaproveitar elenco da mesma equipe — correção prioritária
 
-Autorização27/10/2026: responsável relatou reinserção manual ao inscrever a mesma equipe em outra categoria/disputa e priorizou esse fluxo. Auditoria anterior concluída e commitada em `cc02882`, antes desta implementação: `docs/AUDITORIA-REUSO-BASE-ANTERIOR.md`.
+Autorização27/10/2026: responsável relatou reinserção manual ao inscrever a mesma equipe em outra categoria/disputa e priorizou esse fluxo. Auditoria anterior concluída e commitada em `cc02882`, antes desta implementação: `historico/documentacao/analises/AUDITORIA-REUSO-BASE-ANTERIOR.md`.
 
 ## Experiência e limites
 

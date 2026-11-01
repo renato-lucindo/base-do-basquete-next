@@ -4,7 +4,7 @@
 
 Responsável inscreveu a mesma equipe no mesmo campeonato em outra disputa/categoria e precisou inserir todos os atletas novamente, sem sugestão de reaproveitamento. Prioridade crítica: identidade global reutilizada com origem identificada, conferência de jogadores/camisas e vínculos independentes por disputa, preservando o destino já preenchido manualmente. Não confundir preparação da súmula da inscrição com aproveitamento de elenco de outra inscrição.
 
-Antes de implementar, pediu pente fino do GitHub `renato-lucindo/base-do-basquete` e da pasta `C:/Users/12405304716/Documents/Codex/Base do Basquete`. Consulta de código/referências expressamente autorizada agora, sem migração de dados ou acesso a serviços anteriores. Auditoria concluída em `docs/AUDITORIA-REUSO-BASE-ANTERIOR.md`: sugestão/cópia transacional antiga existe, mas deve ser adaptada ao destino já existente e aos contratos atuais. Recursos úteis de estatísticas/UI e regressões a evitar foram mapeados. Nenhum código antigo foi executado ou copiado nesta etapa.
+Antes de implementar, pediu pente fino do GitHub `renato-lucindo/base-do-basquete` e da pasta `C:/Users/12405304716/Documents/Codex/Base do Basquete`. Consulta de código/referências expressamente autorizada agora, sem migração de dados ou acesso a serviços anteriores. Auditoria concluída em `historico/documentacao/analises/AUDITORIA-REUSO-BASE-ANTERIOR.md`: sugestão/cópia transacional antiga existe, mas deve ser adaptada ao destino já existente e aos contratos atuais. Recursos úteis de estatísticas/UI e regressões a evitar foram mapeados. Nenhum código antigo foi executado ou copiado nesta etapa.
 
 ## Feedback27/10 — cadastro exposto e camisa na pessoa
 

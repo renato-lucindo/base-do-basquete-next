@@ -45,7 +45,7 @@
 
 ## Aplicação autorizada no Supabase — 29/10/2026
 
-Três migrations aplicadas com sucesso no `base-do-basquete-next-dev`, conforme confirmação explícita do responsável; remoto passou de 49 para **52**. Versões reais `20261029221031_roster_reuse_context`, `20261029221048_roster_reuse_write`, `20261029221056_sheet_staff_v2`; SQL conferido integralmente contra o commit aprovado `fe80274`. Arquivos locais renomeados para corresponder ao histórico, sem alterar SQL aplicado ou as 49 migrations anteriores. Mapa completo no [plano](PLANO-MIGRATIONS-PR38.md).
+Três migrations aplicadas com sucesso no `base-do-basquete-next-dev`, conforme confirmação explícita do responsável; remoto passou de 49 para **52**. Versões reais `20261029221031_roster_reuse_context`, `20261029221048_roster_reuse_write`, `20261029221056_sheet_staff_v2`; SQL conferido integralmente contra o commit aprovado `fe80274`. Arquivos locais renomeados para corresponder ao histórico, sem alterar SQL aplicado ou as 49 migrations anteriores. Mapa completo no [plano](../planos/PLANO-MIGRATIONS-PR38.md).
 
 - Catálogo real: wrappers públicos `security invoker` com EXECUTE só para `authenticated`; motores privados sem EXECUTE para papéis API; busca de schema vazia; recibos/linhagem com RLS, política restritiva e trigger de imutabilidade. Advisor posterior sem achados novos: 1 WARN/4 INFO preexistentes.
 - Comparações agregadas antes/depois e após os testes idênticas: 18 súmulas, 17 publicações atuais, 20 versões históricas, 252 vínculos e 171 pessoas. Admin/IDs Auth inalterados, sem consultar senhas ou hashes de credenciais.

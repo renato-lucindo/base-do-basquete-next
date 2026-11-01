@@ -2,7 +2,7 @@
 
 ## Escopo e autorização
 
-Responsável aprovou os ajustes de pessoa/camisa (“Ok, gostei”) e autorizou iniciar a padronização das demais telas (“Ok, inicie”). Implementação somente de apresentação desktop, sobre PR30/base16e171a, branch `codex/admin-demais-telas`. Campos e tabelas compactos, sem novas regras, contratos, migrations, dependências ou alterações em dados humanos. Plano `docs/superpowers/plans/2026-10-27-demais-telas-compactas.md`.
+Responsável aprovou os ajustes de pessoa/camisa (“Ok, gostei”) e autorizou iniciar a padronização das demais telas (“Ok, inicie”). Implementação somente de apresentação desktop, sobre PR30/base16e171a, branch `codex/admin-demais-telas`. Campos e tabelas compactos, sem novas regras, contratos, migrations, dependências ou alterações em dados humanos. Plano `historico/documentacao/planos/2026-10-27-demais-telas-compactas.md`.
 
 ## RED e verificações focais
 
