@@ -21,13 +21,13 @@ Se existir WIP ou alteração alheia, reconciliar antes. Não usar `reset --hard
 
 ## Implementar e verificar
 
-- Nas interfaces e nos protótipos, siga [os padrões de hierarquia](docs/design/PADROES.md). Comece pela informação que a pessoa veio consultar e confira a primeira tela em desktop e celular. As referências navegáveis e os comandos de validação estão em [docs/design](docs/design/README.md).
+- Nas interfaces e nos protótipos, siga o [índice de UI/UX](docs/design/README.md), os [padrões comuns](docs/design/PADROES.md), as regras de [Público](docs/design/PUBLICO.md) ou [Administração](docs/design/ADMIN.md) e os [padrões específicos do admin](docs/design/PADROES-ADMIN.md). Comece pela informação/ação principal e confira os estados e tamanhos afetados. Para saber quais documentos ler em cada tipo de tarefa, consulte [docs/INDICE.md](docs/INDICE.md).
 
 - Commits pequenos, coerentes e com descrição do efeito. `feat:`, `fix:`, `test:` e `docs:` são convenções úteis, sem exigir uma ferramenta adicional.
 - Durante a edição, rode apenas verificações pertinentes. Quando a unidade estabilizar: `npm run gate` e os browsers afetados; CI consolida a composição no SHA da PR.
 - Node24+ e lockfile existente: `npm ci --ignore-scripts`. A aplicação real local usa `npm run dev:foundation`; Vite isolado não fornece a API do Worker. Testes de interface usam fixtures próprias, não dados humanos do preview.
 - Evidência registra comando, ambiente, SHA, resultado e limites. PASS antigo não valida código novo. Também não repetir suítes de código materialmente idêntico por documentação ou troca de sessão.
-- A CI sempre produz o check `validate`. Para alterações só de documentação textual/imagens, faz formato e segredos; código, testes, scripts, workflows ou insumos executáveis exigem o gate e browsers. A alteração de escopo é calculada por diff real, não por título da PR.
+- A CI sempre produz o check `validate`. Para alterações só de documentação textual/imagens, faz formato e segredos; código, testes, scripts, workflows ou insumos executáveis exigem o gate e browsers. A alteração de escopo é calculada por diff real, não por título da PR. Arquivos Markdown/imagens em `historico/documentacao/` também são documentais; scripts de skills, workflow e outras alterações executáveis exigem o gate completo.
 - Não desativar testes ou aumentar timeouts para encobrir defeitos. Diagnostique focalmente e preserve o histórico das falhas relevantes.
 
 ## Revisar e integrar
@@ -46,10 +46,20 @@ Integração Git, aplicação de migration e deploy são ações distintas. Veri
 
 WIP de reaproveitamento de elencos foi preservado fora da consolidação inicial da `main`; sua situação fica no checkpoint. Para retomá-lo, incorporar a `main` por merge explícito, revisar o diff restante e manter **uma** PRdraft para essa unidade. Não executar migrations locais como parte de atualização de Git.
 
-Em troca de agente, entregar branch/PR/SHA, evidências, mudanças alheias e próximo passo. Em pausa por cota, seguir o procedimento do responsável em `docs/PROGRESSO.md`; não estimar porcentagens, programar duplicatas ou comprar créditos.
+Em troca de agente, entregar branch/PR/SHA, evidências, mudanças alheias e próximo passo. Em pausa por cota, seguir o procedimento permanente abaixo; não estimar porcentagens, programar duplicatas ou comprar créditos.
 
 ## Referências
 
 - [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)
 - [Proteção de branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
-- `docs/CONSOLIDACAO-PRS.md`: inventário e destino das PRs históricas.
+- `historico/documentacao/analises/CONSOLIDACAO-PRS.md`: inventário e destino das PRs históricas.
+
+## Checkpoint, histórico e objetivos futuros
+
+Mantenha `docs/PROGRESSO.md` como resumo atual das unidades ativas, substituindo entradas superadas. Preserve evidências e contexto único em `historico/progresso/`; o histórico não é leitura obrigatória nem autorização. Detalhes permanecem nos relatórios de validação e PRs. Consulte `docs/ROADMAP.md` ao planejar escopo: ideias pós-MVP só entram em execução por decisão explícita do responsável.
+
+### Cota e retomada
+
+Use a ferramenta real para consultar a janela de 5h e o saldo semanal. Ao atingir 15% restante na janela de 5h, não inicie outra unidade ou gate: conclua a operação mínima segura, registre checkpoint e preserve o trabalho na branch da unidade. Não invente horários, compre créditos ou consuma resets manuais.
+
+Quando houver autorização vigente para retomada automática, atualize a mesma automação desta conversa para o reset efetivamente observado mais dois minutos; não crie duplicatas. Confirme o agendamento pela ferramenta oficial e registre o identificador e o horário no checkpoint. Ao retomar, confira cota e estado real; se o reset não ocorreu ou outra janela impedir, use o próximo reset aplicável observado. Pause a automação ao concluir a unidade. Sem autorização de agendamento, registre o próximo passo para retomada humana.

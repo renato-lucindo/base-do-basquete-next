@@ -1,4 +1,33 @@
-# Protótipos públicos para implementação
+# Design — índice e fluxo de agentes
+
+## Leitura por tarefa
+
+- [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
+- [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
+- [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
+- [ADMIN.md](ADMIN.md): percursos administrativos e aceite proporcional; componentes e comportamentos ficam em PADROES-ADMIN.
+- [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
+- Evidência histórica, somente se necessária: [VALIDACAO-DESIGN-PUBLICO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md), com evidências e limites dos protótipos.
+
+## Hierarquia de decisões
+
+A fonte única da hierarquia documental e dos critérios de resolução de conflitos é a [seção 8 de docs/INDICE.md](../INDICE.md#8-hierarquia-de-decis%C3%B5es). As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`.
+
+Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da área e com os dados efetivamente disponíveis. Resolva divergências conforme o índice, sem inventar cobertura nem alterar domínio ou publicação por conveniência visual.
+
+## Fluxo de trabalho dos agentes
+
+1. **Entender:** identificar a tarefa e o primeiro dado útil, ler o padrão da área, consultar o estado real no Next e limitar o escopo ao MVP.
+2. **Projetar:** usar `ui-ux-pro-max` para pesquisar recomendações específicas de fluxo, componentes e hierarquia; preservar identidade, decisões e componentes já existentes.
+3. **Implementar:** cuidar desde o início de teclado, leitor de tela, foco, erro, carregamento, vazio, densidade e zoom.
+4. **Revisar:** usar `web-design-guidelines` sobre arquivos de UI alterados, buscar diretrizes atualizadas da fonte indicada pela skill antes da revisão e registrar achados por arquivo/linha.
+5. **Verificar:** revisão **proporcional** à mudança (texto, componente ou fluxo), com tamanhos de tela/estados afetados, testes pertinentes, capturas quando necessário e evidência de SHA/resultado/limites. Axe não substitui inspeção manual nem comprova WCAG integral.
+
+**Skills e instalação híbrida:** consulte [SKILLS.md](SKILLS.md) para origem, licença, versão, hashes e execução. `ui-ux-pro-max` está versionada com catálogos e scripts; `web-design-guidelines` continua por instalação local ou consulta à fonte, pois não foi comprovada licença de redistribuição da coleção. Preservar instalações pessoais e `skills-lock.json` de outros checkouts, sem alegar revisão não executada.
+
+---
+
+## Protótipos públicos para implementação
 
 Esta unidade reúne duas referências navegáveis com dados fictícios: a súmula pública revisada e a página de estatísticas r6 enviada pelo responsável, com cabeçalho e controles compactados. A implementação nas rotas reais será uma unidade posterior.
 
@@ -26,7 +55,7 @@ As dependências vêm do lockfile do projeto. O build da súmula incorpora HTML,
 
 Os verificadores cobrem cálculos, ausência versus zero, filtros/ordenação, quartos, faltas, painéis, teclado, toque, rolagem interna e axe. A verificação de hierarquia mede a primeira linha útil e as linhas visíveis nas duas larguras. A CI executa esse conjunto junto com o gate existente quando houver alterações executáveis.
 
-As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](VALIDACAO.md).
+As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
 
 ## Origem e adaptações
 

@@ -1,5 +1,7 @@
 # Integração futura das páginas públicas
 
+Contrato **específico dos protótipos de súmula e estatísticas**. Para regras gerais, consulte [PADROES.md](PADROES.md); para o fluxo público aprovado, consulte [PUBLICO.md](PUBLICO.md). Este arquivo descreve comportamento e limites de integração, não declara que a implementação real já foi feita ou liberada.
+
 ## Limite desta PR
 
 Entrega de design e comportamento demonstrável. As fontes em `docs/design/prototipos/` não são importadas pela aplicação. Os cenários, a faixa de protótipo e as fixtures são recursos de avaliação; não entram automaticamente no produto.
