@@ -24,6 +24,6 @@ Unidade posterior à publicação da acessibilidade, ainda não iniciada. Objeti
 
 - [ ] Observar RED para suporte ausente/comportamento incorreto; provas focais antes de corrigir algo. Runner de concorrência não deve mudar produto se ele jácumprir o contrato. Serviço local17.11 não equivale a AuthGoTrue real; complementaridade com contratos jáexecutados emSupabase17.11, sem atribuir um ao outro.
 - [ ] Provar término de todos os processos/porta fechada ao sair e registrar versão/ambiente/SHAs/tempos/limitações. CI opcional dedicado com serviço PostgreSQL17.11 apenas se runner/ambiente estiverem estáveis; não repetir515/352/harness126 ou gates completos por artefatos de teste/documentação sem alteração de produto.
-- [ ] Preservar migrations/segredos/dados humanos/preview; docs/VALIDACAO-CONCORRENCIA.md e PROGRESSO.md governam continuidade. Sem merge/produção/revisão independente ou carga inferidos.
+- [ ] Preservar migrations/segredos/dados humanos/preview; historico/documentacao/validacoes/VALIDACAO-CONCORRENCIA.md e PROGRESSO.md governam continuidade. Sem merge/produção/revisão independente ou carga inferidos.
 
 Cota real antes de preparar/baixar/iniciar e entrecasos; ao85%usados5h sómenor operação segura (inclusive parar cluster próprio), checkpoint/push/MESMAautomação resetefetivo+2. Nunca deixar banco de teste/porta ativa por limite de cota; não comprar créditos/plano/resetmanual. Aceites/agenda/StorageHTTP adiados continuam pendentes sem repetir perguntas.

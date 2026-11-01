@@ -26,7 +26,7 @@ Arquivos: src/team-statistics/{contract.ts,query-contract.ts,domain.ts,domain.te
 - [ ] Fonte inteira validada antes de filtro; duplicidade jogo/inscrição, inscrição associada a outro time, contexto trocado, IDs/privados extras recusados. DNP não produz observação nem J individual, mas continua na lista histórica;0/00 distintos e nomes de jogos antigos preservados.
 - [ ] Contratos fechados para tabela/detalhe, versões/cobertura/contexto, paginação20 independente de totais. Buscar/ordenar antes de paginar; ausências não são0. Fonte corrigida muda os derivados na próxima leitura.
 - [ ] Matriz total/per-game x regular/playoffs/all, sem fase inferida. Recorte sem partidas fica vazio, não placar0–0. Mínimo temporal não é necessário a PP/PC; não inventar duração de partida.
-- [ ] GREEN focais, composição estatística afetada e tipos/lint/formato/segredos. Commit pequeno skipci até vertical estável, evidências em docs/VALIDACAO-EQUIPES-PUBLICAS.md/ADR018; não repetir harness126/SQL imutáveis.
+- [ ] GREEN focais, composição estatística afetada e tipos/lint/formato/segredos. Commit pequeno skipci até vertical estável, evidências em historico/documentacao/validacoes/VALIDACAO-EQUIPES-PUBLICAS.md/ADR018; não repetir harness126/SQL imutáveis.
 
 ## ET2 — adapter e rotas read-only
 

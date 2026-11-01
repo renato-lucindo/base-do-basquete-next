@@ -16,4 +16,4 @@ Ruling: trazer apenas migration20261026135708/types da branch anterior para espe
 
 Ruling: nova consulta bounded administrativa entrega candidatos completos e histórico mínimo para busca local/combobox, evitando inferir a lista a partir de só20itens da página existente. Limites explícitos por inscrição, sem truncamento silencioso ou nomes privados fora da necessidade. Escritor existente revalida vínculos/versões no save.
 
-Registro de execução/testes/SHA em docs/VALIDACAO-SUMULA-DESKTOP.md e checkpoint em docs/PROGRESSO.md. Cota real≤15%restante5h interrompe novas unidades/gates; mínimo consistente/push e mesma automação reset+2.
+Registro de execução/testes/SHA em historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md e checkpoint em docs/PROGRESSO.md. Cota real≤15%restante5h interrompe novas unidades/gates; mínimo consistente/push e mesma automação reset+2.

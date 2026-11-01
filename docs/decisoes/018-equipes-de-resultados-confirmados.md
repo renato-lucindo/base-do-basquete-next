@@ -1,5 +1,7 @@
 # 018 — Consulta de equipes conserva inscrição e fontes publicadas
 
+**Vigência (01/11/2026):** identidade por inscrição e fontes publicadas permanecem vigentes. A leitura do agregado foi evoluída para paginação no [019](019-fonte-estatistica-limitada-por-pagina.md). O parágrafo de ordem de branches/CI é registro da execução passada, sem autorizar empilhamento ou publicação agora.
+
 26/10/2026. ESCOPO§8 pede tabela de equipes com busca/ordem/totais/médias e detalhe com estatísticas, elenco e jogos. Esta unidade independente consome somente os resultados já publicados na fonte confirmed-statistics-v1. Política para inscritos sem resultado e agenda futura permanece sem resposta; não antecipar sua exposição nem buscar elenco/cadastro live para preencher lacunas.
 
 Linha de tabela é inscrição na disputa. Mesmo teamId com Lobos/Lobos B conserva dois registrationIds; o detalhe recebe o vínculo explícito. Nome de exibição vem de ocasião pública com proveniência e aliases; participantes e jogos preservam nomes/camisas da ocasião. Uma lista de relacionados publicada não é chamada elenco atual. DNP permanece distinguível de ausência/zero, sem adicionar jogo ou observação individual.

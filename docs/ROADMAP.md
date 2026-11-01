@@ -1,0 +1,82 @@
+# Roadmap do produto
+
+## MVP atual
+
+O escopo e as pendências estão em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md); a execução observada está em [PROGRESSO.md](PROGRESSO.md). Este roadmap não declara etapas concluídas nem substitui decisões de domínio e critérios de aceite.
+
+Concluir o MVP exige validar os percursos do escopo vigente, resolver bloqueios e obter os aceites aplicáveis. Funcionalidade adiada não vira automaticamente pós-MVP: preserve sua classificação e decisão originais até o responsável alterá-las explicitamente.
+
+## Objetivos registrados
+
+A ordem dos IDs não representa prioridade. O identificador original é preservado mesmo quando um objetivo muda de fase. Cada entrada informa seu escopo e status atuais.
+
+### FUT-001 — Tempos debitados na súmula
+
+**Status:** Priorizada para o MVP; implementação técnica relatada na [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38), ainda Draft e não integrada/aceita. Situação de execução e CI no [checkpoint](PROGRESSO.md). **Origem:** pedido de 29/10/2026. **Decisão do responsável em 30/10/2026:** incluir os pedidos de tempo no MVP, deixando de ser exclusivamente pós-MVP. Esta atualização registra a prioridade; não inicia a implementação nem altera as PRs ativas.
+
+**Objetivo e benefício:** registrar o minuto de cada tempo debitado por equipe na súmula, com entrada rápida por teclado e identificação do quarto.
+
+**Comportamento solicitado:**
+
+- Entrada `TO` → `ENTER` → minuto de `1` a `10`.
+- Limite solicitado de dois tempos por equipe no primeiro tempo, compartilhados entre Q1/Q2; três no segundo tempo, compartilhados entre Q3/Q4. Não interpretar como limite por quarto.
+- Fonte segue a coloração do quarto já definida para a súmula: vermelho nos ímpares, azul nos pares; preservar também a identificação textual do período.
+
+**Dependências e pontos para o planejamento futuro:** identificar a equipe destinatária do comando e o quarto vigente; definir confirmação do minuto, correção/remoção e persistência/publicação compatíveis com o histórico da súmula. Conferir a regra FIBA oficial vigente antes de implementar, incluindo restrições dos minutos finais, prorrogações e significado do minuto informado (decorrido ou restante). Os limites acima registram o pedido, não uma verificação normativa completa. Não inferir transferência de tempos entre metades ou prorrogações.
+
+### FUT-002 — Recordes da Carreira no perfil do jogador
+
+**Status:** Ideia. **Origem:** pedido do responsável em 29/10/2026; autorizado somente o registro no roadmap.
+
+**Objetivo e benefício:** mostrar as cinco maiores atuações individuais de cada estatística válida da carreira, como o career high da NBA, permitindo consultar o confronto de origem.
+
+**Comportamento solicitado:** seção “Recordes da Carreira” no perfil do jogador, com ranking próprio por estatística, incluindo pontos, assistências, rebotes e outras métricas válidas disponíveis. Cada atuação deve identificar e referenciar seu confronto. Ao clicar no elemento associado a uma atuação, abrir a página do jogo em que ela ocorreu. O elemento clicável (célula, link, ação ou outro) será definido com o responsável no planejamento futuro; não fixar essa escolha agora. Complemento registrado em 30/10/2026.
+
+Estrutura sugerida pelo responsável para pontos:
+
+| Pos. | PTS | Ano  | Idade    | Campeonato |
+| ---- | --- | ---- | -------- | ---------- |
+| 1    | 53  | 2026 | 26a 12d  | Copa ES    |
+| 2    | 48  | 2016 | 16a 342d | CBI-Sub 16 |
+| 3    | 33  | 2026 | 25a 360d | CCB        |
+| 4    | 33  | 2020 | 20a 1d   | Copa ES    |
+| 5    | 29  | 2026 | 26a 17d  | Camp       |
+
+Exemplo ilustrativo fornecido pelo responsável, sem validação de datas ou dados reais. A coluna da estatística varia conforme a métrica; a referência ao confronto deve estar acessível mesmo que não apareça nas colunas do exemplo. Idade corresponde à data do jogo, não à idade atual.
+
+**Dependências e pontos para o planejamento futuro:** identidade histórica do jogador, jogos e estatísticas publicados elegíveis, cobertura por métrica e data de nascimento utilizável para calcular idade. Dados ausentes não viram zero nem idade estimada. Definir métricas elegíveis e fontes comparáveis, desempate e posições em empates (o exemplo usa posições sequenciais), tratamento de menos de cinco atuações e apresentação de idade indisponível. Preservar correções de resultados e evitar duplicar o mesmo jogo por suas diferentes fontes/versões. Não expor data de nascimento privada para calcular a idade no navegador.
+
+### FUT-003 — Equipes e elencos em duas colunas
+
+**Status:** Ideia pós-MVP, com direção de interface definida; implementação não iniciada. **Origem e decisão:** conversa com o responsável em 30/10/2026. Registro no roadmap, sem priorização para o MVP.
+
+**Objetivo e benefício:** abrir o elenco ao lado da lista administrativa de equipes, facilitando a troca de equipe e evitando que a expansão do elenco alongue a página.
+
+**Comportamento definido:**
+
+- Desktop: duas colunas sem sobreposição; aproximadamente 30% da largura para equipes à esquerda e 70% para o elenco à direita. Ajustar ao espaço disponível e à legibilidade.
+- Clicar em uma equipe destaca sua inscrição e mostra o elenco correspondente no painel direito; selecionar outra troca o conteúdo do painel mantendo a lista visível.
+- Antes da seleção, mostrar “Selecione uma equipe para ver o elenco”.
+- Com edição pendente, confirmar descarte antes de trocar de equipe, preservando as proteções atuais de salvamento.
+- No celular ou quando a largura não comportar as colunas, mostrar somente o elenco selecionado com “Voltar às equipes”; ao retornar, restaurar busca e posição da lista.
+- Manter os diálogos existentes de cadastro e edição.
+
+**Dependências e aceite futuro:** adaptar a expansão atual da inscrição sem alterar identidade global, vínculos ou contratos de persistência; preservar busca, paginação, foco, teclado e guardas de edição/salvamento. Validar 1366×768, 1920×1080, celular, zoom e nomes longos; dimensionar o ponto de mudança de layout pela legibilidade do conteúdo.
+
+Ao registrar novas ideias, use:
+
+| Campo        | Conteúdo                                                        |
+| ------------ | --------------------------------------------------------------- |
+| ID e título  | Identificador estável, por exemplo FUT-001, e nome curto        |
+| Objetivo     | Resultado desejado e para quem                                  |
+| Benefício    | Problema que resolve ou oportunidade                            |
+| Descrição    | Resumo suficiente para retomar a ideia                          |
+| Dependências | Dados, funcionalidades e decisões necessárias; ou não avaliadas |
+| Status       | Ideia, Em avaliação ou Priorizada                               |
+| Decisão      | Data, responsável e referência quando houver aceite             |
+
+## Regra de priorização
+
+Registrar, avaliar ou priorizar uma ideia não altera o escopo do MVP e não autoriza implementação. Somente decisão explícita do responsável permite abrir uma unidade de execução. Antes disso, avaliar benefício, custo e dependências; depois registrar escopo e critérios de aceite no plano próprio. Agentes não antecipam objetivos futuros enquanto concluem outra tarefa.
+
+Este arquivo guarda objetivos do produto; não cria tarefas, agendamentos ou Goals automáticos no aplicativo.

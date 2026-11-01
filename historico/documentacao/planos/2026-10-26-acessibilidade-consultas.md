@@ -22,6 +22,6 @@ Base a58270b/PR21/previewc2e8734; branch sequencial codex/acessibilidade-consult
 
 - [x] Verificação focal durante iteração; gate consolidado/CI somente quando unidade estável. Se produto/artefatos permanecerem idênticos e sótestes/docs mudarem, preservar o preview/evidências existentes em vez de redeploy desnecessário.
 - [x] Se houver alteração material: draftPR sobre21, CI/build verificados, preview protegido/smokes novos proporcionais com credencial efêmera revogada. Sem merge/produção e sem revisão independente inventada.
-- [x] Atualizar docs/VALIDACAO-ACESSIBILIDADE.md/PROGRESSO.md com arquivos, versões, capturas, comandos/resultados, bloqueios/next. Cota real entreunidades/anteslongas; aos85%usados5h checkpoint/push/MESMAautomação resetefetivo+2. Não repetir gates por retomada.
+- [x] Atualizar historico/documentacao/validacoes/VALIDACAO-ACESSIBILIDADE.md/PROGRESSO.md com arquivos, versões, capturas, comandos/resultados, bloqueios/next. Cota real entreunidades/anteslongas; aos85%usados5h checkpoint/push/MESMAautomação resetefetivo+2. Não repetir gates por retomada.
 
 Decisão reversível do agente: automatizar primeiro quatro superfícies públicas jáentregues, usando a ferramenta recomendada pela documentação oficial do Playwright. Administração e avaliação assistiva/manual completas continuam em unidades posteriores. Referência técnica: https://playwright.dev/docs/accessibility-testing; contrato de produto continua sendo exclusivamente o pacote e feedback aceito.

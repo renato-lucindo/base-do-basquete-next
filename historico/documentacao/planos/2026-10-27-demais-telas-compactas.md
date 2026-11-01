@@ -1,6 +1,6 @@
 # Administração compacta — expansão aprovada em27/10/2026
 
-Autorização: após aprovar Editar pessoa/camisa e pedir próximos passos, o responsável confirmou “Ok, inicie” a padronização das demais telas. Referência: piloto claro/azul aprovado, campos expostos e proporcionais, desktop1366×768/1920×1080, pouca rolagem. Plano anterior: `2026-10-26-administracao-compacta.md`, unidade4.
+Autorização: após aprovar Editar pessoa/camisa e pedir próximos passos, o responsável confirmou “Ok, inicie” a padronização das demais telas. Referência: piloto claro/azul aprovado, campos expostos e proporcionais, desktop1366×768/1920×1080, pouca rolagem. Plano anterior: `historico/documentacao/planos/2026-10-26-administracao-compacta.md`, unidade4.
 
 ## Unidades e critérios
 
@@ -19,5 +19,5 @@ Autorização: após aprovar Editar pessoa/camisa e pedir próximos passos, o re
 
 ## Ledger
 
-- A1/A2/A3 implementadas: cabeçalho/listagem/informações, regulamento/premiações, transferência/perfil/decisões/desistência. REDs geométricos observados e corrigidos;87desktop de composição PASS. Campos do diálogo de jogo ajustados por último após RED próprio; focal final em andamento. Sem backend/DDL ou alteração em dados humanos. Ver `docs/VALIDACAO-DEMAIS-TELAS-COMPACTAS.md`. Nenhuma nova decisão de produto; aprovação prévia cobre composição e publicação no preview protegido.
+- A1/A2/A3 implementadas: cabeçalho/listagem/informações, regulamento/premiações, transferência/perfil/decisões/desistência. REDs geométricos observados e corrigidos;87desktop de composição PASS. Campos do diálogo de jogo ajustados por último após RED próprio; focal final em andamento. Sem backend/DDL ou alteração em dados humanos. Ver `historico/documentacao/validacoes/VALIDACAO-DEMAIS-TELAS-COMPACTAS.md`. Nenhuma nova decisão de produto; aprovação prévia cobre composição e publicação no preview protegido.
 - Início: árvore rastreada limpa, HEAD/base16e171a remoto confirmado na PR30 OPEN/MERGEABLE; previewc9fe7e2/CI40500316561 já aprovado. Nenhuma nova operação remota em andamento. Próximo: capturas/testes de densidade reais antes de alterar layout.

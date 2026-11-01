@@ -13,15 +13,15 @@ Medição em Chromium, sem rolagem inicial, com as fontes e os dados fictícios 
 | Estatísticas | 1440×900 | 418 px               | 269 px                  | 16                        |
 | Estatísticas | 390×844  | 586 px               | 419 px                  | 11                        |
 
-O antes de estatísticas corresponde ao pacote r6 fornecido, renderizado na mesma largura. O antes da súmula foi congelado antes de compactar o cabeçalho. O relatório [hierarquia.json](evidencias/hierarquia.json) registra medidas sem arredondamento e SHA256 dos HTMLs medidos. Não há transbordamento horizontal da página nessas larguras.
+O antes de estatísticas corresponde ao pacote r6 fornecido, renderizado na mesma largura. O antes da súmula foi congelado antes de compactar o cabeçalho. O relatório [hierarquia.json](../../../docs/design/evidencias/hierarquia.json) registra medidas sem arredondamento e SHA256 dos HTMLs medidos. Não há transbordamento horizontal da página nessas larguras.
 
 | Súmula no desktop                                         | Súmula no celular                                        |
 | --------------------------------------------------------- | -------------------------------------------------------- |
-| ![Súmula compacta no desktop](evidencias/sumula-1440.png) | ![Súmula compacta no celular](evidencias/sumula-390.png) |
+| ![Súmula compacta no desktop](../../../docs/design/evidencias/sumula-1440.png) | ![Súmula compacta no celular](../../../docs/design/evidencias/sumula-390.png) |
 
 | Estatísticas no desktop                                                | Estatísticas no celular                                               |
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| ![Estatísticas compactas no desktop](evidencias/estatisticas-1440.png) | ![Estatísticas compactas no celular](evidencias/estatisticas-390.png) |
+| ![Estatísticas compactas no desktop](../../../docs/design/evidencias/estatisticas-1440.png) | ![Estatísticas compactas no celular](../../../docs/design/evidencias/estatisticas-390.png) |
 
 ## Verificações funcionais
 

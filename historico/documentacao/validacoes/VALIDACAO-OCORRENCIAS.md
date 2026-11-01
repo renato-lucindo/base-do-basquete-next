@@ -1,6 +1,6 @@
 # Ocorrências — evidências
 
-Plano docs/superpowers/plans/2026-10-24-ocorrencias-persistidas.md, especificação exclusiva ESCOPO§4/7/arquitetura do ZIP, decisão012. Branch codex/ocorrencias-disputa sobre c11f7ab/PR13. Nenhum serviço anterior consultado/alterado.
+Plano historico/documentacao/planos/2026-10-24-ocorrencias-persistidas.md, especificação exclusiva ESCOPO§4/7/arquitetura do ZIP, decisão012. Branch codex/ocorrencias-disputa sobre c11f7ab/PR13. Nenhum serviço anterior consultado/alterado.
 
 ## O1 — leitura segura de decisões anteriores
 

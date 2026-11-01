@@ -20,7 +20,7 @@
 - [x] A1 contratos TS e banco: RED para vazio/seis funções, dependências, IDs repetidos, homônimo, autorização, atomicidade, replay, versões e compatibilidade. Catálogo e vínculos privados com RLS/grants, índices por oficial, recibos imutáveis. RPCs versionadas preservam save_game/get_game/list_games anteriores. Testar zero/upgrade em PostgreSQL descartável e prova real com rollback sem DML Auth/admin antes de aplicar com segurança.
 - [x] A2 transporte: provider, SessionStore, rotas de consulta paginada e editor/salvamento versionado; origem/limite/autorização fresca/identidade/ACK/contexto e tipos. Focais unitários e workerd.
 - [x] A3 interface: dropdown reutilizável com busca/paginação, seleção porID, novo nome/homônimo; seis campos em duas colunas ao final do diálogo, dependências/limpeza confirmada, teclado/foco/rascunho/reauth/retry/409. Focais desktop1366×768 e1920×1080; sem novas colunas públicas/admin de lista.
-- [x] A4 integração: revisão da unidade, gate único estável, CI da PR, publicação protegida e smokes novos/revogação. PR39 integrada, CI583unit/441browsersPASS/91SKIP, fonte6a11747 publicada; detalhes e limitações em docs/VALIDACAO-ARBITRAGEM.md. Sem revisão independente ou aceite humano pós-publicação declarado.
+- [x] A4 integração: revisão da unidade, gate único estável, CI da PR, publicação protegida e smokes novos/revogação. PR39 integrada, CI583unit/441browsersPASS/91SKIP, fonte6a11747 publicada; detalhes e limitações em historico/documentacao/validacoes/VALIDACAO-ARBITRAGEM.md. Sem revisão independente ou aceite humano pós-publicação declarado.
 
 ## Decisões técnicas
 
@@ -31,4 +31,4 @@
 
 ## Revisão e evidências
 
-Conferir duplicação por retries, corrida de homônimos entre jogos, versão incorreta durante leitura, limpeza em cascata indevida e vazamento por DTO público. Registrar comandos/resultados em docs/VALIDACAO-ARBITRAGEM.md e checkpoint na pausa/conclusão.
+Conferir duplicação por retries, corrida de homônimos entre jogos, versão incorreta durante leitura, limpeza em cascata indevida e vazamento por DTO público. Registrar comandos/resultados em historico/documentacao/validacoes/VALIDACAO-ARBITRAGEM.md e checkpoint na pausa/conclusão.

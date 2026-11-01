@@ -1,5 +1,7 @@
 # 016 — Estatísticas preservam domínios e cobertura confirmados
 
+**Vigência (01/11/2026):** autoridade, cobertura, ausência e identidade continuam vigentes. A representação do agregado atual `confirmed-statistics-v1` e sua reconstrução na escrita foram substituídas pelo head/projeções/páginas de [019](019-fonte-estatistica-limitada-por-pagina.md); o histórico e as fórmulas não foram revogados.
+
 25/10/2026. ESCOPO§8/CONTRATOS§Estatísticas e módulos portáveis do ZIP exigem cobertura por métrica, percentuais ponderados, amostra mínima e identidade contextual. Os snapshots G4 já distinguem origem do placar, arremessos/minutos avançados e faltas recebidas; a camada estatística deve preservar essas fronteiras.
 
 Primeira unidade é somente adaptação pura de publicResultSchema, sem consulta/banco/rota nova. A linha conserva pessoa, inscrição, equipe, camisa, jogo e versão da publicação. Nome de exibição e camisa vêm da ocasião confirmada; vínculo ativo e cadastro privado atual não reescrevem histórico. Relacionado que não jogou continua identificável, mas não fornece observação estatística nem denominador; quem jogou sem ações possui zero conhecido nos domínios efetivamente cobertos.
