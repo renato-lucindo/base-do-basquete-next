@@ -15,4 +15,6 @@ Leia `CONTRIBUTING.md` e a abertura atual de `docs/PROGRESSO.md` antes de editar
 
 Padrão atual e comandos estão em `CONTRIBUTING.md`. A limpeza histórica dePRs está documentada em `docs/CONSOLIDACAO-PRS.md`.
 
-Nas tarefas de UI/UX, seguir [docs/design/README.md](docs/design/README.md), `docs/design/PADROES.md` e `PUBLICO.md` ou `ADMIN.md` conforme a área. O índice descreve o uso das skills e a precedência das decisões; histórico arquivado não tem autoridade sobre as regras vigentes.
+Nas tarefas de UI/UX, seguir [docs/design/README.md](docs/design/README.md), `docs/design/PADROES.md` e `PUBLICO.md` ou `ADMIN.md` conforme a área; para componentes e fluxos CRUD do admin, consultar também `docs/design/PADROES-ADMIN.md`. O índice descreve o uso das skills e a precedência das decisões; histórico arquivado não tem autoridade sobre as regras vigentes.
+
+Para identificar quais documentos ler em cada tipo de tarefa, consulte [`docs/INDICE.md`](docs/INDICE.md). Leitura seletiva e obrigatória — não leia toda a documentação em todas as tarefas.

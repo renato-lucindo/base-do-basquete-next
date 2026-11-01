@@ -3,6 +3,7 @@
 ## Leitura obrigatória por tarefa
 
 - [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
+- [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
 - [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
 - [ADMIN.md](ADMIN.md): fluxos, cadastros, tabelas, combobox, diálogos e feedback.
 - [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
@@ -10,7 +11,7 @@
 
 ## Hierarquia de decisões
 
-Decisões explícitas do responsável > segurança, privacidade e contratos do domínio aplicáveis > padrões vigentes (comuns + área) > protótipos aprovados para a tela > recomendações de skills. As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`. Registre e resolva divergências sem mudar publicação, segurança ou domínio por conveniência visual.
+Requisitos obrigatórios de segurança, privacidade, acessibilidade e contratos aplicáveis > decisões explícitas e atuais do responsável > especificações e regras de negócio vigentes > padrões permanentes do projeto (comuns + área) > protótipos aprovados para a tela, quando pertinentes > recomendações de skills. As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`. Registre e resolva divergências sem mudar publicação, segurança ou domínio por conveniência visual.
 
 ## Fluxo de trabalho dos agentes
 

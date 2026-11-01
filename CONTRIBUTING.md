@@ -21,7 +21,7 @@ Se existir WIP ou alteração alheia, reconciliar antes. Não usar `reset --hard
 
 ## Implementar e verificar
 
-- Nas interfaces e nos protótipos, siga o [índice de UI/UX](docs/design/README.md), os [padrões comuns](docs/design/PADROES.md) e as regras de [Público](docs/design/PUBLICO.md) ou [Administração](docs/design/ADMIN.md). Comece pela informação/ação principal e confira os estados e tamanhos afetados. O índice aponta protótipos, verificações e fluxo das skills.
+- Nas interfaces e nos protótipos, siga o [índice de UI/UX](docs/design/README.md), os [padrões comuns](docs/design/PADROES.md), as regras de [Público](docs/design/PUBLICO.md) ou [Administração](docs/design/ADMIN.md) e os [padrões específicos do admin](docs/design/PADROES-ADMIN.md). Comece pela informação/ação principal e confira os estados e tamanhos afetados. Para saber quais documentos ler em cada tipo de tarefa, consulte [docs/INDICE.md](docs/INDICE.md).
 
 - Commits pequenos, coerentes e com descrição do efeito. `feat:`, `fix:`, `test:` e `docs:` são convenções úteis, sem exigir uma ferramenta adicional.
 - Durante a edição, rode apenas verificações pertinentes. Quando a unidade estabilizar: `npm run gate` e os browsers afetados; CI consolida a composição no SHA da PR.
