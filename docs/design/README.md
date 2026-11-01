@@ -11,7 +11,9 @@
 
 ## Hierarquia de decisões
 
-Requisitos obrigatórios de segurança, privacidade, acessibilidade e contratos aplicáveis > decisões explícitas e atuais do responsável > especificações e regras de negócio vigentes > padrões permanentes do projeto (comuns + área) > protótipos aprovados para a tela, quando pertinentes > recomendações de skills. As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`. Registre e resolva divergências sem mudar publicação, segurança ou domínio por conveniência visual.
+A fonte única da hierarquia documental e dos critérios de resolução de conflitos é a [seção 8 de docs/INDICE.md](../INDICE.md#8-hierarquia-de-decis%C3%B5es). As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`.
+
+Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da área e com os dados efetivamente disponíveis. Resolva divergências conforme o índice, sem inventar cobertura nem alterar domínio ou publicação por conveniência visual.
 
 ## Fluxo de trabalho dos agentes
 

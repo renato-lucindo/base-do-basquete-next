@@ -2,7 +2,7 @@
 
 Criado em 31/10/2026; referências reconciliadas em 01/11/2026. Atualizar ao reorganizar ou adicionar documentos.
 
-Este índice orienta agentes iniciando em novas sessões. Leia o documento que corresponde à área do trabalho — não toda a documentação. A hierarquia de decisões está neste índice e em `docs/design/README.md`; as instruções de Git estão em `AGENTS.md` e `CONTRIBUTING.md`; não as repita aqui.
+Este índice orienta agentes iniciando em novas sessões. Leia o documento que corresponde à área do trabalho — não toda a documentação. A [seção 8 deste índice](#8-hierarquia-de-decis%C3%B5es) é a fonte única da hierarquia documental; as instruções de Git estão em `AGENTS.md` e `CONTRIBUTING.md`; não as repita aqui.
 
 ---
 
@@ -186,14 +186,20 @@ Preservados para consulta pontual. **Não substituem decisões vigentes.**
 
 Quando houver contradição entre documentos, resolva pela precedência abaixo. Não escolha arbitrariamente; identifique a origem, a data e o escopo:
 
-1. **Requisitos obrigatórios:** segurança, privacidade, WCAG 2.2 AA e contratos do domínio
+1. **Restrições obrigatórias:** segurança, privacidade e acessibilidade (WCAG 2.2 AA)
 2. **Instruções atuais do responsável:** decisões explícitas e diretas, independente do canal
 3. **Especificações e regras de negócio vigentes:** `docs/decisoes/`, `CONTRATOS.md`, `ESCOPO.md`
 4. **Padrões permanentes do projeto:** `docs/design/PADROES.md`, `PADROES-ADMIN.md`, `ADMIN.md`, `PUBLICO.md`
 5. **Recomendações das skills:** `ui-ux-pro-max`, `web-design-guidelines` — técnicas, não substituem identidade ou decisões do projeto
 6. **Preferências genéricas dos agentes**
 
-Quando não for possível resolver com segurança, identifique a origem e solicite esclarecimento do responsável.
+Os contratos de produto do nível 3 podem evoluir por decisão explícita e autorizada do responsável, com atualização da fonte pertinente e respeito às restrições do nível 1.
+
+Entre documentos de mesma prioridade, aplique a regra mais específica ao escopo em questão somente após confirmar sua vigência. Verifique substituições explícitas e decisões autorizadas formalmente integradas às fontes vigentes, com referência ao que substituem. A data mais recente, isoladamente, não comprova revogação; se escopo ou vigência continuarem ambíguos, siga o procedimento de decisão humana abaixo.
+
+PRs abertas, protótipos e documentos históricos não substituem automaticamente decisões vigentes. Aprovação de um protótipo vale para seu escopo explicitamente aprovado; sua existência ou implementação não autoriza mudanças adicionais de produto. Código e testes demonstram o comportamento implementado, mas não constituem, por si só, autorização para alterar regras de negócio.
+
+Persistindo uma contradição, registre as fontes conflitantes (caminho/seção, versão e escopo), o ponto de discordância e solicite decisão humana. Suspenda apenas as ações dependentes dessa decisão e prossiga com atividades independentes dentro do escopo autorizado.
 
 ---
 
