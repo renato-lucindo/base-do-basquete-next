@@ -6,15 +6,9 @@ Este documento cobre: seleção de componentes, fluxos CRUD, formulários, tabel
 
 ---
 
-## 1. Princípio geral: percurso antes da tela
+## 1. Uso dos componentes
 
-Antes de projetar qualquer tela ou componente administrativo, especifique:
-
-```
-entrada → edição → validação → confirmação/feedback → retorno
-```
-
-Inclua cancelamento, erro, falha de salvamento e conflito de versão. Só então escolha componentes. Não adapte o percurso ao componente; adapte o componente ao percurso.
+Defina primeiro o percurso e o aceite em [ADMIN.md](ADMIN.md). Use as regras abaixo para escolher e implementar componentes, sem repetir a definição das jornadas.
 
 ---
 
@@ -24,6 +18,7 @@ Inclua cancelamento, erro, falha de salvamento e conflito de versão. Só então
 
 - Campos essenciais **sempre visíveis**; não ocultar atrás de acordeão sem ganho concreto de legibilidade.
 - Larguras proporcionais ao conteúdo esperado: nome ocupa mais espaço que altura, camisa ou ano.
+- A camisa é contextual; distinguir vazio, `0` e `00`, sem convertê-los em identidade global.
 - Campos curtos (altura, peso, camisa, ano) ficam em linha com outros campos curtos — não em linha inteira.
 - Grade em duas colunas quando houver simetria natural (nome e sigla, nome e e-mail, data e local).
 - Rótulos persistentes acima do campo; nunca somente placeholder.
@@ -38,7 +33,7 @@ Inclua cancelamento, erro, falha de salvamento e conflito de versão. Só então
 ### Salvamento parcial e falha
 
 - Mostrar estado: salvando / salvo / erro — sem transformar cada gravação em um diálogo de confirmação.
-- Falha parcial em lote: indicar quais itens falharam, manter os bem-sucedidos e permitir nova tentativa seletiva.
+- Falha parcial em lote: indicar quais itens falharam, manter os bem-sucedidos e permitir nova tentativa seletiva. ACK conhecido não repete escrita; resultado incerto conserva comando/IDs para reconciliação conforme o contrato.
 - Conflito de versão: exigir recarga explícita antes de sobrescrever; nunca silenciosa.
 - Sair com edição pendente: avisar e oferecer salvar, descartar ou cancelar.
 
@@ -74,16 +69,16 @@ Inclua cancelamento, erro, falha de salvamento e conflito de versão. Só então
 
 Usar combobox/autocomplete pesquisável sempre que o catálogo tiver mais de ~10 itens.
 
-| Situação | Comportamento |
-| --- | --- |
-| Abrir sem digitar | Não exibir catálogo completo; mostrar campo de busca com placeholder |
-| Iniciar busca | Mínimo 2 caracteres para iniciar consulta (ou imediatamente se local) |
-| Estado vazio | "Nenhum resultado para 'X'" com opção de criar novo quando aplicável |
-| Seleção | Nome completo no campo; estado visualmente claro (não apenas cor) |
-| Limpar | Botão de limpar visível e focável quando há seleção; não apagar automaticamente a seleção com `Escape` |
-| Teclado | Setas navegam; `Enter` seleciona; com a lista aberta, `Escape` fecha sem alterar a seleção e mantém o foco no campo |
-| Múltipla seleção | Tags removíveis; limite de altura da lista; scroll interno |
-| Criar novo | "Criar 'X'" como última opção; abre diálogo sem perder a seleção parcial |
+| Situação          | Comportamento                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Abrir sem digitar | Não exibir catálogo completo; mostrar campo de busca com placeholder                                                |
+| Iniciar busca     | Mínimo 2 caracteres para iniciar consulta (ou imediatamente se local)                                               |
+| Estado vazio      | "Nenhum resultado para 'X'" com opção de criar novo quando aplicável                                                |
+| Seleção           | Nome completo no campo; estado visualmente claro (não apenas cor)                                                   |
+| Limpar            | Botão de limpar visível e focável quando há seleção; não apagar automaticamente a seleção com `Escape`              |
+| Teclado           | Setas navegam; `Enter` seleciona; com a lista aberta, `Escape` fecha sem alterar a seleção e mantém o foco no campo |
+| Múltipla seleção  | Tags removíveis; limite de altura da lista; scroll interno                                                          |
+| Criar novo        | "Criar 'X'" como última opção; abre diálogo sem perder a seleção parcial                                            |
 
 **Nunca** listar o catálogo inteiro ao abrir. **Nunca** usar `<select>` nativo para listas longas com busca.
 
@@ -124,13 +119,13 @@ Usar combobox/autocomplete pesquisável sempre que o catálogo tiver mais de ~10
 
 ### Salvamento
 
-| Estado | Apresentação |
-| --- | --- |
-| Salvando | Indicador discreto (spinner no botão ou barra de progresso) |
-| Salvo | Mensagem breve ou checkmark; desaparece após ~2 s sem ação do usuário |
-| Erro de validação | No campo afetado + resumo no topo do formulário quando múltiplos |
+| Estado                | Apresentação                                                          |
+| --------------------- | --------------------------------------------------------------------- |
+| Salvando              | Indicador discreto (spinner no botão ou barra de progresso)           |
+| Salvo                 | Mensagem breve ou checkmark; desaparece após ~2 s sem ação do usuário |
+| Erro de validação     | No campo afetado + resumo no topo do formulário quando múltiplos      |
 | Erro de rede/servidor | Banner persistente com opção de nova tentativa; descreve o que falhou |
-| Conflito de versão | Aviso persistente; exige recarga explícita antes de prosseguir |
+| Conflito de versão    | Aviso persistente; exige recarga explícita antes de prosseguir        |
 
 ### Toast (notificações complementares)
 
@@ -182,14 +177,14 @@ O usuário deve sempre saber **onde está** e **o que está editando**:
 
 ## 9. Preservação de estado
 
-| Situação | Comportamento esperado |
-| --- | --- |
-| Retornar ao formulário após erro | Manter todos os valores preenchidos |
-| Navegar de um diálogo para outro | Preservar os dados do diálogo de origem ao retornar |
-| Recarregar a página | Rascunhos salvos devem ser recuperados; estado não salvo é perdido com aviso |
-| Troca de equipe/disputa | Confirmar descarte de edição pendente antes de trocar |
-| Filtros e ordenação | Preservar em URL quando não expõem dados privados |
-| Desfazer/refazer | Disponível nas operações da súmula; escopo e limites documentados |
+| Situação                         | Comportamento esperado                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------- |
+| Retornar ao formulário após erro | Manter todos os valores preenchidos                                          |
+| Navegar de um diálogo para outro | Preservar os dados do diálogo de origem ao retornar                          |
+| Recarregar a página              | Rascunhos salvos devem ser recuperados; estado não salvo é perdido com aviso |
+| Troca de equipe/disputa          | Confirmar descarte de edição pendente antes de trocar                        |
+| Filtros e ordenação              | Preservar em URL quando não expõem dados privados                            |
+| Desfazer/refazer                 | Disponível nas operações da súmula; escopo e limites documentados            |
 
 ---
 
@@ -208,6 +203,6 @@ Use as skills para pesquisar padrões de componentes, acessibilidade e hierarqui
 ## Veja também
 
 - [`PADROES.md`](PADROES.md): padrões comuns a ambas as áreas
-- [`ADMIN.md`](ADMIN.md): percurso, aceite proporcional e tabela de componentes
+- [`ADMIN.md`](ADMIN.md): percursos e aceite proporcional
 - [`INTEGRACAO.md`](INTEGRACAO.md): comportamento específico de súmula e estatísticas
 - [`SKILLS.md`](SKILLS.md): origem e uso das skills de UI/UX

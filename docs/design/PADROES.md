@@ -28,6 +28,6 @@ Aplicam-se às áreas pública e administrativa da Base do Basquete Next. Leia t
 
 Defina o que o usuário deve alcançar e como comprovar antes de editar. Mudança textual pede revisão de linguagem; componente pede estados/foco/teclado; fluxo ou navegação pede percurso completo nas resoluções relevantes. Registrar ambiente, comando, SHA e limites.
 
-O comando npm run design:verify verifica os **protótipos específicos** de súmula/estatísticas; seus limites geométricos e provas estão em [VALIDACAO.md](VALIDACAO.md). Não generalizar seus números para toda tela. Inspeção visual, ferramentas automatizadas e axe complementam, mas não comprovam aceite humano nem conformidade integral à WCAG.
+O comando npm run design:verify verifica os **protótipos específicos** de súmula/estatísticas; seus limites geométricos e provas estão em [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md). Não generalizar seus números para toda tela. Inspeção visual, ferramentas automatizadas e axe complementam, mas não comprovam aceite humano nem conformidade integral à WCAG.
 
 O [índice](README.md) documenta o uso das skills e como tratar divergências.

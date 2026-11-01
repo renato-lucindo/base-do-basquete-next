@@ -1,5 +1,7 @@
 # 003 — autorização inicial e verificação de migrations
 
+**Vigência (01/11/2026):** autorização/RLS e imutabilidade de migrations permanecem vigentes. Bootstrap e a etapa F3 foram concluídos posteriormente conforme [004](004-sessao-no-servidor.md); não repetir bootstrap nem interpretar o teste HTTP ainda futuro neste relato como ausência da sessão atual.
+
 Estado: adotada em 23/10/2026, fundação F2.
 
 O pacote exige uma conta administrativa por senha e nega acesso a outra conta autenticada. `public.admin_access` mantém uma única identidade Auth habilitável, sem cadastro público nem escrita pelos papéis de API. Somente a própria identidade habilitada pode consultar `user_id`/`enabled`; colunas operacionais ficam privadas. O backend consulta essa autorização com o JWT do usuário, sem service-role para acesso aos dados. Bootstrap e revogação são operações administrativas explícitas; a futura gestão de papéis não faz parte desta etapa.

@@ -1,5 +1,7 @@
 # 001 — protótipo local antes da fundação
 
+**Vigência (01/11/2026):** decisão preservada para o protótipo fictício. A exclusividade desta etapa foi superada pela fundação dos ADRs [003](003-autorizacao-e-migrations.md)/[004](004-sessao-no-servidor.md) e pelo GitHub Flow de CONTRIBUTING. As pendências e a criação de repositório/branch abaixo são contexto histórico, não próximos passos atuais.
+
 Estado: adotada para o marco 1; composição visual ainda aguarda responsável.
 
 Contexto: o pacote determina protótipo fictício anterior a banco/autenticação/integração. O workspace só continha o ZIP, sem Git. Framework e diretórios são decisões reversíveis do implementador.

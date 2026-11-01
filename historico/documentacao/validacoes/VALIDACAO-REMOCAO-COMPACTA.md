@@ -1,6 +1,6 @@
 # Remoção de inscrição vazia — integração compacta
 
-**Release27/10 concluído:** sourceaa7 no preview protegido, deploymentaff9ee39-5793-4399-914a-fa561834f1c8/versão18934c23-6b8c-4e85-bc47-2b3a2a91f21d100%. GET/POST sem sessão de `/api/registrations/:id/removal` recusados nos smokes; após revogar o acesso temporário, anônimo302→Access. Nenhuma exclusão humana ou DDL. Relatório/hashes/proteção em `docs/VALIDACAO-ADMIN-COMPACTA.md`. Permanecem pendentes aceite humano e A26 para outras entidades/arquivamento; registros abaixo são históricos da integração.
+**Release27/10 concluído:** sourceaa7 no preview protegido, deploymentaff9ee39-5793-4399-914a-fa561834f1c8/versão18934c23-6b8c-4e85-bc47-2b3a2a91f21d100%. GET/POST sem sessão de `/api/registrations/:id/removal` recusados nos smokes; após revogar o acesso temporário, anônimo302→Access. Nenhuma exclusão humana ou DDL. Relatório/hashes/proteção em `historico/documentacao/validacoes/VALIDACAO-ADMIN-COMPACTA.md`. Permanecem pendentes aceite humano e A26 para outras entidades/arquivamento; registros abaixo são históricos da integração.
 
 **Confirmação final27/10:** fonteaa7aa49790d2ed309ff593b9e71c119ef48d3782, CI40452980411/job122019741946 **SUCCESS**,560unit/115arquivos e388browsersPASS/48SKIP, gate completo. Gate local560/6transportes/13PG/23workerd/4PDFs SHA cbb2bd7ba2cfbca01505395a4de4b0d32c13be04399715bb75990eb789e03138. Merge trouxe correção verificada de toolbar e setups de navegação modal; nove focais toolbar/remoção PASS18,7s. Nenhum código de produto mudou após essa fonte. Release não iniciado: consulta pré-deploy atingiu85%usados5h. Pacoteaa7 pronto e preview continua3eca; retomar reset+2 sem repetir suítes. Registros abaixo incluem estados intermediários anteriores à confirmação final.
 
@@ -9,7 +9,7 @@
 ## Reutilização e contratos
 
 - Migration45 `20261026135708_registration_removal.sql` já aplicada: SHA256 `ca525c6f32f362474d58dae93a0cb05bbeea09b5f1b02e8fceeb5bea5d93e4af` conferido, bytes preservados. Banco permanece com48 migrations, sem DDL nova. Tipos já contêm as RPCs.
-- Plano/provas originais em `docs/VALIDACAO-REMOCAO-INSCRICOES.md` recuperados da branch de origem. Contrato real BEGIN/ROLLBACK e três corridas nativas continuam aplicáveis ao SQL inalterado; não foram reexecutados. Não atribuir essas provas à UI nova ou a carga total.
+- Plano/provas originais em `historico/documentacao/validacoes/VALIDACAO-REMOCAO-INSCRICOES.md` recuperados da branch de origem. Contrato real BEGIN/ROLLBACK e três corridas nativas continuam aplicáveis ao SQL inalterado; não foram reexecutados. Não atribuir essas provas à UI nova ou a carga total.
 - RED na base atual: módulo de contrato ausente; depois quatro testes falharam por métodos do provider ausentes. Portados contratos e adapter, oito testes PASS em431ms (`removal-port-provider-green.log`). Nenhuma cópia integral de telas antigas.
 - Rotas/DO específicos: contexto/correlação, replay congelado, sessão e origem antes do corpo. Um cenário workerd focal PASS em1,07s (`removal-port-worker-green.log`), build/typecheck aprovados.
 

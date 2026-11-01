@@ -1,13 +1,13 @@
 # Design — índice e fluxo de agentes
 
-## Leitura obrigatória por tarefa
+## Leitura por tarefa
 
 - [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
 - [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
 - [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
-- [ADMIN.md](ADMIN.md): fluxos, cadastros, tabelas, combobox, diálogos e feedback.
+- [ADMIN.md](ADMIN.md): percursos administrativos e aceite proporcional; componentes e comportamentos ficam em PADROES-ADMIN.
 - [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
-- [VALIDACAO.md](VALIDACAO.md): evidência e limites dos protótipos.
+- Evidência histórica, somente se necessária: [VALIDACAO-DESIGN-PUBLICO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md), com evidências e limites dos protótipos.
 
 ## Hierarquia de decisões
 
@@ -53,7 +53,7 @@ As dependências vêm do lockfile do projeto. O build da súmula incorpora HTML,
 
 Os verificadores cobrem cálculos, ausência versus zero, filtros/ordenação, quartos, faltas, painéis, teclado, toque, rolagem interna e axe. A verificação de hierarquia mede a primeira linha útil e as linhas visíveis nas duas larguras. A CI executa esse conjunto junto com o gate existente quando houver alterações executáveis.
 
-As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](VALIDACAO.md).
+As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
 
 ## Origem e adaptações
 

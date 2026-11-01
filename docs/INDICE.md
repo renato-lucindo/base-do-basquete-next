@@ -1,6 +1,6 @@
 # Índice de documentação — Base do Basquete Next
 
-Criado em 31/10/2026. Atualizar ao reorganizar ou adicionar documentos.
+Criado em 31/10/2026; referências reconciliadas em 01/11/2026. Atualizar ao reorganizar ou adicionar documentos.
 
 Este índice orienta agentes iniciando em novas sessões. Leia o documento que corresponde à área do trabalho — não toda a documentação. A hierarquia de decisões está neste índice e em `docs/design/README.md`; as instruções de Git estão em `AGENTS.md` e `CONTRIBUTING.md`; não as repita aqui.
 
@@ -8,34 +8,34 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 
 ## 1. Leitura obrigatória sempre
 
-| Documento | Quando ler |
-| --- | --- |
-| [`AGENTS.md`](../AGENTS.md) | Início de qualquer sessão. Regras de Git, cota, CI e workflow. |
-| [`CONTRIBUTING.md`](../CONTRIBUTING.md) | Início de qualquer sessão. Comandos, branches, verificação e entrega. |
-| [`docs/PROGRESSO.md`](PROGRESSO.md) | Início de qualquer sessão. Estado atual, unidades ativas e próximo passo. |
+| Documento                               | Quando ler                                                                |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| [`AGENTS.md`](../AGENTS.md)             | Início de qualquer sessão. Regras de Git, cota, CI e workflow.            |
+| [`CONTRIBUTING.md`](../CONTRIBUTING.md) | Início de qualquer sessão. Comandos, branches, verificação e entrega.     |
+| [`docs/PROGRESSO.md`](PROGRESSO.md)     | Início de qualquer sessão. Estado atual, unidades ativas e próximo passo. |
 
 ---
 
 ## 2. Planejamento e escopo
 
-| Documento | Conteúdo |
-| --- | --- |
-| [`docs/MATRIZ-ESCOPO.md`](MATRIZ-ESCOPO.md) | Situação de cada percurso do MVP: entregue, pendente, bloqueado. |
-| `docs/ROADMAP.md` (pendente de integração na main) | Ideias registradas; não autoriza implementação sem decisão explícita. |
-| [`docs/CONSOLIDACAO-PRS.md`](CONSOLIDACAO-PRS.md) | Inventário e destino das PRs históricas fechadas. |
+| Documento                                                                                                       | Conteúdo                                                              |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [`docs/MATRIZ-ESCOPO.md`](MATRIZ-ESCOPO.md)                                                                     | Situação de cada percurso do MVP: entregue, pendente, bloqueado.      |
+| [`docs/ROADMAP.md`](ROADMAP.md)                                                                                 | Ideias registradas; não autoriza implementação sem decisão explícita. |
+| [`historico/documentacao/analises/CONSOLIDACAO-PRS.md`](../historico/documentacao/analises/CONSOLIDACAO-PRS.md) | Inventário e destino das PRs históricas fechadas.                     |
 
 ---
 
 ## 3. Matriz de leitura por tipo de tarefa
 
 > [!IMPORTANT]
-> Leia **apenas** os documentos listados para o tipo de tarefa que você está executando. Não leia toda a documentação em toda sessão.
+> Leia **apenas** as fontes operacionais listadas para o tipo de tarefa. Relatórios, planos e handoffs arquivados são consulta pontual de evidência, nunca leitura obrigatória de toda a área. Não leia toda a documentação em toda sessão.
 
 ### 3.1 Interface administrativa (geral)
 
 1. [`docs/design/README.md`](design/README.md) — fluxo de agentes e hierarquia de decisões de design
 2. [`docs/design/PADROES.md`](design/PADROES.md) — padrões comuns (acessibilidade, tabelas, responsividade)
-3. [`docs/design/ADMIN.md`](design/ADMIN.md) — percurso, componentes e aceite proporcional do admin
+3. [`docs/design/ADMIN.md`](design/ADMIN.md) — percursos e aceite proporcional do admin
 4. [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md) — componentes, CRUD, formulários, modais, filtros e feedback (admin)
 
 ### 3.2 Interface pública
@@ -48,19 +48,19 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 
 1. [`docs/design/PADROES.md`](design/PADROES.md) — seções "Tabelas e ações" e "Acessibilidade"
 2. [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md) — componentes e comportamentos específicos
-3. [`docs/design/ADMIN.md`](design/ADMIN.md) — tabela de componentes e feedback
+3. [`docs/design/ADMIN.md`](design/ADMIN.md) — percursos e aceite proporcional
 
 ### 3.4 Acessibilidade
 
 1. [`docs/design/PADROES.md`](design/PADROES.md) — seção "Acessibilidade e responsividade" (WCAG 2.2 AA, targets, zoom)
-2. [`docs/VALIDACAO-ACESSIBILIDADE.md`](VALIDACAO-ACESSIBILIDADE.md) — evidências e limites dos testes de acessibilidade
-3. [`docs/VALIDACAO-ACESSIBILIDADE-ADMIN.md`](VALIDACAO-ACESSIBILIDADE-ADMIN.md) — evidências específicas do admin
+2. [`historico/documentacao/validacoes/VALIDACAO-ACESSIBILIDADE.md`](../historico/documentacao/validacoes/VALIDACAO-ACESSIBILIDADE.md) — evidências históricas de acessibilidade, somente para comparar cobertura
+3. [`historico/documentacao/validacoes/VALIDACAO-ACESSIBILIDADE-ADMIN.md`](../historico/documentacao/validacoes/VALIDACAO-ACESSIBILIDADE-ADMIN.md) — evidências históricas do admin, somente quando pertinentes
 4. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/EXPERIENCIA.md` — seção "Acessibilidade" (meta WCAG, referência normativa)
 
 ### 3.5 Banco de dados e segurança
 
 1. [`docs/decisoes/`](decisoes/) — decisões arquiteturais numeradas (001–019); ler apenas as relevantes ao contexto
-2. [`docs/ACESSO-ADMINISTRATIVO.md`](ACESSO-ADMINISTRATIVO.md) — sessão administrativa e bootstrap
+2. [`historico/documentacao/analises/ACESSO-ADMINISTRATIVO.md`](../historico/documentacao/analises/ACESSO-ADMINISTRATIVO.md) — evidência histórica de bootstrap concluído (consultar somente se necessário; regra vigente nos ADRs 003/004)
 3. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/ARQUITETURA.md` — módulos, dependências e segurança
 4. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` — fórmulas, formatos e interfaces dos módulos
 
@@ -79,9 +79,9 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 1. [`docs/decisoes/009-sumula-persistida.md`](decisoes/009-sumula-persistida.md) — contrato de persistência da súmula
 2. [`docs/decisoes/016-estatisticas-de-snapshots-confirmados.md`](decisoes/016-estatisticas-de-snapshots-confirmados.md) — fonte das estatísticas
 3. [`docs/design/INTEGRACAO.md`](design/INTEGRACAO.md) — contrato dos protótipos de súmula e estatísticas (colunas, cálculos, UX)
-4. [`docs/design/VALIDACAO.md`](design/VALIDACAO.md) — evidências e limites dos protótipos
-5. [`docs/VALIDACAO-SUMULA-DESKTOP.md`](VALIDACAO-SUMULA-DESKTOP.md) — validação da súmula desktop real
-6. [`docs/VALIDACAO-ESTATISTICAS.md`](VALIDACAO-ESTATISTICAS.md) — validação das estatísticas
+4. [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) — evidências históricas e limites dos protótipos
+5. [`historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md`](../historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md) — evidência histórica de validação da súmula desktop real
+6. [`historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md`](../historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md) — evidência histórica de validação das estatísticas
 7. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` — fórmulas e regras esportivas
 
 > [!NOTE]
@@ -90,19 +90,19 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 ### 3.8 Importação e gerenciamento de atletas/equipes
 
 1. [`docs/decisoes/007-pessoas-e-papeis.md`](decisoes/007-pessoas-e-papeis.md) — identidade compartilhada atleta/técnico
-2. [`docs/decisoes/008-importacao-de-elenco.md`](decisoes/008-importacao-de-elenco.md) — reaproveitamento de elenco
+2. [`docs/decisoes/008-importacao-de-elenco.md`](decisoes/008-importacao-de-elenco.md) — revisão e importação textual de um elenco
 3. [`docs/decisoes/006-equipes-inscricoes.md`](decisoes/006-equipes-inscricoes.md) — equipes e inscrições
 4. [`docs/ESCOPO-IMPORTADOR-DE-EQUIPES.md`](ESCOPO-IMPORTADOR-DE-EQUIPES.md) — escopo do importador
-5. [`docs/ANALISE-IMPORTADOR-DE-EQUIPES.md`](ANALISE-IMPORTADOR-DE-EQUIPES.md) — análise detalhada
-6. [`docs/VALIDACAO-IMPORTADOR.md`](VALIDACAO-IMPORTADOR.md) — validação do importador
-7. [`docs/VALIDACAO-PESSOAS.md`](VALIDACAO-PESSOAS.md) — validação de cadastro de pessoas
-8. [`docs/VALIDACAO-EQUIPES.md`](VALIDACAO-EQUIPES.md) — validação de equipes
+5. [`historico/documentacao/analises/ANALISE-IMPORTADOR-DE-EQUIPES.md`](../historico/documentacao/analises/ANALISE-IMPORTADOR-DE-EQUIPES.md) — análise histórica, somente para investigar proveniência
+6. [`historico/documentacao/validacoes/VALIDACAO-IMPORTADOR.md`](../historico/documentacao/validacoes/VALIDACAO-IMPORTADOR.md) — evidência histórica de validação do importador
+7. [`historico/documentacao/validacoes/VALIDACAO-PESSOAS.md`](../historico/documentacao/validacoes/VALIDACAO-PESSOAS.md) — evidência histórica de validação de cadastro de pessoas
+8. [`historico/documentacao/validacoes/VALIDACAO-EQUIPES.md`](../historico/documentacao/validacoes/VALIDACAO-EQUIPES.md) — evidência histórica de validação de equipes
 9. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` — regras de matching e identidade
 
 ### 3.9 Testes, CI e publicação
 
 1. [`CONTRIBUTING.md`](../CONTRIBUTING.md) — seção "Implementar e verificar": gate, browsers, lint, CI
-2. [`docs/VALIDACAO-*.md`](.) — evidências de validação pertinentes à área alterada (apenas as relevantes)
+2. [`histórico de validações`](../historico/documentacao/README.md#validacoes) — evidências de validação pertinentes à área alterada (apenas as relevantes)
 3. [`docs/MATRIZ-ESCOPO.md`](MATRIZ-ESCOPO.md) — o que já foi validado e o que está pendente de aceite
 4. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/VALIDACAO.md` — entregas, cenários de aceite e critérios
 
@@ -112,56 +112,56 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 
 Estes documentos estão em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/`. São insumos originais do produto, preservados byte a byte. Não alterar.
 
-| Documento | Conteúdo |
-| --- | --- |
-| `docs/ESCOPO.md` | Requisitos, vocabulário e limites do produto |
+| Documento             | Conteúdo                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `docs/ESCOPO.md`      | Requisitos, vocabulário e limites do produto                                           |
 | `docs/EXPERIENCIA.md` | Fluxos, preferências visuais e protótipos — **referência, não prova de implementação** |
-| `docs/ARQUITETURA.md` | Módulos, dependências, segurança e especificação lógica do banco |
-| `docs/CONTRATOS.md` | Fórmulas, formatos de entrada, regras esportivas e interfaces dos módulos |
-| `docs/VALIDACAO.md` | Entregas, cenários de aceite e critérios |
+| `docs/ARQUITETURA.md` | Módulos, dependências, segurança e especificação lógica do banco                       |
+| `docs/CONTRATOS.md`   | Fórmulas, formatos de entrada, regras esportivas e interfaces dos módulos              |
+| `docs/VALIDACAO.md`   | Entregas, cenários de aceite e critérios                                               |
 
 ---
 
 ## 5. Design e padrões de UI/UX
 
-| Documento | Conteúdo | Área |
-| --- | --- | --- |
-| [`docs/design/README.md`](design/README.md) | Índice, fluxo de agentes, hierarquia de decisões e skills | Ambas |
-| [`docs/design/PADROES.md`](design/PADROES.md) | Padrões comuns: hierarquia, acessibilidade, tabelas, responsividade | Ambas |
-| [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md) | Componentes, CRUD, formulários, modais, filtros, combobox, feedback | Admin |
-| [`docs/design/ADMIN.md`](design/ADMIN.md) | Percurso, componentes específicos e aceite proporcional | Admin |
-| [`docs/design/PUBLICO.md`](design/PUBLICO.md) | Fluxos, páginas de disputa e regras de publicação | Público |
-| [`docs/design/INTEGRACAO.md`](design/INTEGRACAO.md) | Contrato dos protótipos de súmula e estatísticas | Ambas |
-| [`docs/design/SKILLS.md`](design/SKILLS.md) | Origem, licença, hashes e uso das skills `ui-ux-pro-max` e `web-design-guidelines` | Ambas |
-| [`docs/design/VALIDACAO.md`](design/VALIDACAO.md) | Evidências e limites dos protótipos públicos | Público |
+| Documento                                                                                                                           | Conteúdo                                                                           | Área    |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------- |
+| [`docs/design/README.md`](design/README.md)                                                                                         | Índice, fluxo de agentes, hierarquia de decisões e skills                          | Ambas   |
+| [`docs/design/PADROES.md`](design/PADROES.md)                                                                                       | Padrões comuns: hierarquia, acessibilidade, tabelas, responsividade                | Ambas   |
+| [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md)                                                                           | Componentes, CRUD, formulários, modais, filtros, combobox, feedback                | Admin   |
+| [`docs/design/ADMIN.md`](design/ADMIN.md)                                                                                           | Percursos e aceite proporcional                                                    | Admin   |
+| [`docs/design/PUBLICO.md`](design/PUBLICO.md)                                                                                       | Fluxos, páginas de disputa e regras de publicação                                  | Público |
+| [`docs/design/INTEGRACAO.md`](design/INTEGRACAO.md)                                                                                 | Contrato dos protótipos de súmula e estatísticas                                   | Ambas   |
+| [`docs/design/SKILLS.md`](design/SKILLS.md)                                                                                         | Origem, licença, hashes e uso das skills `ui-ux-pro-max` e `web-design-guidelines` | Ambas   |
+| [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) | Evidências históricas dos protótipos públicos (consulta pontual)                   | Público |
 
 ---
 
 ## 6. Decisões arquiteturais (ADRs)
 
-Diretório: [`docs/decisoes/`](decisoes/). Leia **apenas** as decisões relevantes ao contexto. Não presuma que uma decisão revogou outra sem conferir datas e escopo.
+Diretório: [`docs/decisoes/`](decisoes/). Leia **apenas** as decisões relevantes ao contexto. Os 19 ADRs foram preservados. Notas de vigência identificam os recortes históricos e as substituições parciais (001, 003, 009, 016 e 018); nenhuma decisão foi revogada apenas por idade. Novidades da PR #38 permanecem condicionadas à sua integração.
 
-| Decisão | Assunto |
-| --- | --- |
-| 001 | Protótipo local |
-| 002 | Preview protegido por Cloudflare Access |
-| 003 | Autorização e migrations |
-| 004 | Sessão no servidor |
-| 005 | Contexto transacional |
-| 006 | Equipes e inscrições |
-| 007 | Pessoas e papéis |
-| 008 | Importação de elenco |
-| 009 | Súmula persistida |
-| 010 | PDF e fontes |
-| 011 | Publicação por jogo |
-| 012 | Regulamento declarativo |
-| 013 | Classificação pública confirmada |
-| 014 | Transferência atômica e retorno |
-| 015 | Colocações e honrarias confirmadas |
-| 016 | Estatísticas de snapshots confirmados |
-| 017 | Perfil publicado independente |
-| 018 | Equipes de resultados confirmados |
-| 019 | Fonte estatística limitada por página |
+| Decisão | Assunto                                 |
+| ------- | --------------------------------------- |
+| 001     | Protótipo local                         |
+| 002     | Preview protegido por Cloudflare Access |
+| 003     | Autorização e migrations                |
+| 004     | Sessão no servidor                      |
+| 005     | Contexto transacional                   |
+| 006     | Equipes e inscrições                    |
+| 007     | Pessoas e papéis                        |
+| 008     | Importação de elenco                    |
+| 009     | Súmula persistida                       |
+| 010     | PDF e fontes                            |
+| 011     | Publicação por jogo                     |
+| 012     | Regulamento declarativo                 |
+| 013     | Classificação pública confirmada        |
+| 014     | Transferência atômica e retorno         |
+| 015     | Colocações e honrarias confirmadas      |
+| 016     | Estatísticas de snapshots confirmados   |
+| 017     | Perfil publicado independente           |
+| 018     | Equipes de resultados confirmados       |
+| 019     | Fonte estatística limitada por página   |
 
 ---
 
@@ -169,13 +169,13 @@ Diretório: [`docs/decisoes/`](decisoes/). Leia **apenas** as decisões relevant
 
 Preservados para consulta pontual. **Não substituem decisões vigentes.**
 
-| Local | Conteúdo |
-| --- | --- |
-| [`historico/documentacao/`](../historico/documentacao/README.md) | Feedbacks, planos e handoffs de UI/UX encerrados |
-| `historico/progresso/` (pendente de integração na main) | Checkpoints anteriores de progresso |
-| [`docs/VALIDACAO-*.md`](.) | Evidências de validação técnica (por percurso) |
-| [`docs/evidencias/`](evidencias/) | Benchmarks, concorrência e capturas de testes |
-| [`docs/design/evidencias/`](design/evidencias/) | Evidências dos protótipos públicos |
+| Local                                                                       | Conteúdo                                                                                         |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [`historico/documentacao/`](../historico/documentacao/README.md)            | Planos, relatos, análises e handoffs preservados; pendências vigentes estão na matriz/checkpoint |
+| [`historico/progresso/`](../historico/progresso/README.md)                  | Checkpoints anteriores de progresso                                                              |
+| [`histórico de validações`](../historico/documentacao/README.md#validacoes) | Evidências de validação técnica (por percurso)                                                   |
+| [`docs/evidencias/`](evidencias/)                                           | Benchmarks, concorrência e capturas de testes                                                    |
+| [`docs/design/evidencias/`](design/evidencias/)                             | Evidências dos protótipos públicos                                                               |
 
 > [!NOTE]
 > `historico/documentacao/AJUSTES-DE-EXPERIENCIA.md` contém feedbacks de protótipo de 22–27/10. Regras permanentes aplicáveis foram absorvidas em `docs/design/`. Não tratar as orientações históricas como requisitos atuais sem verificar se foram incorporadas.
@@ -201,7 +201,7 @@ Quando não for possível resolver com segurança, identifique a origem e solici
 
 ### Editar um jogo (entrada de dados / súmula)
 
-Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `decisoes/009-sumula-persistida.md` → `design/INTEGRACAO.md` (seção Súmula) → `VALIDACAO-SUMULA-DESKTOP.md` → `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` (regras esportivas) → `design/PADROES-ADMIN.md` (formulários e feedback)
+Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `decisoes/009-sumula-persistida.md` → `design/INTEGRACAO.md` (seção Súmula) → evidência de súmula no histórico, se necessária → `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` (regras esportivas) → `design/PADROES-ADMIN.md` (formulários e feedback)
 
 ### Adicionar um atleta (cadastro / importação)
 
@@ -209,7 +209,7 @@ Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `decisoes/007-pes
 
 ### Melhorar o layout de uma tabela administrativa
 
-Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `design/README.md` → `design/PADROES.md` (seção Tabelas e ações) → `design/PADROES-ADMIN.md` → `design/ADMIN.md` → `VALIDACAO-ACESSIBILIDADE-ADMIN.md`
+Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `design/README.md` → `design/PADROES.md` (seção Tabelas e ações) → `design/PADROES-ADMIN.md` → `design/ADMIN.md` → evidência de acessibilidade no histórico, se necessária
 
 ---
 

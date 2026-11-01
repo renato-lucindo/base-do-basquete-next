@@ -22,4 +22,4 @@ Se as medições mostrarem que a fila ou POST/GET continuam dominantes, registra
 
 ## Estado da entrega
 
-Correção inicial integrada pela PR41 e publicada na fontef1513c9, com gate588unit/25workerd e CI443browsersPASS/93SKIP, revisão automática sem apontamentos e smoke protegido/revogação. Detalhes, hashes e limitações em docs/VALIDACAO-DESEMPENHO-SALVAMENTOS.md. A etapa de observação end-to-end autenticada continua pendente; não é suprida pelo benchmark controlado nem pelo smoke sem sessão da aplicação.
+Correção inicial integrada pela PR41 e publicada na fontef1513c9, com gate588unit/25workerd e CI443browsersPASS/93SKIP, revisão automática sem apontamentos e smoke protegido/revogação. Detalhes, hashes e limitações em historico/documentacao/validacoes/VALIDACAO-DESEMPENHO-SALVAMENTOS.md. A etapa de observação end-to-end autenticada continua pendente; não é suprida pelo benchmark controlado nem pelo smoke sem sessão da aplicação.

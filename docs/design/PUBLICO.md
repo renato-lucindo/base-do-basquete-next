@@ -40,7 +40,7 @@ Exemplo ilustrativo; respeitar dados reais de cada edição.
 - **Jogo de súmula:** indicadores existentes no Next; **jogo de boxscore:** indicadores elegíveis do `renato-lucindo/base-do-basquete` anterior, adaptados à arquitetura Next. Nunca juntar métricas incompatíveis nem exibir zero para dado ausente.
 - Expor cobertura, unidade e fonte dos indicadores quando necessário. Atletas podem ter vínculos com equipes diferentes; nomes sozinhos não identificam pessoa ou participação.
 - Reaproveitar a navegação pública bem resolvida do projeto anterior de modo seletivo, sem importar regras de publicação, contratos ou dependências antigas.
-- Para as referências de súmula e estatísticas, seguir [INTEGRACAO.md](INTEGRACAO.md) e [VALIDACAO.md](VALIDACAO.md).
+- Para as referências de súmula e estatísticas, seguir [INTEGRACAO.md](INTEGRACAO.md) e [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
 - A publicação respeita confirmação explícita e fontes públicas do Next. **Não** expor automaticamente inscrições, classificação ou agenda futura por mera existência de rascunho ou regulamento. A decisão sobre elegibilidade pública desses dados continua sem aceite, conforme [decisão 013](../decisoes/013-classificacao-publica-confirmada.md).
 
 **Recomendações ainda sem aceite expresso:** preservar a estrutura atual dos perfis do Next e acrescentar melhorias pontuais do projeto anterior; equipes com identificação, estatísticas, elenco e jogos; jogadores com identificação, equipe, estatísticas e jogos. A validação responsiva é obrigatória para alterações afetadas pelos [padrões comuns](PADROES.md), mesmo sem aprovação específica dessas composições.

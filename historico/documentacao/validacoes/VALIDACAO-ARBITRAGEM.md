@@ -2,7 +2,7 @@
 
 ## A1 — contratos e banco local
 
-Base main e6e8bf49c7040070cfc0fe0aa9cf8eca1169de34, branch codex/arbitragem, worktree `C:/Users/12405304716/.codex/worktrees/uiux-validation/Base do Basquete-v1`. Plano aprovado em `docs/superpowers/plans/2026-10-28-arbitragem.md`.
+Base main e6e8bf49c7040070cfc0fe0aa9cf8eca1169de34, branch codex/arbitragem, worktree `C:/Users/12405304716/.codex/worktrees/uiux-validation/Base do Basquete-v1`. Plano aprovado em `historico/documentacao/planos/2026-10-28-arbitragem.md`.
 
 - RED inicial de importação não executou asserções. Em seguida, schemas provisórios permissivos executaram e falharam nos quatro comportamentos: nomes, sequência/duplicidade e contrato fechado. Implementação passou quatro focais novos e três contratos antigos.
 - PostgreSQL descartável zero/upgrade inicialmente recusou a RPC ausente. Nova migration gerada pela CLI fixada2.121.0: **20261028132846_game_officiating.sql**, somente local/NÃO APLICADA.
