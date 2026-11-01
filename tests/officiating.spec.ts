@@ -455,9 +455,7 @@ for (const [width, height] of [
     await expect(
       page.getByLabel("Hora de início", { exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByLabel("Hora de fim", { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByLabel("Hora de fim", { exact: true })).toBeVisible();
     const shotClock = page.getByRole("combobox", {
       name: "Operador de 24s",
       exact: true,
