@@ -41,7 +41,10 @@ test("public result opens without application login and shows only published par
     page.getByRole("heading", { name: "Resultado publicado", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Lobos 2 × 0 Águias", { exact: true }),
+    page.getByRole("region", { name: "Parciais e placar final" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "2", exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByLabel("Senha", { exact: true })).toHaveCount(0);
   expect(sessionReads).toBe(0);
@@ -106,14 +109,16 @@ test("Site projection keeps unavailable periods distinct from real zero stats", 
   );
   await page.goto(`http://127.0.0.1:5174/resultado.html#${pubId(8)}`);
   await expect(
-    page.getByText("Períodos não informados.", { exact: true }),
+    page.getByText("Parciais indisponíveis na publicação."),
   ).toBeVisible();
   await expect(
-    page.getByText("Boxscore Basketball Site", { exact: true }),
+    page.getByText(
+      /Estatísticas individuais por quarto e faltas detalhadas por período/u,
+    ),
   ).toBeVisible();
   await expect(
     page.getByRole("columnheader", { name: "MIN", exact: true }),
-  ).toHaveCount(2);
+  ).toHaveCount(0);
   await expect(
     page.getByRole("columnheader", { name: "Q1", exact: true }),
   ).toHaveCount(0);

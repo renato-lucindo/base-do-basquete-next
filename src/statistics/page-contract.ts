@@ -30,6 +30,7 @@ export const statisticsRowSchema = reference
       .array(z.string().regex(/^(00|0|[1-9][0-9]?)$/u))
       .min(1)
       .max(101),
+    rank: count.min(1).nullable().optional(),
     gamesPlayed: count,
     coverage: z
       .object({

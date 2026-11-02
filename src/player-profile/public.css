@@ -1,7 +1,7 @@
 .player-page {
   max-width: 1200px;
 }
-.player-navigation {
+.statistics-page > nav.player-navigation {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

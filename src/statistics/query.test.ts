@@ -257,3 +257,48 @@ it("preset de súmula exibe apenas dados simples e compartilha a preferência na
   ]);
   expect(parseStatisticsQuery(serializeStatisticsQuery(query))).toEqual(query);
 });
+
+it("ordena PPJ por valores exatos antes de atribuir posições", () => {
+  const source = sourceFixture();
+  const groups = [
+    { personId: pubId(700), name: "Ranking A", scores: [10, 10, 11] },
+    {
+      personId: pubId(710),
+      name: "Ranking B",
+      scores: [10, 10, 10, 10, 10, 10, 10, 11, 11, 11],
+    },
+  ];
+  source.games = groups.flatMap((group, groupIndex) =>
+    group.scores.map((points, index) => {
+      const snapshot = confirmedManualFixture();
+      snapshot.id = pubId(7000 + groupIndex * 100 + index);
+      const player = snapshot.facts.players[0];
+      player.person.id = group.personId;
+      player.person.name = group.name;
+      snapshot.staff.home.captain = player.person;
+      snapshot.staff.home.coach = player.person;
+      const delta = points - player.points;
+      player.points += delta;
+      player.free += delta;
+      const team = snapshot.facts.teams.home;
+      team.points += delta;
+      team.periods[0] += delta;
+      team.freeMade += delta;
+      team.freeTaken += delta;
+      return { snapshot, phase: null };
+    }),
+  );
+  const result = buildStatisticsPage(
+    source,
+    parseStatisticsQuery(
+      new URLSearchParams("scope=all&q=Ranking&sort=pointsPerGame&dir=desc"),
+    ),
+  );
+  expect(result.total).toBe(2);
+  expect(result.rows.map((r) => [r.personId, r.rank])).toEqual([
+    [pubId(700), 1],
+    [pubId(710), 2],
+  ]);
+  expect(result.rows[0].metrics.pointsPerGame.value).toBeCloseTo(31 / 3);
+  expect(result.rows[1].metrics.pointsPerGame.value).toBe(10.3);
+});

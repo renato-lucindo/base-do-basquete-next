@@ -66,7 +66,7 @@ test("disputa salva oferece estatísticas em outra aba sem substituir edição a
   });
   await expect(link).toHaveAttribute(
     "href",
-    `/estatisticas.html#${tid(3)}?view=simple&scope=all`,
+    `/estatisticas.html#${tid(3)}?scope=all`,
   );
   await expect(link).toHaveAttribute("target", "_blank");
   await expect(link).toHaveAttribute("rel", /noopener/u);
@@ -84,6 +84,10 @@ test("seleção por teclado mantém foco após consulta e limita comparação a 
     name: "Estatísticas dos atletas",
     exact: true,
   });
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
+  await page
+    .getByRole("checkbox", { name: "Comparar atletas na tabela", exact: true })
+    .check();
   const boxes = table.getByRole("checkbox"),
     label = await boxes.first().getAttribute("aria-label");
   await boxes.first().focus();
@@ -107,6 +111,7 @@ test("adicionar filtro foca a métrica e permite remover filtro ainda incompleto
 }) => {
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url);
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();
@@ -158,7 +163,7 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
   });
   await expect(table.getByRole("row")).toHaveCount(21);
   await expect(
-    page.getByRole("status").filter({ hasText: "33 participações" }),
+    page.getByRole("status").filter({ hasText: "33 registros por equipe" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Próxima página", exact: true })
@@ -167,12 +172,13 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
   await expect(page).toHaveURL(/page=2/u);
   await page.reload();
   await expect(table.getByRole("row")).toHaveCount(14);
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("combobox", { name: "Escopo", exact: true })
     .selectOption("regular");
   await expect(page).toHaveURL(/page=1/u);
   await expect(
-    page.getByRole("status").filter({ hasText: "11 participações" }),
+    page.getByRole("status").filter({ hasText: "11 registros por equipe" }),
   ).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Escopo", exact: true }),
@@ -183,6 +189,7 @@ test("MIN oculta por30 preserva coluna e remove filtro/ordem incompatíveis", as
 }) => {
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url + "&preset=all&sort=minutes&filters=minutes:%3E:0");
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await expect(
     page.getByRole("combobox", { name: "Ordenar por", exact: true }),
   ).toHaveValue("minutes");
@@ -244,8 +251,9 @@ test("busca/filtros por teclado, equipes vazias e líderes antes da página têm
   await search.fill("joao");
   await search.press("Enter");
   await expect(
-    page.getByRole("status").filter({ hasText: "3 participações" }),
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
   ).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();
@@ -272,7 +280,7 @@ test("busca/filtros por teclado, equipes vazias e líderes antes da página têm
     .getByRole("checkbox", { name: "Todas as equipes", exact: true })
     .check();
   await expect(
-    page.getByRole("status").filter({ hasText: "3 participações" }),
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
   ).toBeVisible();
 });
 test("amostra insuficiente difere de ausência sem esconder atleta e filtros não usam valor fictício", async ({
@@ -284,7 +292,9 @@ test("amostra insuficiente difere de ausência sem esconder atleta e filtros nã
     page.getByLabel("Amostra insuficiente", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByText("—", { exact: true }).first()).toBeVisible();
+  await page.getByText("Fonte e cobertura dos dados", { exact: true }).click();
   await expect(page.getByText(/Mínimo para o cálculo por 30/u)).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
     .click();
@@ -327,6 +337,7 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto(f.url);
   await expect(page.getByRole("table")).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
   f.state.delayNext = 300;
   await page
     .getByRole("combobox", { name: "Escopo", exact: true })
@@ -335,7 +346,7 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
     .getByRole("combobox", { name: "Escopo", exact: true })
     .selectOption("all");
   await expect(
-    page.getByRole("status").filter({ hasText: "33 participações" }),
+    page.getByRole("status").filter({ hasText: "33 registros por equipe" }),
   ).toBeVisible();
   await page.waitForTimeout(350);
   await expect(
@@ -356,4 +367,37 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
     path: `.preview-artifacts/statistics-${test.info().project.name}-320.png`,
     fullPage: true,
   });
+});
+
+test("filtro em edição resiste à confirmação tardia da navegação de busca", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url);
+  await page
+    .getByRole("table", { name: "Estatísticas dos atletas", exact: true })
+    .waitFor();
+  const search = page.getByLabel("Buscar atleta ou equipe", { exact: true });
+  await search.fill("joao");
+  await search.press("Enter");
+  await expect(
+    page.getByRole("status").filter({ hasText: /^3 registros por equipe\b/u }),
+  ).toBeVisible();
+  await page.getByText("Mais filtros e opções", { exact: true }).click();
+  await page
+    .getByRole("button", { name: "Adicionar filtro", exact: true })
+    .click();
+  const value = page.getByLabel("Valor do filtro 1", { exact: true });
+  await value.fill("3");
+  // Multiple queued fragment notifications can observe the same current URL.
+  await page.evaluate(() =>
+    window.dispatchEvent(new HashChangeEvent("hashchange")),
+  );
+  await expect(value).toHaveValue("3");
+  await page
+    .getByRole("button", { name: "Aplicar consulta", exact: true })
+    .click();
+  await expect(
+    page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
+  ).toBeVisible();
 });

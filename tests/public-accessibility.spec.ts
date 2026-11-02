@@ -22,16 +22,19 @@ test("axe: estatísticas e escolha de colunas", async ({ page }, info) => {
     page.getByRole("table", { name: "Estatísticas dos atletas", exact: true }),
   ).toBeVisible();
   for (const button of await page.locator("button.statistics-sort").all()) {
-    const visible = (await button.innerText()).trim();
+    const visible = (await button.innerText())
+      .trim()
+      .replace(/[↑↓]/gu, "")
+      .trim();
     const escaped = visible.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
     await expect(button).toHaveAccessibleName(new RegExp(escaped, "u"));
   }
   await scan(page, info, "statistics");
-  const columns = page.getByText("Personalizar colunas", { exact: true });
+  const columns = page.getByRole("button", { name: /^Colunas ·/u });
   await expect(columns).toBeVisible();
   await columns.click();
   await expect(
-    page.getByRole("group", { name: "Colunas visíveis" }),
+    page.getByRole("group", { name: "Colunas da tabela", exact: true }),
   ).toBeVisible();
   await scan(page, info, "statistics-columns");
 });
@@ -125,6 +128,12 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   expect(
     await sort.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
   ).toBeGreaterThanOrEqual(font * 2);
+  const searchAction = page
+    .getByRole("button", { name: "Limpar filtros", exact: true })
+    .first();
+  expect(
+    await searchAction.evaluate((el) => el.scrollWidth - el.clientWidth),
+  ).toBeLessThanOrEqual(1);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(320);

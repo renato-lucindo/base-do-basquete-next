@@ -1,6 +1,212 @@
 .statistics-page {
   max-width: 1320px;
   overflow-wrap: anywhere;
+  padding: 12px 16px 28px;
+}
+.statistics-page > h1 {
+  display: inline-block;
+  font-size: 1.32rem;
+  margin: 4px 16px 9px 0;
+}
+.statistics-page > nav {
+  display: inline-block;
+  margin-bottom: 9px;
+  font-size: 0.86rem;
+}
+.statistics-quickbar {
+  display: grid;
+  grid-template-columns:
+    minmax(155px, 2fr) minmax(100px, 1fr) minmax(105px, 1fr)
+    minmax(85px, 0.7fr) minmax(130px, 1.25fr) auto auto auto;
+  align-items: end;
+  gap: 6px;
+  padding: 8px;
+  background: #f6f9fd;
+  border: 1px solid #cfdae8;
+  border-radius: 6px;
+}
+.statistics-quickbar label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  gap: 2px;
+}
+.statistics-page .statistics-quickbar input:not([type="checkbox"]),
+.statistics-page .statistics-quickbar select {
+  min-height: 36px;
+  padding: 5px 7px;
+  font-size: 0.9rem;
+}
+.statistics-quickbar > .statistics-popover {
+  position: relative;
+  min-width: 0;
+}
+.statistics-page .statistics-popover summary,
+.statistics-page .statistics-advanced > summary {
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 1px solid #8798b0;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 0.88rem;
+}
+.statistics-popover-content {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 12;
+  width: min(310px, 80vw);
+  max-height: 340px;
+  overflow: auto;
+  padding: 10px;
+  background: white;
+  border: 1px solid #8798b0;
+  box-shadow: 0 6px 24px #17203324;
+}
+.statistics-page fieldset.statistics-popover-content {
+  margin: 0;
+}
+.statistics-page .statistics-column-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.statistics-column-options label {
+  font-size: 0.85rem;
+}
+.statistics-page .statistics-search-action {
+  min-height: 36px;
+  padding: 7px 11px;
+  white-space: nowrap;
+}
+.statistics-advanced {
+  margin-top: 5px;
+}
+.statistics-advanced > summary {
+  display: inline-block;
+}
+.statistics-advanced .statistics-controls {
+  margin-top: 5px;
+}
+.statistics-result-heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.statistics-page
+  section[aria-label="Resultado da consulta"]
+  > p[role="status"] {
+  margin: 3px 0;
+  font-size: 0.8rem;
+}
+.statistics-explanation {
+  margin: 2px 0;
+  font-size: 0.8rem;
+}
+.statistics-page .statistics-explanation > summary {
+  color: #285586;
+  min-height: 24px;
+  padding: 2px 0;
+}
+.statistics-scroll {
+  margin: 5px 0;
+}
+.statistics-scroll table[aria-label="Estatísticas dos atletas"] {
+  min-width: 1040px;
+  width: 100%;
+}
+.statistics-scroll table[aria-label="Estatísticas dos atletas"] th,
+.statistics-scroll table[aria-label="Estatísticas dos atletas"] td {
+  padding: 4px 7px;
+  line-height: 1.2;
+}
+.statistics-scroll table[aria-label="Estatísticas dos atletas"] td {
+  text-align: right;
+}
+.statistics-scroll table[aria-label="Estatísticas dos atletas"] thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  .statistics-position {
+  position: sticky;
+  left: 0;
+  width: 60px;
+  min-width: 60px;
+  text-align: center;
+  z-index: 3;
+  background: #f0f5fa;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  .statistics-player {
+  position: sticky;
+  left: 60px;
+  width: 230px;
+  min-width: 180px;
+  max-width: 230px;
+  z-index: 3;
+  background: #fff;
+  box-shadow: 2px 0 0 #d9e2ee;
+  white-space: normal;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  thead
+  .statistics-player,
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  thead
+  .statistics-position {
+  z-index: 4;
+  background: #eaf1fa;
+}
+.statistics-player-inner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.statistics-player-inner > div {
+  min-width: 0;
+}
+.statistics-player-inner a {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.statistics-player-inner small {
+  font-size: 0.73rem;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  .statistics-team {
+  max-width: 170px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: left;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  .statistics-sort {
+  min-height: 32px;
+  white-space: nowrap;
+}
+.statistics-scroll
+  table[aria-label="Estatísticas dos atletas"]
+  .statistics-leader {
+  background: #fff0cd;
+}
+.statistics-quickbar :focus-visible,
+.statistics-scroll :focus-visible {
+  outline: 3px solid #075fca;
+  outline-offset: 2px;
 }
 .statistics-controls {
   background: #fff;
@@ -145,6 +351,12 @@
   border: 1px solid #d9e2ee;
 }
 @media (max-width: 800px) {
+  .statistics-quickbar {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .statistics-quickbar > label:first-child {
+    grid-column: span 2;
+  }
   .statistics-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -153,6 +365,86 @@
   }
 }
 @media (max-width: 480px) {
+  .statistics-page {
+    min-width: 0;
+    padding: 5px 10px 20px;
+  }
+  .statistics-page > h1 {
+    font-size: 1.13rem;
+    margin: 2px 8px 5px 0;
+  }
+  .statistics-page > nav {
+    margin-bottom: 5px;
+  }
+  .statistics-quickbar {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+    padding: 5px;
+  }
+  .statistics-quickbar > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .statistics-page .statistics-quickbar input:not([type="checkbox"]),
+  .statistics-page .statistics-quickbar select,
+  .statistics-page .statistics-popover summary,
+  .statistics-page .statistics-search-action {
+    min-width: 0;
+    min-height: 32px;
+  }
+  .statistics-page .statistics-quickbar select {
+    max-width: 100%;
+  }
+  .statistics-page .statistics-popover summary {
+    overflow-wrap: anywhere;
+    padding: 5px 7px;
+  }
+  .statistics-page .statistics-search-action {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    padding-inline: 3px;
+  }
+  .statistics-advanced {
+    margin-top: 3px;
+  }
+  .statistics-page .statistics-advanced > summary {
+    min-height: 32px;
+    padding: 5px 7px;
+  }
+  .statistics-quickbar > label:first-child {
+    grid-column: 1 / 5;
+    grid-row: 1;
+  }
+  .statistics-quickbar > .statistics-search-action {
+    grid-row: 1;
+    grid-column: 5 / 7;
+  }
+  .statistics-quickbar > label:nth-child(2),
+  .statistics-quickbar > label:nth-child(3),
+  .statistics-quickbar > label:nth-child(4),
+  .statistics-quickbar > label:nth-child(5),
+  .statistics-quickbar > .statistics-popover {
+    grid-column: span 3;
+  }
+  .statistics-field-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .statistics-quickbar > label {
+    min-width: 0;
+  }
+  .statistics-scroll
+    table[aria-label="Estatísticas dos atletas"]
+    .statistics-player {
+    width: 155px;
+    min-width: 155px;
+    max-width: 155px;
+  }
   .statistics-fields,
   .statistics-filter,
   .statistics-column-options {

@@ -335,3 +335,55 @@ it("desqualificações simples não confundem exclusão por5faltas nem ausência
     aggregateConfirmedStatistics([c])[0].metrics.disqualifications,
   ).toEqual({ status: "unavailable", value: null });
 });
+
+it("public ranking preserves unrounded averages, percentages and per-30 rates", async () => {
+  const source = normalizeConfirmedGame(confirmedManualFixture()).find(
+    (r) => r.person.id === pubId(1),
+  )!;
+  const scoring = (id: number, person: number, pts: number) => {
+    const row = structuredClone(source);
+    row.gameId = pubId(id);
+    row.person.id = pubId(person);
+    row.scoring = {
+      origin: { kind: "sheet", version: row.source.version },
+      points: pts,
+      twoMade: 0,
+      threeMade: 0,
+      freeMade: pts,
+    };
+    return row;
+  };
+  const facts = [
+    ...[10, 10, 11].map((pts, i) => scoring(7000 + i, 700, pts)),
+    ...[10, 10, 10, 10, 10, 10, 10, 11, 11, 11].map((pts, i) =>
+      scoring(7100 + i, 710, pts),
+    ),
+  ];
+  const ranked = aggregateConfirmedStatistics(facts, {
+    mode: "per-game",
+    minimumSeconds: 600,
+    presentation: "public-leaderboard",
+  });
+  const a = ranked.find((r) => r.personId === pubId(700))!;
+  const b = ranked.find((r) => r.personId === pubId(710))!;
+  expect(a.metrics.pointsPerGame.value).toBeCloseTo(31 / 3);
+  expect(b.metrics.pointsPerGame.value).toBe(10.3);
+  expect(a.metrics.pointsPerGame.value!).toBeGreaterThan(
+    b.metrics.pointsPerGame.value!,
+  );
+  expect(a.metrics.freeMade.value).toBeCloseTo(31 / 3);
+
+  const advanced = await advancedFact(80, 1, 3, 601);
+  const [percent] = aggregateConfirmedStatistics([advanced], {
+    mode: "total",
+    minimumSeconds: 600,
+    presentation: "public-leaderboard",
+  });
+  expect(percent.metrics.fieldGoalPercentage.value).toBeCloseTo(100 / 3);
+  const [normalized] = aggregateConfirmedStatistics([advanced], {
+    mode: "per-30",
+    minimumSeconds: 600,
+    presentation: "public-leaderboard",
+  });
+  expect(normalized.metrics.points.value).toBeCloseTo((2 * 1800) / 601);
+});

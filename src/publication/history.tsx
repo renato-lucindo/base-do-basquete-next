@@ -204,6 +204,12 @@ export function PublicationHistory(p: Props) {
                 Versão publicada {version.version}
               </h4>
               <p>{version.reason || "Primeira publicação"}</p>
+              <h5 className="publication-history-score">
+                {version.snapshot.game.home.name}{" "}
+                {version.snapshot.facts.teams.home.points} ×{" "}
+                {version.snapshot.facts.teams.away.points}{" "}
+                {version.snapshot.game.away.name}
+              </h5>
               {"authority" in version.document && (
                 <details>
                   <summary>Decisões de fonte desta versão</summary>

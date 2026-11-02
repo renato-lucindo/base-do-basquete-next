@@ -585,7 +585,7 @@ export function CompetitionWorkspace({
             {context && editor.savedIds.has(context.id) && (
               <a
                 className="competition-public-link"
-                href={`/estatisticas.html#${context.id}?view=simple&scope=all`}
+                href={`/estatisticas.html#${context.id}?scope=all`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

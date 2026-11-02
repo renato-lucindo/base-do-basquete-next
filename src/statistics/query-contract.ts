@@ -31,15 +31,17 @@ const isMetric = (value: string): value is StatisticsMetric =>
   Object.hasOwn(STATISTICS_METRICS, value);
 const essentials: StatisticsMetric[] = [
   "games",
-  "minutes",
   "points",
-  "rebounds",
-  "assists",
-  "fieldGoalPercentage",
-  "threePointPercentage",
-  "freeThrowPercentage",
-  "efficiency",
-  "plusMinus",
+  "pointsPerGame",
+  "pointsShare",
+  "twoMade",
+  "threeMade",
+  "freeMade",
+  "foulsCommitted",
+  "technicalFouls",
+  "unsportsmanlikeFouls",
+  "fiveFouls",
+  "disqualifications",
 ];
 export const STATISTICS_COLUMN_PRESETS: Record<
   "essentials" | "simple" | "all",
@@ -124,13 +126,14 @@ export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
       (params.get("compare") ?? "").split(",").flatMap(uuid),
     ).slice(0, 2),
     preset,
-    columns: columns.length
-      ? columns
-      : [
-          ...STATISTICS_COLUMN_PRESETS[
-            preset === "custom" ? "essentials" : preset
+    columns:
+      columns.length || (params.has("columns") && preset === "custom")
+        ? columns
+        : [
+            ...STATISTICS_COLUMN_PRESETS[
+              preset === "custom" ? "essentials" : preset
+            ],
           ],
-        ],
   };
 }
 export function serializeStatisticsQuery(
