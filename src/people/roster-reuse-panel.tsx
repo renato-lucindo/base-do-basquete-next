@@ -55,6 +55,7 @@ export function RosterReusePanel(p: Props) {
     !!view?.candidates.some(
       (row) =>
         row.eligibility === "eligible" &&
+        !view.targetRoster.some((r) => r.personId === row.person.id) &&
         (choices[row.sourceEntryId]?.selected ||
           choices[row.sourceEntryId]?.jersey !== row.jersey),
     );
@@ -148,7 +149,11 @@ export function RosterReusePanel(p: Props) {
       setChoices(
         Object.fromEntries(
           result.candidates
-            .filter((r) => r.eligibility === "eligible")
+            .filter(
+              (r) =>
+                r.eligibility === "eligible" &&
+                !result.targetRoster.some((t) => t.personId === r.person.id),
+            )
             .map((r) => [
               r.sourceEntryId,
               { selected: false, jersey: r.jersey },
@@ -176,7 +181,11 @@ export function RosterReusePanel(p: Props) {
   }
   const selection =
     view?.candidates
-      .filter((r) => r.eligibility === "eligible")
+      .filter(
+        (r) =>
+          r.eligibility === "eligible" &&
+          !view.targetRoster.some((t) => t.personId === r.person.id),
+      )
       .map((r) => ({
         sourceEntryId: r.sourceEntryId,
         selected: choices[r.sourceEntryId]?.selected ?? false,

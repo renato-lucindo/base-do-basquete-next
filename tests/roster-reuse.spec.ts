@@ -41,7 +41,7 @@ async function reuseFixture(page: Page, extraCandidates = 0) {
       id: tid(32),
       personId: tid(10),
       name: "Ana Silva",
-      jersey: "5",
+      jersey: "17",
       eligibility: "eligible",
     },
     {
@@ -179,6 +179,10 @@ for (const width of [1366, 1920]) {
     await expect(page.getByLabel("Incluir Joao Silva")).not.toBeChecked();
     await expect(page.getByLabel("Incluir Maria Silva")).not.toBeChecked();
     await expect(page.getByLabel("Incluir Ana Silva")).toBeDisabled();
+    const existing = page.getByRole("row").filter({ hasText: "Ana Silva" });
+    await expect(existing).toContainText("Já está neste elenco");
+    await expect(existing.getByRole("cell").nth(2)).toHaveText("5");
+    await expect(page.getByLabel("Camisa de Ana Silva")).toHaveCount(0);
     await expect(page.getByLabel("Incluir Luiza Silva")).toBeDisabled();
     await expect(
       page.getByRole("button", { name: "Confirmar reaproveitamento" }),
@@ -208,6 +212,11 @@ for (const width of [1366, 1920]) {
     ).toBeVisible();
     expect(f.receipts.size).toBe(1);
     expect(f.people.members.size).toBe(4);
+    expect(
+      JSON.parse(f.attempts[0]).items.map(
+        (r: { sourceEntryId: string }) => r.sourceEntryId,
+      ),
+    ).not.toContain(tid(32));
     await page
       .getByRole("button", { name: "Retornar ao elenco atualizado" })
       .click();

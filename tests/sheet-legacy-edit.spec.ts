@@ -15,8 +15,9 @@ async function seed(
   page: Parameters<typeof desktopSheetFixture>[0],
   version?: 2,
   confirmed = false,
+  withStaff = false,
 ) {
-  const f = await desktopSheetFixture(page);
+  const f = await desktopSheetFixture(page, 11, withStaff);
   const d = emptyPersistedSheet(version);
   d.participants = (["home", "away"] as const).flatMap((side) =>
     f.context.sides[side].roster.map((r, i) => ({
@@ -71,6 +72,54 @@ async function seed(
     });
   return f;
 }
+
+for (const version of [undefined, 2] as const)
+  test(`staff choices respect format ${version ?? 1} and persist after reload`, async ({
+    page,
+  }) => {
+    const f = await seed(page, version, false, true);
+    await openDesktopSheet(page);
+    await page.getByRole("button", { name: "Revisar preparação" }).click();
+    const coach = page.getByLabel("Técnico A", { exact: true });
+    await expect(coach.locator(`option[value="${tid(300)}"]`)).toHaveCount(
+      version ? 1 : 0,
+    );
+    await coach.selectOption(version ? tid(300) : tid(301));
+    const assistant = page.getByLabel("Ass. Técnico A", { exact: true });
+    await expect(assistant.locator(`option[value="${tid(301)}"]`)).toHaveCount(
+      version ? 1 : 0,
+    );
+    await assistant.selectOption(version ? tid(301) : tid(300));
+    await page
+      .getByRole("button", { name: "Concluir preparação e lançar ações" })
+      .click();
+    await page
+      .getByRole("button", { name: "Salvar rascunho da súmula" })
+      .click();
+    await expect(
+      page.getByText("Rascunho da súmula salvo", { exact: true }),
+    ).toBeVisible();
+    expect(f.snapshot()!.document.formatVersion).toBe(version);
+    expect(f.snapshot()!.document.staff.home).toMatchObject({
+      coachStaffEntryId: version ? tid(300) : tid(301),
+      assistantStaffEntryId: version ? tid(301) : tid(300),
+    });
+    expect(
+      f.snapshot()!.document.events.map((e) => [e.id, e.target, e.code]),
+    ).toEqual([
+      [tid(850), "0", "2"],
+      [tid(851), "00", "3"],
+      [tid(852), "0", "2"],
+    ]);
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .click();
+    await page.getByRole("button", { name: "Preparar súmula" }).click();
+    await page.getByRole("button", { name: "Revisar preparação" }).click();
+    await expect(coach).toHaveValue(version ? tid(300) : tid(301));
+    await expect(assistant).toHaveValue(version ? tid(301) : tid(300));
+  });
 
 test("a jersey remains editable after scoring and its previous actions follow the player", async ({
   page,

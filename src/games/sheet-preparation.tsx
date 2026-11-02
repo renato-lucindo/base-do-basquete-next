@@ -489,10 +489,11 @@ export function SheetPreparation({
                   {c.staff
                     .filter(
                       (s) =>
+                        (d.formatVersion === 2 || s.role === "head") &&
                         s.personId !==
-                        c.staff.find(
-                          (a) => a.id === staff.assistantStaffEntryId,
-                        )?.personId,
+                          c.staff.find(
+                            (a) => a.id === staff.assistantStaffEntryId,
+                          )?.personId,
                     )
                     .map((s) => (
                       <option key={s.id} value={s.id}>
@@ -527,9 +528,11 @@ export function SheetPreparation({
                     {c.staff
                       .filter(
                         (s) =>
+                          (d.formatVersion === 2 || s.role === "assistant") &&
                           s.personId !==
-                          c.staff.find((a) => a.id === staff.coachStaffEntryId)
-                            ?.personId,
+                            c.staff.find(
+                              (a) => a.id === staff.coachStaffEntryId,
+                            )?.personId,
                       )
                       .map((s) => (
                         <option key={s.id} value={s.id}>
