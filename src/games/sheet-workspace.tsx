@@ -4,6 +4,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { aggregate, periodLabel, type Side } from "../domain/scoresheet";
 import { deleteAction } from "../scoresheet/actions";
 import { authorAction } from "./sheet-event-author";
+import { identifyPlayerEvents } from "./sheet-identity";
 import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
@@ -190,8 +191,8 @@ export function GameSheetWorkspace(props: Props) {
         ))
     )
       throw Error("Os dados não correspondem a este jogo.");
-    const document = validatePersistedSheet(
-      s?.document ?? emptyPersistedSheet(2),
+    const document = identifyPlayerEvents(
+      validatePersistedSheet(s?.document ?? emptyPersistedSheet(2)),
     );
     setHistory({ present: document, past: [], future: [] });
     setBaseline(JSON.stringify(document));
@@ -320,13 +321,12 @@ export function GameSheetWorkspace(props: Props) {
               .map((p) => ({
                 id: p.rosterEntryId,
                 side: p.side,
-                jersey: p.jersey,
               }))
               .sort((a, b) => a.id.localeCompare(b.id)),
           );
         if (identities(next) !== identities(snapshot.document))
           throw Error(
-            "Os relacionados e as camisas confirmados não podem ser alterados.",
+            "Os relacionados confirmados não podem ser alterados. Corrija somente a camisa do mesmo atleta.",
           );
       }
       const document = next.events.length ? validatePersistedSheet(next) : next;
@@ -359,7 +359,7 @@ export function GameSheetWorkspace(props: Props) {
     const value = target.trim().toUpperCase();
     if (
       !d ||
-      (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C"]).includes(
+      (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C", "TO"]).includes(
         value,
       ) &&
         !d.participants.some((p) => p.side === side && p.jersey === value))
@@ -367,7 +367,7 @@ export function GameSheetWorkspace(props: Props) {
       setError(
         d?.formatVersion === 2
           ? "Escolha uma camisa, C para técnico, AT para assistente ou TO para pedido de tempo."
-          : "Escolha uma camisa, B para banco ou C para técnico.",
+          : "Escolha uma camisa, B para banco, C para técnico ou TO para pedido de tempo.",
       );
       return null;
     }
@@ -715,7 +715,7 @@ export function GameSheetWorkspace(props: Props) {
                   quarto · Alt+Q: escolher período.{" "}
                   {d.formatVersion === 2
                     ? "C: técnico · AT: assistente · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5)."
-                    : "B: banco · C: técnico."}
+                    : "B: banco · C: técnico · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5). Tempos anteriores não informados no legado devem ser conferidos na fonte."}
                 </p>
                 <div className="competition-fields">
                   <label>

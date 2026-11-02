@@ -1,0 +1,38 @@
+# Edição de jogos legados — PR #38
+
+Unidade: `codex/reaproveitar-elenco-banco`, PR #38, retomada de `86fe313902fe0c2d8bcce1ff1f38a3ae7673b473` sobre `main`/`c6004eba`. HEAD, CI e resultado conclusivo são conferidos no [registro de validação da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/38#issuecomment-6576381255). A PR #46 permaneceu em `a74584a32189f9ce42bdde5a3cd27eee0be4f8bd`, sem commits desta unidade.
+
+## Causas reproduzidas antes da correção
+
+| Problema | Camadas e causa | Reprodução RED |
+| --- | --- | --- |
+| TO em súmula v1 | O editor conserva o formato antigo; seleção de alvo, contrato, motor e escritor só aceitavam TO em v2. Converter comissão antiga para v2 exigiria autoria que o legado não fornece. | Teste local de documento v1 com TO falhou no contrato. |
+| Arbitragem em jogo encerrado | O leitor e o contrato reconheciam os dados, mas `save_game_editor` delegava a `save_game`, que rejeitava qualquer escrita em estado `finished` com `game_locked`. | Publicação v1 sintética seguida de inclusão de árbitro falhou em PostgreSQL descartável. |
+| Camisa após ações | Preparação desabilitava o campo; alvos dos eventos eram a camisa, sem referência persistida ao atleta. A guarda confirmada também fixava a camisa. | Browser pontuou e reabriu a preparação; a expectativa de campo habilitado falhou. |
+| Horários reais de início/fim | A PR #38 já possuía colunas/contratos e cálculo de duração; o bloqueio geral de jogos encerrados impedia preenchê-los no legado confirmado. | Mesmo escritor bloqueado; a regressão acrescenta horários nulos/preenchidos, virada do dia e término inválido. |
+
+## Correção
+
+- V1 continua v1, com faltas B/C, ordem e informação ausente preservadas. TO explicitamente informado usa as cotas e minutos do validador v2, sem transformar faltas antigas nem deduzir quem as cometeu. A interface distingue “não informados” de nenhum tempo conhecido.
+- `playerRosterEntryId` opcional mantém compatibilidade de leitura. O editor associa ações numéricas antigas pelo par **lado + camisa original exata**, rejeita ambiguidade/inconsistência e conserva UUIDs dos eventos. A troca atualiza somente os alvos tipados do mesmo relacionado; não usa substituição textual. Novas ações já carregam a referência estável. Motor, histórico e totais recebem a nova camisa, com autoria preservada.
+- O campo de camisa aceita digitação e confirma com Enter/saída do campo; Escape cancela. Camisa ocupada produz erro associado ao campo e conserva o valor anterior. Seleção/remoção de atleta com ações continua bloqueada. A guarda SQL também rejeita transferência silenciosa de ações ao trocar camisas, mesmo em comandos de clientes antigos sem o campo novo.
+- Em jogo encerrado, somente arbitragem e horários reais podem ser atualizados pelo editor. Estado, inscrições, agenda, local e número continuam fixos. Datas reais explícitas permitem virada do dia sem alterar a agenda; ausentes permanecem nulas. Arbitragem mantém sequência, homônimos explícitos e recibos. Os grupos se empilham no celular.
+- A instrução expressa do responsável amplia a correção de fonte manual confirmada: mesma identidade/lado, camisa corrigível com motivo de 10–500 caracteres. Salvar conserva a publicação atual; republicar é transação explícita, com nova versão e histórico anterior imutável. Associação PDF mantém suas guardas próprias. ADRs 009/011 registram a mudança ainda na PR aberta.
+
+## Validação e limites
+
+- Regressões em `sheet-identity.test.ts` e `sheet-legacy-edit.test.ts`: v1/v2, B2 legado, autoria explícita v2, TO/cotas/minutos, 0/00, camisa ocupada, ações anteriores/posteriores, reuso de camisa liberada, placar/faltas/participação, identidade, persistência/recarga, replay, payload divergente, versão de jogo/súmula obsoleta e autorização fresca.
+- Instalação e upgrade em PGlite descartável preservam o documento/recibo anterior. Outro jogo e camisa global ficam intactos. Troca cruzada de camisas sem autoria é recusada no SQL. A fonte confirmada exige motivo; snapshot público e fonte estatística ficam idênticos após salvar, e uma republicação explícita cria a versão corrigida. Histórico anterior e sua imutabilidade são conferidos.
+- Browsers Chromium usam somente fixtures: Jogos, arbitragem, súmula desktop, legado e confirmação/republicação. Cobrem erro, teclado, cancelamento, resposta perdida com comando idêntico, conflito com recarga explícita e gravação posterior. Larguras 1366/1920 e 390 px, rolagem interna, capturas inspecionadas e axe no editor encerrado. Capturas novas ficam em `.preview-artifacts/legacy-*-after-*.png`, fora do diretório limpo pelo build; o artefato `evidencias-uiux-desktop` da CI conserva as capturas geradas nesse run.
+- Revisão do autor com `ui-ux-pro-max` e [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md): rótulos, teclado, foco/erro associado, autocomplete, datas explícitas e arbitragem responsiva. Não equivale a revisão independente, aceite humano ou certificação WCAG integral.
+- Gate consolidado local **PASS**, exit 0: **630 Vitest/129 arquivos**, 13 PostgreSQL, 27 Workerd, 6 transportes, quatro PDFs, 1 runtime PDF, lint/formato/tipos, builds, fronteira cliente/servidor e scanner. Browsers afetados **61 PASS / 41 SKIP**; oito casos novos também foram repetidos para conservar as capturas após o build. A asserção adicional da estatística republicada passou focalmente. O comentário fixo acima registra SHA e CI conclusiva. CI da entrada [41345982299](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41345982299) passou; não é prova do novo HEAD. O check `validate` do SHA entregue precisa ser conferido após o push.
+
+PGlite exercita SQL/roles/recibos em processo isolado, e as fixtures exercitam o browser; isso não comprova corrida real entre conexões, API PostgREST/Access ou sessão humana no serviço remoto. A edição integrada real está em `foundation.html`; o protótipo local antigo em `index.html` conserva seu contrato próprio. Nenhum dado humano foi usado nos testes.
+
+## Migration e operação pendente
+
+Consulta somente de metadados em 02/11/2026 confirmou dev saudável, PostgreSQL 17 e **55 migrations aplicadas**, última `20261031005230_game_actual_times`. Foi preparada pela CLI a nova **`20261102112205_legacy_sheet_editing.sql`**. Ela altera funções, acrescenta a guarda de autoria e preserva assinaturas públicas, autorização, ordem de locks, concorrência e recibos. Não faz backfill, seed, alteração de linhas nem reescrita de versões históricas. As 55 migrations anteriores não foram editadas.
+
+Aplicação real **não autorizada/não realizada**. Quando houver autorização específica: conferir novamente o catálogo e o destino, revisar a migration incremental e aplicá-la antes de publicar o código desta PR; manter Access/segredos e sessões. Publicar um preview isolado somente após conferir CI do SHA escolhido e compatibilidade da configuração, então validar HTTP autenticado e a versão servida. Não substituir outro preview. Integração na `main`, migrations e deploy são decisões separadas.
+
+Para avaliar agora sem dados humanos: `npm ci --ignore-scripts`, `npx vitest run src/games/sheet-identity.test.ts src/games/sheet-legacy-edit.test.ts` e `npx playwright test tests/sheet-legacy-edit.spec.ts tests/sheet.spec.ts --project=desktop --workers=2`. Não apontar esses testes para o Supabase real. No futuro preview autorizado: abrir um jogo legado, informar arbitragem/início/fim, corrigir camisa na preparação, conferir ações/totais, salvar/recarregar e, se confirmado, fornecer motivo e republicar explicitamente para atualizar o público.

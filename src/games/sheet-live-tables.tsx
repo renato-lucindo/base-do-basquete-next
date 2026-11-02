@@ -83,7 +83,7 @@ export function SheetLiveTables({
               <h4>
                 Equipe {letter} · {game[side].name}
               </h4>
-              {d.formatVersion === 2 && (
+              {
                 <p aria-label={`Tempos debitados da equipe ${letter}`}>
                   <strong>Tempos debitados: </strong>
                   {d.events.filter((e) => e.side === side && e.target === "TO")
@@ -103,9 +103,11 @@ export function SheetLiveTables({
                             {periodLabel(e.period)}: {e.code}′{" "}
                           </span>
                         ))
-                    : "Nenhum"}
+                    : d.formatVersion === 2
+                      ? "Nenhum"
+                      : "Não informados na súmula legada"}
                 </p>
-              )}
+              }
               <table
                 className="sheet-live-table"
                 aria-label={`Súmula equipe ${letter}`}

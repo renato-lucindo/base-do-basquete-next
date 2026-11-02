@@ -189,7 +189,7 @@ export async function gamesFixture(page: Page) {
         ...g,
         version: command.expectedVersion + 1,
         savedAt,
-        state: "scheduled",
+        state: old?.state ?? "scheduled",
         timeZone: "America/Sao_Paulo",
         scheduledAt: g.date && g.time ? `${g.date}T${g.time}:00-03:00` : null,
         home: registration(g.homeRegistrationId),

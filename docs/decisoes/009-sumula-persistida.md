@@ -14,6 +14,12 @@ Execução G2: contrato/adaptador e testes; SQL próprio e contratos reais de id
 
 As regras de ações/exclusão também são verificadas no escritor SQL, para não depender exclusivamente do adaptador Worker. Testes cruzam o motor fornecido e PostgreSQL em335 sequências/casos; não equivalem a prova exaustiva ou teste de concorrência. Confirmação/fechamento/publicação continuam na unidadeG4. Naipe da disputa também fica protegido contra reatribuição depois de existir documento.
 
+## Compatibilidade e correção de camisa — PR #38, 02/11/2026
+
+Por instrução expressa do responsável nesta unidade, a camisa do mesmo relacionado pode ser corrigida após ações, inclusive numa fonte confirmada com motivo de revisão. UUID do vínculo e lado permanecem fixos. Eventos novos guardam `playerRosterEntryId`; eventos antigos são associados deterministicamente pelo par lado + camisa original, distinguindo `0` de `00`, antes de qualquer alteração. Referência já presente deve coincidir; ambiguidade ou inconsistência bloqueia a edição. A nova camisa é aplicada aos alvos tipados desse vínculo, preservando IDs, ordem, códigos e autoria de comissão. Não há substituição textual, alteração do elenco global ou de outro jogo.
+
+O formato v1 permanece v1: não converter faltas B/C antigas para autores v2 por inferência. Pedidos de tempo explicitamente informados passam a ser aceitos também em v1, com as mesmas cotas e minutos do motor v2. Ausência no legado não prova que nenhum tempo foi pedido; a interface indica a informação ausente e exige conferência da fonte. Ler não reescreve documentos, recibos nem publicações. Persistir exige os comandos autorizados/versionados existentes; uma correção confirmada não republica implicitamente. Esta ampliação permanece na PR aberta até integração autorizada.
+
 ## Proveniência e prevenção de regressões
 
 `src/domain/scoresheet.ts` deriva do motor `modulos/source/app/modules/keyboard-scoresheet/domain.ts` do pacote imutável; a cópia de testes adapta o import. Metadados de capitão/comissão/titularidade foram estendidos na cópia local, preservando fórmulas e códigos originais, conforme o [feedback preservado](../../historico/documentacao/AJUSTES-DE-EXPERIENCIA.md) e a [proveniência completa](../../historico/documentacao/analises/ORIGEM-DOS-MODULOS.md). Documentos legados são lidos sem reescrever armazenamento e sem fabricar titulares/capitão. O sufixo de `U2` indica lances livres: conta uma falta U, não duas. Referências antigas não substituem o motor e seus testes atuais.

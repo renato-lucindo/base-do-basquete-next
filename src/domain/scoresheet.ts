@@ -21,6 +21,7 @@ export const eventSchema = z.object({
   code: z.string().max(3),
   actorId: z.uuid().optional(),
   successorId: z.uuid().optional(),
+  playerRosterEntryId: z.uuid().optional(),
 });
 export type Entry = z.infer<typeof eventSchema>;
 export const teamStaffSchema = z.object({
@@ -246,12 +247,17 @@ export function aggregate(
   };
   for (const event of [...sheet.events].sort((a, b) => a.period - b.period)) {
     const player = players.find(
-      (p) => p.side === event.side && p.jersey === event.target,
+      (p) =>
+        p.side === event.side &&
+        (event.playerRosterEntryId
+          ? p.actorId === event.playerRosterEntryId && p.jersey === event.target
+          : p.jersey === event.target),
     );
     const own = teams[event.side];
     const opponent = teams[event.side === "home" ? "away" : "home"];
     if (
       event.period > sheet.periods ||
+      (event.playerRosterEntryId && !player) ||
       (!player && !["B", "C", "AT", "TO"].includes(event.target))
     ) {
       errors.push("Camisa ou período inválido.");
@@ -260,10 +266,10 @@ export function aggregate(
     if (event.target === "TO") {
       const minute = Number(event.code);
       if (
-        !identified ||
         !/^(?:[1-9]|10)$/.test(event.code) ||
         minute > (event.period > 4 ? 5 : 10) ||
         event.actorId ||
+        event.playerRosterEntryId ||
         event.successorId
       ) {
         errors.push(

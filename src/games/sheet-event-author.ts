@@ -19,6 +19,25 @@ export function authorAction(
   if (index < 0) throw Error("Ação não encontrada.");
   const existing = editingId ? d.events[index] : undefined;
   const event = { id: existing?.id ?? crypto.randomUUID(), ...action };
+  const player = d.participants.find(
+    (p) => p.side === action.side && p.jersey === action.target,
+  );
+  if (player && existing?.actorId)
+    throw Error(
+      "O responsável por esta falta mudou após a correção. Exclua e registre novamente a ocorrência com autoria explícita.",
+    );
+  if (player)
+    return {
+      ...event,
+      playerRosterEntryId: player.rosterEntryId,
+      ...(successorId === undefined &&
+      existing?.successorId &&
+      existing.side === action.side &&
+      existing.target === action.target
+        ? { successorId: existing.successorId }
+        : {}),
+      ...(successorId ? { successorId } : {}),
+    };
   if (d.formatVersion !== 2) return event;
   const prior = d.events.filter(
     (e, i) =>

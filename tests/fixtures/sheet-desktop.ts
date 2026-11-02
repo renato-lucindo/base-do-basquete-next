@@ -5,6 +5,7 @@ import type { PreparationContext } from "../../src/games/preparation-contract";
 import { gameSnapshotSchema } from "../../src/games/contract";
 import {
   saveSheetSchema,
+  type SaveSheet,
   type SheetSnapshot,
 } from "../../src/games/sheet-contract";
 export async function desktopSheetFixture(
@@ -72,12 +73,51 @@ export async function desktopSheetFixture(
   };
   let snapshot: SheetSnapshot | null = null;
   const commands: unknown[] = [];
+  const attempts: SaveSheet[] = [],
+    receipts = new Map<
+      string,
+      {
+        payload: string;
+        result: { requestId: string; version: number; confirmed: boolean };
+      }
+    >();
+  let loseAck = false,
+    conflict = false;
   await page.route(`**/api/games/${game.id}/sheet/preparation`, (r) =>
     r.fulfill({ json: context }),
   );
   await page.route(`**/api/games/${game.id}/sheet`, (r) => {
-    if (r.request().method() === "GET") return r.fulfill({ json: snapshot });
+    if (r.request().method() === "GET")
+      return r.fulfill({
+        json: snapshot
+          ? { ...snapshot, gameVersion: f.games.get(game.id)!.version }
+          : null,
+      });
     const c = saveSheetSchema.parse(r.request().postDataJSON());
+    attempts.push(c);
+    const prior = receipts.get(c.requestId);
+    if (prior)
+      return r.fulfill({
+        status: prior.payload === JSON.stringify(c) ? 200 : 409,
+        json: prior.result,
+      });
+    if (conflict && snapshot) {
+      conflict = false;
+      snapshot = { ...snapshot, version: snapshot.version + 1 };
+    }
+    if (
+      c.baseVersion !== (snapshot?.version ?? 0) ||
+      c.gameVersion !== f.games.get(game.id)!.version
+    )
+      return r.fulfill({
+        status: 409,
+        json: {
+          error: {
+            code: "version_conflict",
+            message: "A súmula mudou no servidor. Recarregue para conferir.",
+          },
+        },
+      });
     commands.push(c);
     const candidates = [
       ...context.sides.home.roster,
@@ -85,10 +125,10 @@ export async function desktopSheetFixture(
     ];
     snapshot = {
       gameId: game.id,
-      gameVersion: 1,
+      gameVersion: f.games.get(game.id)!.version,
       version: c.baseVersion + 1,
       savedAt,
-      confirmed: false,
+      confirmed: snapshot?.confirmed ?? false,
       document: c.document,
       participants: c.document.participants.map((p) => {
         const m = candidates.find((r) => r.id === p.rosterEntryId)!;
@@ -121,13 +161,25 @@ export async function desktopSheetFixture(
         }),
       ) as SheetSnapshot["staff"],
     };
-    return r.fulfill({
-      json: {
-        requestId: c.requestId,
-        version: snapshot.version,
-        confirmed: false,
-      },
-    });
+    const result = {
+      requestId: c.requestId,
+      version: snapshot.version,
+      confirmed: snapshot.confirmed,
+    };
+    receipts.set(c.requestId, { payload: JSON.stringify(c), result });
+    if (loseAck) {
+      loseAck = false;
+      return r.fulfill({
+        status: 503,
+        json: {
+          error: {
+            code: "access_unavailable",
+            message: "Resposta perdida após gravação.",
+          },
+        },
+      });
+    }
+    return r.fulfill({ json: result });
   });
   await page.route(/\/api\/roster(\?|$)/, (r) => {
     const reg = new URL(r.request().url()).searchParams.get("registrationId");
@@ -152,7 +204,22 @@ export async function desktopSheetFixture(
   await page.route(/\/api\/staff(\?|$)/, (r) =>
     r.fulfill({ json: { items: [], hasMore: false } }),
   );
-  return { ...f, context, commands, snapshot: () => snapshot };
+  return {
+    ...f,
+    context,
+    commands,
+    sheetAttempts: attempts,
+    snapshot: () => snapshot,
+    setSnapshot: (s: SheetSnapshot) => {
+      snapshot = s;
+    },
+    loseNextSheetAck: () => {
+      loseAck = true;
+    },
+    conflictNextSheetSave: () => {
+      conflict = true;
+    },
+  };
 }
 export async function openDesktopSheet(page: Page) {
   await page.goto(

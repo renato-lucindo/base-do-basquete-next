@@ -499,7 +499,13 @@ export function GamesWorkspace(props: Props) {
             </p>
             <fieldset
               className="competition-form"
-              disabled={busy || uncertain || conflict || decisionLocked}
+              disabled={
+                busy ||
+                uncertain ||
+                conflict ||
+                decisionLocked ||
+                savedGame?.state === "finished"
+              }
             >
               <legend>Dados do jogo</legend>
 
@@ -537,46 +543,48 @@ export function GamesWorkspace(props: Props) {
                 )}
               </div>
 
-              <div className="game-actual-times">
-                <label>
-                  Data do jogo
-                  <input
-                    type="date"
-                    value={gameTimeFields(editor.game).date}
-                    onChange={(e) => changeTime("date", e.target.value)}
-                  />
-                </label>
-                <label>
-                  Hora de início
-                  <input
-                    type="time"
-                    value={gameTimeFields(editor.game).start}
-                    disabled={!gameTimeFields(editor.game).date}
-                    onChange={(e) => changeTime("start", e.target.value)}
-                  />
-                </label>
-                <label>
-                  Hora de fim
-                  <input
-                    type="time"
-                    value={gameTimeFields(editor.game).end}
-                    disabled={
-                      !gameTimeFields(editor.game).date ||
-                      !gameTimeFields(editor.game).start
-                    }
-                    onChange={(e) => changeTime("end", e.target.value)}
-                  />
-                </label>
-                <p role="status">
-                  Duração total (inclui intervalos):{" "}
-                  {durationMinutes(editor.game.startAt, editor.game.endAt) ===
-                  null
-                    ? "Informe a hora de fim para calcular."
-                    : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
-                  . Se o fim for anterior ao início, será considerado no dia
-                  seguinte.
-                </p>
-              </div>
+              {savedGame?.state !== "finished" && (
+                <div className="game-actual-times">
+                  <label>
+                    Data do jogo
+                    <input
+                      type="date"
+                      value={gameTimeFields(editor.game).date}
+                      onChange={(e) => changeTime("date", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Hora de início
+                    <input
+                      type="time"
+                      value={gameTimeFields(editor.game).start}
+                      disabled={!gameTimeFields(editor.game).date}
+                      onChange={(e) => changeTime("start", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Hora de fim
+                    <input
+                      type="time"
+                      value={gameTimeFields(editor.game).end}
+                      disabled={
+                        !gameTimeFields(editor.game).date ||
+                        !gameTimeFields(editor.game).start
+                      }
+                      onChange={(e) => changeTime("end", e.target.value)}
+                    />
+                  </label>
+                  <p role="status">
+                    Duração total (inclui intervalos):{" "}
+                    {durationMinutes(editor.game.startAt, editor.game.endAt) ===
+                    null
+                      ? "Informe a hora de fim para calcular."
+                      : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
+                    . Se o fim for anterior ao início, será considerado no dia
+                    seguinte.
+                  </p>
+                </div>
+              )}
               <VenuePicker
                 value={editor.game.venue ?? ""}
                 onChange={(value) => change("venue", value || null)}
@@ -628,6 +636,61 @@ export function GamesWorkspace(props: Props) {
                 </button>
               </div>
             </fieldset>
+            {savedGame?.state === "finished" && (
+              <>
+                <p>
+                  Jogo encerrado: atualize os horários reais e a arbitragem. A
+                  agenda permanece fixa; corrigir a súmula exige motivo e
+                  republicação explícita para atualizar o resultado público.
+                </p>
+                <fieldset
+                  className="competition-form"
+                  disabled={busy || uncertain || conflict || decisionLocked}
+                >
+                  <legend>Horários reais (America/Sao_Paulo)</legend>
+                  <div className="game-actual-times">
+                    <label>
+                      Hora de início
+                      <input
+                        type="datetime-local"
+                        value={editor.game.startAt ?? ""}
+                        name="actualStartAt"
+                        autoComplete="off"
+                        onChange={(e) =>
+                          change("startAt", e.target.value || null)
+                        }
+                      />
+                    </label>
+                    <label>
+                      Hora de fim
+                      <input
+                        type="datetime-local"
+                        value={editor.game.endAt ?? ""}
+                        name="actualEndAt"
+                        autoComplete="off"
+                        onChange={(e) =>
+                          change("endAt", e.target.value || null)
+                        }
+                      />
+                    </label>
+                    <p role="status">
+                      Duração total (inclui intervalos):{" "}
+                      {durationMinutes(
+                        editor.game.startAt,
+                        editor.game.endAt,
+                      ) === null
+                        ? "Informe início e fim válidos para calcular."
+                        : `${durationMinutes(editor.game.startAt, editor.game.endAt)} min`}
+                    </p>
+                  </div>
+                  <p>
+                    Informe também a data de cada horário. Se o jogo terminou
+                    após a meia-noite, use o dia seguinte no fim. Horários
+                    ausentes no legado permanecem em branco.
+                  </p>
+                </fieldset>
+              </>
+            )}
             <OfficiatingEditor
               slots={editor.officiating}
               names={editor.officialNames}

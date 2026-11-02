@@ -377,7 +377,7 @@ describe("keyboard transcription", () => {
     ).not.toThrow();
     expect(() =>
       validateSheet({ ...base, events: [entry("home", "2", 1, "TO")] }),
-    ).toThrow();
+    ).not.toThrow();
   });
 
   it("allows one timeout per overtime and rejects missing or invalid minutes", () => {

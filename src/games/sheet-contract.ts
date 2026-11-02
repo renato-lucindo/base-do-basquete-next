@@ -44,14 +44,25 @@ export const persistedSheetSchema = z
     const fail = (message: string) => ctx.addIssue({ code: "custom", message });
     for (const event of d.events) {
       if (
-        (!d.formatVersion &&
-          (event.target === "TO" || event.actorId || event.successorId)) ||
+        (!d.formatVersion && (event.actorId || event.successorId)) ||
         (d.formatVersion === 2 &&
           event.actorId &&
           event.target !== "C" &&
           event.target !== "AT")
       )
         fail("Autoria de comissão técnica incompatível com o lançamento.");
+      if (
+        event.playerRosterEntryId &&
+        !d.participants.some(
+          (p) =>
+            p.rosterEntryId === event.playerRosterEntryId &&
+            p.side === event.side &&
+            p.jersey === event.target,
+        )
+      )
+        fail(
+          "A autoria do lançamento não corresponde ao atleta e à camisa deste jogo.",
+        );
     }
     if (
       new Set(d.participants.map((p) => p.rosterEntryId)).size !==

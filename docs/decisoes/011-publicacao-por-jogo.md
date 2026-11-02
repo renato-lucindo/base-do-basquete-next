@@ -6,7 +6,9 @@ Confirmar uma súmula cria uma versão pública por jogo. A mesma transação va
 
 O público recebe somente whitelist de contexto, nomes esportivos, camisas, comissão e fatos cobertos. Documento original, nascimento, sexo, registro, notas, autor, motivo e paths permanecem privados. Histórico e leitura administrativa têm funções específicas; RLS permite anônimo somente na projeção atual. Helpers não têm grants API incidentais.
 
-Após confirmação, identidades relacionadas e camisas ficam fixas. Correção da participação é permitida com motivo e nova versão da fonte; salvar não republica. Revisar resultado exige motivo10–500 caracteres. Se houver revisão PDF pronta associada, publicação manual requer decisão explícita de fallback e motivo. Não mistura métricas silenciosamente.
+Após confirmação, identidades relacionadas e lados ficam fixos. Por instrução expressa do responsável em 02/11/2026, a unidade da PR #38 permite corrigir a camisa do mesmo atleta, com motivo e nova versão da fonte manual, além da participação. Esta ampliação está condicionada à integração da PR; snapshots históricos conservam a camisa e os fatos publicados em cada versão. Salvar não republica. Revisar resultado exige motivo10–500 caracteres e republicação explícita para atualizar a projeção atual e seus derivados. Se houver revisão PDF pronta associada, publicação manual requer decisão explícita de fallback e motivo; associações PDF continuam respeitando suas próprias guardas. Não mistura métricas silenciosamente.
+
+Na mesma unidade, jogos encerrados aceitam atualização privada de arbitragem e horários reais de início/fim, mantendo estado, contexto e agenda fixos. A gravação não reescreve snapshots públicos e conserva autorização, concorrência e recibos. Horários ausentes permanecem nulos; a data de cada horário real é explícita, inclusive após a meia-noite.
 
 P1 implementa fonte manual. Autoridade por domínio/PDF, API/UI de confirmação e consulta mínima serão adicionadas em P2/P3 preservando o histórico manual e a integridade referencial. Não declarar etapa4 concluída. Evidências e limitações em VALIDACAO-PUBLICACAO.md.
 
