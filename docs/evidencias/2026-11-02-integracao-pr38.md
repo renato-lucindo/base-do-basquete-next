@@ -23,3 +23,11 @@ Alterações humanas no checkout original, documentos já modificados no worktre
 A CI 41485738438 do candidato d8b8920 passou gate/design e 480 browsers, com 109 SKIP, mas falhou em `save-latency.spec.ts` (sucesso parcial): contagem 1 quando esperava zero durante o lote. O teste ligava o contador depois da interpretação sem aguardar a comparação inicial do elenco concluir. Essa leitura inicial podia ser contada no intervalo reservado ao lote; o efeito do produto já evita recarga enquanto `model.busy` está ativo.
 
 Foi acrescentada somente a sincronização da linha de base no teste: aguardar os efeitos da interpretação e o marcador de comparação concluída antes de ligar o contador. Permanecem as asserções de zero leituras durante o lote, uma ao término e mais uma ao voltar; sem aumento de timeout, remoção de teste ou alteração do produto. Duas variantes × dez repetições = 20 PASS (33,5 s), eslint/formato/diff PASS. A falha anterior não foi omitida nem tratada como aprovação; uma nova CI do novo candidato deve passar antes do merge.
+
+## Checkpoint de cota — candidato aprovado, sem merge
+
+O candidato `f089dd6775a1fc0edb99376aed2d95303286cfe2` recebeu [CI 41489382068](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41489382068) SUCCESS: gate/design, 636 unitários e 481 browsers PASS/109 SKIP. A falha de sincronização foi resolvida sem alterar produto/asserts/timeouts. Merge não executado.
+
+Consulta real após a CI: 93% usados/7% restantes na janela 5h. Aplicado o gatilho de 15% do repositório: somente checkpoint; não iniciar integração que dispararia nova CI da main. Reset observado 02/11/2026 17:34:05 America/Sao_Paulo. Sem agendamento autorizado, não foi criada automação. A autorização do responsável para o merge permanece vigente.
+
+Retomada exata: conferir cota e estado real; PR #38 fora de Draft, HEAD candidato f089dd6, base esperada main c6004eb; check validate atual aprovado. Fazer merge commit com expected_head_sha completo, confirmar SHA efetivo da main, aguardar CI do SHA integrado e registrar conclusão. Não pedir novamente autorização. [Registro remoto](https://github.com/renato-lucindo/base-do-basquete-next/pull/38#issuecomment-6583826799). Este checkpoint documental local não foi enviado para evitar iniciar outra CI sob o limite de cota.
