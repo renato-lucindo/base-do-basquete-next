@@ -294,7 +294,7 @@ it.each([undefined, 2] as const)(
       await db.exec("reset role");
       await db.exec(
         await readFile(
-          "supabase/migrations/20261102112205_legacy_sheet_editing.sql",
+          "supabase/migrations/20261102154118_legacy_sheet_editing.sql",
           "utf8",
         ),
       );
