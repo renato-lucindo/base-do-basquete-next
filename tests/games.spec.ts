@@ -1,6 +1,58 @@
 import { test, expect, type Page } from "@playwright/test";
 import { tid } from "./fixtures/text-import";
 import { gamesFixture as fixture } from "./fixtures/games";
+test("lista jogos com horários reais adicionais sem transformar metadados em comando", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  const home = f.registrations.get(tid(5))!;
+  const away = f.registrations.get(tid(6))!;
+  f.games.set(tid(7), {
+    id: tid(7),
+    disputeId: tid(3),
+    homeRegistrationId: home.id,
+    awayRegistrationId: away.id,
+    home,
+    away,
+    date: "2026-10-23",
+    time: "15:30",
+    startAt: "2026-10-23T15:35",
+    endAt: "2026-10-23T17:07",
+    venue: "Quadra de teste",
+    number: "15",
+    version: 1,
+    savedAt: "2026-10-23T20:10:00Z",
+    state: "scheduled",
+    timeZone: "America/Sao_Paulo",
+    scheduledAt: "2026-10-23T15:30:00-03:00",
+  });
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+  );
+  await expect(
+    page.getByRole("row").filter({ hasText: "Lobos × Lobos B" }),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .click();
+  await expect(page.getByLabel("Horário do jogo", { exact: true })).toHaveValue(
+    "15:30",
+  );
+  await page.getByLabel("Local", { exact: true }).fill("Quadra revisada");
+  const sent = page.waitForRequest(
+    (request) =>
+      request.method() === "POST" &&
+      new URL(request.url()).pathname.startsWith("/api/games"),
+  );
+  await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Jogo salvo" }),
+  ).toBeVisible();
+  const command = (await sent).postDataJSON();
+  expect(command.game).not.toHaveProperty("startAt");
+  expect(command.game).not.toHaveProperty("endAt");
+});
 async function open(page: Page) {
   await page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,

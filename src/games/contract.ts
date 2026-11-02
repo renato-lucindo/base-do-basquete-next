@@ -43,6 +43,18 @@ export const saveGameSchema = z
     game: gameSchema,
   })
   .strict();
+// Actual wall-clock timestamps are additive read metadata from the current RPC.
+// Keep them out of gameFields so existing write commands retain their contract.
+const actualClock = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d$/u)
+  .refine(
+    (value) =>
+      !Number.isNaN(Date.parse(`${value}:00Z`)) &&
+      new Date(`${value}:00Z`).toISOString().slice(0, 16) === value,
+  )
+  .nullable()
+  .optional();
 export const gameSnapshotSchema = z
   .object({
     ...gameFields,
@@ -51,6 +63,8 @@ export const gameSnapshotSchema = z
     state: z.enum(["scheduled", "finished"]),
     timeZone: z.literal("America/Sao_Paulo"),
     scheduledAt: z.iso.datetime({ offset: true }).nullable(),
+    startAt: actualClock,
+    endAt: actualClock,
     home: registrationSnapshotSchema,
     away: registrationSnapshotSchema,
   })

@@ -1,7 +1,88 @@
 import { describe, it, expect, vi } from "vitest";
 import { SupabaseGames } from "./provider";
 const id = "d1000000-0000-4000-8000-000000000001";
+const gameSnapshot = () => {
+  const savedAt = "2026-10-23T19:00:00Z";
+  const team = {
+    id: crypto.randomUUID(),
+    name: "Equipe de teste",
+    abbreviation: null,
+    version: 1,
+    savedAt,
+  };
+  const registration = () => ({
+    id: crypto.randomUUID(),
+    disputeId: id,
+    teamId: team.id,
+    name: "Inscrição de teste",
+    team,
+    version: 1,
+    savedAt,
+  });
+  const home = registration();
+  const away = registration();
+  return {
+    id,
+    disputeId: id,
+    homeRegistrationId: home.id,
+    awayRegistrationId: away.id,
+    date: null,
+    time: null,
+    venue: null,
+    number: null,
+    version: 1,
+    savedAt,
+    state: "finished",
+    timeZone: "America/Sao_Paulo",
+    scheduledAt: null,
+    home,
+    away,
+  };
+};
 describe("fixed game server operations", () => {
+  it.each([
+    {},
+    { startAt: null, endAt: null },
+    { startAt: "2026-10-23T19:00", endAt: "2026-10-23T20:32" },
+  ])(
+    "reads games with legacy or additive actual clock metadata: %j",
+    async (clocks) => {
+      const game = { ...gameSnapshot(), ...clocks };
+      const db = new SupabaseGames(
+        { url: "https://db.example.test", key: "fixture" },
+        async (url) =>
+          Response.json(
+            url.endsWith("/list_games")
+              ? { items: [game], hasMore: false }
+              : game,
+          ),
+      );
+      expect(await db.list("fixture-jwt", id, "", 0)).toEqual({
+        items: [game],
+        hasMore: false,
+      });
+      expect(await db.get("fixture-jwt", id)).toEqual(game);
+    },
+  );
+  it.each([
+    { startAt: "2026-02-30T19:00" },
+    { endAt: "2026-10-23T24:00" },
+    { startAt: 123 },
+    { startAt: "2026-10-23T19:00Z" },
+    { privateField: "unexpected" },
+  ])(
+    "rejects malformed read metadata and unrelated fields: %j",
+    async (extra) => {
+      const game = { ...gameSnapshot(), ...extra };
+      const db = new SupabaseGames(
+        { url: "https://db.example.test", key: "fixture" },
+        async () => Response.json({ items: [game], hasMore: false }),
+      );
+      await expect(db.list("fixture-jwt", id, "", 0)).rejects.toMatchObject({
+        code: "access_unavailable",
+      });
+    },
+  );
   it("lists bounded reusable venues through an administrative RPC", async () => {
     const send = vi.fn(async () =>
       Response.json({ items: [{ name: "Ginásio Azul" }], hasMore: false }),
