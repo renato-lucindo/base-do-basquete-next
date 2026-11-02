@@ -264,6 +264,10 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
 
 test("axe, foco visível, reflow 320px e zoom 200%", async ({ page }, info) => {
   const f = await publicNavigationFixture(page);
+  for (const game of f.games) {
+    game.context.name = "Competição".repeat(12);
+    game.context.category = "Categoria".repeat(8);
+  }
   await page.goto(origin + "/publico.html");
   await page.locator(".competition-tree > details > summary").first().click();
   const scan = await new AxeBuilder({ page })
