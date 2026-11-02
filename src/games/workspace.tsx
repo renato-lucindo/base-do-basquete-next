@@ -4,6 +4,13 @@ import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
 import { changeGameTime, gameTimeFields } from "./time-fields";
+import {
+  actualTimeFields,
+  actualTimeError,
+  applyActualTimeFields,
+  changeActualTimeField,
+  type ActualTimeFields,
+} from "./actual-time-fields";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
 import {
@@ -68,6 +75,7 @@ export function GamesWorkspace(props: Props) {
       version: number;
       officiating: Officiating;
       officialNames: OfficialNames;
+      actualTimes: ActualTimeFields;
     } | null>(null),
     [baseline, setBaseline] = useState(""),
     [busy, setBusy] = useState(false),
@@ -101,6 +109,7 @@ export function GamesWorkspace(props: Props) {
       game: editor.game,
       officiating: editor.officiating,
       officialNames: editor.officialNames,
+      actualTimes: editor.actualTimes,
     }) !== baseline;
   function mayLeave() {
     return (
@@ -228,9 +237,17 @@ export function GamesWorkspace(props: Props) {
       version: s.version,
       officiating,
       officialNames: names,
+      actualTimes: actualTimeFields(g),
     });
     setChosen([s.home, s.away]);
-    setBaseline(JSON.stringify({ game: g, officiating, officialNames: names }));
+    setBaseline(
+      JSON.stringify({
+        game: g,
+        officiating,
+        officialNames: names,
+        actualTimes: actualTimeFields(g),
+      }),
+    );
     pending.current = null;
     knownAck.current = null;
     setUncertain(false);
@@ -251,6 +268,14 @@ export function GamesWorkspace(props: Props) {
   }
   async function save() {
     if (!editor || busy || conflict) return;
+    if (
+      !pending.current &&
+      savedGame?.state === "finished" &&
+      actualTimeError(editor.actualTimes)
+    ) {
+      setError(actualTimeError(editor.actualTimes));
+      return;
+    }
     if (
       !pending.current &&
       officialRoles.some(
@@ -328,6 +353,27 @@ export function GamesWorkspace(props: Props) {
     );
     setStatus("");
   }
+  function changeActualTime<K extends keyof ActualTimeFields>(
+    field: K,
+    value: ActualTimeFields[K],
+  ) {
+    if (busy || uncertain || conflict) return;
+    setEditor((s) => {
+      if (!s) return s;
+      const actualTimes = changeActualTimeField(s.actualTimes, field, value);
+      return {
+        ...s,
+        actualTimes,
+        game: applyActualTimeFields(s.game, actualTimes),
+      };
+    });
+    setError("");
+    setStatus("");
+  }
+  const timeError =
+    editor && savedGame?.state === "finished"
+      ? actualTimeError(editor.actualTimes)
+      : "";
   const candidates = [
     ...new Map(
       [...chosen, ...registrations.items].map((r) => [r.id, r]),
@@ -429,6 +475,7 @@ export function GamesWorkspace(props: Props) {
               },
               officiating: emptyOfficiating(),
               officialNames: emptyOfficialNames(),
+              actualTimes: { date: "", start: "", end: "", endNextDay: false },
             });
             setBaseline("");
             setSavedGame(null);
@@ -650,43 +697,84 @@ export function GamesWorkspace(props: Props) {
                   <legend>Horários reais (America/Sao_Paulo)</legend>
                   <div className="game-actual-times">
                     <label>
+                      Data dos horários reais
+                      <input
+                        type="date"
+                        name="actualDate"
+                        autoComplete="off"
+                        value={editor.actualTimes.date}
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError && !editor.actualTimes.date}
+                        onChange={(e) =>
+                          changeActualTime("date", e.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
                       Hora de início
                       <input
-                        type="datetime-local"
-                        value={editor.game.startAt ?? ""}
-                        name="actualStartAt"
+                        type="time"
+                        value={editor.actualTimes.start}
+                        name="actualStartTime"
                         autoComplete="off"
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError && !editor.actualTimes.start}
                         onChange={(e) =>
-                          change("startAt", e.target.value || null)
+                          changeActualTime("start", e.target.value)
                         }
                       />
                     </label>
                     <label>
                       Hora de fim
                       <input
-                        type="datetime-local"
-                        value={editor.game.endAt ?? ""}
-                        name="actualEndAt"
+                        type="time"
+                        value={editor.actualTimes.end}
+                        name="actualEndTime"
                         autoComplete="off"
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError}
                         onChange={(e) =>
-                          change("endAt", e.target.value || null)
+                          changeActualTime("end", e.target.value)
                         }
                       />
+                    </label>
+                    <label className="reg-check game-end-next-day">
+                      <input
+                        type="checkbox"
+                        name="actualEndNextDay"
+                        checked={editor.actualTimes.endNextDay}
+                        aria-describedby="actual-time-help actual-time-error"
+                        onChange={(e) =>
+                          changeActualTime("endNextDay", e.target.checked)
+                        }
+                      />
+                      Termina no dia seguinte
                     </label>
                     <p role="status">
                       Duração total (inclui intervalos):{" "}
                       {durationMinutes(
                         editor.game.startAt,
                         editor.game.endAt,
-                      ) === null
+                      ) === null || !!timeError
                         ? "Informe início e fim válidos para calcular."
                         : `${durationMinutes(editor.game.startAt, editor.game.endAt)} min`}
                     </p>
                   </div>
-                  <p>
-                    Informe também a data de cada horário. Se o jogo terminou
-                    após a meia-noite, use o dia seguinte no fim. Horários
-                    ausentes no legado permanecem em branco.
+                  <p
+                    id="actual-time-help"
+                    className="game-actual-time-feedback"
+                  >
+                    Início e fim usam a mesma data. Um fim anterior ao início
+                    seleciona o dia seguinte; confira essa opção ao cruzar a
+                    meia-noite. A agenda permanece fixa e horários ausentes no
+                    legado ficam em branco.
+                  </p>
+                  <p
+                    id="actual-time-error"
+                    className={`game-actual-time-feedback${timeError ? " access-error" : ""}`}
+                    aria-live="polite"
+                  >
+                    {timeError}
                   </p>
                 </fieldset>
               </>
