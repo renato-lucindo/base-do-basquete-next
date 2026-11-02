@@ -100,7 +100,9 @@ test("axe: escolha e seções do detalhe da equipe", async ({ page }, info) => {
     ["Participantes", "participants"],
     ["Jogos", "games"],
   ]) {
-    const link = page.getByRole("link", { name: section, exact: true });
+    const link = page
+      .getByRole("navigation", { name: "Seções da equipe" })
+      .getByRole("link", { name: section, exact: true });
     await link.focus();
     await page.keyboard.press("Enter");
     await expect(

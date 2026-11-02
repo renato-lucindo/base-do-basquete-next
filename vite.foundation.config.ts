@@ -8,6 +8,7 @@ export default defineConfig({
     outDir: "dist-foundation",
     rollupOptions: {
       input: [
+        "publico.html",
         "foundation.html",
         "resultado.html",
         "estatisticas.html",

@@ -1,5 +1,6 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
+import { publicCatalogRoute } from "../public-ui/routes";
 import { publicTeamsRoute } from "../team-statistics/routes";
 import {
   publicPlayerProfileRoute,
@@ -44,6 +45,10 @@ export default {
         throw new HttpError(421, "invalid_host", "Endereço inválido.");
       if (url.pathname === "/api/health" && request.method === "GET")
         response = jsonResponse({ ok: true });
+      else if (
+        ["/api/public/catalog", "/api/public/search"].includes(url.pathname)
+      )
+        response = await publicCatalogRoute(request, env, url);
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
       else if (
@@ -133,7 +138,7 @@ export default {
       else if (!["GET", "HEAD"].includes(request.method))
         throw new HttpError(405, "invalid_method", "Método não permitido.");
       else if (!url.pathname.startsWith("/api/")) {
-        if (url.pathname === "/") url.pathname = "/foundation.html";
+        if (url.pathname === "/") url.pathname = "/publico.html";
         response = await env.ASSETS.fetch(new Request(url, request));
       } else
         response = jsonResponse(

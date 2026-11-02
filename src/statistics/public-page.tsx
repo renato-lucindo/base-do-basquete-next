@@ -1,10 +1,7 @@
+import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
-import {
-  PublicHeader,
-  PublicBreadcrumb,
-  PublicFooter,
-} from "../public-ui/shell";
+import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { TeamFilter } from "./reference/team-filter";
 import { ColumnPicker } from "./reference/column-picker";
 import { TooltipProvider } from "./reference/tooltip";
@@ -322,9 +319,8 @@ export function StatisticsPageView() {
         >
           Ir para estatísticas
         </a>
-        <PublicHeader />
+        <PublicHeader disputeId={route.id} section="jogadores" />
         <main id="statistics-content" tabIndex={-1} className="wrap">
-          <PublicBreadcrumb page="Estatísticas" />
           <h1 className="sr-only">Estatísticas dos atletas</h1>
           {route.query.dataset === "boxscore" && (
             <p>Esta consulta inclui somente jogos com boxscore publicado.</p>
@@ -725,13 +721,21 @@ export function StatisticsPageView() {
                               {data.compared.map((r) => (
                                 <tr key={`${r.personId}/${r.registrationId}`}>
                                   <th scope="row" title={r.names.join(" / ")}>
-                                    <a href={`/atleta.html#${r.personId}`}>
+                                    <a
+                                      href={publicDetailLink(
+                                        `/atleta.html#${r.personId}`,
+                                        data.disputeId,
+                                      )}
+                                    >
                                       {display(r.names)}
                                     </a>
                                   </th>
                                   <td title={r.registrationNames.join(" / ")}>
                                     <a
-                                      href={`/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`}
+                                      href={publicDetailLink(
+                                        `/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`,
+                                        data.disputeId,
+                                      )}
                                     >
                                       {display(r.registrationNames)}
                                     </a>

@@ -1,3 +1,4 @@
+import { publicDetailLink } from "../public-ui/navigation";
 import type { TeamsPage } from "./contract";
 import type { TeamDetailPage } from "./detail-contract";
 import type { StatisticsMetric } from "../statistics/metrics";
@@ -113,7 +114,12 @@ export function TeamsTable({
                 <td>
                   <details>
                     <summary>Ver confirmação</summary>
-                    <a href={`/resultado.html#${r.origin.gameId}`}>
+                    <a
+                      href={publicDetailLink(
+                        `/resultado.html#${r.origin.gameId}`,
+                        d.disputeId,
+                      )}
+                    >
                       Resultado v{r.origin.publicationVersion}
                     </a>
                     <p>{teamStamp(r.origin.publishedAt)}</p>
@@ -179,7 +185,12 @@ export function TeamParticipants({
               <tr key={r.personId}>
                 <td>{r.jerseys.join(" / ")}</td>
                 <th scope="row">
-                  <a href={`/atleta.html#${r.personId}`}>
+                  <a
+                    href={publicDetailLink(
+                      `/atleta.html#${r.personId}`,
+                      d.disputeId,
+                    )}
+                  >
                     {r.names.join(" / ")}
                   </a>
                   {r.nicknames.some(Boolean) && (
@@ -287,7 +298,12 @@ export function TeamGames({
             {d.games.items.map((g) => (
               <tr key={g.gameId}>
                 <th scope="row">
-                  <a href={`/resultado.html#${g.gameId}`}>
+                  <a
+                    href={publicDetailLink(
+                      `/resultado.html#${g.gameId}`,
+                      d.disputeId,
+                    )}
+                  >
                     {g.game.home.name} {g.score.home} × {g.score.away}{" "}
                     {g.game.away.name}
                   </a>

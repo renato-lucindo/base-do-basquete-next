@@ -1,3 +1,5 @@
+import { PublicHeader, PublicFooter } from "../public-ui/shell";
+import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { api, ApiFailure } from "../competition/api";
@@ -238,7 +240,12 @@ function Games({
             {d.games.items.map((p) => (
               <tr key={p.fact.gameId}>
                 <th scope="row">
-                  <a href={`/resultado.html#${p.fact.gameId}`}>
+                  <a
+                    href={publicDetailLink(
+                      `/resultado.html#${p.fact.gameId}`,
+                      p.fact.disputeId,
+                    )}
+                  >
                     {p.game.home.name} × {p.game.away.name}
                   </a>
                   <small>
@@ -250,7 +257,10 @@ function Games({
                 <td>{contextLabel(p.fact.context)}</td>
                 <td>
                   <a
-                    href={`/equipe.html#${p.fact.registration.team.id}?disputeId=${p.fact.disputeId}&registrationId=${p.fact.registration.registrationId}`}
+                    href={publicDetailLink(
+                      `/equipe.html#${p.fact.registration.team.id}?disputeId=${p.fact.disputeId}&registrationId=${p.fact.registration.registrationId}`,
+                      p.fact.disputeId,
+                    )}
                   >
                     {p.fact.registration.name}
                   </a>{" "}
@@ -568,10 +578,11 @@ export function PlayerPublicPage() {
       >
         Pular para o perfil
       </a>
-      <header className="access-header">
-        <a href="/foundation.html">Base do Basquete</a>
-        <span className="access-preview">Perfil com fontes confirmadas</span>
-      </header>
+      <PublicHeader
+        disputeId={q.disputeId}
+        section="jogadores"
+        detail={data?.identity.name ?? "Perfil do atleta"}
+      />
       <main
         id="player-content"
         tabIndex={-1}
@@ -820,6 +831,7 @@ export function PlayerPublicPage() {
           </>
         )}
       </main>
+      <PublicFooter />
     </>
   );
 }

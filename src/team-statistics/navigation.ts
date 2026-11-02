@@ -1,3 +1,4 @@
+import { publicDetailLink } from "../public-ui/navigation";
 import { z } from "zod";
 import { teamsPageSchema, type TeamsPage } from "./contract";
 import { teamDetailPageSchema, type TeamDetailPage } from "./detail-contract";
@@ -118,19 +119,20 @@ export function teamDetailLink(
   listState: TeamsQuery | null = null,
 ): string {
   const q = parseTeamDetailQuery(new URLSearchParams());
-  return (
+  return publicDetailLink(
     "/equipe.html" +
-    serializeTeamRoute({
-      kind: "detail",
-      disputeId,
-      teamId,
-      registrationId,
-      query: {
-        ...q,
-        mode: listState?.mode ?? q.mode,
-        scope: listState?.scope ?? q.scope,
-      },
-      listState,
-    })
+      serializeTeamRoute({
+        kind: "detail",
+        disputeId,
+        teamId,
+        registrationId,
+        query: {
+          ...q,
+          mode: listState?.mode ?? q.mode,
+          scope: listState?.scope ?? q.scope,
+        },
+        listState,
+      }),
+    disputeId,
   );
 }

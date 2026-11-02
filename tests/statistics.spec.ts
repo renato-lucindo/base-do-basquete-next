@@ -14,13 +14,13 @@ test("nome estatístico liga à identidade estável no perfil público", async (
   });
   const person = f.source.games[0].snapshot.facts.players[0].person;
   await expect(
-    table.locator(`a[href="/atleta.html#${person.id}"]`).first(),
+    table.locator(`a[href^="/atleta.html"][href*="#${person.id}?"]`).first(),
   ).toBeVisible();
   const team = f.source.games[0].snapshot.game.home;
   await expect(
     table
       .locator(
-        `a[href="/equipe.html#${team.team.id}?disputeId=${f.source.disputeId}&registrationId=${team.registrationId}"]`,
+        `a[href^="/equipe.html"][href*="#${team.team.id}?disputeId=${f.source.disputeId}&registrationId=${team.registrationId}"]`,
       )
       .first(),
   ).toBeVisible();

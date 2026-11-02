@@ -526,10 +526,17 @@ async function fixture(options = {}) {
       },
       serviceBindings: {
         ASSETS: async (request) =>
-          new URL(request.url).pathname === "/foundation.html"
-            ? new Response(await readFile("dist-foundation/foundation.html"), {
-                headers: { "Content-Type": "text/html; charset=utf-8" },
-              })
+          ["/foundation.html", "/publico.html"].includes(
+            new URL(request.url).pathname,
+          )
+            ? new Response(
+                await readFile(
+                  "dist-foundation" + new URL(request.url).pathname,
+                ),
+                {
+                  headers: { "Content-Type": "text/html; charset=utf-8" },
+                },
+              )
             : new Response("Not found", { status: 404 }),
       },
       outboundService: async (request) => {

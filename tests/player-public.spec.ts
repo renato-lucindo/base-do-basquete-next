@@ -34,7 +34,7 @@ test("perfil abre sem sessão, navega pelas cinco seções por teclado e recuper
   const a = f.source.participations[0].fact;
   await expect(
     page.locator(
-      `a[href="/equipe.html#${a.registration.team.id}?disputeId=${a.disputeId}&registrationId=${a.registration.registrationId}"]`,
+      `a[href^="/equipe.html"][href*="#${a.registration.team.id}?disputeId=${a.disputeId}&registrationId=${a.registration.registrationId}"]`,
     ),
   ).toBeVisible();
   expect(f.state.sessionReads).toBe(0);

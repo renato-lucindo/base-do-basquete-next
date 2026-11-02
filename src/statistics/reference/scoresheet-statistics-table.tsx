@@ -1,3 +1,4 @@
+import { publicDetailLink } from "../../public-ui/navigation";
 // Adaptado do ScoresheetStatisticsTable aprovado: mantém estrutura e estilos;
 // valores, cobertura e posições são fornecidos pela projeção pública.
 import { ScrollableTable } from "./scrollable-table";
@@ -201,7 +202,10 @@ export function ScoresheetStatisticsTable({
                     )}
                     <a
                       className="player-name"
-                      href={`/atleta.html#${row.personId}`}
+                      href={publicDetailLink(
+                        `/atleta.html#${row.personId}`,
+                        data.disputeId,
+                      )}
                     >
                       {row.names.length === 1 ? row.names[0] : "var."}
                     </a>{" "}
@@ -226,7 +230,10 @@ export function ScoresheetStatisticsTable({
                     )}
                   >
                     <a
-                      href={`/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`}
+                      href={publicDetailLink(
+                        `/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`,
+                        data.disputeId,
+                      )}
                     >
                       {row.registrationNames.length === 1
                         ? row.registrationNames[0]

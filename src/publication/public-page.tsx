@@ -1,10 +1,7 @@
+import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import {
-  PublicHeader,
-  PublicBreadcrumb,
-  PublicFooter,
-} from "../public-ui/shell";
+import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { api } from "../competition/api";
 import { publicResultSchema, type PublicResult } from "./pdf-contract";
 
@@ -41,11 +38,6 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
   }, [selected]);
   return (
     <article className="public-site scoresheet-public public-game">
-      <PublicBreadcrumb
-        context={r.context.name}
-        page="Súmula"
-        href={`/estatisticas.html#${r.disputeId}?scope=all`}
-      />
       <section
         className="game-context"
         aria-label="Dados da partida"
@@ -198,7 +190,10 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
               <div className="team-heading">
                 <h2>
                   <a
-                    href={`/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}`}
+                    href={publicDetailLink(
+                      `/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}`,
+                      r.disputeId,
+                    )}
                   >
                     {r.game[side].name}
                   </a>
@@ -278,7 +273,10 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                               <span className="athlete-text">
                                 <a
                                   className="athlete-name"
-                                  href={`/atleta.html#${p.person.id}`}
+                                  href={publicDetailLink(
+                                    `/atleta.html#${p.person.id}`,
+                                    r.disputeId,
+                                  )}
                                 >
                                   {p.person.nickname || p.person.name}
                                 </a>
@@ -465,7 +463,7 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
   );
 }
 export function PublicGamePage() {
-  const [id, setId] = useState(() => location.hash.slice(1));
+  const [id, setId] = useState(() => location.hash.slice(1).split("?", 1)[0]);
   const [result, setResult] = useState<PublicResult | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -473,7 +471,7 @@ export function PublicGamePage() {
   const heading = useRef<HTMLHeadingElement>(null);
   const alert = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
-    const read = () => setId(location.hash.slice(1));
+    const read = () => setId(location.hash.slice(1).split("?", 1)[0]);
     window.addEventListener("hashchange", read);
     return () => window.removeEventListener("hashchange", read);
   }, []);
@@ -532,7 +530,12 @@ export function PublicGamePage() {
       >
         Pular para o conteúdo
       </a>
-      <PublicHeader />
+      <PublicHeader
+        disputeId={result?.disputeId}
+        context={result?.context}
+        section="jogos"
+        detail="Súmula"
+      />
       <main id="conteudo" tabIndex={-1} className="wrap">
         <h1 className="sr-only" tabIndex={-1} ref={heading}>
           Resultado publicado

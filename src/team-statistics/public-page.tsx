@@ -1,3 +1,4 @@
+import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { api, ApiFailure } from "../competition/api";
 import {
@@ -156,12 +157,11 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
       >
         Pular para o conteúdo
       </a>
-      <header className="access-header">
-        <a href="/foundation.html">Base do Basquete</a>
-        <span className="access-preview">
-          Equipes em resultados confirmados
-        </span>
-      </header>
+      <PublicHeader
+        disputeId={current.kind === "invalid" ? null : current.disputeId}
+        section="equipes"
+        detail={kind === "detail" ? name : undefined}
+      />
       <main
         id="team-content"
         tabIndex={-1}
@@ -320,15 +320,6 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
             ) : (
               data && (
                 <>
-                  {data.context && (
-                    <p>
-                      {data.context.name} · {data.context.year} ·{" "}
-                      {data.context.gender} · {data.context.category}
-                      {data.context.division
-                        ? ` · ${data.context.division}`
-                        : ""}
-                    </p>
-                  )}
                   <p className="team-provenance">
                     Fonte confirmada v{data.version} ·{" "}
                     {teamStamp(data.confirmedAt)}. Fases na fonte da disputa:{" "}
@@ -463,6 +454,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
           </>
         )}
       </main>
+      <PublicFooter />
     </>
   );
 }
