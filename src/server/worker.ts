@@ -19,6 +19,7 @@ import { gamesRoute } from "../games/routes";
 import { pdfSourcesRoute } from "../boxscore/routes";
 import { peopleRoute } from "../people/routes";
 import { transferRoute } from "../people/transfer-routes";
+import { rosterReuseRoute } from "../people/roster-reuse-routes";
 import { textImportRoute } from "../text-import/routes";
 import {
   cookieHeader,
@@ -105,6 +106,11 @@ export default {
         response = await textImportRoute(request, env, url);
       else if (/^\/api\/roster\/[^/]+\/transfer(?:\/|$)/u.test(url.pathname))
         response = await transferRoute(request, env, url);
+      else if (
+        url.pathname === "/api/roster/reuse" ||
+        url.pathname.startsWith("/api/roster/reuse/")
+      )
+        response = await rosterReuseRoute(request, env, url);
       else if (/^\/api\/people\/[^/]+\/profile(?:\/|$)/u.test(url.pathname))
         response = await privatePlayerProfileRoute(request, env, url);
       else if (

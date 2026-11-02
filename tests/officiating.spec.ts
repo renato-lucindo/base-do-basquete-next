@@ -450,8 +450,18 @@ for (const [width, height] of [
     expect(metrics).toEqual(other);
     expect((await section.boundingBox())!.height).toBeLessThanOrEqual(220);
     await expect(
-      page.getByRole("combobox", { name: "Operador de 24s", exact: true }),
-    ).toBeInViewport();
+      page.getByLabel("Data do jogo", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByLabel("Hora de início", { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Hora de fim", { exact: true })).toBeVisible();
+    const shotClock = page.getByRole("combobox", {
+      name: "Operador de 24s",
+      exact: true,
+    });
+    await shotClock.scrollIntoViewIfNeeded();
+    await expect(shotClock).toBeInViewport();
     await page.screenshot({
       path: `.preview-artifacts/officiating-${width}.png`,
     });

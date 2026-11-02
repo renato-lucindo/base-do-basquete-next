@@ -908,6 +908,13 @@ export type Database = {
         Returns: Json;
       };
       get_roster_entry: { Args: { p_id: string }; Returns: Json };
+      get_roster_reuse_context: {
+        Args: {
+          p_source_registration_id: string;
+          p_target_registration_id: string;
+        };
+        Returns: Json;
+      };
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
       get_text_review: { Args: { p_id: string }; Returns: Json };
@@ -958,6 +965,10 @@ export type Database = {
         };
         Returns: Json;
       };
+      list_roster_reuse_sources: {
+        Args: { p_target_registration_id: string; p_offset?: number };
+        Returns: Json;
+      };
       list_staff: {
         Args: {
           p_active_only?: boolean;
@@ -1003,6 +1014,7 @@ export type Database = {
       };
       save_pdf_review: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
+      apply_roster_reuse: { Args: { p_command: Json }; Returns: Json };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_registration_withdrawal: {
         Args: { p_command: Json };

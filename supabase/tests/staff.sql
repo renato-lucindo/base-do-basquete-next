@@ -12,8 +12,8 @@ insert into public.seasons(id,championship_id,year) values(pg_temp.s_id(91),pg_t
 insert into public.disputes(id,season_id,gender,category) values(pg_temp.s_id(92),pg_temp.s_id(91),'feminino','Adulto');
 insert into public.teams(id,name) values(pg_temp.s_id(94),'Team');
 insert into public.registrations(id,dispute_id,team_id,name) values(pg_temp.s_id(95),pg_temp.s_id(92),pg_temp.s_id(94),'A'),(pg_temp.s_id(96),pg_temp.s_id(92),pg_temp.s_id(94),'B');
-insert into public.persons(id,name) values(pg_temp.s_id(50),'Ana'),(pg_temp.s_id(51),'Bia'),(pg_temp.s_id(52),'Carla');
-insert into public.coaches(person_id) values(pg_temp.s_id(50)),(pg_temp.s_id(51)),(pg_temp.s_id(52));
+insert into public.persons(id,name) values(pg_temp.s_id(50),'Ana'),(pg_temp.s_id(51),'Bia'),(pg_temp.s_id(52),'Carla'),(pg_temp.s_id(53),'Diego'),(pg_temp.s_id(54),'Eva');
+insert into public.coaches(person_id) values(pg_temp.s_id(50)),(pg_temp.s_id(51)),(pg_temp.s_id(52)),(pg_temp.s_id(53)),(pg_temp.s_id(54));
 insert into private.athletes(person_id,sex) values(pg_temp.s_id(50),'female');
 set local role anon;
 select pg_temp.s_error('select public.list_staff(pg_temp.s_id(95))','42501');
@@ -25,8 +25,12 @@ select pg_temp.s_error('delete from public.staff_entries','42501');
 select public.save_staff_entry(pg_temp.s_command());
 select public.save_staff_entry(pg_temp.s_command());
 select public.save_staff_entry(jsonb_set(jsonb_set(pg_temp.s_command(10),'{entry,personId}',to_jsonb(pg_temp.s_id(51))),'{entry,role}','"assistant"'));
-select pg_temp.s_assert(jsonb_array_length(public.list_staff(pg_temp.s_id(95))->'items')=2,'one head and one assistant retained');
-select pg_temp.s_error($q$select public.save_staff_entry(jsonb_set(pg_temp.s_command(20),'{entry,personId}',to_jsonb(pg_temp.s_id(52))))$q$,'PT400');
+select public.save_staff_entry(jsonb_set(pg_temp.s_command(20),'{entry,personId}',to_jsonb(pg_temp.s_id(52))));
+select public.save_staff_entry(jsonb_set(jsonb_set(pg_temp.s_command(30),'{entry,personId}',to_jsonb(pg_temp.s_id(53))),'{entry,role}','"assistant"'));
+select pg_temp.s_assert(jsonb_array_length(public.list_staff(pg_temp.s_id(95))->'items')=4,'two head coaches and two assistants retained');
+select pg_temp.s_assert((select count(*)=2 from public.staff_entries where registration_id=pg_temp.s_id(95) and role='head' and ended_at is null),'two active heads');
+select pg_temp.s_assert((select count(*)=2 from public.staff_entries where registration_id=pg_temp.s_id(95) and role='assistant' and ended_at is null),'two active assistants');
+select pg_temp.s_error($q$select public.save_staff_entry(jsonb_set(jsonb_set(pg_temp.s_command(40),'{entry,personId}',to_jsonb(pg_temp.s_id(52))),'{entry,role}','"assistant"'))$q$,'PT400');
 select pg_temp.s_error($q$select public.save_staff_entry(jsonb_set(jsonb_set(jsonb_set(pg_temp.s_command(),'{commandId}',to_jsonb(pg_temp.s_id(60))),'{expectedVersion}','1'),'{entry,registrationId}',to_jsonb(pg_temp.s_id(96))))$q$,'PT400');
 select pg_temp.s_error($q$select public.save_staff_entry(jsonb_set(pg_temp.s_command(),'{commandId}',to_jsonb(pg_temp.s_id(61))))$q$,'PT409');
 -- Edits of an already linked person touch Recentes but not C1 metadata version.
@@ -37,8 +41,8 @@ select pg_temp.s_assert((select count(*)=1 from private.athletes where person_id
 select pg_temp.s_assert(public.list_persons('Ana')->'items'->0->'contexts' @> jsonb_build_array(jsonb_build_object('registrationId',pg_temp.s_id(95),'teamName','A','year',2026,'active',true)),'search presents contextual team and year');
 select pg_temp.s_assert(jsonb_typeof(public.list_persons('Ana')->'items'->0->'athlete')='boolean' and not ((public.list_persons('Ana')->'items'->0) ? 'birthDate'),'search does not transport private athlete details');
 select public.save_staff_entry(jsonb_set(jsonb_set(jsonb_set(pg_temp.s_command(),'{commandId}',to_jsonb(pg_temp.s_id(62))),'{expectedVersion}','1'),'{entry,active}','false'));
-select public.save_staff_entry(jsonb_set(pg_temp.s_command(20),'{entry,personId}',to_jsonb(pg_temp.s_id(52))));
-select pg_temp.s_assert(jsonb_array_length(public.list_staff(pg_temp.s_id(95),false)->'items')=3,'previous coach remains historical');
+select public.save_staff_entry(jsonb_set(pg_temp.s_command(50),'{entry,personId}',to_jsonb(pg_temp.s_id(54))));
+select pg_temp.s_assert(jsonb_array_length(public.list_staff(pg_temp.s_id(95),false)->'items')=5,'previous coach remains historical, and additional coaches can join');
 select pg_temp.s_error($q$select public.save_staff_entry(jsonb_set(jsonb_set(pg_temp.s_command(),'{commandId}',to_jsonb(pg_temp.s_id(63))),'{expectedVersion}','2'))$q$,'PT400');
 select pg_temp.s_assert(not ((public.get_staff_entry(pg_temp.s_id(12))->'person') ? 'athlete'),'staff projection excludes athlete private details');
 select pg_temp.s_error('select * from private.staff_commands','42501');

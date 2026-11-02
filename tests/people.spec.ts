@@ -715,6 +715,64 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
   ).toBeEnabled();
   expect([...f.staff.values()].filter((s) => !s.active)).toHaveLength(1);
 });
+test("inscrição aceita vários técnicos e assistentes ativos", async ({
+  page,
+}, info) => {
+  test.skip(
+    info.project.name !== "desktop",
+    "Verificação desktop da comissão técnica",
+  );
+  const f = await fixture(page);
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await open(page);
+  const headButton = page.getByRole("button", {
+    name: "Adicionar técnico",
+    exact: true,
+  });
+  const assistantButton = page.getByRole("button", {
+    name: "Adicionar assistente",
+    exact: true,
+  });
+  const addStaff = async (role: "técnico" | "assistente", name: string) => {
+    await page
+      .getByRole("button", { name: `Adicionar ${role}`, exact: true })
+      .click();
+    await page
+      .getByRole("button", {
+        name: /^(Criar nova pessoa|Cadastrar novo atleta)$/,
+        exact: true,
+      })
+      .click();
+    await page.getByLabel("Nome da pessoa", { exact: true }).fill(name);
+    await page
+      .getByRole("button", { name: "Salvar pessoa", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Salvar vínculo", exact: true })
+      .click();
+    await expect(page.getByText(name, { exact: true })).toBeVisible();
+  };
+  await addStaff("técnico", "Diego de Souza da Silva");
+  await addStaff("assistente", "Vinícius Kunzendorff");
+  await expect(headButton).toBeEnabled();
+  await expect(assistantButton).toBeEnabled();
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await addStaff("técnico", "Maria Almeida de Oliveira");
+  await addStaff("assistente", "Carla Técnica");
+  await expect(headButton).toBeEnabled();
+  await expect(assistantButton).toBeEnabled();
+  expect(
+    [...f.staff.values()].filter((s) => s.active && s.role === "head"),
+  ).toHaveLength(2);
+  expect(
+    [...f.staff.values()].filter((s) => s.active && s.role === "assistant"),
+  ).toHaveLength(2);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
 test("homônimos exigem nova identidade explícita sem renomear", async ({
   page,
 }) => {

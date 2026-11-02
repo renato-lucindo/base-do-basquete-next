@@ -59,7 +59,7 @@ it("requires a real revision or fallback reason and rejects extra authorization 
     ),
   ).not.toThrow();
 });
-it("keeps confirmed membership and occasion jerseys immutable while allowing participation correction", () => {
+it("keeps confirmed membership while allowing explicit shirt and participation corrections in a new version", () => {
   const previous = publicationSheet();
   previous.participants.push({
     rosterEntryId: pubId(7),
@@ -77,5 +77,8 @@ it("keeps confirmed membership and occasion jerseys immutable while allowing par
   c.source.document.participants[10].played = true;
   expect(() => prepareManualPublication(c, previous)).not.toThrow();
   c.source.document.participants[10].jersey = "8";
-  expect(() => prepareManualPublication(c, previous)).toThrow(/camisas/);
+  expect(() => prepareManualPublication(c, previous)).not.toThrow();
+  expect(previous.participants[10].jersey).toBe("9");
+  c.source.document.participants[10].rosterEntryId = pubId(999);
+  expect(() => prepareManualPublication(c, previous)).toThrow(/relacionados/);
 });

@@ -131,3 +131,12 @@ Os caminhos de origem abaixo são históricos, resolvidos no commit indicado; os
 Use o [índice ativo](../../docs/INDICE.md) e consulte aqui apenas a prova pertinente. Runners de concorrência e benchmarks permanecem em [docs/evidencias](../../docs/evidencias/); a CI e os protótipos continuam usando [docs/design](../../docs/design/README.md). [Checkpoints anteriores](../progresso/README.md) conservam contexto de execução. Links para `.preview-artifacts`, logs locais e caminhos de máquina identificam evidências não distribuídas; não são arquivos prometidos pelo repositório.
 
 Originais importados do checkout de origem são snapshots históricos de `89eff57`; o estado mais recente de uma PR deve ser lido na própria PR. Nenhuma branch, worktree de origem, serviço, banco ou dado humano foi alterado nesta reorganização.
+
+## Versões adicionais preservadas da PR #38
+
+Na reconciliação da PR #38 com a reorganização documental da main, duas revisões foram preservadas como snapshots adicionais, sem substituir as versões arquivadas anteriormente:
+
+- [Integração UI/UX — revisão da PR #38](validacoes/VALIDACAO-INTEGRACAO-UIUX-PR38.md): versão integral do documento da branch de origem, com evidências posteriores.
+- [Reaproveitamento de elenco — revisão da PR #38](validacoes/VALIDACAO-REAPROVEITAMENTO-ELENCO-PR38.md): versão integral com as verificações posteriores; somente o link relativo para o plano histórico foi ajustado.
+
+Esses snapshots são históricos, não representam autorização de deploy ou aceite. Para o estado corrente e a CI, consultar a [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) e o checkpoint.

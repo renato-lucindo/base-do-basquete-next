@@ -12,9 +12,158 @@ import { playerProfileOutbound } from "./fixtures/player-profile-outbound.mjs";
 import { statisticsRpcBody } from "./fixtures/statistics-rpc.ts";
 import { registrationRemovalOutbound } from "./fixtures/registration-removal-rpc.mjs";
 import { officiatingOutbound } from "./fixtures/officiating-outbound.mjs";
+import { rosterReuseFixture } from "./fixtures/roster-reuse-outbound.mjs";
 
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
+
+test("roster reuse routes reject anonymous reads, forged posts and invalid queries in workerd", async () => {
+  const f = await fixture({});
+  try {
+    for (const path of [
+      `/api/roster/reuse/sources?targetRegistrationId=${id}`,
+      `/api/roster/reuse/context?sourceRegistrationId=${id}&targetRegistrationId=${id}`,
+    ]) {
+      const response = await f.mf.dispatchFetch(origin + path);
+      assert.equal(response.status, 401);
+    }
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    for (const path of [
+      `/api/roster/reuse/sources?targetRegistrationId=${id}&offset=-1`,
+      `/api/roster/reuse/sources?targetRegistrationId=${id}&offset=0&offset=20`,
+      `/api/roster/reuse/context?sourceRegistrationId=invalid&targetRegistrationId=${id}`,
+    ]) {
+      const response = await f.mf.dispatchFetch(origin + path, {
+        headers: { cookie },
+      });
+      assert.equal(response.status, 400);
+    }
+    const forged = await f.mf.dispatchFetch(`${origin}/api/roster/reuse`, {
+      method: "POST",
+      headers: {
+        cookie,
+        origin: "https://another.example.test",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ commandId: id }),
+    });
+    assert.equal(forged.status, 403);
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("roster reuse exercises authenticated Workerd reads, idempotent writes and stale context", async () => {
+  const options = { rosterReuse: true, loseReuseAck: true };
+  const f = await fixture(options);
+  const r = f.reuse;
+  const sourcesPath = `/api/roster/reuse/sources?targetRegistrationId=${r.target.id}`;
+  const contextPath = `/api/roster/reuse/context?sourceRegistrationId=${r.source.id}&targetRegistrationId=${r.target.id}`;
+  try {
+    assert.equal((await f.mf.dispatchFetch(origin + sourcesPath)).status, 401);
+    assert.equal((await f.mf.dispatchFetch(origin + contextPath)).status, 401);
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const get = (path) =>
+      f.mf.dispatchFetch(origin + path, { headers: { cookie } });
+    const send = (command, extra = {}) =>
+      f.mf.dispatchFetch(origin + "/api/roster/reuse", {
+        method: "POST",
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        body: JSON.stringify(command),
+      });
+    const sources = await get(sourcesPath);
+    assert.equal(sources.status, 200);
+    assert.equal((await sources.json()).items[0].id, r.source.id);
+    const context = await get(contextPath);
+    assert.equal(context.status, 200);
+    const view = await context.json();
+    assert.equal(view.contextFingerprint, r.fingerprint);
+    assert.deepEqual(
+      view.candidates.map((c) => c.jersey),
+      ["0", "00"],
+    );
+    const command = {
+      commandId: r.uuid(40),
+      sourceRegistrationId: r.source.id,
+      targetRegistrationId: r.target.id,
+      expectedContextFingerprint: view.contextFingerprint,
+      items: r.candidates.map((candidate, i) => ({
+        sourceEntryId: candidate.sourceEntryId,
+        sourceVersion: candidate.sourceVersion,
+        newEntryId: r.uuid(41 + i),
+        jersey: candidate.jersey,
+      })),
+      confirmed: true,
+    };
+    assert.equal(
+      (await send(command, { origin: "https://evil.test" })).status,
+      403,
+    );
+    assert.equal(options.reuseCommits, undefined);
+    assert.equal((await send(command)).status, 503);
+    const recovered = await send(command);
+    assert.equal(recovered.status, 200, await recovered.clone().text());
+    const receipt = await recovered.json();
+    assert.equal(receipt.commandId, command.commandId);
+    assert.deepEqual(
+      receipt.items.map((item) => item.newEntryId),
+      command.items.map((item) => item.newEntryId),
+    );
+    assert.deepEqual(await (await send(command)).json(), receipt);
+    assert.equal(options.reuseCommits, 1);
+    const reusedCommandId = {
+      ...command,
+      items: command.items.map((item, i) => ({
+        ...item,
+        newEntryId: r.uuid(60 + i),
+      })),
+    };
+    const mismatchedReplay = await send(reusedCommandId);
+    assert.equal(mismatchedReplay.status, 409);
+    assert.equal(
+      (await mismatchedReplay.json()).error.code,
+      "idempotency_conflict",
+    );
+    assert.equal(options.reuseCommits, 1);
+    assert.deepEqual(r.candidates, r.initialCandidates);
+    assert.deepEqual(r.targetRoster[0], r.initialTarget[0]);
+    assert.deepEqual(
+      r.targetRoster.slice(1).map((entry) => entry.jersey),
+      ["0", "00"],
+    );
+    options.staleReuseContext = true;
+    assert.deepEqual(await (await send(command)).json(), receipt);
+    const stale = {
+      ...command,
+      commandId: r.uuid(50),
+      items: command.items.map((item, i) => ({
+        ...item,
+        newEntryId: r.uuid(51 + i),
+      })),
+    };
+    const conflict = await send(stale);
+    assert.equal(conflict.status, 409);
+    assert.equal((await conflict.json()).error.code, "reuse_context_conflict");
+    assert.equal(options.reuseCommits, 1);
+    options.denied = true;
+    const prior = f.calls.filter((path) =>
+      path.includes("roster_reuse"),
+    ).length;
+    assert.equal((await get(contextPath)).status, 403);
+    assert.equal((await send(stale)).status, 401);
+    assert.equal(
+      f.calls.filter((path) => path.includes("roster_reuse")).length,
+      prior,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
 
 test("fresh parallel authority checks finish before data and still reject revocation in workerd", async () => {
   const options = { officiating: true };
@@ -352,6 +501,7 @@ async function fixture(options = {}) {
   const playerProfileResponse = playerProfileOutbound(options, id);
   const removalResponse = registrationRemovalOutbound(options);
   const officiatingResponse = officiatingOutbound(id);
+  const reuse = options.rosterReuse ? rosterReuseFixture(options) : null;
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "access-test",
@@ -385,6 +535,10 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (reuse) {
+          const response = await reuse.handler(request);
+          if (response) return response;
+        }
         if (options.officiating) {
           const r = await officiatingResponse(request);
           if (r) return r;
@@ -988,7 +1142,7 @@ async function fixture(options = {}) {
     send("POST", {
       body: { email: "admin@example.test", password: "fixture-password" },
     });
-  return { mf, send, login, calls };
+  return { mf, send, login, calls, reuse };
 }
 
 test("regulation routes authorize before source reads, compute previews and replay frozen writes after a lost ACK", async () => {

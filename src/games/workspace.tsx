@@ -3,6 +3,14 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
 import { GameSheetWorkspace } from "./sheet-workspace";
+import { changeGameTime, gameTimeFields } from "./time-fields";
+import {
+  actualTimeFields,
+  actualTimeError,
+  applyActualTimeFields,
+  changeActualTimeField,
+  type ActualTimeFields,
+} from "./actual-time-fields";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
 import { VenuePicker } from "./venue-picker";
 import {
@@ -28,6 +36,7 @@ import {
 import {
   gameListingSchema,
   gameSchema,
+  durationMinutes,
   type GameSnapshot,
   type SaveGame,
 } from "./contract";
@@ -48,6 +57,8 @@ const document = (s: GameSnapshot) =>
     awayRegistrationId: s.awayRegistrationId,
     date: s.date,
     time: s.time,
+    startAt: s.startAt,
+    endAt: s.endAt,
     venue: s.venue,
     number: s.number,
   });
@@ -64,6 +75,7 @@ export function GamesWorkspace(props: Props) {
       version: number;
       officiating: Officiating;
       officialNames: OfficialNames;
+      actualTimes: ActualTimeFields;
     } | null>(null),
     [baseline, setBaseline] = useState(""),
     [busy, setBusy] = useState(false),
@@ -97,6 +109,7 @@ export function GamesWorkspace(props: Props) {
       game: editor.game,
       officiating: editor.officiating,
       officialNames: editor.officialNames,
+      actualTimes: editor.actualTimes,
     }) !== baseline;
   function mayLeave() {
     return (
@@ -224,9 +237,17 @@ export function GamesWorkspace(props: Props) {
       version: s.version,
       officiating,
       officialNames: names,
+      actualTimes: actualTimeFields(g),
     });
     setChosen([s.home, s.away]);
-    setBaseline(JSON.stringify({ game: g, officiating, officialNames: names }));
+    setBaseline(
+      JSON.stringify({
+        game: g,
+        officiating,
+        officialNames: names,
+        actualTimes: actualTimeFields(g),
+      }),
+    );
     pending.current = null;
     knownAck.current = null;
     setUncertain(false);
@@ -247,6 +268,14 @@ export function GamesWorkspace(props: Props) {
   }
   async function save() {
     if (!editor || busy || conflict) return;
+    if (
+      !pending.current &&
+      savedGame?.state === "finished" &&
+      actualTimeError(editor.actualTimes)
+    ) {
+      setError(actualTimeError(editor.actualTimes));
+      return;
+    }
     if (
       !pending.current &&
       officialRoles.some(
@@ -317,6 +346,34 @@ export function GamesWorkspace(props: Props) {
     setEditor((s) => (s ? { ...s, game: { ...s.game, [key]: value } } : s));
     setStatus("");
   }
+  function changeTime(field: "date" | "start" | "end", value: string) {
+    if (busy || uncertain || conflict) return;
+    setEditor((s) =>
+      s ? { ...s, game: changeGameTime(s.game, field, value) } : s,
+    );
+    setStatus("");
+  }
+  function changeActualTime<K extends keyof ActualTimeFields>(
+    field: K,
+    value: ActualTimeFields[K],
+  ) {
+    if (busy || uncertain || conflict) return;
+    setEditor((s) => {
+      if (!s) return s;
+      const actualTimes = changeActualTimeField(s.actualTimes, field, value);
+      return {
+        ...s,
+        actualTimes,
+        game: applyActualTimeFields(s.game, actualTimes),
+      };
+    });
+    setError("");
+    setStatus("");
+  }
+  const timeError =
+    editor && savedGame?.state === "finished"
+      ? actualTimeError(editor.actualTimes)
+      : "";
   const candidates = [
     ...new Map(
       [...chosen, ...registrations.items].map((r) => [r.id, r]),
@@ -411,11 +468,14 @@ export function GamesWorkspace(props: Props) {
                 awayRegistrationId: "",
                 date: null,
                 time: null,
+                startAt: null,
+                endAt: null,
                 venue: null,
                 number: null,
               },
               officiating: emptyOfficiating(),
               officialNames: emptyOfficialNames(),
+              actualTimes: { date: "", start: "", end: "", endNextDay: false },
             });
             setBaseline("");
             setSavedGame(null);
@@ -482,12 +542,17 @@ export function GamesWorkspace(props: Props) {
           {feedback}
           <div className="teams-inline">
             <p>
-              Horários em America/Sao_Paulo. Data, horário, local e número são
-              opcionais. Salvar a agenda não publica resultado.
+              Horários em America/Sao_Paulo. Salvar não publica o resultado.
             </p>
             <fieldset
               className="competition-form"
-              disabled={busy || uncertain || conflict || decisionLocked}
+              disabled={
+                busy ||
+                uncertain ||
+                conflict ||
+                decisionLocked ||
+                savedGame?.state === "finished"
+              }
             >
               <legend>Dados do jogo</legend>
 
@@ -525,22 +590,48 @@ export function GamesWorkspace(props: Props) {
                 )}
               </div>
 
-              <label>
-                Data do jogo
-                <input
-                  type="date"
-                  value={editor.game.date ?? ""}
-                  onChange={(e) => change("date", e.target.value || null)}
-                />
-              </label>
-              <label>
-                Horário do jogo
-                <input
-                  type="time"
-                  value={editor.game.time ?? ""}
-                  onChange={(e) => change("time", e.target.value || null)}
-                />
-              </label>
+              {savedGame?.state !== "finished" && (
+                <div className="game-actual-times">
+                  <label>
+                    Data do jogo
+                    <input
+                      type="date"
+                      value={gameTimeFields(editor.game).date}
+                      onChange={(e) => changeTime("date", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Hora de início
+                    <input
+                      type="time"
+                      value={gameTimeFields(editor.game).start}
+                      disabled={!gameTimeFields(editor.game).date}
+                      onChange={(e) => changeTime("start", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Hora de fim
+                    <input
+                      type="time"
+                      value={gameTimeFields(editor.game).end}
+                      disabled={
+                        !gameTimeFields(editor.game).date ||
+                        !gameTimeFields(editor.game).start
+                      }
+                      onChange={(e) => changeTime("end", e.target.value)}
+                    />
+                  </label>
+                  <p role="status">
+                    Duração total (inclui intervalos):{" "}
+                    {durationMinutes(editor.game.startAt, editor.game.endAt) ===
+                    null
+                      ? "Informe a hora de fim para calcular."
+                      : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
+                    . Se o fim for anterior ao início, será considerado no dia
+                    seguinte.
+                  </p>
+                </div>
+              )}
               <VenuePicker
                 value={editor.game.venue ?? ""}
                 onChange={(value) => change("venue", value || null)}
@@ -592,6 +683,102 @@ export function GamesWorkspace(props: Props) {
                 </button>
               </div>
             </fieldset>
+            {savedGame?.state === "finished" && (
+              <>
+                <p>
+                  Jogo encerrado: atualize os horários reais e a arbitragem. A
+                  agenda permanece fixa; corrigir a súmula exige motivo e
+                  republicação explícita para atualizar o resultado público.
+                </p>
+                <fieldset
+                  className="competition-form"
+                  disabled={busy || uncertain || conflict || decisionLocked}
+                >
+                  <legend>Horários reais (America/Sao_Paulo)</legend>
+                  <div className="game-actual-times">
+                    <label>
+                      Data dos horários reais
+                      <input
+                        type="date"
+                        name="actualDate"
+                        autoComplete="off"
+                        value={editor.actualTimes.date}
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError && !editor.actualTimes.date}
+                        onChange={(e) =>
+                          changeActualTime("date", e.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      Hora de início
+                      <input
+                        type="time"
+                        value={editor.actualTimes.start}
+                        name="actualStartTime"
+                        autoComplete="off"
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError && !editor.actualTimes.start}
+                        onChange={(e) =>
+                          changeActualTime("start", e.target.value)
+                        }
+                      />
+                    </label>
+                    <label>
+                      Hora de fim
+                      <input
+                        type="time"
+                        value={editor.actualTimes.end}
+                        name="actualEndTime"
+                        autoComplete="off"
+                        aria-describedby="actual-time-help actual-time-error"
+                        aria-invalid={!!timeError}
+                        onChange={(e) =>
+                          changeActualTime("end", e.target.value)
+                        }
+                      />
+                    </label>
+                    <label className="reg-check game-end-next-day">
+                      <input
+                        type="checkbox"
+                        name="actualEndNextDay"
+                        checked={editor.actualTimes.endNextDay}
+                        aria-describedby="actual-time-help actual-time-error"
+                        onChange={(e) =>
+                          changeActualTime("endNextDay", e.target.checked)
+                        }
+                      />
+                      Termina no dia seguinte
+                    </label>
+                    <p role="status">
+                      Duração total (inclui intervalos):{" "}
+                      {durationMinutes(
+                        editor.game.startAt,
+                        editor.game.endAt,
+                      ) === null || !!timeError
+                        ? "Informe início e fim válidos para calcular."
+                        : `${durationMinutes(editor.game.startAt, editor.game.endAt)} min`}
+                    </p>
+                  </div>
+                  <p
+                    id="actual-time-help"
+                    className="game-actual-time-feedback"
+                  >
+                    Início e fim usam a mesma data. Um fim anterior ao início
+                    seleciona o dia seguinte; confira essa opção ao cruzar a
+                    meia-noite. A agenda permanece fixa e horários ausentes no
+                    legado ficam em branco.
+                  </p>
+                  <p
+                    id="actual-time-error"
+                    className={`game-actual-time-feedback${timeError ? " access-error" : ""}`}
+                    aria-live="polite"
+                  >
+                    {timeError}
+                  </p>
+                </fieldset>
+              </>
+            )}
             <OfficiatingEditor
               slots={editor.officiating}
               names={editor.officialNames}

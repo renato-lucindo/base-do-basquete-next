@@ -36,6 +36,11 @@ import {
   type ConfirmPlayerProfile,
 } from "../player-profile/contract";
 import { SupabaseTransfers } from "../people/transfer-provider";
+import { SupabaseRosterReuse } from "../people/roster-reuse-provider";
+import {
+  applyRosterReuseSchema,
+  type ApplyRosterReuse,
+} from "../people/roster-reuse-contract";
 import {
   saveTransferSchema,
   type SaveTransfer,
@@ -116,6 +121,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly people: SupabasePeople;
   private readonly playerProfiles: SupabasePlayerProfiles;
   private readonly transfers: SupabaseTransfers;
+  private readonly rosterReuse: SupabaseRosterReuse;
   private readonly achievements: SupabaseAchievements;
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
@@ -129,6 +135,10 @@ export class SessionStore extends DurableObject<Env> {
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
     this.transfers = new SupabaseTransfers({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
+    this.rosterReuse = new SupabaseRosterReuse({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
@@ -558,6 +568,37 @@ export class SessionStore extends DurableObject<Env> {
           accessToken,
           sourceEntryId,
           destinationRegistrationId,
+        ),
+      ),
+    );
+  }
+  listRosterReuseSources(targetRegistrationId: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.rosterReuse.sources(accessToken, targetRegistrationId, offset),
+      ),
+    );
+  }
+  getRosterReuseContext(
+    sourceRegistrationId: string,
+    targetRegistrationId: string,
+  ) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.rosterReuse.context(
+          accessToken,
+          sourceRegistrationId,
+          targetRegistrationId,
+        ),
+      ),
+    );
+  }
+  applyRosterReuse(command: ApplyRosterReuse) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.rosterReuse.apply(
+          accessToken,
+          applyRosterReuseSchema.parse(command),
         ),
       ),
     );

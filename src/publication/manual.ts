@@ -25,13 +25,12 @@ export function prepareManualPublication(
           .map((p) => ({
             rosterEntryId: p.rosterEntryId,
             side: p.side,
-            jersey: p.jersey,
           }))
           .sort((a, b) => a.rosterEntryId.localeCompare(b.rosterEntryId)),
       );
     if (identity(document) !== identity(previousConfirmed))
       throw Error(
-        "Os relacionados e as camisas confirmados não podem ser alterados nesta revisão.",
+        "Os relacionados confirmados não podem ser alterados nesta revisão; a camisa pode ser corrigida com motivo.",
       );
   }
   return { command, facts: deriveManualFacts(document) };

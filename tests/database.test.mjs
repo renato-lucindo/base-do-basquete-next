@@ -128,9 +128,25 @@ test("G2 upgrade preserves G1 schedules and does not fabricate sheets or results
     const q =
       "select public.get_game('f4000000-0000-4000-8000-000000000007') as game";
     const before = (await db.query(q)).rows;
+    const assertHistoricalGame = async () => {
+      const after = (await db.query(q)).rows;
+      assert.equal(after[0].game.startAt, null);
+      assert.equal(after[0].game.endAt, null);
+      assert.deepEqual(
+        after.map(({ game }) => ({
+          game: Object.fromEntries(
+            Object.entries(game).filter(
+              ([key]) => key !== "startAt" && key !== "endAt",
+            ),
+          ),
+        })),
+        before,
+        "G1 game fields remain unchanged after adding optional actual times",
+      );
+    };
     for (const migration of migrations.slice(boundary))
       await db.exec(migration);
-    assert.deepEqual((await db.query(q)).rows, before);
+    await assertHistoricalGame();
     assert.equal(
       (
         await db.query(
@@ -140,7 +156,7 @@ test("G2 upgrade preserves G1 schedules and does not fabricate sheets or results
       null,
     );
     await db.exec(await readFile("supabase/tests/game_sheet.sql", "utf8"));
-    assert.deepEqual((await db.query(q)).rows, before);
+    await assertHistoricalGame();
   } finally {
     await db.close();
   }

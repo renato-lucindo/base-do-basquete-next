@@ -16,7 +16,7 @@ export const shirtOrder = (
 export function suggestPreparation(
   context: PreparationContext,
 ): PersistedSheet {
-  const document = emptyPersistedSheet();
+  const document = emptyPersistedSheet(2);
   for (const side of ["home", "away"] as const) {
     const c = context.sides[side],
       previous = c.previous;
@@ -56,8 +56,10 @@ export function suggestPreparation(
     const captain = selected.find(
       (r) => r.personId === previous?.captainPersonId,
     );
+    // Registration roles guide only the initial suggestion; either person can
+    // be selected for either role in this game.
     const heads = c.staff.filter((s) => s.role === "head"),
-      assistants = c.staff.filter((s) => s.role === "assistant");
+      assistants = c.staff;
     const coach = previous
       ? heads.find((s) => s.personId === previous.coachPersonId)
       : heads.length === 1
@@ -65,9 +67,13 @@ export function suggestPreparation(
         : undefined;
     const assistant = coach
       ? previous
-        ? assistants.find((s) => s.personId === previous.assistantPersonId)
-        : assistants.length === 1
-          ? assistants[0]
+        ? assistants.find(
+            (s) =>
+              s.personId === previous.assistantPersonId &&
+              s.personId !== coach.personId,
+          )
+        : assistants.filter((s) => s.personId !== coach.personId).length === 1
+          ? assistants.find((s) => s.personId !== coach.personId)
           : undefined
       : undefined;
     document.staff[side] = {

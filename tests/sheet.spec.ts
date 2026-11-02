@@ -238,7 +238,7 @@ async function fixture(page: Page) {
 }
 async function open(page: Page) {
   await page.goto(
-    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+    `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
     .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
@@ -641,6 +641,7 @@ async function publicationFixture(page: Page) {
   const receipts = new Map<string, unknown>(),
     attempts: string[] = [],
     commands: string[] = [];
+  let publicSnapshot: ReturnType<typeof publishedSheet> | null = null;
   async function attach(targetPage: Page) {
     if (targetPage !== page) await fixture(targetPage);
     await targetPage.route(`**/api/games/${game.id}`, (route) =>
@@ -679,17 +680,7 @@ async function publicationFixture(page: Page) {
         json: {
           gameId: game.id,
           version: publicVersion,
-          published: publicVersion
-            ? publishedSheet(
-                source.document,
-                game.id,
-                game.home.id,
-                game.away.id,
-                publicVersion,
-                source.version,
-                source.gameVersion,
-              )
-            : null,
+          published: publicSnapshot,
           history: [],
           hasMore: false,
           requiresFallback: fallback,
@@ -735,6 +726,15 @@ async function publicationFixture(page: Page) {
           gameVersion: c.gameVersion + 1,
           confirmed: true,
         };
+        publicSnapshot = publishedSheet(
+          source.document,
+          game.id,
+          game.home.id,
+          game.away.id,
+          publicVersion,
+          source.version,
+          source.gameVersion,
+        );
         f.games.set(game.id, {
           ...game,
           version: source.gameVersion,
@@ -775,6 +775,7 @@ async function publicationFixture(page: Page) {
       publicationExpired = true;
     },
     source: () => source,
+    published: () => publicSnapshot,
     fallback: () => {
       fallback = true;
     },
@@ -814,10 +815,21 @@ test("manual publication confirms identities, keeps participation editable and r
     .click();
   await expect(
     page.getByLabel("Camisa de Atleta home 0", { exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByLabel("Atleta A vaga 1", { exact: true }),
   ).toBeDisabled();
+  const firstPublic = structuredClone(f.published());
+  const publicPlayerId = firstPublic!.facts.players.find(
+    (p) => p.side === "home" && p.jersey === "00",
+  )!.person.id;
+  await page.getByLabel("Camisa de Atleta home 0", { exact: true }).fill("17");
+  await page
+    .getByLabel("Camisa de Atleta home 0", { exact: true })
+    .press("Enter");
+  await page
+    .getByRole("textbox", { name: "Motivo da revisão da súmula", exact: true })
+    .fill("Correção da camisa e da participação após conferência.");
   await page
     .getByRole("button", {
       name: "Concluir preparação e lançar ações",
@@ -825,8 +837,9 @@ test("manual publication confirms identities, keeps participation editable and r
     })
     .click();
   await page.getByLabel("Entrou Atleta home 5", { exact: true }).check();
+  expect(f.published()).toEqual(firstPublic);
   await page
-    .getByLabel("Motivo da revisão da súmula", { exact: true })
+    .getByRole("textbox", { name: "Motivo da revisão da súmula", exact: true })
     .fill("Atleta também participou sem ações.");
   await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
@@ -834,7 +847,18 @@ test("manual publication confirms identities, keeps participation editable and r
   await page
     .getByRole("button", { name: "Republicar este jogo", exact: true })
     .click();
-  await expect.poll(() => f.source().version).toBe(3);
+  await expect.poll(() => f.source().version).toBe(4);
+  expect(
+    f.source().document.participants.find((p) => p.rosterEntryId === tid(100))
+      ?.jersey,
+  ).toBe("17");
+  expect(
+    firstPublic!.facts.players.find((p) => p.person.id === publicPlayerId)
+      ?.jersey,
+  ).toBe("00");
+  expect(
+    f.published()!.facts.players.find((p) => p.person.id === publicPlayerId),
+  ).toMatchObject({ jersey: "17", points: 2 });
   expect(
     f.source().document.participants.find((p) => p.rosterEntryId === tid(105))
       ?.played,
