@@ -1,4 +1,5 @@
-import { useState, useId } from "react";
+import { useState, useId, useEffect } from "react";
+import { changeSheetJersey } from "./sheet-identity";
 import type {
   PreparationCandidate,
   PreparationContext,
@@ -7,6 +8,76 @@ import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import { shirtOrder } from "./preparation";
 import type { Side } from "../domain/scoresheet";
+function JerseyField({
+  label,
+  value,
+  disabled,
+  onCommit,
+}: {
+  label: string;
+  value: string;
+  disabled: boolean;
+  onCommit: (value: string) => void;
+}) {
+  const [draft, setDraft] = useState(value),
+    [error, setError] = useState("");
+  const errorId = useId();
+  useEffect(() => {
+    setDraft(value);
+    setError("");
+  }, [value]);
+  function commit() {
+    if (draft === value) return;
+    try {
+      onCommit(draft);
+      setError("");
+    } catch (e) {
+      setDraft(value);
+      setError(
+        e instanceof Error ? e.message : "Não foi possível alterar a camisa.",
+      );
+    }
+  }
+  return (
+    <>
+      <input
+        aria-label={label}
+        inputMode="numeric"
+        name="jersey"
+        autoComplete="off"
+        spellCheck={false}
+        maxLength={2}
+        value={draft}
+        disabled={disabled}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId : undefined}
+        onChange={(e) => {
+          if (/^\d{0,2}$/u.test(e.target.value)) {
+            setDraft(e.target.value);
+            setError("");
+          }
+        }}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            commit();
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            setDraft(value);
+            setError("");
+          }
+        }}
+      />
+      {error && (
+        <small id={errorId} role="alert">
+          {error}
+        </small>
+      )}
+    </>
+  );
+}
 function AthletePicker({
   label,
   value,
@@ -234,19 +305,23 @@ export function SheetPreparation({
                     <tr key={id ?? `empty-${i}`}>
                       <td>
                         {row && (
-                          <input
-                            aria-label={`Camisa de ${currentName}`}
-                            inputMode="numeric"
-                            maxLength={2}
+                          <JerseyField
+                            label={`Camisa de ${currentName}`}
                             value={row.jersey}
-                            disabled={
-                              disabled || !!snapshot?.confirmed || hasActions
-                            }
-                            onChange={(e) => {
-                              if (/^(?:\d{0,2})$/u.test(e.target.value))
-                                update(row.rosterEntryId, {
-                                  jersey: e.target.value,
-                                });
+                            disabled={disabled}
+                            onCommit={(jersey) => {
+                              if (
+                                !onChange(
+                                  changeSheetJersey(
+                                    d,
+                                    row.rosterEntryId,
+                                    jersey,
+                                  ),
+                                )
+                              )
+                                throw Error(
+                                  "Não foi possível alterar a camisa. Revise o aviso da súmula.",
+                                );
                             }}
                           />
                         )}
@@ -412,7 +487,14 @@ export function SheetPreparation({
                       </option>
                     )}
                   {c.staff
-                    .filter((s) => s.role === "head")
+                    .filter(
+                      (s) =>
+                        (d.formatVersion === 2 || s.role === "head") &&
+                        s.personId !==
+                          c.staff.find(
+                            (a) => a.id === staff.assistantStaffEntryId,
+                          )?.personId,
+                    )
                     .map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.person.name}
@@ -444,7 +526,14 @@ export function SheetPreparation({
                         </option>
                       )}
                     {c.staff
-                      .filter((s) => s.role === "assistant")
+                      .filter(
+                        (s) =>
+                          (d.formatVersion === 2 || s.role === "assistant") &&
+                          s.personId !==
+                            c.staff.find(
+                              (a) => a.id === staff.coachStaffEntryId,
+                            )?.personId,
+                      )
                       .map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.person.name}

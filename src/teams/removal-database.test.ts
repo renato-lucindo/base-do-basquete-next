@@ -118,6 +118,7 @@ it.each(["zero", "upgrade", "existing_admin"] as const)(
         "private.game_publication_entries",
         "private.registration_withdrawal_records",
         "private.regulation_registration_links",
+        "private.roster_reuse_commands",
         "private.roster_transfers",
         "private.text_reviews",
         "public.game_sheet_entries",

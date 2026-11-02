@@ -13,6 +13,12 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
+@media (max-width: 700px) {
+  .officiating-columns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
 .game-editor-dialog .officiating-column {
   display: block;
   min-width: 0;

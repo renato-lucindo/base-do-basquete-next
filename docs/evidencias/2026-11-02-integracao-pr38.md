@@ -1,0 +1,50 @@
+# Preparação da integração da PR #38
+
+Em 02/11/2026, o responsável confirmou: “Validei as correções. Pode iniciar o procedimentos para merge”. [Aceite e autorização registrados na PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/38#issuecomment-6582888204). Não inclui produção, novo deploy ou operação no banco real.
+
+## Candidato e revisão
+
+Código funcional aceito e publicado: `4ae05356e49108ec237b82ffa275dd5e1b69b228`. [CI 41479403192](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41479403192) SUCCESS: 636 unitários/130 arquivos, 481 browsers PASS / 109 SKIP, gate e design. Preview exclusivo da PR #38 continua na versão 5, deployment `ddab0f4e-7eac-4050-a9ad-57fb1930f086`. Nenhuma nova publicação faz parte desta integração.
+
+Preflight: base main `c6004eba2c891a2049edd8f7768b37777ea6d523`, PR sem conflitos e sem threads de revisão abertas. Os pareceres antigos são do autor e referem-se a SHAs anteriores; bloqueios de publicação/login relatados neles foram superados pelas evidências posteriores. Não foi obtido parecer independente nem se exige aprovação fictícia de segundo mantenedor. O aceite humano das correções agora foi recebido.
+
+## Correspondência da migration aplicada
+
+Consulta somente de metadados confirmou exclusivamente `20261102154118_legacy_sheet_editing` no ledger dev; `20261102112205` não foi registrado. A SQL aplicada tem 12.997 caracteres e MD5 `b26d4096aa91fd54679f8a5696598220`. O arquivo local, normalizando somente CRLF para LF e removendo a quebra final, tem o mesmo checksum.
+
+O arquivo foi **renomeado** de `20261102112205_legacy_sheet_editing.sql` para `20261102154118_legacy_sheet_editing.sql`, preservando integralmente seus bytes e o blob Git. A única referência executável literal, no teste de upgrade, foi ajustada ao nome canônico. A ordem continua sendo a última migration, depois de `20261031005230_game_actual_times`. Não houve alteração do SQL aplicado, nova migration, reaplicação, migration repair, DDL, DML ou modificação do ledger remoto. A pendência de nomenclatura das evidências anteriores fica resolvida por esta correspondência, sem editar registros históricos.
+
+O checkpoint documental posterior ao preview foi incorporado à mesma branch. Validação focal do upgrade e CI do candidato final são registradas na conversa da PR; não repetir gate local de código funcional idêntico. A integração usa merge commit e exige CI no SHA integrado, conforme CONTRIBUTING. Resultado final, SHA e CI integrados devem ser conferidos e registrados após execução; este documento não antecipa sucesso.
+
+Alterações humanas no checkout original, documentos já modificados no worktree antigo da PR #46 e demais branches/worktrees permanecem preservados. Não apagar branches utilizadas nem atualizar a PR #46 nesta unidade.
+
+## Falha da primeira CI candidata e sincronização do teste
+
+A CI 41485738438 do candidato d8b8920 passou gate/design e 480 browsers, com 109 SKIP, mas falhou em `save-latency.spec.ts` (sucesso parcial): contagem 1 quando esperava zero durante o lote. O teste ligava o contador depois da interpretação sem aguardar a comparação inicial do elenco concluir. Essa leitura inicial podia ser contada no intervalo reservado ao lote; o efeito do produto já evita recarga enquanto `model.busy` está ativo.
+
+Foi acrescentada somente a sincronização da linha de base no teste: aguardar os efeitos da interpretação e o marcador de comparação concluída antes de ligar o contador. Permanecem as asserções de zero leituras durante o lote, uma ao término e mais uma ao voltar; sem aumento de timeout, remoção de teste ou alteração do produto. Duas variantes × dez repetições = 20 PASS (33,5 s), eslint/formato/diff PASS. A falha anterior não foi omitida nem tratada como aprovação; uma nova CI do novo candidato deve passar antes do merge.
+
+## Checkpoint de cota — candidato aprovado, sem merge
+
+O candidato `f089dd6775a1fc0edb99376aed2d95303286cfe2` recebeu [CI 41489382068](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41489382068) SUCCESS: gate/design, 636 unitários e 481 browsers PASS/109 SKIP. A falha de sincronização foi resolvida sem alterar produto/asserts/timeouts. Merge não executado.
+
+Consulta real após a CI: 93% usados/7% restantes na janela 5h. Aplicado o gatilho de 15% do repositório: somente checkpoint; não iniciar integração que dispararia nova CI da main. Reset observado 02/11/2026 17:34:05 America/Sao_Paulo. Sem agendamento autorizado, não foi criada automação. A autorização do responsável para o merge permanece vigente.
+
+Retomada exata: conferir cota e estado real; PR #38 fora de Draft, HEAD candidato f089dd6, base esperada main c6004eb; check validate atual aprovado. Fazer merge commit com expected_head_sha completo, confirmar SHA efetivo da main, aguardar CI do SHA integrado e registrar conclusão. Não pedir novamente autorização. [Registro remoto](https://github.com/renato-lucindo/base-do-basquete-next/pull/38#issuecomment-6583826799). Este checkpoint documental local não foi enviado para evitar iniciar outra CI sob o limite de cota.
+
+
+## Retomada automática confirmada
+
+Em 02/11/2026, agendamento confirmado pela ferramenta oficial: automação `retomar-merge-da-pr-38-ap-s-reset`, ACTIVE, nesta conversa, para 02/11/2026 às 17:36:05 America/Sao_Paulo (reset observado 17:34:05 + 2 minutos). Cota real consultada: 97% usados / 3% restantes na janela de 5h. Continuar o merge já autorizado da PR #38 após reconciliar cota, HEAD e checks; confirmar CI do SHA integrado. Nenhum merge, deploy ou operação de banco nesta programação.
+
+## Retomada e revisão bloqueante
+
+Retomada automática executada em 02/11/2026 às 17:36, após reset confirmado (0% usados na janela 5h; semanal 39%). HEAD f089dd6 e base c6004eb permaneceram iguais, validate SUCCESS. A tentativa de merge foi recusada pelo GitHub (405: All comments must be resolved); nenhuma proteção foi contornada. A consulta atual revelou dois apontamentos abertos do conector de revisão, criados às 16:55:45Z, posteriores à conferência anterior.
+
+- P1, roster-reuse-panel: SQL pode devolver candidato elegível que já está no destino, com camisa diferente. A UI criava uma escolha com a camisa da origem e o domínio corretamente recusava sobrescrever a camisa do destino durante o render, derrubando o painel. Agora membros existentes, identificados por personId, ficam fora das escolhas, seleção e detecção de alterações; a prévia mantém sua camisa e os mostra como já incluídos. Guardas do domínio e SQL permanecem intactas.
+- P2, sheet-preparation: seletores permitiam inverter papéis de comissão em v1, embora a persistência só aceite head como técnico e assistant como assistente nesse formato. Agora a UI filtra por papel no documento legado; v2 conserva papéis intercambiáveis e exclusão de pessoa duplicada. Não converter ou versionar implicitamente o legado e não alterar migrations aplicadas.
+
+Prova RED: Playwright desktop, testes de reaproveitamento 1366 e comissão v1 falharam antes da correção (crash por camisa preservada e opção indevida); comissão v2 passou. Prova GREEN: mesma regressão de reaproveitamento nos desktops 1366/1920, ACK, conflito, paginação, comissão v1/v2 com salvamento/recarga e preservação das ações, mais regressão existente v2: 15 PASS / 1 SKIP, em desktop/mobile, 29,3 s. Fixtures locais, sem gravação em dados humanos. Revisão proporcional dos dois controles conforme os padrões administrativos e diretrizes atuais de Web Interface Guidelines; rótulos, controles nativos e feedback existentes preservados. Não se declara conformidade WCAG integral ou nova validação do preview remoto, cujo código continua no SHA anteriormente publicado.
+
+A regra de CONTRIBUTING solicitada pelo responsável também segue nesta unidade: pausas por cota devem agendar retomada automaticamente, confirmar o agendamento e registrar impedimentos reais. O checkout principal mantém sua alteração local preservada. Gate e CI do novo candidato serão conferidos antes de resolver os apontamentos e tentar o merge novamente.
+Gate consolidado da correção PASS (exit 0): npm run gate, 636 unitários/130 arquivos, 6 transportes, 13 contratos de banco descartável, 27 Workerd, runtime de quatro PDFs, lint/formato/tipos/builds, fronteira e scanner de segredos. Log local ignorado .preview-artifacts/pr38-review-final-gate.log. CI do novo SHA ainda pendente; nenhuma alegação de integração antes da confirmação remota.

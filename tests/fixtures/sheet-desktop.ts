@@ -2,11 +2,17 @@ import type { Page } from "@playwright/test";
 import { gamesFixture } from "./games";
 import { tid } from "./text-import";
 import type { PreparationContext } from "../../src/games/preparation-contract";
+import { gameSnapshotSchema } from "../../src/games/contract";
 import {
   saveSheetSchema,
+  type SaveSheet,
   type SheetSnapshot,
 } from "../../src/games/sheet-contract";
-export async function desktopSheetFixture(page: Page, count = 11) {
+export async function desktopSheetFixture(
+  page: Page,
+  count = 11,
+  withStaff = false,
+) {
   const f = await gamesFixture(page),
     savedAt = "2026-10-26T18:00:00Z",
     home = f.registrations.get(tid(5))!,
@@ -28,12 +34,26 @@ export async function desktopSheetFixture(page: Page, count = 11) {
     version: 1,
     savedAt,
   };
-  f.games.set(game.id, game);
+  f.games.set(game.id, gameSnapshotSchema.parse(game));
   const side = (which: 0 | 1) => ({
     registrationId: which ? away.id : home.id,
     previous: null,
     lastJerseys: {},
-    staff: [],
+    staff: withStaff
+      ? Array.from({ length: 3 }, (_, i) => {
+          const personId = tid(600 + which * 10 + (i === 2 ? 0 : i));
+          return {
+            id: tid(300 + which * 10 + i),
+            personId,
+            role: (i === 1 ? "head" : "assistant") as "head" | "assistant",
+            person: {
+              id: personId,
+              name: `Treinador ${which ? "B" : "A"} ${i === 2 ? 1 : i + 1}`,
+              nickname: null,
+            },
+          };
+        })
+      : [],
     roster: Array.from({ length: count }, (_, i) => ({
       id: tid(100 + which * 100 + i),
       registrationId: which ? away.id : home.id,
@@ -53,12 +73,51 @@ export async function desktopSheetFixture(page: Page, count = 11) {
   };
   let snapshot: SheetSnapshot | null = null;
   const commands: unknown[] = [];
+  const attempts: SaveSheet[] = [],
+    receipts = new Map<
+      string,
+      {
+        payload: string;
+        result: { requestId: string; version: number; confirmed: boolean };
+      }
+    >();
+  let loseAck = false,
+    conflict = false;
   await page.route(`**/api/games/${game.id}/sheet/preparation`, (r) =>
     r.fulfill({ json: context }),
   );
   await page.route(`**/api/games/${game.id}/sheet`, (r) => {
-    if (r.request().method() === "GET") return r.fulfill({ json: snapshot });
+    if (r.request().method() === "GET")
+      return r.fulfill({
+        json: snapshot
+          ? { ...snapshot, gameVersion: f.games.get(game.id)!.version }
+          : null,
+      });
     const c = saveSheetSchema.parse(r.request().postDataJSON());
+    attempts.push(c);
+    const prior = receipts.get(c.requestId);
+    if (prior)
+      return r.fulfill({
+        status: prior.payload === JSON.stringify(c) ? 200 : 409,
+        json: prior.result,
+      });
+    if (conflict && snapshot) {
+      conflict = false;
+      snapshot = { ...snapshot, version: snapshot.version + 1 };
+    }
+    if (
+      c.baseVersion !== (snapshot?.version ?? 0) ||
+      c.gameVersion !== f.games.get(game.id)!.version
+    )
+      return r.fulfill({
+        status: 409,
+        json: {
+          error: {
+            code: "version_conflict",
+            message: "A súmula mudou no servidor. Recarregue para conferir.",
+          },
+        },
+      });
     commands.push(c);
     const candidates = [
       ...context.sides.home.roster,
@@ -66,10 +125,10 @@ export async function desktopSheetFixture(page: Page, count = 11) {
     ];
     snapshot = {
       gameId: game.id,
-      gameVersion: 1,
+      gameVersion: f.games.get(game.id)!.version,
       version: c.baseVersion + 1,
       savedAt,
-      confirmed: false,
+      confirmed: snapshot?.confirmed ?? false,
       document: c.document,
       participants: c.document.participants.map((p) => {
         const m = candidates.find((r) => r.id === p.rosterEntryId)!;
@@ -80,18 +139,47 @@ export async function desktopSheetFixture(page: Page, count = 11) {
           person: m.person,
         };
       }),
-      staff: {
-        home: { captain: null, coach: null, assistant: null },
-        away: { captain: null, coach: null, assistant: null },
-      },
+      staff: Object.fromEntries(
+        (["home", "away"] as const).map((s) => {
+          const selected = c.document.staff[s];
+          const roster = context.sides[s].roster;
+          const staff = context.sides[s].staff;
+          return [
+            s,
+            {
+              captain:
+                roster.find((r) => r.id === selected.captainRosterEntryId)
+                  ?.person ?? null,
+              coach:
+                staff.find((r) => r.id === selected.coachStaffEntryId)
+                  ?.person ?? null,
+              assistant:
+                staff.find((r) => r.id === selected.assistantStaffEntryId)
+                  ?.person ?? null,
+            },
+          ];
+        }),
+      ) as SheetSnapshot["staff"],
     };
-    return r.fulfill({
-      json: {
-        requestId: c.requestId,
-        version: snapshot.version,
-        confirmed: false,
-      },
-    });
+    const result = {
+      requestId: c.requestId,
+      version: snapshot.version,
+      confirmed: snapshot.confirmed,
+    };
+    receipts.set(c.requestId, { payload: JSON.stringify(c), result });
+    if (loseAck) {
+      loseAck = false;
+      return r.fulfill({
+        status: 503,
+        json: {
+          error: {
+            code: "access_unavailable",
+            message: "Resposta perdida após gravação.",
+          },
+        },
+      });
+    }
+    return r.fulfill({ json: result });
   });
   await page.route(/\/api\/roster(\?|$)/, (r) => {
     const reg = new URL(r.request().url()).searchParams.get("registrationId");
@@ -116,11 +204,26 @@ export async function desktopSheetFixture(page: Page, count = 11) {
   await page.route(/\/api\/staff(\?|$)/, (r) =>
     r.fulfill({ json: { items: [], hasMore: false } }),
   );
-  return { ...f, context, commands, snapshot: () => snapshot };
+  return {
+    ...f,
+    context,
+    commands,
+    sheetAttempts: attempts,
+    snapshot: () => snapshot,
+    setSnapshot: (s: SheetSnapshot) => {
+      snapshot = s;
+    },
+    loseNextSheetAck: () => {
+      loseAck = true;
+    },
+    conflictNextSheetSave: () => {
+      conflict = true;
+    },
+  };
 }
 export async function openDesktopSheet(page: Page) {
   await page.goto(
-    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+    `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
     .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })

@@ -8,6 +8,20 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+.game-editor-dialog .game-actual-times .game-end-next-day {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  width: fit-content;
+}
+.game-editor-dialog .game-end-next-day input {
+  width: auto;
+}
+.game-editor-dialog .game-actual-time-feedback {
+  grid-column: 1/-1;
+}
 .admin-table-scroll {
   max-width: 100%;
   overflow-x: auto;
@@ -540,6 +554,18 @@
   .compact-pilot .game-editor-dialog .competition-form {
     grid-template-columns: 150px 120px minmax(0, 1fr) 100px;
     gap: 8px 12px;
+  }
+  .compact-pilot .game-editor-dialog .game-actual-times {
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+    align-items: end;
+    gap: 6px 12px;
+  }
+  .compact-pilot .game-editor-dialog .game-actual-times > p {
+    grid-column: 1/-1;
+    margin: 0;
+    font-size: 0.8125rem;
   }
   .compact-pilot .game-opponents {
     grid-column: 1/-1;

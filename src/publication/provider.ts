@@ -37,7 +37,7 @@ const messages = {
   version_conflict:
     "O jogo ou a fonte foi alterado. Recarregue antes de publicar.",
   confirmed_roster_locked:
-    "Os relacionados e as camisas da súmula confirmada não podem mudar nesta revisão.",
+    "A revisão não corresponde aos relacionados confirmados. Confira identidades, equipes e a associação com o PDF.",
   publication_source_game_locked:
     "Este PDF já foi publicado para outro jogo e deve manter seu destino.",
   source_upload_incomplete:

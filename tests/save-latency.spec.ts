@@ -32,6 +32,17 @@ for (const partialFailure of [false, true])
       exact: true,
     });
     await expect(confirm).toBeEnabled();
+    // Interpretation also refreshes the initial roster comparison. Let that
+    // effect run and finish before measuring reads caused by the save batch.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
+    await expect(
+      page.getByText("Não selecionados nesta conferência:", { exact: true }),
+    ).toBeVisible();
     let rosterReads = 0;
     page.on("request", (request) => {
       if (new URL(request.url()).pathname === "/api/roster") rosterReads++;

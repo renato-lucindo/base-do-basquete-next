@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { tid } from "./fixtures/text-import";
 import { gamesFixture as fixture } from "./fixtures/games";
-test("lista jogos com horários reais adicionais sem transformar metadados em comando", async ({
+test("lista jogos com horários reais adicionais e preserva horários ao editar local", async ({
   page,
 }) => {
   const f = await fixture(page);
@@ -36,8 +36,11 @@ test("lista jogos com horários reais adicionais sem transformar metadados em co
   await page
     .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
     .click();
-  await expect(page.getByLabel("Horário do jogo", { exact: true })).toHaveValue(
-    "15:30",
+  await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
+    "15:35",
+  );
+  await expect(page.getByLabel("Hora de fim", { exact: true })).toHaveValue(
+    "17:07",
   );
   await page.getByLabel("Local", { exact: true }).fill("Quadra revisada");
   const sent = page.waitForRequest(
@@ -50,8 +53,13 @@ test("lista jogos com horários reais adicionais sem transformar metadados em co
     page.getByRole("status").filter({ hasText: "Jogo salvo" }),
   ).toBeVisible();
   const command = (await sent).postDataJSON();
-  expect(command.game).not.toHaveProperty("startAt");
-  expect(command.game).not.toHaveProperty("endAt");
+  expect(command.game).toMatchObject({
+    time: "15:30",
+    startAt: "2026-10-23T15:35",
+    endAt: "2026-10-23T17:07",
+    venue: "Quadra revisada",
+  });
+  expect(f.games.get(tid(7))).toMatchObject(command.game);
 });
 async function open(page: Page) {
   await page.goto(
@@ -72,7 +80,7 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   const f = await fixture(page);
   await open(page);
   await page.getByLabel("Data do jogo", { exact: true }).fill("2026-11-15");
-  await page.getByLabel("Horário do jogo", { exact: true }).fill("15:30");
+  await page.getByLabel("Hora de início", { exact: true }).fill("15:30");
   await page.getByLabel("Local", { exact: true }).fill("Quadra preservada");
   await page
     .getByRole("button", {
@@ -101,7 +109,7 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
     "2026-11-15",
   );
-  await expect(page.getByLabel("Horário do jogo", { exact: true })).toHaveValue(
+  await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
     "15:30",
   );
   await expect(page.getByLabel("Local", { exact: true })).toHaveValue(
@@ -274,4 +282,66 @@ test("repete a mesma intenção e mantém edição até recarga explícita de co
   await expect(page.getByLabel("Local", { exact: true })).toHaveValue(
     "Servidor atualizado",
   );
+});
+test("registra horários reais, calcula duração com virada do dia e recupera a edição", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  await open(page);
+  await expect(page.locator('input[type="datetime-local"]')).toHaveCount(0);
+  await expect(page.locator('input[type="date"]')).toHaveCount(1);
+  await expect(page.locator('input[type="time"]')).toHaveCount(2);
+  await expect(
+    page.getByLabel("Hora de início", { exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByLabel("Hora de fim", { exact: true })).toBeDisabled();
+  await page.getByLabel("Data do jogo", { exact: true }).fill("2026-10-30");
+  await page.getByLabel("Hora de início", { exact: true }).fill("23:15");
+  await page.getByLabel("Hora de fim", { exact: true }).fill("00:47");
+  await expect(
+    page.getByRole("status").filter({ hasText: "1h32min" }),
+  ).toBeVisible();
+  for (const [width, height] of [
+    [1366, 768],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect(page.getByLabel("Hora de fim", { exact: true })).toBeVisible();
+    await page.screenshot({
+      path: `.preview-artifacts/jogos-horarios-${width}.png`,
+    });
+  }
+  await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Jogo salvo" }),
+  ).toBeVisible();
+  expect([...f.games.values()][0]).toMatchObject({
+    startAt: "2026-10-30T23:15",
+    endAt: "2026-10-31T00:47",
+  });
+  await page.reload();
+  await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
+    "2026-10-30",
+  );
+  await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
+    "23:15",
+  );
+  await expect(page.getByLabel("Hora de fim", { exact: true })).toHaveValue(
+    "00:47",
+  );
+  await page.getByLabel("Data do jogo", { exact: true }).fill("2026-11-01");
+  await expect(
+    page.getByRole("status").filter({ hasText: "1h32min" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Jogo salvo" }),
+  ).toBeVisible();
+  expect([...f.games.values()][0]).toMatchObject({
+    date: "2026-11-01",
+    time: "23:15",
+    startAt: "2026-11-01T23:15",
+    endAt: "2026-11-02T00:47",
+  });
 });
