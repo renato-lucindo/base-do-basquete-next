@@ -10,7 +10,7 @@ import {
   achievementRoute,
   publicAchievementRoute,
 } from "../achievements/routes";
-import { regulationRoute } from "../regulation/routes";
+import { regulationRoute, publicStandingsRoute } from "../regulation/routes";
 import { decisionRoute } from "../regulation/decision-routes";
 import { z } from "zod";
 import { HttpError, jsonResponse, readMutationJson } from "./http";
@@ -49,6 +49,8 @@ export default {
         ["/api/public/catalog", "/api/public/search"].includes(url.pathname)
       )
         response = await publicCatalogRoute(request, env, url);
+      else if (url.pathname.startsWith("/api/public/standings/"))
+        response = await publicStandingsRoute(request, env, url);
       else if (url.pathname === "/api/session" && !url.search)
         response = await sessionRoute(request, env);
       else if (

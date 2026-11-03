@@ -69,6 +69,9 @@ export async function publicNavigationFixture(page: Page) {
       },
     });
   });
+  await page.route("**/api/public/standings/**", (route) =>
+    route.fulfill({ json: null }),
+  );
   await page.route("**/api/public/teams/**", (route) => {
     const u = new URL(route.request().url()),
       parts = u.pathname.split("/");

@@ -50,6 +50,10 @@ test("public discovery uses anonymous published tables, validates transport and 
           ]);
         if (u.pathname === "/rest/v1/published_player_profiles")
           return Response.json([]);
+        if (u.pathname === "/rest/v1/rpc/list_public_disputes")
+          return Response.json([]);
+        if (u.pathname === "/rest/v1/rpc/get_public_standings")
+          return Response.json(null);
         assert.fail(`Unexpected outbound: ${u.pathname}`);
       },
     }),
@@ -71,6 +75,8 @@ test("public discovery uses anonymous published tables, validates transport and 
       "/api/public/search?q=a",
       "/api/public/search?q=ab&q=cd",
       "/api/public/catalog?disputeId=x&disputeId=x",
+      "/api/public/standings/bad",
+      `/api/public/standings/${g.disputeId}?extra=1`,
     ]) {
       const r = await mf.dispatchFetch(origin + path);
       assert.equal(r.status, 400);
@@ -84,6 +90,19 @@ test("public discovery uses anonymous published tables, validates transport and 
       405,
     );
     assert.equal(calls.length, 0);
+    assert.equal(
+      (
+        await mf.dispatchFetch(
+          origin + `/api/regulations/${g.disputeId}/publication`,
+        )
+      ).status,
+      401,
+    );
+    const standings = await mf.dispatchFetch(
+      origin + `/api/public/standings/${g.disputeId}`,
+    );
+    assert.equal(standings.status, 200);
+    assert.equal(await standings.json(), null);
     const response = await mf.dispatchFetch(
       origin + `/api/public/catalog?disputeId=${g.disputeId}`,
     );
@@ -96,7 +115,7 @@ test("public discovery uses anonymous published tables, validates transport and 
     );
     const page = await response.json();
     assert.equal(page.games[0].disputeId, g.disputeId);
-    assert.equal(calls[0].searchParams.get("dispute_id"), `eq.${g.disputeId}`);
+    assert.equal(calls[1].searchParams.get("dispute_id"), `eq.${g.disputeId}`);
     const search = await mf.dispatchFetch(
       origin + "/api/public/search?q=Atleta",
     );
@@ -105,7 +124,7 @@ test("public discovery uses anonymous published tables, validates transport and 
       (await search.json()).players[0].person.id,
       g.facts.players[0].person.id,
     );
-    assert.equal(calls.length, 3);
+    assert.equal(calls.length, 5);
   } finally {
     await mf.dispose();
   }

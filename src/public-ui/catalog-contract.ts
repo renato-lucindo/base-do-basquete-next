@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { publicGameSchema } from "../publication/contract";
+import { publicDisputeSchema } from "../regulation/publication-contract";
 
 export const publicContextSchema = publicGameSchema.shape.context;
 export type PublicContext = z.infer<typeof publicContextSchema>;
@@ -22,6 +23,7 @@ export const catalogPageSchema = z
   .object({
     games: z.array(catalogGameSchema).max(100),
     next: z.uuid().nullable(),
+    disputes: z.array(publicDisputeSchema).max(1000).default([]),
   })
   .strict();
 export const searchPlayerSchema = z

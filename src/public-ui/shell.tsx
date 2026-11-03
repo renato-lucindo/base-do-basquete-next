@@ -76,7 +76,8 @@ function DisputeNavigation({
 }) {
   const catalog = usePublicCatalog(disputeId);
   const [selecting, setSelecting] = useState(false);
-  const c = context ?? catalog.games[0]?.context;
+  const c =
+    context ?? catalog.disputes[0]?.context ?? catalog.games[0]?.context;
   return (
     <div className="public-context wrap">
       <div className="public-context-line">
@@ -145,7 +146,11 @@ function QuickSelector() {
         </p>
       )}
       {!catalog.loading && !catalog.error && (
-        <CompetitionTree games={catalog.games} query={query} />
+        <CompetitionTree
+          games={catalog.games}
+          confirmed={catalog.disputes}
+          query={query}
+        />
       )}
       <a href="/publico.html">Todas as competições e busca pública</a>
     </div>

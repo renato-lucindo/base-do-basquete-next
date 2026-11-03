@@ -2,6 +2,7 @@ import { z } from "zod";
 import { providerJson, unavailable } from "../access/provider";
 import { publicGameSchema } from "../publication/contract";
 import { catalogGameSchema, searchPlayerSchema } from "./catalog-contract";
+import { SupabasePublicStandings } from "../regulation/public-provider";
 
 type Config = { url: string; key: string };
 type Send = (url: string, init: RequestInit) => Promise<Response>;
@@ -68,6 +69,14 @@ export class PublicCatalog {
         score: { home, away },
       })),
       next: raw.data.length === 100 ? previous : null,
+      ...(!after
+        ? {
+            disputes: await new SupabasePublicStandings(
+              this.config,
+              this.send,
+            ).disputes(disputeId),
+          }
+        : {}),
     };
   }
   async players(query: string) {

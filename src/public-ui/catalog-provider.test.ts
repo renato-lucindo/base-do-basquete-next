@@ -2,6 +2,7 @@ import { expect, it } from "vitest";
 import { PublicCatalog } from "./catalog-provider";
 import { publishedSheet } from "../../tests/fixtures/published-game";
 import { pubId } from "../../tests/fixtures/publication";
+import { publicRegulationFixture } from "../../tests/fixtures/public-regulation";
 const config = { url: "https://public.example", key: "fixture-publishable" };
 const r = publishedSheet();
 const row = {
@@ -12,6 +13,27 @@ const row = {
   home: 2,
   away: 0,
 };
+it("discovers an explicitly confirmed dispute even with no published result", async () => {
+  const s = publicRegulationFixture();
+  const dispute = {
+    disputeId: s.disputeId,
+    context: s.context,
+    registrations: s.registrations,
+  };
+  const provider = new PublicCatalog(config, async (url, init) => {
+    expect(new Headers(init.headers).has("Authorization")).toBe(false);
+    return Response.json(
+      new URL(url).pathname.endsWith("/rpc/list_public_disputes")
+        ? [dispute]
+        : [],
+    );
+  });
+  expect(await provider.page(null, null)).toEqual({
+    games: [],
+    next: null,
+    disputes: [dispute],
+  });
+});
 it("reads only the published projection with anonymous credentials and a stable cursor", async () => {
   const provider = new PublicCatalog(config, async (url, init) => {
     const u = new URL(url);

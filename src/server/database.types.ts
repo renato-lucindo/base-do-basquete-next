@@ -778,6 +778,16 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      preview_public_standings: {
+        Args: { p_dispute_id: string };
+        Returns: Json;
+      };
+      confirm_public_standings: { Args: { p_command: Json }; Returns: Json };
+      get_public_standings: { Args: { p_dispute_id: string }; Returns: Json };
+      list_public_disputes: {
+        Args: { p_dispute_id?: string | null };
+        Returns: Json;
+      };
       confirm_achievements: { Args: { p_command: Json }; Returns: Json };
       confirm_player_profile: { Args: { p_command: Json }; Returns: Json };
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };

@@ -385,3 +385,85 @@
     min-height: 28px;
   }
 }
+/* Confirmed standings: compact tables with scrolling confined to their region. */
+.public-standings-table {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid #dce3ec;
+  border-radius: 6px;
+}
+.public-standings-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.public-standings-table caption {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+}
+.public-standings-table th,
+.public-standings-table td {
+  padding: 9px 12px;
+  text-align: right;
+  border-top: 1px solid #dce3ec;
+  white-space: nowrap;
+}
+.public-standings-table th[scope="row"] {
+  text-align: left;
+  white-space: normal;
+  min-width: 140px;
+  overflow-wrap: anywhere;
+}
+.public-standings-table thead th:nth-child(2) {
+  text-align: left;
+}
+.public-phase-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.public-phase-navigation a {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #52647b;
+  border-radius: 4px;
+  background: white;
+  color: #143b68;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.public-home .public-phase-navigation a[aria-current="page"] {
+  color: white;
+  background: #143b68;
+}
+.public-phase-navigation a:hover {
+  text-decoration: underline;
+}
+.public-source,
+.public-table-legend {
+  font-size: 13px;
+  color: #46566a;
+}
+.public-series {
+  padding: 12px 0;
+  border-bottom: 1px solid #dce3ec;
+}
+.public-game-pending {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+}
+.public-game-pending span {
+  overflow-wrap: anywhere;
+}
+.public-standings h2,
+.public-standings h3 {
+  overflow-wrap: anywhere;
+}

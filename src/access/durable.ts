@@ -10,6 +10,11 @@ import {
 } from "../achievements/publication-contract";
 import { previewAchievementsSchema } from "../achievements/view-contract";
 import { SupabaseRegulations } from "../regulation/provider";
+import { SupabasePublicStandings } from "../regulation/public-provider";
+import {
+  confirmStandingsSchema,
+  type ConfirmStandings,
+} from "../regulation/publication-contract";
 import { SupabaseDecisions } from "../regulation/decision-provider";
 import {
   saveGameOccurrenceSchema,
@@ -115,6 +120,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly officiating: SupabaseOfficiating;
   private readonly publications: SupabasePublications;
   private readonly regulations: SupabaseRegulations;
+  private readonly publicStandings: SupabasePublicStandings;
   private readonly decisions: SupabaseDecisions;
   private readonly pdfSources: SupabasePdfSources;
   private readonly pdfOriginals: SupabasePdfOriginals;
@@ -147,6 +153,10 @@ export class SessionStore extends DurableObject<Env> {
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
     this.regulations = new SupabaseRegulations({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
+    this.publicStandings = new SupabasePublicStandings({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
     });
@@ -558,6 +568,23 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.regulations.getView(accessToken, disputeId, offset),
+      ),
+    );
+  }
+  previewStandingsPublication(disputeId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publicStandings.preview(accessToken, disputeId),
+      ),
+    );
+  }
+  confirmStandingsPublication(command: ConfirmStandings) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publicStandings.confirm(
+          accessToken,
+          confirmStandingsSchema.parse(command),
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
+import { usePublicStandings } from "../regulation/public-page";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { api, ApiFailure } from "../competition/api";
 import {
@@ -37,6 +38,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     } | null>(null),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
+    [sourceMissing, setSourceMissing] = useState(false),
     [retry, setRetry] = useState(0),
     [search, setSearch] = useState(
       route.kind === "list" ? route.query.search : "",
@@ -67,6 +69,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     const controller = new AbortController();
     setLoading(true);
     setError("");
+    setSourceMissing(false);
     void api(
       teamApiPath(route),
       teamPublicResponseSchema,
@@ -82,6 +85,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
       .catch((e: unknown) => {
         if (!controller.signal.aborted) {
           setResponse(null);
+          setSourceMissing(e instanceof ApiFailure && e.status === 404);
           setError(
             e instanceof ApiFailure
               ? e.message
@@ -131,6 +135,9 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
       });
   }
   const q = current.kind === "invalid" ? null : current.query;
+  const confirmed = usePublicStandings(
+    current.kind === "list" ? current.disputeId : null,
+  );
   const name =
     data?.kind === "confirmed-team-detail-v1"
       ? data.identity.name
@@ -168,6 +175,33 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
         className="access-main statistics-page team-public-page"
       >
         <h1>{name}</h1>
+        {current.kind === "list" && confirmed.data && (
+          <section aria-label="Equipes confirmadas">
+            <h2>Participantes confirmados</h2>
+            <ul className="public-results">
+              {confirmed.data.registrations
+                .filter((r) =>
+                  `${r.name} ${r.team.name}`
+                    .toLocaleLowerCase("pt-BR")
+                    .includes(search.toLocaleLowerCase("pt-BR")),
+                )
+                .map((r) => (
+                  <li key={r.id}>
+                    <strong>{r.name}</strong>
+                    <span> · {r.team.name}</span>
+                  </li>
+                ))}
+            </ul>
+            {confirmed.data.games.every(
+              (g) => g.state !== "played" && g.state !== "awarded",
+            ) && (
+              <p>
+                As equipes estão confirmadas. Ainda não há resultados computados
+                no regulamento publicado.
+              </p>
+            )}
+          </section>
+        )}
         {current.kind === "invalid" ? (
           <p role="alert">
             Abra a consulta a partir de uma disputa e de uma equipe
@@ -300,6 +334,13 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
             </form>
             {loading ? (
               <p role="status">Consultando resultados confirmados…</p>
+            ) : error &&
+              sourceMissing &&
+              confirmed.data &&
+              confirmed.data.games.every(
+                (g) => g.state !== "played" && g.state !== "awarded",
+              ) ? (
+              <p>Nenhum resultado estatístico publicado nesta disputa.</p>
             ) : error ? (
               <div
                 ref={alert}

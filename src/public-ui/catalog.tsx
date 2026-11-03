@@ -8,21 +8,24 @@ import {
   type CatalogGame,
 } from "./catalog-contract";
 import { publicDetailLink } from "./navigation";
+import type { PublicDispute } from "../regulation/publication-contract";
 
 export function usePublicCatalog(disputeId?: string | null) {
   const [state, setState] = useState<{
     key: string;
     games: CatalogGame[];
+    disputes: PublicDispute[];
     loading: boolean;
     error: string;
-  }>({ key: "", games: [], loading: true, error: "" });
+  }>({ key: "", games: [], disputes: [], loading: true, error: "" });
   const [retry, setRetry] = useState(0);
   const key = disputeId ?? "all";
   useEffect(() => {
     const c = new AbortController();
-    setState({ key, games: [], loading: true, error: "" });
+    setState({ key, games: [], disputes: [], loading: true, error: "" });
     void (async () => {
       const games: CatalogGame[] = [];
+      const disputes: PublicDispute[] = [];
       let after: string | null = null;
       do {
         const p = new URLSearchParams();
@@ -46,17 +49,21 @@ export function usePublicCatalog(disputeId?: string | null) {
         if (page.next && (page.next !== previous || !page.games.length))
           throw Error("Catálogo inconsistente. Tente novamente.");
         games.push(...page.games);
+        if (page.disputes.some((d) => disputeId && d.disputeId !== disputeId))
+          throw Error("Disputa inesperada.");
+        disputes.push(...page.disputes);
         if (games.length > 10000 || (games.length === 10000 && page.next))
           throw Error("O catálogo excede a capacidade desta consulta.");
         after = page.next;
       } while (after && !c.signal.aborted);
       if (!c.signal.aborted)
-        setState({ key, games, loading: false, error: "" });
+        setState({ key, games, disputes, loading: false, error: "" });
     })().catch(() => {
       if (!c.signal.aborted)
         setState({
           key,
           games: [],
+          disputes: [],
           loading: false,
           error:
             "Não foi possível carregar as competições publicadas. Tente novamente.",
@@ -65,12 +72,17 @@ export function usePublicCatalog(disputeId?: string | null) {
     return () => c.abort();
   }, [key, disputeId, retry]);
   return {
-    ...(state.key === key ? state : { games: [], loading: true, error: "" }),
+    ...(state.key === key
+      ? state
+      : { games: [], disputes: [], loading: true, error: "" }),
     retry: () => setRetry((n) => n + 1),
   };
 }
-export const publicDisputes = (games: CatalogGame[]) => [
-  ...new Map(games.map((g) => [g.disputeId, g])).values(),
+export const publicDisputes = (
+  games: CatalogGame[],
+  disputes: PublicDispute[] = [],
+) => [
+  ...new Map([...games, ...disputes].map((g) => [g.disputeId, g])).values(),
 ];
 const matches = (text: string, query: string) =>
   text
@@ -87,11 +99,13 @@ const matches = (text: string, query: string) =>
 export function CompetitionTree({
   games,
   query = "",
+  confirmed = [],
 }: {
   games: CatalogGame[];
   query?: string;
+  confirmed?: PublicDispute[];
 }) {
-  const disputes = publicDisputes(games).filter((g) =>
+  const disputes = publicDisputes(games, confirmed).filter((g) =>
     matches(contextLabel(g.context), query),
   );
   const competitions = [
@@ -187,9 +201,11 @@ export function CompetitionTree({
 export function PublicDiscovery({
   games,
   catalogAvailable = true,
+  confirmed = [],
 }: {
   games: CatalogGame[];
   catalogAvailable?: boolean;
+  confirmed?: PublicDispute[];
 }) {
   const initial = () =>
     new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("q") ??
@@ -243,14 +259,23 @@ export function PublicDiscovery({
   const teams = submitted
     ? [
         ...new Map(
-          games
-            .flatMap((g) =>
+          [
+            ...games.flatMap((g) =>
               (["home", "away"] as const).map((side) => ({
                 ...g.game[side],
                 disputeId: g.disputeId,
                 context: g.context,
               })),
-            )
+            ),
+            ...confirmed.flatMap((d) =>
+              d.registrations.map((r) => ({
+                ...r,
+                registrationId: r.id,
+                disputeId: d.disputeId,
+                context: d.context,
+              })),
+            ),
+          ]
             .filter((t) => matches(`${t.name} ${t.team.name}`, submitted))
             .map((t) => [`${t.disputeId}/${t.registrationId}`, t]),
         ).values(),
@@ -284,7 +309,13 @@ export function PublicDiscovery({
           <button type="submit">Buscar</button>
         </div>
       </form>
-      {catalogAvailable && <CompetitionTree games={games} query={submitted} />}
+      {catalogAvailable && (
+        <CompetitionTree
+          games={games}
+          confirmed={confirmed}
+          query={submitted}
+        />
+      )}
       {submitted && (
         <section aria-label="Resultados da busca">
           <h2>Equipes</h2>
@@ -296,7 +327,16 @@ export function PublicDiscovery({
                 <li key={`${t.disputeId}/${t.registrationId}`}>
                   <a
                     href={publicDetailLink(
-                      `/equipe.html#${t.team.id}?registrationId=${t.registrationId}`,
+                      games.some(
+                        (g) =>
+                          g.disputeId === t.disputeId &&
+                          [
+                            g.game.home.registrationId,
+                            g.game.away.registrationId,
+                          ].includes(t.registrationId),
+                      )
+                        ? `/equipe.html#${t.team.id}?registrationId=${t.registrationId}`
+                        : disputeLink(t.disputeId, "equipes"),
                       t.disputeId,
                     )}
                   >
