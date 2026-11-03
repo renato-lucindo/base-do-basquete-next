@@ -11,9 +11,11 @@ import { aggregateConfirmedStatistics } from "../statistics/aggregate";
 import { scopesForStageKind } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 const uuid = (v: string) => z.uuid().parse(v).toLowerCase();
 const identity = (row: TeamRow) => {
-  const { gamesPlayed, metrics, ...v } = row;
+  const { gamesPlayed, metrics, statistics, metricCoverage, ...v } = row;
   void gamesPlayed;
   void metrics;
+  void statistics;
+  void metricCoverage;
   return teamIdentitySchema.parse(v);
 };
 const distinct = <T extends string | null>(v: T[]) => [...new Set(v)].sort();

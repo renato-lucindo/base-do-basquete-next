@@ -8,6 +8,43 @@ import {
 import { buildPublicStandings } from "../src/regulation/public";
 
 const origin = "http://127.0.0.1:5174";
+test("aproveitamento de vitórias não se confunde com pontuação do campeonato", async ({
+  page,
+}, info) => {
+  await publicNavigationFixture(page);
+  const s = publicRegulationFixture();
+  s.definition.groupPhases[0].rules.points = { win: 5, loss: 2 };
+  const standings = buildPublicStandings(s);
+  expect(
+    standings.projection.groupPhases[0].groups[0].standings.rows.find(
+      (r) => r.wins === 1,
+    )?.leaguePoints,
+  ).toBe(5);
+  await page.route("**/api/public/standings/**", (route) =>
+    route.fulfill({ json: standings }),
+  );
+  await page.goto(`${origin}/publico.html#${s.disputeId}?secao=classificacao`);
+  const table = page.getByRole("table", {
+    name: "Classificação por resultados confirmados",
+  });
+  const winner = table.locator("tbody tr").filter({ hasText: "Lobos" });
+  await expect(winner.getByRole("cell").nth(4)).toHaveText("100%");
+  await expect(table.getByRole("columnheader")).toHaveText([
+    "Pos.",
+    "Equipe",
+    "J",
+    "V",
+    "D",
+    "Aprov.",
+    "PP",
+    "PC",
+    "SLD",
+  ]);
+  await page.screenshot({
+    path: `.preview-artifacts/standings-columns-after-${info.project.name}.png`,
+    fullPage: true,
+  });
+});
 test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda e equipes", async ({
   page,
 }, info) => {
@@ -59,6 +96,24 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     name: "Classificação por resultados confirmados",
   });
   await expect(table.getByRole("row")).toHaveCount(3);
+  await expect(table.getByRole("columnheader")).toHaveText([
+    "Pos.",
+    "Equipe",
+    "J",
+    "V",
+    "D",
+    "Aprov.",
+    "PP",
+    "PC",
+    "SLD",
+  ]);
+  await expect(
+    table.getByRole("row").nth(1).getByRole("cell").nth(4),
+  ).toHaveText("—");
+  await expect(table.getByRole("link").first()).toHaveAttribute(
+    "href",
+    /equipe\.html[^#]*#.*registrationId=/,
+  );
   for (const r of s.registrations)
     await expect(
       table

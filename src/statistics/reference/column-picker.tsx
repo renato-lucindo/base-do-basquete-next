@@ -6,10 +6,12 @@ export function ColumnPicker({
   options,
   value,
   onChange,
+  identityNote = "Atleta e posição ficam sempre visíveis.",
 }: {
   options: readonly { key: string; label: string; name: string }[];
   value: string[];
   onChange: (keys: string[]) => void;
+  identityNote?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [panelHeight, setPanelHeight] = useState(560);
@@ -97,9 +99,7 @@ export function ColumnPicker({
                 Nenhuma
               </button>
             </div>
-            <p className="column-picker-note">
-              Atleta e posição ficam sempre visíveis.
-            </p>
+            <p className="column-picker-note">{identityNote}</p>
             <div className="column-options">
               {columnOptions.map((option) => (
                 <label key={option.label}>

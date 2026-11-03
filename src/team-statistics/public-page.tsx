@@ -14,6 +14,13 @@ import {
 } from "./navigation";
 import type { TeamsQuery } from "./query-contract";
 import { parseTeamsQuery, serializeTeamsQuery } from "./query-contract";
+import {
+  TEAM_METRICS,
+  TEAM_METRIC_KEYS,
+  TEAM_COLUMN_PRESETS,
+  type TeamMetric,
+} from "./metrics";
+import { ColumnPicker } from "../statistics/reference/column-picker";
 import type { TeamDetailQuery } from "./detail-query";
 import {
   TeamGames,
@@ -290,6 +297,46 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                 {current.kind === "list" && (
                   <>
                     <label>
+                      Dados
+                      <select
+                        value={current.query.dataset}
+                        disabled={loading}
+                        onChange={(e) =>
+                          listChange({
+                            dataset: e.target.value as TeamsQuery["dataset"],
+                          })
+                        }
+                      >
+                        <option value="all">Todos os resultados</option>
+                        <option value="boxscore">
+                          Boxscores com estatísticas
+                        </option>
+                      </select>
+                    </label>
+                    <label>
+                      Colunas
+                      <select
+                        value={current.query.preset}
+                        disabled={loading}
+                        onChange={(e) => {
+                          const preset = e.target.value as TeamsQuery["preset"];
+                          listChange({
+                            preset,
+                            columns: [
+                              ...TEAM_COLUMN_PRESETS[
+                                preset === "custom" ? "essentials" : preset
+                              ],
+                            ],
+                          });
+                        }}
+                      >
+                        <option value="essentials">Essenciais</option>
+                        <option value="boxscore">Boxscore</option>
+                        <option value="all">Todas</option>
+                        <option value="custom">Personalizadas</option>
+                      </select>
+                    </label>
+                    <label>
                       Ordenar por
                       <select
                         disabled={loading}
@@ -301,10 +348,12 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                         }
                       >
                         <option value="name">Inscrição</option>
-                        <option value="games">Jogos</option>
                         <option value="pointsFor">Pontos a favor</option>
-                        <option value="pointsAgainst">Pontos contra</option>
-                        <option value="difference">Saldo</option>
+                        {TEAM_METRIC_KEYS.map((key) => (
+                          <option key={key} value={key}>
+                            {TEAM_METRICS[key].name}
+                          </option>
+                        ))}
                       </select>
                     </label>
                     <label>
@@ -327,9 +376,30 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                 )}
               </div>
               {current.kind === "list" && (
-                <button type="submit" disabled={loading}>
-                  Buscar
-                </button>
+                <>
+                  <button type="submit" disabled={loading}>
+                    Buscar
+                  </button>
+                  <div className="public-site statistics-public team-column-control">
+                    <ColumnPicker
+                      options={TEAM_METRIC_KEYS.map((key) => ({
+                        key,
+                        ...TEAM_METRICS[key],
+                      }))}
+                      value={current.query.columns}
+                      identityNote="A equipe inscrita fica sempre visível."
+                      onChange={(columns) =>
+                        listChange(
+                          {
+                            preset: "custom",
+                            columns: columns as TeamMetric[],
+                          },
+                          false,
+                        )
+                      }
+                    />
+                  </div>
+                </>
               )}
             </form>
             {loading ? (
@@ -361,29 +431,65 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
             ) : (
               data && (
                 <>
-                  <p className="team-provenance">
-                    Fonte confirmada v{data.version} ·{" "}
-                    {teamStamp(data.confirmedAt)}. Fases na fonte da disputa:{" "}
-                    {data.coverage.regularGames} regulares;{" "}
-                    {data.coverage.playoffGames} eliminatórias;{" "}
-                    {data.coverage.unknownGames} sem fase confirmada. Jogos sem
-                    fase só entram em Todos.
-                  </p>
+                  <details className="team-provenance">
+                    <summary>
+                      Fonte confirmada v{data.version} ·{" "}
+                      {teamStamp(data.confirmedAt)}
+                    </summary>
+                    <p>
+                      Fases na fonte da disputa: {data.coverage.regularGames}{" "}
+                      regulares; {data.coverage.playoffGames} eliminatórias;{" "}
+                      {data.coverage.unknownGames} sem fase confirmada. Jogos
+                      sem fase só entram em Todos.
+                    </p>
+                  </details>
                   {data.kind === "confirmed-teams-page-v1" ? (
                     <section>
                       <h2 ref={heading} tabIndex={-1}>
                         Equipes com resultados confirmados
                       </h2>
                       <p>
-                        Uma linha por inscrição. J conta partidas publicadas; PP
-                        e PC são pontos oficiais a favor e contra. Modo Total
-                        soma os placares; Por jogo divide pelas partidas. Esta
-                        consulta não é uma classificação.
+                        Uma linha por inscrição. PTS: total oficial · PPJ:
+                        pontos por jogo. Selecione um cabeçalho para ordenar.
                       </p>
                       <TeamsTable
                         data={data}
                         onPage={(page) => listChange({ page }, false)}
+                        onSort={(sort) =>
+                          listChange({
+                            sort,
+                            direction:
+                              sort === data.query.sort
+                                ? data.query.direction === "asc"
+                                  ? "desc"
+                                  : "asc"
+                                : sort === "name" ||
+                                    (sort !== "pointsFor" &&
+                                      TEAM_METRICS[sort].lowerIsBetter)
+                                  ? "asc"
+                                  : "desc",
+                          })
+                        }
                       />
+                      <details className="team-table-help">
+                        <summary>Siglas, fontes e cobertura</summary>
+                        <p>
+                          J conta partidas publicadas. PTS é o total oficial e
+                          PPJ sua média por jogo, como em Jogadores. Total/Por
+                          jogo alterna as demais contagens. Percentuais usam a
+                          soma de convertidos e tentados, sem média de
+                          percentuais.
+                        </p>
+                        <p>
+                          —: fonte coletiva ausente, cobertura incompleta ou
+                          percentual sem tentativas. REB/RO/RD, ER e EF dependem
+                          de eventos coletivos não atribuídos, ausentes nesta
+                          fonte; MIN, +/− e PP% não são somas coletivas.
+                          Estatísticas aditivas dos atletas só entram com
+                          cobertura integral. Esta consulta não é uma
+                          classificação.
+                        </p>
+                      </details>
                     </section>
                   ) : data.kind === "confirmed-team-selection-v1" ? (
                     <section>

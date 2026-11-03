@@ -2,6 +2,22 @@ import { useEffect, useState } from "react";
 import { api } from "../competition/api";
 import { publicStandingsSchema, type PublicStandings } from "./public-contract";
 import { publicDetailLink } from "../public-ui/navigation";
+import { teamDetailLink } from "../team-statistics/navigation";
+
+const standingsNumber = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 1,
+});
+const standingsColumns = [
+  ["Pos.", "Posição na classificação; empates permanecem explícitos"],
+  ["Equipe", "Equipe inscrita nesta disputa"],
+  ["J", "Jogos contabilizados"],
+  ["V", "Vitórias"],
+  ["D", "Derrotas"],
+  ["Aprov.", "Aproveitamento de vitórias: V / J × 100; indefinido sem jogos"],
+  ["PP", "Pontos pró"],
+  ["PC", "Pontos contra"],
+  ["SLD", "Saldo de pontos: PP − PC"],
+] as const;
 
 export function usePublicStandings(disputeId: string | null) {
   const [state, setState] = useState<{
@@ -132,19 +148,9 @@ export function PublicStandingsTables({ value }: { value: PublicStandings }) {
                     <caption>Classificação por resultados confirmados</caption>
                     <thead>
                       <tr>
-                        {[
-                          "Posição",
-                          "Equipe",
-                          "J",
-                          "V",
-                          "D",
-                          "Pontos",
-                          "PF",
-                          "PC",
-                          "Saldo",
-                        ].map((t) => (
-                          <th scope="col" key={t}>
-                            {t}
+                        {standingsColumns.map(([label, description]) => (
+                          <th scope="col" key={label} title={description}>
+                            <abbr title={description}>{label}</abbr>
                           </th>
                         ))}
                       </tr>
@@ -153,12 +159,7 @@ export function PublicStandingsTables({ value }: { value: PublicStandings }) {
                       {[...g.standings.rows]
                         .sort(
                           (a, b) =>
-                            (a.position ?? Infinity) -
-                              (b.position ?? Infinity) ||
-                            label(a.registrationId).localeCompare(
-                              label(b.registrationId),
-                              "pt-BR",
-                            ),
+                            (a.position ?? Infinity) - (b.position ?? Infinity),
                         )
                         .map((r) => (
                           <tr key={r.registrationId}>
@@ -166,11 +167,27 @@ export function PublicStandingsTables({ value }: { value: PublicStandings }) {
                               {r.position ?? "—"}
                               {r.tied && r.position !== null ? " (empate)" : ""}
                             </td>
-                            <th scope="row">{label(r.registrationId)}</th>
+                            <th scope="row">
+                              <a
+                                href={teamDetailLink(
+                                  value.disputeId,
+                                  value.registrations.find(
+                                    (v) => v.id === r.registrationId,
+                                  )!.team.id,
+                                  r.registrationId,
+                                )}
+                              >
+                                {label(r.registrationId)}
+                              </a>
+                            </th>
                             <td>{r.games}</td>
                             <td>{r.wins}</td>
                             <td>{r.losses}</td>
-                            <td>{r.leaguePoints}</td>
+                            <td>
+                              {r.games
+                                ? `${standingsNumber.format((100 * r.wins) / r.games)}%`
+                                : "—"}
+                            </td>
                             <td>{r.pointsFor ?? "—"}</td>
                             <td>{r.pointsAgainst ?? "—"}</td>
                             <td>{r.difference ?? "—"}</td>
@@ -180,8 +197,10 @@ export function PublicStandingsTables({ value }: { value: PublicStandings }) {
                   </table>
                 </div>
                 <p className="public-table-legend">
-                  J: jogos computados · V: vitórias · D: derrotas · PF/PC:
-                  pontos a favor/contra. —: posição ou valor indefinido.
+                  J: jogos computados · V: vitórias · D: derrotas · Aprov.: V/J
+                  × 100 · PP/PC: pontos pró/contra · SLD: PP − PC. —: posição ou
+                  valor indefinido. O aproveitamento não representa os pontos de
+                  classificação do regulamento.
                 </p>
                 {!!g.standings.tieSteps.length && (
                   <details>

@@ -3,6 +3,12 @@ import type { TeamsPage } from "./contract";
 import type { TeamDetailPage } from "./detail-contract";
 import type { StatisticsMetric } from "../statistics/metrics";
 import { teamDetailLink } from "./navigation";
+import { TEAM_METRICS, type TeamMetric } from "./metrics";
+import {
+  MetricCell,
+  referenceMetric,
+} from "../statistics/reference/scoresheet-statistics-table";
+import { ScrollableTable } from "../statistics/reference/scrollable-table";
 type Detail = Extract<TeamDetailPage, { kind: "confirmed-team-detail-v1" }>;
 export const teamNumber = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
@@ -51,9 +57,11 @@ export function TeamPager({
 export function TeamsTable({
   data: d,
   onPage,
+  onSort,
 }: {
   data: TeamsPage;
   onPage: (p: number) => void;
+  onSort: (key: TeamsPage["query"]["sort"]) => void;
 }) {
   if (!d.total)
     return (
@@ -63,72 +71,133 @@ export function TeamsTable({
     );
   return (
     <>
-      <div
-        className="statistics-scroll"
-        role="region"
-        aria-label="Tabela de equipes"
-        tabIndex={0}
-      >
-        <table>
-          <caption>Equipes com resultados confirmados</caption>
-          <thead>
-            <tr>
-              {[
-                "Inscrição",
-                "Equipe",
-                "J",
-                "PP",
-                "PC",
-                "Saldo",
-                "Fonte do nome",
-              ].map((t) => (
-                <th scope="col" key={t}>
-                  {t}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {d.rows.map((r) => (
-              <tr key={r.registrationId}>
-                <th scope="row">
-                  <a
-                    href={teamDetailLink(
-                      d.disputeId,
-                      r.teamId,
-                      r.registrationId,
-                      d.query,
-                    )}
+      <div className="public-site statistics-public">
+        <div className="reference-explorer team-statistics-explorer">
+          <ScrollableTable label="Tabela de equipes">
+            <table
+              className="statistics-table"
+              style={{ minWidth: `${240 + d.query.columns.length * 68}px` }}
+            >
+              <caption className="sr-only">
+                Equipes com resultados confirmados
+              </caption>
+              <colgroup>
+                <col style={{ width: 240 }} />
+                {d.query.columns.length > 0 && (
+                  <col span={d.query.columns.length} style={{ width: 68 }} />
+                )}
+              </colgroup>
+              <thead>
+                <tr>
+                  <th
+                    scope="col"
+                    aria-sort={
+                      d.query.sort === "name"
+                        ? d.query.direction === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
+                    }
                   >
-                    {r.name}
-                  </a>
-                  {r.names.length > 1 && (
-                    <small>Nomes na ocasião: {r.names.join(" / ")}</small>
-                  )}
-                </th>
-                <td>{r.teamName}</td>
-                <td>{r.gamesPlayed}</td>
-                <td>{teamNumber.format(r.metrics.pointsFor)}</td>
-                <td>{teamNumber.format(r.metrics.pointsAgainst)}</td>
-                <td>{teamNumber.format(r.metrics.difference)}</td>
-                <td>
-                  <details>
-                    <summary>Ver confirmação</summary>
-                    <a
-                      href={publicDetailLink(
-                        `/resultado.html#${r.origin.gameId}`,
-                        d.disputeId,
-                      )}
+                    <button
+                      className="statistics-sort"
+                      type="button"
+                      onClick={() => onSort("name")}
                     >
-                      Resultado v{r.origin.publicationVersion}
-                    </a>
-                    <p>{teamStamp(r.origin.publishedAt)}</p>
-                  </details>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      Equipe
+                    </button>
+                  </th>
+                  {d.query.columns.map((metric) => {
+                    const def =
+                      metric === "pointsAgainst" || metric === "difference"
+                        ? TEAM_METRICS[metric]
+                        : referenceMetric(metric);
+                    return (
+                      <th
+                        key={metric}
+                        scope="col"
+                        data-team-metric={metric}
+                        aria-sort={
+                          d.query.sort === metric
+                            ? d.query.direction === "asc"
+                              ? "ascending"
+                              : "descending"
+                            : "none"
+                        }
+                      >
+                        <button
+                          className="statistics-sort"
+                          type="button"
+                          title={def.name}
+                          aria-label={`Ordenar por ${def.label} (${def.name})`}
+                          onClick={() => onSort(metric)}
+                        >
+                          {def.label}
+                          {d.query.sort === metric && (
+                            <span aria-hidden="true">
+                              {d.query.direction === "asc" ? " ↑" : " ↓"}
+                            </span>
+                          )}
+                        </button>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {d.rows.map((r) => (
+                  <tr key={r.registrationId}>
+                    <th scope="row">
+                      <a
+                        href={teamDetailLink(
+                          d.disputeId,
+                          r.teamId,
+                          r.registrationId,
+                          d.query,
+                        )}
+                      >
+                        {r.name}
+                      </a>
+                      {r.names.length > 1 && (
+                        <small>Nomes na ocasião: {r.names.join(" / ")}</small>
+                      )}
+                      <small>{r.teamName}</small>
+                      <details>
+                        <summary>Fonte do nome</summary>
+                        <a
+                          href={publicDetailLink(
+                            `/resultado.html#${r.origin.gameId}`,
+                            d.disputeId,
+                          )}
+                        >
+                          Resultado v{r.origin.publicationVersion}
+                        </a>
+                        <p>{teamStamp(r.origin.publishedAt)}</p>
+                      </details>
+                    </th>
+                    {d.query.columns.map((metric: TeamMetric) => (
+                      <td
+                        key={metric}
+                        title={`${TEAM_METRICS[metric].name}. Cobertura: ${r.metricCoverage[metric]} de ${r.gamesPlayed} jogos publicados.`}
+                      >
+                        <MetricCell
+                          value={r.statistics[metric]}
+                          metric={
+                            metric === "pointsAgainst" ||
+                            metric === "difference"
+                              ? undefined
+                              : metric
+                          }
+                          mode={d.query.mode}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollableTable>
+        </div>
       </div>
       <TeamPager {...d} kind="inscrições" onChange={onPage} />
     </>

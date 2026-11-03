@@ -74,3 +74,79 @@
   min-width: 24px;
   min-height: 24px;
 }
+
+.access-main.team-public-page {
+  min-width: 0;
+  max-width: 1280px;
+  width: 100%;
+  margin-inline: auto;
+}
+.team-public-page .public-site.statistics-public {
+  min-height: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+.public-site.statistics-public
+  .team-statistics-explorer
+  .statistics-table
+  th:first-child {
+  min-width: 200px;
+  max-width: 240px;
+  white-space: normal;
+  text-align: left;
+  font-size: 0.875rem;
+}
+.public-site.statistics-public
+  .team-statistics-explorer
+  .statistics-table
+  th[scope="row"]
+  a {
+  display: block;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  min-height: 24px;
+}
+.public-site.statistics-public .team-statistics-explorer .statistics-table td {
+  min-width: 68px;
+  white-space: nowrap;
+}
+.team-statistics-explorer th[scope="row"] small {
+  display: block;
+  color: #526176;
+  font-weight: 400;
+}
+.team-statistics-explorer th[scope="row"] details {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+.public-site.statistics-public .team-statistics-explorer th[scope="row"] > a {
+  color: #075fca;
+  text-decoration: underline;
+}
+.team-public-page .statistics-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  padding: 12px;
+}
+.team-public-page .statistics-fields {
+  flex-basis: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.team-public-page .statistics-controls > button {
+  width: auto;
+  min-width: 96px;
+}
+.team-public-page .team-table-help {
+  margin-block: 12px;
+  color: #42526b;
+  max-width: 100%;
+}
+@media (max-width: 800px) {
+  .team-public-page .statistics-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
