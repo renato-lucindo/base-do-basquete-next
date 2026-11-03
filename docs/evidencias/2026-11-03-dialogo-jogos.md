@@ -18,11 +18,13 @@ Sem aplicação remota, DML humano, deploy ou merge. A migration anterior de est
 
 ## Validação
 
-Windows, Node 24.18.0, Chromium headless, fixtures sintéticas, código `7e5b1fc`.
+Windows, Node 24.18.0, Chromium headless, fixtures sintéticas, código inicial `7e5b1fc`, correção do teste histórico `f798dee` e ajuste final de teclado `ef11da0af12c3626d68f1378e55d71c0ba4a774c`.
 
 - Banco: **2 PASS**, instalação nova e atualização, compatibilidade, idempotência, limites, etapas inválidas, isolamento por disputa e permissões.
 - Playwright final, nove arquivos de jogos/arbitragem/locais/PDFs/retornos/admin/súmula legada, dois workers: **99 PASS / 31 SKIP** dos recortes existentes. Inclui 1366×768, 1920×1080, 390/320 px, zoom equivalente em 683×384, axe, foco, erros e recuperação sem duplicação.
-- Gate com `VITEST_MAX_WORKERS=2`: lint/formato/tipos, **684 unitários/140 arquivos** e **6 transportes PASS**. Parou na expectativa antiga de upgrade: o teste foi atualizado para exigir os novos defaults e comparar todos os demais campos históricos; correção `f798dee31ff4ca015eda749b18550d459b106dc5`, **13/13 testes de banco PASS**. Builds, Workerd/runtime/fronteiras/segredos e CI final ainda pendentes. Logs locais ignorados `game-editor-gate.log` e `game-editor-db-final.log` em `.preview-artifacts/`. Pausa por cota no limiar de 15%, com retomada conferida às 17:24:51 de 03/11/2026, America/Sao_Paulo.
+- Etapas do gate aprovadas por composição após a correção histórica: lint/formato/tipos, **684 unitários/140 arquivos**, **6 transportes**, **13/13 testes de banco**, builds, **28 Workerd**, **1 runtime PDF**, fronteiras e segredos. A primeira execução parou na expectativa de upgrade; o teste passou a exigir os novos defaults e preservar a comparação de todos os campos anteriores. Não foi declarada aprovação daquela execução interrompida.
+- Refinamento de teclado: a opção ativa da lista acompanha a rolagem, sem sair da área visível. **24 browsers focais PASS**, incluindo os dois tamanhos de projeto, tipos/lint/build conferidos novamente. Provas de componentes inalterados reutilizadas; CI executará o gate integral no HEAD enviado. Logs ignorados em `.preview-artifacts/game-editor-*`.
+- Pausa pelo limiar de cota de 15% seguida de retomada manual autorizada após reset do responsável; nenhuma compra de crédito ou reset pelo agente. Agendamento desta conversa será pausado ao concluir.
 - Falhas exploratórias de expectativas antigas, alinhamento, legenda oculta e ícone de limpar foram corrigidas. Uma rodada posterior sofreu `ENOSPC` no C:; regressão final passou usando TEMP/TMP e resultados em `Y:/Codex-Temp/pr49-jogos-20261103`. Nenhum arquivo alheio foi removido.
 - Revisão local com `ui-ux-pro-max` e fonte atual de `web-design-guidelines`, sem alegação de revisão independente, piloto remoto ou conformidade WCAG integral.
 
