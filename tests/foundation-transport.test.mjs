@@ -70,6 +70,7 @@ test("foundation upload refuses an unexpected target or expanded/missing Access 
         success: true,
         result: {
           domain: "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+          destinations: [{ type: "public", uri: "basedobasquete.com.br" }],
           policies: [{ decision: "allow", include: [{ everyone: {} }] }],
         },
       };
