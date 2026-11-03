@@ -19,3 +19,7 @@ O responsável autorizou na conversa de liberação do domínio concluir valida�
 - Esta conversa não executou merge da PR, DDL remoto ou deploy. As operações da unidade de liberação e seus limites estão na evidência própria acima. A automação `concluir-di-logo-de-jogos-na-pr-49` será pausada ao concluir; a anterior `retomar-navega-o-p-blica-pr-49` permanece pausada.
 
 Próximo passo: publicar correções/checkpoint na mesma PR #49, conferir CI do novo SHA e thread resolvido; merge commit autorizado. Depois atualizar e concluir #50 sobre main, validar composição e publicar o domínio. CI obrigatória dos SHAs integrados; login humano/aceite visual não presumidos. Nenhuma retomada automática criada nesta liberação.
+
+## Revisão final após CI aprovada
+
+CI de 895dd82 aprovada: gate/design e 551 browsers PASS / 109 SKIP. Merge bloqueado por três novos threads, sem bypass. Corrigidos parâmetros reais da API de equipes, unidade de pontos consistente no dataset misto e links de perfis sem resultados. 12 unitários, 1 HTTP Workerd e 32 browsers focais PASS, builds/lint/tipos PASS. CI do novo SHA deve ser conferida antes da integração; provas e limites na evidência da liberação. Nenhum deploy de código adicional nem nova operação de banco.

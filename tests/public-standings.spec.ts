@@ -110,10 +110,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await expect(
     table.getByRole("row").nth(1).getByRole("cell").nth(4),
   ).toHaveText("—");
-  await expect(table.getByRole("link").first()).toHaveAttribute(
-    "href",
-    /equipe\.html[^#]*#.*registrationId=/,
-  );
+  await expect(table.getByRole("link")).toHaveCount(0);
   for (const r of s.registrations)
     await expect(
       table

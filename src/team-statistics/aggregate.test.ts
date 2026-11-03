@@ -92,6 +92,46 @@ it("fase usa só atribuições públicas; duas inscrições da mesma equipe não
   expect(all.rows[1].statistics.freeThrowPercentage.value).toBeNull();
   expect(all.rows[0].teamId).toBe(all.rows[1].teamId);
 });
+it("mixed-source table uses total points consistently for every registration in per-game mode", async () => {
+  const s = teamStatisticsFixture();
+  const pdf = await confirmedPdfFixture();
+  for (const [side, registrationId] of [
+    ["home", pubId(35001)],
+    ["away", pubId(35002)],
+  ] as const) {
+    pdf.game[side].registrationId = registrationId;
+    for (const player of pdf.facts.players.filter((p) => p.side === side))
+      player.registrationId = registrationId;
+  }
+  s.games.push({ snapshot: pdf, phase: "knockout" });
+  const page = buildTeamsPage(
+    s,
+    query("mode=per-game&sort=points&direction=desc"),
+  );
+  expect(page.scoresheet).toBe(false);
+  expect(page.rows).toHaveLength(4);
+  for (const row of page.rows) {
+    const total = s.games.reduce(
+      (sum, { snapshot }) =>
+        sum +
+        (["home", "away"] as const).reduce(
+          (n, side) =>
+            n +
+            (snapshot.game[side].registrationId === row.registrationId
+              ? snapshot.facts.teams[side].points
+              : 0),
+          0,
+        ),
+      0,
+    );
+    expect(row.statistics.points.value).toBe(total);
+  }
+  expect(
+    page.rows.find((r) => r.registrationId === pubId(5))!.statistics.points
+      .value,
+  ).toBe(4);
+});
+
 it("boxscore preserva percentuais ponderados, aditivos completos e seleção própria", async () => {
   const s = teamStatisticsFixture(),
     g = await confirmedPdfFixture();

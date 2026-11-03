@@ -48,6 +48,10 @@ export function teamRows(
   q: Pick<TeamsQuery, "mode" | "scope"> & { dataset?: TeamsQuery["dataset"] },
 ): TeamRow[] {
   const { source } = checked;
+  const sheetOnly =
+    q.dataset !== "boxscore" &&
+    source.games.length > 0 &&
+    source.games.every((g) => g.snapshot.source.kind === "sheet");
   const groups = new Map<string, TeamAppearance[]>();
   for (const { snapshot, phase } of source.games) {
     if (!scopesForStageKind(phase).includes(q.scope)) continue;
@@ -97,7 +101,7 @@ export function teamRows(
       teamNames: distinct(g.map((a) => a.snapshot.game[a.side].team.name)),
       gamesPlayed: g.length,
       rank: null,
-      ...aggregateTeamStatistics(g, q.mode),
+      ...aggregateTeamStatistics(g, q.mode, sheetOnly),
       origin: {
         gameId: latest.snapshot.id,
         publicationVersion: latest.snapshot.version,

@@ -35,3 +35,13 @@ Advisor antes/depois sem achado novo: quatro tabelas privadas com RLS sem policy
 Revisão em worktree detached próprio `C:/Users/12405304716/.codex/worktrees/pr49-liberacao-20261103`, base no HEAD observado da mesma PR. Worktree original da branch, checkout humano e serviços de preview preservados. Temporários em `Y:/Codex-Temp/pr49-liberacao-20261103`; dependências do lockfile existente reutilizadas por junction. Nenhum deploy de código ainda.
 
 Enviar atualização à mesma branch da PR #49 sem force push; resolver o thread após prova da correção, conferir CI/revisão e integrar com merge commit. Depois atualizar #50 por merge explícito de main, preservar `/admin`, conferir raiz pública, CI e implantação autorizada. Registrar SHAs finais, CI integrada e versão publicada no checkpoint da liberação do domínio.
+
+## Revisão automática posterior à CI de 895dd82
+
+A CI 41687862935 aprovou gate/design e 551 browsers (109 SKIP), mas o merge foi bloqueado pela política de conversas obrigatórias: três novos apontamentos ainda estavam abertos. Não foi usado bypass administrativo.
+
+- Rota pública de equipes passa a aceitar dataset/preset/columns, que já eram emitidos pelo serializer. Prova HTTP Workerd com esses parâmetros retorna 200 e conserva colunas; duplicação de dataset continua 400.
+- Agregação passa a receber a política de unidade do dataset inteiro, igual à apresentação da tabela. No conjunto misto, PTS permanece total em todas as linhas, inclusive equipes que só participaram de jogos de súmula. Teste com quatro inscrições e fontes distintas valida o total calculado a partir dos fatos.
+- Classificação cria links de perfil somente para inscrições com jogos no catálogo de resultados publicados. Participantes sem resultados conservam nome e classificação sem link indisponível. A prova de zero jogos foi atualizada para exigir ausência de links e preservar nomes/agenda.
+
+Validação posterior: 12 unitários de estatísticas PASS, 1 HTTP Workerd PASS, 32 browsers de navegação/classificação/colunas PASS, builds e lint/tipos PASS. Falha exploratória no teste misto: valor esperado inicial 5 não correspondia à fixture sem o lance livre adicional; corrigido para o total real 4, mantendo a comparação de todas as linhas com os fatos de origem. CI do novo SHA é obrigatória; resultado de 895dd82 não é atribuído ao código novo.

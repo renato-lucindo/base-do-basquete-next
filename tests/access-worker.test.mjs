@@ -276,6 +276,24 @@ test("public team list/detail use confirmed source and require explicit registra
     const p = await r.json();
     assert.equal(p.rows.length, 2);
     assert.equal(p.rows[0].gamesPlayed, 3);
+    const configured = await f.mf.dispatchFetch(
+      origin +
+        path +
+        "?mode=per-game&scope=all&dataset=all&preset=custom&columns=games,points",
+    );
+    assert.equal(configured.status, 200);
+    assert.deepEqual((await configured.json()).query.columns, [
+      "games",
+      "points",
+    ]);
+    assert.equal(
+      (
+        await f.mf.dispatchFetch(
+          origin + path + "?dataset=all&dataset=boxscore",
+        )
+      ).status,
+      400,
+    );
     assert.equal("games" in p, false);
     const selection = await f.mf.dispatchFetch(
       origin + path + `/${team.team.id}`,

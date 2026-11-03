@@ -96,11 +96,9 @@ function observe({ snapshot: g, side }: TeamAppearance): Observation {
 export function aggregateTeamStatistics(
   appearances: TeamAppearance[],
   mode: "total" | "per-game",
+  sheetOnly: boolean,
 ) {
   const observations = appearances.map(observe);
-  const sheetOnly = appearances.every(
-    (a) => a.snapshot.source.kind === "sheet",
-  );
   const metricCoverage = Object.fromEntries(
     TEAM_METRIC_KEYS.map((key) => [
       key,

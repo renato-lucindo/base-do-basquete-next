@@ -93,7 +93,18 @@ function PublicHome() {
               route.section === "jogos" ? (
                 <PublicSchedule value={standings.data} />
               ) : (
-                <PublicStandingsTables key={route.id} value={standings.data} />
+                <PublicStandingsTables
+                  key={route.id}
+                  value={standings.data}
+                  publishedRegistrationIds={
+                    new Set(
+                      catalog.games.flatMap((g) => [
+                        g.game.home.registrationId,
+                        g.game.away.registrationId,
+                      ]),
+                    )
+                  }
+                />
               )
             ) : (
               !standings.loading && (

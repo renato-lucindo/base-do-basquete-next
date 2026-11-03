@@ -63,7 +63,13 @@ export function usePublicStandings(disputeId: string | null) {
   };
 }
 
-export function PublicStandingsTables({ value }: { value: PublicStandings }) {
+export function PublicStandingsTables({
+  value,
+  publishedRegistrationIds,
+}: {
+  value: PublicStandings;
+  publishedRegistrationIds?: ReadonlySet<string>;
+}) {
   const selected = new URLSearchParams(
     window.location.hash.split("?")[1] ?? "",
   ).get("fase");
@@ -168,17 +174,23 @@ export function PublicStandingsTables({ value }: { value: PublicStandings }) {
                               {r.tied && r.position !== null ? " (empate)" : ""}
                             </td>
                             <th scope="row">
-                              <a
-                                href={teamDetailLink(
-                                  value.disputeId,
-                                  value.registrations.find(
-                                    (v) => v.id === r.registrationId,
-                                  )!.team.id,
-                                  r.registrationId,
-                                )}
-                              >
-                                {label(r.registrationId)}
-                              </a>
+                              {publishedRegistrationIds?.has(
+                                r.registrationId,
+                              ) ? (
+                                <a
+                                  href={teamDetailLink(
+                                    value.disputeId,
+                                    value.registrations.find(
+                                      (v) => v.id === r.registrationId,
+                                    )!.team.id,
+                                    r.registrationId,
+                                  )}
+                                >
+                                  {label(r.registrationId)}
+                                </a>
+                              ) : (
+                                label(r.registrationId)
+                              )}
                             </th>
                             <td>{r.games}</td>
                             <td>{r.wins}</td>
