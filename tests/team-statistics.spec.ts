@@ -32,9 +32,9 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   await expect(
     lobos.getByRole("cell", { name: "4", exact: true }),
   ).toBeVisible();
-  await expect(
-    lobos.getByRole("cell", { name: "-2", exact: true }),
-  ).toBeVisible();
+  await expect(table.locator('[data-team-metric="foulsReceived"]')).toHaveCount(
+    1,
+  );
   await expect(page.getByLabel("Senha", { exact: true })).toHaveCount(0);
   expect(f.state.sessionReads).toBe(0);
 });

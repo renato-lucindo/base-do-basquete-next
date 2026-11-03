@@ -39,19 +39,20 @@ function observe({ snapshot: g, side }: TeamAppearance): Observation {
       (n, p) => n + ("fouls" in p ? p.fouls : 0),
       0,
     );
-    result.technicalFouls = rows.reduce(
-      (n, p) => n + ("technical" in p ? p.technical : 0),
-      0,
-    );
+    const collective = team.teamStatistics;
+    if (collective) {
+      result.technicalFouls = collective.technicalFouls;
+      if (collective.disqualifications !== null)
+        result.disqualifications = collective.disqualifications;
+      if (collective.foulsReceived !== null)
+        result.foulsReceived = collective.foulsReceived;
+    }
     result.unsportsmanlikeFouls = rows.reduce(
       (n, p) => n + ("unsportsmanlike" in p ? p.unsportsmanlike : 0),
       0,
     );
     result.fiveFouls = rows.filter(
       (p) => "status" in p && p.status === "excluded",
-    ).length;
-    result.disqualifications = rows.filter(
-      (p) => "status" in p && (p.status === "GD" || p.status === "D"),
     ).length;
   } else {
     // The public PDF contract contains the entire related roster and enforces
@@ -97,6 +98,9 @@ export function aggregateTeamStatistics(
   mode: "total" | "per-game",
 ) {
   const observations = appearances.map(observe);
+  const sheetOnly = appearances.every(
+    (a) => a.snapshot.source.kind === "sheet",
+  );
   const metricCoverage = Object.fromEntries(
     TEAM_METRIC_KEYS.map((key) => [
       key,
@@ -131,9 +135,9 @@ export function aggregateTeamStatistics(
       const total = observations.reduce((n, o) => n + o[key]!, 0);
       const scale =
         key === "games" ||
-        key === "points" ||
+        (!sheetOnly && key === "points") ||
         key === "fiveFouls" ||
-        key === "disqualifications"
+        (!sheetOnly && key === "disqualifications")
           ? 1
           : key === "pointsPerGame" || mode === "per-game"
             ? observations.length

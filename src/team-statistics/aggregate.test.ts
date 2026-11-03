@@ -39,7 +39,10 @@ it("LL% de súmula soma convertidos e tentados, e conserva o valor em total/méd
       value: 10,
     });
     expect(r.metricCoverage.freeThrowPercentage).toBe(3);
-    expect(r.statistics.points).toEqual({ status: "available", value: 5 });
+    expect(r.statistics.points).toEqual({
+      status: "available",
+      value: mode === "total" ? 5 : 5 / 3,
+    });
     expect(r.statistics.pointsPerGame.value).toBe(5 / 3);
     expect(r.statistics.twoMade.value).toBe(mode === "total" ? 2 : 2 / 3);
   }

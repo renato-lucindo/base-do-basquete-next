@@ -32,6 +32,10 @@ type Rpc =
   | "publish_sheet_game"
   | "publish_pdf_game";
 const messages = {
+  team_disqualifications_below_known:
+    "O total de desqualificações da equipe é menor que as ocorrências identificadas na súmula.",
+  invalid_team_statistics:
+    "Confira os totais coletivos; deixe em branco os valores desconhecidos.",
   idempotency_conflict:
     "Este envio já foi usado com outros dados. Recarregue para continuar.",
   version_conflict:

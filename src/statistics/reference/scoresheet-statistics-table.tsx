@@ -2,7 +2,7 @@ import { publicDetailLink } from "../../public-ui/navigation";
 // Adaptado do ScoresheetStatisticsTable aprovado: mantém estrutura e estilos;
 // valores, cobertura e posições são fornecidos pela projeção pública.
 import { ScrollableTable } from "./scrollable-table";
-import { useNameTooltip } from "./tooltip";
+import { StatisticsSortHeader } from "./sort-header";
 import { STATISTICS_METRICS, type StatisticsMetric } from "../metrics";
 import type { StatisticsPage } from "../page-contract";
 import type { StatisticsQuery } from "../query-contract";
@@ -20,10 +20,12 @@ export function MetricCell({
   value,
   metric,
   mode,
+  forceDecimal = false,
 }: {
   value: Row["metrics"][StatisticsMetric];
   metric?: StatisticsMetric;
   mode?: StatisticsPage["mode"];
+  forceDecimal?: boolean;
 }) {
   if (value.status !== "available")
     return (
@@ -41,7 +43,8 @@ export function MetricCell({
     );
   return (
     <>
-      {(metric === "pointsShare" ||
+      {(forceDecimal ||
+      metric === "pointsShare" ||
       metric === "pointsPerGame" ||
       (mode === "per-game" &&
         metric &&
@@ -69,42 +72,14 @@ function SortHeader({
   data: StatisticsPage;
   onSort: (key: StatisticsMetric) => void;
 }) {
-  const definition = referenceMetric(metric),
-    active = data.sort === metric;
-  const tooltip = useNameTooltip(definition.name);
   return (
-    <th
-      scope="col"
-      data-public-metric={metric}
-      aria-label={definition.name}
-      aria-sort={
-        active
-          ? data.direction === "asc"
-            ? "ascending"
-            : "descending"
-          : "none"
-      }
-      className={active ? "reference-sorted active-column" : undefined}
-    >
-      <button
-        {...tooltip}
-        type="button"
-        className="statistics-sort sort"
-        aria-label={`Ordenar por ${definition.label} (${definition.name})`}
-        aria-pressed={active}
-        onClick={(event) => {
-          onSort(metric);
-          tooltip.onClick(event);
-        }}
-      >
-        <span>{definition.label}</span>
-        {active && (
-          <span className="sort-arrow" aria-hidden="true">
-            {data.direction === "asc" ? "↑" : "↓"}
-          </span>
-        )}
-      </button>
-    </th>
+    <StatisticsSortHeader
+      definition={referenceMetric(metric)}
+      active={data.sort === metric}
+      direction={data.direction}
+      onSort={() => onSort(metric)}
+      metricKey={metric}
+    />
   );
 }
 export function ScoresheetStatisticsTable({

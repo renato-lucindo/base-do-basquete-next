@@ -1,6 +1,10 @@
 import { publicationSheet, pubId } from "./publication";
 import { deriveManualFacts } from "../../src/publication/manual";
-import { publicGameSchema } from "../../src/publication/contract";
+import {
+  publicGameSchema,
+  type SheetTeamReview,
+} from "../../src/publication/contract";
+import type { PersistedSheet } from "../../src/games/sheet-contract";
 import { publicPdfGameSchema } from "../../src/publication/pdf-contract";
 import { pdfPublicationFixture } from "./pdf-publication";
 import { preparePdfFacts } from "../../src/publication/pdf-authority";
@@ -40,8 +44,11 @@ export function publishedGameShell() {
     },
   };
 }
-export function confirmedManualFixture(withBench = false) {
-  const doc = publicationSheet();
+export function confirmedManualFixture(
+  withBench = false,
+  doc: PersistedSheet = publicationSheet(),
+  review?: SheetTeamReview,
+) {
   if (withBench)
     doc.participants.push({
       rosterEntryId: pubId(7),
@@ -50,7 +57,7 @@ export function confirmedManualFixture(withBench = false) {
       played: false,
       starter: false,
     });
-  const f = deriveManualFacts(doc),
+  const f = deriveManualFacts(doc, review),
     { base, person } = publishedGameShell();
   const players = f.players.map(({ rosterEntryId, ...r }) => ({
     ...r,
@@ -62,7 +69,16 @@ export function confirmedManualFixture(withBench = false) {
       const cap = players.find((p) => p.side === side && p.captain)!.person;
       return [
         side,
-        { captain: cap, coach: cap, assistant: null, captainIsCoach: true },
+        {
+          captain: cap,
+          coach: doc.staff[side].coachStaffEntryId
+            ? person(doc.staff[side].coachStaffEntryId)
+            : cap,
+          assistant: doc.staff[side].assistantStaffEntryId
+            ? person(doc.staff[side].assistantStaffEntryId)
+            : null,
+          captainIsCoach: !doc.staff[side].coachStaffEntryId,
+        },
       ];
     }),
   );

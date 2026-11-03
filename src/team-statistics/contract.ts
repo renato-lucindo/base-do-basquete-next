@@ -26,6 +26,7 @@ export const teamIdentitySchema = z
 export const teamRowSchema = teamIdentitySchema
   .safeExtend({
     gamesPlayed: count.min(1).max(10000),
+    rank: count.min(1).nullable().default(null),
     statistics: z.record(teamMetricSchema, metricCellSchema),
     metricCoverage: z.record(teamMetricSchema, count),
     metrics: z
@@ -61,6 +62,7 @@ export const teamsPageSchema = z
     confirmedAt: z.iso.datetime({ offset: true }),
     context: publicGameSchema.shape.context.nullable(),
     query: teamsQuerySchema,
+    scoresheet: z.boolean().default(false),
     coverage: z
       .object({ regularGames: count, playoffGames: count, unknownGames: count })
       .strict(),

@@ -11,6 +11,7 @@ import {
 } from "../games/sheet-contract";
 import { prepareManualPublication } from "./manual";
 import type { PublishSheet } from "./contract";
+import { deriveSheetTeamStatistics } from "./sheet-team-statistics";
 import {
   publicationStateSchema,
   publicationSheetResultSchema,
@@ -33,6 +34,12 @@ type Props = {
   onPublished: (r: Ack, explicitReload: boolean) => Promise<void>;
 };
 export function SheetPublicationPanel(p: Props) {
+  const emptyReview = () => ({
+    home: { disqualifications: "", foulsReceived: "" },
+    away: { disqualifications: "", foulsReceived: "" },
+  });
+  const [teamReview, setTeamReview] = useState(emptyReview);
+  const reviewDocument = useRef("");
   const [state, setState] = useState<PublicationState | null>(null),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -45,6 +52,7 @@ export function SheetPublicationPanel(p: Props) {
     epoch = useRef(0);
   const blocked = busy || uncertain || ack !== null;
   const totals = aggregate(toEngineSheet(p.document));
+  const collective = deriveSheetTeamStatistics(p.document);
   useEffect(() => {
     p.onLock(blocked);
   }, [blocked, p.onLock]);
@@ -108,6 +116,8 @@ export function SheetPublicationPanel(p: Props) {
         );
       setState(s);
       setFallback(false);
+      reviewDocument.current = JSON.stringify(p.document);
+      setTeamReview(emptyReview());
     } catch (e) {
       if (n === epoch.current) {
         if (e instanceof ApiFailure && e.status === 409) p.onConflict();
@@ -127,6 +137,15 @@ export function SheetPublicationPanel(p: Props) {
   async function publish() {
     if (p.disabled || busy || !state || ack) return;
     setError("");
+    if (
+      !pending.current &&
+      reviewDocument.current !== JSON.stringify(p.document)
+    ) {
+      setError(
+        "A súmula mudou. Recarregue a revisão antes de publicar os totais coletivos.",
+      );
+      return;
+    }
     let command = pending.current;
     if (!command) {
       try {
@@ -140,6 +159,17 @@ export function SheetPublicationPanel(p: Props) {
               kind: "sheet",
               baseSheetVersion: p.sourceVersion,
               document: structuredClone(p.document),
+              teamReview: Object.fromEntries(
+                (["home", "away"] as const).map((side) => [
+                  side,
+                  Object.fromEntries(
+                    Object.entries(teamReview[side]).map(([key, value]) => [
+                      key,
+                      value.trim() === "" ? null : Number(value),
+                    ]),
+                  ),
+                ]),
+              ) as NonNullable<PublishSheet["source"]["teamReview"]>,
             },
             reason: p.reason,
             fallback,
@@ -147,9 +177,11 @@ export function SheetPublicationPanel(p: Props) {
           undefined,
           state.requiresFallback,
         ).command;
-      } catch {
+      } catch (e) {
         setError(
-          "Confira o fechamento, a decisão de fonte e o motivo da publicação.",
+          e instanceof Error && e.message.includes("desqualificações")
+            ? e.message
+            : "Confira o fechamento, os totais coletivos, a decisão de fonte e o motivo da publicação.",
         );
         return;
       }
@@ -209,6 +241,7 @@ export function SheetPublicationPanel(p: Props) {
       !!state && (p.confirmed || state.version > 0 || state.requiresFallback),
     ready =
       !!state &&
+      reviewDocument.current === JSON.stringify(p.document) &&
       (!state.requiresFallback || fallback) &&
       (!needsReason || p.reason.trim().length >= 10);
   return (
@@ -253,6 +286,56 @@ export function SheetPublicationPanel(p: Props) {
               Usar súmula manual em vez do PDF
             </label>
           )}
+          <fieldset disabled={blocked || p.disabled}>
+            <legend>Estatísticas coletivas a publicar</legend>
+            <p>
+              Confira a súmula completa. Informe o total de GD de toda a equipe,
+              incluindo jogadores, técnico, assistente e banco, sem contar a
+              mesma pessoa duas vezes. FR exige contagem própria da fonte. Em
+              branco significa desconhecido; zero deve ser confirmado
+              explicitamente.
+            </p>
+            {(["home", "away"] as const).map((side) => (
+              <div key={side}>
+                <h5>{p.game[side].name}</h5>
+                <p>
+                  T: {collective[side].technicalFouls}. GD identificadas:{" "}
+                  {collective[side].minimumDisqualifications}. B2 não conta
+                  outra técnica nem informa o total de pessoas desqualificadas.
+                </p>
+                {(["disqualifications", "foulsReceived"] as const).map(
+                  (metric) => (
+                    <label key={metric}>
+                      {metric === "disqualifications"
+                        ? "GD — total da equipe"
+                        : "FR — faltas recebidas"}{" "}
+                      · {p.game[side].name}
+                      <input
+                        name={`${side}-${metric}`}
+                        autoComplete="off"
+                        inputMode="numeric"
+                        type="number"
+                        min={
+                          metric === "disqualifications"
+                            ? collective[side].minimumDisqualifications
+                            : 0
+                        }
+                        max={2147483647}
+                        step={1}
+                        value={teamReview[side][metric]}
+                        onChange={(e) =>
+                          setTeamReview((v) => ({
+                            ...v,
+                            [side]: { ...v[side], [metric]: e.target.value },
+                          }))
+                        }
+                      />
+                    </label>
+                  ),
+                )}
+              </div>
+            ))}
+          </fieldset>
           {!p.confirmed && needsReason && (
             <label>
               Motivo da publicação

@@ -89,7 +89,10 @@
 .public-site.statistics-public
   .team-statistics-explorer
   .statistics-table
-  th:first-child {
+  th[scope="row"],
+.public-site.statistics-public
+  .team-statistics-explorer
+  th[data-team-metric="name"] {
   min-width: 200px;
   max-width: 240px;
   white-space: normal;
@@ -149,4 +152,9 @@
   .team-public-page .statistics-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.public-site.statistics-public .team-statistics-explorer .rank {
+  min-width: 56px;
+  text-align: center;
 }

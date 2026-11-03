@@ -7,6 +7,8 @@ import { perGame } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-202610
 import { teamsQuerySchema, type TeamsQuery } from "./query-contract";
 import { teamsPageSchema, type TeamsPage, type TeamRow } from "./contract";
 import { aggregateTeamStatistics, type TeamAppearance } from "./aggregate";
+import { SHEET_TEAM_COLUMNS, TEAM_COLUMN_PRESETS } from "./metrics";
+import { rankSortedRows } from "../statistics/ranking";
 export class TeamCapacityError extends Error {
   constructor() {
     super(
@@ -94,6 +96,7 @@ export function teamRows(
       names: distinct(g.map((a) => a.snapshot.game[a.side].name)),
       teamNames: distinct(g.map((a) => a.snapshot.game[a.side].team.name)),
       gamesPlayed: g.length,
+      rank: null,
       ...aggregateTeamStatistics(g, q.mode),
       origin: {
         gameId: latest.snapshot.id,
@@ -114,6 +117,16 @@ export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
     { source, coverage } = checked,
     q = teamsQuerySchema.parse(queryInput),
     rows = teamRows(checked, q);
+  const scoresheet =
+    q.dataset !== "boxscore" &&
+    source.games.length > 0 &&
+    source.games.every((g) => g.snapshot.source.kind === "sheet");
+  if (
+    scoresheet &&
+    q.preset === "essentials" &&
+    q.columns.join() === TEAM_COLUMN_PRESETS.essentials.join()
+  )
+    q.columns = [...SHEET_TEAM_COLUMNS];
   const search = normalizeStatisticsSearch(q.search),
     filtered = rows.filter(
       (r) =>
@@ -147,6 +160,9 @@ export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
   });
   const totalPages = Math.max(1, Math.ceil(filtered.length / 20)),
     page = Math.min(q.page, totalPages);
+  const ranked = rankSortedRows(filtered, (r) =>
+    q.sort === "name" ? null : value(r),
+  );
   return teamsPageSchema.parse({
     kind: "confirmed-teams-page-v1",
     disputeId: source.disputeId,
@@ -160,8 +176,9 @@ export function buildTeamsPage(input: unknown, queryInput: unknown): TeamsPage {
           b.snapshot.id.localeCompare(a.snapshot.id),
       )[0]?.snapshot.context ?? null,
     query: { ...q, page },
+    scoresheet,
     coverage,
-    rows: filtered.slice((page - 1) * 20, page * 20),
+    rows: ranked.slice((page - 1) * 20, page * 20),
     page,
     pageSize: 20,
     total: filtered.length,

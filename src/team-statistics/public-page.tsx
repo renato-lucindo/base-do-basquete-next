@@ -13,11 +13,17 @@ import {
   type TeamPublicResponse,
 } from "./navigation";
 import type { TeamsQuery } from "./query-contract";
-import { parseTeamsQuery, serializeTeamsQuery } from "./query-contract";
+import {
+  teamsQuerySchema,
+  parseTeamsQuery,
+  serializeTeamsQuery,
+} from "./query-contract";
 import {
   TEAM_METRICS,
   TEAM_METRIC_KEYS,
   TEAM_COLUMN_PRESETS,
+  SHEET_TEAM_COLUMNS,
+  sheetTeamMetric,
   type TeamMetric,
 } from "./metrics";
 import { ColumnPicker } from "../statistics/reference/column-picker";
@@ -35,10 +41,25 @@ const sections = [
   { id: "participantes", label: "Participantes" },
   { id: "jogos", label: "Jogos" },
 ] as const;
+function initialTeamRoute(kind: "list" | "detail") {
+  const route = readTeamRoute(kind, window.location.hash);
+  if (route.kind !== "list" || window.location.hash.includes("columns="))
+    return route;
+  try {
+    const stored = sessionStorage.getItem("team-statistics-selected-columns");
+    if (stored)
+      route.query = teamsQuerySchema.parse({
+        ...route.query,
+        preset: "custom",
+        columns: JSON.parse(stored),
+      });
+  } catch {
+    /* Session preferences cannot prevent public reads. */
+  }
+  return route;
+}
 export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
-  const [route, setRoute] = useState(() =>
-      readTeamRoute(kind, window.location.hash),
-    ),
+  const [route, setRoute] = useState(() => initialTeamRoute(kind)),
     [response, setResponse] = useState<{
       key: string;
       data: TeamPublicResponse;
@@ -59,7 +80,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     current = data ? response!.route : route;
   useEffect(() => {
     const read = () => {
-      const next = readTeamRoute(kind, window.location.hash);
+      const next = initialTeamRoute(kind);
       focus.current = true;
       setLoading(true);
       setError("");
@@ -120,6 +141,16 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     else window.location.hash = hash;
   }
   function listChange(patch: Partial<TeamsQuery>, reset = true) {
+    if (patch.columns) {
+      try {
+        sessionStorage.setItem(
+          "team-statistics-selected-columns",
+          JSON.stringify(patch.columns),
+        );
+      } catch {
+        /* URL remains the source of truth. */
+      }
+    }
     if (current.kind === "list")
       navigate({
         ...current,
@@ -324,9 +355,13 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                           listChange({
                             preset,
                             columns: [
-                              ...TEAM_COLUMN_PRESETS[
-                                preset === "custom" ? "essentials" : preset
-                              ],
+                              ...(data?.kind === "confirmed-teams-page-v1" &&
+                              data.scoresheet &&
+                              (preset === "essentials" || preset === "custom")
+                                ? SHEET_TEAM_COLUMNS
+                                : TEAM_COLUMN_PRESETS[
+                                    preset === "custom" ? "essentials" : preset
+                                  ]),
                             ],
                           });
                         }}
@@ -387,12 +422,20 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                         key,
                         ...TEAM_METRICS[key],
                         label:
-                          key === "pointsAgainst" || key === "difference"
-                            ? TEAM_METRICS[key].label
-                            : referenceMetric(key).label,
+                          data?.kind === "confirmed-teams-page-v1" &&
+                          data.scoresheet
+                            ? sheetTeamMetric(key).label
+                            : key === "pointsAgainst" || key === "difference"
+                              ? TEAM_METRICS[key].label
+                              : referenceMetric(key).label,
                       }))}
                       value={current.query.columns}
-                      identityNote="A equipe inscrita fica sempre visível."
+                      identityNote={
+                        data?.kind === "confirmed-teams-page-v1" &&
+                        data.scoresheet
+                          ? "A equipe inscrita e a posição estatística ficam sempre visíveis."
+                          : "A equipe inscrita fica sempre visível."
+                      }
                       onChange={(columns) =>
                         listChange(
                           {
@@ -454,8 +497,9 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                         Equipes com resultados confirmados
                       </h2>
                       <p>
-                        Uma linha por inscrição. PTS: total oficial · PPJ:
-                        pontos por jogo. Selecione um cabeçalho para ordenar.
+                        {data.scoresheet
+                          ? "Ranking estatístico, independente da classificação oficial. Uma linha por inscrição. Selecione uma métrica para ranquear; a ordem por nome mantém a posição indefinida."
+                          : "Uma linha por inscrição. PTS: total oficial · PPJ: pontos por jogo. Selecione um cabeçalho para ordenar."}
                       </p>
                       <TeamsTable
                         data={data}
@@ -478,12 +522,22 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                       />
                       <details className="team-table-help">
                         <summary>Siglas, fontes e cobertura</summary>
+                        {data.scoresheet && (
+                          <p>
+                            T inclui atletas e todas as ocorrências C/B técnicas
+                            da comissão e banco, sem B2. GD e FR dependem de
+                            totais coletivos conferidos na publicação. Histórico
+                            sem essa cobertura permanece indisponível. FC já
+                            inclui T/U dos atletas; não são somadas novamente.
+                            LL% = LLC/LLT × 100; sem tentativas, —.
+                          </p>
+                        )}
                         <p>
-                          J conta partidas publicadas. PTS é o total oficial e
-                          PPJ sua média por jogo, como em Jogadores. Total/Por
-                          jogo alterna as demais contagens. Percentuais usam a
-                          soma de convertidos e tentados, sem média de
-                          percentuais.
+                          {data.scoresheet
+                            ? "J conta partidas publicadas. Por jogo divide PTS, 2P, 3P, FC, FR, LLT, LLC, T, U e GD por J; J permanece a contagem de partidas."
+                            : "J conta partidas publicadas. PTS é o total oficial e PPJ sua média por jogo, como em Jogadores. Total/Por jogo alterna as demais contagens."}{" "}
+                          Percentuais usam a soma de convertidos e tentados, sem
+                          média de percentuais.
                         </p>
                         <p>
                           —: fonte coletiva ausente, cobertura incompleta ou
