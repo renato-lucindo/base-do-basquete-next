@@ -4,6 +4,16 @@ Atualizado em 03/11/2026. Escopo em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md); objeti
 
 ## Unidade — navegação e tabelas públicas, PR #49
 
+### Ajuste de nomes e tooltips — 03/11
+
+- Pedido atual na mesma PR/branch: código `c78a782cc2bf0adf0174a6f237a8bc64bbbd5d03`, enviado ao remoto. Removidos “oficiais”/“registradas” dos nomes das métricas e tooltips secundárias da tabela; mantidas as explicações dos cabeçalhos e a tooltip do jogador.
+- Um nome por identidade na consulta: a grafia da publicação mais recente da fonte substitui as anteriores antes dos filtros de fase/fonte, busca e comparação. Nome não vira `var.` nem lista com `/`; sem ler cadastros privados ou modificar snapshots históricos. Correções ainda privadas continuam sujeitas à publicação existente.
+- Verificação focal: 15 testes PASS. Browsers iniciais: 45 PASS/7 SKIP; duas expectativas de nome antigo corrigidas e rechecagem final de nome/comparação em desktop/mobile **4 PASS**. Uma repetição durante falta de memória falhou ao carregar páginas; a execução final com dois workers passou. Revisão local de UI preserva cabeçalhos acessíveis e descrições de ausência.
+- Gate local **PASS**: 673 testes/136 arquivos, 6 transportes, 13 de banco descartável, 28 Workerd, 1 runtime PDF, tipos/lint/formato/builds/fronteiras/segredos. A primeira tentativa esgotou memória; repetição com `VITEST_MAX_WORKERS=2`. [CI atual da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks) pendente no envio do checkpoint; run do código `41657994915` observado **IN_PROGRESS**. A CI antiga abaixo não valida este incremento.
+- Preview continua na versão `7720909` descrita abaixo: sem deploy, banco, migrations ou merge neste ajuste. Worktree iniciou limpo; alterações humanas do checkout principal e demais worktrees preservadas. Próximo passo: conferir conclusão da CI no SHA da PR e revisão do responsável.
+
+### Evidências anteriores das tabelas
+
 - Mesma branch `codex/navegacao-publica`, [PR #49 para main](https://github.com/renato-lucindo/base-do-basquete-next/pull/49), base da unidade `d84c09e`. Worktree `C:/Users/12405304716/.codex/worktrees/navegacao-publica`. Núcleo de tabelas `77601df`, capturas/checkpoint `5ca0a2b`; código implantado `77209094d3b600ef39168d4f50b4b42b9e9950c2`, incluindo a sigla F do seletor compartilhado. Checkpoint posterior somente documental. Nenhuma nova branch/pilha ou merge.
 - Pedido anexado de 03/11: classificação com nove colunas, aproveitamento V/J e perfil por inscrição; domínio/empates/decisões/grupos/fases/publicação preservados. Equipes ganha métricas/cobertura, LL% ponderado, fonte all/boxscore, presets e colunas compartilhados com Jogadores, ordenação por cabeçalho e URL/retorno. Campos coletivos sem fonte suficiente continuam indisponíveis; não há nova publicação/DDL.
 - Gate local **PASS**: 672 testes/136 arquivos, 6 transportes, 13 testes de banco descartável, 28 Workerd, 1 runtime PDF, tipos/lint/formato/builds/fronteiras/segredos. Focais de equipes 27 PASS. Browsers: 26 PASS na composição classificação/equipes e 14 PASS após refinamentos finais, sobrepostos; regressão focal de Jogadores 7 PASS/1 SKIP. [Evidências e capturas](evidencias/2026-11-03-tabelas-classificacao-equipes.md).
