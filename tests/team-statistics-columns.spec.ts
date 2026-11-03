@@ -138,6 +138,9 @@ test("muitas colunas, nomes longos, picker, teclado, axe e 320px/zoom ficam cont
   await expect(
     page.getByText("A equipe inscrita fica sempre visível."),
   ).toBeVisible();
+  await expect(
+    page.getByRole("checkbox", { name: "F · Faltas cometidas", exact: true }),
+  ).toBeChecked();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: /Colunas ·/ })).toBeFocused();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

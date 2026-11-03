@@ -21,6 +21,7 @@ import {
   type TeamMetric,
 } from "./metrics";
 import { ColumnPicker } from "../statistics/reference/column-picker";
+import { referenceMetric } from "../statistics/reference/scoresheet-statistics-table";
 import type { TeamDetailQuery } from "./detail-query";
 import {
   TeamGames,
@@ -385,6 +386,10 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                       options={TEAM_METRIC_KEYS.map((key) => ({
                         key,
                         ...TEAM_METRICS[key],
+                        label:
+                          key === "pointsAgainst" || key === "difference"
+                            ? TEAM_METRICS[key].label
+                            : referenceMetric(key).label,
                       }))}
                       value={current.query.columns}
                       identityNote="A equipe inscrita fica sempre visível."
