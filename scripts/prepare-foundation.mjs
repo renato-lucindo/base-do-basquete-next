@@ -16,6 +16,7 @@ if (dirty.length)
   throw new Error("Commit the verified unit before preparing a deployment");
 const manifest = {};
 const paths = [
+  "publico.html",
   "foundation.html",
   "resultado.html",
   "estatisticas.html",
@@ -26,7 +27,7 @@ const paths = [
 ];
 for (const path of paths) {
   if (
-    !/^((?:foundation|resultado|estatisticas|atleta|equipes|equipe)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
+    !/^((?:publico|foundation|resultado|estatisticas|atleta|equipes|equipe)\.html|assets\/[A-Za-z0-9_-]+\.(js|css))$/.test(
       path,
     )
   )

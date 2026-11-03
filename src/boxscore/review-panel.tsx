@@ -749,6 +749,7 @@ export function PdfReviewPanel(props: Props) {
           {gamesAux && context && (
             <GamesWorkspace
               disputeId={context.id}
+              contextLabel={context.label}
               gender={context.gender}
               enabled={props.enabled}
               guard={auxGuard}

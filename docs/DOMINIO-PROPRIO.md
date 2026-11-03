@@ -39,7 +39,7 @@ A rede corporativa deste computador bloqueia o domínio como `high-risk`: HTTP a
 
 ## Continuidade
 
-Conferir CI do HEAD da PR #50, revisar e integrar somente dentro da autorização vigente; merge não publica outro bundle. Conferir CI integrada se houver merge. O responsável pode abrir o domínio novamente e conferir acesso direto e login interno. Nenhuma retomada automática agendada.
+O responsável autorizou concluir integração, migrations e deploy. PR49 integrada em e310a0c após CI e revisão; PR50 recebe a composição por merge explícito de main. Conferir CI atual e integrada antes de publicar. A retomada após cota ocorreu pela automação retomar-libera-o-do-dom-nio-ap-s-reset; pausar ao concluir. Abertura direta e login humano não foram confirmados nesta rede.
 
 Antes da propagação, zona pending e consultas com NS do Registro.br; activation check solicitado e primeira inclusão no Access recusada (`12130`). Com a zona active, domínio e Access foram configurados. A retirada posterior do Access registra a decisão explícita mais recente e substitui a intenção inicial de proteger o domínio próprio.
 
@@ -55,6 +55,6 @@ Pedido seguinte do responsável: a raiz deve abrir a página pública de campeon
 - Alias também implementado no Worker fonte, para conservar o comportamento sem depender exclusivamente da regra de borda. A raiz permanece temporariamente como estava.
 - Build foundation PASS e build Worker dry-run PASS; teste Workerd focal PASS para os dois aliases e query, HTML de login, no-store, POST rejeitado e API privada anônima 401. ESLint dos arquivos alterados PASS. O primeiro build local falhou porque o checkout esparso omitia módulos da especificação; incluídos os módulos versionados necessários, ambos os builds passaram.
 
-A inicial de campeonatos não existe na main nem no bundle publicado. Está na PR #49 (`codex/navegacao-publica`), observada ainda draft em `83ca28c8f0d5b372aa216504fa3226fb8f4f73b5`, com CI em execução e migrations `20261103153010_sheet_team_statistics.sql` e `20261103163618_game_editor_metadata.sql` pendentes no serviço real, segundo seu checkpoint. Não se incorporou trabalho dessa branch nem se alteraram seus arquivos. A própria PR pede autorização de integração, migrations e deploy.
+A página pública foi integrada pela PR #49 em e310a0c30da753c9ee7f82f32e4349e7825cbeae, depois de CI SUCCESS do head63917c9 e revisão resolvida. Migrations20261103174254 e20261103174303 já aplicadas e reconciliadas, sem alterar SQL. Autorizações e provas em [liberação pública](evidencias/2026-11-03-liberacao-publica.md).
 
-A separação completa depende de liberar a área pública pela PR #49; depois, a raiz deve servir `/publico.html`, com links públicos voltando à raiz e login em `/admin`. Não apontar a raiz para um asset ausente nem publicar a PR draft por conveniência, conforme AGENTS/CONTRIBUTING. Falta decisão do responsável sobre a liberação da dependência. CI desta alteração de rota deve ser conferida no novo SHA da mesma PR #50. Abertura remota do alias continua sem teste nesta rede corporativa.
+A composição na mesma PR #50 mantém raiz em /publico.html e os dois aliases administrativos em /foundation.html. Build foundation e Worker dry-run PASS; 6 testes focais PASS: assets reais distintos na raiz e admin, no-store, rejeição de POST e API privada anônima401, descoberta pública anônima e transporte de publicação. Nova CI da composição e CI integrada obrigatórias antes de concluir. Código novo ainda não publicado neste checkpoint; atualizar versão/deployment após o deploy autorizado.

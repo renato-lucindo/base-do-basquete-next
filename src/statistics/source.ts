@@ -88,6 +88,29 @@ export function selectStatisticsFacts(
       };
     }),
   }));
+  // A corrected public name replaces earlier spellings for this identity,
+  // including when the selected phase/dataset contains only older games.
+  const currentNames = new Map<
+    string,
+    (typeof normalized)[number]["facts"][number]
+  >();
+  for (const { facts } of normalized)
+    for (const fact of facts) {
+      const current = currentNames.get(fact.person.id);
+      if (
+        !current ||
+        Date.parse(fact.publishedAt) > Date.parse(current.publishedAt) ||
+        (Date.parse(fact.publishedAt) === Date.parse(current.publishedAt) &&
+          fact.gameId > current.gameId)
+      )
+        currentNames.set(fact.person.id, fact);
+    }
+  for (const { facts } of normalized)
+    for (const fact of facts)
+      fact.person = {
+        ...fact.person,
+        name: currentNames.get(fact.person.id)!.person.name,
+      };
   const eligible = normalized.filter((g) => dataset === "all" || g.boxscore);
   return {
     disputeId: source.disputeId,

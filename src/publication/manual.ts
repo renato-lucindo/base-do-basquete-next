@@ -5,6 +5,7 @@ import {
   type PersistedSheet,
 } from "../games/sheet-contract";
 import { publishSheetSchema, type PublishSheet } from "./contract";
+import { deriveSheetTeamStatistics } from "./sheet-team-statistics";
 export function prepareManualPublication(
   input: PublishSheet,
   previousConfirmed?: PersistedSheet,
@@ -33,15 +34,35 @@ export function prepareManualPublication(
         "Os relacionados confirmados não podem ser alterados nesta revisão; a camisa pode ser corrigida com motivo.",
       );
   }
-  return { command, facts: deriveManualFacts(document) };
+  return {
+    command,
+    facts: deriveManualFacts(document, command.source.teamReview),
+  };
 }
-export function deriveManualFacts(input: PersistedSheet) {
+export function deriveManualFacts(
+  input: PersistedSheet,
+  review?: PublishSheet["source"]["teamReview"],
+) {
   const document = validatePersistedSheet(input, true);
   const total = aggregate(toEngineSheet(document));
+  const collective = deriveSheetTeamStatistics(document, review);
+  const team = (side: "home" | "away") => {
+    const {
+      activeCoachId: _active,
+      staffPeople: _people,
+      ...facts
+    } = total.teams[side];
+    const { minimumDisqualifications: _minimum, ...teamStatistics } =
+      collective[side];
+    void _active;
+    void _people;
+    void _minimum;
+    return { ...facts, teamStatistics };
+  };
   return {
     rulesVersion: document.rulesVersion,
     periods: document.periods,
-    teams: total.teams,
+    teams: { home: team("home"), away: team("away") },
     players: document.participants.map((p, index) => {
       const t = total.players[index];
       return {

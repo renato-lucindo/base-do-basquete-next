@@ -8,6 +8,7 @@ import { saveResultSchema } from "../competition/contract";
 import {
   gameListingSchema,
   venueListingSchema,
+  roundListingSchema,
   gameSnapshotSchema,
   type SaveGame,
 } from "./contract";
@@ -32,6 +33,18 @@ export class SupabaseGames {
       venueListingSchema,
       "list_game_venues",
       {
+        p_query: query,
+        p_offset: offset,
+      },
+      token,
+    );
+  }
+  listRounds(token: string, disputeId: string, query: string, offset: number) {
+    return this.checked(
+      roundListingSchema,
+      "list_game_rounds",
+      {
+        p_dispute_id: disputeId,
         p_query: query,
         p_offset: offset,
       },

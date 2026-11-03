@@ -1,7 +1,8 @@
+import { publicDetailLink } from "../../public-ui/navigation";
 // Adaptado do ScoresheetStatisticsTable aprovado: mantém estrutura e estilos;
 // valores, cobertura e posições são fornecidos pela projeção pública.
 import { ScrollableTable } from "./scrollable-table";
-import { useNameTooltip } from "./tooltip";
+import { StatisticsSortHeader } from "./sort-header";
 import { STATISTICS_METRICS, type StatisticsMetric } from "../metrics";
 import type { StatisticsPage } from "../page-contract";
 import type { StatisticsQuery } from "../query-contract";
@@ -19,10 +20,12 @@ export function MetricCell({
   value,
   metric,
   mode,
+  forceDecimal = false,
 }: {
   value: Row["metrics"][StatisticsMetric];
   metric?: StatisticsMetric;
   mode?: StatisticsPage["mode"];
+  forceDecimal?: boolean;
 }) {
   if (value.status !== "available")
     return (
@@ -32,11 +35,6 @@ export function MetricCell({
         aria-label={
           value.status === "insufficient-sample"
             ? "Amostra insuficiente"
-            : undefined
-        }
-        title={
-          value.status === "insufficient-sample"
-            ? "Amostra temporal abaixo do mínimo da publicação"
             : "Não informado para este cálculo"
         }
       >
@@ -45,7 +43,8 @@ export function MetricCell({
     );
   return (
     <>
-      {(metric === "pointsShare" ||
+      {(forceDecimal ||
+      metric === "pointsShare" ||
       metric === "pointsPerGame" ||
       (mode === "per-game" &&
         metric &&
@@ -73,42 +72,14 @@ function SortHeader({
   data: StatisticsPage;
   onSort: (key: StatisticsMetric) => void;
 }) {
-  const definition = referenceMetric(metric),
-    active = data.sort === metric;
-  const tooltip = useNameTooltip(definition.name);
   return (
-    <th
-      scope="col"
-      data-public-metric={metric}
-      aria-label={definition.name}
-      aria-sort={
-        active
-          ? data.direction === "asc"
-            ? "ascending"
-            : "descending"
-          : "none"
-      }
-      className={active ? "reference-sorted active-column" : undefined}
-    >
-      <button
-        {...tooltip}
-        type="button"
-        className="statistics-sort sort"
-        aria-label={`Ordenar por ${definition.label} (${definition.name})`}
-        aria-pressed={active}
-        onClick={(event) => {
-          onSort(metric);
-          tooltip.onClick(event);
-        }}
-      >
-        <span>{definition.label}</span>
-        {active && (
-          <span className="sort-arrow" aria-hidden="true">
-            {data.direction === "asc" ? "↑" : "↓"}
-          </span>
-        )}
-      </button>
-    </th>
+    <StatisticsSortHeader
+      definition={referenceMetric(metric)}
+      active={data.sort === metric}
+      direction={data.direction}
+      onSort={() => onSort(metric)}
+      metricKey={metric}
+    />
   );
 }
 export function ScoresheetStatisticsTable({
@@ -181,7 +152,7 @@ export function ScoresheetStatisticsTable({
                 <th
                   scope="row"
                   className="reference-player statistics-player"
-                  title={row.names.join(" / ")}
+                  title={row.names[0]}
                 >
                   <span className="player">
                     {comparisonEnabled && (
@@ -201,32 +172,28 @@ export function ScoresheetStatisticsTable({
                     )}
                     <a
                       className="player-name"
-                      href={`/atleta.html#${row.personId}`}
+                      href={publicDetailLink(
+                        `/atleta.html#${row.personId}`,
+                        data.disputeId,
+                      )}
                     >
-                      {row.names.length === 1 ? row.names[0] : "var."}
+                      {row.names[0]}
                     </a>{" "}
                     <span
                       className="player-jersey"
                       aria-label={`Camisa ${row.jerseys.join(" / ")}`}
-                      title={
-                        row.jerseys.length > 1
-                          ? "Camisas usadas nas participações publicadas"
-                          : undefined
-                      }
                     >
                       #{row.jerseys.join(" / ")}
                     </span>
                   </span>
                 </th>
                 {showTeam && (
-                  <td
-                    className="team-name"
-                    title={[...row.registrationNames, ...row.teamNames].join(
-                      " / ",
-                    )}
-                  >
+                  <td className="team-name">
                     <a
-                      href={`/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`}
+                      href={publicDetailLink(
+                        `/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`,
+                        data.disputeId,
+                      )}
                     >
                       {row.registrationNames.length === 1
                         ? row.registrationNames[0]
@@ -250,7 +217,6 @@ export function ScoresheetStatisticsTable({
                           ref.registrationId === row.registrationId,
                       ) || undefined
                     }
-                    title={`Cobertura: ${row.coverage.scoringGames} jogos com pontos; ${row.coverage.advancedGames} avançados; ${row.coverage.foulGames} com FC; ${row.coverage.foulsReceivedGames} com FR; ${row.coverage.plusMinusGames} com saldo; ${row.coverage.disciplineGames} disciplinares.`}
                   >
                     <MetricCell
                       metric={key}

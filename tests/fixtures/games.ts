@@ -9,6 +9,16 @@ import {
   saveGameEditorSchema,
   type GameEditorSnapshot,
 } from "../../src/games/officiating-contract";
+export async function selectGameRegistration(
+  page: Page,
+  side: "mandante" | "visitante",
+  name: string,
+) {
+  await page
+    .getByRole("combobox", { name: `Inscrição ${side}`, exact: true })
+    .fill(name);
+  await page.getByRole("option", { name, exact: true }).click();
+}
 export async function gamesFixture(page: Page) {
   await textImportFixture(page);
   const savedAt = "2026-10-23T19:00:00Z",
@@ -133,6 +143,28 @@ export async function gamesFixture(page: Page) {
           json: {
             items: names.slice(offset, offset + 20).map((name) => ({ name })),
             hasMore: names.length > offset + 20,
+          },
+        });
+      }
+      if (id === "rounds") {
+        const query = url.searchParams.get("q") ?? "",
+          offset = Number(url.searchParams.get("offset") ?? 0);
+        const rounds = [
+          ...new Set(
+            [...games.values()]
+              .filter((g) => g.disputeId === url.searchParams.get("disputeId"))
+              .map((g) => g.round)
+              .filter((r): r is number => r != null),
+          ),
+        ]
+          .filter((r) => String(r).includes(query))
+          .sort((a, b) => a - b);
+        return route.fulfill({
+          json: {
+            items: rounds
+              .slice(offset, offset + 20)
+              .map((round) => ({ round })),
+            hasMore: rounds.length > offset + 20,
           },
         });
       }

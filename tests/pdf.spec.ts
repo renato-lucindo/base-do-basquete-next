@@ -1,3 +1,4 @@
+import { selectGameRegistration } from "./fixtures/games";
 import { test, expect } from "@playwright/test";
 import { pdfFixture, pdfPath } from "./fixtures/pdf";
 import { tid } from "./fixtures/text-import";
@@ -290,12 +291,8 @@ test("cadastro auxiliar mantém o rascunho, retorna foco e permite escolher o jo
   });
   await trigger.click();
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
-  await page
-    .getByLabel("Inscrição mandante", { exact: true })
-    .selectOption(tid(5));
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(tid(6));
+  await selectGameRegistration(page, "mandante", "Lobos");
+  await selectGameRegistration(page, "visitante", "Lobos B");
   await page.getByLabel("Local", { exact: true }).fill("Ginásio criado aqui");
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(

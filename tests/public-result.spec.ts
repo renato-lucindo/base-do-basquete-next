@@ -12,12 +12,12 @@ test("resultado liga cada atleta à identidade sem usar camisa como chave", asyn
   await page.goto(`http://127.0.0.1:5174/resultado.html#${r.id}`);
   for (const p of r.facts.players)
     await expect(
-      page.locator(`a[href="/atleta.html#${p.person.id}"]`),
+      page.locator(`a[href^="/atleta.html"][href*="#${p.person.id}?"]`),
     ).toBeVisible();
   for (const side of ["home", "away"] as const)
     await expect(
       page.locator(
-        `a[href="/equipe.html#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}"]`,
+        `a[href^="/equipe.html"][href*="#${r.game[side].team.id}?disputeId=${r.disputeId}&registrationId=${r.game[side].registrationId}"]`,
       ),
     ).toBeVisible();
 });

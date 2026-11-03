@@ -32,9 +32,9 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   await expect(
     lobos.getByRole("cell", { name: "4", exact: true }),
   ).toBeVisible();
-  await expect(
-    lobos.getByRole("cell", { name: "-2", exact: true }),
-  ).toBeVisible();
+  await expect(table.locator('[data-team-metric="foulsReceived"]')).toHaveCount(
+    1,
+  );
   await expect(page.getByLabel("Senha", { exact: true })).toHaveCount(0);
   expect(f.state.sessionReads).toBe(0);
 });
@@ -120,14 +120,16 @@ test("participantes históricos separam homônimos, camisas0/00 e DNP de zero", 
   await expect(
     table.getByRole("cell", { name: "00", exact: true }),
   ).toHaveCount(1);
-  const dnp = table
-    .getByRole("row")
-    .filter({ has: page.locator(`a[href="/atleta.html#${pubId(7)}"]`) });
+  const dnp = table.getByRole("row").filter({
+    has: page.locator(`a[href^="/atleta.html"][href*="#${pubId(7)}?"]`),
+  });
   await expect(dnp).toContainText("Não participou");
   await expect(
     dnp.getByRole("cell", { name: "—", exact: true }),
   ).not.toHaveCount(0);
-  expect(await table.locator('a[href^="/atleta.html#"]').count()).toBe(6);
+  expect(
+    await table.locator('a[href^="/atleta.html"][href*="#"]').count(),
+  ).toBe(6);
 });
 test("paginação de jogos/participantes não reduz resumo e preserva filtros", async ({
   page,
@@ -144,7 +146,10 @@ test("paginação de jogos/participantes não reduz resumo e preserva filtros", 
       })
       .getByRole("row"),
   ).toHaveCount(21);
-  await page.getByRole("link", { name: "Jogos", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Seções da equipe" })
+    .getByRole("link", { name: "Jogos", exact: true })
+    .click();
   await expect(
     page
       .getByRole("table", { name: "Jogos da inscrição", exact: true })
@@ -194,7 +199,10 @@ test("resposta atrasada e320px/texto200% preservam rota/foco/controles", async (
     page.getByRole("heading", { name: "Lobos", exact: true }),
   ).toBeVisible();
   f.state.delayNext = 300;
-  await page.getByRole("link", { name: "Jogos", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Seções da equipe" })
+    .getByRole("link", { name: "Jogos", exact: true })
+    .click();
   await page.getByRole("link", { name: "Participantes", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Participantes", exact: true }),

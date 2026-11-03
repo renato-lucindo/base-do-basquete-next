@@ -149,7 +149,7 @@ test("seletores aprovados preservam escolhas, teclado e consulta real", async ({
   await page.getByRole("button", { name: "Por jogo", exact: true }).click();
   await expect.poll(() => f.state.queries.at(-1)?.get("mode")).toBe("per-game");
   const sort = page.getByRole("button", {
-    name: "Ordenar por 3P (Cestas de três oficiais)",
+    name: "Ordenar por 3P (Cestas de três)",
     exact: true,
   });
   await sort.focus();
@@ -158,9 +158,7 @@ test("seletores aprovados preservam escolhas, teclado e consulta real", async ({
     table.locator('th[data-public-metric="threeMade"]'),
   ).toHaveAttribute("aria-sort", "descending");
   await expect(sort).toBeFocused();
-  await expect(page.getByRole("tooltip")).toContainText(
-    "Cestas de três oficiais",
-  );
+  await expect(page.getByRole("tooltip")).toContainText("Cestas de três");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("tooltip")).toBeHidden();
 });

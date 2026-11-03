@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { publicGameSchema } from "../publication/contract";
-import { teamsQuerySchema } from "./query-contract";
+import { teamsQuerySchema, teamMetricSchema } from "./query-contract";
+import { metricCellSchema } from "../statistics/page-contract";
 const uuid = z.uuid().transform((v) => v.toLowerCase()),
   count = z.number().int().min(0).max(2147483647),
   version = count.min(1);
@@ -22,16 +23,37 @@ export const teamIdentitySchema = z
   })
   .strict()
   .refine((r) => r.names.includes(r.name) && r.teamNames.includes(r.teamName));
-export const teamRowSchema = teamIdentitySchema.safeExtend({
-  gamesPlayed: count.min(1).max(10000),
-  metrics: z
-    .object({
-      pointsFor: z.number().finite().nonnegative(),
-      pointsAgainst: z.number().finite().nonnegative(),
-      difference: z.number().finite(),
-    })
-    .strict(),
-});
+export const teamRowSchema = teamIdentitySchema
+  .safeExtend({
+    gamesPlayed: count.min(1).max(10000),
+    rank: count.min(1).nullable().default(null),
+    statistics: z.record(teamMetricSchema, metricCellSchema),
+    metricCoverage: z.record(teamMetricSchema, count),
+    metrics: z
+      .object({
+        pointsFor: z.number().finite().nonnegative(),
+        pointsAgainst: z.number().finite().nonnegative(),
+        difference: z.number().finite(),
+      })
+      .strict(),
+  })
+  .superRefine((r, c) => {
+    if (
+      Object.values(r.metricCoverage).some((n) => n > r.gamesPlayed) ||
+      r.statistics.games.status !== "available" ||
+      r.statistics.games.value !== r.gamesPlayed ||
+      Object.entries(r.statistics).some(
+        ([key, cell]) =>
+          cell.status === "available" &&
+          r.metricCoverage[key as keyof typeof r.metricCoverage] !==
+            r.gamesPlayed,
+      )
+    )
+      c.addIssue({
+        code: "custom",
+        message: "Cobertura coletiva inconsistente.",
+      });
+  });
 export const teamsPageSchema = z
   .object({
     kind: z.literal("confirmed-teams-page-v1"),
@@ -40,6 +62,7 @@ export const teamsPageSchema = z
     confirmedAt: z.iso.datetime({ offset: true }),
     context: publicGameSchema.shape.context.nullable(),
     query: teamsQuerySchema,
+    scoresheet: z.boolean().default(false),
     coverage: z
       .object({ regularGames: count, playoffGames: count, unknownGames: count })
       .strict(),

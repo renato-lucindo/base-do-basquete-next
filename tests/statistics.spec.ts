@@ -3,6 +3,35 @@ import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
 
+test("nome corrigido é único na tabela e tooltip; células e equipes não têm tooltip", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  const personId = f.source.games[0].snapshot.facts.players[0].person.id;
+  for (const game of f.source.games)
+    for (const player of game.snapshot.facts.players)
+      if (player.person.id === personId) player.person.name = "Nome anterior";
+  const latest = f.source.games[0].snapshot;
+  latest.publishedAt = "2026-11-03T14:00:00Z";
+  latest.facts.players[0].person.name = "Nome corrigido";
+  await page.goto(f.url + "&q=Nome%20corrigido");
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  await expect(table.locator("tbody tr")).toHaveCount(1);
+  const name = table.locator("tbody th[scope=row]");
+  await expect(name).toHaveAttribute("title", "Nome corrigido");
+  await expect(name.locator(".player-name")).toHaveText("Nome corrigido");
+  await expect(
+    table.locator(
+      "tbody td[title], tbody .player-jersey[title], tbody .missing[title]",
+    ),
+  ).toHaveCount(0);
+  await expect(table).not.toContainText("Nome anterior");
+  await expect(table).not.toContainText("var.");
+});
+
 test("nome estatístico liga à identidade estável no perfil público", async ({
   page,
 }) => {
@@ -14,13 +43,13 @@ test("nome estatístico liga à identidade estável no perfil público", async (
   });
   const person = f.source.games[0].snapshot.facts.players[0].person;
   await expect(
-    table.locator(`a[href="/atleta.html#${person.id}"]`).first(),
+    table.locator(`a[href^="/atleta.html"][href*="#${person.id}?"]`).first(),
   ).toBeVisible();
   const team = f.source.games[0].snapshot.game.home;
   await expect(
     table
       .locator(
-        `a[href="/equipe.html#${team.team.id}?disputeId=${f.source.disputeId}&registrationId=${team.registrationId}"]`,
+        `a[href^="/equipe.html"][href*="#${team.team.id}?disputeId=${f.source.disputeId}&registrationId=${team.registrationId}"]`,
       )
       .first(),
   ).toBeVisible();
@@ -233,9 +262,14 @@ test("comparação fora da página mantém todas inscrições do atleta e permit
   await expect(
     comparison.getByText("Outra inscrição", { exact: true }),
   ).toBeVisible();
-  await expect(comparison.getByText("João 1-0", { exact: true })).toBeVisible();
+  await expect(comparison.getByText("João 1-0", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(comparison.getByText("João 3-0", { exact: true })).toHaveCount(
+    2,
+  );
   await expect(comparison.getByText("João 2-0", { exact: true })).toBeVisible();
-  await comparison.getByRole("button", { name: /Remover João 1-0/u }).click();
+  await comparison.getByRole("button", { name: /Remover João 3-0/u }).click();
   await expect(
     comparison.getByText("Outra inscrição", { exact: true }),
   ).toHaveCount(0);

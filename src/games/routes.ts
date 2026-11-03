@@ -14,6 +14,31 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     );
   const session = env.SESSIONS.getByName(name),
     root = url.pathname === "/api/games";
+  if (url.pathname === "/api/games/rounds") {
+    if (request.method !== "GET")
+      throw new HttpError(405, "invalid_method", "Método não permitido.");
+    const dispute = z.uuid().safeParse(url.searchParams.get("disputeId")),
+      query = url.searchParams.get("q") ?? "",
+      rawOffset = url.searchParams.get("offset") ?? "0",
+      offset = Number(rawOffset);
+    if (
+      !dispute.success ||
+      !/^\d{0,10}$/u.test(query) ||
+      !/^\d+$/u.test(rawOffset) ||
+      !Number.isSafeInteger(offset) ||
+      offset > 100000 ||
+      [...url.searchParams.keys()].some(
+        (k) =>
+          !["disputeId", "q", "offset"].includes(k) ||
+          url.searchParams.getAll(k).length !== 1,
+      )
+    )
+      throw badInput();
+    const result = await session.listGameRounds(dispute.data, query, offset);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
   if (url.pathname === "/api/games/officials") {
     if (request.method !== "GET")
       throw new HttpError(405, "invalid_method", "Método não permitido.");

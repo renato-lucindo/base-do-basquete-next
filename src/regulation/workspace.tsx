@@ -22,6 +22,7 @@ import { DefinitionEditor } from "./definition-editor";
 import { AdminToast } from "../competition/admin-toast";
 import { RegulationProjection } from "./projection";
 import { AchievementPanel } from "../achievements/panel";
+import { StandingsPublicationPanel } from "./publication-panel";
 import "./screen.css";
 type VersionView = ReturnType<typeof regulationVersionViewSchema.parse>;
 const empty = (): RegulationDefinition => ({
@@ -112,8 +113,10 @@ export function RegulationWorkspace({
     alert = useRef<HTMLParagraphElement>(null),
     panel = useRef<HTMLElement>(null);
   const achievementGuard = useRef(() => true);
+  const publicationGuard = useRef(() => true);
+  const [publicationLocked, setPublicationLocked] = useState(false);
   const dirty = !!view && JSON.stringify(draft) !== baseline,
-    locked = busy || !!pending.current;
+    locked = busy || !!pending.current || publicationLocked;
   const names = new Map(registrations.map((r) => [r.id, r.name]));
   const path = `/api/regulations/${disputeId}`;
   useEffect(() => {
@@ -130,7 +133,8 @@ export function RegulationWorkspace({
         window.confirm(
           "Há alterações no regulamento ou um envio não confirmado. Sair desta edição?",
         )) &&
-      achievementGuard.current();
+      achievementGuard.current() &&
+      publicationGuard.current();
     return () => {
       guard.current = () => true;
     };
@@ -590,6 +594,21 @@ export function RegulationWorkspace({
               title="Classificação atual"
             />
           )}
+          <StandingsPublicationPanel
+            key={disputeId}
+            disputeId={disputeId}
+            enabled={
+              enabled &&
+              !dirty &&
+              !busy &&
+              !pending.current &&
+              !readPending &&
+              !!view.version
+            }
+            guard={publicationGuard}
+            onSessionLost={onSessionLost}
+            onLockChange={setPublicationLocked}
+          />
           <section>
             <h3>Histórico do regulamento</h3>
             {!history.length && <p>Nenhuma versão nesta página.</p>}

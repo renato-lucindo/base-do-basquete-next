@@ -47,6 +47,14 @@ const gameFields = {
   endAt: actualClock.optional(),
   venue: label(160),
   number: label(40),
+  stageKind: z.enum(["round_robin", "knockout"]).optional(),
+  round: z.number().int().min(1).max(2147483647).nullable().optional(),
+  knockoutStage: z
+    .string()
+    .regex(/^[^\u0000-\u001f\u007f]*$/u)
+    .nullable()
+    .pipe(label(100))
+    .optional(),
 };
 const valid = (g: {
   homeRegistrationId: string;
@@ -55,10 +63,13 @@ const valid = (g: {
   time: string | null;
   startAt?: string | null;
   endAt?: string | null;
+  stageKind?: "round_robin" | "knockout";
+  knockoutStage?: string | null;
 }) =>
   g.homeRegistrationId !== g.awayRegistrationId &&
   (g.time === null || g.date !== null) &&
-  (g.endAt == null || durationMinutes(g.startAt, g.endAt) !== null);
+  (g.endAt == null || durationMinutes(g.startAt, g.endAt) !== null) &&
+  (g.knockoutStage == null || g.stageKind === "knockout");
 export const gameSchema = z.object(gameFields).strict().refine(valid, {
   message:
     "Escolha inscrições distintas, informe a data da agenda e confira os horários reais de início e término.",
@@ -96,6 +107,18 @@ export const gameListingSchema = z
   .strict();
 export type GameSnapshot = z.infer<typeof gameSnapshotSchema>;
 export type SaveGame = z.infer<typeof saveGameSchema>;
+export const roundListingSchema = z
+  .object({
+    items: z
+      .array(
+        z
+          .object({ round: z.number().int().positive().max(2147483647) })
+          .strict(),
+      )
+      .max(20),
+    hasMore: z.boolean(),
+  })
+  .strict();
 export const venueListingSchema = z
   .object({
     items: z

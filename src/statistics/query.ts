@@ -1,3 +1,4 @@
+import { rankSortedRows } from "./ranking";
 import {
   aggregateConfirmedStatistics,
   aggregateComparedStatistics,
@@ -111,20 +112,7 @@ export function buildStatisticsPage(
       .filter((r) => r.metrics[metric].value === best)
       .map(rowRef);
   }
-  const ranked = sorted.map((row, index) => ({
-    ...row,
-    rank:
-      value(row) === null
-        ? null
-        : index > 0 && value(row) === value(sorted[index - 1])
-          ? 0
-          : index + 1,
-  }));
-  for (let i = 0, previous = 1; i < ranked.length; i++) {
-    const rank = ranked[i].rank;
-    if (rank === 0) ranked[i].rank = previous;
-    else if (rank !== null) previous = rank;
-  }
+  const ranked = rankSortedRows(sorted, value);
   const totalPages = Math.max(1, Math.ceil(sorted.length / 20)),
     page = Math.min(query.page, totalPages);
   const comparisonSummaries = query.compare.length

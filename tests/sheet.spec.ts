@@ -805,6 +805,14 @@ test("manual publication confirms identities, keeps participation editable and r
       path: `.preview-artifacts/manual-publication-320-${test.info().project.name}.png`,
     });
   await page
+    .getByLabel(/GD — total da equipe/)
+    .first()
+    .fill("2");
+  await page
+    .getByLabel(/FR — faltas recebidas/)
+    .first()
+    .fill("7");
+  await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
   await expect(
@@ -819,6 +827,11 @@ test("manual publication confirms identities, keeps participation editable and r
   await expect(
     page.getByLabel("Atleta A vaga 1", { exact: true }),
   ).toBeDisabled();
+  const reviewed = publishSheetSchema.parse(JSON.parse(f.commands[0]));
+  expect(reviewed.source.teamReview).toEqual({
+    home: { disqualifications: 2, foulsReceived: 7 },
+    away: { disqualifications: null, foulsReceived: null },
+  });
   const firstPublic = structuredClone(f.published());
   const publicPlayerId = firstPublic!.facts.players.find(
     (p) => p.side === "home" && p.jersey === "00",
