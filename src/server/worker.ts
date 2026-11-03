@@ -133,7 +133,8 @@ export default {
       else if (!["GET", "HEAD"].includes(request.method))
         throw new HttpError(405, "invalid_method", "Método não permitido.");
       else if (!url.pathname.startsWith("/api/")) {
-        if (url.pathname === "/") url.pathname = "/foundation.html";
+        if (["/", "/admin", "/admin/"].includes(url.pathname))
+          url.pathname = "/foundation.html";
         response = await env.ASSETS.fetch(new Request(url, request));
       } else
         response = jsonResponse(

@@ -17,6 +17,30 @@ import { rosterReuseFixture } from "./fixtures/roster-reuse-outbound.mjs";
 const origin = "https://app.example.test";
 const id = "10000000-0000-4000-8000-000000000001";
 
+test("admin entry routes serve the login without opening private APIs", async () => {
+  const f = await fixture({});
+  try {
+    const loginHtml = await readFile("dist-foundation/foundation.html", "utf8");
+    for (const path of ["/admin", "/admin/", "/admin?retorno=jogos"]) {
+      const response = await f.mf.dispatchFetch(origin + path);
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get("content-type"), /text\/html/);
+      assert.equal(await response.text(), loginHtml);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+    }
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + "/admin", { method: "POST" })).status,
+      405,
+    );
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + "/api/competitions")).status,
+      401,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
 test("roster reuse routes reject anonymous reads, forged posts and invalid queries in workerd", async () => {
   const f = await fixture({});
   try {

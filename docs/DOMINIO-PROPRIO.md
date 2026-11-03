@@ -44,3 +44,17 @@ Conferir CI do HEAD da PR #50, revisar e integrar somente dentro da autorizaçã
 Antes da propagação, zona pending e consultas com NS do Registro.br; activation check solicitado e primeira inclusão no Access recusada (`12130`). Com a zona active, domínio e Access foram configurados. A retirada posterior do Access registra a decisão explícita mais recente e substitui a intenção inicial de proteger o domínio próprio.
 
 Referências: [Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) e [Cloudflare Access](https://developers.cloudflare.com/workers/configuration/cloudflare-access/).
+
+## Entrada administrativa e página inicial
+
+Pedido seguinte do responsável: a raiz deve abrir a página pública de campeonatos, com a administração em `/admin`. Em 03/11, `/admin` e `/admin/` foram habilitados no domínio por uma regra de URL Rewrite, sem enviar outro bundle:
+
+- Ruleset `35c91c8c751c478c891e71e3549961ee`, fase `http_request_transform`, versão 1.
+- Regra `d809069f742447a3961bfc88d7dbbff4`, ref `base_basquete_admin_entry`.
+- Restrita ao hostname `basedobasquete.com.br`, paths exatos `/admin` e `/admin/`, métodos GET/HEAD; reescreve internamente para `/foundation.html`, preservando a URL visível e a query.
+- Alias também implementado no Worker fonte, para conservar o comportamento sem depender exclusivamente da regra de borda. A raiz permanece temporariamente como estava.
+- Build foundation PASS e build Worker dry-run PASS; teste Workerd focal PASS para os dois aliases e query, HTML de login, no-store, POST rejeitado e API privada anônima 401. ESLint dos arquivos alterados PASS. O primeiro build local falhou porque o checkout esparso omitia módulos da especificação; incluídos os módulos versionados necessários, ambos os builds passaram.
+
+A inicial de campeonatos não existe na main nem no bundle publicado. Está na PR #49 (`codex/navegacao-publica`), observada ainda draft em `83ca28c8f0d5b372aa216504fa3226fb8f4f73b5`, com CI em execução e migrations `20261103153010_sheet_team_statistics.sql` e `20261103163618_game_editor_metadata.sql` pendentes no serviço real, segundo seu checkpoint. Não se incorporou trabalho dessa branch nem se alteraram seus arquivos. A própria PR pede autorização de integração, migrations e deploy.
+
+A separação completa depende de liberar a área pública pela PR #49; depois, a raiz deve servir `/publico.html`, com links públicos voltando à raiz e login em `/admin`. Não apontar a raiz para um asset ausente nem publicar a PR draft por conveniência, conforme AGENTS/CONTRIBUTING. Falta decisão do responsável sobre a liberação da dependência. CI desta alteração de rota deve ser conferida no novo SHA da mesma PR #50. Abertura remota do alias continua sem teste nesta rede corporativa.
