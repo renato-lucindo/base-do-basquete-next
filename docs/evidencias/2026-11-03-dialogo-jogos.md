@@ -12,9 +12,9 @@ Protótipo aprovado nesta conversa, implementado na mesma branch `codex/navegaca
 
 ## Persistência
 
-Migration nova `20261103163618_game_editor_metadata.sql`, criada com Supabase CLI e testada apenas em PGlite descartável. Acrescenta `stage_kind`, `round_number`, `knockout_stage` e RPC autenticada de rodadas com security invoker. RLS/permissões existentes preservadas. Jogos antigos recebem regular por decisão explícita do responsável; envios antigos preservam os campos omitidos e os recibos existentes.
+Migration criada como `20261103163618_game_editor_metadata.sql` com Supabase CLI e testada nesta conversa em PGlite descartável. Acrescenta `stage_kind`, `round_number`, `knockout_stage` e RPC autenticada de rodadas com security invoker. RLS/permissões existentes preservadas. Jogos antigos recebem regular por decisão explícita do responsável; envios antigos preservam os campos omitidos e os recibos existentes.
 
-Sem aplicação remota, DML humano, deploy ou merge. A migration anterior de estatísticas coletivas também permanece pendente.
+Esta conversa não executou aplicação remota, DML humano, deploy ou merge da PR. A unidade paralela de liberação aplicou e reconciliou por renomeação as versões `20261103174254_sheet_team_statistics.sql` e `20261103174303_game_editor_metadata.sql`, sem mudar SQL; contexto e provas em [liberação pública](2026-11-03-liberacao-publica.md). Essas alterações chegaram em `52d430a` e foram preservadas por merge explícito no worktree deste cadastro.
 
 ## Validação
 
@@ -33,4 +33,4 @@ Windows, Node 24.18.0, Chromium headless, fixtures sintéticas, código inicial 
 
 ![Mobile](dialogo-jogos/mobile-390.png)
 
-Mesma [PR #49](https://github.com/renato-lucindo/base-do-basquete-next/pull/49), mantida draft; [CI do HEAD](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks). Migrations e deploy exigem autorização específica.
+Mesma [PR #49](https://github.com/renato-lucindo/base-do-basquete-next/pull/49), colocada em revisão pela unidade de liberação; [CI do HEAD](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks). A liberação segue na conversa própria, com suas autorizações e verificações.

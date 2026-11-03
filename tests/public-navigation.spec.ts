@@ -125,6 +125,38 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   ).toBeVisible();
 });
 
+test("busca pública repete o mesmo termo após falha transitória", async ({
+  page,
+}) => {
+  const f = await publicNavigationFixture(page);
+  let attempts = 0;
+  await page.route("**/api/public/search?*", async (route) => {
+    attempts += 1;
+    if (attempts === 1)
+      await route.fulfill({
+        status: 503,
+        json: { error: { code: "unavailable", message: "Indisponível" } },
+      });
+    else await route.fallback();
+  });
+  await page.goto(origin + "/publico.html");
+  const name = f.source.games[0].snapshot.facts.players[0].person.name;
+  await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
+  const submit = page.getByRole("button", { name: "Buscar", exact: true });
+  await submit.click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Não foi possível buscar jogadores",
+  );
+  const failedUrl = page.url();
+  await submit.click();
+  await expect(
+    page.locator('.public-results a[href^="/atleta.html"]').first(),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(page.url()).toBe(failedUrl);
+  expect(attempts).toBe(2);
+});
+
 test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   page,
 }) => {
