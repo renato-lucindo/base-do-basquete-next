@@ -61,4 +61,15 @@ it("confirmation preserves the command on retry and checks every ACK identity", 
     await p.confirm("fixture-token", command),
   );
   expect(sent).toEqual([{ p_command: command }, { p_command: command }]);
+  await expect(
+    p.confirm("fixture-token", {
+      ...command,
+      commandId: command.commandId.toUpperCase(),
+      disputeId: command.disputeId.toUpperCase(),
+    }),
+  ).resolves.toMatchObject({
+    commandId: command.commandId,
+    disputeId: command.disputeId,
+  });
+  expect(sent[2]).toEqual({ p_command: command });
 });
