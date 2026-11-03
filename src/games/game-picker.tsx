@@ -197,7 +197,7 @@ export function GamePicker(props: Props) {
           disabled={props.disabled}
           inputMode={props.kind === "round" ? "numeric" : undefined}
           maxLength={
-            props.kind === "round" ? 10 : props.kind === "stage" ? 100 : 160
+            props.kind === "round" ? 10 : props.kind === "stage" ? 100 : 120
           }
           placeholder={
             registration

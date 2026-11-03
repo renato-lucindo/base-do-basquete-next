@@ -8,6 +8,14 @@ test("busca mantém a opção ativa visível ao navegar pela lista com teclado",
 }) => {
   const f = await gamesFixture(page);
   const template = f.registrations.get(tid(5))!;
+  const longName = "Associação " + "Basquete ".repeat(11) + "da Capital";
+  f.registrations.set(tid(70), { ...template, id: tid(70), name: longName });
+  const queries: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.pathname === "/api/registrations")
+      queries.push(url.searchParams.get("q") ?? "");
+  });
   for (let n = 30; n < 55; n++)
     f.registrations.set(tid(n), {
       ...template,
@@ -29,6 +37,19 @@ test("busca mantém a opção ativa visível ao navegar pela lista com teclado",
   await expect(option).toBeInViewport();
   await field.press("Enter");
   await expect(field).toHaveValue("Equipe 49");
+  await field.fill(`${longName} extra`);
+  await expect(field).toHaveValue(longName);
+  await page.getByRole("option", { name: longName, exact: true }).click();
+  await expect(field).toHaveValue(longName);
+  await field.press("Tab");
+  await field.focus();
+  await expect(
+    page.getByRole("option", { name: longName, exact: true }),
+  ).toBeVisible();
+  await field.press("Escape");
+  await expect(field).toHaveValue(longName);
+  expect(queries.some((q) => q.length === 120)).toBe(true);
+  expect(queries.every((q) => q.length <= 120)).toBe(true);
 });
 
 test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visíveis", async ({
