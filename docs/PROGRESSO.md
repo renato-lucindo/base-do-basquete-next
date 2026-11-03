@@ -2,7 +2,13 @@
 
 Atualizado em 02/11/2026. Escopo em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md), objetivos em [ROADMAP.md](ROADMAP.md), leitura seletiva em [INDICE.md](INDICE.md). O [checkpoint anterior da PR #46](../historico/progresso/2026-11-02-pr46-antes-integracao.md) preserva contexto documental e os estados antigos; não representa a situação atual.
 
-## Unidade ativa — integração da PR #46
+## Domínio próprio — checkpoint de 03/11/2026
+
+Branch `codex/dominio-proprio`, base `d84c09e`, em worktree próprio. Zona `basedobasquete.com.br` no plano Free; responsável informou troca dos NS, mas Cloudflare ainda retorna `pending` e consultas públicas ainda mostram Registro.br. Nova verificação de ativação solicitada. Cadastro dos novos hostnames no Access recusado por zona indisponível; leitura posterior confirmou proteção anterior intacta. Worker permanece na versão `f477bd9e-4c77-48dc-a977-286a3448917e`; nenhum deploy, alteração de origem, banco ou vínculo do domínio. Detalhes e próximo passo em [DOMINIO-PROPRIO.md](DOMINIO-PROPRIO.md). CI desta unidade ainda não executada.
+
+## Registro anterior — integração da PR #46
+
+As notas seguintes registram 02/11. Em 03/11, o histórico de `origin/main` consultado já contém o merge da PR #46 em `d84c09e` e da PR #38 em `afe95a5`. Esta unidade de domínio não revalida seus aceites nem suas suítes.
 
 - O responsável pediu “Realize todas as etapas” após receber a lista de atualização da main, validação/CI, conferência visual e merge da [PR #46](https://github.com/renato-lucindo/base-do-basquete-next/pull/46). Merge autorizado nesta conversa; não declarar aceite visual humano que não ocorreu. Sem autorização nova de deploy, produção ou operações no banco real.
 - Branch existente `codex/implementacao-publica`, origem `a74584a32189f9ce42bdde5a3cd27eee0be4f8bd`; última CI desse SHA [41431013924](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41431013924) SUCCESS. Atualização por merge explícito de main `afe95a52ab1d357e0078f20cd169a8f62e7b4ec1`, que integrou a PR #38 com CI [41523717012](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41523717012) SUCCESS: 636 unitários, 485 browsers PASS/109 SKIP.
