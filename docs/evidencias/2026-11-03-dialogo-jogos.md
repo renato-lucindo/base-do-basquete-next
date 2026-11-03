@@ -22,7 +22,7 @@ Windows, Node 24.18.0, Chromium headless, fixtures sintéticas, código `7e5b1fc
 
 - Banco: **2 PASS**, instalação nova e atualização, compatibilidade, idempotência, limites, etapas inválidas, isolamento por disputa e permissões.
 - Playwright final, nove arquivos de jogos/arbitragem/locais/PDFs/retornos/admin/súmula legada, dois workers: **99 PASS / 31 SKIP** dos recortes existentes. Inclui 1366×768, 1920×1080, 390/320 px, zoom equivalente em 683×384, axe, foco, erros e recuperação sem duplicação.
-- Gate com `VITEST_MAX_WORKERS=2`: em execução neste checkpoint; lint/formato/tipos aprovados. Conferir o resultado consolidado em `.preview-artifacts/game-editor-gate.log` antes de declarar PASS.
+- Gate com `VITEST_MAX_WORKERS=2`: lint/formato/tipos, **684 unitários/140 arquivos** e **6 transportes PASS**. Parou na expectativa antiga de upgrade: o teste foi atualizado para exigir os novos defaults e comparar todos os demais campos históricos; correção `f798dee31ff4ca015eda749b18550d459b106dc5`, **13/13 testes de banco PASS**. Builds, Workerd/runtime/fronteiras/segredos e CI final ainda pendentes. Logs locais ignorados `game-editor-gate.log` e `game-editor-db-final.log` em `.preview-artifacts/`. Pausa por cota no limiar de 15%, com retomada conferida às 17:24:51 de 03/11/2026, America/Sao_Paulo.
 - Falhas exploratórias de expectativas antigas, alinhamento, legenda oculta e ícone de limpar foram corrigidas. Uma rodada posterior sofreu `ENOSPC` no C:; regressão final passou usando TEMP/TMP e resultados em `Y:/Codex-Temp/pr49-jogos-20261103`. Nenhum arquivo alheio foi removido.
 - Revisão local com `ui-ux-pro-max` e fonte atual de `web-design-guidelines`, sem alegação de revisão independente, piloto remoto ou conformidade WCAG integral.
 
