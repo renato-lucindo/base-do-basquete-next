@@ -841,49 +841,53 @@ export function GamesWorkspace(props: Props) {
                   setStatus("");
                 }}
               />
-              <div className="game-knockout">
-                <label className="game-knockout-check">
-                  <input
-                    type="checkbox"
-                    name="knockout"
-                    checked={editor.game.stageKind === "knockout"}
-                    aria-controls={stageId}
-                    onChange={(e) => {
-                      const knockout = e.target.checked;
-                      if (busy || uncertain || conflict) return;
-                      setEditor((s) =>
-                        s
-                          ? {
-                              ...s,
-                              game: {
-                                ...s.game,
-                                stageKind: knockout
-                                  ? "knockout"
-                                  : "round_robin",
-                                knockoutStage: knockout
-                                  ? s.game.knockoutStage
-                                  : null,
-                              },
-                            }
-                          : s,
-                      );
-                      setStatus("");
-                    }}
+              <div className="game-knockout-fields">
+                <div className="game-knockout">
+                  <label className="game-knockout-check">
+                    <input
+                      type="checkbox"
+                      name="knockout"
+                      checked={editor.game.stageKind === "knockout"}
+                      aria-controls={stageId}
+                      onChange={(e) => {
+                        const knockout = e.target.checked;
+                        if (busy || uncertain || conflict) return;
+                        setEditor((s) =>
+                          s
+                            ? {
+                                ...s,
+                                game: {
+                                  ...s.game,
+                                  stageKind: knockout
+                                    ? "knockout"
+                                    : "round_robin",
+                                  knockoutStage: knockout
+                                    ? s.game.knockoutStage
+                                    : null,
+                                },
+                              }
+                            : s,
+                        );
+                        setStatus("");
+                      }}
+                    />
+                    Jogo de eliminatória
+                  </label>
+                </div>
+                <div id={stageId} hidden={editor.game.stageKind !== "knockout"}>
+                  <GamePicker
+                    kind="stage"
+                    label="Etapa (opcional)"
+                    value={editor.game.knockoutStage ?? ""}
+                    disputeId={props.disputeId}
+                    disabled={busy || uncertain || conflict || decisionLocked}
+                    onSessionLost={props.onSessionLost}
+                    onChange={(value) => change("knockoutStage", value || null)}
                   />
-                  Jogo de eliminatória
-                </label>
-                <p>Marque apenas para jogos eliminatórios.</p>
-              </div>
-              <div id={stageId} hidden={editor.game.stageKind !== "knockout"}>
-                <GamePicker
-                  kind="stage"
-                  label="Etapa (opcional)"
-                  value={editor.game.knockoutStage ?? ""}
-                  disputeId={props.disputeId}
-                  disabled={busy || uncertain || conflict || decisionLocked}
-                  onSessionLost={props.onSessionLost}
-                  onChange={(value) => change("knockoutStage", value || null)}
-                />
+                </div>
+                <p className="game-knockout-hint">
+                  Marque apenas para jogos eliminatórios.
+                </p>
               </div>
             </fieldset>
             {savedGame?.state === "finished" && (

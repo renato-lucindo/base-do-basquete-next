@@ -144,13 +144,18 @@
 }
 .game-editor-dialog .game-classification {
   display: grid;
-  grid-template-columns: 135px minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 135px minmax(0, 1fr);
   gap: 18px;
   margin: 0 0 17px;
   align-items: start;
 }
-.game-editor-dialog .game-knockout {
-  padding-top: calc(1.25rem + 7px);
+.game-editor-dialog .game-knockout-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(68px, auto) auto;
+  column-gap: 18px;
+  align-items: end;
+  min-width: 0;
 }
 .game-editor-dialog .game-knockout-check {
   display: flex;
@@ -169,7 +174,8 @@
   accent-color: #075fca;
   flex: none;
 }
-.game-editor-dialog .game-knockout p {
+.game-editor-dialog .game-knockout-hint {
+  grid-column: 1;
   font-size: 0.6875rem;
   color: #42526b;
   margin: 0;
@@ -289,12 +295,15 @@
     grid-column: 1/-1;
   }
   .game-editor-dialog .game-classification {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
   .game-editor-dialog .game-classification > .game-picker {
     grid-column: 1/-1;
     max-width: 135px;
+  }
+  .game-editor-dialog .game-knockout-fields {
+    column-gap: 12px;
   }
   .game-editor-dialog .game-knockout-check {
     font-size: 0.75rem;

@@ -75,7 +75,7 @@ test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visí
     page.getByRole("group", { name: "Oficiais de Quadra", exact: true }),
   ).toBeHidden();
   await page.getByLabel("Jogo de eliminatória", { exact: true }).check();
-  for (const [width, height] of info.project.name === "desktop"
+  for (const [width, height, fontSize = 16] of info.project.name === "desktop"
     ? [
         [1366, 768],
         [1920, 1080],
@@ -84,8 +84,12 @@ test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visí
     : [
         [390, 844],
         [320, 740],
+        [320, 740, 20],
       ]) {
     await page.setViewportSize({ width, height });
+    await page.evaluate((size) => {
+      document.documentElement.style.fontSize = `${size}px`;
+    }, fontSize);
     await page
       .getByRole("combobox", { name: "Etapa (opcional)", exact: true })
       .scrollIntoViewIfNeeded();
@@ -110,7 +114,7 @@ test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visí
       ),
     ).toBe(true);
     await page.screenshot({
-      path: `.preview-artifacts/game-editor-${width}.png`,
+      path: `.preview-artifacts/game-editor-${width}-${fontSize}.png`,
     });
   }
   await page
