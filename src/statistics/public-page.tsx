@@ -45,15 +45,11 @@ function Cell({ value }: { value: Row["metrics"][StatisticsMetric] }) {
   return value.status === "available" ? (
     <>{number.format(value.value)}</>
   ) : value.status === "insufficient-sample" ? (
-    <span
-      className="statistics-insufficient"
-      aria-label="Amostra insuficiente"
-      title="Amostra temporal abaixo do mínimo da publicação"
-    >
+    <span className="statistics-insufficient" aria-label="Amostra insuficiente">
       -
     </span>
   ) : (
-    <span title="Não informado para este cálculo">—</span>
+    <span aria-label="Não informado para este cálculo">—</span>
   );
 }
 function location() {
@@ -730,7 +726,7 @@ export function StatisticsPageView() {
                                       {display(r.names)}
                                     </a>
                                   </th>
-                                  <td title={r.registrationNames.join(" / ")}>
+                                  <td>
                                     <a
                                       href={publicDetailLink(
                                         `/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`,

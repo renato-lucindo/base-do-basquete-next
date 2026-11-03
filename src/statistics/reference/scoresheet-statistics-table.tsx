@@ -33,11 +33,6 @@ export function MetricCell({
         aria-label={
           value.status === "insufficient-sample"
             ? "Amostra insuficiente"
-            : undefined
-        }
-        title={
-          value.status === "insufficient-sample"
-            ? "Amostra temporal abaixo do mínimo da publicação"
             : "Não informado para este cálculo"
         }
       >
@@ -182,7 +177,7 @@ export function ScoresheetStatisticsTable({
                 <th
                   scope="row"
                   className="reference-player statistics-player"
-                  title={row.names.join(" / ")}
+                  title={row.names[0]}
                 >
                   <span className="player">
                     {comparisonEnabled && (
@@ -207,28 +202,18 @@ export function ScoresheetStatisticsTable({
                         data.disputeId,
                       )}
                     >
-                      {row.names.length === 1 ? row.names[0] : "var."}
+                      {row.names[0]}
                     </a>{" "}
                     <span
                       className="player-jersey"
                       aria-label={`Camisa ${row.jerseys.join(" / ")}`}
-                      title={
-                        row.jerseys.length > 1
-                          ? "Camisas usadas nas participações publicadas"
-                          : undefined
-                      }
                     >
                       #{row.jerseys.join(" / ")}
                     </span>
                   </span>
                 </th>
                 {showTeam && (
-                  <td
-                    className="team-name"
-                    title={[...row.registrationNames, ...row.teamNames].join(
-                      " / ",
-                    )}
-                  >
+                  <td className="team-name">
                     <a
                       href={publicDetailLink(
                         `/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`,
@@ -257,7 +242,6 @@ export function ScoresheetStatisticsTable({
                           ref.registrationId === row.registrationId,
                       ) || undefined
                     }
-                    title={`Cobertura: ${row.coverage.scoringGames} jogos com pontos; ${row.coverage.advancedGames} avançados; ${row.coverage.foulGames} com FC; ${row.coverage.foulsReceivedGames} com FR; ${row.coverage.plusMinusGames} com saldo; ${row.coverage.disciplineGames} disciplinares.`}
                   >
                     <MetricCell
                       metric={key}

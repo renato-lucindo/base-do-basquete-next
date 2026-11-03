@@ -357,7 +357,6 @@ export function SimpleStatisticsPageView() {
                                     ? "statistics-leader"
                                     : undefined
                                 }
-                                title={`Cobertura: ${r.coverage.scoringGames} jogos com pontos; ${r.coverage.foulGames} com faltas; ${r.coverage.disciplineGames} disciplinares.`}
                               >
                                 {r.metrics[key].status === "available"
                                   ? number.format(r.metrics[key].value)
