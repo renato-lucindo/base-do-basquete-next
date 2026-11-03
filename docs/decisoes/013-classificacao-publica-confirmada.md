@@ -21,9 +21,9 @@ O Worker reutiliza o domínio puro para calcular classificação/critério/cober
 
 Correção G4 já publicada deve aparecer na leitura seguinte dos derivados, sem cache obsoleto; uma decisão ancorada em fonte anterior vira revisão/conflito. Alteração privada posterior do regulamento/agenda/efeito não pode vazar por essa atualização. Regras e efeitos confirmados mantêm suas versões; fonte de resultado atual é lida consistentemente sob a raiz do campeonato. História privada permanece íntegra. Não materializar a classificação neste primeiro recorte; ler/calcular sob origem/versionamento explícitos, Cache-Control no-store no início.
 
-## Implementação pendente e critérios de aceitação
+## Interfaces e critérios de aceitação
 
-Preservar os contratos públicos existentes de fonte/classificação e o cálculo do domínio. A implementação posterior precisa de confirmação autenticada, fonte pública mínima, leitor anônimo e integração do catálogo, agenda e tabelas. A formalização documental desta política não implementa esses percursos nem autoriza publicar dados reais, aplicar migrations, fazer merge ou deploy.
+Preservar os contratos públicos existentes de fonte/classificação e o cálculo do domínio. A implementação requer confirmação autenticada, fonte pública mínima, leitor anônimo e integração do catálogo, agenda e tabelas. A aprovação desta política não autoriza publicar dados reais, aplicar migrations, fazer merge ou deploy; estado de execução e validação pertence ao checkpoint e às evidências.
 
 Validar que confirmar uma disputa sem resultados permite encontrá-la e consultar participantes, agenda e tabela com J=0; salvar/alterar rascunhos mantém a versão pública; participantes/jogos fora do conjunto confirmado não aparecem; publicar/corrigir resultado incluído recalcula os derivados sem divulgar mudanças privadas; empates e valores indefinidos são preservados. Exigir também provas de confirmação atômica, prévia desatualizada, concorrência, exposição anônima e interface.
 

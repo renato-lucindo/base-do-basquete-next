@@ -4,6 +4,8 @@ Unidade da [PR #49](https://github.com/renato-lucindo/base-do-basquete-next/pull
 
 ## Resultado e limites
 
+Estado da primeira entrega. A [continuação de 03/11/2026](2026-11-03-classificacao-publica.md) implementa a confirmação, classificação e agenda definidas após estas provas; consultar o checkpoint para a situação vigente. Os testes/capturas abaixo permanecem evidências dos artefatos originais.
+
 - A raiz do Worker serve `publico.html`; `foundation.html` conserva o acesso administrativo. Descoberta por competição, ano, naipe e categoria/divisão; árvore pesquisável e expansível, dois naipes lado a lado no desktop e verticais no celular. Busca global inclui equipes e jogadores, sem jogos.
 - Abrir disputa leva à Classificação. Cabeçalho, breadcrumbs, seletor rápido e quatro seções compartilham contexto público. Jogos publicados ficam em lista cronológica; equipes, estatísticas completas/simples, comparação, colunas, perfis e súmula reaproveitam os módulos existentes.
 - URLs HTML anteriores continuam válidas. A disputa acompanha links de atletas, jogos e inscrições; `returnTo`, antes do hash, preserva a consulta de origem. O destino de retorno aceita somente páginas públicas locais e contexto correspondente, ou a busca global. Não depende de armazenamento local, sessão ou navegação prévia. Perfis independentes continuam consultáveis sem inventar disputa.
