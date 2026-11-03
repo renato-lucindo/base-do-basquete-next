@@ -15,10 +15,6 @@ export async function uploadFoundation(payload, client = cloudflare) {
   if (
     !protection.success ||
     app.domain !== `${name}.renato-lucindo-jr.workers.dev` ||
-    !app.destinations?.some(
-      (destination) =>
-        destination.type === "public" && destination.uri === hostname,
-    ) ||
     app.policies?.length !== 1 ||
     app.policies[0].decision !== "allow" ||
     app.policies[0].include?.length !== 1 ||

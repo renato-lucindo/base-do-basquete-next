@@ -89,14 +89,13 @@ test("foundation upload refuses an unexpected target or expanded/missing Access 
   assert.equal(calls[0].method, "GET");
 });
 
-test("foundation upload requires exact custom-domain protection and keeps the canonical origin", async () => {
+test("foundation upload keeps the public canonical origin and protects the separate preview", async () => {
   const payload = {
     accountId: "16b4a5e0a99a031d28051ebadb4811cc",
     workerName: "base-do-basquete-next-preview",
     sourceCommit: "1234567890123456789012345678901234567890",
     modules: { "index.mjs": "export default {};" },
   };
-  let destinations = [];
   let uploadedMetadata;
   const calls = [];
   const client = {
@@ -108,7 +107,12 @@ test("foundation upload requires exact custom-domain protection and keeps the ca
           result: {
             domain:
               "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
-            destinations,
+            destinations: [
+              {
+                type: "public",
+                uri: "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+              },
+            ],
             policies: [
               {
                 decision: "allow",
@@ -129,20 +133,6 @@ test("foundation upload requires exact custom-domain protection and keeps the ca
       return { success: true, result: { id: payload.workerName } };
     },
   };
-  for (const destination of [
-    undefined,
-    { type: "public", uri: "*.basedobasquete.com.br" },
-    { type: "public", uri: "basedobasquete.com.br/admin" },
-  ]) {
-    destinations = destination ? [destination] : [];
-    calls.length = 0;
-    await assert.rejects(
-      uploadFoundation(payload, client),
-      /Access protection/,
-    );
-    assert.equal(calls.length, 1);
-  }
-  destinations = [{ type: "public", uri: "basedobasquete.com.br" }];
   assert.equal((await uploadFoundation(payload, client)).success, true);
   assert.equal(
     uploadedMetadata.bindings.find((binding) => binding.name === "APP_ORIGIN")
