@@ -445,6 +445,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  listGameRounds(disputeId: string, query: string, offset: number) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.games.listRounds(accessToken, disputeId, query, offset),
+      ),
+    );
+  }
   listGameOfficials(query: string, offset: number) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>

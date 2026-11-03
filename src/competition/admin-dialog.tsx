@@ -9,6 +9,8 @@ export function AdminDialog({
   children,
   className = "",
   closeLabel,
+  footer,
+  closeOnBackdrop = false,
 }: {
   title: string;
   open: boolean;
@@ -17,6 +19,8 @@ export function AdminDialog({
   children: ReactNode;
   className?: string;
   closeLabel?: string;
+  footer?: ReactNode;
+  closeOnBackdrop?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null),
     id = useId();
@@ -48,6 +52,18 @@ export function AdminDialog({
       ref={dialog}
       aria-labelledby={id}
       className={`admin-dialog ${className}`}
+      onClick={(event) => {
+        if (!closeOnBackdrop || busy || event.target !== event.currentTarget)
+          return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        if (
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom
+        )
+          onClose();
+      }}
       onCancel={(event) => {
         event.preventDefault();
         if (!busy) onClose();
@@ -66,6 +82,7 @@ export function AdminDialog({
         </button>
       </header>
       <div className="admin-dialog-body">{children}</div>
+      {footer && <footer className="admin-dialog-footer">{footer}</footer>}
     </dialog>
   );
 }

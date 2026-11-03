@@ -113,11 +113,14 @@ for (const width of [1366, 1920])
             .getByRole("combobox", { name: "Local", exact: true }),
         ).toBeVisible();
         await expect(
-          page
-            .getByRole("dialog")
-            .getByLabel("Inscrição mandante", { exact: true })
-            .getByRole("option", { name: "Lobos", exact: true }),
-        ).toHaveCount(1);
+          page.getByRole("combobox", {
+            name: "Inscrição mandante",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(page.getByRole("dialog").getByRole("option")).toHaveCount(
+          0,
+        );
         page.once("dialog", (dialog) => dialog.accept());
         await page
           .getByRole("button", { name: "Voltar à lista de jogos", exact: true })

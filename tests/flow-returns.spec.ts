@@ -1,3 +1,4 @@
+import { selectGameRegistration } from "./fixtures/games";
 import { test, expect } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
@@ -18,12 +19,8 @@ test("saved game exposes return without scrolling and preserves the games search
   );
   await page.getByLabel("Buscar jogo", { exact: true }).fill("Lobos");
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
-  await page
-    .getByLabel("Inscrição mandante", { exact: true })
-    .selectOption(tid(5));
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(tid(6));
+  await selectGameRegistration(page, "mandante", "Lobos");
+  await selectGameRegistration(page, "visitante", "Lobos B");
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Jogo salvo" }),
@@ -67,7 +64,7 @@ test("saved game exposes return without scrolling and preserves the games search
     .click();
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
-  ).toHaveValue(tid(5));
+  ).toHaveValue("Lobos");
 });
 
 test("scoresheet offers visible returns and protects unsaved preparation", async ({
