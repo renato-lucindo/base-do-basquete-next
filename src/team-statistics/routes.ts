@@ -28,7 +28,17 @@ export async function publicTeamsRoute(
     throw bad();
   const allowed = match[2]
     ? ["registrationId", "mode", "scope", "section", "page", "rosterPage"]
-    : ["mode", "scope", "q", "sort", "direction", "page"];
+    : [
+        "mode",
+        "scope",
+        "q",
+        "sort",
+        "direction",
+        "page",
+        "dataset",
+        "preset",
+        "columns",
+      ];
   if (
     [...url.searchParams.keys()].some(
       (k) => !allowed.includes(k) || url.searchParams.getAll(k).length !== 1,

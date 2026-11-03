@@ -289,6 +289,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   await expect(
     page.getByRole("status").filter({ hasText: "Duração total" }),
   ).toContainText("92 min");
+  await page.locator(".game-officiating summary").click();
   await page
     .getByRole("combobox", { name: "Árbitro", exact: true })
     .fill("Árbitro legado");
@@ -325,6 +326,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   await expect(
     page.getByLabel("Termina no dia seguinte", { exact: true }),
   ).toBeChecked();
+  await page.locator(".game-officiating summary").click();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   if (info.project.name === "mobile") {
     const court = await page

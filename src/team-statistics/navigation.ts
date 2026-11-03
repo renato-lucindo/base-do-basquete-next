@@ -1,4 +1,6 @@
+import { publicDetailLink } from "../public-ui/navigation";
 import { z } from "zod";
+import { SHEET_TEAM_COLUMNS, TEAM_COLUMN_PRESETS } from "./metrics";
 import { teamsPageSchema, type TeamsPage } from "./contract";
 import { teamDetailPageSchema, type TeamDetailPage } from "./detail-contract";
 import {
@@ -80,11 +82,19 @@ export function teamRouteForResponse(
   if (r.kind === "invalid" || r.disputeId !== d.disputeId)
     throw Error("Consulta incompatível.");
   if (r.kind === "list") {
+    const expected = { ...r.query };
+    if (
+      d.kind === "confirmed-teams-page-v1" &&
+      d.scoresheet &&
+      expected.preset === "essentials" &&
+      expected.columns.join() === TEAM_COLUMN_PRESETS.essentials.join()
+    )
+      expected.columns = [...SHEET_TEAM_COLUMNS];
     if (
       d.kind !== "confirmed-teams-page-v1" ||
       d.query.page > r.query.page ||
       serializeTeamsQuery({ ...d.query, page: r.query.page }) !==
-        serializeTeamsQuery(r.query)
+        serializeTeamsQuery(expected)
     )
       throw Error("Consulta incompatível.");
     return { ...r, query: d.query };
@@ -118,19 +128,20 @@ export function teamDetailLink(
   listState: TeamsQuery | null = null,
 ): string {
   const q = parseTeamDetailQuery(new URLSearchParams());
-  return (
+  return publicDetailLink(
     "/equipe.html" +
-    serializeTeamRoute({
-      kind: "detail",
-      disputeId,
-      teamId,
-      registrationId,
-      query: {
-        ...q,
-        mode: listState?.mode ?? q.mode,
-        scope: listState?.scope ?? q.scope,
-      },
-      listState,
-    })
+      serializeTeamRoute({
+        kind: "detail",
+        disputeId,
+        teamId,
+        registrationId,
+        query: {
+          ...q,
+          mode: listState?.mode ?? q.mode,
+          scope: listState?.scope ?? q.scope,
+        },
+        listState,
+      }),
+    disputeId,
   );
 }

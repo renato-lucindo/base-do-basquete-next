@@ -1,3 +1,4 @@
+import { selectGameRegistration } from "./fixtures/games";
 import { test, expect, type Page } from "@playwright/test";
 import { tid } from "./fixtures/text-import";
 import { gamesFixture as fixture } from "./fixtures/games";
@@ -66,12 +67,8 @@ async function open(page: Page) {
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
-  await page
-    .getByLabel("Inscrição mandante", { exact: true })
-    .selectOption(tid(5));
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(tid(6));
+  await selectGameRegistration(page, "mandante", "Lobos");
+  await selectGameRegistration(page, "visitante", "Lobos B");
 }
 
 test("cria inscrição dentro do jogo e volta com agenda, seleção e foco preservados", async ({
@@ -117,10 +114,10 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   );
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
-  ).toHaveValue(tid(5));
+  ).toHaveValue("Lobos");
   await expect(
     page.getByLabel("Inscrição visitante", { exact: true }),
-  ).toHaveValue(tid(6));
+  ).toHaveValue("Lobos B");
   await expect(
     page.getByRole("button", {
       name: "Criar ou editar inscrição aqui",
@@ -130,9 +127,7 @@ test("cria inscrição dentro do jogo e volta com agenda, seleção e foco prese
   const created = [...f.registrations.values()].find(
     (r) => r.name === "Lobos Juvenil",
   )!;
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(created.id);
+  await selectGameRegistration(page, "visitante", created.name);
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Jogo salvo" }),
@@ -156,31 +151,19 @@ test("conserva inscrições selecionadas entre páginas e buscas", async ({
       name: `Equipe ${i}`,
     });
   await open(page);
-  await page
-    .getByRole("button", { name: "Mais inscrições", exact: true })
-    .click();
+  await page.getByLabel("Inscrição visitante", { exact: true }).fill("Equipe");
   await expect(
-    page
-      .getByLabel("Inscrição visitante", { exact: true })
-      .locator(`option[value="${tid(52)}"]`),
-  ).toHaveCount(1);
+    page.getByRole("option", { name: "Equipe 30", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Mais opções", exact: true }).click();
+  await page.getByRole("option", { name: "Equipe 52", exact: true }).click();
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
-  ).toHaveValue(tid(5));
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(tid(52));
-  await page
-    .getByLabel("Buscar inscrições para este jogo", { exact: true })
-    .fill("Equipe 30");
-  await expect(
-    page
-      .getByLabel("Inscrição visitante", { exact: true })
-      .locator(`option[value="${tid(30)}"]`),
-  ).toHaveCount(1);
+  ).toHaveValue("Lobos");
+  await selectGameRegistration(page, "mandante", "Equipe 30");
   await expect(
     page.getByLabel("Inscrição visitante", { exact: true }),
-  ).toHaveValue(tid(52));
+  ).toHaveValue("Equipe 52");
   await page.getByRole("button", { name: "Salvar jogo", exact: true }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "Jogo salvo" }),

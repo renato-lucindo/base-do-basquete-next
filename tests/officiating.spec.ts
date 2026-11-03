@@ -1,3 +1,4 @@
+import { selectGameRegistration } from "./fixtures/games";
 import { test, expect, type Page } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
@@ -10,12 +11,9 @@ async function open(page: Page) {
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
-  await page
-    .getByLabel("Inscrição mandante", { exact: true })
-    .selectOption(tid(5));
-  await page
-    .getByLabel("Inscrição visitante", { exact: true })
-    .selectOption(tid(6));
+  await selectGameRegistration(page, "mandante", "Lobos");
+  await selectGameRegistration(page, "visitante", "Lobos B");
+  await page.locator(".game-officiating summary").click();
 }
 test("arbitragem opcional fica em duas colunas e libera funções em sequência", async ({
   page,
@@ -115,6 +113,7 @@ test("persiste escala, reutiliza o catálogo e exclui identidades já selecionad
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
+  await page.locator(".game-officiating summary").click();
   const referee = page.getByRole("combobox", { name: "Árbitro", exact: true });
   await referee.fill("João");
   await page.getByRole("option", { name: "João", exact: true }).click();
@@ -441,7 +440,7 @@ for (const [width, height] of [
       weight: getComputedStyle(e).fontWeight,
     }));
     const other = await page
-      .getByRole("group", { name: "Dados do jogo", exact: true })
+      .getByRole("group", { name: "Confronto", exact: true })
       .locator(":scope > legend")
       .evaluate((e) => ({
         size: getComputedStyle(e).fontSize,

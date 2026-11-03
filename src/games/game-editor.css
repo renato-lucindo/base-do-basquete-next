@@ -1,0 +1,342 @@
+.game-editor-dialog {
+  width: min(848px, calc(100vw - 32px));
+  border-radius: 9px;
+}
+.game-editor-dialog .admin-dialog-header {
+  padding: 19px 25px;
+}
+.game-editor-dialog .admin-dialog-header h3 {
+  font-size: 1.4rem;
+}
+.game-editor-dialog .admin-dialog-body {
+  padding: 18px 25px 0;
+}
+.game-editor-dialog .teams-inline {
+  display: block;
+}
+.game-editor-dialog .game-context {
+  margin: 0 0 18px;
+  color: #42526b;
+  font-size: 0.8125rem;
+}
+.game-editor-dialog
+  :is(.game-confrontation, .game-agenda, .game-classification) {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.game-editor-dialog legend {
+  font-size: 0.8125rem;
+  font-weight: 650;
+  padding: 0;
+  margin-bottom: 12px;
+  width: 100%;
+}
+.game-editor-dialog legend.admin-visually-hidden {
+  width: 1px;
+  max-width: 1px;
+  margin: -1px;
+}
+.game-editor-dialog .officiating-section > legend {
+  font-weight: 650;
+}
+.game-editor-dialog .game-agenda legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.game-editor-dialog .game-agenda legend span {
+  font-weight: 400;
+  color: #42526b;
+  font-size: 0.75rem;
+}
+.game-editor-dialog .game-opponents {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+.game-editor-dialog :is(label, .game-picker) {
+  max-width: none;
+  min-width: 0;
+}
+.game-editor-dialog label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+  gap: 7px;
+}
+.game-editor-dialog input:not([type="checkbox"]) {
+  width: 100%;
+  min-width: 0;
+  min-height: 41px;
+  padding: 9px 10px;
+  font-size: 0.875rem;
+  border: 1px solid #8998ad;
+  border-radius: 5px;
+}
+.game-editor-dialog input:focus-visible {
+  outline: 2px solid #075fca;
+  outline-offset: 2px;
+}
+.game-editor-dialog .game-picker > label {
+  margin-bottom: 7px;
+  line-height: 1.25rem;
+}
+.game-editor-dialog .game-picker-input {
+  position: relative;
+}
+.game-editor-dialog .game-picker-input input {
+  padding-right: 35px;
+}
+.game-editor-dialog .game-picker-clear {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  min-height: 37px;
+  width: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #42526b;
+  font-size: 1.2rem;
+}
+.game-editor-dialog .game-picker-clear:hover {
+  background: #edf5ff;
+}
+.game-editor-dialog .game-registration-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 9px 0 19px;
+}
+.game-editor-dialog .game-registration-tools p {
+  color: #42526b;
+  font-size: 0.75rem;
+  margin: 0;
+}
+.game-editor-dialog .game-add-registration {
+  background: transparent;
+  color: #075fca;
+  border: 0;
+  padding: 5px 0;
+  min-height: 32px;
+  font-size: 0.75rem;
+}
+.game-editor-dialog .game-add-registration:hover {
+  text-decoration: underline;
+}
+.game-editor-dialog .game-agenda {
+  border-top: 1px solid #d9e2ee;
+  padding-top: 17px;
+}
+.game-editor-dialog .game-agenda-grid {
+  display: grid;
+  grid-template-columns: 136px 110px 110px minmax(0, 1fr) 105px;
+  gap: 12px;
+}
+.game-editor-dialog .game-agenda-hint {
+  font-size: 0.75rem;
+  color: #42526b;
+  margin: 9px 0 18px;
+}
+.game-editor-dialog .game-classification {
+  display: grid;
+  grid-template-columns: 135px minmax(0, 1fr);
+  gap: 18px;
+  margin: 0 0 17px;
+  align-items: start;
+}
+.game-editor-dialog .game-knockout-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(68px, auto) auto;
+  column-gap: 18px;
+  align-items: end;
+  min-width: 0;
+}
+.game-editor-dialog .game-knockout-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 41px;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.game-editor-dialog .game-knockout-check input {
+  width: 17px;
+  height: 17px;
+  min-height: 17px;
+  margin: 0;
+  accent-color: #075fca;
+  flex: none;
+}
+.game-editor-dialog .game-knockout-hint {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  color: #42526b;
+  margin: 0;
+}
+.game-editor-dialog .game-field-error {
+  color: #a12720;
+  font-size: 0.75rem;
+  margin: 6px 0 0;
+}
+.game-editor-dialog input[aria-invalid="true"] {
+  border-color: #a12720;
+}
+.game-editor-dialog .game-officiating {
+  border-top: 1px solid #d9e2ee;
+}
+.game-editor-dialog .game-officiating summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  cursor: pointer;
+  min-height: 49px;
+  padding: 12px 0;
+}
+.game-editor-dialog .game-officiating summary::after {
+  content: "⌄";
+  margin-left: auto;
+}
+.game-editor-dialog .game-officiating[open] summary::after {
+  content: "⌃";
+}
+.game-editor-dialog .game-officiating summary span {
+  font-weight: 400;
+  color: #42526b;
+  font-size: 0.75rem;
+}
+.game-editor-dialog .game-publication-note {
+  color: #42526b;
+  font-size: 0.75rem;
+  margin: 0 0 18px;
+}
+.game-editor-dialog .admin-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: none;
+  border-top: 1px solid #d9e2ee;
+  padding: 15px 25px;
+  background: #fafbfd;
+}
+.game-editor-dialog .game-save-note {
+  color: #42526b;
+  font-size: 0.75rem;
+  min-width: 0;
+}
+.game-editor-dialog .game-footer-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.game-editor-dialog .game-footer-actions button {
+  min-height: 41px;
+  font-size: 0.8125rem;
+  padding: 9px 13px;
+}
+.game-editor-dialog .game-cancel {
+  border-color: transparent;
+  background: transparent;
+}
+.game-editor-dialog .game-picker-options {
+  z-index: 20;
+}
+.game-editor-dialog .game-picker-options button[aria-selected="true"] {
+  background: #edf5ff;
+  color: #075fca;
+}
+@media (min-width: 1000px) {
+  .compact-pilot .games-workspace .game-editor-dialog {
+    width: min(848px, calc(100vw - 48px));
+  }
+  .compact-pilot .game-editor-dialog .game-opponents {
+    gap: 28px;
+  }
+  .compact-pilot .game-editor-dialog .game-context {
+    margin: 0 0 18px;
+  }
+}
+@media (max-width: 760px) {
+  .game-editor-dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+  .game-editor-dialog :is(.admin-dialog-header, .admin-dialog-footer) {
+    padding: 14px 16px;
+  }
+  .game-editor-dialog .admin-dialog-header > button {
+    font-size: 0.75rem;
+    padding: 7px;
+  }
+  .game-editor-dialog .admin-dialog-body {
+    padding: 16px 16px 0;
+  }
+  .game-editor-dialog .game-opponents {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+  .game-editor-dialog .game-agenda-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px 12px;
+  }
+  .game-editor-dialog .game-agenda-grid .venue-picker {
+    grid-row: 3;
+    grid-column: 1/-1;
+  }
+  .game-editor-dialog .game-classification {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .game-editor-dialog .game-classification > .game-picker {
+    grid-column: 1/-1;
+    max-width: 135px;
+  }
+  .game-editor-dialog .game-knockout-fields {
+    column-gap: 12px;
+  }
+  .game-editor-dialog .game-knockout-check {
+    font-size: 0.75rem;
+  }
+  .game-editor-dialog .game-registration-tools {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .game-editor-dialog .game-registration-tools p {
+    max-width: 140px;
+  }
+  .game-editor-dialog .game-add-registration {
+    text-align: right;
+  }
+  .game-editor-dialog .admin-dialog-footer {
+    display: block;
+  }
+  .game-editor-dialog .game-save-note {
+    display: block;
+    margin-bottom: 10px;
+  }
+  .game-editor-dialog .game-footer-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .game-editor-dialog .game-footer-actions button {
+    font-size: 0.75rem;
+    padding: 8px;
+    min-height: 44px;
+  }
+  .game-editor-dialog .game-footer-actions .game-cancel {
+    grid-row: 2;
+    grid-column: 1/-1;
+    min-height: 30px;
+  }
+}

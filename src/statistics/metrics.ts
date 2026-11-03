@@ -10,13 +10,13 @@ export const STATISTICS_METRICS = {
   },
   technicalFouls: {
     label: "T",
-    name: "Faltas técnicas registradas",
+    name: "Faltas técnicas",
     normalizable: true,
     lowerIsBetter: true,
   },
   unsportsmanlikeFouls: {
     label: "U",
-    name: "Faltas antidesportivas registradas",
+    name: "Faltas antidesportivas",
     normalizable: true,
     lowerIsBetter: true,
   },
@@ -28,7 +28,7 @@ export const STATISTICS_METRICS = {
   },
   pointsPerGame: {
     label: "PPJ",
-    name: "Pontos oficiais por jogo",
+    name: "Pontos por jogo",
     normalizable: false,
     lowerIsBetter: false,
   },
@@ -40,19 +40,19 @@ export const STATISTICS_METRICS = {
   },
   twoMade: {
     label: "2P",
-    name: "Cestas de dois oficiais",
+    name: "Cestas de dois",
     normalizable: true,
     lowerIsBetter: false,
   },
   threeMade: {
     label: "3P",
-    name: "Cestas de três oficiais",
+    name: "Cestas de três",
     normalizable: true,
     lowerIsBetter: false,
   },
   freeMade: {
     label: "LL",
-    name: "Lances livres oficiais",
+    name: "Lances livres",
     normalizable: true,
     lowerIsBetter: false,
   },

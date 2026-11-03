@@ -1,5 +1,31 @@
 import { z } from "zod";
 import { persistedSheetSchema } from "../games/sheet-contract";
+const reviewedCount = z.number().int().min(0).max(2147483647).nullable();
+export const sheetTeamReviewSchema = z
+  .object({
+    home: z
+      .object({
+        disqualifications: reviewedCount,
+        foulsReceived: reviewedCount,
+      })
+      .strict(),
+    away: z
+      .object({
+        disqualifications: reviewedCount,
+        foulsReceived: reviewedCount,
+      })
+      .strict(),
+  })
+  .strict();
+export type SheetTeamReview = z.infer<typeof sheetTeamReviewSchema>;
+export const sheetTeamStatisticsSchema = z
+  .object({
+    version: z.literal(1),
+    technicalFouls: z.number().int().min(0).max(2147483647),
+    disqualifications: reviewedCount,
+    foulsReceived: reviewedCount,
+  })
+  .strict();
 export const publishSheetSchema = z
   .object({
     requestId: z.uuid(),
@@ -11,6 +37,7 @@ export const publishSheetSchema = z
         kind: z.literal("sheet"),
         baseSheetVersion: z.number().int().min(0).max(2147483646),
         document: persistedSheetSchema,
+        teamReview: sheetTeamReviewSchema.optional(),
       })
       .strict(),
     reason: z.string().trim().max(500),
@@ -58,6 +85,7 @@ const teamFacts = z
     coachB: count,
     coachStatus: z.enum(["eligible", "GD", "D"]),
     foulsByPeriod: z.array(count).min(4).max(12),
+    teamStatistics: sheetTeamStatisticsSchema.optional(),
   })
   .strict();
 const playerFacts = z

@@ -1,3 +1,5 @@
+import { PublicHeader, PublicFooter } from "../public-ui/shell";
+import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "../competition/api";
@@ -155,10 +157,7 @@ export function SimpleStatisticsPageView() {
       >
         Ir para estatísticas
       </a>
-      <header className="access-header">
-        <a href="/foundation.html">Base do Basquete</a>
-        <span className="access-preview">Resultados confirmados</span>
-      </header>
+      <PublicHeader disputeId={route.id} section="jogadores" />
       <main
         className="access-main statistics-page simple-statistics"
         id="simple-statistics-content"
@@ -326,14 +325,22 @@ export function SimpleStatisticsPageView() {
                               {(data.page - 1) * data.pageSize + index + 1}
                             </td>
                             <th scope="row">
-                              <a href={`/atleta.html#${r.personId}`}>
+                              <a
+                                href={publicDetailLink(
+                                  `/atleta.html#${r.personId}`,
+                                  data.disputeId,
+                                )}
+                              >
                                 {display(r.names)}
                               </a>
                               {r.gamesPlayed === 0 && <small>Não jogou</small>}
                             </th>
                             <td>
                               <a
-                                href={`/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`}
+                                href={publicDetailLink(
+                                  `/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`,
+                                  data.disputeId,
+                                )}
                               >
                                 {display(r.registrationNames)}
                               </a>
@@ -350,7 +357,6 @@ export function SimpleStatisticsPageView() {
                                     ? "statistics-leader"
                                     : undefined
                                 }
-                                title={`Cobertura: ${r.coverage.scoringGames} jogos com pontos; ${r.coverage.foulGames} com faltas; ${r.coverage.disciplineGames} disciplinares.`}
                               >
                                 {r.metrics[key].status === "available"
                                   ? number.format(r.metrics[key].value)
@@ -403,6 +409,7 @@ export function SimpleStatisticsPageView() {
           </>
         )}
       </main>
+      <PublicFooter />
     </>
   );
 }

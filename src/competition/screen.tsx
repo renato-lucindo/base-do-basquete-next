@@ -945,6 +945,24 @@ export function CompetitionWorkspace({
             <div hidden={tab !== "games"}>
               <GamesWorkspace
                 key={context.id}
+                contextLabel={
+                  savedCompetition?.seasons
+                    .flatMap((s) =>
+                      s.disputes.map((d) => ({
+                        id: d.id,
+                        label:
+                          savedCompetition.name +
+                          " · " +
+                          s.year +
+                          " · " +
+                          d.category +
+                          " · " +
+                          (d.gender === "feminino" ? "Feminino" : "Masculino") +
+                          (d.division ? " · " + d.division : ""),
+                      })),
+                    )
+                    .find((d) => d.id === context.id)?.label
+                }
                 disputeId={context.id}
                 gender={
                   savedCompetition?.seasons

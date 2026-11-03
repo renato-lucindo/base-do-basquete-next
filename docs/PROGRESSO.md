@@ -1,21 +1,25 @@
 # Progresso atual
 
-Atualizado em 02/11/2026. Escopo em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md), objetivos em [ROADMAP.md](ROADMAP.md), leitura seletiva em [INDICE.md](INDICE.md). O [checkpoint anterior da PR #46](../historico/progresso/2026-11-02-pr46-antes-integracao.md) preserva contexto documental e os estados antigos; não representa a situação atual.
+Atualizado em 03/11/2026. [Escopo](MATRIZ-ESCOPO.md) · [Roadmap](ROADMAP.md). [Checkpoint anterior](../historico/progresso/2026-11-03-antes-liberacao-publica.md) preserva as provas e decisões do cadastro de jogos.
 
-## Unidade ativa — integração da PR #46
+## Liberação autorizada — PR #49 antes da PR #50
 
-- O responsável pediu “Realize todas as etapas” após receber a lista de atualização da main, validação/CI, conferência visual e merge da [PR #46](https://github.com/renato-lucindo/base-do-basquete-next/pull/46). Merge autorizado nesta conversa; não declarar aceite visual humano que não ocorreu. Sem autorização nova de deploy, produção ou operações no banco real.
-- Branch existente `codex/implementacao-publica`, origem `a74584a32189f9ce42bdde5a3cd27eee0be4f8bd`; última CI desse SHA [41431013924](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41431013924) SUCCESS. Atualização por merge explícito de main `afe95a52ab1d357e0078f20cd169a8f62e7b4ec1`, que integrou a PR #38 com CI [41523717012](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41523717012) SUCCESS: 636 unitários, 485 browsers PASS/109 SKIP.
-- Conflito textual somente em PROGRESSO, resolvido por síntese atual e preservação do histórico. Conflito semântico na composição automática de contrato de jogos: declaração duplicada de actualClock e contrato antigo de metadados versus escrita de horários da main. Mantido contrato vigente da main, que valida os mesmos horários opcionais na leitura/escrita. Teste de UI da PR atualizado para o editor vigente e para provar que editar local preserva agenda e horários reais. [Evidência de integração](evidencias/2026-11-02-integracao-pr46.md).
-- Worktree exclusivo detached `C:/Users/12405304716/.codex/worktrees/pr46-integracao-20261102`. Unitários focais 46 PASS/6 arquivos; browsers 42 PASS e gate consolidado PASS (647 unitários/131 arquivos), com contratos descartáveis/Worker/builds/tipos/segurança. Nova CI ainda pendente. CI do novo SHA e CI integrada devem ser conferidas antes de concluir. Dois apontamentos antigos de revisão resolvidos; reconferir threads atuais antes do merge.
+O responsável autorizou na conversa de liberação do domínio concluir validação, integração, migrations e deploy para campeonatos na raiz e administração em `/admin`. Mesma PR #49, branch `codex/navegacao-publica`, revisão em worktree detached exclusivo `C:/Users/12405304716/.codex/worktrees/pr49-liberacao-20261103`, origem `83ca28c8f0d5b372aa216504fa3226fb8f4f73b5`. A unidade de domínio da PR #50 aguarda esta integração, sem incorporação de WIP ou nova pilha.
 
-## Serviços e banco preservados
+- Corrigido thread de revisão: repetir busca com o mesmo termo após erro agora dispara requisição nova. Navegação pública 16 browsers PASS; teste novo 2 PASS.
+- CI anterior [41683662938](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41683662938): gate/design PASS, 548 browsers PASS / 109 SKIP / 1 FAIL no alinhamento mobile. CSS corrigido sem afrouxar teste; focal original 2 PASS em desktop/mobile/zoom/320px. CI do novo HEAD ainda deve ser conferida.
+- Migrations **aplicadas**, ledger conferido: `20261103174254_sheet_team_statistics.sql` e `20261103174303_game_editor_metadata.sql`. Nomes reconciliados com versões reais sem mudar SQL. Banco descartável 3 PASS; verificações remotas de estrutura/grants e inventário preservados, sem novo achado de advisor. [Evidência detalhada](evidencias/2026-11-03-liberacao-publica.md).
+- Preview PR49 continua na versão anterior `61d47226-5f8b-4693-930c-44e5e33529ce`, fonte `7720909`; não foi republicado. Serviço do domínio permanece na versão de configuração `188ff4c2-b3ae-40ec-bb90-e3df7192429c`; raiz pública ainda não implantada.
+- Checkout humano `sync/trabalho-casa`, CONTRIBUTING/skills e demais worktrees preservados. A revisão da liberação foi feita em cópia detached; o trabalho do cadastro continuou no worktree original da PR49. Não inventar nova execução de provas inalteradas.
 
-- Preview exclusivo da PR #46: https://base-do-basquete-next-pr46.renato-lucindo-jr.workers.dev/ — publicação anterior fonte a74584a, deployment `a6e71220-bb03-468c-aafe-bf542712bc0b`, versão 4 `aaabe60d-6f67-4c93-804d-8ea66fdcd968`. Não foi republicado nesta integração. Access exigiu novo login; foi solicitado ao responsável, sem copiar sessão ou alterar proteção.
-- Preview PR #38 permanece fonte 4ae0535, deployment `ddab0f4e-7eac-4050-a9ad-57fb1930f086`, versão 5 `d0c80fe1-d77e-4911-b271-1bc85f183bf8`; compartilhado preservado. As correções finais da revisão #38 estão na main e não foram publicadas em serviço.
-- Nenhuma consulta ou operação no Supabase real nesta integração. Migrations aplicadas imutáveis; testes usam fixtures e banco descartável. Merge não autoriza deploy ou SQL.
+## Cadastro de jogos — retomada desta conversa
 
-## Continuidade
+- Pop-up aprovado implementado em `7e5b1fc`; teclado e limite de busca refinados. **99 browsers PASS / 31 SKIP**, gate local por composição, mais **24 browsers** e **2 focais** após refinamentos. [Contrato, capturas e provas](evidencias/2026-11-03-dialogo-jogos.md).
+- Alinhamento pela base dos campos em `48d004b4e72aa2a765442277a333d4b67d409458`, incluindo rótulo de duas linhas e fonte ampliada: **34 browsers PASS**, lint/tipos/build. Substitui o ajuste paralelo de espaçamento fixo; requisito estrito do teste preservado. Integração de `52d430a` preserva a busca pública e as migrations reconciliadas, sem reaplicar SQL. Resultado consolidado do SHA enviado nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks).
+- Esta conversa não executou merge da PR, DDL remoto ou deploy. As operações da unidade de liberação e seus limites estão na evidência própria acima. A automação `concluir-di-logo-de-jogos-na-pr-49` será pausada ao concluir; a anterior `retomar-navega-o-p-blica-pr-49` permanece pausada.
 
-- Checkout principal sync/trabalho-casa, modificação solicitada em CONTRIBUTING e não rastreados preservados. Worktree antigo da branch pública, em 3c75a41, conserva modificação preexistente de PROGRESSO; releases e demais branches/worktrees preservados.
-- Próximo passo: concluir verificações locais, enviar atualização à mesma PR, conferir nova CI, revisão e conferência de navegador; merge commit com SHA esperado autorizado e CI obrigatória do SHA integrado. Sem nova branch/PR por sessão e sem publicação de serviços. Se houver pausa por cota, agendar retomada após reset conforme CONTRIBUTING.
+Próximo passo: publicar correções/checkpoint na mesma PR #49, conferir CI do novo SHA e thread resolvido; merge commit autorizado. Depois atualizar e concluir #50 sobre main, validar composição e publicar o domínio. CI obrigatória dos SHAs integrados; login humano/aceite visual não presumidos. Nenhuma retomada automática criada nesta liberação.
+
+## Revisão final após CI aprovada
+
+CI de 895dd82 aprovada: gate/design e 551 browsers PASS / 109 SKIP. Merge bloqueado por três novos threads, sem bypass. Corrigidos parâmetros reais da API de equipes, unidade de pontos consistente no dataset misto e links de perfis sem resultados. 12 unitários, 1 HTTP Workerd e 32 browsers focais PASS, builds/lint/tipos PASS. CI do novo SHA deve ser conferida antes da integração; provas e limites na evidência da liberação. Nenhum deploy de código adicional nem nova operação de banco.

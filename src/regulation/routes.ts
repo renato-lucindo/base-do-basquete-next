@@ -3,6 +3,26 @@ import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveRegulationSchema } from "./persistence-contract";
 import { previewRegulationSchema } from "./view-contract";
+import { SupabasePublicStandings } from "./public-provider";
+import { confirmStandingsSchema } from "./publication-contract";
+export async function publicStandingsRoute(
+  request: Request,
+  env: Env,
+  url: URL,
+) {
+  if (request.method !== "GET")
+    throw new HttpError(405, "invalid_method", "Método não permitido.");
+  const m = /^\/api\/public\/standings\/([^/]+)$/u.exec(url.pathname);
+  const id = z.uuid().safeParse(m?.[1]);
+  if (!id.success || url.search)
+    throw new HttpError(400, "invalid_input", "Disputa inválida.");
+  return jsonResponse(
+    await new SupabasePublicStandings({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    }).get(id.data.toLowerCase()),
+  );
+}
 const bad = () =>
   new HttpError(400, "invalid_input", "Contexto do regulamento inválido.");
 export async function regulationRoute(request: Request, env: Env, url: URL) {
@@ -37,6 +57,21 @@ export async function regulationRoute(request: Request, env: Env, url: URL) {
     return jsonResponse(r.value);
   }
   if (url.search) throw bad();
+  if (tail === "/publication" && request.method === "GET") {
+    const r = await session.previewStandingsPublication(id.data);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
+  if (tail === "/publication" && request.method === "POST") {
+    const c = await readMutationJson(request, confirmStandingsSchema, {
+      origin: env.APP_ORIGIN,
+      maxBytes: 2048,
+    });
+    if (c.disputeId !== id.data) throw bad();
+    const r = await session.confirmStandingsPublication(c);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
   const version = /^\/versions\/([0-9]+)$/u.exec(tail);
   if (version && request.method === "GET") {
     const n = Number(version[1]);

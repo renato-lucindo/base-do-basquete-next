@@ -132,16 +132,26 @@ test("G2 upgrade preserves G1 schedules and does not fabricate sheets or results
       const after = (await db.query(q)).rows;
       assert.equal(after[0].game.startAt, null);
       assert.equal(after[0].game.endAt, null);
+      assert.equal(after[0].game.stageKind, "round_robin");
+      assert.equal(after[0].game.round, null);
+      assert.equal(after[0].game.knockoutStage, null);
       assert.deepEqual(
         after.map(({ game }) => ({
           game: Object.fromEntries(
             Object.entries(game).filter(
-              ([key]) => key !== "startAt" && key !== "endAt",
+              ([key]) =>
+                ![
+                  "startAt",
+                  "endAt",
+                  "stageKind",
+                  "round",
+                  "knockoutStage",
+                ].includes(key),
             ),
           ),
         })),
         before,
-        "G1 game fields remain unchanged after adding optional actual times",
+        "G1 game fields remain unchanged after adding optional actual times and administrative metadata",
       );
     };
     for (const migration of migrations.slice(boundary))

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
@@ -12,6 +12,8 @@ import {
   type ActualTimeFields,
 } from "./actual-time-fields";
 import { GameOccurrencePanel } from "../regulation/occurrence-panel";
+import { GamePicker } from "./game-picker";
+import "./game-editor.css";
 import { VenuePicker } from "./venue-picker";
 import {
   OfficiatingEditor,
@@ -29,10 +31,7 @@ import {
 } from "./officiating-contract";
 import { AdminDialog } from "../competition/admin-dialog";
 import { AdminToast } from "../competition/admin-toast";
-import {
-  registrationListingSchema,
-  type RegistrationSnapshot,
-} from "../teams/contract";
+import { type RegistrationSnapshot } from "../teams/contract";
 import {
   gameListingSchema,
   gameSchema,
@@ -42,6 +41,7 @@ import {
 } from "./contract";
 type Props = {
   disputeId: string;
+  contextLabel?: string;
   gender: "masculino" | "feminino";
   enabled: boolean;
   guard: { current: () => boolean };
@@ -61,8 +61,13 @@ const document = (s: GameSnapshot) =>
     endAt: s.endAt,
     venue: s.venue,
     number: s.number,
+    stageKind: s.stageKind ?? "round_robin",
+    round: s.round ?? null,
+    knockoutStage: s.knockoutStage ?? null,
   });
 export function GamesWorkspace(props: Props) {
+  const stageId = useId(),
+    workspace = useRef<HTMLElement>(null);
   const [list, setList] = useState<{ items: GameSnapshot[]; hasMore: boolean }>(
       { items: [], hasMore: false },
     ),
@@ -76,6 +81,7 @@ export function GamesWorkspace(props: Props) {
       officiating: Officiating;
       officialNames: OfficialNames;
       actualTimes: ActualTimeFields;
+      roundText: string;
     } | null>(null),
     [baseline, setBaseline] = useState(""),
     [busy, setBusy] = useState(false),
@@ -83,14 +89,11 @@ export function GamesWorkspace(props: Props) {
     [conflict, setConflict] = useState(false),
     [error, setError] = useState(""),
     [status, setStatus] = useState("");
-  const [registrations, setRegistrations] = useState<{
-      items: RegistrationSnapshot[];
-      hasMore: boolean;
-    }>({ items: [], hasMore: false }),
-    [chosen, setChosen] = useState<RegistrationSnapshot[]>([]),
-    [find, setFind] = useState(""),
-    [findOffset, setFindOffset] = useState(0),
-    [auxiliary, setAuxiliary] = useState(false);
+  const [chosen, setChosen] = useState<RegistrationSnapshot[]>([]),
+    [auxiliary, setAuxiliary] = useState(false),
+    [officialsOpen, setOfficialsOpen] = useState(false),
+    [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const saveAction = useRef<"save" | "next">("save");
   const pending = useRef<SaveGameEditor | null>(null),
     knownAck = useRef<{ id: string; version: number } | null>(null),
     sheetGuard = useRef<() => boolean>(() => true),
@@ -110,6 +113,7 @@ export function GamesWorkspace(props: Props) {
       officiating: editor.officiating,
       officialNames: editor.officialNames,
       actualTimes: editor.actualTimes,
+      roundText: editor.roundText,
     }) !== baseline;
   function mayLeave() {
     return (
@@ -143,11 +147,25 @@ export function GamesWorkspace(props: Props) {
     if (!auxiliary && returningFromAuxiliary.current) {
       returningFromAuxiliary.current = false;
       auxiliaryTrigger.current?.focus();
+    } else if (editor && !auxiliary && !sheetVisible) {
+      workspace.current
+        ?.querySelector<HTMLInputElement>(
+          '.game-editor-dialog input[aria-label="Inscrição mandante"]',
+        )
+        ?.focus();
     } else heading.current?.focus();
   }, [props.enabled, editor?.game.id, auxiliary]);
   useEffect(() => {
     if (error && props.enabled) alert.current?.focus();
   }, [error, props.enabled]);
+  useEffect(() => {
+    if (props.enabled && Object.keys(fieldErrors).length)
+      workspace.current
+        ?.querySelector<HTMLInputElement>(
+          '.game-editor-dialog input[aria-invalid="true"]',
+        )
+        ?.focus();
+  }, [fieldErrors, props.enabled]);
   function report(failure: unknown) {
     if (isSessionFailure(failure)) props.onSessionLost();
     else
@@ -185,38 +203,6 @@ export function GamesWorkspace(props: Props) {
       controller.abort();
     };
   }, [props.enabled, props.disputeId, query, offset, epoch]);
-  useEffect(() => {
-    if (!props.enabled || !editor || auxiliary) return;
-    let active = true;
-    const controller = new AbortController();
-    const timer = setTimeout(() => {
-      void api(
-        `/api/registrations?disputeId=${props.disputeId}&q=${encodeURIComponent(find)}&offset=${findOffset}`,
-        registrationListingSchema,
-        undefined,
-        controller.signal,
-      )
-        .then((r) => {
-          if (active) setRegistrations(r);
-        })
-        .catch((e) => {
-          if (active) report(e);
-        });
-    }, 150);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [
-    props.enabled,
-    props.disputeId,
-    !!editor,
-    auxiliary,
-    find,
-    findOffset,
-    epoch,
-  ]);
   function accept(snapshot: GameEditorSnapshot) {
     const s = snapshot.game;
     if (s.disputeId !== props.disputeId)
@@ -238,14 +224,17 @@ export function GamesWorkspace(props: Props) {
       officiating,
       officialNames: names,
       actualTimes: actualTimeFields(g),
+      roundText: g.round == null ? "" : String(g.round),
     });
     setChosen([s.home, s.away]);
+    setFieldErrors({});
     setBaseline(
       JSON.stringify({
         game: g,
         officiating,
         officialNames: names,
         actualTimes: actualTimeFields(g),
+        roundText: g.round == null ? "" : String(g.round),
       }),
     );
     pending.current = null;
@@ -266,7 +255,7 @@ export function GamesWorkspace(props: Props) {
       setBusy(false);
     }
   }
-  async function save() {
+  async function save(action: "save" | "next" = "save") {
     if (!editor || busy || conflict) return;
     if (
       !pending.current &&
@@ -283,10 +272,36 @@ export function GamesWorkspace(props: Props) {
           editor.officialNames[role].trim() && !editor.officiating[role],
       )
     ) {
+      setOfficialsOpen(true);
       setError(
         "Selecione um oficial da lista ou escolha Usar novo oficial para cada nome digitado.",
       );
       return;
+    }
+    if (!pending.current) {
+      saveAction.current = action;
+      const fields: Record<string, string> = {};
+      if (!editor.game.homeRegistrationId)
+        fields.home = "Selecione uma equipe mandante da lista.";
+      if (!editor.game.awayRegistrationId)
+        fields.away = "Selecione uma equipe visitante da lista.";
+      if (
+        editor.game.homeRegistrationId &&
+        editor.game.homeRegistrationId === editor.game.awayRegistrationId
+      )
+        fields.away = "Escolha uma equipe diferente do mandante.";
+      if (
+        editor.game.round != null &&
+        (!Number.isInteger(editor.game.round) ||
+          editor.game.round < 1 ||
+          editor.game.round > 2147483647)
+      )
+        fields.round = "Informe um número inteiro maior que zero.";
+      setFieldErrors(fields);
+      if (Object.keys(fields).length) {
+        setError("Revise os campos indicados antes de salvar.");
+        return;
+      }
     }
     const parsed = saveGameEditorSchema.safeParse(
       pending.current ?? {
@@ -314,10 +329,18 @@ export function GamesWorkspace(props: Props) {
           pending.current,
         ));
       knownAck.current = result;
-      accept(
-        await api(`/api/games/${result.id}/editor`, gameEditorSnapshotSchema),
+      const snapshot = await api(
+        `/api/games/${result.id}/editor`,
+        gameEditorSnapshotSchema,
       );
-      setStatus("Jogo salvo");
+      const intent = saveAction.current;
+      accept(snapshot);
+      if (intent === "next") beginNew(snapshot.game);
+      setStatus(
+        intent === "next"
+          ? "Jogo salvo. Preencha o próximo confronto."
+          : "Jogo salvo",
+      );
       setEpoch((v) => v + 1);
       props.onSaved();
     } catch (e) {
@@ -344,6 +367,8 @@ export function GamesWorkspace(props: Props) {
   ) {
     if (busy || uncertain || conflict) return;
     setEditor((s) => (s ? { ...s, game: { ...s.game, [key]: value } } : s));
+    setFieldErrors({});
+    setError("");
     setStatus("");
   }
   function changeTime(field: "date" | "start" | "end", value: string) {
@@ -374,11 +399,6 @@ export function GamesWorkspace(props: Props) {
     editor && savedGame?.state === "finished"
       ? actualTimeError(editor.actualTimes)
       : "";
-  const candidates = [
-    ...new Map(
-      [...chosen, ...registrations.items].map((r) => [r.id, r]),
-    ).values(),
-  ];
   const showDialog = !!editor && !auxiliary && !sheetVisible;
   const feedback = (
     <>
@@ -412,8 +432,53 @@ export function GamesWorkspace(props: Props) {
       setError("");
     }
   }
+  function beginNew(previous?: GameSnapshot) {
+    const fresh = {
+      game: {
+        id: crypto.randomUUID(),
+        disputeId: props.disputeId,
+        homeRegistrationId: "",
+        awayRegistrationId: "",
+        date: previous?.date ?? null,
+        time: null,
+        startAt: null,
+        endAt: null,
+        venue: previous?.venue ?? null,
+        number: null,
+        stageKind: "round_robin" as const,
+        round: previous?.round ?? null,
+        knockoutStage: null,
+      },
+      version: 0,
+      officiating: emptyOfficiating(),
+      officialNames: emptyOfficialNames(),
+      actualTimes: { date: "", start: "", end: "", endNextDay: false },
+      roundText: previous?.round == null ? "" : String(previous.round),
+    };
+    setEditor(fresh);
+    setBaseline(
+      JSON.stringify({
+        game: fresh.game,
+        officiating: fresh.officiating,
+        officialNames: fresh.officialNames,
+        actualTimes: fresh.actualTimes,
+        roundText: fresh.roundText,
+      }),
+    );
+    setSavedGame(null);
+    setChosen([]);
+    setError("");
+    setStatus("");
+    setUncertain(false);
+    setConflict(false);
+    setFieldErrors({});
+    setOfficialsOpen(false);
+    pending.current = null;
+    knownAck.current = null;
+    saveAction.current = "save";
+  }
   return (
-    <section className="games-workspace">
+    <section className="games-workspace" ref={workspace}>
       <AdminToast
         message={
           props.enabled &&
@@ -459,33 +524,7 @@ export function GamesWorkspace(props: Props) {
           disabled={busy || auxiliary || sheetVisible || decisionLocked}
           onClick={() => {
             if (!mayLeave()) return;
-            setEditor({
-              version: 0,
-              game: {
-                id: crypto.randomUUID(),
-                disputeId: props.disputeId,
-                homeRegistrationId: "",
-                awayRegistrationId: "",
-                date: null,
-                time: null,
-                startAt: null,
-                endAt: null,
-                venue: null,
-                number: null,
-              },
-              officiating: emptyOfficiating(),
-              officialNames: emptyOfficialNames(),
-              actualTimes: { date: "", start: "", end: "", endNextDay: false },
-            });
-            setBaseline("");
-            setSavedGame(null);
-            setChosen([]);
-            setError("");
-            setStatus("");
-            setUncertain(false);
-            setConflict(false);
-            pending.current = null;
-            knownAck.current = null;
+            beginNew();
           }}
         >
           Novo jogo
@@ -538,14 +577,81 @@ export function GamesWorkspace(props: Props) {
           onClose={closeEditor}
           closeLabel="Voltar à lista de jogos"
           className="game-editor-dialog"
+          closeOnBackdrop
+          footer={
+            <>
+              <span className="game-save-note" role="status">
+                {busy
+                  ? "Salvando…"
+                  : uncertain
+                    ? "Envio não confirmado"
+                    : dirty
+                      ? "Alterações não salvas"
+                      : status || "Preencha o confronto para salvar"}
+              </span>
+              <div className="game-footer-actions">
+                {savedGame && (
+                  <button
+                    className="secondary"
+                    disabled={busy || uncertain || conflict || dirty}
+                    onClick={() => {
+                      if (occurrenceGuard.current()) setSheetVisible(true);
+                    }}
+                  >
+                    Preparar súmula
+                  </button>
+                )}
+                <button
+                  className="secondary game-cancel"
+                  disabled={busy}
+                  onClick={closeEditor}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="secondary"
+                  disabled={busy || conflict || decisionLocked}
+                  onClick={() => void save()}
+                >
+                  {uncertain
+                    ? knownAck.current
+                      ? "Recuperar jogo salvo"
+                      : "Repetir o mesmo envio"
+                    : "Salvar jogo"}
+                </button>
+                {!editor.version && !uncertain && (
+                  <button
+                    disabled={busy || conflict || decisionLocked}
+                    onClick={() => void save("next")}
+                  >
+                    Salvar e adicionar outro
+                  </button>
+                )}
+                {conflict && (
+                  <button
+                    disabled={busy}
+                    onClick={() => void load(editor.game.id)}
+                  >
+                    Recarregar jogo
+                  </button>
+                )}
+              </div>
+            </>
+          }
         >
-          {feedback}
+          {error && (
+            <p role="alert" ref={alert} tabIndex={-1} className="access-error">
+              {error}
+            </p>
+          )}
           <div className="teams-inline">
-            <p>
-              Horários em America/Sao_Paulo. Salvar não publica o resultado.
+            <p className="game-context">
+              {props.contextLabel ??
+                "Disputa · " +
+                  (props.gender === "feminino" ? "Feminino" : "Masculino")}
             </p>
             <fieldset
-              className="competition-form"
+              className="game-confrontation"
               disabled={
                 busy ||
                 uncertain ||
@@ -554,133 +660,234 @@ export function GamesWorkspace(props: Props) {
                 savedGame?.state === "finished"
               }
             >
-              <legend>Dados do jogo</legend>
-
+              <legend>Confronto</legend>
               <div className="game-opponents">
                 {(["homeRegistrationId", "awayRegistrationId"] as const).map(
                   (key, i) => (
-                    <label key={key}>
-                      {i ? "Inscrição visitante" : "Inscrição mandante"}
-                      <select
-                        aria-label={
-                          i ? "Inscrição visitante" : "Inscrição mandante"
-                        }
-                        value={editor.game[key]}
-                        onChange={(e) => {
-                          const r = candidates.find(
-                            (r) => r.id === e.target.value,
-                          );
-                          if (r)
-                            setChosen((rows) => [
-                              ...rows.filter((x) => x.id !== r.id),
-                              r,
-                            ]);
-                          change(key, e.target.value);
-                        }}
-                      >
-                        <option value="">Selecione uma inscrição</option>
-                        {candidates.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    <GamePicker
+                      key={key}
+                      kind="registration"
+                      label={i ? "Visitante" : "Mandante"}
+                      accessibleLabel={
+                        i ? "Inscrição visitante" : "Inscrição mandante"
+                      }
+                      value={
+                        chosen.find((r) => r.id === editor.game[key])?.name ??
+                        ""
+                      }
+                      excludedId={
+                        editor.game[
+                          i ? "homeRegistrationId" : "awayRegistrationId"
+                        ]
+                      }
+                      disputeId={props.disputeId}
+                      disabled={
+                        busy ||
+                        uncertain ||
+                        conflict ||
+                        decisionLocked ||
+                        savedGame?.state === "finished"
+                      }
+                      invalid={fieldErrors[i ? "away" : "home"]}
+                      onSessionLost={props.onSessionLost}
+                      onChange={(value, r) => {
+                        if (r)
+                          setChosen((rows) => [
+                            ...rows.filter((x) => x.id !== r.id),
+                            r,
+                          ]);
+                        change(key, value);
+                      }}
+                    />
                   ),
                 )}
               </div>
-
-              {savedGame?.state !== "finished" && (
-                <div className="game-actual-times">
-                  <label>
-                    Data do jogo
-                    <input
-                      type="date"
-                      value={gameTimeFields(editor.game).date}
-                      onChange={(e) => changeTime("date", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Hora de início
-                    <input
-                      type="time"
-                      value={gameTimeFields(editor.game).start}
-                      disabled={!gameTimeFields(editor.game).date}
-                      onChange={(e) => changeTime("start", e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Hora de fim
-                    <input
-                      type="time"
-                      value={gameTimeFields(editor.game).end}
-                      disabled={
-                        !gameTimeFields(editor.game).date ||
-                        !gameTimeFields(editor.game).start
-                      }
-                      onChange={(e) => changeTime("end", e.target.value)}
-                    />
-                  </label>
-                  <p role="status">
-                    Duração total (inclui intervalos):{" "}
-                    {durationMinutes(editor.game.startAt, editor.game.endAt) ===
-                    null
-                      ? "Informe a hora de fim para calcular."
-                      : `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min`}
-                    . Se o fim for anterior ao início, será considerado no dia
-                    seguinte.
-                  </p>
-                </div>
-              )}
-              <VenuePicker
-                value={editor.game.venue ?? ""}
-                onChange={(value) => change("venue", value || null)}
-                disabled={busy || !props.enabled}
-                onSessionLost={props.onSessionLost}
-              />
-              <label>
-                Número do jogo
-                <input
-                  maxLength={40}
-                  value={editor.game.number ?? ""}
-                  onChange={(e) => change("number", e.target.value || null)}
-                />
-              </label>
-              <div className="competition-actions game-registration-tools">
-                <label className="game-registration-search">
-                  Buscar inscrições para este jogo
-                  <input
-                    value={find}
-                    maxLength={120}
-                    onChange={(e) => {
-                      setFind(e.target.value);
-                      setFindOffset(0);
-                    }}
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={!findOffset}
-                  onClick={() => setFindOffset(Math.max(0, findOffset - 20))}
-                >
-                  Inscrições anteriores
-                </button>
-                <button
-                  type="button"
-                  disabled={!registrations.hasMore}
-                  onClick={() => setFindOffset(findOffset + 20)}
-                >
-                  Mais inscrições
-                </button>
+              <div className="game-registration-tools">
+                <p>Não encontrou uma equipe na disputa?</p>
                 <button
                   ref={auxiliaryTrigger}
                   type="button"
+                  className="game-add-registration"
                   onClick={() => {
                     if (occurrenceGuard.current()) setAuxiliary(true);
                   }}
                 >
                   Criar ou editar inscrição aqui
                 </button>
+              </div>
+            </fieldset>
+            <fieldset
+              className="game-agenda"
+              disabled={
+                busy ||
+                uncertain ||
+                conflict ||
+                decisionLocked ||
+                savedGame?.state === "finished"
+              }
+            >
+              <legend>
+                Agenda <span>Preenchimento opcional</span>
+              </legend>
+              <div className="game-agenda-grid">
+                {savedGame?.state !== "finished" && (
+                  <>
+                    <label>
+                      Data do jogo
+                      <input
+                        type="date"
+                        name="gameDate"
+                        autoComplete="off"
+                        value={gameTimeFields(editor.game).date}
+                        onChange={(e) => changeTime("date", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Hora de início
+                      <input
+                        type="time"
+                        name="gameStart"
+                        autoComplete="off"
+                        value={gameTimeFields(editor.game).start}
+                        disabled={!gameTimeFields(editor.game).date}
+                        onChange={(e) => changeTime("start", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Hora de fim
+                      <input
+                        type="time"
+                        name="gameEnd"
+                        autoComplete="off"
+                        value={gameTimeFields(editor.game).end}
+                        disabled={
+                          !gameTimeFields(editor.game).date ||
+                          !gameTimeFields(editor.game).start
+                        }
+                        onChange={(e) => changeTime("end", e.target.value)}
+                      />
+                    </label>
+                  </>
+                )}
+                <VenuePicker
+                  value={editor.game.venue ?? ""}
+                  onChange={(value) => change("venue", value || null)}
+                  disabled={
+                    busy ||
+                    uncertain ||
+                    conflict ||
+                    decisionLocked ||
+                    savedGame?.state === "finished" ||
+                    !props.enabled
+                  }
+                  onSessionLost={props.onSessionLost}
+                />
+                <label>
+                  Número do jogo
+                  <input
+                    name="gameNumber"
+                    autoComplete="off"
+                    maxLength={40}
+                    placeholder="Ex.: 024…"
+                    value={editor.game.number ?? ""}
+                    onChange={(e) => change("number", e.target.value || null)}
+                  />
+                </label>
+              </div>
+              <p className="game-agenda-hint" role="status">
+                Horários de Brasília.
+                {savedGame?.state !== "finished" &&
+                  editor.game.endAt &&
+                  " Duração total (inclui intervalos): " +
+                    `${Math.floor(durationMinutes(editor.game.startAt, editor.game.endAt)! / 60)}h${String(durationMinutes(editor.game.startAt, editor.game.endAt)! % 60).padStart(2, "0")}min.`}
+                {editor.game.startAt &&
+                  editor.game.endAt &&
+                  editor.game.startAt.slice(0, 10) !==
+                    editor.game.endAt.slice(0, 10) &&
+                  " Término no dia seguinte."}
+              </p>
+            </fieldset>
+            <fieldset
+              className="game-classification"
+              disabled={busy || uncertain || conflict || decisionLocked}
+            >
+              <legend className="admin-visually-hidden">
+                Rodada e eliminatória
+              </legend>
+              <GamePicker
+                kind="round"
+                label="Rodada (opcional)"
+                value={editor.roundText}
+                disputeId={props.disputeId}
+                disabled={busy || uncertain || conflict || decisionLocked}
+                invalid={fieldErrors.round}
+                onSessionLost={props.onSessionLost}
+                onChange={(value) => {
+                  if (busy || uncertain || conflict) return;
+                  setEditor((s) =>
+                    s
+                      ? {
+                          ...s,
+                          roundText: value,
+                          game: {
+                            ...s.game,
+                            round: value ? Number(value) : null,
+                          },
+                        }
+                      : s,
+                  );
+                  setFieldErrors({});
+                  setError("");
+                  setStatus("");
+                }}
+              />
+              <div className="game-knockout-fields">
+                <div className="game-knockout">
+                  <label className="game-knockout-check">
+                    <input
+                      type="checkbox"
+                      name="knockout"
+                      checked={editor.game.stageKind === "knockout"}
+                      aria-controls={stageId}
+                      onChange={(e) => {
+                        const knockout = e.target.checked;
+                        if (busy || uncertain || conflict) return;
+                        setEditor((s) =>
+                          s
+                            ? {
+                                ...s,
+                                game: {
+                                  ...s.game,
+                                  stageKind: knockout
+                                    ? "knockout"
+                                    : "round_robin",
+                                  knockoutStage: knockout
+                                    ? s.game.knockoutStage
+                                    : null,
+                                },
+                              }
+                            : s,
+                        );
+                        setStatus("");
+                      }}
+                    />
+                    Jogo de eliminatória
+                  </label>
+                </div>
+                <div id={stageId} hidden={editor.game.stageKind !== "knockout"}>
+                  <GamePicker
+                    kind="stage"
+                    label="Etapa (opcional)"
+                    value={editor.game.knockoutStage ?? ""}
+                    disputeId={props.disputeId}
+                    disabled={busy || uncertain || conflict || decisionLocked}
+                    onSessionLost={props.onSessionLost}
+                    onChange={(value) => change("knockoutStage", value || null)}
+                  />
+                </div>
+                <p className="game-knockout-hint">
+                  Marque apenas para jogos eliminatórios.
+                </p>
               </div>
             </fieldset>
             {savedGame?.state === "finished" && (
@@ -779,52 +986,43 @@ export function GamesWorkspace(props: Props) {
                 </fieldset>
               </>
             )}
-            <OfficiatingEditor
-              slots={editor.officiating}
-              names={editor.officialNames}
-              disabled={
-                busy ||
-                uncertain ||
-                conflict ||
-                decisionLocked ||
-                !props.enabled
-              }
-              onSessionLost={props.onSessionLost}
-              onChange={(officiating, officialNames) => {
-                setEditor((s) =>
-                  s ? { ...s, officiating, officialNames } : s,
-                );
-                setStatus("");
-              }}
-            />
-            <div className="competition-actions">
-              <button
-                disabled={busy || uncertain || conflict || dirty || !savedGame}
-                onClick={() => {
-                  if (occurrenceGuard.current()) setSheetVisible(true);
+            <details
+              className="game-officiating"
+              open={officialsOpen}
+              onToggle={(e) => setOfficialsOpen(e.currentTarget.open)}
+            >
+              <summary>
+                Arbitragem e mesa{" "}
+                <span>
+                  {
+                    officialRoles.filter((r) => editor.officialNames[r].trim())
+                      .length
+                  }{" "}
+                  de 6 oficiais informados · opcional
+                </span>
+              </summary>
+              <OfficiatingEditor
+                slots={editor.officiating}
+                names={editor.officialNames}
+                disabled={
+                  busy ||
+                  uncertain ||
+                  conflict ||
+                  decisionLocked ||
+                  !props.enabled
+                }
+                onSessionLost={props.onSessionLost}
+                onChange={(officiating, officialNames) => {
+                  setEditor((s) =>
+                    s ? { ...s, officiating, officialNames } : s,
+                  );
+                  setStatus("");
                 }}
-              >
-                Preparar súmula
-              </button>
-              <button
-                disabled={busy || conflict || decisionLocked}
-                onClick={() => void save()}
-              >
-                {uncertain
-                  ? knownAck.current
-                    ? "Recuperar jogo salvo"
-                    : "Repetir o mesmo envio"
-                  : "Salvar jogo"}
-              </button>
-              {conflict && (
-                <button
-                  disabled={busy}
-                  onClick={() => void load(editor.game.id)}
-                >
-                  Recarregar jogo
-                </button>
-              )}
-            </div>
+              />
+            </details>
+            <p className="game-publication-note">
+              Salvar o jogo não publica o resultado.
+            </p>
             {savedGame && (
               <GameOccurrencePanel
                 key={savedGame.id}
