@@ -6,6 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "routes": [{ "pattern": "basedobasquete.com.br", "custom_domain": true }],
   "assets": {
     "directory": "./dist-foundation",
     "binding": "ASSETS",
@@ -13,7 +14,7 @@
     "run_worker_first": true,
   },
   "vars": {
-    "APP_ORIGIN": "https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+    "APP_ORIGIN": "https://basedobasquete.com.br",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
   },
   "secrets": {
