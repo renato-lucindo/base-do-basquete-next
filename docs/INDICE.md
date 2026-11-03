@@ -167,6 +167,8 @@ Diretório: [`docs/decisoes/`](decisoes/). Leia **apenas** as decisões relevant
 
 ## 7. Histórico e evidências
 
+Entrega pública atual: [classificação e estatísticas de equipes](evidencias/2026-11-03-tabelas-classificacao-equipes.md), com testes, capturas e deployment da PR #49. Consulte apenas quando a tarefa exigir essas provas; o resumo de execução permanece em PROGRESSO.md.
+
 Preservados para consulta pontual. **Não substituem decisões vigentes.**
 
 | Local                                                                       | Conteúdo                                                                                         |
