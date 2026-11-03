@@ -1,0 +1,35 @@
+# Tabelas públicas de classificação e equipes
+
+03/11/2026. Pedido anexado pelo responsável nesta conversa. Mesma [PR #49](https://github.com/renato-lucindo/base-do-basquete-next/pull/49), branch `codex/navegacao-publica`, incremento `77601df6dd5c199ee04e739626525723976db7dd` após `a7d59b9`. Sem migrations, dados humanos, merge ou produção nesta implementação. O [checkpoint anterior](../../historico/progresso/2026-11-03-antes-tabelas-equipes.md) registra a implantação prévia da navegação.
+
+## Entrega e fontes
+
+- Classificação: exatamente **Pos. / Equipe / J / V / D / Aprov. / PP / PC / SLD**. Aproveitamento é V/J × 100; J=0 permanece indefinido. Equipe liga ao perfil por teamId e registrationId. O domínio de `regulation/standings.ts` e `outcome-standings.ts`, os DTOs de fonte/classificação e a confirmação pública permanecem intactos. A apresentação ordena somente por posição, conservando empates e a ordem do domínio, sem critério de nome/UUID.
+- Equipes: novas células estatísticas e cobertura por métrica no DTO existente, uma linha por inscrição. Reutilizados metadados/presets de métricas, cálculo individual para aditivos integralmente cobertos no PDF, MetricCell, ColumnPicker e ScrollableTable de Jogadores; nota do picker parametrizada com o texto anterior como default. Busca, modos, fonte de dados, fase pública, presets/colunas e ordenação por cabeçalho conservam URL/paginação/retorno do perfil. Ausentes ficam ao final de ambas as direções de ordenação.
+- PTS conserva o total oficial e PPJ a média oficial, como na tabela de Jogadores. As demais contagens normalizáveis alternam total/média; J e estados disciplinares continuam contagens. PP/PC/saldo numéricos anteriores permanecem disponíveis para o perfil e links antigos. Nomes e identidades vêm das ocasiões publicadas.
+- LL% usa os totais coletivos `freeMade/freeTaken` nas súmulas. PDF usa as tentativas/convertidos avançados somente quando todas as participações publicadas oferecem cobertura. Somam-se numeradores/denominadores antes da divisão, sem média de percentuais; nenhuma tentativa ou cobertura incompleta resulta em indisponível. O mesmo identificador `freeThrowPercentage` aparece uma única vez nos presets de súmula/boxscore/todas.
+- AST, roubos, tocos, faltas e arremessos de PDF só somam participações com cobertura integral. REB/RO/RD, ER e EF não recebem totais artificiais: a fonte atual não oferece os eventos coletivos não atribuídos necessários para completá-los. MIN, +/− e PP% individuais não têm soma coletiva válida. Esses campos são indisponíveis e explicados na interface. Coletivos já publicados do PDF, como pontos no garrafão/por posse/maior vantagem, continuam preservados por jogo no perfil. Não houve ampliação da publicação para buscar dados privados ou alterar contratos G4.
+- A consulta continua usando a fonte paginada e versionada do ADR 019. Nenhum RPC, SQL ou credencial nova. Fase não publicada continua desconhecida; não usar regulamento privado ou metadado live para completar a consulta.
+
+Referência funcional examinada localmente em `base-do-basquete/app/components/public-sports-core.tsx` e nos módulos de métricas/estatísticas do projeto anterior. Aproveitados a estrutura das nove colunas, links por contexto e percentuais ponderados. Não copiados o desempate por nome, consultas, contratos ou publicação do legado.
+
+## Verificação observada
+
+- `npm run gate` **PASS**: **672 testes / 136 arquivos**, 6 transportes, 13 de banco descartável, 28 HTTP/Workerd, 1 runtime PDF, tipos, lint, formato, builds, fronteiras e scanner de segredos. Log local `.preview-artifacts/team-columns-gate.log`.
+- `npx vitest run src/team-statistics`: **27 PASS**, incluindo seis testes novos: LL% 1/1 + 0/9 = 10%, total/média, zero/ausência, fase, duas inscrições da mesma equipe, boxscore/aditivos, rejeição de cobertura incompleta, ordenação/URL e contaminação de cobertura do DTO. Domínio de desempate mantido; suite focal conjunta anterior de equipes/standings/outcome: 37 PASS.
+- Playwright: **26 PASS** no conjunto classificação/equipes antes do refinamento final; **14 PASS** após a revisão visual final e o cenário de aproveitamento distinto dos pontos de campeonato, com sobreposição. As sete situações finais verificam cabeçalhos exatos, J=0, correção, fases, links, LL%, presets, estado da URL e perfil, nomes longos, 320 CSS px, ampliação CSS de 200%, teclado e axe nos estados exercitados.
+- Regressão focal de Jogadores: `tests/statistics.spec.ts` / `statistics-simple.spec.ts`, grep `MIN oculta|resposta antiga|súmula apresenta|busca/filtros`: **7 PASS / 1 SKIP** previsto pelo teste móvel. Não somar execuções sobrepostas como casos únicos.
+- Revisão com ui-ux-pro-max: recomendação específica de contenção de tabelas responsivas. Web Interface Guidelines consultadas na [fonte vigente](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md). Corrigidos inclusão dos estilos compartilhados, largura explícita das colunas e contenção, nomes longos, links reconhecíveis e instruções expansíveis. Testes de largura mínima e altura da linha impedem a regressão visual que os primeiros testes apenas de overflow não detectavam. Sem parecer independente, teste de leitor de tela ou alegação de conformidade WCAG integral.
+
+O primeiro browser focal falhou no regex do link por não admitir o `returnTo` existente; o teste foi corrigido preservando a URL do produto. A primeira versão de muitas colunas falhou em 320 px e na inspeção visual; estilos/colgroup/larguras foram corrigidos e as verificações repetidas. Nenhum timeout ou teste foi desativado para contornar essas falhas.
+
+| Página | Desktop | Mobile |
+| --- | --- | --- |
+| Classificação | [Nove colunas](navegacao-publica/classificacao-colunas-desktop.png) | [Nove colunas](navegacao-publica/classificacao-colunas-mobile.png) |
+| Equipes, muitas colunas | [Tabela](navegacao-publica/equipes-colunas-desktop.png) | [Tabela](navegacao-publica/equipes-colunas-mobile.png) |
+
+## CI e preview
+
+CI consolidada deste incremento deve ser verificada por SHA nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks); os runs anteriores `41622557571`/`41619304640` foram SUCCESS, mas não validam este novo código. O [preview exclusivo PR49](https://base-do-basquete-next-pr49.renato-lucindo-jr.workers.dev/publico.html) ainda servia `c5257dd` ao preparar este registro; a atualização somente ocorrerá após aprovação da CI, sob a autorização de preview vigente nesta conversa. Estado efetivo de publicação e resultado remoto serão registrados na descrição da PR/checkpoint.
+
+Migrations remotas e produção proibidas neste pedido; nenhum novo DDL é necessário. Piloto autenticado da confirmação de regulamento continua sendo aceite separado e pendente. Não se publicou conjunto humano para demonstrar as tabelas. Coletivos sem fonte suficiente são uma limitação de dados, não permissão para preenchê-los com soma incompleta.
