@@ -3,6 +3,34 @@ import AxeBuilder from "@axe-core/playwright";
 import { gamesFixture, selectGameRegistration } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
 
+test("busca mantém a opção ativa visível ao navegar pela lista com teclado", async ({
+  page,
+}) => {
+  const f = await gamesFixture(page);
+  const template = f.registrations.get(tid(5))!;
+  for (let n = 30; n < 55; n++)
+    f.registrations.set(tid(n), {
+      ...template,
+      id: tid(n),
+      name: `Equipe ${n}`,
+    });
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+  );
+  await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
+  const field = page.getByLabel("Inscrição mandante", { exact: true });
+  await field.fill("Equipe");
+  await expect(
+    page.getByRole("option", { name: "Equipe 49", exact: true }),
+  ).toBeAttached();
+  for (let n = 0; n < 20; n++) await field.press("ArrowDown");
+  const option = page.getByRole("option", { name: "Equipe 49", exact: true });
+  await expect(option).toHaveAttribute("aria-selected", "true");
+  await expect(option).toBeInViewport();
+  await field.press("Enter");
+  await expect(field).toHaveValue("Equipe 49");
+});
+
 test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visíveis", async ({
   page,
 }, info) => {

@@ -50,6 +50,12 @@ export function GamePicker(props: Props) {
     registration = props.kind === "registration";
   const popupStyle = useAnchoredOptions(input, popup, open && !props.disabled);
   useEffect(() => {
+    if (open && active >= 0)
+      popup.current
+        ?.querySelector<HTMLElement>('[role="option"][aria-selected="true"]')
+        ?.scrollIntoView({ block: "nearest" });
+  }, [open, active]);
+  useEffect(() => {
     if (!open || props.disabled) return;
     const controller = new AbortController();
     let current = true;
