@@ -1,25 +1,23 @@
 # Progresso atual
 
-Atualizado em 03/11/2026. [Escopo](MATRIZ-ESCOPO.md) · [Roadmap](ROADMAP.md). [Checkpoint anterior](../historico/progresso/2026-11-03-antes-liberacao-publica.md) preserva as provas e decisões do cadastro de jogos.
+Atualizado em 03/11/2026, após retomada automática. [Checkpoint da pausa](../historico/progresso/2026-11-03-pausa-liberacao-dominio.md) preserva autorização, cota, agendamento e estados anteriores. [Escopo](MATRIZ-ESCOPO.md) · [Roadmap](ROADMAP.md).
 
-## Liberação autorizada — PR #49 antes da PR #50
+## Liberação do domínio e separação das entradas
 
-O responsável autorizou na conversa de liberação do domínio concluir validação, integração, migrations e deploy para campeonatos na raiz e administração em `/admin`. Mesma PR #49, branch `codex/navegacao-publica`, revisão em worktree detached exclusivo `C:/Users/12405304716/.codex/worktrees/pr49-liberacao-20261103`, origem `83ca28c8f0d5b372aa216504fa3226fb8f4f73b5`. A unidade de domínio da PR #50 aguarda esta integração, sem incorporação de WIP ou nova pilha.
+O responsável autorizou integração, migrations e deploy para campeonatos em https://basedobasquete.com.br/ e administração em /admin. A retomada ocorreu após reset: ferramenta real confirmou 1% consumido na janela de 5h e 15% semanal. Procedimento permanente em CONTRIBUTING.md: checkpoint e heartbeat reset + dois minutos ao pausar por cota. Automação desta conversa: retomar-libera-o-do-dom-nio-ap-s-reset; pausar ao concluir.
 
-- Corrigido thread de revisão: repetir busca com o mesmo termo após erro agora dispara requisição nova. Navegação pública 16 browsers PASS; teste novo 2 PASS.
-- CI anterior [41683662938](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41683662938): gate/design PASS, 548 browsers PASS / 109 SKIP / 1 FAIL no alinhamento mobile. CSS corrigido sem afrouxar teste; focal original 2 PASS em desktop/mobile/zoom/320px. CI do novo HEAD ainda deve ser conferida.
-- Migrations **aplicadas**, ledger conferido: `20261103174254_sheet_team_statistics.sql` e `20261103174303_game_editor_metadata.sql`. Nomes reconciliados com versões reais sem mudar SQL. Banco descartável 3 PASS; verificações remotas de estrutura/grants e inventário preservados, sem novo achado de advisor. [Evidência detalhada](evidencias/2026-11-03-liberacao-publica.md).
-- Preview PR49 continua na versão anterior `61d47226-5f8b-4693-930c-44e5e33529ce`, fonte `7720909`; não foi republicado. Serviço do domínio permanece na versão de configuração `188ff4c2-b3ae-40ec-bb90-e3df7192429c`; raiz pública ainda não implantada.
-- Checkout humano `sync/trabalho-casa`, CONTRIBUTING/skills e demais worktrees preservados. A revisão da liberação foi feita em cópia detached; o trabalho do cadastro continuou no worktree original da PR49. Não inventar nova execução de provas inalteradas.
+- PR #49 integrada por merge commit em e310a0c30da753c9ee7f82f32e4349e7825cbeae, 03/11 às 22:10:12 UTC, sem bypass. CI do head63917c9 SUCCESS, run41691195491; quatro conversas de revisão conferidas resolvidas. Conferir CI integrada antes de concluir. Provas detalhadas: [liberação pública](evidencias/2026-11-03-liberacao-publica.md), [cadastro de jogos](evidencias/2026-11-03-dialogo-jogos.md).
+- Mesma PR #50, branch codex/dominio-proprio, worktree C:/Users/12405304716/.codex/worktrees/dominio-proprio. Merge explícito de origin/main após integrar49. Conflitos somente em checkpoint e roteamento: raiz serve /publico.html; /admin e /admin/ servem /foundation.html. Teste HTTP com assets reais verifica separação e guarda administrativa. CI anterior de fb9fcbf SUCCESS, run41694489736; código da composição exige nova CI.
+- Histórico do cadastro, alinhamento mobile e revisão da PR49 preservado nas evidências e arquivos históricos incorporados. Sem nova unidade ou nova PR na retomada.
 
-## Cadastro de jogos — retomada desta conversa
+## Banco e serviço
 
-- Pop-up aprovado implementado em `7e5b1fc`; teclado e limite de busca refinados. **99 browsers PASS / 31 SKIP**, gate local por composição, mais **24 browsers** e **2 focais** após refinamentos. [Contrato, capturas e provas](evidencias/2026-11-03-dialogo-jogos.md).
-- Alinhamento pela base dos campos em `48d004b4e72aa2a765442277a333d4b67d409458`, incluindo rótulo de duas linhas e fonte ampliada: **34 browsers PASS**, lint/tipos/build. Substitui o ajuste paralelo de espaçamento fixo; requisito estrito do teste preservado. Integração de `52d430a` preserva a busca pública e as migrations reconciliadas, sem reaplicar SQL. Resultado consolidado do SHA enviado nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/49/checks).
-- Esta conversa não executou merge da PR, DDL remoto ou deploy. As operações da unidade de liberação e seus limites estão na evidência própria acima. A automação `concluir-di-logo-de-jogos-na-pr-49` será pausada ao concluir; a anterior `retomar-navega-o-p-blica-pr-49` permanece pausada.
+Migrations já aplicadas no Supabase nizmasjddyrhmevvfviz: 20261103174254_sheet_team_statistics e 20261103174303_game_editor_metadata; SQL imutável. Não reaplicar, alterar ledger ou executar seeds. Provas, hashes, estrutura/grants e baseline de advisor na evidência da liberação; nenhuma nova operação de banco na retomada.
 
-Próximo passo: publicar correções/checkpoint na mesma PR #49, conferir CI do novo SHA e thread resolvido; merge commit autorizado. Depois atualizar e concluir #50 sobre main, validar composição e publicar o domínio. CI obrigatória dos SHAs integrados; login humano/aceite visual não presumidos. Nenhuma retomada automática criada nesta liberação.
+Worker base-do-basquete-next-preview ainda na versão188ff4c2-b3ae-40ec-bb90-e3df7192429c, deployment08b39ef7-51bc-4f1f-b33b-69e0f741b2de em100%. Novo bundle ainda não publicado. Origem https://basedobasquete.com.br; domínio próprio sem Access por decisão explícita, previews protegidos. Rewrite /admin já configurado na borda e preservado. [Configuração do domínio](DOMINIO-PROPRIO.md). Rede corporativa bloqueia teste remoto; confirmação humana posterior ao deploy continua pendente.
 
-## Revisão final após CI aprovada
+## Continuidade
 
-CI de 895dd82 aprovada: gate/design e 551 browsers PASS / 109 SKIP. Merge bloqueado por três novos threads, sem bypass. Corrigidos parâmetros reais da API de equipes, unidade de pontos consistente no dataset misto e links de perfis sem resultados. 12 unitários, 1 HTTP Workerd e 32 browsers focais PASS, builds/lint/tipos PASS. CI do novo SHA deve ser conferida antes da integração; provas e limites na evidência da liberação. Nenhum deploy de código adicional nem nova operação de banco.
+Validar composição, conferir CI atual/revisão e integrar a PR50; conferir CI do SHA integrado e publicar código validado, registrando versão/deployment e bindings preservados. Atualizar este checkpoint com resultados reais e pausar heartbeat ao concluir. Reutilizar provas de artefatos inalterados.
+
+Preservadas mudanças alheias do checkout principal sync/trabalho-casa (CONTRIBUTING.md, .agents/skills/web-design-guidelines/, skills-lock.json) e demais worktrees. Não sobrescrever trabalho do outro agente da PR49. Temporários em Y:/Codex-Temp/pr49-liberacao-20261103.

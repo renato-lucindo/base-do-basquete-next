@@ -1,60 +1,15 @@
-// Ephemeral service credential arrives encrypted for a private key held in memory.
-import {
-  generateKeyPairSync,
-  privateDecrypt,
-  constants,
-  createHash,
-  randomUUID,
-  randomBytes,
-} from "node:crypto";
+// The canonical domain is public; administrative APIs still require an app session.
+import { createHash, randomUUID, randomBytes } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { createInterface } from "node:readline";
 import assert from "node:assert/strict";
 import { chromium } from "@playwright/test";
 
-const { publicKey, privateKey } = generateKeyPairSync("rsa", {
-  modulusLength: 2048,
-});
-console.log(
-  JSON.stringify({
-    publicKey: publicKey
-      .export({ type: "spki", format: "der" })
-      .toString("base64"),
-  }),
-);
-const input = createInterface({ input: process.stdin, terminal: false });
-const ciphertext = await new Promise((resolve, reject) => {
-  const timer = setTimeout(
-    () => reject(new Error("Credential delivery timeout")),
-    240000,
-  );
-  input.once("line", (line) => {
-    clearTimeout(timer);
-    resolve(line);
-  });
-});
-input.close();
-const credential = JSON.parse(
-  privateDecrypt(
-    {
-      key: privateKey,
-      oaepHash: "sha256",
-      padding: constants.RSA_PKCS1_OAEP_PADDING,
-    },
-    Buffer.from(ciphertext, "base64"),
-  ).toString(),
-);
-const headers = {
-  "CF-Access-Client-ID": credential.client_id,
-  "CF-Access-Client-Secret": credential.client_secret,
-  "Cache-Control": "no-cache, no-store",
-};
-const origin =
-  "https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev";
+const headers = { "Cache-Control": "no-cache, no-store" };
+const origin = "https://basedobasquete.com.br";
 const manifest = JSON.parse(
   readFileSync(".worker-artifacts/foundation-manifest.json", "utf8"),
 );
-let stage = "Access propagation";
+let stage = "deployment availability";
 let status;
 let browser;
 let currentPage;
@@ -224,7 +179,7 @@ try {
   const rejection = await invalid.json();
   stage = "Auth error contract";
   assert.equal(rejection.error.code, "invalid_session");
-  // Access can set its own cookies; failed password login must not mint an app session.
+  // Failed password login must not mint an application session.
   stage = "no application cookie on invalid password";
   assert.ok(
     !invalid.headers
@@ -255,7 +210,20 @@ try {
     const document = await page.goto(origin, { waitUntil: "domcontentloaded" });
     status = document?.status();
     assert.equal(status, 200);
-    stage = `browser ${name} ready`;
+    stage = `browser ${name} public home`;
+    await page
+      .getByRole("heading", { name: "Competições", exact: true })
+      .waitFor();
+    assert.equal(await page.getByLabel("Senha", { exact: true }).count(), 0);
+    await page.screenshot({
+      path: `.preview-artifacts/home-${name}.png`,
+      fullPage: true,
+    });
+    const adminDocument = await page.goto(origin + "/admin", {
+      waitUntil: "domcontentloaded",
+    });
+    assert.equal(adminDocument.status(), 200);
+    stage = `browser ${name} admin ready`;
     await page
       .getByRole("heading", { name: "Acesso administrativo" })
       .waitFor();

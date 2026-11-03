@@ -70,6 +70,7 @@ test("foundation upload refuses an unexpected target or expanded/missing Access 
         success: true,
         result: {
           domain: "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+          destinations: [{ type: "public", uri: "basedobasquete.com.br" }],
           policies: [{ decision: "allow", include: [{ everyone: {} }] }],
         },
       };
@@ -86,4 +87,58 @@ test("foundation upload refuses an unexpected target or expanded/missing Access 
   await assert.rejects(uploadFoundation(payload, client), /Access protection/);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].method, "GET");
+});
+
+test("foundation upload keeps the public canonical origin and protects the separate preview", async () => {
+  const payload = {
+    accountId: "16b4a5e0a99a031d28051ebadb4811cc",
+    workerName: "base-do-basquete-next-preview",
+    sourceCommit: "1234567890123456789012345678901234567890",
+    modules: { "index.mjs": "export default {};" },
+  };
+  let uploadedMetadata;
+  const calls = [];
+  const client = {
+    request: async (request) => {
+      calls.push(request);
+      if (request.path.includes("/access/apps/"))
+        return {
+          success: true,
+          result: {
+            domain:
+              "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+            destinations: [
+              {
+                type: "public",
+                uri: "base-do-basquete-next-preview.renato-lucindo-jr.workers.dev",
+              },
+            ],
+            policies: [
+              {
+                decision: "allow",
+                include: [{ email: { email: "renato.lucindo.jr@gmail.com" } }],
+              },
+            ],
+          },
+        };
+      if (request.path.endsWith("/settings"))
+        return { success: true, result: { tags: ["foundation"] } };
+      assert.equal(request.method, "PUT");
+      const multipart = await new Request("https://upload.test", {
+        method: "POST",
+        headers: { "content-type": request.contentType },
+        body: request.body,
+      }).formData();
+      uploadedMetadata = JSON.parse(await multipart.get("metadata").text());
+      return { success: true, result: { id: payload.workerName } };
+    },
+  };
+  assert.equal((await uploadFoundation(payload, client)).success, true);
+  assert.equal(
+    uploadedMetadata.bindings.find((binding) => binding.name === "APP_ORIGIN")
+      .text,
+    "https://basedobasquete.com.br",
+  );
+  assert.deepEqual(uploadedMetadata.keep_bindings, ["secret_text"]);
+  assert.equal(uploadedMetadata.migrations, undefined);
 });

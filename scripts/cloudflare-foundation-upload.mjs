@@ -2,6 +2,7 @@
 export async function uploadFoundation(payload, client = cloudflare) {
   const account = "16b4a5e0a99a031d28051ebadb4811cc";
   const name = "base-do-basquete-next-preview";
+  const hostname = "basedobasquete.com.br";
   const appId = "556be918-42ad-44e5-a85f-c2783f65b2ba";
   if (payload.accountId !== account || payload.workerName !== name)
     throw new Error("Unexpected target");
@@ -37,7 +38,7 @@ export async function uploadFoundation(payload, client = cloudflare) {
   if (existing && !settings.result.tags?.includes("foundation"))
     throw new Error("Refusing to replace an unrelated Worker");
   const bindings = [
-    { name: "APP_ORIGIN", type: "plain_text", text: `https://${app.domain}` },
+    { name: "APP_ORIGIN", type: "plain_text", text: `https://${hostname}` },
     {
       name: "SUPABASE_URL",
       type: "plain_text",
