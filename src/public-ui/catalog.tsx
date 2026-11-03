@@ -212,6 +212,7 @@ export function PublicDiscovery({
     "";
   const [query, setQuery] = useState(initial);
   const [submitted, setSubmitted] = useState(initial);
+  const [searchAttempt, setSearchAttempt] = useState(0);
   const [result, setResult] = useState<{
     key: string;
     players: typeof searchPageSchema._output.players;
@@ -255,7 +256,7 @@ export function PublicDiscovery({
         if (!c.signal.aborted) setLoading(false);
       });
     return () => c.abort();
-  }, [submitted]);
+  }, [submitted, searchAttempt]);
   const teams = submitted
     ? [
         ...new Map(
@@ -292,6 +293,7 @@ export function PublicDiscovery({
           const p = new URLSearchParams({ q: query.trim() });
           window.location.hash = `?${p}`;
           setSubmitted(query.trim());
+          setSearchAttempt((attempt) => attempt + 1);
         }}
       >
         <label htmlFor="public-search">

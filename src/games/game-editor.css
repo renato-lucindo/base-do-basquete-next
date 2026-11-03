@@ -296,6 +296,16 @@
     grid-column: 1/-1;
     max-width: 135px;
   }
+  .game-editor-dialog
+    .game-classification
+    > div:last-child
+    .game-picker
+    > label {
+    min-height: 2.5rem;
+  }
+  .game-editor-dialog .game-knockout {
+    padding-top: calc(2.5rem + 7px);
+  }
   .game-editor-dialog .game-knockout-check {
     font-size: 0.75rem;
   }
