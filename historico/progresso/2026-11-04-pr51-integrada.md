@@ -1,0 +1,23 @@
+# Progresso atual
+
+Atualizado em04/11/2026. [Contrato](design/REFORMA-UIUX.md) · [Validação/capturas](design/VALIDACAO-REFORMA-UIUX.md) · [Checkpoint anterior](../historico/progresso/2026-11-04-antes-integracao-perfil-real.md).
+
+## Unidade ativa — perfil real e súmula preservada, PR #51
+
+- Worktree `C:/Users/12405304716/.codex/worktrees/reforma-uiux`, branch `codex/reforma-uiux-piloto`, base/origin/main `eff36fe0eda76962e6babbc4a9464a98c3dad478` conferida por fetch. [PR #51](https://github.com/renato-lucindo/base-do-basquete-next/pull/51) Draft. Material **`853cc8ac8cfaa65982c994e3d6590e8504e35525`**; HEAD documental posterior recuperar por Git. Mesma unidade/PR.
+- Autorização expressa “Ok, pode implementar na PR” permite levar o último plano de perfil/jogo às rotas reais nesta PR. `/atleta.html` passa à página contínua: identificação pública/conquistas, resumo temporada/carreira, até3 atuações recentes e estatísticas por inscrição, seguidos de Jogos completos/Histórico/Evolução recolhidos. A origem não limita a carreira; filtros/checkboxes/ordem/colunas/painéis/retorno/rolagem persistem. Sem inventar foto/idade/data completa, cobertura ou premiação individual.
+- Súmula real preservada, sem mudar `PublicGameView` ou sua folha. Retorno de jogos de outra disputa ao perfil público identificado corrigido. API pública, Worker, banco, migrations, publicação e deploy sem alterações. Busca global nova, demais páginas públicas e administração continuam no piloto; sem boxscore/comparação/recordes novos. Não declarar a reforma inteira entregue nem aceite visual final.
+
+## Provas e CI
+
+- `npm run gate` **PASS**:693 unitários/142 arquivos, transporte7, banco isolado13, Worker/HTTP29, PDF/workerd1, tipos/builds/lint/formato/fronteira/segredos. Depois, nomes de campos/rolagem dos menus e fixture/cache do preview receberam TypeScript/lint/formato focais; cálculos/contratos/Worker iguais. Scanner de fontes final PASS1058 arquivos; logs/hashes/limites na validação.
+- Browsers: **42 PASS** perfil/acessibilidade + **38 PASS** navegação/jogo/fidelidade/visual; **6 PASS** reaplicados após polimento. Nomes longos,320/390/1366/1920, texto200%, teclado/foco/axe, filtros independentes, paginação25 registros, origem de outra disputa, participação explícita, ausência/zero/cobertura e retry/inconsistência. Capturas reais com fixtures versionadas. Revisão do autor `ui-ux-pro-max`/`web-design-guidelines`; sem parecer independente, leitor de tela humano ou certificação WCAG integral.
+- Contrato existente entrega páginas de20. Carreira completa exige ler todas, concorrência3, validando identidade/consulta/publicação/unicidade/totais antes de agregar. Falha detectável impede resumo parcial; sem token transacional ou benchmark no limite de10000. Placar só é combinado com a mesma publicação da participação; indisponível/corrigido conserva —. Somente fixtures locais nas provas.
+- CI anterior `5e8226bd17181199142fc80be85481d9773f1d55`: [41835454084](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41835454084) **SUCCESS**, conferida nesta execução. Este checkpoint antecede o push novo; **CI nova pendente**. Consultar SHA/run nos [checks](https://github.com/renato-lucindo/base-do-basquete-next/pull/51/checks) e descrição da PR, sem extrapolar o PASS anterior.
+
+## Continuidade e preservação
+
+- [Preview da rota real com fixtures](http://127.0.0.1:5177/atleta.html#f9300000-0000-4000-8000-000000010000), `npm run preview:public`; identificado como teste, cache separado, HTTP200/sem erro JavaScript. Servidor local em5177 nesta execução. [Piloto offline](design/prototipos/reforma-uiux/Piloto%20UIUX.html) inalterado:364501 bytes/SHA256 `782a247dbba5c27c2d6827325a7e4b7f7679698df836c979be5bd762bd7c49ee`, servido em4189; não incorpora um backend offline.
+- Próximo passo: conferir CI do HEAD enviado e avaliar o perfil integrado. Ajustes nesta mesma PR; demais etapas da reforma não foram ampliadas. Nenhum merge/deploy ou inspeção remota de dados humanos. Serviço publicado herdado não foi modificado; referências no checkpoint anterior.
+- Checkout principal `sync/trabalho-casa`: `CONTRIBUTING.md` modificado e `.agents/skills/web-design-guidelines/`/`skills-lock.json` não rastreados, preservados. Outros worktrees intocados.
+- Cota real mais recente:23% restante/5h, semanal52% restante. Não atingiu o gatilho15%; confirmar valor final na descrição da PR. Automação existente `retomar-piloto-uiux-pr-51` continua **PAUSED**; esta execução conclui a implementação autorizada, sem consumir créditos/resets. Se surgir pausa por cota, atualizar o mesmo agendamento pelo reset real+2min conforme CONTRIBUTING.md.
