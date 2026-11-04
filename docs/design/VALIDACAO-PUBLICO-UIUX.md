@@ -13,7 +13,7 @@ Filtros de equipes existentes continuam com checkboxes, Todas/Nenhuma, composiç
 ## Verificações
 
 - TypeScript/eslint focais PASS.
-- Browsers públicos:157 PASS e7 skips mobile já existentes em statistics-simple;12 arquivos,164 cenários desktop/mobile. Conferência final adicional dos alinhamentos:4 PASS. Gate consolidado em execução.
+- Browsers públicos:157 PASS e7 skips mobile já existentes em statistics-simple;12 arquivos,164 cenários desktop/mobile. Conferência final adicional dos alinhamentos:4 PASS. Gate consolidado PASS:693 unitários/142 arquivos, transporte7, banco isolado13, Worker/HTTP29, PDF/workerd1, lint/formato/tipos/build/fronteira cliente/segredos. Ambiente Windows, Node24.18, Wrangler4.152.0, material91b5fe1.
 - Casos novos: header de outra rota, tabelas1366/1920,25 jogos paginados com ausências, filtro vazio/recarregar e retorno exato das duas rolagens. Fixtures não atribuem atuação por mera associação à equipe.
 - Casos existentes reutilizados/executados para contratos, seleção vazia, ordenação, foco/teclado, dados incompatíveis, fonte insuficiente e links de volta. Reflow320,390, ampliação de texto200%/zoom e axe contemplados nos browsers públicos.
 
@@ -21,7 +21,14 @@ Filtros de equipes existentes continuam com checkboxes, Todas/Nenhuma, composiç
 
 Aplicadas ui-ux-pro-max (consulta local de tabelas/responsividade) e web-design-guidelines com fonte atualizada em04/11: [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md). Referências orientam interação; tema e decisões locais prevalecem.
 
-Achados corrigidos: largura mínima global/colunas distribuídas em statistics/reference.css e team-statistics/public-tables.tsx; alinhamento do nome da equipe; informação técnica nas linhas; densidade mobile sem reduzir fonte; retorno deslocado pela medição da barra. Revisão do próprio autor, sem parecer independente. Testes axe não comprovam conformidade integral WCAG nem aceite humano.
+Achados corrigidos, com linhas da implementação revista:
+
+- `src/statistics/reference.css:1687`: largura mínima global/colunas distribuídas substituídas pelo dimensionamento pelo conteúdo.
+- `src/team-statistics/screen.css:284`: cabeçalho e botão Equipe à esquerda, acompanhando seus valores.
+- `src/statistics/public-page.tsx:774` e `src/team-statistics/public-page.tsx:521`: cobertura legível preservada sem versões/datas técnicas nas linhas.
+- `src/statistics/reference.css:1858` e `src/public-ui/position.ts:4`: espaço estável para a barra e retorno das duas rolagens sem deslocamento.
+
+Densidade mobile conferida sem reduzir fonte. Revisão do próprio autor, sem parecer independente. Testes axe não comprovam conformidade integral WCAG nem aceite humano.
 
 ## Limites e próxima unidade
 
