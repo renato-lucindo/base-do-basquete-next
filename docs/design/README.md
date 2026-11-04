@@ -75,3 +75,7 @@ A cópia extraída contém as fontes necessárias à reprodução, o arquivo leg
 Em estatísticas, `react-prototype/prepare.cjs` regenera os adaptadores a partir de `upstream/` e das fixtures legadas. Caso esses componentes sejam alterados, atualize o gerador correspondente e formate o resultado. O build normal usa os adaptadores já versionados.
 
 Consulte [os padrões permanentes](PADROES.md) e [o contrato de integração](INTEGRACAO.md) antes de implementar.
+
+## Administração real — unidade em validação
+
+O padrão aceito está implementado na branch `codex/admin-uiux`: Jogos com ordenação no servidor antes da paginação, Informações com campos proporcionais e equipes/elencos em dois painéis, preservando os componentes de edição existentes. [Provas, capturas e limites](VALIDACAO-ADMIN-UIUX.md). Estado da PR/CI e autorização da migration em [PROGRESSO.md](../PROGRESSO.md); implementação local não representa aplicação de banco ou deploy.

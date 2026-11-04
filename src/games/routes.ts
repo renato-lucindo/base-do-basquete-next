@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
-import { saveGameSchema } from "./contract";
+import { saveGameSchema, gameOrderSchema } from "./contract";
 import { saveSheetSchema } from "./sheet-contract";
 import { saveGameEditorSchema } from "./officiating-contract";
 export async function gamesRoute(request: Request, env: Env, url: URL) {
@@ -156,7 +156,7 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     if (
       [...url.searchParams.keys()].some(
         (k) =>
-          !["q", "offset", "disputeId"].includes(k) ||
+          !["q", "offset", "disputeId", "sort", "direction"].includes(k) ||
           url.searchParams.getAll(k).length !== 1,
       )
     )
@@ -173,7 +173,19 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
       offset > 100000
     )
       throw badInput();
-    const r = await session.listGames(dispute.data, query, offset);
+    const order = gameOrderSchema.safeParse({
+      column: url.searchParams.get("sort") ?? "date",
+      direction: url.searchParams.get("direction") ?? "asc",
+    });
+    if (!order.success) throw badInput();
+    const r = await session.listGames(
+      dispute.data,
+      query,
+      offset,
+      url.searchParams.has("sort") || url.searchParams.has("direction")
+        ? order.data
+        : undefined,
+    );
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }

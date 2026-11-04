@@ -1,3 +1,4 @@
+import type { GameOrder } from "../games/contract";
 import { SupabasePublications } from "../publication/provider";
 import { SupabaseAchievements } from "../achievements/provider";
 import {
@@ -431,10 +432,15 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  listGames(disputeId: string, query: string, offset: number) {
+  listGames(
+    disputeId: string,
+    query: string,
+    offset: number,
+    order?: GameOrder,
+  ) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.games.list(accessToken, disputeId, query, offset),
+        this.games.list(accessToken, disputeId, query, offset, order),
       ),
     );
   }

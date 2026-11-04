@@ -150,6 +150,9 @@ test("saved preparation returns through game data and list without losing the sa
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Jogos", exact: true }),
+    page.getByRole("button", {
+      name: "Abrir jogo Lobos × Lobos B",
+      exact: true,
+    }),
   ).toBeFocused();
 });

@@ -201,3 +201,31 @@ describe("fixed game server operations", () => {
     ).rejects.toMatchObject({ code: "access_unavailable" });
   });
 });
+
+it("envia ordenacao fechada para RPC propria e conserva listagem antiga", async () => {
+  const send = vi.fn<(url: string, init: RequestInit) => Promise<Response>>(
+    async () => Response.json({ items: [], hasMore: false }),
+  );
+  const db = new SupabaseGames(
+    { url: "https://db.example.test", key: "fixture" },
+    send,
+  );
+  await db.list("fixture-jwt", id, "time", 20, {
+    column: "number",
+    direction: "desc",
+  });
+  expect(send.mock.calls[0][0]).toBe(
+    "https://db.example.test/rest/v1/rpc/list_games_ordered",
+  );
+  expect(JSON.parse(send.mock.calls[0][1]!.body as string)).toEqual({
+    p_dispute_id: id,
+    p_query: "time",
+    p_offset: 20,
+    p_sort: "number",
+    p_direction: "desc",
+  });
+  await db.list("fixture-jwt", id, "", 0);
+  expect(send.mock.calls[1][0]).toBe(
+    "https://db.example.test/rest/v1/rpc/list_games",
+  );
+});

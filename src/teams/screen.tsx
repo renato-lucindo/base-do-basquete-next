@@ -65,6 +65,10 @@ export function TeamsWorkspace({
     [expanded, setExpanded] = useState("");
   const [editor, setEditor] = useState<Edit | null>(null),
     [baseline, setBaseline] = useState("");
+  const registrationSearch = useRef<HTMLInputElement>(null);
+  const masterRef = useRef<HTMLElement>(null),
+    detailRef = useRef<HTMLElement>(null),
+    masterPosition = useRef({ scroll: 0, y: 0, id: "" });
   const membersGuard = useRef<() => boolean>(() => true);
   const withdrawalGuard = useRef<() => boolean>(() => true);
   const [withdrawalLocked, setWithdrawalLocked] = useState(false);
@@ -363,6 +367,7 @@ export function TeamsWorkspace({
       setBusy(false);
     }
   }
+  const selectedRegistration = list.items.find((r) => r.id === expanded);
   const feedback = (
     <>
       {error && (
@@ -399,7 +404,10 @@ export function TeamsWorkspace({
       />
     );
   return (
-    <section className="teams-workspace" aria-busy={busy}>
+    <section
+      className={`teams-workspace${expanded ? " teams-has-selection" : ""}`}
+      aria-busy={busy}
+    >
       <AdminToast
         message={
           enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
@@ -447,6 +455,7 @@ export function TeamsWorkspace({
         <label className="competition-search">
           Buscar inscrição ou equipe
           <input
+            ref={registrationSearch}
             value={query}
             maxLength={120}
             onChange={(e) => {
@@ -477,10 +486,6 @@ export function TeamsWorkspace({
           Importar equipe e elenco
         </button>
       </div>
-      <p className="teams-help">
-        Uma equipe pode ter várias inscrições nesta disputa, com nomes públicos
-        e elencos próprios.
-      </p>
       {!finding && !editor && feedback}
       {(finding || editor) && (
         <AdminDialog
@@ -682,20 +687,37 @@ export function TeamsWorkspace({
         </AdminDialog>
       )}
 
-      {loading && <p role="status">Carregando inscrições…</p>}
-      {
-        <>
+      <div className={`teams-split${expanded ? " has-selection" : ""}`}>
+        <section
+          className="teams-master"
+          ref={masterRef}
+          aria-label="Equipes inscritas"
+        >
+          {loading && <p role="status">Carregando inscrições…</p>}
           <ul className="competition-list">
             {list.items.map((r) => (
-              <li key={r.id}>
+              <li
+                key={r.id}
+                className={expanded === r.id ? "is-selected" : undefined}
+              >
                 <button
                   className="competition-open"
                   aria-expanded={expanded === r.id}
-                  aria-controls={`registration-${r.id}`}
+                  id={`select-registration-${r.id}`}
+                  aria-controls={
+                    expanded === r.id ? `registration-${r.id}` : undefined
+                  }
                   aria-label={`${expanded === r.id ? "Recolher" : "Expandir"} ${r.name}`}
                   onClick={() => {
-                    if (membersGuard.current() && withdrawalGuard.current())
-                      setExpanded((v) => (v === r.id ? "" : r.id));
+                    if (!mayLeave()) return;
+                    masterPosition.current = {
+                      scroll: masterRef.current?.scrollTop ?? 0,
+                      y: window.scrollY,
+                      id: r.id,
+                    };
+                    setExpanded((v) => (v === r.id ? "" : r.id));
+                    if (window.matchMedia("(max-width:999px)").matches)
+                      requestAnimationFrame(() => detailRef.current?.focus());
                   }}
                 >
                   {r.name}
@@ -717,8 +739,69 @@ export function TeamsWorkspace({
                       setRemoving({ id: r.id, name: r.name });
                     }}
                   >
-                    Excluir inscrição
+                    Excluir
                   </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {!loading && !list.items.length && (
+            <p>
+              {query
+                ? "Nenhuma inscrição encontrada."
+                : "Nenhuma inscrição nesta disputa."}
+            </p>
+          )}
+          <Pagination
+            offset={offset}
+            hasMore={list.hasMore}
+            setOffset={(n) => {
+              if (membersGuard.current() && withdrawalGuard.current()) {
+                setExpanded("");
+                setOffset(n);
+              }
+            }}
+          />
+        </section>
+        <section
+          className="teams-detail"
+          ref={detailRef}
+          tabIndex={-1}
+          aria-label={
+            selectedRegistration
+              ? `Elenco de ${selectedRegistration.name}`
+              : "Elenco"
+          }
+        >
+          {expanded && (
+            <button
+              type="button"
+              className="secondary teams-return"
+              onClick={() => {
+                if (!mayLeave()) return;
+                setExpanded("");
+                requestAnimationFrame(() => {
+                  if (masterRef.current)
+                    masterRef.current.scrollTop = masterPosition.current.scroll;
+                  const origin = document.getElementById(
+                    `select-registration-${expanded}`,
+                  );
+                  window.scrollTo(0, masterPosition.current.y);
+                  if (origin) origin.focus({ preventScroll: true });
+                  else registrationSearch.current?.focus();
+                });
+              }}
+            >
+              Voltar às equipes
+            </button>
+          )}
+          {selectedRegistration ? (
+            [selectedRegistration].map((r) => (
+              <div key={r.id}>
+                {r.name !== r.team.name && (
+                  <p className="registration-origin">Equipe: {r.team.name}</p>
+                )}
+                <div className="competition-actions registration-actions">
                   {expanded === r.id && (
                     <>
                       <button
@@ -805,28 +888,15 @@ export function TeamsWorkspace({
                     </>
                   )}
                 </div>
-              </li>
-            ))}
-          </ul>
-          {!loading && !list.items.length && (
-            <p>
-              {query
-                ? "Nenhuma inscrição encontrada."
-                : "Nenhuma inscrição nesta disputa."}
+              </div>
+            ))
+          ) : (
+            <p className="teams-selection-empty">
+              Selecione uma equipe para ver o elenco
             </p>
           )}
-          <Pagination
-            offset={offset}
-            hasMore={list.hasMore}
-            setOffset={(n) => {
-              if (membersGuard.current() && withdrawalGuard.current()) {
-                setExpanded("");
-                setOffset(n);
-              }
-            }}
-          />
-        </>
-      }
+        </section>
+      </div>
       {error && !uncertain && !conflict && (
         <button
           className="secondary"

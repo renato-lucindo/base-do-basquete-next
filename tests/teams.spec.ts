@@ -265,11 +265,13 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
   await page
     .getByRole("button", { name: "Salvar equipe global", exact: true })
     .click();
+  const selectedPanel = page.getByRole("region", {
+    name: "Elenco de Lobos B",
+    exact: true,
+  });
+  await expect(selectedPanel).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Recolher Lobos B", exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Lobos Renomeados", { exact: false }).first(),
+    selectedPanel.getByText("Equipe: Lobos Renomeados", { exact: true }),
   ).toBeVisible();
   expect([...f.registrations.values()].map((r) => r.name)).toEqual([
     "Lobos",

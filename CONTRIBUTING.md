@@ -44,6 +44,14 @@ Uma unidade dependente começa da `main` depois de integrar a anterior. Se uma d
 
 Integração Git, aplicação de migration e deploy são ações distintas. Verifique autorização e ambiente para cada uma. Nunca disparar DDL ou deploy porque uma PR foi mesclada; a CI deste repositório não faz essas operações. Preserve dados humanos, políticas Access e segredos.
 
+### Autorização permanente de migrations de leitura no desenvolvimento
+
+Em04/11/2026, o responsável autorizou a migration administrativa e determinou: **“Autorizo. Deixe essa autorização como padrão nos docs”**. Fica autorizada, sem nova confirmação a cada migration, a aplicação de migrations revisadas e testadas que criem funções de consulta e seus privilégios mínimos exclusivamente no **base-do-basquete-next-dev (`nizmasjddyrhmevvfviz`)**. Devem preservar RLS, os contratos existentes e a proteção dos dados, sem escrita nos dados da aplicação.
+
+Antes de aplicar, conferir o alvo, o SQL concreto, os testes, o hash e o histórico remoto; depois verificar funções, privilégios, RLS e advisors e registrar o resultado. Migrations aplicadas continuam imutáveis. A autorização vem desta decisão do responsável, nunca do merge ou do agendamento.
+
+Esta autorização não cobre outros projetos ou produção, alterações de tabelas ou dados, seeds, operações destrutivas, mudanças em Auth/Access, redução de segurança, deploy ou publicação de dados. Operações fora desse escopo exigem autorização correspondente sobre uma proposta concreta.
+
 WIP de reaproveitamento de elencos foi preservado fora da consolidação inicial da `main`; sua situação fica no checkpoint. Para retomá-lo, incorporar a `main` por merge explícito, revisar o diff restante e manter **uma** PRdraft para essa unidade. Não executar migrations locais como parte de atualização de Git.
 
 Em troca de agente, entregar branch/PR/SHA, evidências, mudanças alheias e próximo passo. Em pausa por cota, seguir o procedimento permanente abaixo; não estimar porcentagens, programar duplicatas ou comprar créditos.

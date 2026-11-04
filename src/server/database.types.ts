@@ -973,6 +973,16 @@ export type Database = {
         Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;
       };
+      list_games_ordered: {
+        Args: {
+          p_dispute_id: string;
+          p_query?: string;
+          p_offset?: number;
+          p_sort?: string;
+          p_direction?: string;
+        };
+        Returns: Json;
+      };
       list_games: {
         Args: { p_dispute_id: string; p_offset?: number; p_query?: string };
         Returns: Json;

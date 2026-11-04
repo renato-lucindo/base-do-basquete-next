@@ -32,12 +32,28 @@ test("transfere com camisa00, preserva períodos e retoma o novo vínculo", asyn
   await page
     .getByRole("button", { name: "Voltar ao elenco", exact: true })
     .click();
+  if (
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos B", exact: true })
     .click();
   const row = page.getByTestId("roster-row").filter({ hasText: "Ana Silva" });
   await expect(row).toContainText("00");
   await page.reload();
+  if (
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos B", exact: true })
     .click();
@@ -174,6 +190,14 @@ test("retorno cria terceiro período sem reativar a primeira linha", async ({
   await page
     .getByRole("button", { name: "Voltar ao elenco", exact: true })
     .click();
+  if (
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos B", exact: true })
     .click();
