@@ -653,6 +653,10 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
     .getByRole("button", { name: "Expandir Lobos", exact: true })
     .click();
   await expect(page.getByText("Carla Técnica", { exact: true })).toBeVisible();
+  if (info.project.name === "mobile")
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos B", exact: true })
     .click();
@@ -675,6 +679,10 @@ test("elenco ordenado, técnico na mesma pessoa, assistente e retomada", async (
   await page
     .getByRole("button", { name: "Cancelar edição", exact: true })
     .click();
+  if (info.project.name === "mobile")
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos", exact: true })
     .click();

@@ -137,3 +137,11 @@ export const venueListingSchema = z
     hasMore: z.boolean(),
   })
   .strict();
+
+export const gameOrderSchema = z
+  .object({
+    column: z.enum(["number", "matchup", "date", "time", "venue", "state"]),
+    direction: z.enum(["asc", "desc"]),
+  })
+  .strict();
+export type GameOrder = z.infer<typeof gameOrderSchema>;

@@ -321,9 +321,15 @@ test("ACK confirmado recupera sóGET e guarda impede recolher edição", async (
       .filter({ hasText: "Desistência ou retorno não salvo" }),
   ).toBeVisible();
   page.once("dialog", (d) => d.dismiss());
-  await page
-    .getByRole("button", { name: "Recolher Lobos", exact: true })
-    .click();
+  const back = page.getByRole("button", {
+    name: "Voltar às equipes",
+    exact: true,
+  });
+  if (await back.isVisible()) await back.click();
+  else
+    await page
+      .getByRole("button", { name: "Recolher Lobos", exact: true })
+      .click();
   await expect(
     page.getByRole("textbox", {
       name: "Motivo da desistência ou retorno",
@@ -506,6 +512,14 @@ test("duas abas isolam versão e duas inscrições da mesma equipe", async ({
     }),
   ).toHaveValue("exclude_results");
   expect(f.options.withdrawalCommits).toBe(1);
+  if (
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole("button", { name: "Voltar às equipes", exact: true })
+      .click();
   await page
     .getByRole("button", { name: "Expandir Lobos B", exact: true })
     .click();

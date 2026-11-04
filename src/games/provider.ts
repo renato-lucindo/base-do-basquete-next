@@ -7,6 +7,8 @@ import type { Database } from "../server/database.types";
 import { saveResultSchema } from "../competition/contract";
 import {
   gameListingSchema,
+  gameOrderSchema,
+  type GameOrder,
   venueListingSchema,
   roundListingSchema,
   gameSnapshotSchema,
@@ -51,11 +53,25 @@ export class SupabaseGames {
       token,
     );
   }
-  async list(token: string, disputeId: string, query: string, offset: number) {
+  async list(
+    token: string,
+    disputeId: string,
+    query: string,
+    offset: number,
+    order?: GameOrder,
+  ) {
+    const parsed = order ? gameOrderSchema.parse(order) : undefined;
     const r = await this.checked(
       gameListingSchema,
-      "list_games",
-      { p_dispute_id: disputeId, p_query: query, p_offset: offset },
+      parsed ? "list_games_ordered" : "list_games",
+      {
+        p_dispute_id: disputeId,
+        p_query: query,
+        p_offset: offset,
+        ...(parsed
+          ? { p_sort: parsed.column, p_direction: parsed.direction }
+          : {}),
+      },
       token,
     );
     if (r.items.some((g) => g.disputeId !== disputeId)) throw unavailable();

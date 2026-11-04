@@ -27,8 +27,8 @@
   overflow-x: auto;
 }
 .admin-data-table {
-  width: 100%;
-  min-width: 720px;
+  width: max-content;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
   text-align: left;
@@ -326,9 +326,9 @@
     padding: 6px 8px 8px;
   }
   .compact-pilot .competition-dispute .competition-fields {
-    grid-template-columns: minmax(140px, 180px) minmax(160px, 1fr) minmax(
-        100px,
-        180px
+    grid-template-columns: minmax(120px, 160px) minmax(140px, 200px) minmax(
+        140px,
+        220px
       );
     gap: 12px;
     margin: 0;
@@ -736,5 +736,43 @@
   }
   .compact-pilot .text-import-done td:first-child {
     background: #e8f7f0;
+  }
+}
+
+.admin-data-table .numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.admin-data-table th .admin-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  color: inherit;
+  border: 0;
+  border-radius: 2px;
+  padding: 4px 0;
+  min-height: 32px;
+  font: inherit;
+  font-weight: 650;
+  text-align: inherit;
+  cursor: pointer;
+}
+.admin-data-table th .admin-sort:focus-visible {
+  outline: 2px solid #075fca;
+  outline-offset: 3px;
+}
+.admin-data-table td:not(.nowrap) {
+  max-width: 32rem;
+}
+@media (max-width: 999px) {
+  .admin-data-table th .admin-sort {
+    min-height: 44px;
+  }
+  .admin-data-table {
+    max-width: none;
+  }
+  .competition-fields {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 220px));
   }
 }

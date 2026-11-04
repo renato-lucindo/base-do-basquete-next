@@ -976,11 +976,24 @@ async function fixture(options = {}) {
             hasMore: false,
           });
         }
-        if (url.pathname === "/rest/v1/rpc/list_games") {
+        if (
+          [
+            "/rest/v1/rpc/list_games",
+            "/rest/v1/rpc/list_games_ordered",
+          ].includes(url.pathname)
+        ) {
           assert.equal(
             request.headers.get("authorization"),
             "Bearer fixture-access",
           );
+          if (url.pathname.endsWith("/list_games_ordered"))
+            assert.deepEqual(await request.json(), {
+              p_dispute_id: id,
+              p_query: "",
+              p_offset: 20,
+              p_sort: "number",
+              p_direction: "desc",
+            });
           return Response.json({ items: [], hasMore: false });
         }
         if (url.pathname === "/rest/v1/rpc/get_game")
@@ -1929,6 +1942,16 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       (await send("GET", `/api/games?disputeId=${id}&q=Team&offset=20`)).status,
       200,
     );
+    assert.equal(
+      (
+        await send(
+          "GET",
+          `/api/games?disputeId=${id}&sort=number&direction=desc&offset=20`,
+        )
+      ).status,
+      200,
+    );
+    assert.ok(f.calls.some((p) => p.endsWith("/list_games_ordered")));
     assert.equal((await send("GET", `/api/games/${id}`)).status, 404);
     const venues = await send("GET", "/api/games/venues?q=Azul&offset=20");
     assert.equal(venues.status, 200);
@@ -1988,6 +2011,9 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       `/api/games?disputeId=${id}&disputeId=${id}`,
       `/api/games?disputeId=${id}&offset=-1`,
       `/api/games?disputeId=${id}&unknown=x`,
+      `/api/games?disputeId=${id}&sort=unsafe`,
+      `/api/games?disputeId=${id}&direction=unsafe`,
+      `/api/games?disputeId=${id}&sort=date&sort=number`,
       `/api/games/invalid`,
     ])
       assert.equal((await send("GET", path)).status, 400, path);

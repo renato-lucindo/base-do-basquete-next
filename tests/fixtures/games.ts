@@ -185,13 +185,56 @@ export async function gamesFixture(page: Page) {
             },
           },
         });
-      const query = url.searchParams.get("q") ?? "";
+      const query = (url.searchParams.get("q") ?? "").toLocaleLowerCase(
+          "pt-BR",
+        ),
+        offset = Number(url.searchParams.get("offset") ?? 0),
+        column = url.searchParams.get("sort") ?? "date",
+        direction = url.searchParams.get("direction") ?? "asc";
+      const key = (g: GameSnapshot) =>
+        column === "matchup"
+          ? g.home.name + " × " + g.away.name
+          : column === "state"
+            ? g.state === "finished"
+              ? "Resultado publicado"
+              : "Sem resultado"
+            : column === "date"
+              ? g.date
+                ? g.date + " " + (g.time ?? "~")
+                : null
+              : column === "time"
+                ? g.time
+                : column === "venue"
+                  ? g.venue
+                  : g.number;
+      const items = [...games.values()]
+        .filter(
+          (g) =>
+            g.disputeId === url.searchParams.get("disputeId") &&
+            [g.home.name, g.away.name, g.venue ?? "", g.number ?? ""]
+              .join(" ")
+              .toLocaleLowerCase("pt-BR")
+              .includes(query),
+        )
+        .sort((a, b) => {
+          const x = key(a),
+            y = key(b);
+          if (x == null || y == null)
+            return x == null && y == null
+              ? a.id.localeCompare(b.id)
+              : x == null
+                ? 1
+                : -1;
+          return (
+            String(x).localeCompare(String(y), "pt-BR", {
+              numeric: column === "number",
+            }) * (direction === "asc" ? 1 : -1) || a.id.localeCompare(b.id)
+          );
+        });
       return route.fulfill({
         json: {
-          items: [...games.values()].filter((g) =>
-            (g.home.name + g.away.name + (g.venue ?? "")).includes(query),
-          ),
-          hasMore: false,
+          items: items.slice(offset, offset + 20),
+          hasMore: items.length > offset + 20,
         },
       });
     }
