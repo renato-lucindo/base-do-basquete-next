@@ -1,10 +1,8 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   DataTable,
   Icon,
   Modal,
-  SectionTabs,
-  TabPanel,
   type Column,
 } from "../../../../src/ui-system/components";
 import { TeamFilter } from "../../../../src/statistics/reference/team-filter";
@@ -18,6 +16,7 @@ import {
   participations,
   players,
   publicBio,
+  profileSummary,
   publishedGames,
   type Appearance,
   type Participation,
@@ -35,6 +34,7 @@ import {
   PilotLink,
   returnRoute,
   syncProfileQuery,
+  scrollPositions,
   type Go,
 } from "./pilot-navigation";
 import { ColumnPicker, useMobile } from "./table-controls";
@@ -83,7 +83,7 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
       </>
     );
   return (
-    <article className="bb-game-detail">
+    <article className="bb-game-detail public-site scoresheet-public public-game">
       <Back
         go={go}
         to={back}
@@ -91,66 +91,31 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
           back.includes("jogador/") ? "Voltar ao perfil" : "Voltar aos jogos"
         }
       />
-      <div className="bb-game-overview">
-        <header className="bb-game-header">
-          <h1 className="bb-sr-only">
-            {published ? "Súmula" : "Jogo"}: {game.home.name} × {game.away.name}
-          </h1>
-          <p className="bb-game-kicker">
-            <span>Jogo {game.number ?? "sem número"}</span>
-            <span className="bb-game-status">
-              {published ? "Encerrado" : "Agendado"}
-              {published &&
-                published.sheet.home.periods.length > 4 &&
-                ` · ${published.sheet.home.periods.length - 4} ${published.sheet.home.periods.length === 5 ? "prorrogação" : "prorrogações"}`}
-            </span>
-          </p>
-          <p className="bb-game-meta">
-            {displayDate(game.date)} · {game.time ?? "Horário a definir"}
-            <span>{game.venue ?? "Local a definir"}</span>
-          </p>
-          <div
-            className="bb-match-score"
-            role="group"
-            aria-label={`Placar: ${game.home.name} ${game.homePoints ?? "a definir"}, ${game.away.name} ${game.awayPoints ?? "a definir"}`}
-          >
-            <div className="bb-score-side bb-score-home">
-              <PilotLink
-                go={go}
-                to={`publico/equipe/${game.home.id}`}
-                className="bb-row-link"
-              >
-                {game.home.name}
-              </PilotLink>
-              <strong className="bb-final-score">
-                {game.homePoints ?? "—"}
-              </strong>
-            </div>
-            <span className="bb-score-divider" aria-hidden="true">
-              –
-            </span>
-            <div className="bb-score-side bb-score-away">
-              <PilotLink
-                go={go}
-                to={`publico/equipe/${game.away.id}`}
-                className="bb-row-link"
-              >
-                {game.away.name}
-              </PilotLink>
-              <strong className="bb-final-score">
-                {game.awayPoints ?? "—"}
-              </strong>
-            </div>
-          </div>
-        </header>
+      <header
+        className="game-context bb-game-header"
+        aria-label="Dados da partida"
+      >
+        <h1 className="bb-sr-only">
+          {published ? "Súmula" : "Jogo"}: {game.home.name} × {game.away.name}
+        </h1>
+        <strong>Jogo {game.number ?? "sem número"}</strong>
+        <p>
+          {displayDate(game.date)} · {game.time ?? "Horário a definir"} ·{" "}
+          {game.venue ?? "Local a definir"}
+        </p>
+        <span className="bb-game-status">
+          {published ? "Encerrado" : "Agendado"}
+        </span>
+      </header>
+      <div className="period-section">
         {published && (
           <div
-            className="bb-parcials bb-table-scroll"
+            className="bb-parcials period-scroll public-periods"
             role="region"
             tabIndex={0}
             aria-label="Parciais da partida"
           >
-            <table className="bb-table">
+            <table className="period-table">
               <caption className="bb-sr-only">
                 Pontos e faltas coletivas por período
               </caption>
@@ -173,14 +138,21 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                     <th scope="row">{team.name}</th>
                     {team.periods.map((points, i) => (
                       <td key={i} className="bb-numeric">
-                        <span className="bb-period-points">
-                          <strong>{points}</strong>
-                          <small>{show(team.foulsByPeriod[i])} FC</small>
+                        <span className="period-points">
+                          <span>{points}</span>
+                          <small
+                            className="period-fouls"
+                            aria-label={`Faltas coletivas: ${show(team.foulsByPeriod[i])}`}
+                          >
+                            F{show(team.foulsByPeriod[i])}
+                          </small>
                         </span>
                       </td>
                     ))}
-                    <td className="bb-numeric">
-                      <strong>{team.points}</strong>
+                    <td className="period-total">
+                      <strong className="bb-final-score period-points">
+                        {team.points}
+                      </strong>
                     </td>
                   </tr>
                 ))}
@@ -191,10 +163,9 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
       </div>
       {published ? (
         <>
-          <div className="bb-sheet-toolbar">
-            <h2>Súmula do jogo</h2>
+          <div className="teams-heading">
             <div
-              className="bb-period-filter"
+              className="period-filter"
               role="group"
               aria-label="Período das estatísticas"
             >
@@ -218,7 +189,7 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
             {period === "all" ? "jogo todo" : periodLabel(Number(period))} para
             as duas equipes. O placar final permanece inalterado.
           </p>
-          <div className="bb-sheet-teams">
+          <div className="teams-grid public-rosters">
             {[published.sheet.home, published.sheet.away].map((original) => {
               const team = periodTeam(original, period);
               const free = total(team, "free");
@@ -228,25 +199,31 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                   : (free / team.freeTaken) * 100;
               return (
                 <section
-                  className="bb-score-team"
+                  className="team-section public-roster bb-score-team"
                   key={team.id}
                   aria-label={`Elenco de ${team.name}`}
                 >
-                  <div className="bb-roster-heading">
-                    <h3>
+                  <div className="team-heading">
+                    <h2>
                       <PilotLink go={go} to={`publico/equipe/${team.id}`}>
                         {team.name}
                       </PilotLink>
-                    </h3>
-                    <span>{team.players.length} atletas</span>
+                    </h2>
                   </div>
                   <div
-                    className="bb-table-scroll"
+                    className="table-scroll public-athletes"
                     role="region"
                     tabIndex={0}
                     aria-label={`Súmula de ${team.name}`}
                   >
-                    <table className="bb-table bb-scoresheet-table">
+                    <table className="roster-table bb-scoresheet-table">
+                      <colgroup>
+                        <col className="jersey-col" />
+                        <col />
+                        {[0, 1, 2, 3, 4].map((n) => (
+                          <col key={n} className="stat-col" />
+                        ))}
+                      </colgroup>
                       <caption className="bb-sr-only">
                         {team.name} —{" "}
                         {period === "all"
@@ -255,12 +232,20 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                       </caption>
                       <thead>
                         <tr>
-                          <th scope="col" className="bb-numeric">
+                          <th scope="col" className="jersey-cell">
                             Nº
                           </th>
-                          <th scope="col">Atleta</th>
+                          <th scope="col" className="athlete-cell">
+                            Atleta
+                          </th>
                           {["PTS", "2P", "3P", "LL", "F"].map((label) => (
-                            <th scope="col" className="bb-numeric" key={label}>
+                            <th
+                              scope="col"
+                              className={
+                                label === "PTS" ? "points-cell" : "bb-numeric"
+                              }
+                              key={label}
+                            >
                               {label}
                             </th>
                           ))}
@@ -286,30 +271,39 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                                     : undefined
                               }
                             >
-                              <td className="bb-numeric">{player.jersey}</td>
-                              <th scope="row" className="bb-primary-cell">
-                                <div className="bb-athlete-name">
+                              <td className="jersey-cell">{player.jersey}</td>
+                              <th scope="row" className="athlete-cell">
+                                <div className="athlete-line bb-athlete-name">
                                   <PilotLink
                                     go={go}
                                     to={`publico/jogador/${player.id}`}
                                     className={
                                       player.starter
-                                        ? "bb-row-link bb-starter"
-                                        : "bb-row-link"
+                                        ? "athlete-name bb-starter"
+                                        : "athlete-name"
                                     }
                                   >
                                     {player.name}
                                     {player.starter ? " *" : ""}
                                   </PilotLink>
                                   {player.captain && (
-                                    <span className="bb-captain">CAP</span>
+                                    <span className="captain bb-captain">
+                                      CAP
+                                    </span>
                                   )}
                                 </div>
                               </th>
                               {(
                                 ["points", "two", "three", "free"] as const
                               ).map((key) => (
-                                <td className="bb-numeric" key={key}>
+                                <td
+                                  className={
+                                    key === "points"
+                                      ? "points-cell"
+                                      : "bb-numeric"
+                                  }
+                                  key={key}
+                                >
                                   {show(player[key])}
                                 </td>
                               ))}
@@ -332,32 +326,31 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                       </tbody>
                       <tfoot>
                         <tr>
-                          <th scope="row" colSpan={2}>
-                            Total
+                          <th scope="row" colSpan={2} className="total-label">
+                            Total da equipe
                           </th>
                           {(
                             ["points", "two", "three", "free", "fouls"] as const
                           ).map((key) => (
                             <td className="bb-numeric" key={key}>
-                              {show(total(team, key))}
+                              {key === "free" ? (
+                                <span className="bb-free-summary">
+                                  {show(free)}/{show(team.freeTaken)}
+                                  <small>
+                                    {show(pct)}
+                                    {pct === null ? "" : "%"}
+                                  </small>
+                                </span>
+                              ) : (
+                                show(total(team, key))
+                              )}
                             </td>
                           ))}
                         </tr>
                       </tfoot>
                     </table>
                   </div>
-                  <p className="bb-free-summary">
-                    Lances livres:{" "}
-                    <strong>
-                      {show(free)}/{show(team.freeTaken)}
-                    </strong>
-                    <span>
-                      {" "}
-                      · {show(pct)}
-                      {pct === null ? "" : "%"}
-                    </span>
-                  </p>
-                  <dl className="bb-coaches">
+                  <dl className="staff bb-coaches">
                     <div>
                       <dt>Técnico</dt>
                       <dd>{team.coach}</dd>
@@ -371,24 +364,40 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
               );
             })}
           </div>
-          <details className="bb-detail-legend">
-            <summary>Legenda da súmula</summary>
-            <p>
-              <strong>*</strong> Titular · <strong>CAP</strong> Capitão ·{" "}
-              <strong>PTS</strong> Pontos · <strong>2P/3P</strong> Cestas
-              convertidas · <strong>LL</strong> Lances livres convertidos ·{" "}
-              <strong>F</strong> Faltas · <strong>FC</strong> Faltas coletivas
-            </p>
-            <p>
-              0 indica participação sem registro da ação; — indica ausência de
-              participação ou dado não informado. Toque no total de faltas para
-              ver os registros.
-            </p>
-          </details>
+          <section className="legend" aria-labelledby="bb-game-legend">
+            <h2 id="bb-game-legend">Legenda</h2>
+            <dl>
+              {[
+                ["* Titular", "Nome em negrito e asterisco"],
+                ["CAP", "Capitão da equipe"],
+                ["PTS", "Pontos totais"],
+                ["2P / 3P", "Cestas de dois / três pontos"],
+                ["LL", "Lances livres convertidos"],
+                ["F", "Faltas cometidas"],
+              ].map(([code, label]) => (
+                <div key={code}>
+                  <dt>{code}</dt>
+                  <dd>{label}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="legend-notes">
+              <p>
+                0 indica participação sem registro da ação; — indica ausência de
+                participação ou dado não informado. Toque no total de faltas
+                para ver os registros.
+              </p>
+              <p>
+                <strong>5F:</strong> exclusão por cinco faltas.{" "}
+                <strong>GD/D:</strong> desqualificação.
+              </p>
+            </div>
+          </section>
         </>
       ) : (
         <p className="bb-empty">
-          O resultado deste jogo ainda não foi publicado.
+          {game.home.name} × {game.away.name}. O resultado deste jogo ainda não
+          foi publicado.
         </p>
       )}
       {fouls && (
@@ -420,13 +429,13 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
                 return (
                   events.length > 0 && (
                     <section key={half}>
-                      <h3>
+                      <h2>
                         {half === 0
                           ? "1º tempo"
                           : half === 1
                             ? "2º tempo"
                             : "Prorrogação"}
-                      </h3>
+                      </h2>
                       <ul>
                         {events.map((event, i) => (
                           <li
@@ -478,13 +487,15 @@ export function PublicGame({ id, go }: { id: string; go: Go }) {
   );
 }
 
-const profileTabs = [
+const profileSections = [
   { key: "resumo", label: "Resumo" },
-  { key: "estatisticas", label: "Estatísticas" },
-  { key: "conquistas", label: "Conquistas e honrarias" },
-  { key: "jogos", label: "Jogos" },
+  { key: "recentes", label: "Últimos jogos" },
+  { key: "estatisticas", label: "Campeonatos" },
+  { key: "jogos", label: "Jogos completos" },
   { key: "historico", label: "Histórico" },
+  { key: "evolucao", label: "Evolução" },
 ];
+const extraPanels = ["jogos", "historico", "evolucao"];
 export function PlayerProfile({
   id,
   go,
@@ -505,11 +516,6 @@ export function PlayerProfile({
       rows.map((row) => [row.teamId, { id: row.teamId, name: row.teamName }]),
     ).values(),
   ];
-  const [active, setActive] = useState(
-    profileTabs.some((t) => t.key === query.get("secao"))
-      ? query.get("secao")!
-      : "resumo",
-  );
   const [year, setYear] = useState(
     rows.some((row) => String(row.year) === query.get("anoPerfil"))
       ? query.get("anoPerfil")!
@@ -577,12 +583,56 @@ export function PlayerProfile({
         row.teamId === a.team.id,
     ),
   );
-  const points = allGames.reduce((sum, a) => sum + (a.player.points ?? 0), 0);
-  const panelId = useId();
-  function changeTab(value: string) {
-    setActive(value);
-    syncProfileQuery({ secao: value });
+
+  const summaries = profileSummary(id);
+  const sectionId = (section: string) => `bb-profile-${id}-${section}`;
+  const [openPanels, setOpenPanels] = useState<string[]>(() => {
+    const keys = (query.get("paineisPerfil") ?? "")
+      .split(",")
+      .filter((key) => extraPanels.includes(key));
+    const target = query.get("secao");
+    if (target && extraPanels.includes(target) && !keys.includes(target))
+      keys.push(target);
+    return keys;
+  });
+  const panels = useRef(openPanels);
+  function openPanel(key: string, open: boolean) {
+    if (panels.current.includes(key) === open) return;
+    const next = open
+      ? [...panels.current, key]
+      : panels.current.filter((k) => k !== key);
+    panels.current = next;
+    setOpenPanels(next);
+    syncProfileQuery({ paineisPerfil: next.length ? next.join(",") : "all" });
+    if (
+      !open &&
+      new URLSearchParams(location.hash.split("?")[1]).get("secao") === key
+    )
+      syncProfileQuery({ secao: "resumo" });
   }
+  function focusSection(key: string) {
+    const element = document.getElementById(sectionId(key));
+    element?.focus({ preventScroll: true });
+    element?.scrollIntoView({ block: "start" });
+  }
+  function jump(key: string) {
+    if (extraPanels.includes(key)) openPanel(key, true);
+    syncProfileQuery({ secao: key });
+    requestAnimationFrame(() => focusSection(key));
+  }
+  function sectionHref(key: string) {
+    const [path, search] = location.hash.slice(1).split("?");
+    const params = new URLSearchParams(search);
+    params.set("secao", key);
+    return `#${path}?${params}`;
+  }
+  useEffect(() => {
+    const target = query.get("secao");
+    if (!target || scrollPositions.has(location.hash.slice(1))) return;
+    const frame = requestAnimationFrame(() => focusSection(target));
+    return () => cancelAnimationFrame(frame);
+    // Only a new entry with a section link should jump; return restores its scroll.
+  }, [id]);
   const numeric = (row: Participation, key: StatKey) =>
     row.games === 0
       ? null
@@ -643,6 +693,7 @@ export function PlayerProfile({
         render: (row: Participation) => show(numeric(row, key)),
       })),
   ];
+
   if (!player)
     return (
       <>
@@ -650,6 +701,16 @@ export function PlayerProfile({
         <Back go={go} to="publico/jogadores" label="Voltar a jogadores" />
       </>
     );
+  const metadata = [
+    ["Posição", bio?.position],
+    ["Nascimento", bio?.birthYear],
+    ["Altura", bio?.height],
+    ["Peso", bio?.weight],
+    ["Mão dominante", bio?.dominantHand],
+    ["Origem", bio?.city],
+  ].filter(
+    ([, value]) => value !== null && value !== undefined && value !== "",
+  );
   return (
     <article className="bb-player-detail">
       <Back
@@ -663,260 +724,329 @@ export function PlayerProfile({
               : "Voltar a jogadores"
         }
       />
-      <div className="bb-player-intro">
+      <div
+        className={`bb-player-identity-grid${awards.length ? " bb-with-honors" : ""}`}
+      >
         <header className="bb-player-header">
-          <div>
-            <p className="bb-eyebrow">Perfil do jogador</p>
-            <h1>{player.name}</h1>
-            {bio?.nickname && (
-              <p className="bb-player-nickname">{bio.nickname}</p>
-            )}
-            <p className="bb-player-meta">
-              {bio
-                ? `${bio.position} · Nasc. ${bio.birthYear} · ${bio.height} · ${bio.city}`
-                : player.team.name}
-            </p>
-          </div>
-          <div className="bb-career-summary">
-            <p className="bb-career-caption">
-              Carreira completa{" "}
-              <span>
-                {rows.at(-1)?.year ?? "—"}–{rows[0]?.year ?? "—"}
-              </span>
-            </p>
-            <dl className="bb-career-numbers">
-              <div>
-                <dt>Jogos</dt>
-                <dd>{allGames.length}</dd>
-              </div>
-              <div>
-                <dt>Pontos</dt>
-                <dd>{allGames.length ? points : "—"}</dd>
-              </div>
-              <div>
-                <dt>PTS por jogo</dt>
-                <dd>
-                  {allGames.length ? show(points / allGames.length) : "—"}
-                </dd>
-              </div>
+          <h1>{player.name}</h1>
+          {bio?.nickname && (
+            <p className="bb-player-nickname">“{bio.nickname}”</p>
+          )}
+          {metadata.length > 0 && (
+            <dl className="bb-player-metadata">
+              {metadata.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}:</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
             </dl>
-          </div>
+          )}
         </header>
-        <SectionTabs
-          id={panelId}
-          label="Seções do perfil do jogador"
-          items={profileTabs}
-          active={active}
-          onChange={changeTab}
-        />
+        <aside
+          className="bb-profile-honors"
+          aria-labelledby={sectionId("conquistas")}
+        >
+          <h2 id={sectionId("conquistas")} tabIndex={-1}>
+            Conquistas e honrarias
+          </h2>
+          {awards.length ? (
+            [
+              { kind: "collective", label: "Títulos coletivos" },
+              { kind: "individual", label: "Honrarias individuais" },
+            ].map(
+              (group) =>
+                awards.some((a) => a.kind === group.kind) && (
+                  <section key={group.kind}>
+                    <h3>{group.label}</h3>
+                    <ul className="bb-honors">
+                      {awards
+                        .filter((a) => a.kind === group.kind)
+                        .map((award) => (
+                          <li key={award.id}>
+                            <Icon name="trophy" />
+                            <div>
+                              <strong>
+                                {award.title} · {award.competition}
+                              </strong>
+                              <p>
+                                {award.year} · {award.category} · {award.team}
+                              </p>
+                            </div>
+                          </li>
+                        ))}
+                    </ul>
+                  </section>
+                ),
+            )
+          ) : (
+            <p className="bb-coverage-note">
+              Nenhuma conquista publicada para este jogador.
+            </p>
+          )}
+        </aside>
       </div>
-      <TabPanel id={panelId} active={active}>
-        {["estatisticas", "jogos", "historico"].includes(active) && (
-          <div className="bb-toolbar bb-profile-filters">
-            <label>
-              Ano
-              <select
-                name="profile-year"
-                value={year}
-                onChange={(event) => {
-                  setYear(event.target.value);
-                  syncProfileQuery({ anoPerfil: event.target.value });
-                }}
-              >
-                <option value="all">Todos</option>
-                {[...new Set(rows.map((row) => row.year))].map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Campeonato
-              <select
-                name="profile-competition"
-                value={competition}
-                onChange={(event) => {
-                  setCompetition(event.target.value);
-                  syncProfileQuery({ competicaoPerfil: event.target.value });
-                }}
-              >
-                <option value="all">Todos</option>
-                {[...new Set(rows.map((row) => row.competition))].map(
-                  (value) => (
-                    <option key={value}>{value}</option>
-                  ),
-                )}
-              </select>
-            </label>
-            <TeamFilter
-              options={teamOptions}
-              value={selectedTeams}
-              onChange={(value) => {
-                setTeams(value);
-                syncProfileQuery({ equipesPerfil: value.join(",") });
-              }}
-            />
-            <button
-              type="button"
-              className="bb-text-button"
-              onClick={() => {
-                setYear("all");
-                setCompetition("all");
-                setTeams(teamOptions.map((t) => t.id));
-                syncProfileQuery({
-                  anoPerfil: "all",
-                  competicaoPerfil: "all",
-                  equipesPerfil: "all",
-                });
+      <section
+        className="bb-player-summary"
+        aria-labelledby={sectionId("resumo")}
+      >
+        <div className="bb-section-heading">
+          <div className="bb-section-title">
+            <h2 id={sectionId("resumo")} tabIndex={-1}>
+              Resumo estatístico
+            </h2>
+            <span className="bb-count">Médias por jogo</span>
+          </div>
+          <button
+            className="bb-text-button"
+            aria-label="Siglas do resumo estatístico"
+            onClick={onSiglas}
+          >
+            Siglas
+          </button>
+        </div>
+        <DataTable
+          label="Resumo da temporada e da carreira"
+          columns={[
+            {
+              key: "label",
+              label: "Período",
+              render: (row) => <strong>{row.label}</strong>,
+            },
+            {
+              key: "games",
+              label: "J",
+              numeric: true,
+              render: (row) => row.games,
+            },
+            ...profileMetricKeys.map((key) => ({
+              key,
+              label: metricShort[key],
+              numeric: true,
+              render: (row: (typeof summaries)[number]) => show(row[key]),
+            })),
+          ]}
+          rows={summaries}
+          rowId={(row) => row.id}
+        />
+      </section>
+      <nav
+        className="bb-profile-jumps"
+        aria-label="Seções do perfil do jogador"
+      >
+        {profileSections.map((section) => (
+          <a
+            key={section.key}
+            href={sectionHref(section.key)}
+            onClick={(event) => {
+              if (
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.shiftKey &&
+                !event.altKey &&
+                event.button === 0
+              ) {
+                event.preventDefault();
+                jump(section.key);
+              }
+            }}
+          >
+            {section.label}
+          </a>
+        ))}
+      </nav>
+      <section
+        className="bb-profile-recent"
+        aria-labelledby={sectionId("recentes")}
+      >
+        <div className="bb-section-heading">
+          <h2 id={sectionId("recentes")} tabIndex={-1}>
+            Três últimos jogos
+          </h2>
+          <a
+            className="bb-text-button"
+            href={sectionHref("jogos")}
+            onClick={(event) => {
+              if (
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.shiftKey &&
+                !event.altKey &&
+                event.button === 0
+              ) {
+                event.preventDefault();
+                jump("jogos");
+              }
+            }}
+          >
+            Ver todos os jogos <Icon name="chevron" />
+          </a>
+        </div>
+        <PlayerGames
+          rows={allGames.slice(0, 3)}
+          go={go}
+          mobile={mobile}
+          compact
+        />
+      </section>
+      <section
+        className="bb-profile-statistics"
+        aria-labelledby={sectionId("estatisticas")}
+      >
+        <h2 id={sectionId("estatisticas")} tabIndex={-1}>
+          Estatísticas por campeonato
+        </h2>
+        <div className="bb-toolbar bb-profile-filters">
+          <label>
+            Ano
+            <select
+              name="profile-year"
+              value={year}
+              onChange={(event) => {
+                setYear(event.target.value);
+                syncProfileQuery({ anoPerfil: event.target.value });
               }}
             >
-              Limpar filtros
+              <option value="all">Todos</option>
+              {[...new Set(rows.map((row) => row.year))].map((value) => (
+                <option key={value}>{value}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Campeonato
+            <select
+              name="profile-competition"
+              value={competition}
+              onChange={(event) => {
+                setCompetition(event.target.value);
+                syncProfileQuery({ competicaoPerfil: event.target.value });
+              }}
+            >
+              <option value="all">Todos</option>
+              {[...new Set(rows.map((row) => row.competition))].map((value) => (
+                <option key={value}>{value}</option>
+              ))}
+            </select>
+          </label>
+          <TeamFilter
+            options={teamOptions}
+            value={selectedTeams}
+            onChange={(value) => {
+              setTeams(value);
+              syncProfileQuery({ equipesPerfil: value.join(",") });
+            }}
+          />
+          <button
+            type="button"
+            className="bb-text-button"
+            onClick={() => {
+              setYear("all");
+              setCompetition("all");
+              setTeams(teamOptions.map((t) => t.id));
+              syncProfileQuery({
+                anoPerfil: "all",
+                competicaoPerfil: "all",
+                equipesPerfil: "all",
+              });
+            }}
+          >
+            Limpar filtros
+          </button>
+        </div>{" "}
+        <div className="bb-section-heading">
+          <div className="bb-section-title">
+            <span className="bb-count">{filtered.length} participações</span>
+            <button type="button" className="bb-text-button" onClick={onSiglas}>
+              Siglas
             </button>
           </div>
-        )}
-        {active === "resumo" && (
-          <div className="bb-profile-overview">
-            <section>
-              <div className="bb-section-heading">
-                <h2>Jogos recentes</h2>
+          <div className="bb-actions">
+            <div
+              className="bb-segment"
+              role="group"
+              aria-label="Modo das estatísticas do perfil"
+            >
+              {["average", "total"].map((value) => (
                 <button
-                  className="bb-text-button"
+                  key={value}
                   type="button"
-                  onClick={() => changeTab("jogos")}
+                  aria-pressed={mode === value}
+                  onClick={() => {
+                    setMode(value);
+                    syncProfileQuery({ modoPerfil: value });
+                  }}
                 >
-                  Ver todos <Icon name="chevron" />
+                  {value === "average" ? "Por jogo" : "Totais"}
                 </button>
-              </div>
-              <PlayerGames
-                rows={allGames.slice(0, 4)}
-                go={go}
-                mobile={mobile}
-                compact
-              />
-            </section>
-            <section>
-              <div className="bb-section-heading">
-                <h2>
-                  Participações <span className="bb-count">{rows.length}</span>
-                </h2>
-                <button
-                  className="bb-text-button"
-                  type="button"
-                  onClick={() => changeTab("estatisticas")}
-                >
-                  Ver estatísticas <Icon name="chevron" />
-                </button>
-              </div>
-              <ParticipationList rows={rows} go={go} />
-            </section>
+              ))}
+            </div>
+            <ColumnPicker
+              selected={visibleMetrics}
+              options={profileMetricKeys}
+              onChange={changeMetrics}
+            />
           </div>
+        </div>
+        <DataTable
+          label="Estatísticas da carreira por competição"
+          columns={statsColumns}
+          rows={filtered}
+          rowId={(row) => row.id}
+        />
+        {filtered.some((row) => !row.games) && (
+          <p className="bb-coverage-note">
+            Participação registrada sem estatísticas individuais disponíveis.
+          </p>
         )}
-        {active === "estatisticas" && (
-          <>
-            <div className="bb-section-heading">
-              <div className="bb-section-title">
-                <h2>Desempenho por competição</h2>
-                <button
-                  type="button"
-                  className="bb-text-button"
-                  onClick={onSiglas}
-                >
-                  Siglas
-                </button>
-              </div>
-              <div className="bb-actions">
-                <div
-                  className="bb-segment"
-                  role="group"
-                  aria-label="Modo das estatísticas do perfil"
-                >
-                  {["average", "total"].map((value) => (
-                    <button
-                      key={value}
-                      type="button"
-                      aria-pressed={mode === value}
-                      onClick={() => {
-                        setMode(value);
-                        syncProfileQuery({ modoPerfil: value });
-                      }}
-                    >
-                      {value === "average" ? "Por jogo" : "Totais"}
-                    </button>
-                  ))}
-                </div>
-                <ColumnPicker
-                  selected={visibleMetrics}
-                  options={profileMetricKeys}
-                  onChange={changeMetrics}
-                />
-              </div>
+      </section>
+      <div className="bb-profile-extras">
+        {extraPanels.map((key) => (
+          <details
+            key={key}
+            className="bb-profile-extra"
+            open={openPanels.includes(key)}
+            onToggle={(event) => openPanel(key, event.currentTarget.open)}
+          >
+            <summary
+              id={sectionId(key)}
+              onClick={(event) => {
+                event.preventDefault();
+                openPanel(key, !panels.current.includes(key));
+              }}
+            >
+              {key === "jogos"
+                ? "Jogos completos"
+                : key === "historico"
+                  ? "Histórico"
+                  : "Evolução"}
+            </summary>
+            <div className="bb-extra-content">
+              {key === "jogos" && (
+                <>
+                  <h2>
+                    Jogos{" "}
+                    <span className="bb-count">{filteredGames.length}</span>
+                  </h2>
+                  <PlayerGames
+                    rows={filteredGames}
+                    go={go}
+                    mobile={mobile}
+                    metrics={visibleMetrics}
+                  />
+                </>
+              )}
+              {key === "historico" && (
+                <>
+                  <h2>Equipes e temporadas</h2>
+                  <ParticipationList rows={filtered} go={go} />
+                </>
+              )}
+              {key === "evolucao" && <Evolution rows={filteredGames} go={go} />}
             </div>
-            <DataTable
-              label="Estatísticas da carreira por competição"
-              columns={statsColumns}
-              rows={filtered}
-              rowId={(row) => row.id}
-            />
-            {filtered.some((row) => !row.games) && (
-              <p className="bb-coverage-note">
-                Participação registrada sem estatísticas individuais
-                disponíveis.
-              </p>
-            )}
-            <Evolution rows={filteredGames} go={go} />
-          </>
-        )}
-        {active === "jogos" && (
-          <>
-            <h2 className="bb-detail-section-title">
-              Jogos <span className="bb-count">{filteredGames.length}</span>
-            </h2>
-            <div className="bb-profile-game-columns">
-              <ColumnPicker
-                selected={visibleMetrics}
-                options={profileMetricKeys}
-                onChange={changeMetrics}
-              />
-            </div>
-            <PlayerGames
-              rows={filteredGames}
-              go={go}
-              mobile={mobile}
-              metrics={visibleMetrics}
-            />
-          </>
-        )}
-        {active === "historico" && (
-          <>
-            <h2 className="bb-detail-section-title">Equipes e temporadas</h2>
-            <ParticipationList rows={filtered} go={go} />
-          </>
-        )}
-        {active === "conquistas" && (
-          <>
-            <h2 className="bb-detail-section-title">Conquistas e honrarias</h2>
-            {awards.length ? (
-              <ul className="bb-honors">
-                {awards.map((award) => (
-                  <li key={award.id}>
-                    <Icon name="trophy" />
-                    <div>
-                      <h3>{award.title}</h3>
-                      <p>
-                        {award.year} · {award.competition} · {award.category}
-                      </p>
-                      <span>{award.team}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="bb-empty">
-                Nenhuma conquista publicada para este jogador.
-              </p>
-            )}
-          </>
-        )}
-      </TabPanel>
+          </details>
+        ))}
+      </div>
     </article>
   );
 }

@@ -31,7 +31,7 @@ Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da 
 
 Direção aprovada: **público primeiro no celular, administração no desktop**, tema claro e azul, tabelas e formulários compactos. As decisões e os limites estão em [REFORMA-UIUX.md](REFORMA-UIUX.md).
 
-- [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfil completo de carreira, súmula pública com parciais/elencos/faltas, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
+- [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfil contínuo de carreira com conquistas/resumo/três recentes/campeonatos, súmula com a composição atual e parciais/elencos/faltas, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
 - Para servir localmente: `node docs/design/prototipos/reforma-uiux/server.cjs`, depois abrir [o piloto local](http://127.0.0.1:4189/).
 - Fontes compartilhadas em `src/ui-system/`, isoladas das páginas reais até o aceite visual. Build e verificação incluídos em `npm run design:build` e `npm run design:verify`.
 - Expansão às páginas reais depende do aceite humano do piloto, por escolha expressa do responsável nesta conversa. Uma unidade/PR por vez, sem pilha dependente.

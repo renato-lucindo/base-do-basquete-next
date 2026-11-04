@@ -364,7 +364,45 @@ export function participations(playerId: string): Participation[] {
     });
   return [...rows.values()];
 }
-export const publicBio = (playerId: string) =>
+export function profileSummary(playerId: string) {
+  const records = appearances(playerId);
+  const years = participations(playerId).map((row) => row.year);
+  const latestYear = years.length ? Math.max(...years) : null;
+  return [
+    {
+      id: "season",
+      label: latestYear === null ? "Temporada" : String(latestYear),
+      records: records.filter((row) => row.game.year === latestYear),
+    },
+    { id: "career", label: "Carreira", records },
+  ].map(({ id, label, records }) => {
+    const mean = (key: "points" | "two" | "three" | "free" | "fouls") =>
+      !records.length || records.some((row) => row.player[key] === null)
+        ? null
+        : records.reduce((sum, row) => sum + row.player[key]!, 0) /
+          records.length;
+    return {
+      id,
+      label,
+      games: records.length,
+      points: mean("points"),
+      two: mean("two"),
+      three: mean("three"),
+      free: mean("free"),
+      fouls: mean("fouls"),
+    };
+  });
+}
+export type PublicBio = {
+  nickname?: string;
+  birthYear?: number;
+  position?: string;
+  height?: string;
+  weight?: string;
+  dominantHand?: string;
+  city?: string;
+};
+export const publicBio = (playerId: string): PublicBio | null =>
   playerId === "player-1"
     ? {
         nickname: "JP",
@@ -379,6 +417,7 @@ export const honors = (playerId: string) =>
     ? [
         {
           id: "honor-1",
+          kind: "collective",
           title: "Campeão",
           competition: "Copa da Base",
           year: 2025,
@@ -387,6 +426,7 @@ export const honors = (playerId: string) =>
         },
         {
           id: "honor-2",
+          kind: "individual",
           title: "Quinteto ideal",
           competition: "Copa ES",
           year: 2026,

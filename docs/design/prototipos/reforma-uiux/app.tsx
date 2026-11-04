@@ -38,6 +38,7 @@ import {
 } from "./fixtures";
 import "../../../../src/ui-system/theme.css";
 import "./pilot.css";
+import "../../../../src/publication/public-view.css";
 import "./public-details.css";
 
 import {
@@ -127,6 +128,7 @@ function App() {
   }
   for (const key of [
     "secao",
+    "paineisPerfil",
     "anoPerfil",
     "competicaoPerfil",
     "equipesPerfil",

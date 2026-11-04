@@ -2,7 +2,31 @@
 
 Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
-## Revisão atual — composição do jogo e do perfil (04/11)
+## Revisão atual — perfil contínuo e composição atual da súmula (04/11)
+
+Plano explicitamente aprovado nesta conversa: recuperar o jogo atual, usar o print do Basketball Reference para organização de nome/dados pessoais e apresentar perfil contínuo com conquistas laterais desktop/abaixo no celular, resumo de temporada/carreira, três últimos jogos e estatísticas por campeonato. Jogos completos/Histórico/Evolução ficam recolhidos depois desses blocos. A proposta de jogo de72aba24 foi reprovada; a implementação atual aguarda avaliação visual.
+
+- **Jogo:** reutiliza diretamente `src/publication/public-view.css`, sem modificar a aplicação. Contexto compacto e tabela de parciais/total, sem placar separado nem painéis novos; elencos, comissão, titulares/capitão/0/00, LL%, recortes sincronizados e faltas explícitas preservados. A prova renderiza também o `PublicGameView` atual com `confirmedManualFixture`, sem API/dado humano, e compara altura, fonte, borda e fundo das células em390/1366. Não é comparação com banco/serviço publicado.
+- **Perfil:** sem tablist; nome28/24, campos públicos rotulados e omissão de ausentes, conquistas separadas por tipo, resumo em duas linhas com J e médias elegíveis. Cobertura parcial não entra como zero. Três jogos derivados de atuações explícitas; filtros da tabela não alteram resumo, conquistas ou recentes. Painéis/recortes/rolagem sobrevivem ao retorno e recarga; links antigos de seção continuam funcionando.
+- **Verificação final:** `npm run design:verify` PASS, referências originais/tipagem e **17 cenários/20 capturas** do piloto. Axe sem violações selecionadas em telas/painéis/menus/diálogos; teclado/foco,320/390/1366/1920 e zoomCSS200. Teste adicional de teclado no navegador: Space abre e Enter fecha o painel; link antigo de conquistas leva ao título correto. Inspeção visual do autor no desktop/mobile e navegador da conversa. Não é parecer independente, WCAG integral ou aceite humano.
+- **Gate consolidado:** `npm run gate` PASS — 689 unitários/141 arquivos, transporte7, banco isolado13, Worker/HTTP29, PDF/workerd1; formato/lint/tipos/builds/fronteira/segredos. Apenas documentação e cópias de capturas atualizadas depois dessa execução; formato focal reaplicado antes do commit. CI nova no checkpoint/PR; nenhuma integração Git/deploy executada.
+
+Falhas focais tratadas: fechamento do painel nativo podia chegar à URL depois da recarga, corrigido com atualização controlada no acionamento do summary; o teste de retorno passou a medir rolagem após colocar o link de saída na tela, evitando confundir a rolagem automática do Playwright com a posição de saída. Não ampliados timeouts ou removidas provas de retorno. A primeira inspeção também detectou colisão com classes do perfil de equipe; as classes de identidade/resumo do jogador foram isoladas. Foco da célula F passou a ter seletor com especificidade suficiente contra a folha da súmula.
+
+Revisão do autor com `ui-ux-pro-max` (busca `heading hierarchy --domain ux`, hierarquia sequencial/tipografia) e `web-design-guidelines` ([fonte atual](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultada nesta execução). Achados tratados por local:
+
+- `public-details.tsx:590` e `pilot-navigation.tsx:71`: abertura dos painéis na URL, links reais de seção e limpeza de parâmetros em entrada nova; retorno conserva contexto.
+- `public-details.tsx:728` e `public-details.css:174`: ordem DOM identificação/conquistas/resumo, lateral apenas no desktop, nomes longos e campos ausentes sem espaço artificial.
+- `public-details.tsx:790` e `fixtures.ts:367`: resumo separado dos filtros; médias e cobertura conferidas, ano de nascimento sem inferir idade/data completa.
+- `public-details.tsx:1009` e `public-details.css:91`: painel nativo acessível por teclado, controle de persistência e foco do total de faltas dentro da célula.
+
+HTML autocontido: 364501 bytes, SHA256 `782a247dbba5c27c2d6827325a7e4b7f7679698df836c979be5bd762bd7c49ee`. HTTP local200, conteúdo idêntico ao arquivo. Logs locais: `design-perfil-continuo.log` e `gate-perfil-continuo.log` em `docs/design/.preview-artifacts/reforma-uiux/`; hashes/SHA no checkpoint.
+
+Capturas vigentes: [perfil desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [perfil celular](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [súmula desktop](prototipos/reforma-uiux/capturas/sumula-desktop.png), [súmula celular](prototipos/reforma-uiux/capturas/sumula-mobile.png), [componente atual com fixture desktop](prototipos/reforma-uiux/capturas/jogo-atual-referencia-1366.png), [componente atual com fixture celular](prototipos/reforma-uiux/capturas/jogo-atual-referencia-390.png). As capturas históricas nos mesmos caminhos foram substituídas; usar o SHA da seção antiga para reproduzi-las.
+
+Fixtures apenas: nenhuma API, rota real, banco, publicação, deploy, boxscore, comparação ou recordes novos. As tabelas do catálogo ainda reutilizam cenários fictícios e não comprovam cobertura de todos os recortes. PR #51 permanece Draft.
+
+## Revisão de 72aba24 — histórico, jogo reprovado (04/11)
 
 As **duas páginas anteriores foram reprovadas pelo responsável**, apesar de seus testes funcionais verdes. A nova revisão usa a liberdade de composição reiterada nesta conversa, priorizando o jogo. O resultado e as parciais agora formam um bloco central; os elencos ficam próximos em 900 px, sem o card externo da página nem abas repetidas no detalhe. O perfil ocupa 1000 px, reúne identificação/biografia e números de carreira, e apresenta jogos recentes antes das participações. Tema claro/azul e contratos funcionais preservados.
 

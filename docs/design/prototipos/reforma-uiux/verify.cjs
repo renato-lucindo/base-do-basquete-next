@@ -151,6 +151,21 @@ async function main() {
       "Relacionado sem atuação não ganha jogos no perfil",
     );
     assert.equal(domain.participations("player-1").length, 3);
+    const summary = domain.profileSummary("player-1");
+    assert.deepEqual(
+      summary.map((row) => [row.label, row.games, row.points]),
+      [
+        ["2026", 8, 11.5],
+        ["Carreira", 10, 11.5],
+      ],
+    );
+    assert.equal(domain.profileSummary("player-7")[1].games, 0);
+    assert.equal(domain.profileSummary("player-7")[1].points, null);
+    const missing = domain.players.find((p) =>
+      domain.appearances(p.id).some((a) => a.player.fouls === null),
+    );
+    assert(missing, "Deve haver cenário de cobertura incompleta");
+    assert.equal(domain.profileSummary(missing.id)[1].fouls, null);
     assert(
       domain
         .participations("player-1")
@@ -210,15 +225,23 @@ async function main() {
         table.getByRole("columnheader", { name: "F", exact: true }),
       ).toBeVisible();
       await page.setViewportSize({ width: 390, height: 844 });
+      await page.locator("#bb-profile-player-1-evolucao").click();
       const chart = page.locator("figure");
       await chart.focus();
       await page.keyboard.press("ArrowRight");
       await expect
         .poll(() => chart.evaluate((element) => element.scrollLeft))
         .toBeGreaterThan(0);
-      await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+      await page
+        .getByRole("link", { name: "Ver todos os jogos", exact: true })
+        .click();
       await expect(
-        page.getByRole("columnheader", { name: "F", exact: true }),
+        page
+          .getByRole("region", {
+            name: "Jogos disputados pelo jogador",
+            exact: true,
+          })
+          .getByRole("columnheader", { name: "F", exact: true }),
       ).toBeVisible();
       await noOverflow(page);
       await page.context().close();
@@ -236,8 +259,8 @@ async function main() {
       await expect(link).toHaveAttribute("href", /competition=Copa\+ES/);
       await link.click();
       await expect(
-        page.getByRole("tab", { name: "Resumo", exact: true }),
-      ).toHaveAttribute("aria-selected", "true");
+        page.getByRole("heading", { name: "Resumo estatístico", exact: true }),
+      ).toBeVisible();
       await page
         .getByRole("link", { name: "Voltar a jogadores", exact: true })
         .click();
@@ -317,61 +340,86 @@ async function main() {
       await expect(page.locator(".bb-free-summary").first()).toContainText(
         "17/—",
       );
-      await expect(page.locator(".bb-parcials")).toContainText("— FC");
+      await expect(page.locator(".bb-parcials")).toContainText("F—");
       await page.getByRole("button", { name: /não informadas/ }).click();
       await expect(dialog).toContainText("Faltas não informadas neste recorte");
       await page.keyboard.press("Escape");
       await page.goto(`${origin}/#publico/jogo/game-3`);
       for (const summary of await page.locator(".bb-free-summary").all())
-        await expect(summary).toContainText("0/0 · —");
+        await expect(summary).toHaveText(/0\/0\s*—/);
       await page.goto(`${origin}/#publico/jogo/game-24`);
       await expect(page.locator(".bb-game-header")).toContainText("Agendado");
       await expect(page.locator(".bb-score-team")).toHaveCount(0);
-      await expect(page.locator(".bb-final-score").first()).toHaveText("—");
+      await expect(page.locator(".bb-final-score")).toHaveCount(0);
       await page.context().close();
     });
-    await test("Perfil: carreira completa, filtros compartilháveis, participação real e retorno do jogo", async () => {
+    await test("Perfil contínuo: carreira, três recentes, filtros independentes, painéis e retorno", async () => {
       const page = await pageAt(
         "publico/jogador/player-1?competition=Copa+ES&year=2026&gender=Masculino&category=Sub-15",
       );
-      await expect(
-        page.getByRole("tab", { name: "Resumo", exact: true }),
-      ).toHaveAttribute("aria-selected", "true");
-      await expect(page.locator(".bb-participation-list li")).toHaveCount(3);
-      await expect(page.locator(".bb-career-numbers dd").first()).toHaveText(
-        "10",
-      );
-      await expect(page.locator(".bb-context-wrap")).toHaveCount(0);
-      await screenshot(page, "perfil-resumo-desktop");
-      await page
-        .getByRole("tab", { name: "Estatísticas", exact: true })
-        .click();
-      await expect(page.locator('[name="profile-year"]')).toHaveValue("all");
+      const summary = page.getByRole("region", {
+        name: "Resumo da temporada e da carreira",
+        exact: true,
+      });
+      const recent = page.getByRole("region", {
+        name: "Jogos recentes do jogador",
+        exact: true,
+      });
       const table = page.getByRole("region", {
         name: "Estatísticas da carreira por competição",
         exact: true,
       });
+      const complete = page.getByRole("region", {
+        name: "Jogos disputados pelo jogador",
+        exact: true,
+      });
+      await expect(page.locator("main [role=tablist]")).toHaveCount(0);
+      await expect(page.locator(".bb-profile-extra[open]")).toHaveCount(0);
+      await expect(summary.locator("tbody tr")).toHaveCount(2);
+      await expect(
+        summary.locator("tbody tr").last().locator("td").nth(1),
+      ).toHaveText("10");
+      await expect(recent.locator("tbody tr")).toHaveCount(3);
+      const expected = domain
+        .appearances("player-1")
+        .slice(0, 3)
+        .map((row) => row.game.id);
+      const actual = await recent
+        .locator("tbody a")
+        .evaluateAll((es) =>
+          es.map((e) => e.getAttribute("href").split("/").at(-1).split("?")[0]),
+        );
+      assert.deepEqual(actual, expected);
       await expect(table.locator("tbody tr")).toHaveCount(3);
+      await expect(page.locator(".bb-honors li")).toHaveCount(2);
+      await expect(page.locator(".bb-context-wrap")).toHaveCount(0);
+      await expect(page.locator('[name="profile-year"]')).toHaveValue("all");
+      const summaryBefore = await summary.innerText(),
+        recentBefore = await recent.innerText();
+      await screenshot(page, "perfil-resumo-desktop", true);
       await page.getByRole("button", { name: "Totais", exact: true }).click();
       await expect(
         table.locator("tbody tr").first().locator("td").nth(3),
       ).toHaveText("92");
       await expect(table.locator("tbody tr").last()).toContainText("—");
-      await screenshot(page, "perfil-estatisticas-desktop");
+      await screenshot(page, "perfil-estatisticas-desktop", true);
       await page.locator('[name="profile-year"]').selectOption("2025");
       await expect(table.locator("tbody tr")).toHaveCount(1);
-      await expect(table).toContainText("GS Nice de Paula");
+      assert.equal(await summary.innerText(), summaryBefore);
+      assert.equal(await recent.innerText(), recentBefore);
       await page.reload();
-      await expect(
-        page.getByRole("tab", { name: "Estatísticas", exact: true }),
-      ).toHaveAttribute("aria-selected", "true");
       await expect(page.locator('[name="profile-year"]')).toHaveValue("2025");
       await expect(
         page.getByRole("button", { name: "Totais", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
-      await page.getByRole("tab", { name: "Jogos", exact: true }).click();
-      await expect(page.locator("tbody tr")).toHaveCount(2);
-      await page.locator("tbody a").first().click();
+      await page
+        .getByRole("link", { name: "Ver todos os jogos", exact: true })
+        .click();
+      await expect(complete.locator("tbody tr")).toHaveCount(2);
+      const firstGame = complete.locator("tbody a").first();
+      await firstGame.scrollIntoViewIfNeeded();
+      const before = await page.evaluate(() => scrollY);
+      await firstGame.click();
       await expect(page.locator(".bb-context-detail")).toHaveText(
         "2025 · Masculino · Sub-14",
       );
@@ -379,21 +427,22 @@ async function main() {
         .getByRole("link", { name: "Voltar ao perfil", exact: true })
         .click();
       await expect(
-        page.getByRole("tab", { name: "Jogos", exact: true }),
-      ).toHaveAttribute("aria-selected", "true");
+        page.locator("#bb-profile-player-1-jogos").locator(".."),
+      ).toHaveAttribute("open", "");
       await expect(page.locator('[name="profile-year"]')).toHaveValue("2025");
+      await expect.poll(() => page.evaluate(() => scrollY)).toBe(before);
       await page
         .getByRole("button", { name: "Limpar filtros", exact: true })
         .click();
-      await expect(page.locator("tbody tr")).toHaveCount(10);
+      await expect(complete.locator("tbody tr")).toHaveCount(10);
       await page.locator(".team-filter > button").click();
       await page
         .getByRole("button", { name: "Não selecionar nenhuma equipe" })
         .click();
       await page.keyboard.press("Escape");
-      await expect(page.locator("tbody")).toContainText(
-        "Nenhum jogo com participação",
-      );
+      await expect(complete).toContainText("Nenhum jogo com participação");
+      assert.equal(await summary.innerText(), summaryBefore);
+      assert.equal(await recent.innerText(), recentBefore);
       await page.reload();
       await expect(page.locator("#team-filter-value")).toHaveText(
         "Nenhuma equipe",
@@ -401,118 +450,172 @@ async function main() {
       await page
         .getByRole("button", { name: "Limpar filtros", exact: true })
         .click();
-      await page.getByRole("tab", { name: "Histórico", exact: true }).click();
+      await page.locator("#bb-profile-player-1-historico").click();
       await expect(page.locator(".bb-participation-list li")).toHaveCount(3);
-      await page
-        .getByRole("tab", { name: "Conquistas e honrarias", exact: true })
-        .click();
-      await expect(page.locator(".bb-honors li")).toHaveCount(2);
+      await page.locator("#bb-profile-player-1-jogos").click();
+      await page.reload();
+      await expect(
+        page.locator("#bb-profile-player-1-jogos").locator(".."),
+      ).not.toHaveAttribute("open", "");
+      await expect(
+        page.locator("#bb-profile-player-1-historico").locator(".."),
+      ).toHaveAttribute("open", "");
       await page.goto(`${origin}/#publico/jogador/player-7?secao=jogos`);
-      await expect(page.locator("tbody")).toContainText(
-        "Nenhum jogo com participação",
-      );
-      await page
-        .getByRole("tab", { name: "Conquistas e honrarias", exact: true })
-        .click();
+      await expect(
+        page.getByRole("region", {
+          name: "Jogos disputados pelo jogador",
+          exact: true,
+        }),
+      ).toContainText("Nenhum jogo com participação");
       await expect(
         page.getByText("Nenhuma conquista publicada para este jogador."),
       ).toBeVisible();
+      await expect(page.locator(".bb-player-metadata")).toHaveCount(0);
+      await expect(
+        page
+          .getByRole("region", {
+            name: "Resumo da temporada e da carreira",
+            exact: true,
+          })
+          .locator("tbody tr")
+          .last(),
+      ).toContainText("—");
       await page.goto(`${origin}/#publico/jogador/player-1`);
-      await page.setViewportSize({ width: 390, height: 844 });
-      await noOverflow(page);
-      await screenshot(page, "perfil-resumo-mobile");
       await page.context().close();
+      const mobile = await pageAt("publico/jogador/player-1", 390, 844);
+      await noOverflow(mobile);
+      await screenshot(mobile, "perfil-resumo-mobile", true);
+      await mobile.context().close();
     });
-    await test("Jogo: contexto centralizado acima do placar e tipografia proporcional", async () => {
+    await test("Jogo recupera composição e estilos da súmula atual, sem placar adicional", async () => {
+      const referenceModule = { exports: {} };
+      const bundle = esbuild.buildSync({
+        stdin: {
+          contents: `import{createElement}from'react';import{renderToStaticMarkup}from'react-dom/server';import{PublicGameView}from'./src/publication/public-page';import{confirmedManualFixture}from'./tests/fixtures/statistics-publications';export const html=renderToStaticMarkup(createElement(PublicGameView,{result:confirmedManualFixture()}));`,
+          resolveDir: root,
+          loader: "tsx",
+        },
+        bundle: true,
+        write: false,
+        platform: "node",
+        format: "cjs",
+        jsx: "automatic",
+        loader: { ".css": "empty" },
+        define: { "import.meta.env": "{}" },
+        packages: "external",
+      }).outputFiles[0].text;
+      new Function("module", "exports", "require", bundle)(
+        referenceModule,
+        referenceModule.exports,
+        require,
+      );
+      const css = fs.readFileSync(
+        path.join(root, "src/publication/public-view.css"),
+        "utf8",
+      );
       for (const width of [320, 390, 1366, 1920]) {
         const page = await pageAt("publico/jogo/game-1", width, 844);
-        const header = page.locator(".bb-game-header");
-        const geometry = await header.evaluate((element) => {
-          const scores = [...element.querySelectorAll(".bb-final-score")];
-          const score = scores[0];
-          const meta = element.querySelector(".bb-game-meta");
-          const team = element.querySelector(".bb-score-side > a");
-          const rect = score.getBoundingClientRect();
-          const parent = element
-            .querySelector(".bb-match-score")
-            .getBoundingClientRect();
-          const second = scores[1].getBoundingClientRect();
-          return {
-            blockCenterDelta: (parent.left + parent.right) / 2 - innerWidth / 2,
-            centerDelta:
-              ((rect.left + rect.right + second.left + second.right) / 2 -
-                parent.left -
-                parent.right) /
-              2,
-            metaBottom: meta.getBoundingClientRect().bottom,
-            scoreTop: rect.top,
-            scoreSize: parseFloat(getComputedStyle(score).fontSize),
-            teamSize: parseFloat(getComputedStyle(team).fontSize),
-            metaSize: parseFloat(getComputedStyle(meta).fontSize),
-          };
-        });
-        assert(Math.abs(geometry.blockCenterDelta) < 1);
-        if (width >= 640) assert(Math.abs(geometry.centerDelta) < 1);
-        assert(geometry.metaBottom <= geometry.scoreTop);
-        assert(
-          geometry.scoreSize / geometry.teamSize >= 1 &&
-            geometry.scoreSize / geometry.teamSize <= 1.8,
-        );
-        assert(geometry.metaSize < geometry.teamSize);
-        await expect(header).toContainText("Encerrado");
+        await expect(
+          page.locator(".bb-match-score,.bb-game-overview"),
+        ).toHaveCount(0);
+        await expect(page.locator(".bb-parcials .bb-final-score")).toHaveText([
+          "88",
+          "83",
+        ]);
+        const context = await page.locator(".game-context").boundingBox();
+        const table = await page.locator(".period-table").boundingBox();
+        assert(context.y + context.height <= table.y);
         await noOverflow(page);
-        if (width === 390 || width === 1366)
+        if (width === 390 || width === 1366) {
+          const reference = await browser.newPage({
+            viewport: { width, height: 844 },
+          });
+          await reference.setContent(
+            `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:24px}${css}</style><body>${referenceModule.exports.html}</body></html>`,
+          );
+          const styles = async (p) =>
+            p
+              .locator(".roster-table")
+              .first()
+              .locator("tbody tr")
+              .first()
+              .evaluate((row) => {
+                const cells = row.querySelectorAll("td,th");
+                const stat = getComputedStyle(cells[2]);
+                return {
+                  height: row.getBoundingClientRect().height,
+                  font: stat.fontSize,
+                  border: stat.borderRightColor,
+                  background: stat.backgroundColor,
+                };
+              });
+          assert.deepEqual(
+            await styles(page),
+            await styles(reference),
+            "Células devem reutilizar os estilos da página atual",
+          );
+          await screenshot(reference, `jogo-atual-referencia-${width}`, true);
           await screenshot(page, `jogo-cabecalho-${width}`);
+          await reference.close();
+        }
         await page.context().close();
       }
     });
-    await test("Detalhes: nomes longos sem colisão com o placar e PTS recentes visíveis em 320/390", async () => {
-      for (const width of [320, 390]) {
-        const page = await pageAt("publico/jogo/game-1", width, 844);
-        await page.locator(".bb-score-home a").evaluate((link) => {
-          link.textContent = "Associação de Basquetebol de São José dos Campos";
-        });
-        await page.locator(".bb-score-away a").evaluate((link) => {
-          link.textContent = "Clube de Regatas e Esportes Saldanha da Gama";
-        });
-        await page
-          .locator(".bb-athlete-name a")
-          .first()
-          .evaluate((link) => {
-            link.textContent = "José Antônio de Albuquerque e Vasconcelos";
-          });
-        const home = await page.locator(".bb-score-home").boundingBox();
-        const away = await page.locator(".bb-score-away").boundingBox();
-        assert(home.y + home.height <= away.y);
-        for (const side of await page.locator(".bb-score-side").all()) {
-          const label = await side.locator("a").boundingBox();
-          const score = await side.locator(".bb-final-score").boundingBox();
+    await test("Perfil responsivo: ordem contínua, lateral de conquistas, nomes longos e PTS em 320", async () => {
+      for (const width of [320, 390, 1366, 1920]) {
+        const page = await pageAt("publico/jogador/player-1", width, 844);
+        const identity = await page.locator(".bb-player-header").boundingBox();
+        const honors = await page.locator(".bb-profile-honors").boundingBox();
+        const summary = await page.locator(".bb-player-summary").boundingBox();
+        const recent = await page.locator(".bb-profile-recent").boundingBox();
+        const stats = await page
+          .locator(".bb-profile-statistics")
+          .boundingBox();
+        if (width >= 960)
           assert(
-            label.x + label.width <= score.x,
-            "Nome completo e placar não podem se sobrepor",
+            honors.x >= identity.x + identity.width &&
+              Math.abs(honors.y - identity.y) < 1,
           );
-        }
-        await noOverflow(page);
-        if (width === 320) await screenshot(page, "sumula-nomes-longos-320");
-        await page.goto(`${origin}/#publico/jogador/player-1`);
-        const recent = page.getByRole("region", {
+        else assert(honors.y >= identity.y + identity.height);
+        assert(
+          summary.y >= honors.y + honors.height &&
+            recent.y >= summary.y + summary.height &&
+            stats.y >= recent.y + recent.height,
+        );
+        const table = page.getByRole("region", {
           name: "Jogos recentes do jogador",
           exact: true,
         });
-        const bounds = await recent.boundingBox();
-        for (const cell of await recent.locator("tbody td:last-child").all()) {
+        const bounds = await table.boundingBox();
+        for (const cell of await table.locator("tbody td:last-child").all()) {
           const rect = await cell.boundingBox();
           assert(
             rect.x >= bounds.x &&
               rect.x + rect.width <= bounds.x + bounds.width + 1,
-            "PTS de jogos recentes deve estar visível sem rolar horizontalmente",
+            "PTS recente deve estar visível sem rolagem horizontal",
           );
         }
-        await page.locator("h1").evaluate((heading) => {
-          heading.textContent = "José Antônio de Albuquerque e Vasconcelos";
+        await page.locator("h1").evaluate((el) => {
+          el.textContent = "José Antônio de Albuquerque e Vasconcelos";
         });
         await noOverflow(page);
-        if (width === 320) await screenshot(page, "perfil-nome-longo-320");
+        if (width === 320)
+          await screenshot(page, "perfil-nome-longo-320", true);
+        await page.goto(`${origin}/#publico/jogo/game-1`);
+        await page
+          .locator(".period-table tbody th")
+          .first()
+          .evaluate((el) => {
+            el.textContent = "Associação de Basquetebol de São José dos Campos";
+          });
+        await page
+          .locator(".athlete-name")
+          .first()
+          .evaluate((el) => {
+            el.textContent = "José Antônio de Albuquerque e Vasconcelos";
+          });
+        await noOverflow(page);
+        if (width === 320) await screenshot(page, "sumula-nomes-longos-320");
         await page.context().close();
       }
     });
@@ -958,14 +1061,8 @@ async function main() {
           );
         }
         await page.goto(`${origin}/#publico/jogador/player-1`);
-        for (const label of [
-          "Resumo",
-          "Estatísticas",
-          "Conquistas e honrarias",
-          "Jogos",
-          "Histórico",
-        ]) {
-          await page.getByRole("tab", { name: label, exact: true }).click();
+        for (const key of ["jogos", "historico", "evolucao"]) {
+          await page.locator(`#bb-profile-player-1-${key}`).click();
           await noOverflow(page);
           const result = await new AxeBuilder({ page })
             .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
@@ -976,12 +1073,9 @@ async function main() {
               nodes: v.nodes.map((n) => n.target),
             })),
             [],
-            `Perfil ${label} em ${width}`,
+            `Painel ${key} em ${width}`,
           );
         }
-        await page
-          .getByRole("tab", { name: "Estatísticas", exact: true })
-          .click();
         await page.locator(".team-filter > button").click();
         const teamsMenu = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])

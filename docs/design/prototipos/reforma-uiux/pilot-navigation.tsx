@@ -68,6 +68,7 @@ export function routeWithContext(next: string) {
   const params = new URLSearchParams(location.hash.split("?")[1]);
   for (const key of [
     "secao",
+    "paineisPerfil",
     "anoPerfil",
     "competicaoPerfil",
     "equipesPerfil",
