@@ -48,7 +48,7 @@ Exemplo ilustrativo fornecido pelo responsável, sem validação de datas ou dad
 
 ### FUT-003 — Equipes e elencos em duas colunas
 
-**Status:** Priorizada pelo responsável para a reforma de UI/UX em 03/11/2026, substituindo o adiamento pós-MVP. Piloto com fixtures iniciado; integração nas rotas reais depende de seu aceite visual. **Origem:** conversa de 30/10/2026. **Decisão atual e critérios:** [reforma de UI/UX](design/REFORMA-UIUX.md). Estado real, branch e CI no [checkpoint](PROGRESSO.md).
+**Status:** Priorizada para a reforma de UI/UX em03/11/2026, substituindo o adiamento pós-MVP; piloto aceito e composição integrada às rotas reais na PR54 após autorização da sequência. Provas e limites em [validação administrativa](design/VALIDACAO-ADMIN-UIUX.md); liberação e aceite de produção permanecem distintos. **Origem:** conversa de 30/10/2026. **Decisão atual e critérios:** [reforma de UI/UX](design/REFORMA-UIUX.md). Estado real, branch e CI no [checkpoint](PROGRESSO.md).
 
 **Objetivo e benefício:** abrir o elenco ao lado da lista administrativa de equipes, facilitando a troca de equipe e evitando que a expansão do elenco alongue a página.
 
