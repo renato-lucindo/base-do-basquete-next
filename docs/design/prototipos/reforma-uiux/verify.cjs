@@ -438,6 +438,7 @@ async function main() {
             .getBoundingClientRect();
           const second = scores[1].getBoundingClientRect();
           return {
+            blockCenterDelta: (parent.left + parent.right) / 2 - innerWidth / 2,
             centerDelta:
               ((rect.left + rect.right + second.left + second.right) / 2 -
                 parent.left -
@@ -450,7 +451,8 @@ async function main() {
             metaSize: parseFloat(getComputedStyle(meta).fontSize),
           };
         });
-        assert(Math.abs(geometry.centerDelta) < 1);
+        assert(Math.abs(geometry.blockCenterDelta) < 1);
+        if (width >= 640) assert(Math.abs(geometry.centerDelta) < 1);
         assert(geometry.metaBottom <= geometry.scoreTop);
         assert(
           geometry.scoreSize / geometry.teamSize >= 1 &&
@@ -461,6 +463,56 @@ async function main() {
         await noOverflow(page);
         if (width === 390 || width === 1366)
           await screenshot(page, `jogo-cabecalho-${width}`);
+        await page.context().close();
+      }
+    });
+    await test("Detalhes: nomes longos sem colisão com o placar e PTS recentes visíveis em 320/390", async () => {
+      for (const width of [320, 390]) {
+        const page = await pageAt("publico/jogo/game-1", width, 844);
+        await page.locator(".bb-score-home a").evaluate((link) => {
+          link.textContent = "Associação de Basquetebol de São José dos Campos";
+        });
+        await page.locator(".bb-score-away a").evaluate((link) => {
+          link.textContent = "Clube de Regatas e Esportes Saldanha da Gama";
+        });
+        await page
+          .locator(".bb-athlete-name a")
+          .first()
+          .evaluate((link) => {
+            link.textContent = "José Antônio de Albuquerque e Vasconcelos";
+          });
+        const home = await page.locator(".bb-score-home").boundingBox();
+        const away = await page.locator(".bb-score-away").boundingBox();
+        assert(home.y + home.height <= away.y);
+        for (const side of await page.locator(".bb-score-side").all()) {
+          const label = await side.locator("a").boundingBox();
+          const score = await side.locator(".bb-final-score").boundingBox();
+          assert(
+            label.x + label.width <= score.x,
+            "Nome completo e placar não podem se sobrepor",
+          );
+        }
+        await noOverflow(page);
+        if (width === 320) await screenshot(page, "sumula-nomes-longos-320");
+        await page.goto(`${origin}/#publico/jogador/player-1`);
+        const recent = page.getByRole("region", {
+          name: "Jogos recentes do jogador",
+          exact: true,
+        });
+        const bounds = await recent.boundingBox();
+        for (const cell of await recent.locator("tbody td:last-child").all()) {
+          const rect = await cell.boundingBox();
+          assert(
+            rect.x >= bounds.x &&
+              rect.x + rect.width <= bounds.x + bounds.width + 1,
+            "PTS de jogos recentes deve estar visível sem rolar horizontalmente",
+          );
+        }
+        await page.locator("h1").evaluate((heading) => {
+          heading.textContent = "José Antônio de Albuquerque e Vasconcelos";
+        });
+        await noOverflow(page);
+        if (width === 320) await screenshot(page, "perfil-nome-longo-320");
         await page.context().close();
       }
     });
@@ -642,6 +694,7 @@ async function main() {
       await expect(page.locator(".bb-context-detail")).toHaveText(
         "2025 · Masculino · Sub-15",
       );
+      await expect(page.locator("main")).toBeFocused();
       await search.fill("zzzzsemresultado");
       await expect(
         page.getByText("Nenhum resultado para “zzzzsemresultado”."),

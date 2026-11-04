@@ -255,26 +255,33 @@ function App() {
               {admin ? "2026 · Masculino · Sub-15" : contextDetail}
             </span>
           </div>
-          <nav
-            className="bb-tabs"
-            aria-label={
-              admin ? "Administração do campeonato" : "Seções da disputa"
-            }
-          >
-            {(admin ? adminTabs : publicTabs).map((item) => (
-              <PilotLink
-                key={item.key}
-                go={go}
-                to={`${admin ? "admin" : "publico"}/${item.key}${!admin && contextQuery.size ? `?${contextQuery}` : ""}`}
-                aria-current={navSection === item.key ? "page" : undefined}
-              >
-                {item.label}
-              </PilotLink>
-            ))}
-          </nav>
+          {section !== "jogo" && (
+            <nav
+              className="bb-tabs"
+              aria-label={
+                admin ? "Administração do campeonato" : "Seções da disputa"
+              }
+            >
+              {(admin ? adminTabs : publicTabs).map((item) => (
+                <PilotLink
+                  key={item.key}
+                  go={go}
+                  to={`${admin ? "admin" : "publico"}/${item.key}${!admin && contextQuery.size ? `?${contextQuery}` : ""}`}
+                  aria-current={navSection === item.key ? "page" : undefined}
+                >
+                  {item.label}
+                </PilotLink>
+              ))}
+            </nav>
+          )}
         </div>
       )}
-      <main ref={main} id="pilot-main" className="bb-main" tabIndex={-1}>
+      <main
+        ref={main}
+        id="pilot-main"
+        className={`bb-main${section === "jogo" ? " bb-main-game" : section === "jogador" ? " bb-main-profile" : ""}`}
+        tabIndex={-1}
+      >
         {admin ? (
           <section aria-label="Área administrativa">
             {section === "informacoes" ? (

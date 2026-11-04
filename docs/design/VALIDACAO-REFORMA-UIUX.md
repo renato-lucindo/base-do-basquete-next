@@ -2,7 +2,32 @@
 
 Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
-## Incremento atual — súmula e perfil completos no piloto (04/11)
+## Revisão atual — composição do jogo e do perfil (04/11)
+
+As **duas páginas anteriores foram reprovadas pelo responsável**, apesar de seus testes funcionais verdes. A nova revisão usa a liberdade de composição reiterada nesta conversa, priorizando o jogo. O resultado e as parciais agora formam um bloco central; os elencos ficam próximos em 900 px, sem o card externo da página nem abas repetidas no detalhe. O perfil ocupa 1000 px, reúne identificação/biografia e números de carreira, e apresenta jogos recentes antes das participações. Tema claro/azul e contratos funcionais preservados.
+
+Inspeção do autor em 320/390/1366/1920 px e no navegador aberto pelo responsável. Foram comparadas a referência original de súmula, a versão reprovada e a nova composição. Na revisão mobile, a tabela recente do perfil cortava PTS: corrigidos largura do confronto e data em duas linhas. Na captura de estresse, nomes longos não colidiam, mas formavam colunas estreitas: o jogo mobile passou a usar uma linha por equipe/placar, preservando o confronto horizontal no desktop. O verificador ganhou uma prova específica para nomes longos sem colisão e pontos recentes visíveis em 320/390; preservado o mínimo anterior de seis atletas completos por equipe na primeira tela desktop. As capturas de nomes longos alteram apenas o texto no DOM para estresse visual, sem representar identidades novas nas fixtures.
+
+HTML autocontido: **339743 bytes**, SHA256 `6ee69d129ab6e6df86ad6235577b0550645f24e82e45708a55bcb3f1818525c1`. Build/tipagem e verificações focais verdes durante a implementação; prova consolidada desta revisão registrada no checkpoint após a execução. Log local: `docs/design/.preview-artifacts/reforma-uiux/design-final-revisao.log`. As capturas selecionadas abaixo são substituídas pelas da execução vigente; versões anteriores podem ser recuperadas no SHA indicado em cada seção histórica.
+
+Prova final: `npm run design:verify` **PASS**, tipagem, referências originais e **17 cenários/18 capturas** do piloto, sem erros JavaScript ou violações axe selecionadas. Reflow320/zoomCSS200, períodos/faltas/ausência, filtros/retorno e cinco abas preservados. `npm run gate` **PASS**, 689 unitários/141 arquivos, transporte7, banco isolado13, Worker/HTTP29, PDF/workerd1, builds/tipos/lint/fronteira/segredos. Após a composição final mobile, reaplicado o conjunto completo de design; os artefatos de aplicação/banco/Worker permaneceram inalterados. CI do SHA publicado fica no checkpoint/PR, sem extrapolar a prova da versão anterior.
+
+Uma execução focal intermediária falhou no autocomplete depois de navegar: o teste preencheu a busca antes de o foco de navegação chegar ao conteúdo e o painel foi fechado pela mudança de foco. Corrigida a sincronização do teste, aguardando o foco esperado em `main` antes de digitar, sem ampliar timeout nem alterar o componente de busca. A execução final reaplica o percurso.
+
+Revisão do autor pelas skills: `ui-ux-pro-max`, consulta pertinente `data dense hierarchy --domain style`, aplicada à hierarquia/densidade sem importar navegação de dashboard; `web-design-guidelines`, [fonte atual](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultada nesta execução. Achados tratados:
+
+- `public-details.tsx:112` / `public-details.css`: nomes e placar em áreas independentes; confronto central no desktop, linhas por equipe no celular, sem colisão e com metadados acima.
+- `public-details.css` (`.bb-foul-trigger:focus-visible`): contorno para dentro da célula evita corte pelo painel; alvo completo, teclado/Escape/retorno preservados.
+- `public-details.tsx:961` / `public-details.css`: datas sem ano na mesma linha e largura controlada do confronto preservam PTS no celular; a data completa permanece no elemento `time`.
+- `app.tsx:258` / `public-details.tsx:668`: retorno/contexto permanecem acessíveis; menos repetição no jogo, cabeçalho e abas próximos no perfil. Filtros, alternativas do gráfico e estados vazios preservados.
+
+Capturas para avaliar: [jogo desktop](prototipos/reforma-uiux/capturas/sumula-desktop.png), [jogo mobile](prototipos/reforma-uiux/capturas/sumula-mobile.png), [perfil desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [perfil mobile](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [jogo com nomes longos em 320 px](prototipos/reforma-uiux/capturas/sumula-nomes-longos-320.png), [perfil com nome longo em 320 px](prototipos/reforma-uiux/capturas/perfil-nome-longo-320.png).
+
+Não é revisão independente, aceite humano ou comprovação de WCAG integral. Piloto/fixtures apenas; sem integração às rotas reais, banco, API, deploy ou dados humanos. PR permanece Draft aguardando nova avaliação.
+
+## Entrega anterior de 04/11 — histórico, reprovada visualmente
+
+O restante desta seção registra `c0f2f0c`/`3fbcefa`, não a revisão atual. As imagens nos mesmos caminhos foram substituídas; para reproduzir as anteriores, usar a árvore de `3fbcefaa2184410097bfd201a1f1ba40986eeb66`. A CI [41769727652](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41769727652) terminou SUCCESS, conferida na retomada; isso não altera a reprovação visual.
 
 A composição intermediária rejeitada foi refeita. A súmula tem confronto compacto, metadados acima e parciais ao lado no desktop/abaixo no celular; duas tabelas com 12 atletas, titulares/capitão/0/00, totais/LL%, comissão, recortes sincronizados e detalhes de faltas. O perfil começa pela carreira completa, com cinco abas, filtros/aba/modo compartilháveis, jogos vinculados à participação, conquistas/histórico, evolução e valores acessíveis. Essenciais e seletor de colunas persistente no celular.
 
