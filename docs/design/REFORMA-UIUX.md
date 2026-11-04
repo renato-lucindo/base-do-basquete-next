@@ -51,6 +51,8 @@ Pedido posterior de 03/11/2026, aprovado para implementação na mesma PR #51 e 
 
 Estado real e pendências deste incremento ficam no checkpoint. A prova original abaixo continua histórica; não declara a súmula ou o perfil completos.
 
+**Orientação posterior do responsável, nesta mesma conversa:** o cabeçalho intermediário do jogo no celular não foi aprovado. Foi concedida liberdade para ajustar composição e proporções segundo padrões/referências; os tamanhos acima passam a referências iniciais, não requisitos rígidos. Reavaliar quebra de nomes, hierarquia e espaços junto ao corpo completo da súmula. Preservar simplicidade, legibilidade e densidade; não confundir testes verdes com aceite visual.
+
 - `node docs/design/prototipos/reforma-uiux/build.cjs` gera o HTML autocontido; `node docs/design/prototipos/reforma-uiux/verify.cjs` tipa e verifica nove cenários com Playwright/axe. Ambos estão nos comandos de design do repositório.
 - Cobertura: busca sem acento/caixa, tipos/teclado/erro/resposta antiga, filtros e retorno, escolhas de colunas/redimensionamento, ordenação completa e ausentes, cadastro/cancelamento/foco, campos proporcionais, histórico com edição pendente, 12 atletas/0/00 e retorno mobile.
 - Tamanhos: 390×844, 1366×768, 1920×1080, reflow em 320 CSS px e ampliação CSS de 200%. Axe em oito telas e menus/diálogos/autocomplete abertos complementa a inspeção visual; não comprova WCAG integral nem zoom nativo de todos os navegadores.
