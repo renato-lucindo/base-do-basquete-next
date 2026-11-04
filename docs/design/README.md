@@ -76,6 +76,8 @@ Em estatísticas, `react-prototype/prepare.cjs` regenera os adaptadores a partir
 
 Consulte [os padrões permanentes](PADROES.md) e [o contrato de integração](INTEGRACAO.md) antes de implementar.
 
-## Administração real — unidade em validação
+## Administração real e preparação da liberação
 
-O padrão aceito está implementado na branch `codex/admin-uiux`: Jogos com ordenação no servidor antes da paginação, Informações com campos proporcionais e equipes/elencos em dois painéis, preservando os componentes de edição existentes. [Provas, capturas e limites](VALIDACAO-ADMIN-UIUX.md). Estado da PR/CI e autorização da migration em [PROGRESSO.md](../PROGRESSO.md); implementação local não representa aplicação de banco ou deploy.
+O padrão aceito foi incorporado às rotas reais: Jogos com ordenação no servidor antes da paginação, Informações com campos proporcionais e equipes/elencos em dois painéis, preservando os componentes de edição existentes. [Provas, capturas e limites](VALIDACAO-ADMIN-UIUX.md). Estado da PR/CI e autorização da migration em [PROGRESSO.md](../PROGRESSO.md); implementação local não representa aplicação de banco ou deploy.
+
+[Validação final, pacote local e plano de liberação/rollback](PREPARACAO-LIBERACAO-UIUX.md). A preparação não executa deploy nem publicação de dados; fonte do pacote, evidências e limites estão identificados no relatório.
