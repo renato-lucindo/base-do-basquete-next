@@ -35,7 +35,7 @@ Decisões expressas do responsável em 03/11/2026, após entrevista nesta conver
 
 Uma branch/PR por unidade, integrada antes de iniciar outra dependente. Migrations aplicadas são imutáveis. Aplicar DDL real, fazer deploy e publicar dados exige autorização própria. Não acrescentar recursos esportivos novos nesta reforma.
 
-O piloto demonstra as interações com dados locais: busca amplia fixtures já carregadas, ordenação antecede o recorte local e salvamentos existem apenas em memória. Não demonstra paginação de busca no servidor, gravação, conflitos de versão ou autorização de publicação. Importação de PDFs e Regulamento exibem explicitamente o limite do piloto, sem simular sucesso dessas operações. As tabelas de equipe/perfil são exemplos visuais, não uma nova implementação de cálculo estatístico.
+O piloto demonstra as interações com dados locais: busca amplia fixtures já carregadas, ordenação antecede o recorte local e salvamentos existem apenas em memória. Não demonstra paginação de busca no servidor, gravação, conflitos de versão ou autorização de publicação. Importação de PDFs e Regulamento exibem explicitamente o limite do piloto, sem simular sucesso dessas operações. As tabelas de equipe/perfil são exemplos visuais, não uma nova implementação de cálculo estatístico. Categorias/temporadas do seletor reutilizam fixtures para avaliar a estrutura; não representam cobertura histórica real. O formulário de Informações reinicia suas fixtures ao sair da aba: seu feedback é demonstração, não recuperação de cadastro persistido.
 
 ## Verificação e continuidade
 

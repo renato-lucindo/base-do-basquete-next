@@ -14,7 +14,7 @@ Windows, Node 24.18.0, dependências do lockfile (`npm ci --ignore-scripts`), Ch
 
 O verificador percorre público/admin em 390×844, 1366×768 e 1920×1080; testa reflow em 320 CSS px e ampliação CSS de 200%. Axe sem violações selecionadas em oito telas por resolução, diálogo, seletor de colunas e autocomplete abertos. Exercitados cancelamento/foco, erro recuperável, respostas antigas, ordenação entre páginas, retorno com filtros, campos proporcionais, 12 atletas e distinção 0/00. O exemplo rejeita camisa duplicada. A geometria garante ao menos dez atletas completos no desktop e cinco no celular na primeira tela.
 
-Gate local PASS: 689 unitários, transporte 7, banco isolado 13, Worker/HTTP 29 e PDF/workerd 1; formatação, lint, tipagem, builds, fronteira do cliente e scanner de segredos PASS. `npm run design:verify` completo PASS. O refinamento final de densidade mudou somente CSS e o limite de linhas visíveis no verificador; os nove cenários/tipagem do piloto foram reaplicados após a mudança, reutilizando a prova de backend e protótipos inalterados. CI do SHA publicado pendente. A prova do piloto não substitui verificações das rotas reais.
+Gate local PASS: 689 unitários, transporte 7, banco isolado 13, Worker/HTTP 29 e PDF/workerd 1; formatação, lint, tipagem, builds, fronteira do cliente e scanner de segredos PASS. `npm run design:verify` completo PASS. O refinamento final de densidade mudou somente CSS e o limite de linhas visíveis no verificador; os nove cenários/tipagem do piloto foram reaplicados após a mudança, reutilizando a prova de backend e protótipos inalterados. CI **SUCCESS** no SHA `298e1917ba3347a67b8be8a2aa7c4a9aa9a5a732`, [run 41745327850](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/41745327850): gate completo, design (incluindo o CSS final), **689 unitários**, **551 browsers PASS / 109 SKIP**. Conferência direta dos steps e do log do job `126296757627`. Checkpoint posterior apenas documental reutiliza essa prova; CI do HEAD vigente será conferida antes de integrar. A prova do piloto não substitui verificações das rotas reais.
 
 ## Inspeção visual
 
@@ -25,6 +25,8 @@ Capturas selecionadas da execução final:
 - [Jogos no desktop](prototipos/reforma-uiux/capturas/jogos-desktop.png): seis cabeçalhos ordenáveis e ações próximas.
 - [Informações no desktop](prototipos/reforma-uiux/capturas/informacoes-desktop.png): Categoria com 145 px em 1366, sem crescer para preencher a página.
 - [Equipes/elenco no desktop](prototipos/reforma-uiux/capturas/elenco-desktop.png): lista ao lado de 12 atletas, sem sobreposição.
+
+O HTML servido localmente respondeu HTTP 200 e conferiu byte a byte com o arquivo commitado (288397 bytes, SHA256 `b27dc4e89f51a937dd66ea34fe5736add6c5b10999d18d43c895b05c8fbe927e`).
 
 Conjunto completo e JSON: `docs/design/.preview-artifacts/reforma-uiux/`.
 
