@@ -2,7 +2,19 @@
 
 Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
-## Provas focais
+## Incremento de 03/11 — checkpoint parcial
+
+Implementados: largura intrínseca das tabelas com limite de identificação de 360 px desktop/260 px mobile, números à direita; TeamFilter da r6 reutilizado no piloto com checkboxes, contador e Todas/Nenhuma; cabeçalho do jogo centralizado, contexto acima e nomes/placar proporcionais. Súmula completa e perfil V4 **pendentes**, não avaliados como concluídos.
+
+`node docs/design/prototipos/reforma-uiux/build.cjs` e `node docs/design/prototipos/reforma-uiux/verify.cjs`: **PASS**, tipagem e 11 cenários, dez capturas, incluindo geometria em 1366/1920, filtros múltiplos/vazio/busca/mínimo/retorno e cabeçalho em 320/390/1366/1920. Demais cenários de teclado/reflow/axe continuaram verdes. Primeira execução revelou seletor de colunas fora da tela em 320 px após a mudança de filtro; corrigidos flex/min-width e ancoragem antes da prova final.
+
+Inspeção visual do autor: [tabela desktop](prototipos/reforma-uiux/capturas/publico-desktop.png) e [jogo no celular](prototipos/reforma-uiux/capturas/jogo-cabecalho-390.png). HTML atual: 292785 bytes, SHA256 `08ecc6bf9ba960ff6b11666df06a29ff757d49ba62b42231b6a3e68eb433c142`.
+
+Revisão `web-design-guidelines`, [diretrizes atualizadas](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultadas em 03/11. Arquivos revisados: app.tsx, pilot.css, theme.css e TeamFilter reutilizado. `pilot.css:14`/regras mobile: painel de seleção com alvos de 44 px e rolagem interna; `theme.css:289`: largura proporcional e números tabulares preservados; `app.tsx:591`: controle semântico r6 com Escape/retorno de foco; `app.tsx:1813`: título e contexto legíveis e centralizados. Sem novo bloqueio encontrado neste recorte. Não é parecer independente. Recomendações da ui-ux-pro-max de navegação por teclado e rolagem interna foram consultadas no planejamento e aplicadas.
+
+**Gate consolidado não repetido neste incremento:** pausa ao atingir 15% restante na janela de 5h. A prova integral original abaixo vale para seu SHA antigo; CI nova deve ser consultada na retomada.
+
+## Provas focais da primeira entrega
 
 Windows, Node 24.18.0, dependências do lockfile (`npm ci --ignore-scripts`), Chromium headless/Playwright 1.64.1. Nenhum dado humano ou serviço remoto participa dos testes.
 

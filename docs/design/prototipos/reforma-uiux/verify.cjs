@@ -66,6 +66,125 @@ async function main() {
     return page;
   }
   try {
+    await test("Jogo: contexto centralizado acima do placar e tipografia proporcional", async () => {
+      for (const width of [320, 390, 1366, 1920]) {
+        const page = await pageAt("publico/jogo/game-1", width, 844);
+        const header = page.locator(".bb-game-header");
+        const geometry = await header.evaluate((element) => {
+          const score = element.querySelector(".bb-scoreboard > strong");
+          const meta = element.querySelector(".bb-game-meta");
+          const team = element.querySelector(".bb-scoreboard > a");
+          const rect = score.getBoundingClientRect();
+          const parent = element.getBoundingClientRect();
+          return {
+            centerDelta:
+              (rect.left + rect.right - parent.left - parent.right) / 2,
+            metaBottom: meta.getBoundingClientRect().bottom,
+            scoreTop: rect.top,
+            scoreSize: parseFloat(getComputedStyle(score).fontSize),
+            teamSize: parseFloat(getComputedStyle(team).fontSize),
+            metaSize: parseFloat(getComputedStyle(meta).fontSize),
+          };
+        });
+        assert(Math.abs(geometry.centerDelta) < 1);
+        assert(geometry.metaBottom <= geometry.scoreTop);
+        assert.equal(geometry.scoreSize - geometry.teamSize, 4);
+        assert(geometry.metaSize < geometry.teamSize);
+        await expect(header).toContainText("Encerrado");
+        await noOverflow(page);
+        if (width === 390 || width === 1366)
+          await screenshot(page, `jogo-cabecalho-${width}`);
+        await page.context().close();
+      }
+    });
+    await test("Tabelas compactas à esquerda e equipes por checkboxes combinadas aos filtros", async () => {
+      for (const width of [1366, 1920]) {
+        for (const route of [
+          "publico/jogadores",
+          "publico/equipes",
+          "admin/jogos",
+        ]) {
+          const page = await pageAt(route, width, 1080);
+          const geometry = await page
+            .locator(".bb-table-scroll")
+            .first()
+            .evaluate((region) => {
+              const table = region.querySelector("table");
+              const primary = table.querySelector(".bb-primary-cell");
+              return {
+                start:
+                  table.getBoundingClientRect().left -
+                  region.getBoundingClientRect().left,
+                width: table.getBoundingClientRect().width,
+                regionWidth: region.getBoundingClientRect().width,
+                primaryWidth: primary.getBoundingClientRect().width,
+                numericAlign: getComputedStyle(
+                  table.querySelector(".bb-numeric"),
+                ).textAlign,
+              };
+            });
+          assert(Math.abs(geometry.start) < 2);
+          assert(
+            geometry.primaryWidth <= 361,
+            "Identificação não pode absorver a largura excedente",
+          );
+          assert.equal(geometry.numericAlign, "right");
+          if (width === 1920 && route === "publico/jogadores")
+            assert(
+              geometry.width < geometry.regionWidth - 100,
+              "Largura excedente deve ficar após a última coluna",
+            );
+          await noOverflow(page);
+          await page.context().close();
+        }
+      }
+      const page = await pageAt("publico/jogadores");
+      const filter = page.locator(".team-filter");
+      await filter
+        .getByRole("button", { name: /Equipe Todas as equipes/ })
+        .click();
+      await filter
+        .getByRole("button", { name: "Não selecionar nenhuma equipe" })
+        .click();
+      await expect(page.locator("tbody")).toContainText(
+        "Nenhum resultado encontrado",
+      );
+      await filter
+        .getByRole("checkbox", { name: "Álvares Cabral", exact: true })
+        .check();
+      await filter
+        .getByRole("checkbox", { name: "Saldanha da Gama", exact: true })
+        .check();
+      await expect(filter.locator("#team-filter-value")).toHaveText(
+        "Equipes · 2 de 6",
+      );
+      await page.keyboard.press("Escape");
+      await expect(filter.locator("button").first()).toBeFocused();
+      const search = page.getByRole("searchbox", {
+        name: "Buscar jogador na tabela",
+      });
+      await search.fill("joao");
+      await expect(page.locator("tbody tr")).toHaveCount(2);
+      await page.locator('[name="minimum-games"]').fill("6");
+      await expect(page.locator("tbody")).toContainText(
+        "Nenhum resultado encontrado",
+      );
+      await page.locator('[name="minimum-games"]').fill("0");
+      await page.locator("tbody .bb-row-link").first().click();
+      await page.getByRole("link", { name: "Voltar a jogadores" }).click();
+      await expect(search).toHaveValue("joao");
+      await expect(filter.locator("#team-filter-value")).toHaveText(
+        "Equipes · 2 de 6",
+      );
+      await filter.locator("button").first().click();
+      await filter
+        .getByRole("button", { name: "Selecionar todas as equipes" })
+        .click();
+      await expect(filter.getByRole("checkbox", { checked: true })).toHaveCount(
+        6,
+      );
+      await page.context().close();
+    });
     await test("Público mobile: essenciais, busca no topo e reflow em 390/320 CSS px", async () => {
       const page = await pageAt("publico/jogadores", 390, 844);
       await expect(page.locator("table thead th")).toHaveCount(5);

@@ -287,7 +287,7 @@
   scrollbar-color: #a9b8c9 transparent;
 }
 .bb-table {
-  width: 100%;
+  width: max-content;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
@@ -333,6 +333,7 @@
 }
 .bb-table .bb-primary-cell {
   min-width: 170px;
+  max-width: 360px;
   white-space: normal;
   overflow-wrap: anywhere;
 }

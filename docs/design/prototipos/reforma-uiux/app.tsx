@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { createRoot } from "react-dom/client";
+import { TeamFilter } from "../../../../src/statistics/reference/team-filter";
 import {
   DataTable,
   Icon,
@@ -433,7 +434,10 @@ function PlayerStatistics({
 }) {
   const stateKey = `players/${subset === players ? "all" : subset.map((p) => p.id).join(",")}`;
   const [query, setQuery] = useRetainedState(`${stateKey}/query`, ""),
-    [team, setTeam] = useRetainedState(`${stateKey}/team`, "all"),
+    [selectedTeams, setSelectedTeams] = useRetainedState<string[]>(
+      `${stateKey}/teams`,
+      () => teams.map((team) => team.id),
+    ),
     [minimum, setMinimum] = useRetainedState(`${stateKey}/minimum`, "0"),
     [mode, setMode] = useRetainedState(`${stateKey}/mode`, "total"),
     [page, setPage] = useRetainedState(`${stateKey}/page`, 1),
@@ -470,7 +474,7 @@ function PlayerStatistics({
   const filtered = subset.filter(
     (p) =>
       normalizeSearch(p.name).includes(normalizeSearch(query)) &&
-      (team === "all" || p.team.id === team) &&
+      selectedTeams.includes(p.team.id) &&
       p.games >= Number(minimum),
   );
   const val = (p: Player, key: string): SortValue => {
@@ -584,24 +588,14 @@ function PlayerStatistics({
             }}
           />
         </label>
-        <label className="bb-select-label">
-          <span className="bb-sr-only">Filtrar por equipe</span>
-          <select
-            value={team}
-            name="team-filter"
-            onChange={(e) => {
-              setTeam(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="all">Todas as equipes</option>
-            {teams.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <TeamFilter
+          options={teams}
+          value={selectedTeams}
+          onChange={(ids) => {
+            setSelectedTeams(ids);
+            setPage(1);
+          }}
+        />
         <label className="bb-minimum">
           Mín. jogos
           <input
@@ -1816,33 +1810,37 @@ function GameDetail({ id, go }: { id: string; go: Go }) {
         <Icon name="back" />
         Voltar aos jogos
       </PilotLink>
-      <Heading title={`Jogo ${game.number ?? "sem número"}`} />
-      <p className="bb-muted">
-        {displayDate(game.date)} · {game.time ?? "A definir"} ·{" "}
-        {game.venue ?? "Local a definir"}
-      </p>
-      <div className="bb-scoreboard">
-        <PilotLink
-          className="bb-row-link"
-          go={go}
-          to={`publico/equipe/${game.home.id}`}
-        >
-          {game.home.name}
-        </PilotLink>
-        <strong>
-          {game.homePoints ?? "—"}
-          <span>×</span>
-          {game.awayPoints ?? "—"}
-        </strong>
-        <PilotLink
-          className="bb-row-link"
-          go={go}
-          to={`publico/equipe/${game.away.id}`}
-        >
-          {game.away.name}
-        </PilotLink>
-      </div>
-      <p className="bb-muted">{game.status}</p>
+      <header className="bb-game-header">
+        <h1>Jogo {game.number ?? "sem número"}</h1>
+        <p className="bb-muted bb-game-meta">
+          {displayDate(game.date)} · {game.time ?? "A definir"} ·{" "}
+          {game.venue ?? "Local a definir"}
+        </p>
+        <div className="bb-scoreboard">
+          <PilotLink
+            className="bb-row-link"
+            go={go}
+            to={`publico/equipe/${game.home.id}`}
+          >
+            {game.home.name}
+          </PilotLink>
+          <strong>
+            {game.homePoints ?? "—"}
+            <span>×</span>
+            {game.awayPoints ?? "—"}
+          </strong>
+          <PilotLink
+            className="bb-row-link"
+            go={go}
+            to={`publico/equipe/${game.away.id}`}
+          >
+            {game.away.name}
+          </PilotLink>
+        </div>
+        <p className="bb-muted bb-game-status">
+          {game.status === "Resultado publicado" ? "Encerrado" : game.status}
+        </p>
+      </header>
     </>
   );
 }

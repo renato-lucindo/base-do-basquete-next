@@ -39,6 +39,18 @@ O piloto demonstra as interações com dados locais: busca amplia fixtures já c
 
 ## Verificação e continuidade
 
+### Incremento aprovado — tabelas, súmula e perfil
+
+Pedido posterior de 03/11/2026, aprovado para implementação na mesma PR #51 e **ainda dentro do piloto**:
+
+- Todas as tabelas ficam compactas à esquerda, colunas proporcionais ao conteúdo; números continuam à direita. Equipes nos filtros públicos usa checkboxes r6 com Todas/Nenhuma, contador, busca/mínimo combinados e retorno preservado; nenhuma equipe selecionada mostra vazio. Seleção administrativa de equipe para editar elenco continua individual.
+- Jogo concluído: somente **súmula**, sem boxscore neste incremento. Cabeçalho centralizado; data/hora/local acima e em menor hierarquia; nomes/placar 18/22 px desktop e 16/20 px celular. Completar parciais/prorrogações, elencos, totais, comissão, titulares/capitão, 0/00, faltas e recortes sincronizados conforme INTEGRACAO.md. Não alterar placar final ao recortar; ausência e não participação não viram zero.
+- Perfil: adaptar o V4 encontrado em `C:/Users/12405304716/Documents/Codex/2026-08-25/new-chat/outputs/perfil-jogador-v4.html`, preservando identidade clara/azul e cabeçalho compacto. Abas Resumo, Estatísticas, Conquistas e honrarias, Jogos e Histórico. Começar **sempre na carreira completa**, inclusive vindo de campeonato; oferecer filtros internos e retorno com contexto/posição preservados. Estatísticas por participação, totais/médias e evolução apenas com dados elegíveis; mostrar conquistas, trajetória/equipes/camisas e partidas efetivamente vinculadas ao atleta.
+- Fixtures devem registrar identidade, vínculo e participação coerentes: não atribuir ao atleta todos os jogos da equipe nem somar métricas incompatíveis. Não acrescentar comparação nem Recordes da Carreira (FUT-002).
+- Validar geometria das colunas em 1366/1920, filtros/retorno, consistência esportiva, 390/320/zoom200, teclado/foco e axe. Atualizar capturas, revisão pelas duas skills e gate consolidado quando estável/com cota. Manter Draft/aceite pendente e nenhuma alteração de API/banco/deploy.
+
+Estado real e pendências deste incremento ficam no checkpoint. A prova original abaixo continua histórica; não declara a súmula ou o perfil completos.
+
 - `node docs/design/prototipos/reforma-uiux/build.cjs` gera o HTML autocontido; `node docs/design/prototipos/reforma-uiux/verify.cjs` tipa e verifica nove cenários com Playwright/axe. Ambos estão nos comandos de design do repositório.
 - Cobertura: busca sem acento/caixa, tipos/teclado/erro/resposta antiga, filtros e retorno, escolhas de colunas/redimensionamento, ordenação completa e ausentes, cadastro/cancelamento/foco, campos proporcionais, histórico com edição pendente, 12 atletas/0/00 e retorno mobile.
 - Tamanhos: 390×844, 1366×768, 1920×1080, reflow em 320 CSS px e ampliação CSS de 200%. Axe em oito telas e menus/diálogos/autocomplete abertos complementa a inspeção visual; não comprova WCAG integral nem zoom nativo de todos os navegadores.
