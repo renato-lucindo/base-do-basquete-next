@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
+import { scanAccessibility } from "./fixtures/accessibility";
 const route = (area: string) =>
   `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}${area}`;
 test("Jogos ordena no servidor antes de paginar e conserva contexto ao fechar editor", async ({
@@ -296,4 +297,51 @@ test("Retorno conserva pesquisa pagina e posicao da lista de equipes", async ({
     page.getByRole("button", { name: "Página anterior", exact: true }),
   ).toBeVisible();
   if (info.project.name === "mobile") await expect(choice).toBeFocused();
+});
+
+test("Retorno permanece acessivel quando a inscricao salva sai do filtro", async ({
+  page,
+}, info) => {
+  const f = await gamesFixture(page);
+  await page.goto(route("/equipes"));
+  const search = page.getByRole("textbox", {
+    name: "Buscar inscrição ou equipe",
+    exact: true,
+  });
+  await search.fill("Lobos B");
+  await page
+    .getByRole("button", { name: "Expandir Lobos B", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Editar inscrição", exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Nome público da inscrição", exact: true })
+    .fill("Tigres");
+  await page
+    .getByRole("button", { name: "Salvar inscrição", exact: true })
+    .click();
+  await expect(
+    page.getByRole("region", { name: "Elenco", exact: true }),
+  ).toBeVisible();
+  expect(f.registrations.get(tid(6))!.name).toBe("Tigres");
+  const back = page.getByRole("button", {
+    name: "Voltar às equipes",
+    exact: true,
+  });
+  if (info.project.name === "mobile") {
+    await expect(back).toBeVisible();
+    await back.focus();
+  }
+  await scanAccessibility(page, info, "admin-registration-outside-filter");
+  if (info.project.name === "mobile") {
+    await page.keyboard.press("Enter");
+    await expect(search).toBeFocused();
+  }
+  await expect(search).toBeVisible();
+  await expect(search).toHaveValue("Lobos B");
+  await search.fill("");
+  await expect(
+    page.getByRole("button", { name: "Expandir Tigres", exact: true }),
+  ).toBeVisible();
 });

@@ -65,6 +65,7 @@ export function TeamsWorkspace({
     [expanded, setExpanded] = useState("");
   const [editor, setEditor] = useState<Edit | null>(null),
     [baseline, setBaseline] = useState("");
+  const registrationSearch = useRef<HTMLInputElement>(null);
   const masterRef = useRef<HTMLElement>(null),
     detailRef = useRef<HTMLElement>(null),
     masterPosition = useRef({ scroll: 0, y: 0, id: "" });
@@ -454,6 +455,7 @@ export function TeamsWorkspace({
         <label className="competition-search">
           Buscar inscrição ou equipe
           <input
+            ref={registrationSearch}
             value={query}
             maxLength={120}
             onChange={(e) => {
@@ -771,28 +773,31 @@ export function TeamsWorkspace({
               : "Elenco"
           }
         >
+          {expanded && (
+            <button
+              type="button"
+              className="secondary teams-return"
+              onClick={() => {
+                if (!mayLeave()) return;
+                setExpanded("");
+                requestAnimationFrame(() => {
+                  if (masterRef.current)
+                    masterRef.current.scrollTop = masterPosition.current.scroll;
+                  const origin = document.getElementById(
+                    `select-registration-${expanded}`,
+                  );
+                  window.scrollTo(0, masterPosition.current.y);
+                  if (origin) origin.focus({ preventScroll: true });
+                  else registrationSearch.current?.focus();
+                });
+              }}
+            >
+              Voltar às equipes
+            </button>
+          )}
           {selectedRegistration ? (
             [selectedRegistration].map((r) => (
               <div key={r.id}>
-                <button
-                  type="button"
-                  className="secondary teams-return"
-                  onClick={() => {
-                    if (!mayLeave()) return;
-                    setExpanded("");
-                    requestAnimationFrame(() => {
-                      if (masterRef.current)
-                        masterRef.current.scrollTop =
-                          masterPosition.current.scroll;
-                      document
-                        .getElementById(`select-registration-${r.id}`)
-                        ?.focus({ preventScroll: true });
-                      window.scrollTo(0, masterPosition.current.y);
-                    });
-                  }}
-                >
-                  Voltar às equipes
-                </button>
                 {r.name !== r.team.name && (
                   <p className="registration-origin">Equipe: {r.team.name}</p>
                 )}
