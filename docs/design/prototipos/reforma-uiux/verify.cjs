@@ -21,10 +21,10 @@ async function test(name, action) {
   report.scenarios.push(name);
   console.log(`PASS ${name}`);
 }
-async function screenshot(page, name) {
+async function screenshot(page, name, fullPage = false) {
   await page.screenshot({
     path: path.join(out, `${name}.png`),
-    fullPage: false,
+    fullPage,
   });
   report.screenshots.push(`${name}.png`);
 }
@@ -47,6 +47,116 @@ async function main() {
     ],
     { cwd: root, stdio: "inherit" },
   );
+  const fixtureBundle = esbuild.buildSync({
+    absWorkingDir: root,
+    entryPoints: [path.join(__dirname, "fixtures.ts")],
+    bundle: true,
+    write: false,
+    format: "cjs",
+    platform: "browser",
+  });
+  const fixtureModule = { exports: {} };
+  new Function(
+    "module",
+    "exports",
+    "window",
+    fixtureBundle.outputFiles[0].text,
+  )(fixtureModule, fixtureModule.exports, {});
+  const domain = fixtureModule.exports;
+  await test("Fixtures: identidade, participação, placar, parciais, totais e ausência consistentes", async () => {
+    assert.equal(
+      new Set(domain.players.map((p) => p.id)).size,
+      domain.players.length,
+    );
+    for (const team of domain.teams) {
+      const roster = domain.players.filter((p) => p.team.id === team.id);
+      assert.equal(roster.length, 12);
+      assert.equal(new Set(roster.map((p) => p.shirt)).size, 12);
+      assert(
+        roster.some((p) => p.shirt === "0") &&
+          roster.some((p) => p.shirt === "00"),
+      );
+    }
+    for (const game of domain.publishedGames) {
+      const seen = new Set();
+      for (const side of ["home", "away"]) {
+        const team = game.sheet[side];
+        assert.equal(team.players.filter((p) => p.starter).length, 5);
+        assert.equal(
+          team.periods.reduce((a, b) => a + b, 0),
+          team.points,
+        );
+        assert.equal(team.points, game[`${side}Points`]);
+        assert.equal(
+          team.players.reduce((sum, p) => sum + (p.points ?? 0), 0),
+          team.points,
+        );
+        for (const [i, points] of team.periods.entries())
+          assert.equal(
+            team.players.reduce(
+              (sum, p) => sum + (p.quarters[i].points ?? 0),
+              0,
+            ),
+            points,
+          );
+        for (const player of team.players) {
+          assert(
+            !seen.has(player.id),
+            "Identidade não pode atuar pelas duas equipes na mesma partida",
+          );
+          seen.add(player.id);
+          for (const period of player.quarters) {
+            if (period.played)
+              assert.equal(
+                period.points,
+                2 * period.two + 3 * period.three + period.free,
+              );
+            else
+              for (const key of ["points", "two", "three", "free", "fouls"])
+                assert.equal(period[key], null);
+          }
+          for (const key of ["points", "two", "three", "free"])
+            assert.equal(
+              player[key],
+              player.played
+                ? player.quarters.reduce((sum, p) => sum + (p[key] ?? 0), 0)
+                : null,
+            );
+          if (player.fouls !== null)
+            assert.equal(player.fouls, player.foulEvents.length);
+        }
+      }
+    }
+    for (const player of domain.players) {
+      const records = domain.appearances(player.id);
+      assert(
+        records.every(
+          (row) => row.player.id === player.id && row.player.played,
+        ),
+      );
+      assert.equal(
+        player.games,
+        records.filter((row) => row.game.year === 2026).length,
+      );
+      assert.equal(
+        player.points,
+        records
+          .filter((row) => row.game.year === 2026)
+          .reduce((sum, row) => sum + row.player.points, 0),
+      );
+    }
+    assert.equal(
+      domain.appearances("player-7").length,
+      0,
+      "Relacionado sem atuação não ganha jogos no perfil",
+    );
+    assert.equal(domain.participations("player-1").length, 3);
+    assert(
+      domain
+        .participations("player-1")
+        .some((row) => row.games === 0 && row.fouls === null),
+    );
+  });
   const server = http.createServer((_request, response) => {
     response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     response.end(fs.readFileSync(path.join(__dirname, "Piloto UIUX.html")));
@@ -66,19 +176,273 @@ async function main() {
     return page;
   }
   try {
+    await test("Perfil mobile: essenciais, seletor de colunas persistente e gráfico por teclado", async () => {
+      const page = await pageAt(
+        "publico/jogador/player-1?secao=estatisticas",
+        390,
+        844,
+      );
+      const table = page.getByRole("region", {
+        name: "Estatísticas da carreira por competição",
+        exact: true,
+      });
+      await expect(table.locator("thead th")).toHaveCount(4);
+      const siglas = page.getByRole("button", { name: "Siglas", exact: true });
+      await siglas.click();
+      await expect(page.getByRole("dialog")).toContainText("Pontos");
+      await page.keyboard.press("Escape");
+      await expect(siglas).toBeFocused();
+      await expect(table).toContainText("Álvares Cabral · 4");
+      await screenshot(page, "perfil-estatisticas-mobile");
+      const columns = page.locator(".bb-column-picker");
+      await columns.locator("summary").click();
+      await page.setViewportSize({ width: 320, height: 844 });
+      await noOverflow(page);
+      await columns.getByRole("checkbox", { name: /^F / }).check();
+      await page.keyboard.press("Escape");
+      await expect(columns.locator("summary")).toBeFocused();
+      await page.setViewportSize({ width: 1366, height: 768 });
+      await expect(
+        table.getByRole("columnheader", { name: "F", exact: true }),
+      ).toBeVisible();
+      await page.reload();
+      await expect(
+        table.getByRole("columnheader", { name: "F", exact: true }),
+      ).toBeVisible();
+      await page.setViewportSize({ width: 390, height: 844 });
+      const chart = page.locator("figure");
+      await chart.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect
+        .poll(() => chart.evaluate((element) => element.scrollLeft))
+        .toBeGreaterThan(0);
+      await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+      await expect(
+        page.getByRole("columnheader", { name: "F", exact: true }),
+      ).toBeVisible();
+      await noOverflow(page);
+      await page.context().close();
+    });
+    await test("Retorno do perfil restaura contexto e posição da tabela no celular", async () => {
+      const page = await pageAt(
+        "publico/jogadores?competition=Copa+ES&year=2026&gender=Masculino&category=Sub-15",
+        390,
+        844,
+      );
+      await page.evaluate(() => scrollTo(0, 160));
+      const before = await page.evaluate(() => scrollY);
+      assert(before > 100);
+      const link = page.locator("tbody .bb-row-link").nth(5);
+      await expect(link).toHaveAttribute("href", /competition=Copa\+ES/);
+      await link.click();
+      await expect(
+        page.getByRole("tab", { name: "Resumo", exact: true }),
+      ).toHaveAttribute("aria-selected", "true");
+      await page
+        .getByRole("link", { name: "Voltar a jogadores", exact: true })
+        .click();
+      await expect.poll(() => page.evaluate(() => scrollY)).toBe(before);
+      assert.equal(
+        new URLSearchParams(page.url().split("?")[1]).get("gender"),
+        "Masculino",
+      );
+      await page.context().close();
+    });
+    await test("Súmula: parciais, recortes sincronizados, faltas, zero, ausência e cenários publicados", async () => {
+      const page = await pageAt("publico/jogo/game-1", 1366, 768);
+      const teams = page.locator(".bb-score-team");
+      await expect(teams).toHaveCount(2);
+      for (const team of await teams.all()) {
+        await expect(team.locator("tbody tr")).toHaveCount(12);
+        await expect(team.locator(".bb-starter")).toHaveCount(5);
+        await expect(team.locator(".bb-captain")).toHaveCount(1);
+      }
+      const visible = await teams
+        .first()
+        .locator("tbody tr")
+        .evaluateAll(
+          (rows) =>
+            rows.filter(
+              (row) => row.getBoundingClientRect().bottom <= innerHeight,
+            ).length,
+        );
+      assert(
+        visible >= 6,
+        "Primeira tela desktop deve mostrar pelo menos seis atletas completos por equipe",
+      );
+      const scores = await page.locator(".bb-final-score").allTextContents();
+      await page.getByRole("button", { name: "1ª PR", exact: true }).click();
+      await expect(teams.first().locator("tfoot td").first()).toHaveText("12");
+      await expect(teams.last().locator("tfoot td").first()).toHaveText("7");
+      assert.deepEqual(
+        await page.locator(".bb-final-score").allTextContents(),
+        scores,
+      );
+      const zero = teams.first().locator('[data-player="player-alvares-6"]');
+      await page.getByRole("button", { name: "1º Q", exact: true }).click();
+      await expect(zero.locator("td").nth(1)).toHaveText("—");
+      await page.getByRole("button", { name: "2º Q", exact: true }).click();
+      await expect(zero.locator("td").nth(1)).toHaveText("0");
+      await page
+        .getByRole("button", { name: "Jogo todo", exact: true })
+        .click();
+      const trigger = teams.first().getByRole("button", {
+        name: "Faltas de Ruan Pereira: 5",
+        exact: true,
+      });
+      const sizes = await trigger.evaluate((button) => ({
+        cell: button.parentElement.getBoundingClientRect().toJSON(),
+        button: button.getBoundingClientRect().toJSON(),
+      }));
+      assert(
+        Math.abs(sizes.cell.height - sizes.button.height) < 2 &&
+          Math.abs(sizes.cell.width - sizes.button.width) < 2,
+        "Toda a célula F deve abrir o detalhe",
+      );
+      await trigger.click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toContainText("Excluído por cinco faltas");
+      await expect(dialog.locator("li")).toHaveCount(5);
+      await expect(dialog.getByText(/Antidesportiva/)).toHaveCount(1);
+      await page.keyboard.press("Escape");
+      await expect(trigger).toBeFocused();
+      await screenshot(page, "sumula-desktop", true);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await noOverflow(page);
+      const first = await teams.first().boundingBox(),
+        second = await teams.last().boundingBox();
+      assert(second.y > first.y + first.height);
+      await screenshot(page, "sumula-mobile", true);
+      await page.goto(`${origin}/#publico/jogo/game-2`);
+      await expect(page.locator(".bb-free-summary").first()).toContainText(
+        "17/—",
+      );
+      await expect(page.locator(".bb-parcials")).toContainText("— FC");
+      await page.getByRole("button", { name: /não informadas/ }).click();
+      await expect(dialog).toContainText("Faltas não informadas neste recorte");
+      await page.keyboard.press("Escape");
+      await page.goto(`${origin}/#publico/jogo/game-3`);
+      for (const summary of await page.locator(".bb-free-summary").all())
+        await expect(summary).toContainText("0/0 · —");
+      await page.goto(`${origin}/#publico/jogo/game-24`);
+      await expect(page.locator(".bb-game-header")).toContainText("Agendado");
+      await expect(page.locator(".bb-score-team")).toHaveCount(0);
+      await expect(page.locator(".bb-final-score").first()).toHaveText("—");
+      await page.context().close();
+    });
+    await test("Perfil: carreira completa, filtros compartilháveis, participação real e retorno do jogo", async () => {
+      const page = await pageAt(
+        "publico/jogador/player-1?competition=Copa+ES&year=2026&gender=Masculino&category=Sub-15",
+      );
+      await expect(
+        page.getByRole("tab", { name: "Resumo", exact: true }),
+      ).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator(".bb-participation-list li")).toHaveCount(3);
+      await expect(page.locator(".bb-career-numbers dd").first()).toHaveText(
+        "10",
+      );
+      await expect(page.locator(".bb-context-wrap")).toHaveCount(0);
+      await screenshot(page, "perfil-resumo-desktop");
+      await page
+        .getByRole("tab", { name: "Estatísticas", exact: true })
+        .click();
+      await expect(page.locator('[name="profile-year"]')).toHaveValue("all");
+      const table = page.getByRole("region", {
+        name: "Estatísticas da carreira por competição",
+        exact: true,
+      });
+      await expect(table.locator("tbody tr")).toHaveCount(3);
+      await page.getByRole("button", { name: "Totais", exact: true }).click();
+      await expect(
+        table.locator("tbody tr").first().locator("td").nth(3),
+      ).toHaveText("92");
+      await expect(table.locator("tbody tr").last()).toContainText("—");
+      await screenshot(page, "perfil-estatisticas-desktop");
+      await page.locator('[name="profile-year"]').selectOption("2025");
+      await expect(table.locator("tbody tr")).toHaveCount(1);
+      await expect(table).toContainText("GS Nice de Paula");
+      await page.reload();
+      await expect(
+        page.getByRole("tab", { name: "Estatísticas", exact: true }),
+      ).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator('[name="profile-year"]')).toHaveValue("2025");
+      await expect(
+        page.getByRole("button", { name: "Totais", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+      await expect(page.locator("tbody tr")).toHaveCount(2);
+      await page.locator("tbody a").first().click();
+      await expect(page.locator(".bb-context-detail")).toHaveText(
+        "2025 · Masculino · Sub-14",
+      );
+      await page
+        .getByRole("link", { name: "Voltar ao perfil", exact: true })
+        .click();
+      await expect(
+        page.getByRole("tab", { name: "Jogos", exact: true }),
+      ).toHaveAttribute("aria-selected", "true");
+      await expect(page.locator('[name="profile-year"]')).toHaveValue("2025");
+      await page
+        .getByRole("button", { name: "Limpar filtros", exact: true })
+        .click();
+      await expect(page.locator("tbody tr")).toHaveCount(10);
+      await page.locator(".team-filter > button").click();
+      await page
+        .getByRole("button", { name: "Não selecionar nenhuma equipe" })
+        .click();
+      await page.keyboard.press("Escape");
+      await expect(page.locator("tbody")).toContainText(
+        "Nenhum jogo com participação",
+      );
+      await page.reload();
+      await expect(page.locator("#team-filter-value")).toHaveText(
+        "Nenhuma equipe",
+      );
+      await page
+        .getByRole("button", { name: "Limpar filtros", exact: true })
+        .click();
+      await page.getByRole("tab", { name: "Histórico", exact: true }).click();
+      await expect(page.locator(".bb-participation-list li")).toHaveCount(3);
+      await page
+        .getByRole("tab", { name: "Conquistas e honrarias", exact: true })
+        .click();
+      await expect(page.locator(".bb-honors li")).toHaveCount(2);
+      await page.goto(`${origin}/#publico/jogador/player-7?secao=jogos`);
+      await expect(page.locator("tbody")).toContainText(
+        "Nenhum jogo com participação",
+      );
+      await page
+        .getByRole("tab", { name: "Conquistas e honrarias", exact: true })
+        .click();
+      await expect(
+        page.getByText("Nenhuma conquista publicada para este jogador."),
+      ).toBeVisible();
+      await page.goto(`${origin}/#publico/jogador/player-1`);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await noOverflow(page);
+      await screenshot(page, "perfil-resumo-mobile");
+      await page.context().close();
+    });
     await test("Jogo: contexto centralizado acima do placar e tipografia proporcional", async () => {
       for (const width of [320, 390, 1366, 1920]) {
         const page = await pageAt("publico/jogo/game-1", width, 844);
         const header = page.locator(".bb-game-header");
         const geometry = await header.evaluate((element) => {
-          const score = element.querySelector(".bb-scoreboard > strong");
+          const scores = [...element.querySelectorAll(".bb-final-score")];
+          const score = scores[0];
           const meta = element.querySelector(".bb-game-meta");
-          const team = element.querySelector(".bb-scoreboard > a");
+          const team = element.querySelector(".bb-score-side > a");
           const rect = score.getBoundingClientRect();
-          const parent = element.getBoundingClientRect();
+          const parent = element
+            .querySelector(".bb-match-score")
+            .getBoundingClientRect();
+          const second = scores[1].getBoundingClientRect();
           return {
             centerDelta:
-              (rect.left + rect.right - parent.left - parent.right) / 2,
+              ((rect.left + rect.right + second.left + second.right) / 2 -
+                parent.left -
+                parent.right) /
+              2,
             metaBottom: meta.getBoundingClientRect().bottom,
             scoreTop: rect.top,
             scoreSize: parseFloat(getComputedStyle(score).fontSize),
@@ -88,7 +452,10 @@ async function main() {
         });
         assert(Math.abs(geometry.centerDelta) < 1);
         assert(geometry.metaBottom <= geometry.scoreTop);
-        assert.equal(geometry.scoreSize - geometry.teamSize, 4);
+        assert(
+          geometry.scoreSize / geometry.teamSize >= 1 &&
+            geometry.scoreSize / geometry.teamSize <= 1.8,
+        );
         assert(geometry.metaSize < geometry.teamSize);
         await expect(header).toContainText("Encerrado");
         await noOverflow(page);
@@ -165,7 +532,7 @@ async function main() {
       });
       await search.fill("joao");
       await expect(page.locator("tbody tr")).toHaveCount(2);
-      await page.locator('[name="minimum-games"]').fill("6");
+      await page.locator('[name="minimum-games"]').fill("99");
       await expect(page.locator("tbody")).toContainText(
         "Nenhum resultado encontrado",
       );
@@ -183,6 +550,16 @@ async function main() {
       await expect(filter.getByRole("checkbox", { checked: true })).toHaveCount(
         6,
       );
+      await page.keyboard.press("Escape");
+      await search.fill("");
+      const foulsHeader = page.getByRole("columnheader", {
+        name: "F",
+        exact: true,
+      });
+      await foulsHeader.getByRole("button").click();
+      await expect(
+        page.locator("tbody tr").first().locator("td").first(),
+      ).toHaveText("1");
       await page.context().close();
     });
     await test("Público mobile: essenciais, busca no topo e reflow em 390/320 CSS px", async () => {
@@ -411,7 +788,7 @@ async function main() {
         .getByRole("searchbox", { name: "Buscar equipe inscrita" })
         .fill("alvares");
       await page
-        .getByRole("button", { name: /^Editar João Pedro Silva$/ })
+        .getByRole("button", { name: /^Editar João Pedro Silva, camisa 4$/ })
         .click();
       const dialog = page.getByRole("dialog");
       await dialog.getByLabel("Camisa", { exact: true }).fill("00");
@@ -507,6 +884,7 @@ async function main() {
           "publico/classificacao",
           "publico/campeonatos",
           "publico/jogador/player-1",
+          "publico/jogo/game-1",
           "admin/jogos",
           "admin/informacoes",
           "admin/equipes",
@@ -526,6 +904,52 @@ async function main() {
             `${route} em ${width}`,
           );
         }
+        await page.goto(`${origin}/#publico/jogador/player-1`);
+        for (const label of [
+          "Resumo",
+          "Estatísticas",
+          "Conquistas e honrarias",
+          "Jogos",
+          "Histórico",
+        ]) {
+          await page.getByRole("tab", { name: label, exact: true }).click();
+          await noOverflow(page);
+          const result = await new AxeBuilder({ page })
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+            .analyze();
+          assert.deepEqual(
+            result.violations.map((v) => ({
+              id: v.id,
+              nodes: v.nodes.map((n) => n.target),
+            })),
+            [],
+            `Perfil ${label} em ${width}`,
+          );
+        }
+        await page
+          .getByRole("tab", { name: "Estatísticas", exact: true })
+          .click();
+        await page.locator(".team-filter > button").click();
+        const teamsMenu = await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+          .analyze();
+        assert.deepEqual(
+          teamsMenu.violations.map((v) => v.id),
+          [],
+          `Checkboxes em ${width}`,
+        );
+        await page.keyboard.press("Escape");
+        await page.goto(`${origin}/#publico/jogo/game-1`);
+        await page.locator(".bb-foul-trigger").first().click();
+        const fouls = await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+          .analyze();
+        assert.deepEqual(
+          fouls.violations.map((v) => v.id),
+          [],
+          `Faltas em ${width}`,
+        );
+        await page.keyboard.press("Escape");
         await page.goto(`${origin}/#admin/jogos`);
         await page.getByRole("button", { name: "Novo jogo" }).click();
         const modal = await new AxeBuilder({ page })
@@ -573,6 +997,19 @@ async function main() {
       await noOverflow(page);
       await screenshot(page, "informacoes-zoom200");
       await page.context().close();
+      for (const route of [
+        "publico/jogo/game-1",
+        "publico/jogador/player-1?secao=estatisticas",
+      ]) {
+        const detail = await pageAt(route, 320, 844);
+        await noOverflow(detail);
+        await detail.setViewportSize({ width: 1366, height: 768 });
+        await detail.evaluate(() => {
+          document.body.style.zoom = "2";
+        });
+        await noOverflow(detail);
+        await detail.context().close();
+      }
     });
     assert.deepEqual(report.errors, [], "Erros JavaScript no navegador");
   } finally {

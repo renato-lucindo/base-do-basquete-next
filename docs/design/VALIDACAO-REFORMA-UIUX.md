@@ -2,7 +2,32 @@
 
 Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
-## Incremento de 03/11 — checkpoint parcial
+## Incremento atual — súmula e perfil completos no piloto (04/11)
+
+A composição intermediária rejeitada foi refeita. A súmula tem confronto compacto, metadados acima e parciais ao lado no desktop/abaixo no celular; duas tabelas com 12 atletas, titulares/capitão/0/00, totais/LL%, comissão, recortes sincronizados e detalhes de faltas. O perfil começa pela carreira completa, com cinco abas, filtros/aba/modo compartilháveis, jogos vinculados à participação, conquistas/histórico, evolução e valores acessíveis. Essenciais e seletor de colunas persistente no celular.
+
+`npm run design:verify` **PASS**, incluindo tipagem e **16 cenários/16 capturas** do piloto, referências originais e seus verificadores. Conferidos identidade e camisas únicas, somas por partida/período, ausência versus zero, registros sem scout, mínimos/checkboxes/ranking sem incluir ausentes, retorno/filtros/rolagem, teclado do gráfico e seletor após redimensionamento/recarga. Axe em nove telas, cinco abas do perfil, equipes/colunas/autocomplete e diálogos, em 390×844/1366×768/1920×1080; reflow320 e zoom CSS200 também nos novos detalhes. Sem violações selecionadas ou erros JavaScript. Não é prova de WCAG integral ou aceite humano.
+
+Capturas atuais: [súmula desktop completa](prototipos/reforma-uiux/capturas/sumula-desktop.png), [súmula mobile completa](prototipos/reforma-uiux/capturas/sumula-mobile.png), [resumo desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [resumo mobile](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [estatísticas desktop](prototipos/reforma-uiux/capturas/perfil-estatisticas-desktop.png), [estatísticas mobile](prototipos/reforma-uiux/capturas/perfil-estatisticas-mobile.png). Inspeção visual do autor nas duas áreas; pelo menos seis atletas completos por equipe na primeira tela da súmula desktop, sem encolher a fonte para passar a medição.
+
+HTML autocontido: **334084 bytes**, SHA256 `d27c3a2c50fbbad372e007213d03c41da16b7f1b49f87fedfbac06102e34d67a`. Node24.18.0; Wrangler4.152.0 existente usado somente pelos comandos locais do gate. Logs/JSON em `docs/design/.preview-artifacts/reforma-uiux/`.
+
+Revisão do autor conforme `ui-ux-pro-max` e `web-design-guidelines` ([diretrizes atuais](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md), consultadas em04/11). Busca agregada de sistema descartada quanto a navegação comercial/paleta; buscas específicas `data dense dashboard --domain style`, `keyboard navigation focus --domain ux` e `time series trend --domain chart` forneceram recomendações pertinentes de densidade, foco e gráfico com tabela equivalente, preservando as decisões do projeto.
+
+| Local revisado                                    | Achado e tratamento                                                                                                                                                  |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `public-details.tsx:69` e `public-details.css`    | Cabeçalho refeito e medido; equipes/placares simétricos, metadados menores, parciais e elencos próximos.                                                             |
+| `public-details.tsx:297` e regras `.bb-foul-cell` | Alvo cobre a célula inteira; diálogo nativo retorna foco, faltas explícitas mantêm período e penalidade textual.                                                     |
+| `public-details.tsx:464` / `table-controls.tsx:4` | Estado compartilhável, rótulos persistentes, checkbox com alvo associado e seletor reutilizado; colunas manuais sobrevivem ao resize/recarga.                        |
+| `public-details.tsx:1009` / `public-details.css`  | Axe detectou gráfico rolável sem foco; corrigido com figura nomeada/focável, rolagem por teclado e tabela de valores.                                                |
+| `pilot-navigation.tsx:65` / `app.tsx`             | Links reais preservam contexto em nova aba; visitas preservam destino de retorno sem poluir filtros, com rolagem restaurada.                                         |
+| `fixtures.ts` / `match-model.ts`                  | Fixtures da referência de súmula adaptadas por IDs, sem inferir participação pela equipe; desconhecido permanece ausente. Editor distingue nomes iguais pela camisa. |
+
+Gate consolidado desta entrega **PASS**: 689 unitários/141 arquivos, transporte7, banco isolado13, Worker/HTTP29 e PDF/workerd1; lint/formato/tipos/builds/fronteira/segredos PASS. Ajuste final da ajuda de siglas somente no piloto foi coberto pela nova execução completa de design; artefatos da aplicação/banco/Worker permaneceram idênticos aos do gate. SHA e CI ficam no checkpoint e na PR. Sem API/rotas reais, migration, deploy ou dados humanos alterados. Recortes gerais do catálogo ainda reutilizam cenários fictícios; a seleção de um campeonato não comprova cobertura real. Classificação conserva a ordem fictícia publicada do piloto, sem implementar critérios novos de desempate. Perfil/súmula são demonstração navegável; aceite visual permanece pendente.
+
+## Checkpoint intermediário de 03/11 — histórico
+
+As capturas nos caminhos locais foram substituídas pela revisão vigente. Para reproduzir a evidência antiga, consulte a árvore do commit `42dcfe35f9db87ee37de28b0a7d8642f5b13944a`; os números abaixo descrevem aquele instante, não o HTML atual.
 
 Implementados: largura intrínseca das tabelas com limite de identificação de 360 px desktop/260 px mobile, números à direita; TeamFilter da r6 reutilizado no piloto com checkboxes, contador e Todas/Nenhuma; cabeçalho do jogo centralizado, contexto acima e nomes/placar proporcionais. Súmula completa e perfil V4 **pendentes**, não avaliados como concluídos.
 

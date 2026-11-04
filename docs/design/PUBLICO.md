@@ -57,4 +57,4 @@ O responsável definiu público primeiro no celular, tema claro e azul, tabela d
 
 Retirar da apresentação pública versões, datas técnicas, “Fonte do nome” e instruções internas; preservar rastreabilidade administrativa e avisos indispensáveis para interpretar cobertura/ausência. Isso substitui recomendações anteriores de exibir proveniência técnica nas linhas. Não muda elegibilidade, cálculos ou publicação.
 
-Perfis de jogador terão Estatísticas e Jogos; de equipe, Estatísticas, Elenco e Jogos quando disponíveis. A composição deixa de ser recomendação sem aceite, mas sua implementação visual real ainda depende do piloto escolhido pelo responsável. Contrato, sequência, defaults e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md).
+Perfis de jogador terão Resumo, Estatísticas, Conquistas e honrarias, Jogos e Histórico, com entrada pela carreira completa e filtros internos; de equipe, Estatísticas, Elenco e Jogos quando disponíveis. A composição deixa de ser recomendação sem aceite, mas sua implementação visual real ainda depende do piloto escolhido pelo responsável. Contrato, sequência, defaults e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md).

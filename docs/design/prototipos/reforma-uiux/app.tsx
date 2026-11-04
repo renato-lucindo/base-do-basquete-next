@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type AnchorHTMLAttributes,
-  type SetStateAction,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { TeamFilter } from "../../../../src/statistics/reference/team-filter";
 import {
@@ -36,68 +29,28 @@ import {
   metricLabels,
   metricShort,
   pilotSearch,
+  publishedGames,
   players,
   teams,
+  teamSummary,
   type Game,
   type Player,
 } from "./fixtures";
 import "../../../../src/ui-system/theme.css";
 import "./pilot.css";
+import "./public-details.css";
 
-type Go = (route: string) => void;
-function PilotLink({
-  to,
-  go,
-  children,
-  ...props
-}: { to: string; go: Go } & AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return (
-    <a
-      {...props}
-      href={`#${to}`}
-      onClick={(event) => {
-        if (
-          !event.ctrlKey &&
-          !event.metaKey &&
-          !event.shiftKey &&
-          !event.altKey &&
-          event.button === 0
-        ) {
-          event.preventDefault();
-          go(to);
-        }
-      }}
-    >
-      {children}
-    </a>
-  );
-}
-// State is retained only in this fictional pilot's current browser session.
-const retained = new Map<string, unknown>();
-function useRetainedState<T>(
-  key: string,
-  initial: T | (() => T),
-): [T, (action: SetStateAction<T>) => void] {
-  const [value, setValue] = useState<T>(() =>
-    retained.has(key)
-      ? (retained.get(key) as T)
-      : typeof initial === "function"
-        ? (initial as () => T)()
-        : initial,
-  );
-  return [
-    value,
-    (action) =>
-      setValue((previous) => {
-        const next =
-          typeof action === "function"
-            ? (action as (value: T) => T)(previous)
-            : action;
-        retained.set(key, next);
-        return next;
-      }),
-  ];
-}
+import {
+  PilotLink,
+  useRetainedState,
+  rememberNavigation,
+  reconcileNavigation,
+  scrollPositions,
+  routeWithContext,
+  type Go,
+} from "./pilot-navigation";
+import { PublicGame, PlayerProfile } from "./public-details";
+import { ColumnPicker } from "./table-controls";
 const publicTabs = [
   { key: "classificacao", label: "Classificação" },
   { key: "jogos", label: "Jogos" },
@@ -160,18 +113,33 @@ function App() {
   const admin = route.startsWith("admin/"),
     section = route.split("?")[0].split("/")[1] ?? "jogadores";
   const contextQuery = new URLSearchParams(route.split("?")[1] ?? "");
+  if (section === "jogo") {
+    const game = publishedGames.find(
+      (g) => g.id === route.split("?")[0].split("/")[2],
+    );
+    if (game) {
+      contextQuery.set("competition", game.competition);
+      contextQuery.set("year", String(game.year));
+      contextQuery.set("gender", game.gender);
+      contextQuery.set("category", game.category);
+      contextQuery.delete("division");
+    }
+  }
+  for (const key of [
+    "secao",
+    "anoPerfil",
+    "competicaoPerfil",
+    "equipesPerfil",
+    "modoPerfil",
+  ])
+    contextQuery.delete(key);
   const contextName = contextQuery.get("competition") ?? "Copa ES";
   const contextDetail = `${contextQuery.get("year") ?? "2026"} · ${contextQuery.get("gender") ?? "Masculino"} · ${contextQuery.get("category") ?? "Sub-15"}${contextQuery.get("division") ? ` · ${contextQuery.get("division")}` : ""}`;
   current.current = route;
   const go: Go = (next) => {
-    const destination =
-      next.includes("?") ||
-      next.startsWith("admin/") ||
-      next.includes("campeonatos") ||
-      !current.current.includes("?")
-        ? next
-        : `${next}?${current.current.split("?")[1]}`;
+    const destination = routeWithContext(next);
     if (destination !== current.current && guard.current()) {
+      rememberNavigation(location.hash.slice(1), destination);
       approved.current = true;
       location.hash = destination;
     }
@@ -184,9 +152,13 @@ function App() {
         return;
       }
       approved.current = false;
+      reconcileNavigation(next);
       setRoute(next);
-      window.scrollTo(0, 0);
-      requestAnimationFrame(() => main.current?.focus({ preventScroll: true }));
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositions.get(next) ?? 0);
+        main.current?.focus({ preventScroll: true });
+        document.title = `${main.current?.querySelector("h1")?.textContent ?? "Piloto UI/UX"} · Base do Basquete`;
+      });
     };
     window.addEventListener("hashchange", changed);
     return () => window.removeEventListener("hashchange", changed);
@@ -264,7 +236,8 @@ function App() {
           </PilotLink>
         </div>
       </header>
-      {(admin || !["campeonatos", "participacoes"].includes(section)) && (
+      {(admin ||
+        !["campeonatos", "participacoes", "jogador"].includes(section)) && (
         <div className="bb-context-wrap">
           <div className="bb-context">
             <div>
@@ -330,7 +303,11 @@ function App() {
             onSiglas={() => setSiglas(true)}
           />
         ) : section === "jogo" ? (
-          <GameDetail id={route.split("?")[0].split("/")[2]} go={go} />
+          <PublicGame
+            key={route.split("?")[0]}
+            id={route.split("?")[0].split("/")[2]}
+            go={go}
+          />
         ) : (
           <section aria-label="Dados da disputa">
             {section === "equipes" ? (
@@ -362,65 +339,6 @@ function App() {
         </Modal>
       )}
     </div>
-  );
-}
-function ColumnPicker({
-  selected,
-  onChange,
-}: {
-  selected: string[];
-  onChange: (selected: string[]) => void;
-}) {
-  const details = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    const close = (event: PointerEvent) => {
-      if (!details.current?.contains(event.target as Node) && details.current)
-        details.current.open = false;
-    };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, []);
-  return (
-    <details
-      ref={details}
-      className="bb-column-picker"
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.currentTarget.open = false;
-          event.currentTarget.querySelector("summary")?.focus();
-        }
-      }}
-    >
-      <summary className="bb-button">
-        <Icon name="columns" />
-        Colunas<span className="bb-count">{selected.length}</span>
-      </summary>
-      <div className="bb-column-menu">
-        <strong>Colunas visíveis</strong>
-        {Object.entries(metricLabels).map(([key, label]) => (
-          <label key={key}>
-            <input
-              type="checkbox"
-              name={`column-${key}`}
-              checked={selected.includes(key)}
-              onChange={(e) =>
-                onChange(
-                  e.target.checked
-                    ? Object.keys(metricLabels).filter(
-                        (k) => k === key || selected.includes(k),
-                      )
-                    : selected.filter((k) => k !== key),
-                )
-              }
-            />
-            <span>
-              {metricShort[key]} <small>{label}</small>
-            </span>
-          </label>
-        ))}
-      </div>
-    </details>
   );
 }
 function PlayerStatistics({
@@ -478,6 +396,7 @@ function PlayerStatistics({
       p.games >= Number(minimum),
   );
   const val = (p: Player, key: string): SortValue => {
+    if (p.games === 0 && key in metricLabels && key !== "games") return null;
     const value =
       key === "team" ? p.team.name : (p[key as keyof Player] as SortValue);
     return typeof value === "number" &&
@@ -490,20 +409,27 @@ function PlayerStatistics({
         "technical",
         "unsportsmanlike",
       ].includes(key)
-      ? value / p.games
+      ? p.games
+        ? value / p.games
+        : null
       : value;
   };
   const sorted = sortRows(filtered, sort, val, (p) => p.id),
     size = 14;
   const rank = (p: Player) =>
-    ["name", "team"].includes(sort.key)
+    ["name", "team"].includes(sort.key) || val(p, sort.key) === null
       ? "—"
       : 1 +
-        sorted.filter((other) =>
-          sort.direction === "desc"
-            ? Number(val(other, sort.key)) > Number(val(p, sort.key))
-            : Number(val(other, sort.key)) < Number(val(p, sort.key)),
-        ).length;
+        sorted.filter((other) => {
+          const otherValue = val(other, sort.key);
+          return (
+            otherValue !== null &&
+            otherValue !== undefined &&
+            (sort.direction === "desc"
+              ? Number(otherValue) > Number(val(p, sort.key))
+              : Number(otherValue) < Number(val(p, sort.key)))
+          );
+        }).length;
   const schema: Column<Player>[] = [
     { key: "rank", label: "Pos.", numeric: true, render: (p) => rank(p) },
     {
@@ -549,7 +475,8 @@ function PlayerStatistics({
       description: metricLabels[key],
       numeric: true,
       sortable: true,
-      render: (p: Player) => decimal.format(Number(val(p, key))),
+      render: (p: Player) =>
+        val(p, key) === null ? "—" : decimal.format(Number(val(p, key))),
     })),
   ];
   function changeColumns(value: string[]) {
@@ -657,14 +584,7 @@ function TeamStatistics({ go, teamId }: { go: Go; teamId?: string }) {
   const [query, setQuery] = useState(""),
     [sort, setSort] = useState<Sort>({ key: "points", direction: "desc" });
   const rows = teams
-    .map((team, i) => ({
-      ...team,
-      games: 6,
-      points: 360 + i * 17,
-      two: 112 + i * 3,
-      three: 21 + i * 2,
-      free: 73 + i * 5,
-    }))
+    .map((team) => ({ ...team, ...teamSummary(team.id) }))
     .filter((t) => !teamId || t.id === teamId);
   const filtered = sortRows(
     rows.filter((t) =>
@@ -773,15 +693,20 @@ function Standings({ go }: { go: Go }) {
       label: key,
       numeric: true,
       render: (t: (typeof teams)[number]) =>
-        [
-          6,
-          6 - teams.indexOf(t),
-          teams.indexOf(t),
-          `${decimal.format(((6 - teams.indexOf(t)) / 6) * 100)}%`,
-          450 - teams.indexOf(t) * 12,
-          310 + teams.indexOf(t) * 10,
-          140 - teams.indexOf(t) * 22,
-        ][i],
+        (() => {
+          const result = teamSummary(t.id);
+          return [
+            result.games,
+            result.wins,
+            result.losses,
+            result.games
+              ? `${decimal.format((result.wins / result.games) * 100)}%`
+              : "—",
+            result.points,
+            result.against,
+            result.difference,
+          ][i];
+        })(),
     })),
   ];
   return (
@@ -1417,13 +1342,7 @@ function Rosters({ guard }: { guard: Guard }) {
   const [query, setQuery] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
     [roster, setRoster] = useRetainedState("pilot-rosters", () =>
-      teams.flatMap((team, ti) =>
-        Array.from({ length: 12 }, (_, i) => ({
-          ...players[(i + ti * 4) % players.length],
-          id: `roster-${team.id}-${i}`,
-          team,
-        })),
-      ),
+      players.map((player) => ({ ...player })),
     ),
     [editing, setEditing] = useState<Player | null>(null),
     [draft, setDraft] = useState<Player | null>(null),
@@ -1454,7 +1373,7 @@ function Rosters({ guard }: { guard: Guard }) {
         <button
           type="button"
           className="bb-text-button"
-          aria-label={`Editar ${p.name}`}
+          aria-label={`Editar ${p.name}, camisa ${p.shirt}`}
           onClick={() => {
             setEditing(p);
             setDraft({ ...p });
@@ -1724,15 +1643,28 @@ function Profile({
   go: Go;
   onSiglas: () => void;
 }) {
-  const isPlayer = kind === "jogador",
-    player = players.find((p) => p.id === id) ?? players[0],
-    team = isPlayer
-      ? player.team
-      : (teams.find((t) => t.id === id) ?? teams[0]);
+  return kind === "jogador" ? (
+    <PlayerProfile id={id} go={go} onSiglas={onSiglas} />
+  ) : (
+    <TeamProfile kind={kind} id={id} go={go} onSiglas={onSiglas} />
+  );
+}
+function TeamProfile({
+  id,
+  go,
+  onSiglas,
+}: {
+  kind: string;
+  id: string;
+  go: Go;
+  onSiglas: () => void;
+}) {
+  const team = teams.find((t) => t.id === id) ?? teams[0];
+  const summary = teamSummary(team.id);
   const [active, setActive] = useState("estatisticas");
   const tabs = [
     { key: "estatisticas", label: "Estatísticas" },
-    ...(!isPlayer ? [{ key: "elenco", label: "Elenco" }] : []),
+    { key: "elenco", label: "Elenco" },
     { key: "jogos", label: "Jogos" },
   ];
   return (
@@ -1740,35 +1672,36 @@ function Profile({
       <PilotLink
         className="bb-text-button bb-profile-back"
         go={go}
-        to={`publico/${isPlayer ? "jogadores" : "equipes"}`}
+        to="publico/equipes"
       >
         <Icon name="back" />
-        Voltar a {isPlayer ? "jogadores" : "equipes"}
+        Voltar a equipes
       </PilotLink>
       <div className="bb-profile-summary">
         <div className="bb-profile-identity">
           <span className="bb-identity-mark">
-            <Icon name={isPlayer ? "player" : "teams"} />
+            <Icon name="teams" />
           </span>
           <div>
-            <h1>
-              {isPlayer ? player.name : team.name}
-              {isPlayer && <span className="bb-shirt">{player.shirt}</span>}
-            </h1>
-            <p>{isPlayer ? team.name : team.fullName}</p>
+            <h1>{team.name}</h1>
+            <p>{team.fullName}</p>
           </div>
         </div>
         <div className="bb-profile-numbers">
           <div>
-            <strong>{isPlayer ? player.games : 6}</strong>
+            <strong>{summary.games}</strong>
             <span>Jogos</span>
           </div>
           <div>
-            <strong>{isPlayer ? player.points : 450}</strong>
+            <strong>{summary.points}</strong>
             <span>Pontos</span>
           </div>
           <div>
-            <strong>{decimal.format(isPlayer ? player.average : 75)}</strong>
+            <strong>
+              {summary.games
+                ? decimal.format(summary.points / summary.games)
+                : "—"}
+            </strong>
             <span>Por jogo</span>
           </div>
         </div>
@@ -1789,58 +1722,10 @@ function Profile({
             onSiglas={onSiglas}
             subset={players.filter((p) => p.team.id === team.id)}
           />
-        ) : isPlayer ? (
-          <PlayerStatistics go={go} onSiglas={onSiglas} subset={[player]} />
         ) : (
           <TeamStatistics go={go} teamId={team.id} />
         )}
       </TabPanel>
-    </>
-  );
-}
-function GameDetail({ id, go }: { id: string; go: Go }) {
-  const game = games.find((g) => g.id === id) ?? games[0];
-  return (
-    <>
-      <PilotLink
-        className="bb-text-button bb-profile-back"
-        go={go}
-        to={"publico/jogos"}
-      >
-        <Icon name="back" />
-        Voltar aos jogos
-      </PilotLink>
-      <header className="bb-game-header">
-        <h1>Jogo {game.number ?? "sem número"}</h1>
-        <p className="bb-muted bb-game-meta">
-          {displayDate(game.date)} · {game.time ?? "A definir"} ·{" "}
-          {game.venue ?? "Local a definir"}
-        </p>
-        <div className="bb-scoreboard">
-          <PilotLink
-            className="bb-row-link"
-            go={go}
-            to={`publico/equipe/${game.home.id}`}
-          >
-            {game.home.name}
-          </PilotLink>
-          <strong>
-            {game.homePoints ?? "—"}
-            <span>×</span>
-            {game.awayPoints ?? "—"}
-          </strong>
-          <PilotLink
-            className="bb-row-link"
-            go={go}
-            to={`publico/equipe/${game.away.id}`}
-          >
-            {game.away.name}
-          </PilotLink>
-        </div>
-        <p className="bb-muted bb-game-status">
-          {game.status === "Resultado publicado" ? "Encerrado" : game.status}
-        </p>
-      </header>
     </>
   );
 }

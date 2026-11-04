@@ -501,48 +501,6 @@ body {
   color: var(--bb-muted);
   margin-top: 3px;
 }
-.bb-game-header {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
-}
-.bb-game-header h1 {
-  font-size: 14px;
-  margin: 6px 0;
-  font-weight: 600;
-}
-.bb-game-meta,
-.bb-game-status {
-  font-size: 13px;
-  margin: 6px 0;
-}
-.bb-scoreboard {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 20px;
-  margin: 14px 0;
-}
-.bb-scoreboard > a {
-  font-size: 18px;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-.bb-scoreboard > a:first-child {
-  text-align: right;
-}
-.bb-scoreboard > a:last-child {
-  text-align: left;
-}
-.bb-game-header .bb-scoreboard > strong {
-  font-size: 22px;
-  white-space: nowrap;
-}
-.bb-scoreboard > strong span {
-  color: var(--bb-muted);
-  font-size: 16px;
-  margin: 0 8px;
-}
 @media (min-width: 1600px) {
   .bb-dispute-grid {
     grid-template-columns: 155px 145px 230px 150px;
@@ -689,13 +647,13 @@ body {
     grid-template-columns: 1fr;
     gap: 18px;
   }
-  .bb-scoreboard {
-    gap: 10px;
-  }
-  .bb-scoreboard > a {
-    font-size: 16px;
-  }
-  .bb-game-header .bb-scoreboard > strong {
-    font-size: 20px;
-  }
+}
+
+.bb-toolbar .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

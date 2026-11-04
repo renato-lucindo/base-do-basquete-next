@@ -1,3 +1,4 @@
+import { makeSheet, type Sheet } from "./match-model";
 import { normalizeSearch } from "../../../../src/ui-system/controls";
 import type {
   SearchGroup,
@@ -74,30 +75,52 @@ const names = [
   "Murilo Freitas",
   "Otávio Cardoso",
 ];
-export const players = names.map((name, i) => {
-  const two = 17 + ((i * 7) % 44),
-    three = 3 + ((i * 3) % 18),
-    free = (i * 5) % 27,
-    games = 5 + (i % 4),
-    points = two * 2 + three * 3 + free;
-  return {
-    id: `player-${i + 1}`,
-    name,
-    team: teams[i % teams.length],
-    shirt: i === 5 ? "00" : i === 6 ? "0" : String((i % 23) + 4),
-    games,
-    points,
-    average: points / games,
-    two,
-    three,
-    free,
-    fouls: 8 + (i % 13),
-    technical: i % 3,
-    unsportsmanlike: i % 2,
-    excluded: i % 4 === 0 ? 1 : 0,
-    disqualified: 0,
-  };
-});
+const jerseys = [
+  "4",
+  "0",
+  "00",
+  "7",
+  "11",
+  "14",
+  "17",
+  "21",
+  "22",
+  "35",
+  "42",
+  "55",
+];
+const identities = names.map((name, i) => ({
+  id: `player-${i + 1}`,
+  name,
+  team: teams[i % 6],
+}));
+for (const [ti, team] of teams.entries()) {
+  const count = identities.filter((p) => p.team.id === team.id).length;
+  for (let i = count; i < 12; i++)
+    identities.push({
+      id: `player-${team.id}-${i}`,
+      name: `${["Vitor", "Bruno", "César", "Diego", "Alan", "Ruan", "Leandro", "Danilo", "Ícaro", "Hugo", "Fábio", "Breno"][i]} ${["Pereira", "Mendes", "Barros", "Teixeira", "Ramos", "Castro"][ti]}`,
+      team,
+    });
+}
+export const players = identities.map((person) => ({
+  ...person,
+  shirt:
+    jerseys[
+      identities.filter((p) => p.team.id === person.team.id).indexOf(person)
+    ],
+  games: 0,
+  points: 0,
+  average: null as number | null,
+  two: 0,
+  three: 0,
+  free: 0,
+  fouls: 0 as number | null,
+  technical: 0 as number | null,
+  unsportsmanlike: 0 as number | null,
+  excluded: 0 as number | null,
+  disqualified: 0 as number | null,
+}));
 export type Player = (typeof players)[number];
 const numbers = [
   4,
@@ -152,6 +175,226 @@ export const games = numbers.map((number, i) => ({
   awayPoints: i < 23 ? 49 + (i % 23) : null,
 }));
 export type Game = (typeof games)[number];
+export type PublishedGame = Game & {
+  year: number;
+  competition: string;
+  category: string;
+  gender: string;
+  sheet: Sheet;
+};
+const roster = (id: string) => players.filter((p) => p.team.id === id);
+export const publishedGames: PublishedGame[] = games
+  .filter((g) => g.status === "Resultado publicado")
+  .map((g, i) => {
+    const sheet = makeSheet(i, g.home, g.away, roster);
+    g.homePoints = sheet.home.points;
+    g.awayPoints = sheet.away.points;
+    return {
+      ...g,
+      year: 2026,
+      competition: "Copa ES",
+      category: "Sub-15",
+      gender: "Masculino",
+      sheet,
+    };
+  });
+// Explicit previous-team participation; names alone never identify a player.
+for (const [i, g] of games.slice(0, 8).entries()) {
+  const oldRoster = (id: string) =>
+    roster(teams[(teams.findIndex((t) => t.id === id) + 1) % teams.length].id);
+  const sheet = makeSheet(i + 3, g.home, g.away, oldRoster);
+  publishedGames.push({
+    ...g,
+    id: `history-${i + 1}`,
+    number: i + 1,
+    date: `2025-08-${String(i + 10).padStart(2, "0")}`,
+    homePoints: sheet.home.points,
+    awayPoints: sheet.away.points,
+    year: 2025,
+    competition: "Copa da Base",
+    category: "Sub-14",
+    gender: "Masculino",
+    sheet,
+  });
+}
+export function appearances(playerId: string) {
+  return publishedGames
+    .flatMap((game) =>
+      (["home", "away"] as const).flatMap((side) => {
+        const team = game.sheet[side],
+          person = team.players.find((p) => p.id === playerId);
+        return person?.played
+          ? [
+              {
+                game,
+                team,
+                player: person,
+                opponent: game[side === "home" ? "away" : "home"],
+              },
+            ]
+          : [];
+      }),
+    )
+    .sort((a, b) => (b.game.date ?? "").localeCompare(a.game.date ?? ""));
+}
+// Current table totals are derived from the very same published game appearances.
+for (const player of players) {
+  const records = appearances(player.id).filter((a) => a.game.year === 2026);
+  player.games = records.length;
+  for (const key of ["points", "two", "three", "free"] as const)
+    player[key] = records.reduce((sum, a) => sum + (a.player[key] ?? 0), 0);
+  player.fouls = records.some((a) => a.player.fouls === null)
+    ? null
+    : records.reduce((sum, a) => sum + (a.player.fouls ?? 0), 0);
+  player.average = records.length ? player.points / records.length : null;
+  const events = records.flatMap((a) => a.player.foulEvents);
+  player.technical = records.some((a) => a.player.fouls === null)
+    ? null
+    : events.filter((e) => e.kind === "T").length;
+  player.unsportsmanlike = records.some((a) => a.player.fouls === null)
+    ? null
+    : events.filter((e) => e.kind === "U").length;
+  player.excluded = records.some((a) => a.player.status === null)
+    ? null
+    : records.filter((a) => a.player.status === "five").length;
+  player.disqualified = records.some((a) => a.player.status === null)
+    ? null
+    : records.filter((a) => ["GD", "D"].includes(a.player.status ?? "")).length;
+}
+export type Appearance = ReturnType<typeof appearances>[number];
+export function teamSummary(teamId: string) {
+  const records = publishedGames.filter(
+    (g) => g.year === 2026 && (g.home.id === teamId || g.away.id === teamId),
+  );
+  const own = records.map((g) =>
+    g.home.id === teamId ? g.sheet.home : g.sheet.away,
+  );
+  const points = own.reduce((sum, team) => sum + team.points, 0);
+  const against = records.reduce(
+    (sum, g) =>
+      sum + (g.home.id === teamId ? g.sheet.away.points : g.sheet.home.points),
+    0,
+  );
+  const wins = records.filter((g) =>
+    g.home.id === teamId
+      ? g.sheet.home.points > g.sheet.away.points
+      : g.sheet.away.points > g.sheet.home.points,
+  ).length;
+  return {
+    games: records.length,
+    points,
+    against,
+    wins,
+    losses: records.length - wins,
+    difference: points - against,
+    two: own.reduce(
+      (sum, t) => sum + t.players.reduce((n, p) => n + (p.two ?? 0), 0),
+      0,
+    ),
+    three: own.reduce(
+      (sum, t) => sum + t.players.reduce((n, p) => n + (p.three ?? 0), 0),
+      0,
+    ),
+    free: own.reduce(
+      (sum, t) => sum + t.players.reduce((n, p) => n + (p.free ?? 0), 0),
+      0,
+    ),
+  };
+}
+export type Participation = {
+  id: string;
+  year: number;
+  competition: string;
+  category: string;
+  teamId: string;
+  teamName: string;
+  shirt: string;
+  games: number;
+  points: number;
+  two: number;
+  three: number;
+  free: number;
+  fouls: number | null;
+};
+export function participations(playerId: string): Participation[] {
+  const rows = new Map<string, Participation>();
+  for (const a of appearances(playerId)) {
+    const id = `${a.game.year}/${a.game.competition}/${a.team.id}/${a.player.jersey}`;
+    const row = rows.get(id) ?? {
+      id,
+      year: a.game.year,
+      competition: a.game.competition,
+      category: a.game.category,
+      teamId: a.team.id,
+      teamName: a.team.name,
+      shirt: a.player.jersey,
+      games: 0,
+      points: 0,
+      two: 0,
+      three: 0,
+      free: 0,
+      fouls: 0,
+    };
+    row.games++;
+    for (const key of ["points", "two", "three", "free"] as const)
+      row[key] += a.player[key] ?? 0;
+    row.fouls =
+      row.fouls === null || a.player.fouls === null
+        ? null
+        : row.fouls + a.player.fouls;
+    rows.set(id, row);
+  }
+  // Documented registration without individual game coverage remains a participation.
+  const person = players.find((p) => p.id === playerId);
+  if (person)
+    rows.set("2024-registration", {
+      id: "2024-registration",
+      year: 2024,
+      competition: "Festival das Escolas",
+      category: "Sub-13",
+      teamId: person.team.id,
+      teamName: person.team.name,
+      shirt: "12",
+      games: 0,
+      points: 0,
+      two: 0,
+      three: 0,
+      free: 0,
+      fouls: null,
+    });
+  return [...rows.values()];
+}
+export const publicBio = (playerId: string) =>
+  playerId === "player-1"
+    ? {
+        nickname: "JP",
+        birthYear: 2011,
+        position: "Armador",
+        height: "1,76 m",
+        city: "Vitória · ES",
+      }
+    : null;
+export const honors = (playerId: string) =>
+  playerId === "player-1"
+    ? [
+        {
+          id: "honor-1",
+          title: "Campeão",
+          competition: "Copa da Base",
+          year: 2025,
+          category: "Sub-14",
+          team: "GS Nice de Paula",
+        },
+        {
+          id: "honor-2",
+          title: "Quinteto ideal",
+          competition: "Copa ES",
+          year: 2026,
+          category: "Sub-15",
+          team: "Álvares Cabral",
+        },
+      ]
+    : [];
 export const competitions = [
   {
     id: "copa-es",
@@ -254,5 +497,11 @@ export const metricShort: Record<string, string> = {
 export const decimal = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 });
+const dateFormat = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "UTC",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+});
 export const displayDate = (date: string | null) =>
-  date ? date.split("-").reverse().join("/") : "A definir";
+  date ? dateFormat.format(new Date(`${date}T12:00:00Z`)) : "A definir";
