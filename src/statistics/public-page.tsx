@@ -1,3 +1,4 @@
+import { usePublicPosition } from "../public-ui/position";
 import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -97,9 +98,13 @@ export function StatisticsPageView() {
     [comparisonEnabled, setComparisonEnabled] = useState(
       route.query.compare.length > 0,
     ),
-    [showTeam, setShowTeam] = useState(
-      () => sessionStorage.getItem("statistics-team-column") !== "hidden",
-    );
+    [showTeam, setShowTeam] = useState(() => {
+      const saved = sessionStorage.getItem("statistics-team-column");
+      return (
+        saved === "visible" ||
+        (saved === null && !window.matchMedia("(max-width: 600px)").matches)
+      );
+    });
   const latestRoute = useRef(route);
   const form = useRef<HTMLFormElement>(null),
     resultHeading = useRef<HTMLHeadingElement>(null),
@@ -128,6 +133,7 @@ export function StatisticsPageView() {
     window.addEventListener("hashchange", read);
     return () => window.removeEventListener("hashchange", read);
   }, []);
+  usePublicPosition(!loading && !!data && !error);
   const serialized = serializeStatisticsQuery(route.query).toString();
   useEffect(() => {
     if (!route.id) {
@@ -247,6 +253,15 @@ export function StatisticsPageView() {
     media.addEventListener("change", resize);
     return () => media.removeEventListener("change", resize);
   }, [serialized]);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width:600px)");
+    const resize = () => {
+      if (sessionStorage.getItem("statistics-team-column") === null)
+        setShowTeam(!media.matches);
+    };
+    media.addEventListener("change", resize);
+    return () => media.removeEventListener("change", resize);
+  }, []);
   function selectColumns(columns: StatisticsMetric[], team = showTeam) {
     responsiveColumns.current = false;
     setShowTeam(team);
@@ -339,7 +354,7 @@ export function StatisticsPageView() {
                   }}
                 >
                   <label className="search-label" htmlFor="search">
-                    Buscar atleta
+                    <span className="local-search-label">Buscar atleta</span>
                     <div className="search-field">
                       <svg
                         aria-hidden="true"
@@ -416,8 +431,17 @@ export function StatisticsPageView() {
                       }}
                     />
                   </label>
+                </form>
+                <div className="table-toolbar">
+                  <p role="status" aria-live="polite">
+                    {loading
+                      ? "Carregando atletas…"
+                      : data && !error
+                        ? `${data.total} ${data.total === 1 ? "registro por equipe" : "registros por equipe"} · Página ${data.page} de ${data.totalPages}`
+                        : ""}
+                  </p>
                   <button
-                    className="clear-button"
+                    className="clear-button toolbar-clear"
                     type="button"
                     onClick={() =>
                       quickChange({
@@ -430,15 +454,6 @@ export function StatisticsPageView() {
                   >
                     Limpar filtros
                   </button>
-                </form>
-                <div className="table-toolbar">
-                  <p role="status" aria-live="polite">
-                    {loading
-                      ? "Carregando atletas…"
-                      : data && !error
-                        ? `${data.total} ${data.total === 1 ? "registro por equipe" : "registros por equipe"} · Página ${data.page} de ${data.totalPages}`
-                        : ""}
-                  </p>
                   <div className="table-display-controls">
                     <ColumnPicker
                       options={[
@@ -756,14 +771,7 @@ export function StatisticsPageView() {
           {data && (
             <>
               <details className="statistics-explanation">
-                <summary>Fonte e cobertura dos dados</summary>
-                <p>
-                  Fonte confirmada v{data.version} ·{" "}
-                  {new Date(data.confirmedAt).toLocaleString("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                  })}{" "}
-                  (UTC−03).
-                </p>
+                <summary>Cobertura dos dados</summary>
                 <p>
                   Cobertura de fases: {data.coverage.regularGames} regulares,{" "}
                   {data.coverage.playoffGames} eliminatórias e{" "}

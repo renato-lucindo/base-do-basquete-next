@@ -34,7 +34,7 @@ Direção aprovada: **público primeiro no celular, administração no desktop**
 - [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfil contínuo de carreira com conquistas/resumo/três recentes/campeonatos, súmula com a composição atual e parciais/elencos/faltas, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
 - Para servir localmente: `node docs/design/prototipos/reforma-uiux/server.cjs`, depois abrir [o piloto local](http://127.0.0.1:4189/).
 - Fontes compartilhadas em `src/ui-system/`; a tabela passou a ser utilizada também no perfil real após autorização de 04/11. Build e verificação do piloto incluídos em `npm run design:build` e `npm run design:verify`.
-- Em 04/11 o responsável autorizou implementar na mesma PR #51 o último plano de perfil/jogo. Perfil integrado à rota real e súmula vigente preservada; demais páginas da reforma continuam no piloto. Estado e validação no checkpoint. Uma unidade/PR por vez, sem pilha dependente.
+- Em 04/11 o responsável autorizou implementar na mesma PR #51 o último plano de perfil/jogo. Perfil integrado à rota real e súmula vigente preservada; o piloto foi aceito e o responsável autorizou a sequência público real → busca no servidor → administração → preparação da liberação. Estado de cada unidade e CI no checkpoint, sem inferir deploy/DDL. Uma unidade/PR por vez, sem pilha dependente.
 
 ## Protótipos públicos para implementação
 

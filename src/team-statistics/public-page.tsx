@@ -1,3 +1,4 @@
+import { usePublicPosition } from "../public-ui/position";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { usePublicStandings } from "../regulation/public-page";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -34,7 +35,6 @@ import {
   TeamParticipants,
   TeamsTable,
   teamNumber,
-  teamStamp,
 } from "./public-tables";
 const sections = [
   { id: "resumo", label: "Resumo" },
@@ -59,6 +59,22 @@ function initialTeamRoute(kind: "list" | "detail") {
   return route;
 }
 export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
+  const [advancedOpen, setAdvancedOpen] = useState(() => {
+    try {
+      return sessionStorage.getItem("team-advanced-open") === "true";
+    } catch {
+      return false;
+    }
+  });
+  function toggleAdvanced() {
+    const value = !advancedOpen;
+    setAdvancedOpen(value);
+    try {
+      sessionStorage.setItem("team-advanced-open", String(value));
+    } catch {
+      /* The panel remains usable without session storage. */
+    }
+  }
   const [route, setRoute] = useState(() => initialTeamRoute(kind)),
     [response, setResponse] = useState<{
       key: string;
@@ -78,6 +94,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     key = serializeTeamRoute(route);
   const data = response?.key === key ? response.data : null,
     current = data ? response!.route : route;
+  usePublicPosition(!loading && !!data && !error);
   useEffect(() => {
     const read = () => {
       const next = initialTeamRoute(kind);
@@ -345,69 +362,90 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                         </option>
                       </select>
                     </label>
-                    <label>
-                      Colunas
-                      <select
-                        value={current.query.preset}
-                        disabled={loading}
-                        onChange={(e) => {
-                          const preset = e.target.value as TeamsQuery["preset"];
-                          listChange({
-                            preset,
-                            columns: [
-                              ...(data?.kind === "confirmed-teams-page-v1" &&
-                              data.scoresheet &&
-                              (preset === "essentials" || preset === "custom")
-                                ? SHEET_TEAM_COLUMNS
-                                : TEAM_COLUMN_PRESETS[
-                                    preset === "custom" ? "essentials" : preset
-                                  ]),
-                            ],
-                          });
+                    <details
+                      className="team-advanced-controls"
+                      open={advancedOpen}
+                    >
+                      <summary
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleAdvanced();
                         }}
                       >
-                        <option value="essentials">Essenciais</option>
-                        <option value="boxscore">Boxscore</option>
-                        <option value="all">Todas</option>
-                        <option value="custom">Personalizadas</option>
-                      </select>
-                    </label>
-                    <label>
-                      Ordenar por
-                      <select
-                        disabled={loading}
-                        value={current.query.sort}
-                        onChange={(e) =>
-                          listChange({
-                            sort: e.target.value as TeamsQuery["sort"],
-                          })
-                        }
-                      >
-                        <option value="name">Inscrição</option>
-                        <option value="pointsFor">Pontos a favor</option>
-                        {TEAM_METRIC_KEYS.map((key) => (
-                          <option key={key} value={key}>
-                            {TEAM_METRICS[key].name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      Direção
-                      <select
-                        disabled={loading}
-                        value={current.query.direction}
-                        onChange={(e) =>
-                          listChange({
-                            direction: e.target
-                              .value as TeamsQuery["direction"],
-                          })
-                        }
-                      >
-                        <option value="asc">Crescente</option>
-                        <option value="desc">Decrescente</option>
-                      </select>
-                    </label>
+                        Mais opções
+                      </summary>
+                      <div className="statistics-fields">
+                        {" "}
+                        <label>
+                          Colunas
+                          <select
+                            value={current.query.preset}
+                            disabled={loading}
+                            onChange={(e) => {
+                              const preset = e.target
+                                .value as TeamsQuery["preset"];
+                              listChange({
+                                preset,
+                                columns: [
+                                  ...(data?.kind ===
+                                    "confirmed-teams-page-v1" &&
+                                  data.scoresheet &&
+                                  (preset === "essentials" ||
+                                    preset === "custom")
+                                    ? SHEET_TEAM_COLUMNS
+                                    : TEAM_COLUMN_PRESETS[
+                                        preset === "custom"
+                                          ? "essentials"
+                                          : preset
+                                      ]),
+                                ],
+                              });
+                            }}
+                          >
+                            <option value="essentials">Essenciais</option>
+                            <option value="boxscore">Boxscore</option>
+                            <option value="all">Todas</option>
+                            <option value="custom">Personalizadas</option>
+                          </select>
+                        </label>
+                        <label>
+                          Ordenar por
+                          <select
+                            disabled={loading}
+                            value={current.query.sort}
+                            onChange={(e) =>
+                              listChange({
+                                sort: e.target.value as TeamsQuery["sort"],
+                              })
+                            }
+                          >
+                            <option value="name">Inscrição</option>
+                            <option value="pointsFor">Pontos a favor</option>
+                            {TEAM_METRIC_KEYS.map((key) => (
+                              <option key={key} value={key}>
+                                {TEAM_METRICS[key].name}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Direção
+                          <select
+                            disabled={loading}
+                            value={current.query.direction}
+                            onChange={(e) =>
+                              listChange({
+                                direction: e.target
+                                  .value as TeamsQuery["direction"],
+                              })
+                            }
+                          >
+                            <option value="asc">Crescente</option>
+                            <option value="desc">Decrescente</option>
+                          </select>
+                        </label>
+                      </div>
+                    </details>
                   </>
                 )}
               </div>
@@ -480,10 +518,7 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
               data && (
                 <>
                   <details className="team-provenance">
-                    <summary>
-                      Fonte confirmada v{data.version} ·{" "}
-                      {teamStamp(data.confirmedAt)}
-                    </summary>
+                    <summary>Cobertura das fases</summary>
                     <p>
                       Fases na fonte da disputa: {data.coverage.regularGames}{" "}
                       regulares; {data.coverage.playoffGames} eliminatórias;{" "}
@@ -497,9 +532,8 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                         Equipes com resultados confirmados
                       </h2>
                       <p>
-                        {data.scoresheet
-                          ? "Ranking estatístico, independente da classificação oficial. Uma linha por inscrição. Selecione uma métrica para ranquear; a ordem por nome mantém a posição indefinida."
-                          : "Uma linha por inscrição. PTS: total oficial · PPJ: pontos por jogo. Selecione um cabeçalho para ordenar."}
+                        Ranking estatístico por inscrição, independente da
+                        classificação oficial.
                       </p>
                       <TeamsTable
                         data={data}
@@ -590,12 +624,6 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                           <p>
                             Equipe: {data.identity.teamName} · inscrição:{" "}
                             {data.identity.name}.
-                          </p>
-                          <p>
-                            Nomes publicados: {data.identity.names.join(" / ")}.
-                            Última confirmação de nome: resultado v
-                            {data.identity.origin.publicationVersion} em{" "}
-                            {teamStamp(data.identity.origin.publishedAt)}.
                           </p>
                           {data.statistics ? (
                             <>

@@ -8,6 +8,7 @@ import {
   type CatalogGame,
 } from "./catalog-contract";
 import { publicDetailLink } from "./navigation";
+import { PUBLIC_SEARCH_EVENT } from "./search-form";
 import type { PublicDispute } from "../regulation/publication-contract";
 
 export function usePublicCatalog(disputeId?: string | null) {
@@ -210,7 +211,6 @@ export function PublicDiscovery({
   const initial = () =>
     new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("q") ??
     "";
-  const [query, setQuery] = useState(initial);
   const [submitted, setSubmitted] = useState(initial);
   const [searchAttempt, setSearchAttempt] = useState(0);
   const [result, setResult] = useState<{
@@ -222,11 +222,18 @@ export function PublicDiscovery({
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const read = () => {
-      setQuery(initial());
       setSubmitted(initial());
     };
+    const submit = () => {
+      read();
+      setSearchAttempt((n) => n + 1);
+    };
     window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
+    window.addEventListener(PUBLIC_SEARCH_EVENT, submit);
+    return () => {
+      window.removeEventListener("hashchange", read);
+      window.removeEventListener(PUBLIC_SEARCH_EVENT, submit);
+    };
   }, []);
   useEffect(() => {
     const c = new AbortController();
@@ -284,33 +291,6 @@ export function PublicDiscovery({
     : [];
   return (
     <>
-      <form
-        role="search"
-        aria-label="Busca pública"
-        className="public-search"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const p = new URLSearchParams({ q: query.trim() });
-          window.location.hash = `?${p}`;
-          setSubmitted(query.trim());
-          setSearchAttempt((attempt) => attempt + 1);
-        }}
-      >
-        <label htmlFor="public-search">
-          Buscar competições, disputas, equipes ou jogadores
-        </label>
-        <div>
-          <input
-            id="public-search"
-            type="search"
-            maxLength={120}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoComplete="off"
-          />
-          <button type="submit">Buscar</button>
-        </div>
-      </form>
       {catalogAvailable && (
         <CompetitionTree
           games={games}

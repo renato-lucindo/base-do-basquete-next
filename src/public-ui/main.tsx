@@ -1,8 +1,10 @@
+import { PublicGamesTable } from "./games-table";
+import { usePublicPosition } from "./position";
 import { createRoot } from "react-dom/client";
 import { useEffect, useState } from "react";
 import { PublicHeader, PublicFooter, PublicBreadcrumb } from "./shell";
 import { PublicDiscovery, usePublicCatalog } from "./catalog";
-import { readPublicDispute, publicDetailLink } from "./navigation";
+import { readPublicDispute } from "./navigation";
 import {
   usePublicStandings,
   PublicStandingsTables,
@@ -27,6 +29,7 @@ function PublicHome() {
       (a.game.time ?? "99").localeCompare(b.game.time ?? "99") ||
       a.id.localeCompare(b.id),
   );
+  usePublicPosition(!catalog.loading && !standings.loading);
   const invalid =
     window.location.hash.length > 1 &&
     !window.location.hash.startsWith("#?") &&
@@ -146,34 +149,20 @@ function PublicHome() {
                       {!catalog.loading &&
                         !catalog.error &&
                         (games.length ? (
-                          <ul className="public-games">
-                            {games.map((g) => (
-                              <li key={g.id}>
-                                <time dateTime={g.game.date ?? undefined}>
-                                  {g.game.date
-                                    ?.split("-")
-                                    .reverse()
-                                    .join("/") ?? "Data a definir"}{" "}
-                                  · {g.game.time ?? "Horário a definir"}
-                                </time>
-                                <a
-                                  href={publicDetailLink(
-                                    `/resultado.html#${g.id}`,
-                                    g.disputeId,
-                                  )}
-                                >
-                                  <span>{g.game.home.name}</span>
-                                  <strong>
-                                    {g.score.home} × {g.score.away}
-                                  </strong>
-                                  <span>{g.game.away.name}</span>
-                                </a>
-                                <small>
-                                  {g.game.venue ?? "Local a definir"}
-                                </small>
-                              </li>
-                            ))}
-                          </ul>
+                          <PublicGamesTable
+                            games={games.map((g) => ({
+                              id: g.id,
+                              disputeId: g.disputeId,
+                              home: g.game.home.name,
+                              away: g.game.away.name,
+                              date: g.game.date,
+                              time: g.game.time,
+                              venue: g.game.venue,
+                              score: g.score,
+                              status: "Encerrado",
+                              published: true,
+                            }))}
+                          />
                         ) : (
                           <p role="status">
                             Disputa não encontrada ou sem consulta pública

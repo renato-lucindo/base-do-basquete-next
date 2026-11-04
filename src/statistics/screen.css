@@ -114,8 +114,8 @@
   margin: 5px 0;
 }
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] {
-  min-width: 1040px;
-  width: 100%;
+  min-width: 0;
+  width: max-content;
 }
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] th,
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] td {
@@ -296,7 +296,9 @@
 }
 .statistics-scroll table {
   border-collapse: collapse;
-  min-width: 100%;
+  width: max-content;
+  min-width: 0;
+  font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
 }
 .statistics-scroll caption {
@@ -491,7 +493,7 @@
   margin-bottom: 4px;
 }
 .simple-statistics-table {
-  width: 100%;
+  width: max-content;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }

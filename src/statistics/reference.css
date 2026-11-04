@@ -1683,3 +1683,182 @@
 .public-site.statistics-public .table-legend dd {
   overflow-wrap: anywhere;
 }
+
+/* Approved compact pilot, integrated into public statistics. Extra width stays after columns. */
+.public-site.statistics-public .reference-explorer .statistics-table {
+  width: max-content;
+  min-width: 0;
+  table-layout: auto;
+  font:
+    0.875rem/1.45 Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(.column-player, .column-team, .column-team-identity, .column-metric) {
+  width: auto;
+  min-width: 0;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(th, td) {
+  height: auto;
+  padding: 5px 10px;
+  border-right: 0;
+  font-size: 0.875rem;
+}
+.public-site.statistics-public .reference-explorer .statistics-table thead th {
+  font-size: 0.8125rem;
+  height: 36px;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(th, td):first-child {
+  font: inherit;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  .reference-player {
+  min-width: 170px;
+  width: auto;
+  max-width: 340px;
+}
+.public-site.statistics-public .reference-explorer .reference-player .player {
+  width: max-content;
+  max-width: 320px;
+  white-space: normal;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .reference-player
+  .player-name {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .reference-player
+  .player-jersey {
+  font-size: 0.8125rem;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(.team-name, .team-column-header) {
+  min-width: 120px;
+  max-width: 200px;
+  font-size: 0.875rem;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  .team-name
+  a {
+  display: block;
+  max-width: 190px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .public-site.statistics-public
+    .reference-explorer
+    .statistics-table
+    .reference-player {
+    min-width: 150px;
+    max-width: 190px;
+  }
+  .public-site.statistics-public .reference-explorer .reference-player .player {
+    max-width: 180px;
+  }
+  .public-site.statistics-public
+    .reference-explorer
+    .statistics-table
+    :is(th, td) {
+    padding-inline: 8px;
+  }
+}
+
+.public-site.statistics-public .table-toolbar {
+  gap: 8px 12px;
+  margin-block: 12px;
+}
+.public-site.statistics-public .table-toolbar > p {
+  flex: 1;
+  min-width: 0;
+}
+.public-site.statistics-public .toolbar-clear {
+  min-height: 32px;
+  padding: 4px;
+  color: #075fca;
+  font: inherit;
+  font-size: 0.8125rem;
+}
+.public-site.statistics-public .player-team-mobile {
+  display: none;
+}
+@media (max-width: 600px) {
+  .public-site.statistics-public .player-team-mobile {
+    display: inline;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: #526176;
+  }
+  .public-site.statistics-public .table-toolbar {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-site.statistics-public .table-toolbar > p {
+    flex: 1 0 calc(100% - 112px);
+  }
+  .public-site.statistics-public .table-toolbar > .toolbar-clear {
+    flex: 0 0 100px;
+  }
+}
+
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  .reference-player {
+  font-size: 0.875rem;
+}
+@media (max-width: 600px) {
+  .public-site.statistics-public .table-toolbar {
+    padding-block: 0;
+  }
+  .public-site.statistics-public .filters input {
+    font-size: 1rem;
+    min-height: 44px;
+  }
+  .public-site.statistics-public .filters #team-filter-toggle {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-site.statistics-public .local-search-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .public-site.statistics-public .search-field input {
+    margin-top: 0;
+  }
+}
+
+/* Reserve the scrollbar strip during measurement and return restoration, avoiding layout jumps. */
+.public-site.statistics-public
+  .scrollable-table:not([data-shadow-left]):not([data-shadow-right])
+  .scrollable-table-top {
+  display: block;
+  visibility: hidden;
+}

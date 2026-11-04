@@ -106,9 +106,6 @@ export function ScoresheetStatisticsTable({
         <table
           aria-label="Estatísticas dos atletas"
           className="statistics-table statistics-table-scoresheet"
-          style={{
-            minWidth: `calc(var(--identity-columns, 450px) - ${showTeam ? "0px" : "var(--team-column, 135px)"} + ${data.columns.length * 68}px)`,
-          }}
         >
           <caption className="sr-only">
             Estatísticas publicadas. Selecione um cabeçalho para ordenar.
@@ -185,6 +182,20 @@ export function ScoresheetStatisticsTable({
                     >
                       #{row.jerseys.join(" / ")}
                     </span>
+                    {!showTeam && (
+                      <span className="player-team-mobile">
+                        {" "}
+                        ·{" "}
+                        <a
+                          href={publicDetailLink(
+                            `/equipe.html#${row.teamId}?disputeId=${data.disputeId}&registrationId=${row.registrationId}`,
+                            data.disputeId,
+                          )}
+                        >
+                          {row.registrationNames.join(" / ")}
+                        </a>
+                      </span>
+                    )}
                   </span>
                 </th>
                 {showTeam && (

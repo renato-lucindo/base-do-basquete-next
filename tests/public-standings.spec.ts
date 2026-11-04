@@ -83,7 +83,9 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await page
     .getByRole("searchbox", { name: /Buscar competições/ })
     .fill(s.context.name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await page
     .locator(
       `.competition-tree a[href="/publico.html#${s.disputeId}?secao=classificacao"]`,

@@ -214,6 +214,7 @@ test("colunas de boxscore mantêm LL% único e retorno do perfil preserva contro
   await page
     .getByRole("combobox", { name: "Dados", exact: true })
     .selectOption("boxscore");
+  await page.getByText("Mais opções", { exact: true }).click();
   await page
     .getByRole("combobox", { name: "Colunas", exact: true })
     .selectOption("boxscore");
