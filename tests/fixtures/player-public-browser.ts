@@ -4,6 +4,7 @@ import { pubId } from "./publication";
 import { emptyPerson } from "../../src/people/contract";
 import { buildPlayerProfile } from "../../src/player-profile/domain";
 import { parseProfileQuery } from "../../src/player-profile/query-contract";
+import { confirmedManualFixture } from "./statistics-publications";
 export async function playerPublicFixture(
   page: Page,
   options: { long?: boolean; profileOnly?: boolean } = {},
@@ -78,7 +79,19 @@ export async function playerPublicFixture(
     delayNext: 0,
     sessionReads: 0,
     queries: [] as URLSearchParams[],
+    failPage: 0,
+    changedPage: 0,
   };
+  const result = confirmedManualFixture();
+  await page.route("**/api/public/games/**", (route) => {
+    const id = new URL(route.request().url()).pathname.split("/").at(-1);
+    return id === result.id
+      ? route.fulfill({ json: result })
+      : route.fulfill({
+          status: 404,
+          json: { error: { message: "Resultado indisponível" } },
+        });
+  });
   await page.route("**/api/session", (route) => {
     state.sessionReads++;
     return route.fulfill({
@@ -92,7 +105,11 @@ export async function playerPublicFixture(
     const delay = state.delayNext;
     state.delayNext = 0;
     if (delay) await new Promise((r) => setTimeout(r, delay));
-    if (state.failNext || state.missing) {
+    if (
+      state.failNext ||
+      state.missing ||
+      Number(url.searchParams.get("page") ?? 1) === state.failPage
+    ) {
       const missing = state.missing;
       state.failNext = false;
       await route
@@ -113,6 +130,8 @@ export async function playerPublicFixture(
       source,
       parseProfileQuery(url.searchParams),
     );
+    if (Number(url.searchParams.get("page") ?? 1) === state.changedPage)
+      result.identity.name = "Publicação alterada";
     await route
       .fulfill({
         json: state.corrupt

@@ -1,64 +1,182 @@
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { z } from "zod";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { publicDetailLink } from "../public-ui/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { z } from "zod";
 import { api, ApiFailure } from "../competition/api";
+import { publicResultSchema } from "../publication/pdf-contract";
+import { DataTable, type Column } from "../ui-system/components";
+import { loadPublicCareer } from "./public-loader";
 import {
-  playerProfilePageSchema,
-  type PlayerProfilePage,
-} from "./page-contract";
-import {
-  parseProfileQuery,
-  serializeProfileQuery,
-  PROFILE_SECTIONS,
-  type ProfileQuery,
-} from "./query-contract";
-import {
-  STATISTICS_METRICS,
-  type StatisticsMetric,
-} from "../statistics/metrics";
+  careerGroups,
+  careerStatistics,
+  chronologicalGames,
+  PROFILE_METRICS,
+  metricLabel,
+  type ProfileMetric,
+  type PublicCareer,
+} from "./public-model";
+import { STATISTICS_METRICS } from "../statistics/metrics";
+import type { ConfirmedPlayerGame } from "./participation-contract";
+
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const date = (s: string | null) =>
-  s ? s.split("-").reverse().join("/") : "Data não informada";
-const stamp = (s: string) =>
-  new Date(s).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-type Context = PlayerProfilePage["contexts"][number]["context"];
-const contextLabel = (c: Context) =>
-  `${c.name} · ${c.year} · ${c.gender} · ${c.category}${c.division ? ` · ${c.division}` : ""}`;
+const date = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(
+        new Date(`${value}T12:00:00Z`),
+      )
+    : "Data não informada";
+const sections = [
+  ["resumo", "Resumo"],
+  ["conquistas", "Conquistas e honrarias"],
+  ["estatisticas", "Estatísticas"],
+  ["jogos", "Jogos"],
+  ["historico", "Histórico"],
+  ["evolucao", "Evolução"],
+] as const;
+const extras = ["jogos", "historico", "evolucao"];
+type View = {
+  year: string;
+  championship: string;
+  teams: string[] | null;
+  mode: "per-game" | "total";
+  scope: string;
+  columns: ProfileMetric[];
+  panels: string[];
+  page: number;
+  statsPage: number;
+  sort: string;
+  direction: "asc" | "desc";
+  section: string;
+};
 function readLocation() {
-  const [id = "", search = ""] = window.location.hash.slice(1).split("?", 2);
-  try {
-    return {
-      id: z.uuid().parse(id).toLowerCase(),
-      query: parseProfileQuery(new URLSearchParams(search)),
-    };
-  } catch {
-    return { id: null, query: parseProfileQuery(new URLSearchParams()) };
-  }
-}
-function Metadata({
-  metadata: m,
-}: {
-  metadata: PlayerProfilePage["identity"]["metadata"];
-}) {
-  if (!m) return <p>Campos opcionais do perfil ainda não foram publicados.</p>;
-  const values: [string, string | number | null][] = [
-    ["Apelido", m.nickname],
-    ["Ano de nascimento", m.publicBirthYear],
-    ["Altura", m.heightCm === null ? null : `${m.heightCm} cm`],
-    ["Peso", m.weightKg === null ? null : `${number.format(m.weightKg)} kg`],
-    ["Posição", m.position],
-    [
-      "Mão dominante",
-      m.dominantHand
-        ? { left: "Esquerda", right: "Direita", both: "Ambidestra" }[
-            m.dominantHand
-          ]
-        : null,
-    ],
-    ["Cidade de origem", m.originCity],
-    ["Estado de origem", m.originState],
+  const [id = "", search = ""] = window.location.hash.slice(1).split("?", 2),
+    p = new URLSearchParams(search);
+  const section = sections.some(([key]) => key === p.get("secao"))
+    ? p.get("secao")!
+    : "resumo";
+  const panels = [
+    ...new Set(
+      (p.get("paineisPerfil") ?? "")
+        .split(",")
+        .filter((key) => extras.includes(key)),
+    ),
   ];
+  if (extras.includes(section) && !p.has("paineisPerfil")) panels.push(section);
+  return {
+    id: z.uuid().safeParse(id).success ? id.toLowerCase() : null,
+    origin: z.uuid().safeParse(p.get("disputeId")).success
+      ? p.get("disputeId")
+      : null,
+    view: {
+      year: p.get("anoPerfil") ?? "",
+      championship: p.get("campeonatoPerfil") ?? "",
+      teams: p.has("equipesPerfil")
+        ? p.get("equipesPerfil")!.split(",").filter(Boolean)
+        : null,
+      mode: p.get("mode") === "total" ? "total" : "per-game",
+      scope: ["regular", "playoffs"].includes(p.get("scope") ?? "")
+        ? p.get("scope")!
+        : "all",
+      columns: p.has("colunasPerfil")
+        ? PROFILE_METRICS.filter((m) =>
+            p.get("colunasPerfil")!.split(",").includes(m),
+          )
+        : matchMedia("(max-width: 600px)").matches
+          ? ["points"]
+          : [...PROFILE_METRICS],
+      panels,
+      page: Math.max(1, Math.min(500, Math.floor(Number(p.get("page")) || 1))),
+      statsPage: Math.max(
+        1,
+        Math.min(500, Math.floor(Number(p.get("paginaCampeonatos")) || 1)),
+      ),
+      sort: [
+        "competition",
+        "team",
+        "jersey",
+        "games",
+        ...PROFILE_METRICS,
+      ].includes(p.get("ordemPerfil") ?? "")
+        ? p.get("ordemPerfil")!
+        : "year",
+      direction: p.get("direcaoPerfil") === "asc" ? "asc" : "desc",
+      section,
+    } as View,
+  };
+}
+function query(view: View, origin: string | null) {
+  const p = new URLSearchParams({ secao: view.section, mode: view.mode });
+  if (origin) p.set("disputeId", origin);
+  if (view.year) p.set("anoPerfil", view.year);
+  if (view.championship) p.set("campeonatoPerfil", view.championship);
+  if (view.teams !== null) p.set("equipesPerfil", view.teams.join(","));
+  if (view.scope !== "all") p.set("scope", view.scope);
+  p.set("colunasPerfil", view.columns.join(","));
+  p.set("paineisPerfil", view.panels.join(","));
+  if (view.page > 1) p.set("page", String(view.page));
+  if (view.statsPage > 1) p.set("paginaCampeonatos", String(view.statsPage));
+  if (view.sort !== "year") p.set("ordemPerfil", view.sort);
+  p.set("direcaoPerfil", view.direction);
+  return p.toString();
+}
+function Cell({
+  summary,
+  metric,
+}: {
+  summary: ReturnType<typeof careerStatistics>;
+  metric: ProfileMetric;
+}) {
+  const cell = summary?.metrics[metric];
+  return cell?.status === "available" ? (
+    number.format(cell.value)
+  ) : (
+    <span title="Informação indisponível ou cobertura incompleta">—</span>
+  );
+}
+function Metrics({
+  games,
+  id,
+  mode,
+  columns,
+}: {
+  games: ConfirmedPlayerGame[];
+  id: string;
+  mode: View["mode"];
+  columns: ProfileMetric[];
+}) {
+  const summary = careerStatistics(games, id, mode);
+  return (
+    <>
+      {columns.map((metric) => (
+        <td key={metric} className="player-numeric">
+          <Cell summary={summary} metric={metric} />
+        </td>
+      ))}
+    </>
+  );
+}
+function Metadata({ career }: { career: PublicCareer }) {
+  const m = career.page.identity.metadata;
+  const values: [string, ReactNode][] = m
+    ? [
+        ["Posição", m.position],
+        ["Ano de nascimento", m.publicBirthYear],
+        ["Altura", m.heightCm === null ? null : `${m.heightCm} cm`],
+        [
+          "Peso",
+          m.weightKg === null ? null : `${number.format(m.weightKg)} kg`,
+        ],
+        [
+          "Mão dominante",
+          m.dominantHand
+            ? { left: "Esquerda", right: "Direita", both: "Ambidestra" }[
+                m.dominantHand
+              ]
+            : null,
+        ],
+        ["Origem", [m.originCity, m.originState].filter(Boolean).join(" · ")],
+      ]
+    : [];
   return (
     <>
       <dl className="player-metadata">
@@ -66,506 +184,520 @@ function Metadata({
           .filter(([, v]) => v !== null && v !== "")
           .map(([k, v]) => (
             <div key={k}>
-              <dt>{k}</dt>
+              <dt>{k}:</dt>
               <dd>{v}</dd>
             </div>
           ))}
       </dl>
-      {m.biography && <p className="player-biography">{m.biography}</p>}
+      {m?.biography && <p className="player-biography">{m.biography}</p>}
     </>
   );
 }
-function Statistics({ data: d }: { data: PlayerProfilePage }) {
-  const s = d.statistics,
-    summary = s.summary;
-  if (!summary)
-    return (
-      <p className="statistics-empty">
-        {s.status === "mixed-minimums"
-          ? "Este recorte reúne mínimos de tempo diferentes. Selecione uma disputa para consultar por 30 minutos."
-          : "Nenhum jogo disputado com dados confirmados neste recorte."}
-      </p>
-    );
+function Honors({ career }: { career: PublicCareer }) {
+  const d = career.page;
   return (
-    <>
-      <p>
-        {summary.gamesPlayed} jogos disputados · {s.relatedGames} participações
-        relacionadas.
-      </p>
-      <p>
-        PTS oficiais e pontos avançados preservam fontes e coberturas próprias.
-        — indica dado não informado; - indica amostra temporal insuficiente.
-      </p>
-      <p>
-        Cobertura: {summary.coverage.scoringGames} jogos com pontos oficiais;{" "}
-        {summary.coverage.advancedGames} com estatísticas avançadas;{" "}
-        {summary.coverage.foulGames} com faltas cometidas;{" "}
-        {summary.coverage.foulsReceivedGames} com faltas recebidas;{" "}
-        {summary.coverage.plusMinusGames} com saldo;{" "}
-        {summary.coverage.disciplineGames} com disciplina.
-      </p>
-      {d.query.mode === "per-30" && (
-        <p>
-          Mínimo temporal desta fonte: {s.minimumSeconds} segundos. Minutos não
-          são normalizados por 30.
-        </p>
+    <aside className="player-honors" aria-labelledby="conquistas">
+      <h2 id="conquistas" tabIndex={-1}>
+        Conquistas e honrarias
+      </h2>
+      {!d.honors.length && !d.teamPlacements.length ? (
+        <p>Nenhuma conquista publicada.</p>
+      ) : (
+        <>
+          {!!d.honors.length && (
+            <>
+              <h3>Honrarias individuais</h3>
+              <ul>
+                {d.honors.map((h) => (
+                  <li key={`${h.disputeId}/${h.honor.id}`}>
+                    <strong>{h.honor.title}</strong>
+                    <small>
+                      {h.context.name} · {h.context.year} · {h.context.gender} ·{" "}
+                      {h.context.category}
+                      {h.context.division ? ` · ${h.context.division}` : ""}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {!!d.teamPlacements.length && (
+            <>
+              <h3>Colocações das equipes</h3>
+              <ul>
+                {d.teamPlacements.map((h) => (
+                  <li key={`${h.disputeId}/${h.registration.registrationId}`}>
+                    <strong>
+                      {h.position}º lugar · {h.registration.name}
+                    </strong>
+                    <small>
+                      {h.context.name} · {h.context.year} · {h.context.gender} ·{" "}
+                      {h.context.category}
+                      {h.context.division ? ` · ${h.context.division}` : ""}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+              <p className="player-note">
+                Colocação coletiva; não representa premiação individual do
+                atleta.
+              </p>
+            </>
+          )}
+        </>
       )}
-      <div
-        className="statistics-scroll"
-        role="region"
-        aria-label="Tabela de estatísticas da carreira"
-        tabIndex={0}
-      >
-        <table>
-          <caption>Estatísticas da carreira</caption>
-          <thead>
-            <tr>
-              <th scope="col">Métrica</th>
-              <th scope="col">Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(Object.keys(STATISTICS_METRICS) as StatisticsMetric[])
-              .filter((k) => d.query.mode !== "per-30" || k !== "minutes")
-              .map((k) => {
-                const c = summary.metrics[k],
-                  m = STATISTICS_METRICS[k];
-                return (
-                  <tr key={k}>
-                    <th scope="row">
-                      {m.label} <small>{m.name}</small>
-                    </th>
-                    <td>
-                      {c.status === "available" ? (
-                        number.format(c.value)
-                      ) : (
-                        <span
-                          title={
-                            c.status === "insufficient-sample"
-                              ? "Amostra temporal insuficiente"
-                              : "Não informado para este cálculo"
-                          }
-                        >
-                          {c.status === "insufficient-sample" ? "-" : "—"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      </div>
-    </>
+    </aside>
   );
 }
-function Pager({
-  kind,
-  page,
-  totalPages,
-  total,
-  onChange,
-}: {
-  kind: "jogos" | "inscrições";
-  page: number;
-  totalPages: number;
-  total: number;
-  onChange: (n: number) => void;
-}) {
+function Table({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <nav className="statistics-actions" aria-label={`Paginação de ${kind}`}>
-      <button
-        type="button"
-        disabled={page === 1}
-        onClick={() => onChange(page - 1)}
-        aria-label={`Página anterior de ${kind}`}
-      >
-        Anterior
-      </button>
-      <span>
-        Página {page} de {totalPages} · {total} {kind}
-      </span>
-      <button
-        type="button"
-        disabled={page === totalPages}
-        onClick={() => onChange(page + 1)}
-        aria-label={`Próxima página de ${kind}`}
-      >
-        Próxima
-      </button>
-    </nav>
+    <div
+      className="player-scroll"
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+    >
+      <table>
+        <caption className="player-sr-only">{label}</caption>
+        {children}
+      </table>
+    </div>
   );
 }
 function Games({
-  data: d,
-  onPage,
+  games,
+  recent = false,
 }: {
-  data: PlayerProfilePage;
-  onPage: (n: number) => void;
+  games: ConfirmedPlayerGame[];
+  recent?: boolean;
 }) {
-  if (!d.games.total)
-    return <p>Ainda não há jogos confirmados neste recorte.</p>;
+  const [scores, setScores] = useState<Record<string, string>>({});
+  const ids = games.map((g) => g.fact.gameId).join(",");
+  useEffect(() => {
+    const controller = new AbortController();
+    setScores({});
+    // Fetch only visible rows. A corrected result is not paired with an older participation.
+    let cursor = 0;
+    async function read() {
+      while (cursor < games.length && !controller.signal.aborted) {
+        const g = games[cursor++];
+        try {
+          const result = await api(
+            `/api/public/games/${g.fact.gameId}`,
+            publicResultSchema,
+            undefined,
+            controller.signal,
+          );
+          if (controller.signal.aborted) return;
+          if (
+            result.id === g.fact.gameId &&
+            result.disputeId === g.fact.disputeId &&
+            result.version === g.fact.publicationVersion &&
+            result.publishedAt === g.fact.publishedAt
+          )
+            setScores((s) => ({
+              ...s,
+              [g.fact.gameId]:
+                `${result.facts.teams.home.points} × ${result.facts.teams.away.points}`,
+            }));
+        } catch {
+          /* Keep unavailable separate from a zero score. */
+        }
+      }
+    }
+    void Promise.all([read(), read(), read()]);
+    return () => controller.abort();
+    // The validated career is immutable for a visit; row IDs determine this read.
+  }, [ids]);
+  const columns: Column<ConfirmedPlayerGame>[] = [
+    { key: "date", label: "Data", render: (g) => date(g.game.date) },
+    {
+      key: "game",
+      label: "Confronto",
+      primary: true,
+      render: (g) => (
+        <>
+          <a
+            href={publicDetailLink(
+              `/resultado.html#${g.fact.gameId}`,
+              g.fact.disputeId,
+            )}
+          >
+            {g.game.home.name} × {g.game.away.name}
+          </a>
+          <small>
+            {recent && (
+              <span className="player-recent-date">{date(g.game.date)} · </span>
+            )}
+            {g.fact.context.name} · {g.fact.context.year} ·{" "}
+            {g.fact.context.category}
+          </small>
+        </>
+      ),
+    },
+    {
+      key: "score",
+      label: "Placar",
+      numeric: true,
+      render: (g) => (
+        <span
+          title={
+            scores[g.fact.gameId]
+              ? "Placar final"
+              : "Placar indisponível nesta leitura; consulte a súmula"
+          }
+        >
+          {scores[g.fact.gameId] ?? "—"}
+        </span>
+      ),
+    },
+    {
+      key: "points",
+      label: "PTS",
+      numeric: true,
+      description: "Pontos do jogador",
+      render: (g) => (g.fact.played ? (g.fact.scoring?.points ?? "—") : "—"),
+    },
+  ];
+  if (!recent)
+    columns.push({
+      key: "played",
+      label: "Participação",
+      render: (g) => (
+        <>
+          {!g.fact.played
+            ? "Não participou"
+            : g.fact.starter
+              ? "Titular"
+              : "Participou"}
+          {g.fact.captain ? " · CAP" : ""}
+          <small>
+            {g.fact.registration.name} · Camisa {g.fact.jersey}
+          </small>
+        </>
+      ),
+    });
   return (
-    <>
-      <p>
-        Ordem da confirmação mais recente. Datas e horários permanecem como
-        publicados. O resultado vinculado abre sua versão atual.
-      </p>
-      <div
-        className="statistics-scroll"
-        role="region"
-        aria-label="Tabela de jogos confirmados"
-        tabIndex={0}
-      >
-        <table>
-          <caption>Jogos confirmados</caption>
-          <thead>
-            <tr>
-              {[
-                "Jogo",
-                "Contexto",
-                "Inscrição e camisa",
-                "Nome da ocasião",
-                "Participação",
-                "PTS oficiais",
-                "Fontes",
-              ].map((t) => (
-                <th scope="col" key={t}>
-                  {t}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {d.games.items.map((p) => (
-              <tr key={p.fact.gameId}>
-                <th scope="row">
-                  <a
-                    href={publicDetailLink(
-                      `/resultado.html#${p.fact.gameId}`,
-                      p.fact.disputeId,
-                    )}
-                  >
-                    {p.game.home.name} × {p.game.away.name}
-                  </a>
-                  <small>
-                    {date(p.game.date)}
-                    {p.game.time ? ` · ${p.game.time}` : ""}
-                    {p.game.venue ? ` · ${p.game.venue}` : ""}
-                  </small>
-                </th>
-                <td>{contextLabel(p.fact.context)}</td>
-                <td>
-                  <a
-                    href={publicDetailLink(
-                      `/equipe.html#${p.fact.registration.team.id}?disputeId=${p.fact.disputeId}&registrationId=${p.fact.registration.registrationId}`,
-                      p.fact.disputeId,
-                    )}
-                  >
-                    {p.fact.registration.name}
-                  </a>{" "}
-                  · #{p.fact.jersey}
-                  <small>{p.fact.registration.team.name}</small>
-                </td>
-                <td>{p.fact.person.name}</td>
-                <td>
-                  {!p.fact.played
-                    ? "Não participou"
-                    : p.fact.starter
-                      ? "Titular"
-                      : "Participou"}
-                  {p.fact.captain ? " · Capitão" : ""}
-                </td>
-                <td>{p.fact.scoring?.points ?? "—"}</td>
-                <td>
-                  <details>
-                    <summary>Ver fontes</summary>
-                    <p>
-                      Resultado v{p.fact.publicationVersion} ·{" "}
-                      {stamp(p.fact.publishedAt)}
-                    </p>
-                    <p>
-                      PTS:{" "}
-                      {p.fact.scoring?.origin.kind === "pdf"
-                        ? "PDF"
-                        : p.fact.scoring
-                          ? "Súmula manual"
-                          : "Não informado"}
-                      {p.fact.scoring
-                        ? ` v${p.fact.scoring.origin.version}`
-                        : ""}
-                    </p>
-                    <p>
-                      Avançados:{" "}
-                      {p.fact.advanced
-                        ? `PDF v${p.fact.advanced.origin.version}`
-                        : "Não informados"}
-                    </p>
-                    <p>
-                      Fase:{" "}
-                      {p.fact.phase === "round_robin"
-                        ? "Regular"
-                        : p.fact.phase === "knockout"
-                          ? "Eliminatória"
-                          : "Não confirmada"}
-                    </p>
-                  </details>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <Pager kind="jogos" {...d.games} onChange={onPage} />
-    </>
+    <DataTable
+      label={recent ? "Três últimos jogos" : "Jogos confirmados"}
+      columns={columns}
+      rows={games}
+      rowId={(g) => g.fact.gameId}
+      empty="Ainda não há jogos confirmados neste recorte."
+    />
   );
 }
-function Honors({ data: d }: { data: PlayerProfilePage }) {
-  return (
-    <>
-      <h3>Honrarias individuais</h3>
-      {!d.honors.length ? (
-        <p>Nenhuma honraria individual confirmada neste recorte.</p>
-      ) : (
-        <ul className="player-awards">
-          {d.honors.map((h) => (
-            <li key={h.disputeId + "/" + h.honor.id}>
-              <strong>{h.honor.title}</strong>
-              <p>{contextLabel(h.context)}</p>
-              <p>
-                Destinatário publicado: {h.recipient.name} · confirmação v
-                {h.version} em {stamp(h.confirmedAt)}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-      <h3>Colocações das equipes na ocasião</h3>
-      <p>
-        A participação contextual não atribui premiação individual nem
-        elegibilidade automática a medalha.
-      </p>
-      {!d.teamPlacements.length ? (
-        <p>Nenhuma colocação de equipe comprovada neste recorte.</p>
-      ) : (
-        <ul className="player-awards">
-          {d.teamPlacements.map((p) => (
-            <li key={p.disputeId + "/" + p.registration.registrationId}>
-              <strong>
-                {p.position}º lugar · {p.registration.name}
-              </strong>
-              <p>{contextLabel(p.context)}</p>
-              <p>
-                Confirmação v{p.version} em {stamp(p.confirmedAt)}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  );
-}
-function History({
-  data: d,
-  onPage,
+function CheckOptions({
+  label,
+  options,
+  selected,
+  onChange,
 }: {
-  data: PlayerProfilePage;
-  onPage: (n: number) => void;
+  label: string;
+  options: { id: string; name: string }[];
+  selected: string[];
+  onChange: (ids: string[]) => void;
 }) {
-  if (!d.historyPagination.total)
-    return (
-      <p>
-        Nenhuma inscrição comprovada por participação publicada neste recorte.
-      </p>
-    );
   return (
-    <>
-      <p>
-        Trajetória nas participações confirmadas, sem inferir equipe atual ou
-        datas de início e fim de vínculo. Datas abaixo são de jogos conhecidos.
-        O escopo de fase filtra jogos e estatísticas; este histórico reúne as
-        inscrições do recorte.
-      </p>
-      <div
-        className="statistics-scroll"
-        role="region"
-        aria-label="Tabela de histórico do atleta"
-        tabIndex={0}
-      >
-        <table>
-          <caption>Inscrições em participações confirmadas</caption>
-          <thead>
-            <tr>
-              {[
-                "Contexto",
-                "Equipe e inscrição",
-                "Nomes da ocasião",
-                "Camisas",
-                "Participações",
-                "Datas de jogos",
-              ].map((t) => (
-                <th key={t} scope="col">
-                  {t}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {d.history.map((h) => (
-              <tr key={h.disputeId + "/" + h.registration.registrationId}>
-                <th scope="row">{contextLabel(h.context)}</th>
-                <td>
-                  {h.teamNames.join(" / ")}
-                  <small>
-                    <a
-                      href={`/equipe.html#${h.registration.team.id}?disputeId=${h.disputeId}&registrationId=${h.registration.registrationId}`}
-                    >
-                      {h.registrationNames.join(" / ")}
-                    </a>
-                  </small>
-                </td>
-                <td>{h.names.join(" / ")}</td>
-                <td>{h.jerseys.join(" / ")}</td>
-                <td>
-                  {h.playedGames} disputados · {h.relatedGames} relacionados
-                </td>
-                <td>
-                  {h.firstGameDate
-                    ? `${date(h.firstGameDate)} a ${date(h.lastGameDate)}`
-                    : "Datas não informadas"}
-                  {h.unknownDates && h.firstGameDate && (
-                    <small>Há outros jogos sem data informada.</small>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <Pager kind="inscrições" {...d.historyPagination} onChange={onPage} />
-    </>
+    <details
+      className="player-options"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.currentTarget.open = false;
+          e.currentTarget.querySelector("summary")?.focus();
+        }
+      }}
+    >
+      <summary>
+        {label} <span>{selected.length}</span>
+      </summary>
+      <fieldset>
+        <legend className="player-sr-only">{label}</legend>
+        <div className="player-option-actions">
+          <button
+            type="button"
+            onClick={() => onChange(options.map((o) => o.id))}
+          >
+            Todas
+          </button>
+          <button type="button" onClick={() => onChange([])}>
+            Nenhuma
+          </button>
+        </div>
+        {options.map((o) => (
+          <label key={o.id}>
+            <input
+              type="checkbox"
+              name={label}
+              value={o.id}
+              checked={selected.includes(o.id)}
+              onChange={(e) =>
+                onChange(
+                  e.target.checked
+                    ? [...selected, o.id]
+                    : selected.filter((id) => id !== o.id),
+                )
+              }
+            />
+            {o.name}
+          </label>
+        ))}
+      </fieldset>
+    </details>
   );
 }
 export function PlayerPublicPage() {
   const [route, setRoute] = useState(readLocation),
-    [result, setResult] = useState<{
-      key: string;
-      data: PlayerProfilePage;
-    } | null>(null),
+    [career, setCareer] = useState<PublicCareer | null>(null),
     [error, setError] = useState(""),
-    [loading, setLoading] = useState(true),
     [retry, setRetry] = useState(0);
-  const heading = useRef<HTMLHeadingElement>(null),
-    alert = useRef<HTMLDivElement>(null),
-    focus = useRef(false);
-  const serialized = serializeProfileQuery(route.query),
-    key = `${route.id}?${serialized}`;
-  const data = result?.key === key ? result.data : null;
-  const controls = result?.data.personId === route.id ? result.data : null;
-  const q = data?.query ?? route.query;
+  const restored = useRef(false);
+  const alert = useRef<HTMLDivElement>(null);
+  const { id, origin, view } = route;
   useEffect(() => {
-    const read = () => {
-      focus.current = true;
-      setLoading(true);
-      setError("");
-      setRoute(readLocation());
-    };
+    const read = () => setRoute(readLocation());
     window.addEventListener("hashchange", read);
-    return () => window.removeEventListener("hashchange", read);
+    window.addEventListener("popstate", read);
+    return () => {
+      window.removeEventListener("hashchange", read);
+      window.removeEventListener("popstate", read);
+    };
   }, []);
   useEffect(() => {
-    if (!route.id) {
-      setLoading(false);
+    setCareer(null);
+    setError("");
+    restored.current = false;
+    if (!id) {
+      setError("Abra o perfil a partir de um atleta identificado.");
       return;
     }
     const controller = new AbortController();
-    setError("");
-    setLoading(true);
-    void api(
-      `/api/public/players/${route.id}?${serialized}`,
-      playerProfilePageSchema,
-      undefined,
-      controller.signal,
-    )
+    void loadPublicCareer(id, controller.signal)
       .then((next) => {
-        if (controller.signal.aborted) return;
-        const requested = parseProfileQuery(new URLSearchParams(serialized));
-        if (
-          next.personId !== route.id ||
-          serializeProfileQuery({
-            ...next.query,
-            page: requested.page,
-            historyPage: requested.historyPage,
-          }) !== serialized ||
-          next.query.page > requested.page ||
-          next.query.historyPage > requested.historyPage
-        )
-          throw new ApiFailure(
-            503,
-            "A resposta não corresponde à consulta. Tente novamente.",
-          );
-        setResult({ key, data: next });
-        window.history.replaceState(
-          null,
-          "",
-          `#${route.id}?${serializeProfileQuery(next.query)}`,
-        );
+        if (!controller.signal.aborted) setCareer(next);
       })
       .catch((e: unknown) => {
-        if (!controller.signal.aborted) {
-          setResult(null);
+        if (!controller.signal.aborted)
           setError(
             e instanceof ApiFailure
               ? e.message
               : "Não foi possível consultar o perfil. Tente novamente.",
           );
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [route.id, serialized, key, retry]);
-  useLayoutEffect(() => {
-    const target = error ? alert.current : data ? heading.current : null;
-    if (!loading && focus.current && target) {
-      focus.current = false;
-      target.focus();
+  }, [id, retry]);
+  const ready = career?.page.personId === id ? career : null;
+  useEffect(() => {
+    if (error) alert.current?.focus();
+  }, [error]);
+  useEffect(() => {
+    const save = () => {
+      try {
+        sessionStorage.setItem(
+          `player-scroll:${location.pathname}${location.hash}`,
+          String(window.scrollY),
+        );
+      } catch {
+        /* Browsing without storage remains usable. */
+      }
+    };
+    window.addEventListener("pagehide", save);
+    return () => window.removeEventListener("pagehide", save);
+  }, []);
+  useEffect(() => {
+    if (!ready || restored.current) return;
+    restored.current = true;
+    let saved: string | null = null;
+    try {
+      saved = sessionStorage.getItem(
+        `player-scroll:${location.pathname}${location.hash}`,
+      );
+    } catch {
+      /* Optional restoration. */
     }
-  }, [data, loading, error]);
-  const href = (next: ProfileQuery) =>
-    `#${route.id}?${serializeProfileQuery(next)}`;
-  function navigate(patch: Partial<ProfileQuery>) {
-    focus.current = true;
-    const hash = href({ ...q, ...patch });
-    if (window.location.hash === hash) setRetry((v) => v + 1);
-    else window.location.hash = hash;
-  }
-  function filter(patch: Partial<ProfileQuery>) {
-    navigate({ ...patch, page: 1, historyPage: 1 });
-  }
-  const contexts = controls?.contexts ?? [],
-    championships = [
-      ...new Map(
-        contexts.map((r) => [r.context.championshipId, r.context]),
-      ).values(),
-    ],
-    seasons = [
-      ...new Map(
-        contexts
-          .filter(
-            (r) =>
-              !q.championshipId ||
-              r.context.championshipId === q.championshipId,
-          )
-          .map((r) => [r.context.seasonId, r.context]),
-      ).values(),
-    ],
-    disputes = contexts.filter(
-      (r) =>
-        (!q.championshipId || r.context.championshipId === q.championshipId) &&
-        (!q.seasonId || r.context.seasonId === q.seasonId),
+    const frame = requestAnimationFrame(() => {
+      if (saved !== null && Number.isFinite(Number(saved)))
+        window.scrollTo(0, Number(saved));
+      else if (view.section !== "resumo") {
+        const el = document.getElementById(view.section);
+        el?.focus({ preventScroll: true });
+        el?.scrollIntoView();
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [ready, view.section]);
+  function update(patch: Partial<View>, jump = false) {
+    const affectsRows = [
+      "year",
+      "championship",
+      "teams",
+      "scope",
+      "sort",
+      "direction",
+    ].some((k) => k in patch);
+    const next = {
+      ...view,
+      ...(affectsRows ? { statsPage: 1 } : {}),
+      ...patch,
+    };
+    window.history[jump ? "pushState" : "replaceState"](
+      window.history.state,
+      "",
+      `#${id}?${query(next, origin)}`,
     );
+    setRoute({ ...route, view: next });
+    if (jump)
+      requestAnimationFrame(() => {
+        const el = document.getElementById(next.section);
+        el?.focus({ preventScroll: true });
+        el?.scrollIntoView();
+      });
+  }
+  const groups = ready ? careerGroups(ready) : [];
+  const teams = [
+    ...new Map(
+      groups.map((g) => [
+        g.history.registration.team.id,
+        {
+          id: g.history.registration.team.id,
+          name: g.history.teamNames.join(" / "),
+        },
+      ]),
+    ).values(),
+  ];
+  const selected = view.teams ?? teams.map((t) => t.id);
+  const years = [...new Set(groups.map((g) => g.history.context.year))].sort(
+    (a, b) => b - a,
+  );
+  const championships = [
+    ...new Map(
+      groups.map((g) => [
+        g.history.context.championshipId,
+        { id: g.history.context.championshipId, name: g.history.context.name },
+      ]),
+    ).values(),
+  ];
+  const inPhase = (g: ConfirmedPlayerGame) =>
+    view.scope === "all" ||
+    g.fact.phase === (view.scope === "regular" ? "round_robin" : "knockout");
+  const filtered = groups
+    .filter(
+      (g) =>
+        (!view.year || String(g.history.context.year) === view.year) &&
+        (!view.championship ||
+          g.history.context.championshipId === view.championship) &&
+        selected.includes(g.history.registration.team.id),
+    )
+    .map((g) => ({ ...g, games: g.games.filter(inPhase) }));
+  const filteredGames = chronologicalGames(filtered.flatMap((g) => g.games));
+  const summaries = new Map(
+    filtered.map((g) => [g.key, careerStatistics(g.games, id!, view.mode)]),
+  );
+  const ordered = [...filtered].sort((a, b) => {
+    const value = (g: typeof a): string | number | null => {
+      if (view.sort === "competition")
+        return `${g.history.context.name} ${g.history.context.year} ${g.history.context.category}`;
+      if (view.sort === "team") return g.history.registrationNames.join(" / ");
+      if (view.sort === "jersey") return g.history.jerseys.join(" / ");
+      if (view.sort === "games")
+        return g.games.filter((p) => p.fact.played).length;
+      if (view.sort === "year") return g.history.context.year;
+      return (
+        summaries.get(g.key)?.metrics[view.sort as ProfileMetric]?.value ?? null
+      );
+    };
+    const av = value(a),
+      bv = value(b);
+    if (av === null || bv === null)
+      return av === bv ? a.key.localeCompare(b.key) : av === null ? 1 : -1;
+    const diff =
+      typeof av === "number" && typeof bv === "number"
+        ? av - bv
+        : String(av).localeCompare(String(bv), "pt-BR", {
+            numeric: true,
+            sensitivity: "base",
+          });
+    return (
+      (view.direction === "asc" ? diff : -diff) || a.key.localeCompare(b.key)
+    );
+  });
+  const statsPage = Math.min(
+    view.statsPage,
+    Math.max(1, Math.ceil(ordered.length / 20)),
+  );
+  const latest = years[0];
+  const summaryRows = [
+    {
+      label: latest ? String(latest) : "Temporada mais recente",
+      games: ready?.games.filter((g) => g.fact.context.year === latest) ?? [],
+    },
+    { label: "Carreira", games: ready?.games ?? [] },
+  ];
+  const statsColumns: Column<(typeof groups)[number]>[] = [
+    {
+      key: "competition",
+      label: "Campeonato",
+      primary: true,
+      render: (g) => (
+        <>
+          {g.history.context.name}
+          <small>
+            {g.history.context.year} · {g.history.context.gender} ·{" "}
+            {g.history.context.category}
+            {g.history.context.division
+              ? ` · ${g.history.context.division}`
+              : ""}
+            <span className="player-mobile-id">
+              <br />
+              {g.history.registrationNames.join(" / ")} · Camisa{" "}
+              {g.history.jerseys.join(" / ")}
+            </span>
+          </small>
+        </>
+      ),
+    },
+    {
+      key: "team",
+      label: "Equipe",
+      render: (g) => (
+        <span className="player-team-cell">
+          <a
+            href={publicDetailLink(
+              `/equipe.html#${g.history.registration.team.id}?registrationId=${g.history.registration.registrationId}`,
+              g.history.disputeId,
+            )}
+          >
+            {g.history.registrationNames.join(" / ")}
+          </a>
+        </span>
+      ),
+    },
+    {
+      key: "jersey",
+      label: "Camisa",
+      render: (g) => g.history.jerseys.join(" / "),
+    },
+    {
+      key: "games",
+      label: "J",
+      numeric: true,
+      description: "Participações confirmadas em quadra",
+      render: (g) => g.games.filter((p) => p.fact.played).length,
+    },
+    ...view.columns.map((metric) => ({
+      key: metric,
+      label: metricLabel(metric),
+      numeric: true,
+      description: STATISTICS_METRICS[metric].name,
+      render: (g: (typeof groups)[number]) => (
+        <Cell summary={summaries.get(g.key) ?? null} metric={metric} />
+      ),
+    })),
+  ];
+  const page = Math.min(
+    view.page,
+    Math.max(1, Math.ceil(filteredGames.length / 20)),
+  );
   return (
     <>
       <a
@@ -579,255 +711,468 @@ export function PlayerPublicPage() {
         Pular para o perfil
       </a>
       <PublicHeader
-        disputeId={q.disputeId}
+        disputeId={origin}
         section="jogadores"
-        detail={data?.identity.name ?? "Perfil do atleta"}
+        detail={ready?.page.identity.name ?? "Perfil do atleta"}
       />
       <main
         id="player-content"
         tabIndex={-1}
-        className="access-main statistics-page player-page"
+        className="access-main player-page bb-ui"
       >
-        <h1>{data?.identity.name ?? "Perfil do atleta"}</h1>
-        {!route.id ? (
-          <p role="alert">Abra o perfil a partir de um atleta identificado.</p>
+        {error ? (
+          <div className="access-error" role="alert" ref={alert} tabIndex={-1}>
+            <h1>Perfil do atleta</h1>
+            <p>{error}</p>
+            {id && (
+              <button onClick={() => setRetry((n) => n + 1)}>
+                Tentar novamente
+              </button>
+            )}
+          </div>
+        ) : !ready ? (
+          <>
+            <h1>Perfil do atleta</h1>
+            <p role="status">Consultando perfil e participações publicadas…</p>
+          </>
         ) : (
           <>
+            <div
+              className={`player-overview ${ready.page.honors.length || ready.page.teamPlacements.length ? "player-with-honors" : ""}`}
+            >
+              <header className="player-identity">
+                <h1>{ready.page.identity.name}</h1>
+                {ready.page.identity.nickname && (
+                  <p className="player-nickname">
+                    {ready.page.identity.nickname}
+                  </p>
+                )}
+                <Metadata career={ready} />
+              </header>
+              <Honors career={ready} />
+            </div>
+            <section className="player-summary" aria-labelledby="resumo">
+              <h2 id="resumo" tabIndex={-1}>
+                Resumo <small>Médias por jogo</small>
+              </h2>
+              <Table label="Resumo de temporada e carreira">
+                <thead>
+                  <tr>
+                    <th scope="col">Resumo</th>
+                    <th scope="col" className="player-numeric">
+                      <abbr title="Jogos com participação confirmada">J</abbr>
+                    </th>
+                    {PROFILE_METRICS.map((m) => (
+                      <th key={m} scope="col" className="player-numeric">
+                        <abbr title={STATISTICS_METRICS[m].name}>
+                          {metricLabel(m)}
+                        </abbr>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {summaryRows.map((row) => (
+                    <tr key={row.label}>
+                      <th scope="row">{row.label}</th>
+                      <td className="player-numeric">
+                        {row.games.filter((g) => g.fact.played).length}
+                      </td>
+                      <Metrics
+                        games={row.games}
+                        id={id!}
+                        mode="per-game"
+                        columns={[...PROFILE_METRICS]}
+                      />
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </section>
             <nav className="player-navigation" aria-label="Seções do perfil">
-              {PROFILE_SECTIONS.map((s) => (
+              {sections.map(([key, label]) => (
                 <a
-                  key={s.id}
-                  href={href({ ...q, section: s.id })}
-                  aria-current={q.section === s.id ? "page" : undefined}
+                  key={key}
+                  href={`#${id}?${query({ ...view, section: key, panels: extras.includes(key) ? [...new Set([...view.panels, key])] : view.panels }, origin)}`}
+                  onClick={(e) => {
+                    if (
+                      e.button ||
+                      e.ctrlKey ||
+                      e.metaKey ||
+                      e.shiftKey ||
+                      e.altKey
+                    )
+                      return;
+                    e.preventDefault();
+                    update(
+                      {
+                        section: key,
+                        panels: extras.includes(key)
+                          ? [...new Set([...view.panels, key])]
+                          : view.panels,
+                      },
+                      true,
+                    );
+                  }}
                 >
-                  {s.label}
+                  {label}
                 </a>
               ))}
             </nav>
-            {controls && (
-              <div className="statistics-controls">
-                <div className="statistics-fields">
-                  <label>
-                    Campeonato
-                    <select
-                      value={q.championshipId ?? ""}
-                      disabled={loading}
-                      onChange={(e) =>
-                        filter({
-                          championshipId: e.target.value || null,
-                          seasonId: null,
-                          disputeId: null,
-                        })
-                      }
-                    >
-                      <option value="">Toda a carreira</option>
-                      {q.championshipId &&
-                        !championships.some(
-                          (c) => c.championshipId === q.championshipId,
-                        ) && (
-                          <option value={q.championshipId}>
-                            Recorte sem dados
-                          </option>
-                        )}
-                      {championships.map((c) => (
-                        <option key={c.championshipId} value={c.championshipId}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    Temporada
-                    <select
-                      value={q.seasonId ?? ""}
-                      disabled={loading}
-                      onChange={(e) => {
-                        const c = seasons.find(
-                          (c) => c.seasonId === e.target.value,
-                        );
-                        filter({
-                          seasonId: e.target.value || null,
-                          championshipId: c?.championshipId ?? q.championshipId,
-                          disputeId: null,
-                        });
-                      }}
-                    >
-                      <option value="">Todas</option>
-                      {q.seasonId &&
-                        !seasons.some((c) => c.seasonId === q.seasonId) && (
-                          <option value={q.seasonId}>Recorte sem dados</option>
-                        )}
-                      {seasons.map((c) => (
-                        <option key={c.seasonId} value={c.seasonId}>
-                          {c.year} · {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    Disputa
-                    <select
-                      value={q.disputeId ?? ""}
-                      disabled={loading}
-                      onChange={(e) => {
-                        const c = contexts.find(
-                          (r) => r.disputeId === e.target.value,
-                        )?.context;
-                        filter({
-                          disputeId: e.target.value || null,
-                          seasonId: c?.seasonId ?? q.seasonId,
-                          championshipId: c?.championshipId ?? q.championshipId,
-                        });
-                      }}
-                    >
-                      <option value="">Todas</option>
-                      {q.disputeId &&
-                        !disputes.some((r) => r.disputeId === q.disputeId) && (
-                          <option value={q.disputeId}>Recorte sem dados</option>
-                        )}
-                      {disputes.map((r) => (
-                        <option key={r.disputeId} value={r.disputeId}>
-                          {contextLabel(r.context)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {(q.section === "estatisticas" ||
-                    q.section === "resumo" ||
-                    q.section === "jogos") && (
-                    <>
-                      <label>
-                        Modo
-                        <select
-                          value={q.mode}
-                          disabled={loading}
-                          onChange={(e) =>
-                            filter({
-                              mode: e.target.value as ProfileQuery["mode"],
-                            })
-                          }
-                        >
-                          <option value="per-game">Por jogo</option>
-                          <option value="total">Total</option>
-                          <option value="per-30">Por 30 minutos</option>
-                        </select>
-                      </label>
-                      <label>
-                        Escopo
-                        <select
-                          value={q.scope}
-                          disabled={loading}
-                          onChange={(e) =>
-                            filter({
-                              scope: e.target.value as ProfileQuery["scope"],
-                            })
-                          }
-                        >
-                          <option value="all">Todos</option>
-                          <option value="regular">Fase regular</option>
-                          <option value="playoffs">Eliminatórias</option>
-                        </select>
-                      </label>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-            {loading ? (
-              <p role="status">Consultando perfil confirmado…</p>
-            ) : error ? (
-              <div
-                ref={alert}
-                role="alert"
-                tabIndex={-1}
-                className="access-error"
-              >
-                <p>{error}</p>
-                <button
-                  onClick={() => {
-                    focus.current = true;
-                    setRetry((v) => v + 1);
+            <section className="player-recent" aria-labelledby="recentes">
+              <div className="player-section-title">
+                <h2 id="recentes">Três últimos jogos</h2>
+                <a
+                  href={`#${id}?${query({ ...view, section: "jogos", panels: [...new Set([...view.panels, "jogos"])] }, origin)}`}
+                  onClick={(e) => {
+                    if (
+                      e.button ||
+                      e.ctrlKey ||
+                      e.metaKey ||
+                      e.shiftKey ||
+                      e.altKey
+                    )
+                      return;
+                    e.preventDefault();
+                    update(
+                      {
+                        section: "jogos",
+                        page: 1,
+                        panels: [...new Set([...view.panels, "jogos"])],
+                      },
+                      true,
+                    );
                   }}
                 >
-                  Tentar novamente
-                </button>
+                  Ver todos os jogos
+                </a>
               </div>
-            ) : (
-              data && (
-                <>
-                  <p className="player-provenance">
-                    Identidade:{" "}
-                    {data.identity.origin.kind === "profile"
-                      ? "perfil confirmado"
-                      : data.identity.origin.kind === "game"
-                        ? "ocasião de jogo publicado"
-                        : "honraria confirmada"}{" "}
-                    · v{data.identity.origin.version} ·{" "}
-                    {stamp(data.identity.origin.publishedAt)}.
-                  </p>
-                  <section aria-labelledby="player-section">
-                    <h2 id="player-section" ref={heading} tabIndex={-1}>
-                      {PROFILE_SECTIONS.find((s) => s.id === q.section)?.label}
-                    </h2>
-                    {q.section === "resumo" && (
-                      <>
-                        <Metadata metadata={data.identity.metadata} />
-                        {data.statistics.summary ? (
-                          <p>
-                            {data.statistics.summary.gamesPlayed} jogos
-                            disputados
+              <Games
+                recent
+                games={chronologicalGames(
+                  ready.games.filter((g) => g.fact.played),
+                ).slice(0, 3)}
+              />
+            </section>
+            <section
+              className="player-championships"
+              aria-labelledby="estatisticas"
+            >
+              <h2 id="estatisticas" tabIndex={-1}>
+                Estatísticas por campeonato
+              </h2>
+              <div className="player-filters">
+                <label>
+                  Ano
+                  <select
+                    name="anoPerfil"
+                    value={view.year}
+                    onChange={(e) => update({ year: e.target.value, page: 1 })}
+                  >
+                    <option value="">Todos</option>
+                    {years.map((year) => (
+                      <option key={year}>{year}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Campeonato
+                  <select
+                    name="campeonatoPerfil"
+                    value={view.championship}
+                    onChange={(e) =>
+                      update({ championship: e.target.value, page: 1 })
+                    }
+                  >
+                    <option value="">Todos</option>
+                    {championships.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <CheckOptions
+                  label="Equipes"
+                  options={teams}
+                  selected={selected}
+                  onChange={(ids) => update({ teams: ids, page: 1 })}
+                />
+                <label>
+                  Valores
+                  <select
+                    name="mode"
+                    value={view.mode}
+                    onChange={(e) =>
+                      update({ mode: e.target.value as View["mode"] })
+                    }
+                  >
+                    <option value="per-game">Médias por jogo</option>
+                    <option value="total">Totais</option>
+                  </select>
+                </label>
+                <label>
+                  Fase
+                  <select
+                    name="scope"
+                    value={view.scope}
+                    onChange={(e) => update({ scope: e.target.value, page: 1 })}
+                  >
+                    <option value="all">Todas</option>
+                    <option value="regular">Regular</option>
+                    <option value="playoffs">Eliminatórias</option>
+                  </select>
+                </label>
+                <CheckOptions
+                  label="Colunas"
+                  options={PROFILE_METRICS.map((m) => ({
+                    id: m,
+                    name: `${metricLabel(m)} · ${STATISTICS_METRICS[m].name}`,
+                  }))}
+                  selected={view.columns}
+                  onChange={(ids) =>
+                    update({
+                      columns: PROFILE_METRICS.filter((m) => ids.includes(m)),
+                    })
+                  }
+                />
+              </div>
+              <div className="player-championship-table">
+                <DataTable
+                  label="Estatísticas por campeonato"
+                  columns={statsColumns.map((c) => ({ ...c, sortable: true }))}
+                  sort={{ key: view.sort, direction: view.direction }}
+                  onSort={(key) =>
+                    update({
+                      sort: key,
+                      direction:
+                        view.sort === key && view.direction === "asc"
+                          ? "desc"
+                          : "asc",
+                    })
+                  }
+                  rows={ordered.slice((statsPage - 1) * 20, statsPage * 20)}
+                  rowId={(g) => g.key}
+                  empty="Nenhuma participação neste recorte."
+                />
+              </div>
+              {ordered.length > 20 && (
+                <nav
+                  className="player-pager"
+                  aria-label="Paginação de campeonatos"
+                >
+                  <button
+                    disabled={statsPage === 1}
+                    onClick={() => update({ statsPage: statsPage - 1 })}
+                  >
+                    Campeonatos anteriores
+                  </button>
+                  <span>
+                    Página {statsPage} de {Math.ceil(ordered.length / 20)} ·{" "}
+                    {ordered.length} participações
+                  </span>
+                  <button
+                    disabled={statsPage * 20 >= ordered.length}
+                    onClick={() => update({ statsPage: statsPage + 1 })}
+                  >
+                    Próximos campeonatos
+                  </button>
+                </nav>
+              )}
+              <p className="player-note">
+                J conta os jogos em que o atleta entrou em quadra. — indica
+                ausência de informação ou cobertura incompleta; 0 é um resultado
+                confirmado. Filtros afetam apenas os campeonatos e os painéis
+                abaixo.
+              </p>
+              <details className="player-glossary">
+                <summary>Siglas e cobertura</summary>
+                <dl>
+                  <div>
+                    <dt>J</dt>
+                    <dd>
+                      Jogos em que o atleta participou, sem contar apenas a
+                      inscrição na súmula.
+                    </dd>
+                  </div>
+                  {PROFILE_METRICS.map((m) => (
+                    <div key={m}>
+                      <dt>{metricLabel(m)}</dt>
+                      <dd>
+                        {STATISTICS_METRICS[m].name}
+                        {view.mode === "per-game"
+                          ? ", média por jogo"
+                          : ", total"}
+                        .
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p>
+                  Uma métrica sem cobertura em todos os jogos do recorte
+                  permanece indisponível. Jogos sem fase confirmada aparecem
+                  apenas em Todas.
+                </p>
+              </details>
+            </section>
+            <div className="player-extras">
+              {extras.map((key) => (
+                <details
+                  key={key}
+                  open={view.panels.includes(key)}
+                  onToggle={(e) => {
+                    if (e.currentTarget.open !== view.panels.includes(key))
+                      update({
+                        panels: e.currentTarget.open
+                          ? [...view.panels, key]
+                          : view.panels.filter((k) => k !== key),
+                      });
+                  }}
+                >
+                  <summary
+                    id={key}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      update({
+                        panels: view.panels.includes(key)
+                          ? view.panels.filter((k) => k !== key)
+                          : [...view.panels, key],
+                      });
+                    }}
+                  >
+                    {key === "jogos"
+                      ? "Jogos completos"
+                      : key === "historico"
+                        ? "Histórico"
+                        : "Evolução"}
+                  </summary>
+                  {view.panels.includes(key) && (
+                    <div className="player-extra-content">
+                      {key === "jogos" ? (
+                        <>
+                          <Games
+                            games={filteredGames.slice(
+                              (page - 1) * 20,
+                              page * 20,
+                            )}
+                          />
+                          <nav
+                            className="player-pager"
+                            aria-label="Paginação de jogos"
+                          >
+                            <button
+                              disabled={page === 1}
+                              onClick={() => update({ page: page - 1 })}
+                            >
+                              Anterior
+                            </button>
+                            <span>
+                              Página {page} de{" "}
+                              {Math.max(
+                                1,
+                                Math.ceil(filteredGames.length / 20),
+                              )}{" "}
+                              · {filteredGames.length} jogos
+                            </span>
+                            <button
+                              disabled={page * 20 >= filteredGames.length}
+                              onClick={() => update({ page: page + 1 })}
+                            >
+                              Próxima
+                            </button>
+                          </nav>
+                        </>
+                      ) : key === "historico" ? (
+                        <>
+                          <p className="player-note">
+                            Inscrições comprovadas por participações publicadas;
+                            não indicam vínculo atual.
                           </p>
-                        ) : data.statistics.relatedGames === 0 ? (
-                          <p>Ainda não há jogos confirmados neste recorte.</p>
-                        ) : data.statistics.status === "mixed-minimums" ? (
-                          <p>
-                            Resumo estatístico indisponível neste modo.
-                            Selecione uma disputa em Estatísticas.
+                          <ul className="player-history">
+                            {filtered.map((g) => (
+                              <li key={g.key}>
+                                <strong>
+                                  {g.history.context.year} ·{" "}
+                                  {g.history.context.name}
+                                </strong>
+                                <span>
+                                  {g.history.registrationNames.join(" / ")} ·{" "}
+                                  {g.history.context.gender} ·{" "}
+                                  {g.history.context.category} · Camisa{" "}
+                                  {g.history.jerseys.join(" / ")}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                          {!filtered.length && (
+                            <p>Nenhuma inscrição neste recorte.</p>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <p className="player-note">
+                            Médias por jogo nas temporadas selecionadas. Sem
+                            interpolar dados ausentes.
                           </p>
-                        ) : (
-                          <p>
-                            Nenhum jogo disputado neste recorte; há
-                            participações relacionadas.
-                          </p>
-                        )}
-                        <p>
-                          {data.historyPagination.total} inscrições em
-                          participações publicadas. Equipes e camisas de cada
-                          ocasião estão no Histórico.
-                        </p>
-                      </>
-                    )}
-                    {q.section === "estatisticas" && (
-                      <>
-                        <p>
-                          Fases confirmadas:{" "}
-                          {data.statistics.phaseCoverage.regularGames}{" "}
-                          regulares;{" "}
-                          {data.statistics.phaseCoverage.playoffGames}{" "}
-                          eliminatórias;{" "}
-                          {data.statistics.phaseCoverage.unknownGames} sem fase
-                          confirmada. Os jogos sem fase só entram em Todos.
-                        </p>
-                        <Statistics data={data} />
-                      </>
-                    )}
-                    {q.section === "conquistas" && <Honors data={data} />}
-                    {q.section === "jogos" && (
-                      <Games
-                        data={data}
-                        onPage={(page) => navigate({ page })}
-                      />
-                    )}
-                    {q.section === "historico" && (
-                      <History
-                        data={data}
-                        onPage={(historyPage) => navigate({ historyPage })}
-                      />
-                    )}
-                  </section>
-                </>
-              )
-            )}
+                          <Table label="Evolução por temporada">
+                            <thead>
+                              <tr>
+                                <th scope="col">Temporada</th>
+                                <th scope="col" className="player-numeric">
+                                  J
+                                </th>
+                                {PROFILE_METRICS.map((m) => (
+                                  <th
+                                    key={m}
+                                    scope="col"
+                                    className="player-numeric"
+                                  >
+                                    {metricLabel(m)}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {years
+                                .filter((y) =>
+                                  filteredGames.some(
+                                    (g) => g.fact.context.year === y,
+                                  ),
+                                )
+                                .map((year) => {
+                                  const games = filteredGames.filter(
+                                    (g) => g.fact.context.year === year,
+                                  );
+                                  return (
+                                    <tr key={year}>
+                                      <th scope="row">{year}</th>
+                                      <td className="player-numeric">
+                                        {
+                                          games.filter((g) => g.fact.played)
+                                            .length
+                                        }
+                                      </td>
+                                      <Metrics
+                                        games={games}
+                                        id={id!}
+                                        mode="per-game"
+                                        columns={[...PROFILE_METRICS]}
+                                      />
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </Table>
+                          {!filteredGames.length && (
+                            <p>Sem jogos neste recorte.</p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </details>
+              ))}
+            </div>
           </>
         )}
       </main>

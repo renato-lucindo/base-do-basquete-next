@@ -1,8 +1,39 @@
-# Validação do piloto de UI/UX
+# Validação da reforma de UI/UX
 
 Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
-## Revisão atual — perfil contínuo e composição atual da súmula (04/11)
+## Integração nas rotas reais — autorização de04/11
+
+O responsável autorizou implementar o último plano na mesma PR #51. `/atleta.html` agora apresenta a página contínua usando apenas respostas públicas validadas: identificação/dados disponíveis, conquistas laterais/abaixo, resumo temporada/carreira, até3 atuações recentes e estatísticas por inscrição. Jogos completos/Histórico/Evolução recolhidos. Sem foto/idade/data completa inventadas. Honrarias sem equipe disponível não recebem associação inferida; colocações coletivas não atribuem premiação individual.
+
+A súmula real mantém `PublicGameView` e sua folha de estilos. O ajuste de navegação permite retornar de qualquer disputa ao perfil público identificado com filtros, colunas, painéis e posição preservados; não amplia o conjunto de destinos externos aceitos. API, Worker, banco, migrations e regras de publicação permanecem sem alterações.
+
+### Provas locais
+
+- `npm run gate`: **PASS**,693 unitários/142 arquivos, transporte7, banco isolado13, Worker/HTTP29, PDF/workerd1, tipos/builds/formato/lint/fronteira/segredos. Posteriormente, atributos de formulário, contenção de rolagem dos menus e fixtures/cache do preview receberam TypeScript/lint/formato focais; os cálculos, contratos e Worker permaneceram iguais. Sem banco real ou deploy.
+- `npx playwright test tests/player-public.spec.ts tests/public-accessibility.spec.ts --workers=4`: **42 PASS**, desktop/mobile. Cobre ordem dos blocos, carreira independente da origem, resumo/recentes invariantes, checkbox Nenhuma/vazio e persistência, ordenação/colunas,25 registros distribuídos em páginas, cobertura/ausência/zero, erros/retry/contaminação, alteração entre páginas, datas e atuação explícita, retorno de outra disputa/rolagem,320/390/1366/1920, nomes longos e texto200%. Axe nos blocos, painéis e opções. Polimento posterior: **6 PASS** de geometria320/390 e axe/checkboxes nos dois projetos.
+- `npx playwright test tests/public-navigation.spec.ts tests/public-result.spec.ts tests/public-prototype-fidelity.spec.ts tests/public-implementation-visual.spec.ts --workers=4`: **38 PASS**, incluindo fidelidade da súmula vigente, fontes sem parciais, faltas, navegação sem sessão, recortes, controles e seleção. Total:80 verificações de interface nesta etapa, mais6 reaplicadas após o polimento.
+- Preview das rotas reais em5177 com fixtures declaradas: HTTP200,3 atuações/3 inscrições do atleta de exemplo e sem erro JavaScript; inspecionado em1366/390. Cache próprio do Vite evita interferir nos testes de5174. IDs de inscrição distintos por disputa fictícia; fonte e contratos validados, sem acesso ao banco.
+- Inspeção visual do autor: conquistas ao lado no desktop/abaixo no celular; tabela à esquerda com números à direita. A primeira inspeção mobile cortava os pontos recentes: data agrupada junto ao confronto, preservando placar/PTS na área visível. HTML offline do piloto inalterado,364501 bytes/SHA256 `782a247dbba5c27c2d6827325a7e4b7f7679698df836c979be5bd762bd7c49ee`; continua referência fictícia, não uma cópia offline do produto.
+
+Capturas da aplicação com fixtures de teste: [1366](evidencias/perfil-real/perfil-1366.png), [1920](evidencias/perfil-real/perfil-1920.png), [390](evidencias/perfil-real/perfil-390.png), [320](evidencias/perfil-real/perfil-320.png), [texto200%](evidencias/perfil-real/perfil-320-text200.png), [sem metadados opcionais/conquistas](evidencias/perfil-real/perfil-sem-metadados-390.png). As provas anteriores do piloto continuam abaixo, com limites próprios; não equivalem às rotas reais.
+
+Logs em `.preview-artifacts/`: `player-integration-gate.log` SHA256 `2e6f9e6fc58e9dafbcae1644247525c14131089ab0f709db14c8684efdf16b9a`; `player-integration-verified.log` SHA256 `ec9bf60c8645cfa5a057af6dff1d1d564ede38cc011d99ba9e797a7a6380b3d2`; `player-integration-regression.log` SHA256 `83a2fa1ffa2ccee9860e770d015f0d21b449ca5d96fb012dc3cb47b0aef56f2b`. SHA material/CI no checkpoint e descrição da PR, sem extrapolar os resultados de outro commit.
+
+### Revisão de UI/UX do autor
+
+`ui-ux-pro-max`: consulta `progressive disclosure data tables --domain ux`, resultado Table Handling/Responsive aplicado à rolagem interna, mantendo regras do projeto acima das recomendações genéricas. `web-design-guidelines`: [diretrizes atuais](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultadas nesta execução. Achados tratados:
+
+- `src/player-profile/public-page.tsx:330` / `public.css:403`: data dos recentes agrupada no celular, sem esconder PTS/placar; nomes longos com quebra.
+- `src/player-profile/public-page.tsx:988`: glossário acessível por teclado/toque para siglas e cobertura; campos nativos rotulados/com nome, estados vazios e aviso de erro com foco.
+- `src/player-profile/public.css:1`: tipografia emrem para acompanhar ampliação de texto; reflow interno, sem transbordamento da página. Menus com Escape/retorno do foco e rolagem contida.
+- `src/public-ui/navigation.ts:29`: retorno do perfil de carreira entre disputas, preservando validação de destino local.
+
+Falhas intermediárias registradas: fixture de teste comparava `Number(null)` ao gatilho0, simulando falha em toda primeira página; corrigido para página1. Dois seletores de teste confundiam label exato com o nome acessível do combobox e região com tabela; corrigidos sem ampliar timeout. Uma comparação usava innerText como expectativa de textContent; padronizada. Um teste de estatísticas recebeu otimização de dependências obsoleta ao iniciar preview com cache compartilhado; separado o cache, e a suíte correspondente passou novamente. Não são evidências de regressão resolvidas por ignorar testes.
+
+Limites: revisão do autor, sem parecer independente, teste assistivo humano ou certificação WCAG integral. Os80 casos usam fixtures/transportes locais, não cobertura de dados humanos publicados. A API exige paginação de20; históricos extensos precisam de muitas consultas (até500 no limite de10000 registros), concorrência3. Falhas e inconsistências detectáveis impedem agregação parcial; não há token transacional de carreira no contrato nem benchmark no limite. Demais telas/novo autocomplete global/admin permanecem no piloto, fora deste recorte. PR Draft, sem merge/deploy/publicação.
+
+## Piloto anterior — perfil contínuo e composição atual da súmula (04/11)
 
 Plano explicitamente aprovado nesta conversa: recuperar o jogo atual, usar o print do Basketball Reference para organização de nome/dados pessoais e apresentar perfil contínuo com conquistas laterais desktop/abaixo no celular, resumo de temporada/carreira, três últimos jogos e estatísticas por campeonato. Jogos completos/Histórico/Evolução ficam recolhidos depois desses blocos. A proposta de jogo de72aba24 foi reprovada; a implementação atual aguarda avaliação visual.
 

@@ -26,6 +26,12 @@ export function safePublicReturn(
     return null;
   const [id, search = ""] = u.hash.slice(1).split("?", 2);
   if (u.pathname === "/publico.html" && !id) return u.pathname + u.hash;
+  // A career profile can link to games in several disputes. Its public return
+  // must preserve its own filters instead of requiring the game's dispute.
+  if (u.pathname === "/atleta.html" && z.uuid().safeParse(id).success) {
+    u.search = "";
+    return u.pathname + u.hash;
+  }
   const context = ["/equipe.html", "/atleta.html", "/resultado.html"].includes(
     u.pathname,
   )

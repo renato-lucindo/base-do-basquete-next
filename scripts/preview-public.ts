@@ -21,7 +21,7 @@ import { competitiveFactFromPublication } from "../src/regulation/standings";
 const source = statisticsSourceSchema.parse(
   JSON.parse(await readFile("tests/fixtures/statistics-source.json", "utf8")),
 );
-// Preview fixtures only. The real application source and contracts are unchanged.
+// Preview fixtures only. This server never connects to a database or publishes data.
 const sources = [
   source,
   ...[
@@ -39,10 +39,28 @@ const sources = [
     },
   ].map((context, index) => {
     const clone = structuredClone(source);
+    const registrationIds = new Map(
+      [
+        ...new Set(
+          clone.games.flatMap(({ snapshot }) => [
+            snapshot.game.home.registrationId,
+            snapshot.game.away.registrationId,
+          ]),
+        ),
+      ]
+        .sort()
+        .map((id, i) => [id, pubId(400000 + index * 100 + i)]),
+    );
     clone.disputeId = context.id;
     clone.games.forEach(({ snapshot }, gameIndex) => {
       snapshot.id = pubId(100000 + index * 100 + gameIndex);
       snapshot.disputeId = context.id;
+      for (const side of ["home", "away"] as const)
+        snapshot.game[side].registrationId = registrationIds.get(
+          snapshot.game[side].registrationId,
+        )!;
+      for (const player of snapshot.facts.players)
+        player.registrationId = registrationIds.get(player.registrationId)!;
       Object.assign(snapshot.context, {
         gender: context.gender,
         category: context.category,
@@ -165,10 +183,11 @@ standings.forEach(buildPublicStandings);
 
 const server = await createServer({
   configFile: "vite.foundation.config.ts",
+  cacheDir: ".preview-artifacts/public-vite-cache",
   server: { host: "127.0.0.1", port: 5177, strictPort: true },
   plugins: [
     {
-      name: "pr49-fixture-preview",
+      name: "public-fixture-preview",
       transformIndexHtml() {
         return [
           {
@@ -178,7 +197,7 @@ const server = await createServer({
               style:
                 "font:13px/1.4 system-ui,sans-serif;padding:6px 16px;background:#eef5ff;color:#163d76;border-bottom:1px solid #c7d9ef",
             },
-            children: "Preview local da PR #49 · Dados fictícios de teste",
+            children: "Preview local da PR #51 · Dados fictícios de teste",
             injectTo: "body-prepend",
           },
         ];
@@ -200,7 +219,7 @@ const server = await createServer({
           if (url.pathname === "/foundation.html") {
             res.setHeader("Content-Type", "text/html; charset=utf-8");
             res.end(
-              '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Preview público</title><main style="font:16px system-ui;padding:24px"><h1>Preview público da PR #49</h1><p>A administração não está conectada neste preview com dados fictícios.</p><a href="/publico.html">Voltar às competições</a></main></html>',
+              '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Preview público</title><main style="font:16px system-ui;padding:24px"><h1>Preview público da PR #51</h1><p>A administração não está conectada neste preview com dados fictícios.</p><a href="/publico.html">Voltar às competições</a></main></html>',
             );
             return;
           }
@@ -370,4 +389,4 @@ const server = await createServer({
   ],
 });
 await server.listen();
-console.log("PR49_PREVIEW_READY http://127.0.0.1:5177/publico.html");
+console.log("PUBLIC_PREVIEW_READY http://127.0.0.1:5177/publico.html");

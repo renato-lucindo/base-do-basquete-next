@@ -38,7 +38,7 @@ test("axe: estatísticas e escolha de colunas", async ({ page }, info) => {
   ).toBeVisible();
   await scan(page, info, "statistics-columns");
 });
-test("axe: cinco seções do perfil preservam semântica e navegação de teclado", async ({
+test("axe: perfil contínuo, painéis e seleção por checkboxes", async ({
   page,
 }, info) => {
   const f = await playerPublicFixture(page);
@@ -46,33 +46,30 @@ test("axe: cinco seções do perfil preservam semântica e navegação de teclad
   await expect(
     page.getByRole("heading", { name: "Ana Pública", exact: true }),
   ).toBeVisible();
-  await scan(page, info, "player-summary");
-  for (const [section, state] of [
-    ["Estatísticas", "statistics"],
-    ["Conquistas e honrarias", "honors"],
-    ["Jogos", "games"],
-    ["Histórico", "history"],
+  await scan(page, info, "player-continuous");
+  for (const [name, target] of [
+    ["Jogos", "#jogos"],
+    ["Histórico", "#historico"],
+    ["Evolução", "#evolucao"],
   ]) {
-    const link = page
+    await page
       .getByRole("navigation", { name: "Seções do perfil" })
-      .getByRole("link", { name: section, exact: true });
-    await link.focus();
+      .getByRole("link", { name, exact: true })
+      .focus();
     await page.keyboard.press("Enter");
-    await expect(
-      page.getByRole("heading", { name: section, exact: true }),
-    ).toBeFocused();
-    if (section === "Jogos" || section === "Histórico") {
-      const label =
-        section === "Jogos" ? "Paginação de jogos" : "Paginação de inscrições";
-      expect(
-        await page
-          .getByRole("navigation", { name: label, exact: true })
-          .count(),
-      ).toBe(1);
-    }
-    await scan(page, info, `player-${state}`);
+    await expect(page.locator(target)).toBeFocused();
+    await scan(page, info, `player-${name}`);
+  }
+  for (const name of ["Equipes", "Colunas"]) {
+    await page
+      .locator(".player-options > summary")
+      .filter({ hasText: name })
+      .click();
+    await scan(page, info, `player-options-${name}`);
+    await page.keyboard.press("Escape");
   }
 });
+
 test("axe: lista de equipes longa e escolha explícita da inscrição", async ({
   page,
 }, info) => {
