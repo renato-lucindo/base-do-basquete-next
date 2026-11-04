@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import {
+  publicSearchFixture,
+  searchFixtureHits,
+} from "./fixtures/public-search";
 import { publicNavigationFixture } from "./fixtures/public-navigation";
 import {
   publicRegulationFixture,
@@ -79,16 +83,29 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
       json: { error: { message: "Sem estatísticas publicadas." } },
     }),
   );
+  await publicSearchFixture(page, () =>
+    searchFixtureHits(
+      f.games,
+      [
+        {
+          disputeId: s.disputeId,
+          context: s.context,
+          registrations: s.registrations,
+        },
+      ],
+      [],
+    ),
+  );
   await page.goto(origin + "/publico.html");
   await page
-    .getByRole("searchbox", { name: /Buscar competições/ })
+    .getByRole("combobox", { name: /Buscar competições/ })
     .fill(s.context.name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   await page
     .locator(
-      `.competition-tree a[href="/publico.html#${s.disputeId}?secao=classificacao"]`,
+      `.public-search-entity a[href="/publico.html#${s.disputeId}?secao=classificacao"]`,
     )
     .click();
   await expect(

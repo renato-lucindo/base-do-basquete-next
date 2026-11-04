@@ -13,7 +13,7 @@ test("busca visível no cabeçalho de outra rota abre resultados públicos", asy
   const catalog = await publicNavigationFixture(page);
   const team = await teamPublicFixture(page);
   await page.goto(team.listUrl);
-  const search = page.getByRole("searchbox", { name: /Buscar competições/ });
+  const search = page.getByRole("combobox", { name: /Buscar competições/ });
   await expect(search).toBeVisible();
   await search.fill(
     catalog.source.games[0].snapshot.facts.players[0].person.name,
@@ -21,7 +21,7 @@ test("busca visível no cabeçalho de outra rota abre resultados públicos", asy
   await search.press("Enter");
   await expect(page).toHaveURL(/\/publico.html#\?q=/u);
   await expect(
-    page.locator('.public-results a[href^="/atleta.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
 });
 

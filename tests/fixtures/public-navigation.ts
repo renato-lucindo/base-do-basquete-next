@@ -1,3 +1,4 @@
+import { publicSearchFixture, searchFixtureHits } from "./public-search";
 import type { Page } from "@playwright/test";
 import { statisticsBrowserFixture } from "./statistics-browser";
 import { catalogGameSchema } from "../../src/public-ui/catalog-contract";
@@ -142,5 +143,26 @@ export async function publicNavigationFixture(page: Page) {
     ];
     return route.fulfill({ json: { players, hasMore: false } });
   });
-  return { ...f, games, state };
+  const discovery = await publicSearchFixture(page, () =>
+    searchFixtureHits(
+      state.missing ? [] : games,
+      [],
+      [
+        ...new Map(
+          f.source.games
+            .flatMap(({ snapshot }) =>
+              snapshot.facts.players.map((p) => ({
+                kind: "players" as const,
+                id: p.person.id,
+                name: p.person.name,
+                nickname: p.person.nickname,
+                disputeId: state.profileOnly ? null : snapshot.disputeId,
+              })),
+            )
+            .map((p) => [p.id, p]),
+        ).values(),
+      ],
+    ),
+  );
+  return { ...f, games, state, discovery };
 }

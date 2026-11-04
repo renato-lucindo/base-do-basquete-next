@@ -1,6 +1,6 @@
 import { publicationRoute, publicGameRoute } from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
-import { publicCatalogRoute } from "../public-ui/routes";
+import { publicCatalogRoute, publicSearchRoute } from "../public-ui/routes";
 import { publicTeamsRoute } from "../team-statistics/routes";
 import {
   publicPlayerProfileRoute,
@@ -45,6 +45,8 @@ export default {
         throw new HttpError(421, "invalid_host", "Endereço inválido.");
       if (url.pathname === "/api/health" && request.method === "GET")
         response = jsonResponse({ ok: true });
+      else if (url.pathname === "/api/public/discovery")
+        response = await publicSearchRoute(request, env, url);
       else if (
         ["/api/public/catalog", "/api/public/search"].includes(url.pathname)
       )

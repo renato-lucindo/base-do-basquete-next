@@ -4,11 +4,9 @@ import {
   catalogPageSchema,
   contextLabel,
   disputeLink,
-  searchPageSchema,
   type CatalogGame,
 } from "./catalog-contract";
-import { publicDetailLink } from "./navigation";
-import { PUBLIC_SEARCH_EVENT } from "./search-form";
+import { PublicSearchResults } from "./search-results";
 import type { PublicDispute } from "../regulation/publication-contract";
 
 export function usePublicCatalog(disputeId?: string | null) {
@@ -201,180 +199,21 @@ export function CompetitionTree({
 
 export function PublicDiscovery({
   games,
-  catalogAvailable = true,
   confirmed = [],
+  catalogAvailable = true,
 }: {
   games: CatalogGame[];
-  catalogAvailable?: boolean;
   confirmed?: PublicDispute[];
+  catalogAvailable?: boolean;
 }) {
-  const initial = () =>
-    new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("q") ??
-    "";
-  const [submitted, setSubmitted] = useState(initial);
-  const [searchAttempt, setSearchAttempt] = useState(0);
-  const [result, setResult] = useState<{
-    key: string;
-    players: typeof searchPageSchema._output.players;
-    hasMore: boolean;
-  } | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const read = () => {
-      setSubmitted(initial());
-    };
-    const submit = () => {
-      read();
-      setSearchAttempt((n) => n + 1);
-    };
-    window.addEventListener("hashchange", read);
-    window.addEventListener(PUBLIC_SEARCH_EVENT, submit);
-    return () => {
-      window.removeEventListener("hashchange", read);
-      window.removeEventListener(PUBLIC_SEARCH_EVENT, submit);
-    };
-  }, []);
-  useEffect(() => {
-    const c = new AbortController();
-    setError("");
-    setResult(null);
-    if (submitted.trim().length < 2) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    void api(
-      `/api/public/search?${new URLSearchParams({ q: submitted })}`,
-      searchPageSchema,
-      undefined,
-      c.signal,
-    )
-      .then((r) => {
-        if (!c.signal.aborted) setResult({ ...r, key: submitted });
-      })
-      .catch(() => {
-        if (!c.signal.aborted)
-          setError(
-            "Não foi possível buscar jogadores. As competições e equipes continuam disponíveis.",
-          );
-      })
-      .finally(() => {
-        if (!c.signal.aborted) setLoading(false);
-      });
-    return () => c.abort();
-  }, [submitted, searchAttempt]);
-  const teams = submitted
-    ? [
-        ...new Map(
-          [
-            ...games.flatMap((g) =>
-              (["home", "away"] as const).map((side) => ({
-                ...g.game[side],
-                disputeId: g.disputeId,
-                context: g.context,
-              })),
-            ),
-            ...confirmed.flatMap((d) =>
-              d.registrations.map((r) => ({
-                ...r,
-                registrationId: r.id,
-                disputeId: d.disputeId,
-                context: d.context,
-              })),
-            ),
-          ]
-            .filter((t) => matches(`${t.name} ${t.team.name}`, submitted))
-            .map((t) => [`${t.disputeId}/${t.registrationId}`, t]),
-        ).values(),
-      ]
-    : [];
   return (
-    <>
-      {catalogAvailable && (
-        <CompetitionTree
-          games={games}
-          confirmed={confirmed}
-          query={submitted}
-        />
-      )}
-      {submitted && (
-        <section aria-label="Resultados da busca">
-          <h2>Equipes</h2>
-          {!catalogAvailable ? (
-            <p>A consulta de equipes está indisponível neste momento.</p>
-          ) : teams.length ? (
-            <ul className="public-results">
-              {teams.map((t) => (
-                <li key={`${t.disputeId}/${t.registrationId}`}>
-                  <a
-                    href={publicDetailLink(
-                      games.some(
-                        (g) =>
-                          g.disputeId === t.disputeId &&
-                          [
-                            g.game.home.registrationId,
-                            g.game.away.registrationId,
-                          ].includes(t.registrationId),
-                      )
-                        ? `/equipe.html#${t.team.id}?registrationId=${t.registrationId}`
-                        : disputeLink(t.disputeId, "equipes"),
-                      t.disputeId,
-                    )}
-                  >
-                    {t.name}
-                  </a>
-                  <small>{contextLabel(t.context)}</small>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Nenhuma equipe encontrada.</p>
-          )}
-          <h2>Jogadores</h2>
-          {loading && <p role="status">Buscando jogadores…</p>}
-          {error && <p role="alert">{error}</p>}
-          {result?.key === submitted && (
-            <>
-              {result.players.length ? (
-                <ul className="public-results">
-                  {result.players.map((p) => (
-                    <li key={`${p.person.id}/${p.disputeId}`}>
-                      <a
-                        href={publicDetailLink(
-                          `/atleta.html#${p.person.id}`,
-                          p.disputeId,
-                        )}
-                      >
-                        {p.person.name}
-                        {p.person.nickname ? ` (${p.person.nickname})` : ""}
-                      </a>
-                      {p.disputeId && (
-                        <small>
-                          {games.find((g) => g.disputeId === p.disputeId)
-                            ? contextLabel(
-                                games.find((g) => g.disputeId === p.disputeId)!
-                                  .context,
-                              )
-                            : "Participação publicada"}
-                        </small>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>Nenhum jogador encontrado.</p>
-              )}
-              {result.hasMore && (
-                <p>
-                  Há mais participações ou perfis. Refine a busca para localizar
-                  o jogador.
-                </p>
-              )}
-            </>
-          )}
-        </section>
-      )}
-    </>
+    <PublicSearchResults
+      catalogAvailable={catalogAvailable}
+      fallback={
+        catalogAvailable ? (
+          <CompetitionTree games={games} confirmed={confirmed} />
+        ) : null
+      }
+    />
   );
 }
