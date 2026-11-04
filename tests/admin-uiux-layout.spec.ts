@@ -7,8 +7,9 @@ for (const area of ["jogos", "equipes", "informacoes"])
     const f = await gamesFixture(page),
       home = f.registrations.get(tid(5))!,
       away = f.registrations.get(tid(6))!;
-    home.name =
+    const longName =
       "Clube de Basquete de Albuquerque e Vasconcelos da Regiao Metropolitana";
+    home.name = longName;
     f.games.set(tid(501), {
       id: tid(501),
       disputeId: tid(3),
@@ -28,6 +29,12 @@ for (const area of ["jogos", "equipes", "informacoes"])
     });
     const widths = info.project.name === "desktop" ? [1366, 1920] : [320, 390];
     for (const width of widths) {
+      // Prove that short content leaves spare width after the table on every OS.
+      // Long content may legitimately fill the region with different system fonts.
+      if (area === "jogos") {
+        home.name = "Lobos";
+        f.games.get(tid(501))!.venue = "Quadra";
+      }
       await page.goto("about:blank");
       await page.setViewportSize({ width, height: width > 1000 ? 900 : 844 });
       await page.goto(
@@ -64,6 +71,32 @@ for (const area of ["jogos", "equipes", "informacoes"])
             .boundingBox();
         expect(table!.x).toBe(region!.x);
         expect(table!.width).toBeLessThan(region!.width - 30);
+      }
+      if (area === "jogos") {
+        home.name = longName;
+        f.games.get(tid(501))!.venue =
+          "Centro Municipal de Esportes e Cultura da Regiao Metropolitana";
+        await page.reload();
+        await expect(
+          page.getByRole("button", {
+            name: `Abrir jogo ${longName} × ${away.name}`,
+            exact: true,
+          }),
+        ).toBeVisible();
+        const region = await page
+            .getByRole("region", { name: "Tabela de jogos", exact: true })
+            .boundingBox(),
+          table = await page
+            .getByRole("table", { name: "Jogos da disputa", exact: true })
+            .boundingBox();
+        expect(table!.x).toBe(region!.x);
+        if (width >= 1366)
+          expect(table!.width).toBeLessThanOrEqual(region!.width + 1);
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
       }
       await page.screenshot({
         path: `.preview-artifacts/admin-reform-${area}-${width}.png`,
