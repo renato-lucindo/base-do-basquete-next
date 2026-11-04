@@ -1,0 +1,5 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "include": ["app.tsx", "fixtures.ts", "../../../../src/ui-system"],
+  "exclude": []
+}

@@ -1,0 +1,543 @@
+/* The game body reuses src/publication/public-view.css without editing production. */
+.bb-public:has(.bb-player-detail),
+.bb-public:has(.bb-game-detail) {
+  background: var(--bb-surface);
+}
+.bb-main.bb-main-game,
+.bb-main.bb-main-profile {
+  margin: 0 auto;
+  max-width: 1328px;
+  padding: 0 24px 24px;
+  background: var(--bb-surface);
+  border: 0;
+  border-radius: 0;
+}
+.bb-game-detail {
+  max-width: 1280px;
+  margin: 0 auto;
+  min-width: 0;
+}
+.bb-player-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-width: 0;
+}
+.bb-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.bb-game-status {
+  font-size: 11px;
+  color: var(--bb-muted);
+}
+.public-site.scoresheet-public .bb-parcials {
+  max-width: 100%;
+}
+.public-site.scoresheet-public .bb-parcials .period-table {
+  width: 760px;
+  max-width: 100%;
+}
+.public-site.scoresheet-public .bb-parcials .period-fouls {
+  white-space: nowrap;
+}
+.public-site.scoresheet-public .bb-final-score {
+  font-size: inherit;
+}
+.public-site.scoresheet-public .bb-athlete-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.public-site.scoresheet-public .bb-athlete-name > a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.public-site.scoresheet-public .bb-starter {
+  font-weight: 700;
+}
+.public-site.scoresheet-public .bb-player-inactive {
+  color: var(--bb-muted);
+}
+.public-site.scoresheet-public .bb-player-excluded,
+.public-site.scoresheet-public .bb-player-excluded > *,
+.public-site.scoresheet-public .bb-player-excluded a {
+  color: var(--bb-danger);
+  font-weight: 700;
+}
+.public-site.scoresheet-public .bb-foul-cell {
+  position: relative;
+  padding: 0;
+}
+.public-site.scoresheet-public .bb-foul-trigger {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  padding: 5px 9px;
+  text-align: right;
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+}
+.public-site.scoresheet-public .bb-foul-trigger:hover {
+  background: var(--bb-blue-soft);
+}
+.public-site.scoresheet-public .bb-foul-trigger:focus-visible {
+  outline-offset: -3px;
+}
+.bb-free-summary {
+  display: block;
+  white-space: normal;
+}
+.bb-free-summary small {
+  display: block;
+  color: var(--bb-muted);
+  font-size: 11px;
+}
+.bb-coaches {
+  margin: 0;
+  padding: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 12px;
+}
+.bb-coaches > div {
+  display: flex;
+  gap: 5px;
+}
+.bb-coaches dt {
+  color: var(--bb-muted);
+}
+.bb-coaches dd {
+  margin: 0;
+}
+.bb-foul-total {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--bb-muted);
+}
+.bb-foul-total strong {
+  color: var(--bb-text);
+  font-size: 24px;
+}
+.bb-foul-groups {
+  display: grid;
+  gap: 12px;
+}
+.bb-foul-groups section {
+  border: 1px solid var(--bb-line);
+  border-radius: 4px;
+  padding: 10px;
+}
+.bb-foul-groups h3 {
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.bb-foul-groups ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.bb-foul-groups li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+}
+.bb-foul-groups li strong {
+  font-size: 18px;
+  min-width: 18px;
+}
+.bb-foul-groups li span {
+  font-size: 12px;
+}
+.bb-quarter-red {
+  color: #ad343d;
+}
+.bb-quarter-blue {
+  color: #075fca;
+}
+.bb-exclusion-note {
+  color: var(--bb-danger);
+  font-weight: 700;
+}
+
+/* Continuous profile: identity/honors, summary, latest games, championship statistics. */
+.bb-player-identity-grid {
+  display: grid;
+  gap: 16px 28px;
+  padding: 8px 0 18px;
+}
+.bb-player-header {
+  min-width: 0;
+}
+.bb-player-header h1 {
+  font-size: 28px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  margin-bottom: 8px;
+}
+.bb-player-nickname {
+  font-size: 14px;
+  margin: 0 0 12px !important;
+  color: var(--bb-muted);
+}
+.bb-player-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  max-width: 680px;
+  margin: 12px 0 0;
+}
+.bb-player-metadata > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.bb-player-metadata dt {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bb-player-metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.bb-profile-honors {
+  min-width: 0;
+}
+.bb-profile-honors h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.bb-profile-honors h3 {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bb-muted);
+  margin: 10px 0 4px;
+}
+.bb-honors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bb-honors li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+.bb-honors svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--bb-blue);
+}
+.bb-honors strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.bb-honors p {
+  font-size: 12px;
+  color: var(--bb-muted);
+  margin-top: 2px !important;
+}
+.bb-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+.bb-section-heading h2,
+.bb-profile-statistics > h2,
+.bb-extra-content > h2 {
+  font-size: 17px;
+}
+.bb-section-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.bb-section-heading .bb-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  min-height: 36px;
+}
+.bb-player-summary {
+  padding: 16px 0 14px;
+  border-top: 1px solid var(--bb-line);
+}
+.bb-player-summary .bb-table {
+  font-size: 14px;
+}
+.bb-player-summary .bb-table td,
+.bb-player-summary .bb-table tbody th {
+  padding: 8px 18px;
+}
+.bb-player-summary .bb-table td:first-child {
+  padding-left: 0;
+}
+.bb-player-summary .bb-table thead th:first-child {
+  padding-left: 10px;
+}
+.bb-profile-jumps {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  border-block: 1px solid var(--bb-line);
+  margin: 6px 0 20px;
+}
+.bb-profile-jumps a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  white-space: nowrap;
+  font-size: 12px;
+  text-decoration: none;
+}
+.bb-profile-jumps a:hover {
+  text-decoration: underline;
+}
+.bb-profile-recent {
+  margin-bottom: 28px;
+}
+.bb-profile-recent .bb-table .bb-primary-cell {
+  min-width: 200px;
+  max-width: 340px;
+}
+.bb-player-detail h2[id],
+.bb-player-detail summary[id] {
+  scroll-margin-top: 16px;
+}
+.bb-player-detail tbody a {
+  color: var(--bb-text);
+  text-decoration: none;
+}
+.bb-player-detail tbody a:hover {
+  color: var(--bb-blue);
+  text-decoration: underline;
+}
+.bb-profile-filters {
+  margin: 14px 0;
+  align-items: end;
+}
+.bb-profile-filters > label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--bb-muted);
+}
+.bb-profile-filters select {
+  width: auto;
+  max-width: 240px;
+}
+.bb-profile-filters > .bb-text-button {
+  min-height: 36px;
+  font-size: 12px;
+}
+.bb-stat-category,
+.bb-date-year {
+  display: block;
+  font-size: 12px;
+  color: var(--bb-muted);
+  font-weight: 400;
+}
+.bb-coverage-note {
+  font-size: 12px;
+  color: var(--bb-muted);
+  line-height: 1.5;
+  margin: 10px 0 !important;
+}
+.bb-profile-extras {
+  margin-top: 24px;
+  border-top: 1px solid var(--bb-line);
+}
+.bb-profile-extra {
+  border-bottom: 1px solid var(--bb-line);
+}
+.bb-profile-extra > summary {
+  padding: 12px 0;
+  min-height: 44px;
+  color: var(--bb-blue);
+  font-size: 14px;
+  cursor: pointer;
+}
+.bb-extra-content {
+  padding: 4px 0 20px;
+}
+.bb-extra-content > h2 {
+  margin-bottom: 12px;
+}
+.bb-participation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 760px;
+}
+.bb-participation-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  border-bottom: 1px solid var(--bb-line);
+  padding: 12px 0;
+}
+.bb-participation-year {
+  font-weight: 600;
+  font-size: 12px;
+}
+.bb-participation-list li > div {
+  min-width: 0;
+}
+.bb-participation-list a {
+  font-size: 14px;
+}
+.bb-participation-list small {
+  display: block;
+  color: var(--bb-muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.bb-participation-games {
+  margin-left: auto;
+  color: var(--bb-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bb-evolution {
+  max-width: 900px;
+  margin-top: 24px;
+}
+.bb-evolution figure {
+  margin: 0;
+  overflow-x: auto;
+}
+.bb-evolution svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  min-width: 600px;
+}
+.bb-evolution circle {
+  fill: var(--bb-blue);
+}
+.bb-chart-line {
+  fill: none;
+  stroke: var(--bb-blue);
+  stroke-width: 2;
+}
+.bb-chart-axis {
+  stroke: var(--bb-line);
+}
+.bb-evolution text {
+  font-size: 12px;
+  fill: #42556c;
+}
+.bb-evolution figcaption {
+  font-size: 11px;
+  color: var(--bb-muted);
+}
+.bb-chart-data {
+  margin-top: 10px;
+  font-size: 12px;
+}
+.bb-chart-metric select {
+  width: auto;
+}
+
+@media (min-width: 960px) {
+  .bb-player-identity-grid.bb-with-honors {
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  }
+  .bb-with-honors .bb-profile-honors {
+    border-left: 1px solid var(--bb-line);
+    padding-left: 24px;
+  }
+}
+@media (max-width: 639px) {
+  .bb-main.bb-main-game,
+  .bb-main.bb-main-profile {
+    padding: 0 14px 20px;
+  }
+  .bb-player-header h1 {
+    font-size: 24px;
+  }
+  .bb-player-metadata {
+    gap: 8px 16px;
+  }
+  .bb-player-metadata > div {
+    flex-wrap: wrap;
+    gap: 2px 6px;
+  }
+  .bb-player-summary .bb-table {
+    font-size: 14px;
+  }
+  .bb-player-summary .bb-table td,
+  .bb-player-summary .bb-table tbody th {
+    padding: 8px;
+  }
+  .bb-player-summary .bb-section-heading {
+    gap: 4px;
+  }
+  .bb-profile-jumps {
+    gap: 18px;
+  }
+  .bb-profile-jumps a {
+    min-height: 44px;
+  }
+  .bb-profile-recent .bb-table .bb-primary-cell {
+    min-width: 120px;
+    max-width: clamp(120px, calc(100vw - 155px), 230px);
+  }
+  .bb-profile-recent .bb-table td,
+  .bb-profile-recent .bb-table th {
+    padding-inline: 8px;
+  }
+  .bb-profile-filters > label {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .bb-profile-filters > label:first-child {
+    flex: 0 1 90px;
+  }
+  .bb-profile-filters select {
+    width: 100%;
+    max-width: 100%;
+  }
+  .bb-profile-filters > .team-filter {
+    flex-basis: 60%;
+  }
+  .bb-player-detail .bb-profile-statistics .bb-table .bb-primary-cell {
+    min-width: 140px;
+    max-width: 220px;
+  }
+  .bb-profile-statistics .bb-actions {
+    margin-left: auto;
+  }
+  .bb-participation-list li {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .bb-participation-list li > div {
+    flex: 1;
+  }
+  .bb-participation-games {
+    flex-basis: 100%;
+    padding-left: 40px;
+  }
+  .bb-evolution text {
+    font-size: 18px;
+  }
+}

@@ -19,6 +19,8 @@ Contratos de identidade, dados privados, 0/00, atomicidade/recibos e publicaçã
 
 ## Aceite proporcional
 
+Decisão de 03/11/2026: reorganizar tarefas preservando as abas atuais, padronizar todas as telas para desktop e incluir o painel equipes/elenco 30/70. Jogos terá ordenação de uma coluna por vez sobre todos os registros; Informações terá campos proporcionais. Busca global permanece somente pública. O responsável escolheu validar um piloto navegável antes da expansão às rotas reais. Detalhes e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md).
+
 No desktop, conferir **1366×768** e **1920×1080** com nomes longos, listas representativas (12 atletas quando houver elenco), dropdowns e diálogos abertos. Verificar o percurso completo, cancelamento, teclado, zoom, foco, vazios, erro, recuperação e retorno. Validar mobile se a alteração o afetar.
 
 Registrar SHA, ambiente, comando, resultado e limites. Revisão do autor, axe ou fixtures não substituem revisão independente, aceite humano ou prova autenticada remota. Nenhuma sugestão estética amplia o MVP. Evidências anteriores ficam no [índice histórico](../../historico/documentacao/README.md) e são consultadas somente quando pertinentes.
