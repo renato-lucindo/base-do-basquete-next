@@ -326,7 +326,7 @@ test("amostra insuficiente difere de ausência sem esconder atleta e filtros nã
     page.getByLabel("Amostra insuficiente", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByText("—", { exact: true }).first()).toBeVisible();
-  await page.getByText("Fonte e cobertura dos dados", { exact: true }).click();
+  await page.getByText("Cobertura dos dados", { exact: true }).click();
   await expect(page.getByText(/Mínimo para o cálculo por 30/u)).toBeVisible();
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page

@@ -77,20 +77,18 @@ export function TeamsTable({
         <div className="public-site statistics-public">
           <div className="reference-explorer team-statistics-explorer">
             <ScrollableTable label="Tabela de equipes">
-              <table
-                className="statistics-table"
-                style={{
-                  minWidth: `${(d.scoresheet ? 296 : 240) + d.query.columns.length * 68}px`,
-                }}
-              >
+              <table className="statistics-table">
                 <caption className="sr-only">
                   Equipes com resultados confirmados
                 </caption>
                 <colgroup>
-                  {d.scoresheet && <col style={{ width: 56 }} />}
-                  <col style={{ width: 240 }} />
+                  {d.scoresheet && <col className="column-position" />}
+                  <col className="column-team-identity" />
                   {d.query.columns.length > 0 && (
-                    <col span={d.query.columns.length} style={{ width: 68 }} />
+                    <col
+                      span={d.query.columns.length}
+                      className="column-metric"
+                    />
                   )}
                 </colgroup>
                 <thead>
@@ -149,22 +147,7 @@ export function TeamsTable({
                         >
                           {r.name}
                         </a>
-                        {r.names.length > 1 && (
-                          <small>Nomes na ocasião: {r.names.join(" / ")}</small>
-                        )}
-                        <small>{r.teamName}</small>
-                        <details>
-                          <summary>Fonte do nome</summary>
-                          <a
-                            href={publicDetailLink(
-                              `/resultado.html#${r.origin.gameId}`,
-                              d.disputeId,
-                            )}
-                          >
-                            Resultado v{r.origin.publicationVersion}
-                          </a>
-                          <p>{teamStamp(r.origin.publishedAt)}</p>
-                        </details>
+                        {r.teamName !== r.name && <small>{r.teamName}</small>}
                       </th>
                       {d.query.columns.map((metric: TeamMetric) => (
                         <td
@@ -219,9 +202,8 @@ export function TeamParticipants({
   return (
     <>
       <p>
-        Participantes das ocasiões publicadas, em ordem de camisa. Esta lista
-        não representa o elenco atual. J conta quem jogou; DNP não produz
-        observações e quem jogou sem ações conserva zero conhecido.
+        Participantes dos jogos publicados, em ordem de camisa. J conta
+        atuações; esta lista não indica o elenco atual.
       </p>
       <div
         className="statistics-scroll"
@@ -229,7 +211,7 @@ export function TeamParticipants({
         aria-label="Tabela de participantes históricos"
         tabIndex={0}
       >
-        <table>
+        <table className="team-participants-table">
           <caption>Participantes em jogos publicados</caption>
           <thead>
             <tr>
@@ -395,10 +377,6 @@ export function TeamGames({
                       {g.game.away.name}
                     </a>
                   </small>
-                  <small>
-                    Resultado v{g.publicationVersion} ·{" "}
-                    {teamStamp(g.publishedAt)}
-                  </small>
                 </th>
                 <td>
                   {date(g.game.date)}
@@ -414,10 +392,7 @@ export function TeamGames({
                   {g.collective ? (
                     <details>
                       <summary>Ver dados desta partida</summary>
-                      <p>
-                        {g.game[g.side].name} · PDF v
-                        {g.collectiveOrigin?.version}
-                      </p>
+                      <p>{g.game[g.side].name} · Estatísticas coletivas</p>
                       <dl>
                         {Object.entries(collectiveLabels).map(([k, label]) => (
                           <div key={k}>

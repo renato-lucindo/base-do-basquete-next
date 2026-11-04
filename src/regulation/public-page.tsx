@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { PublicGamesTable } from "../public-ui/games-table";
 import { api } from "../competition/api";
 import { publicStandingsSchema, type PublicStandings } from "./public-contract";
-import { publicDetailLink } from "../public-ui/navigation";
 import { teamDetailLink } from "../team-statistics/navigation";
 
 const standingsNumber = new Intl.NumberFormat("pt-BR", {
@@ -88,10 +88,7 @@ export function PublicStandingsTables({
     id ? (names.get(id) ?? "Equipe confirmada") : "A definir";
   return (
     <section className="public-standings" aria-label="Classificação publicada">
-      <p className="public-source">
-        Publicação v{value.publicationVersion} · Regulamento v
-        {value.regulationVersion} · Classificação provisória
-      </p>
+      <p className="public-source">Classificação provisória</p>
       <p>
         Resultados publicados atualizam esta consulta. Empates e pendências não
         confirmam colocações finais.
@@ -283,57 +280,29 @@ export function PublicStandingsTables({
 
 export function PublicSchedule({ value }: { value: PublicStandings }) {
   const names = new Map(value.registrations.map((r) => [r.id, r.name]));
-  const games = [...value.games].sort(
-    (a, b) =>
-      (a.date ?? "9999").localeCompare(b.date ?? "9999") ||
-      (a.time ?? "99").localeCompare(b.time ?? "99") ||
-      a.id.localeCompare(b.id),
-  );
-  if (!games.length)
-    return <p>Nenhum jogo vinculado ao regulamento publicado.</p>;
   return (
-    <ul className="public-games">
-      {games.map((g) => {
-        const score = g.score
-          ? `${g.score.homePoints} × ${g.score.awayPoints}`
-          : g.state === "awarded"
+    <PublicGamesTable
+      games={value.games.map((g) => ({
+        id: g.id,
+        disputeId: value.disputeId,
+        home: names.get(g.homeRegistrationId) ?? "Equipe confirmada",
+        away: names.get(g.awayRegistrationId) ?? "Equipe confirmada",
+        date: g.date,
+        time: g.time,
+        venue: g.venue,
+        score: g.score
+          ? { home: g.score.homePoints, away: g.score.awayPoints }
+          : null,
+        published: g.state === "played",
+        status:
+          g.state === "awarded"
             ? "Decisão administrativa"
             : g.state === "excluded"
               ? "Desconsiderado"
               : g.state === "conflict"
                 ? "Em revisão"
-                : "Aguardando resultado";
-        const content = (
-          <>
-            <span>{names.get(g.homeRegistrationId)}</span>
-            <strong>{score}</strong>
-            <span>{names.get(g.awayRegistrationId)}</span>
-          </>
-        );
-        return (
-          <li key={g.id}>
-            <time dateTime={g.date ?? undefined}>
-              {g.date
-                ? g.date.split("-").reverse().join("/")
-                : "Data a definir"}{" "}
-              · {g.time ?? "Horário a definir"}
-            </time>
-            {g.state === "played" ? (
-              <a
-                href={publicDetailLink(
-                  `/resultado.html#${g.id}`,
-                  value.disputeId,
-                )}
-              >
-                {content}
-              </a>
-            ) : (
-              <div className="public-game-pending">{content}</div>
-            )}
-            <small>{g.venue ?? "Local a definir"}</small>
-          </li>
-        );
-      })}
-    </ul>
+                : "Aguardando resultado",
+      }))}
+    />
   );
 }

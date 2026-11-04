@@ -8,6 +8,7 @@ import {
 } from "./catalog-contract";
 import { CompetitionTree, usePublicCatalog } from "./catalog";
 import { safePublicReturn, sectionReturn } from "./navigation";
+import { PublicSearchForm } from "./search-form";
 import "./navigation.css";
 
 export function PublicHeader({
@@ -30,7 +31,10 @@ export function PublicHeader({
           </span>
           <span>Base do Basquete</span>
         </a>
-        <a href="/publico.html">Competições e busca</a>
+        <PublicSearchForm />
+        <a href="/publico.html" className="public-catalog-link">
+          Campeonatos
+        </a>
         <a href="/foundation.html" className="public-admin">
           Administração
         </a>
@@ -115,11 +119,6 @@ function DisputeNavigation({
           <span aria-hidden="true"> / </span>
           <span aria-current="page">{detail}</span>
         </nav>
-      )}
-      {!detail && (
-        <PublicBreadcrumb
-          page={publicSections.find((s) => s.id === section)!.label}
-        />
       )}
     </div>
   );

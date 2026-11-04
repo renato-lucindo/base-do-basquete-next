@@ -19,20 +19,12 @@ for (const kind of ["estatisticas", "sumula"] as const) {
     const selectors =
       kind === "estatisticas"
         ? [
-            ".header-inner.wrap",
-            ".brand",
             ".filters",
             "#team-filter-toggle",
             "#column-picker-toggle",
             ".reference-explorer .statistics-table .reference-player",
           ]
-        : [
-            ".header-inner.wrap",
-            ".brand",
-            ".game-context",
-            ".period-table",
-            ".roster-table .athlete-cell",
-          ];
+        : [".game-context", ".period-table", ".roster-table .athlete-cell"];
     const read = () =>
       page.evaluate(
         (items) =>
@@ -77,7 +69,14 @@ for (const kind of ["estatisticas", "sumula"] as const) {
         .first()
         .waitFor();
     }
-    expect(await read()).toEqual(expected);
+    // Shared navigation now follows the accepted reform pilot. Preserve the scoresheet body and reference controls;
+    // player names follow the explicit 14px legibility requirement.
+    const approved = expected.map((item) =>
+      item.selector.includes(".reference-player")
+        ? { ...item, size: "14px" }
+        : item,
+    );
+    expect(await read()).toEqual(approved);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -175,7 +174,7 @@ test("colunas padrão acompanham largura até uma escolha manual", async ({
   });
   await expect(table.getByRole("columnheader")).toHaveCount(15);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(table.getByRole("columnheader")).toHaveCount(11);
+  await expect(table.getByRole("columnheader")).toHaveCount(10);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(table.getByRole("columnheader")).toHaveCount(15);
 });

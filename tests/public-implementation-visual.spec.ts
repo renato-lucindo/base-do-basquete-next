@@ -37,6 +37,9 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
     const first = rows[0].getBoundingClientRect();
     return {
       firstY: first.y,
+      searchHeight:
+        document.querySelector(".public-header-search")?.getBoundingClientRect()
+          .height ?? 0,
       visible: rows.filter(
         (row) => row.getBoundingClientRect().bottom <= innerHeight,
       ).length,
@@ -47,9 +50,10 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
     };
   });
   console.log(`SÚMULA ${info.project.name}: ${JSON.stringify(frame)}`);
-  expect(frame.firstY).toBeLessThan(
-    info.project.name === "desktop" ? 400 : 460,
-  );
+  // The accepted always-visible global search adds one mobile row; the scoresheet body retains its previous density.
+  expect(
+    frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0),
+  ).toBeLessThan(info.project.name === "desktop" ? 400 : 460);
   expect(frame.visible).toBeGreaterThanOrEqual(Math.min(8, frame.total));
   expect(frame.viewportOverflow).toBe(false);
   expect(frame.sticky).toBe("sticky");

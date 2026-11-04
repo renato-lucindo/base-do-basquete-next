@@ -39,7 +39,9 @@ test("descoberta hierárquica, teclado e quatro seções preservam a disputa", a
   await page
     .getByRole("searchbox", { name: /Buscar competições/ })
     .fill(c.name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   const target = page.locator(
     `.competition-tree a[href="${disputeLink(f.source.disputeId)}"]`,
   );
@@ -142,7 +144,10 @@ test("busca pública repete o mesmo termo após falha transitória", async ({
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
-  const submit = page.getByRole("button", { name: "Buscar", exact: true });
+  const submit = page.getByRole("button", {
+    name: "Buscar na base",
+    exact: true,
+  });
   await submit.click();
   await expect(page.getByRole("alert")).toContainText(
     "Não foi possível buscar jogadores",
@@ -164,7 +169,9 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await expect(
     page.locator('.public-results a[href^="/atleta.html"]').first(),
   ).toBeVisible();
@@ -178,7 +185,9 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   await page
     .getByRole("searchbox", { name: /Buscar competições/ })
     .fill(f.games[0].game.home.name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await expect(
     page.locator('.public-results a[href^="/equipe.html"]').first(),
   ).toBeVisible();
@@ -242,13 +251,17 @@ test("vazio, erro e contexto inválido oferecem recuperação sem bloquear outra
   await page
     .getByRole("searchbox", { name: /Buscar competições/ })
     .fill(f.source.games[0].snapshot.facts.players[0].person.name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await expect(
     page.locator('.public-results a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   f.state.failed = false;
   await page.getByRole("searchbox", { name: /Buscar competições/ }).fill("");
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await page.getByRole("button", { name: "Tentar novamente" }).click();
   await expect(page.locator(".competition-tree")).toBeVisible();
   f.state.missing = true;
@@ -277,7 +290,9 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Buscar na base", exact: true })
+    .click();
   await page.locator('.public-results a[href^="/atleta.html"]').first().click();
   await expect(
     page.getByRole("navigation", { name: "Seções do perfil" }),

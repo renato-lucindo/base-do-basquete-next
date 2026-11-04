@@ -158,3 +158,138 @@
   min-width: 56px;
   text-align: center;
 }
+
+/* Frequent controls sit beside the table; secondary options remain disclosed. */
+.team-public-page {
+  font-size: 0.875rem;
+  background: #fff;
+}
+.team-public-page .statistics-controls {
+  border: 0;
+  padding: 0;
+  margin: 14px 0;
+  gap: 10px;
+  background: transparent;
+}
+.team-public-page .statistics-controls > .statistics-fields {
+  display: contents;
+}
+.team-public-page .statistics-controls label {
+  font-size: 0.8125rem;
+}
+.team-public-page .statistics-controls select {
+  width: auto;
+  max-width: 240px;
+  min-height: 38px;
+  padding: 6px 9px;
+}
+.team-public-page .statistics-controls input:not([type="checkbox"]) {
+  max-width: 280px;
+  min-height: 38px;
+  padding: 6px 9px;
+}
+.team-public-page .statistics-controls > button {
+  min-height: 38px;
+  padding: 7px 12px;
+}
+.team-advanced-controls > summary {
+  padding: 8px;
+  min-height: 38px;
+}
+.team-advanced-controls[open] {
+  flex-basis: 100%;
+  order: 3;
+}
+.team-advanced-controls > .statistics-fields {
+  grid-template-columns: repeat(3, minmax(0, 240px));
+  padding: 12px;
+  border: 1px solid #dce4ee;
+  margin-top: 6px;
+}
+.team-public-page .team-provenance {
+  font-size: 0.8125rem;
+  color: #526176;
+  margin: 8px 0;
+}
+.team-public-page .team-provenance summary {
+  padding-block: 6px;
+  min-height: 32px;
+}
+.team-public-page .team-table-help {
+  font-size: 0.8125rem;
+}
+.public-site.statistics-public
+  .team-statistics-explorer
+  .statistics-table
+  th[scope="row"] {
+  min-width: 170px;
+  max-width: 300px;
+}
+.public-site.statistics-public
+  .team-statistics-explorer
+  .statistics-table
+  th[scope="row"]
+  > a {
+  width: max-content;
+  max-width: 280px;
+}
+.public-site.statistics-public .team-statistics-explorer .statistics-table td {
+  min-width: 0;
+}
+.team-public-page .statistics-scroll th[scope="row"] {
+  min-width: 150px;
+  max-width: 320px;
+  white-space: normal;
+}
+.team-public-page .statistics-scroll :is(th, td) {
+  font-size: 0.875rem;
+  padding: 6px 10px;
+}
+.team-public-page .statistics-scroll td {
+  white-space: normal;
+  max-width: 260px;
+}
+.team-participants-table
+  :is(th, td):is(:first-child, :nth-child(n + 4):not(:last-child)) {
+  text-align: right;
+}
+.team-public-page .team-navigation a {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  text-decoration: none;
+  padding: 8px 12px;
+}
+.team-public-page .team-navigation a[aria-current="page"] {
+  border-bottom-color: #075fca;
+  background: #eef5ff;
+}
+@media (max-width: 600px) {
+  .team-public-page .statistics-controls select,
+  .team-public-page .statistics-controls input:not([type="checkbox"]) {
+    font-size: 1rem;
+    min-height: 44px;
+    max-width: 100%;
+  }
+  .team-advanced-controls > .statistics-fields {
+    grid-template-columns: 1fr;
+  }
+  .team-public-page .statistics-controls > label {
+    min-width: 0;
+  }
+}
+
+.public-site.statistics-public
+  .team-statistics-explorer
+  th[data-team-metric="name"] {
+  text-align: left;
+}
+.public-site.statistics-public
+  .team-statistics-explorer
+  th[data-team-metric="name"]
+  .statistics-sort {
+  justify-content: flex-start;
+}
+.public-site.statistics-public .team-statistics-explorer .rank {
+  text-align: right;
+}

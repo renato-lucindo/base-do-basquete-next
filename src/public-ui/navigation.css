@@ -467,3 +467,260 @@
 .public-standings h3 {
   overflow-wrap: anywhere;
 }
+
+/* Shared public header: consistent entry and visible search on every route. */
+.public-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.public-header.site-header {
+  font:
+    0.875rem/1.5 Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+}
+.public-header.site-header > .header-inner.wrap {
+  display: grid;
+  grid-template-columns: auto minmax(200px, 560px) 1fr auto;
+  align-items: center;
+  gap: 16px;
+  height: auto;
+  min-height: 68px;
+  width: calc(100% - 48px);
+  max-width: 1600px;
+  padding-block: 10px;
+}
+.public-header.site-header .header-inner .brand {
+  font-size: 1rem;
+  letter-spacing: 0;
+  margin: 0;
+  gap: 10px;
+}
+.public-header.site-header .header-inner .brand-mark {
+  width: 30px;
+  height: 30px;
+  font-size: 1.125rem;
+  padding: 0;
+}
+.public-header.site-header .public-header-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid #bdcbdc;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+.public-header.site-header .public-header-search svg {
+  flex: none;
+  color: #526176;
+}
+.public-header.site-header .public-header-search input {
+  min-width: 0;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #172033;
+  font: inherit;
+}
+.public-header.site-header .public-header-search button {
+  flex: none;
+  min-height: 36px;
+  border: 0;
+  padding: 6px;
+  background: transparent;
+  color: #075fca;
+  font: inherit;
+  cursor: pointer;
+}
+.public-header.site-header .public-header-search button:hover {
+  text-decoration: underline;
+}
+.public-header.site-header .public-header-search:focus-within {
+  border-color: #075fca;
+}
+.public-header.site-header .public-catalog-link {
+  justify-self: end;
+  white-space: nowrap;
+}
+.public-header.site-header .header-inner > a:not(.brand) {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.public-home {
+  font-size: 0.875rem;
+}
+.public-home h1 {
+  font-size: 1.3125rem;
+  margin-bottom: 14px;
+}
+.public-home h2 {
+  font-size: 1.0625rem;
+}
+.public-home .public-main {
+  max-width: 1600px;
+}
+.public-standings-table table {
+  width: max-content;
+}
+.public-standings-table th[scope="row"] {
+  max-width: 320px;
+}
+.public-standings-table th,
+.public-standings-table td {
+  padding: 7px 12px;
+}
+.public-standings-table {
+  border-radius: 0;
+}
+@media (max-width: 800px) {
+  .public-header.site-header > .header-inner.wrap {
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    min-height: 0;
+    width: calc(100% - 32px);
+  }
+  .public-header.site-header .public-header-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: none;
+  }
+  .public-header.site-header .public-header-search input {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+  .public-header.site-header .public-header-search button {
+    min-height: 44px;
+  }
+  .public-header.site-header .public-admin {
+    display: none !important;
+  }
+  .public-header.site-header .public-catalog-link {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .public-home .public-main {
+    width: calc(100% - 32px);
+  }
+}
+
+.public-games-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin: 12px 0;
+}
+.public-games-tools label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  width: min(320px, 100%);
+}
+.public-games-tools input {
+  font: inherit;
+  padding: 7px 10px;
+  min-height: 38px;
+}
+.public-games-tools p {
+  margin: 0 0 8px;
+  color: #526176;
+}
+.public-table-scroll {
+  overflow: auto;
+  max-width: 100%;
+  border-block: 1px solid #dce4ee;
+}
+.public-table-scroll table {
+  width: max-content;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.public-table-scroll :is(th, td) {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e7ecf2;
+  vertical-align: middle;
+}
+.public-table-scroll thead th {
+  color: #42556c;
+  background: #f1f5fa;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+.public-table-scroll tbody th {
+  font-weight: 500;
+  min-width: 180px;
+  max-width: 340px;
+  overflow-wrap: anywhere;
+}
+.public-table-scroll tbody th a {
+  display: inline;
+  padding: 0;
+}
+.public-table-scroll .public-numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+.public-table-scroll td:last-child {
+  max-width: 300px;
+  overflow-wrap: anywhere;
+}
+.public-table-scroll small {
+  display: block;
+  color: #526176;
+  font-weight: 400;
+  font-size: 0.8125rem;
+}
+.public-games-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+@media (max-width: 600px) {
+  .public-table-scroll tbody th {
+    min-width: 170px;
+    max-width: 190px;
+  }
+  .public-table-scroll :is(th, td) {
+    padding-inline: 8px;
+  }
+  .public-games-tools input {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .public-header.site-header > .header-inner.wrap {
+    padding-block: 5px;
+  }
+  .public-header.site-header .public-context-line p {
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .public-header.site-header .dispute-navigation a {
+    min-height: 40px;
+  }
+}
+
+.public-header.site-header .public-header-search input {
+  margin: 0;
+}
