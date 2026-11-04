@@ -787,6 +787,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      search_public_entities: {
+        Args: {
+          p_query: string;
+          p_type?: string;
+          p_page?: number;
+          p_entity_id?: string | null;
+        };
+        Returns: Json;
+      };
       preview_public_standings: {
         Args: { p_dispute_id: string };
         Returns: Json;

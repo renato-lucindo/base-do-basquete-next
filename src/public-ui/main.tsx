@@ -29,7 +29,7 @@ function PublicHome() {
       (a.game.time ?? "99").localeCompare(b.game.time ?? "99") ||
       a.id.localeCompare(b.id),
   );
-  usePublicPosition(!catalog.loading && !standings.loading);
+  usePublicPosition(!!route.id && !catalog.loading && !standings.loading);
   const invalid =
     window.location.hash.length > 1 &&
     !window.location.hash.startsWith("#?") &&

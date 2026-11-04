@@ -1,3 +1,7 @@
+import {
+  searchFixtureHits,
+  fixtureSearchPage,
+} from "../tests/fixtures/public-search";
 import { readFile } from "node:fs/promises";
 import { createServer } from "vite";
 import { statisticsSourceSchema } from "../src/statistics/source";
@@ -18,6 +22,7 @@ import { publicStandingsSourceSchema } from "../src/regulation/public-contract";
 import { buildPublicStandings } from "../src/regulation/public";
 import { competitiveFactFromPublication } from "../src/regulation/standings";
 
+const previewPort = Number(process.env.PUBLIC_PREVIEW_PORT ?? 5177);
 const source = statisticsSourceSchema.parse(
   JSON.parse(await readFile("tests/fixtures/statistics-source.json", "utf8")),
 );
@@ -183,8 +188,8 @@ standings.forEach(buildPublicStandings);
 
 const server = await createServer({
   configFile: "vite.foundation.config.ts",
-  cacheDir: ".preview-artifacts/public-vite-cache",
-  server: { host: "127.0.0.1", port: 5177, strictPort: true },
+  cacheDir: `.preview-artifacts/public-vite-cache-${previewPort}`,
+  server: { host: "127.0.0.1", port: previewPort, strictPort: true },
   plugins: [
     {
       name: "public-fixture-preview",
@@ -197,14 +202,18 @@ const server = await createServer({
               style:
                 "font:13px/1.4 system-ui,sans-serif;padding:6px 16px;background:#eef5ff;color:#163d76;border-bottom:1px solid #c7d9ef",
             },
-            children: "Preview local da PR #51 · Dados fictícios de teste",
+            children:
+              "Preview local da reforma UI/UX · Dados fictícios de teste",
             injectTo: "body-prepend",
           },
         ];
       },
       configureServer(vite) {
         vite.middlewares.use(async (req, res, next) => {
-          const url = new URL(req.url ?? "/", "http://127.0.0.1:5177");
+          const url = new URL(
+            req.url ?? "/",
+            `http://127.0.0.1:${previewPort}`,
+          );
           const json = (data: unknown, status = 200) => {
             res.statusCode = status;
             res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -219,7 +228,7 @@ const server = await createServer({
           if (url.pathname === "/foundation.html") {
             res.setHeader("Content-Type", "text/html; charset=utf-8");
             res.end(
-              '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Preview público</title><main style="font:16px system-ui;padding:24px"><h1>Preview público da PR #51</h1><p>A administração não está conectada neste preview com dados fictícios.</p><a href="/publico.html">Voltar às competições</a></main></html>',
+              '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Preview público</title><main style="font:16px system-ui;padding:24px"><h1>Preview público da reforma UI/UX</h1><p>A administração não está conectada neste preview com dados fictícios.</p><a href="/publico.html">Voltar às competições</a></main></html>',
             );
             return;
           }
@@ -264,6 +273,38 @@ const server = await createServer({
                         registrations: s.registrations,
                       })),
               });
+              return;
+            }
+            if (url.pathname === "/api/public/discovery") {
+              const players = [
+                ...new Map(
+                  games
+                    .flatMap((g) =>
+                      g.facts.players.map((p) => ({
+                        kind: "players" as const,
+                        id: p.person.id,
+                        name: p.person.name,
+                        nickname: p.person.nickname,
+                        disputeId: g.disputeId,
+                      })),
+                    )
+                    .map((p) => [p.id, p]),
+                ).values(),
+              ];
+              json(
+                fixtureSearchPage(
+                  searchFixtureHits(
+                    catalog,
+                    standings.map((s) => ({
+                      disputeId: s.disputeId,
+                      context: s.context,
+                      registrations: s.registrations,
+                    })),
+                    players,
+                  ),
+                  p,
+                ),
+              );
               return;
             }
             if (url.pathname === "/api/public/search") {
@@ -389,4 +430,6 @@ const server = await createServer({
   ],
 });
 await server.listen();
-console.log("PUBLIC_PREVIEW_READY http://127.0.0.1:5177/publico.html");
+console.log(
+  `PUBLIC_PREVIEW_READY http://127.0.0.1:${previewPort}/publico.html`,
+);

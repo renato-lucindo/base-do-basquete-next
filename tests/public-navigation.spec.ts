@@ -36,14 +36,12 @@ test("descoberta hierárquica, teclado e quatro seções preservam a disputa", a
     path: `.preview-artifacts/public-navigation-home-after-${info.project.name}.png`,
     fullPage: true,
   });
-  await page
-    .getByRole("searchbox", { name: /Buscar competições/ })
-    .fill(c.name);
+  await page.getByRole("combobox", { name: /Buscar competições/ }).fill(c.name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   const target = page.locator(
-    `.competition-tree a[href="${disputeLink(f.source.disputeId)}"]`,
+    `.public-search-entity a[href="${disputeLink(f.source.disputeId)}"]`,
   );
   await target.focus();
   await page.keyboard.press("Enter");
@@ -132,7 +130,7 @@ test("busca pública repete o mesmo termo após falha transitória", async ({
 }) => {
   const f = await publicNavigationFixture(page);
   let attempts = 0;
-  await page.route("**/api/public/search?*", async (route) => {
+  await page.route("**/api/public/discovery?*", async (route) => {
     attempts += 1;
     if (attempts === 1)
       await route.fulfill({
@@ -143,19 +141,19 @@ test("busca pública repete o mesmo termo após falha transitória", async ({
   });
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
-  await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
+  await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
   const submit = page.getByRole("button", {
     name: "Buscar na base",
     exact: true,
   });
   await submit.click();
   await expect(page.getByRole("alert")).toContainText(
-    "Não foi possível buscar jogadores",
+    "Não foi possível buscar agora",
   );
   const failedUrl = page.url();
   await submit.click();
   await expect(
-    page.locator('.public-results a[href^="/atleta.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
   expect(page.url()).toBe(failedUrl);
@@ -168,28 +166,28 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   const f = await publicNavigationFixture(page);
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
-  await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
+  await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   await expect(
-    page.locator('.public-results a[href^="/atleta.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   await page.reload();
   await expect(
-    page.getByRole("searchbox", { name: /Buscar competições/ }),
+    page.getByRole("combobox", { name: /Buscar competições/ }),
   ).toHaveValue(name);
   await expect(
-    page.locator('.public-results a[href^="/atleta.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   await page
-    .getByRole("searchbox", { name: /Buscar competições/ })
+    .getByRole("combobox", { name: /Buscar competições/ })
     .fill(f.games[0].game.home.name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   await expect(
-    page.locator('.public-results a[href^="/equipe.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/equipe.html"]').first(),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Jogos", exact: true }),
@@ -249,16 +247,16 @@ test("vazio, erro e contexto inválido oferecem recuperação sem bloquear outra
   await page.goto(origin + "/publico.html");
   await expect(page.getByRole("alert")).toContainText("Não foi possível");
   await page
-    .getByRole("searchbox", { name: /Buscar competições/ })
+    .getByRole("combobox", { name: /Buscar competições/ })
     .fill(f.source.games[0].snapshot.facts.players[0].person.name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   await expect(
-    page.locator('.public-results a[href^="/atleta.html"]').first(),
+    page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   f.state.failed = false;
-  await page.getByRole("searchbox", { name: /Buscar competições/ }).fill("");
+  await page.getByRole("combobox", { name: /Buscar competições/ }).fill("");
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
@@ -289,11 +287,14 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
   f.state.profileOnly = true;
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
-  await page.getByRole("searchbox", { name: /Buscar competições/ }).fill(name);
+  await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
   await page
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
-  await page.locator('.public-results a[href^="/atleta.html"]').first().click();
+  await page
+    .locator('.public-search-entity-list a[href^="/atleta.html"]')
+    .first()
+    .click();
   await expect(
     page.getByRole("navigation", { name: "Seções do perfil" }),
   ).toBeVisible();
@@ -305,7 +306,7 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
     .getByRole("link", { name: "Voltar à origem", exact: true })
     .click();
   await expect(
-    page.getByRole("searchbox", { name: /Buscar competições/ }),
+    page.getByRole("combobox", { name: /Buscar competições/ }),
   ).toHaveValue(name);
 });
 

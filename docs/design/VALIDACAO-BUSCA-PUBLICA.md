@@ -1,0 +1,42 @@
+# Validação — busca pública e autocomplete
+
+04/11/2026, branch `codex/busca-global`, base834693f após PR52. SHA/CI/aplicação real em [PROGRESSO.md](../PROGRESSO.md); contrato em [ADR020](../decisoes/020-busca-publica-normalizada.md).
+
+## Resultado e limites
+
+Autocomplete compartilhado, cinco sugestões por grupo, filtro de tipo, consulta a partir de dois caracteres após300ms, cancelamento e descarte de resposta antiga. Setas/Home/End/Enter/Escape, foco no campo, Tab nativo, clique em links e acesso aos resultados completos. Equipes deduplicadas com participações públicas e campeonatos com hierarquia; perfil sempre carreira completa. Busca/tipo/página/identidade e retorno na URL, página restaurada após carregamento dos resultados.
+
+A RPC PostgreSQL normaliza antes da seleção e paginação em toda a fonte pública, com ordenação determinística e contagens. Não depende dos50 registros antigos nem de catálogo baixado no navegador. Consultas de páginas diferentes não têm token de snapshot compartilhado. Nenhuma promessa de desempenho no volume máximo real; não há índice materializado novo. Resposta excedente falha inteira, sem omitir participações silenciosamente.
+
+## Evidências observadas
+
+- SQL PGlite isolado: banco completo do zero, fixtures transacionais de publicações,67 perfis confirmados (66 correspondentes ao termo), resultado além do antigo corte50, ranking exato/início/trecho, caixa/acentos/NFD, apelido, páginas20/6 e ajuste ao fim. Cadastro privado e nome alterado não aparecem; perfil sem jogos e honraria sem atuação são descobertos. Retirada confirmada da honraria remove destinatário sem outra fonte. Helpers privados negados ao anônimo e entradas inválidas recusadas com PT400.
+- Provider:3 testes PASS de RPC parametrizada sem JWT/cookie, correlação, contaminação, contagens e falha/abort sem eco do diagnóstico privado. SQL+provider:4 PASS.
+- Workerd real local:1 PASS no endpoint, método/parâmetros, nenhuma sessão/Authorization encaminhada, no-store, DTO contaminado e erro seguro. Build Worker dry-run PASS; sem deploy.
+- Browsers públicos:106 PASS antes dos últimos ajustes de CSS; novas verificações focais cobrem largura das opções, Escape a partir do filtro e320px/texto200%. Revisão focal final32PASS +2PASS do acesso direto por contexto. Gate anterior697unitários/144 arquivos, transporte7, banco13, Workerd30, PDF1 PASS; após fechar os últimos ajustes de contexto/teclado, gate final PASS:697 unitários/144 arquivos, transporte7, banco13, Workerd30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos.
+
+## Revisão UI/UX
+
+ui-ux-pro-max, consulta local de autocomplete/vazio/carregamento; [APG combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) e [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultados em04/11. Tema claro/azul e contratos locais prevalecem. Workers best practices aplicada ao transporte limitado e ciclo de requisição; Supabase a funções/privilégios/migration.
+
+Achados corrigidos: herança `.public-search > div` colocava sugestões em colunas estreitas, detectada por captura e protegida por geometria; Escape no filtro reabria o painel ao focar o input; cabeçalho320/texto200% quebrava a marca em caracteres, agora reflow em linhas completas. Retirada a repetição “Perfil público” em cada sugestão sem apelido. Capturas revisadas, sem aceitar apenas o resultado de axe. A ordem recebida da API não altera a navegação entre grupos: setas acompanham a ordem visual. Disputa identificada abre Classificação diretamente. Revisão do autor, sem parecer independente; axe não prova conformidade WCAG integral.
+
+## Operação autorizada e executada
+
+Migration nova `20261104171445_public_global_search.sql`, criada por Supabase CLI3.0.0 `migration new` (comando local/help conferido). Contém somente três funções e seus privilégios, sem DML, tabelas, colunas, índices, extensão ou publicação de dados. Migrations anteriores intactas. Alvo de desenvolvimento conferido por metadados: `base-do-basquete-next-dev`, ref `nizmasjddyrhmevvfviz`. Advisors do alvo consultados como baseline; isso não é prova da migration aplicada.
+
+O responsável autorizou explicitamente “Aplicar no desenvolvimento”. MCP apply_migration retornou success em04/11/2026; histórico remoto confirmou versão **20261104171445**, nome public_global_search. O arquivo criado localmente como20261104163154 foi renomeado para a versão observada, sem alterar o SQL canônico LF (hash abaixo). Somente o projeto autorizado recebeu DDL; nenhum deploy, Access, seed ou publicação de dados.
+
+Verificação real após aplicação: três funções presentes, volatilidade e search_path vazio conferidos; RPC SECURITY DEFINER com EXECUTE apenas anon/authenticated, auxiliares sem EXECUTE para anon/authenticated/service_role. Transação READ ONLY com SET LOCAL ROLE anon retornou contagens zero para termo artificial inexistente; helper privado negado, termo curto e página zero recusados com PT400. Isso prova execução/privilégios no alvo, não desempenho nem correspondência de acentos em dados humanos; essas regras continuam comprovadas nas fixtures isoladas.
+
+Advisors antes/depois: mesmos4 avisos informativos RLS sem política,11 FKs sem índice,59 índices não usados e alerta prévio de senhas vazadas. A nova RPC acrescentou um achado em cada regra SECURITY DEFINER [anônima](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable) e [autenticada](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable), intencional para leitura pública das projeções congeladas, conforme ADR020. Os auxiliares não são expostos. Nenhuma correção de configuração alheia executada.
+
+## Capturas e operação revisável
+
+[Autocomplete390](evidencias/busca-publica/autocomplete-390.png), [desktop](evidencias/busca-publica/autocomplete-desktop.png), [participações da equipe](evidencias/busca-publica/participacoes-equipe.png), [reflow320/texto200%](evidencias/busca-publica/reflow-320-texto200.png). Somente fixtures identificadas, sem alegar acesso real ao banco.
+
+Browsers finais44PASS (busca/navegação/classificação/tabelas/retorno), mais10PASS após ajuste final de linguagem/isolamento CSS. Fonte estável; gate final PASS:697 unitários/144 arquivos, transporte7, banco13, Workerd30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos. Revisão por arquivo/linha: search-form.tsx:104 (Escape/foco), search-contract.ts:130 (correlação da disputa), search.css:4 (painel vertical sem herdar layout antigo), search-state.ts (cancelamento/correlação), search-database.test.ts (prova de limite e publicação).
+
+Migration preparada SHA-256 (UTF-8/LF, blob Git) `a444b816b374eeea0f78a9b2df7f13598cbe753701420216db21a0496b851b19`. Aplicação executada somente no projeto de desenvolvimento identificado, em uma transação de migration com histórico, sem DML/seed, dados publicados, deploy ou mudança de Access. Histórico, definições/grants, consulta anônima somente leitura, entradas inválidas, negação dos helpers e advisors conferidos conforme registro acima. Reversão técnica, se necessária e autorizada: remover apenas as três funções novas na ordem RPC → helper de entidades → normalizador, sem CASCADE nem alteração de dados. Não executar reversão automaticamente.
+
+Preview local desta unidade: [abrir com fixtures](http://127.0.0.1:5180/publico.html), isolado dos previews4189/5177 e sem banco/sessão. Porta configurável por PUBLIC_PREVIEW_PORT; cache Vite por porta. Smoke Playwright390px: busca “joao”, escolha por teclado, abertura do perfil contínuo e zero pageerrors. [Captura do preview](evidencias/busca-publica/preview-local-390.png). Script/logo identificam dados fictícios, sem alegar implementação remota.
