@@ -27,6 +27,15 @@ Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da 
 
 ---
 
+## Reforma de UI/UX — piloto de 03/11/2026
+
+Direção aprovada: **público primeiro no celular, administração no desktop**, tema claro e azul, tabelas e formulários compactos. As decisões e os limites estão em [REFORMA-UIUX.md](REFORMA-UIUX.md).
+
+- [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfis, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
+- Para servir localmente: `node docs/design/prototipos/reforma-uiux/server.cjs`, depois abrir [o piloto local](http://127.0.0.1:4189/).
+- Fontes compartilhadas em `src/ui-system/`, isoladas das páginas reais até o aceite visual. Build e verificação incluídos em `npm run design:build` e `npm run design:verify`.
+- Expansão às páginas reais depende do aceite humano do piloto, por escolha expressa do responsável nesta conversa. Uma unidade/PR por vez, sem pilha dependente.
+
 ## Protótipos públicos para implementação
 
 Esta unidade reúne duas referências navegáveis com dados fictícios: a súmula pública revisada e a página de estatísticas r6 enviada pelo responsável, com cabeçalho e controles compactados. A implementação nas rotas reais será uma unidade posterior.
