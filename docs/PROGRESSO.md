@@ -8,7 +8,7 @@ Piloto aceito e instrução expressa **“Realize todas essas etapas na sequênc
 
 ## Estado Git e CI
 
-Worktree `C:/Users/12405304716/.codex/worktrees/reforma-uiux`, branch **`codex/admin-uiux`** criada diretamente de origin/main9b06df88a6d34c12e480d435a03e1be617d69d85 após CI integrada aprovada e consulta de PRs abertas vazia. Checkpoint/histórico locais da espera preservados e incorporados nesta unidade; código administrativo validado localmente, commit material e draft a registrar após este checkpoint. Recuperar HEAD por Git.
+Worktree `C:/Users/12405304716/.codex/worktrees/reforma-uiux`, branch **`codex/admin-uiux`** criada diretamente de origin/main9b06df88a6d34c12e480d435a03e1be617d69d85 após CI integrada aprovada e consulta de PRs abertas vazia. Checkpoint/histórico locais da espera preservados e incorporados nesta unidade; código administrativo validado localmente no material **61562ab4a8c505d3be52ed0d2814b25b73f36df3**, seguido deste checkpoint documental. Recuperar HEAD atualizado por Git; draft será aberta após push, nenhuma outra PR aberta na consulta desta unidade.
 
 - PR51 integrada9cb3660; CI HEAD41840654483/main41848486075 SUCCESS. Perfil contínuo real; súmula atual preservada.
 - PR52 integrada834693f07069c025af62013247db57f21ebaf5c5; CI HEAD41863784899/main41867956743 SUCCESS. Cabeçalho/tabelas/agenda/filtros/retorno públicos.
