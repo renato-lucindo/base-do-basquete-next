@@ -147,6 +147,10 @@ test("Equipes: largura intrínseca, sticky, barra superior e bordas", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await page.screenshot({
+    path: `.preview-artifacts/equipes-zoom200-${info.project.name}.png`,
+    fullPage: true,
+  });
   await page.evaluate(() => {
     document.documentElement.style.zoom = "";
     document.documentElement.style.fontSize = "200%";
@@ -156,6 +160,10 @@ test("Equipes: largura intrínseca, sticky, barra superior e bordas", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await page.screenshot({
+    path: `.preview-artifacts/equipes-text200-${info.project.name}.png`,
+    fullPage: true,
+  });
 });
 
 test("Equipes: consulta explícita e retorno do perfil conservam seleção e rolagem", async ({
@@ -316,7 +324,8 @@ test("Equipes: armazenamento indisponível preserva consultas curtas e foco", as
   const table = page.getByRole("table", { name: "Estatísticas das equipes" });
   await expect(table.locator("tbody tr")).toHaveCount(2);
   const totals = page.getByRole("button", { name: "Totais", exact: true });
-  await totals.click();
+  await totals.focus();
+  await page.keyboard.press("Enter");
   await expect(totals).toBeFocused();
   await expect(page).toHaveURL(/mode=total/);
   await expect(page.getByRole("alert")).toHaveCount(0);

@@ -22,3 +22,7 @@ Contratos/cálculos, navegação, interface e diagnóstico implementados e testa
 Cota real13%5h/30%semanal, reset1793934163. Retomada oficial `retomar-refinamento-de-equipes` ACTIVE confirmada para06/11/2026 00:04:43 America/Sao_Paulo, reset+2min. Mesma branch/worktree/unidade. PR61 de outro chat tem automação para o mesmo instante e o mesmo alvoUIUX; conferir main/deployment antes de publicar e não substituir build mais novo. Não repetir gates inalterados. DiscoC ~130MB livre; testes sequenciais para evitar novos traces grandes.
 
 WIP material publicado e conferido: `2853a653706b9ca18302a6a8b202ea39bd9d4acb`. Checkout limpo depois do push. Sem PR/CI remota para respeitar pausa antes de novo gate.
+
+## Revisão final na PR63
+
+Main6d37e29 incorporada em6b41ac1, PR63 única. Focais finais48unitários/20Chromium+2storagecheio/12WebKit+4finais de foco e bordasPASS, conforme relatório; não somar recortes sobrepostos. Storage só é necessário para referência longa; falha mantém escolha anterior e avisa. Zero conhecido usa0. Revisão de skills concluída; CI da PR/integrada e deploy/smoke ainda pendentes. Atualizar evidências/estado final na mesma unidade.

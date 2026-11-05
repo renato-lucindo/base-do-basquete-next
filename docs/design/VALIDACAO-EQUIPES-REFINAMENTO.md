@@ -45,3 +45,21 @@ Rodada ampliada:56cenários Chromium PASS e2falhas por ENOSPC na gravação de t
 WebKit Windows:2cenários geométricos desktop/mobile PASS, incluindo sticky/sincronização/1050–1051/zoom e texto200. Não confirma overscroll nativo em Windows nem celular físico. A CI macOS inclui agora o teste de Equipes. Capturas mobile renovadas depois do ajuste de largura do nome; restantes preservadas.
 
 Pausa real em13% restante5h, reset1793934163. Retomada automática oficial `retomar-refinamento-de-equipes` ACTIVE, confirmada por view e arquivo da automação para este chat:06/11/2026 às00:04:43 America/Sao_Paulo (03:04:43UTC), reset+2min. Não há PR criada, CI remota, merge ou deploy desta unidade. Não iniciar outro gate nesta janela. Próximo passo:reconciliar main/PR61/serviço, fechar focais pendentes de revisão/formato, abrir e validar a única PR, integrar e publicar somente o Worker autorizado.
+
+## Fechamento da revisão — PR63
+
+Branch material `ccc5de5`, main documental6d37e29 incorporada em `6b41ac1`; [PR63](https://github.com/renato-lucindo/base-do-basquete-next/pull/63), sem pilha. Esta revisão mantém os limites estatísticos e operacionais acima. Zero comprovado apresenta **0** também em Por jogo, sem destaque. Mais opções do boxscore conserva Colunas/Ordenar por/Direção; PB/PB% aparecem uma única vez no catálogo.
+
+Achados do autor corrigidos e verificados:
+
+- `src/team-statistics/list-navigation.ts:12`: argumento padrão acessava sessionStorage mesmo em consultas curtas. Teste RED→GREEN; acesso agora só quando há referência local.
+- `src/team-statistics/list-page.tsx:103`: falha de armazenamento não pode aplicar escolha que o retorno não preserva. Seleção anterior mantida, aviso explícito; em abertura externa excepcional sem storage, perfis ficam indisponíveis até reduzir a seleção. Testes de armazenamento bloqueado/cheio desktop e celular PASS.
+- `src/team-statistics/list-table.tsx:109`: zero conhecido usa0 na apresentação, mantendo médias positivas com uma casa. Browser RED→GREEN.
+
+Revisão web-design-guidelines refeita pela fonte atual em05/11/2026: sem novos achados pendentes nos arquivos alterados. ui-ux-pro-max aplicado ao foco/filtragem. Recomendações genéricas de virtualização e alterações globais de touch-action cedem ao contrato explícito de tabela integral/gestos nativos e ao limite1000. Revisão autoral, sem parecer independente.
+
+Resultados finais locais incrementais:48unitários de Equipes PASS;20cenários Chromium PASS na rodada +2de armazenamento cheio PASS após corrigir a interação do teste (click, pois a aplicação rejeita a desmarcação quando não consegue guardar). WebKitWindows12PASS e2expectativas inválidas de foco após clique; Safari não dá foco de teclado ao botão por clique. O teste passa a focar/ativar por Enter e comprova a manutenção do foco:4cenários finais de armazenamento/bordas PASS. Os12anteriores são de produto inalterado, sem repetir por docs. Nenhum retry/skip/timeout adicional. CI macOS continua obrigatória para overscroll nativo.
+
+Capturas da composição final renovadas: desktop1366/1920,390/320, [zoom200%](evidencias/equipes-refinamento/zoom-200.png) e [texto200%](evidencias/equipes-refinamento/texto-200.png). Sem transbordamento da página; PTS/J acessíveis no celular, nomes com quebra controlada, Pos. vertical e nome horizontal fixos, scrollbars sincronizadas, blocos intrínsecos em1051+ e altura70vh. Barra superior reservada/oculta sem overflow, visível apenas quando há deslocamento horizontal. Preservada inércia/gestos/zoom nativos, sem handlers preventDefault para toque/roda. Testes não substituem celular físico.
+
+CI inicial da PR em42130603266 sobre6b41ac1 não valida os ajustes posteriores no próprio teste/relatório; consultar o último SHA. Integração e deploy ainda não executados. Configurações UIUX/principal e Access comparadas somente em leitura, sem alteração. Estado atual no checkpoint.
