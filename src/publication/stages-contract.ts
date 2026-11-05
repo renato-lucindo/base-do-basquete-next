@@ -16,12 +16,18 @@ export const confirmGameStagesSchema = z
     requestId: z.uuid(),
     disputeId: z.uuid(),
     baseStatisticsVersion: version.max(2147483646),
-    reason: z.string().trim().min(10).max(500).regex(/^[^\u0000-\u001f\u007f]+$/u),
+    reason: z
+      .string()
+      .trim()
+      .min(10)
+      .max(500)
+      .regex(/^[^\u0000-\u001f\u007f]+$/u),
     games: z.array(game).min(1).max(100),
   })
   .strict()
   .refine(
-    ({ games }) => new Set(games.map((g) => g.gameId.toLowerCase())).size === games.length,
+    ({ games }) =>
+      new Set(games.map((g) => g.gameId.toLowerCase())).size === games.length,
     "O mesmo jogo não pode aparecer duas vezes.",
   );
 export type ConfirmGameStages = z.infer<typeof confirmGameStagesSchema>;
