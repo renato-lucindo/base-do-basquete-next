@@ -438,339 +438,351 @@ export function StatisticsPageView() {
                     />
                   </label>
                 </form>
-                <div className="table-toolbar">
-                  <p role="status" aria-live="polite">
-                    {loading
-                      ? "Carregando atletas…"
-                      : data && !error
-                        ? `${data.total} ${data.total === 1 ? "registro por equipe" : "registros por equipe"} · Página ${data.page} de ${data.totalPages}`
-                        : ""}
-                  </p>
-                  <button
-                    className="clear-button toolbar-clear"
-                    type="button"
-                    onClick={() =>
-                      quickChange({
-                        search: "",
-                        teams: null,
-                        filters: [],
-                        page: 1,
-                      })
-                    }
-                  >
-                    Limpar filtros
-                  </button>
-                  <div className="table-display-controls">
-                    <ColumnPicker
-                      options={[
-                        { key: "team", label: "Equipe", name: "" },
-                        ...[...new Set([...scoreKeys, ...draft.columns])].map(
-                          (key) => ({
-                            key,
-                            label: referenceMetric(key).label,
-                            name: STATISTICS_METRICS[key].name,
-                          }),
-                        ),
-                      ]}
-                      value={[...(showTeam ? ["team"] : []), ...draft.columns]}
-                      onChange={(keys) =>
-                        selectColumns(
-                          keys.filter((k): k is StatisticsMetric =>
-                            Object.hasOwn(STATISTICS_METRICS, k),
-                          ),
-                          keys.includes("team"),
-                        )
+                <div
+                  className="statistics-results-block"
+                  data-compact-desktop={
+                    data?.hasBoxscore === false || undefined
+                  }
+                >
+                  <div className="table-toolbar">
+                    <p role="status" aria-live="polite">
+                      {loading
+                        ? "Carregando atletas…"
+                        : data && !error
+                          ? `${data.total} ${data.total === 1 ? "registro por equipe" : "registros por equipe"} · Página ${data.page} de ${data.totalPages}`
+                          : ""}
+                    </p>
+                    <button
+                      className="clear-button toolbar-clear"
+                      type="button"
+                      onClick={() =>
+                        quickChange({
+                          search: "",
+                          teams: null,
+                          filters: [],
+                          page: 1,
+                        })
                       }
-                    />
-                    <fieldset className="mode-control">
-                      <legend>Arremessos e faltas</legend>
-                      <div className="segmented">
-                        <button
-                          type="button"
-                          aria-pressed={draft.mode === "total"}
-                          onClick={() =>
-                            quickChange({ mode: "total", page: 1 })
-                          }
-                        >
-                          Totais
-                        </button>
-                        <button
-                          type="button"
-                          aria-pressed={draft.mode === "per-game"}
-                          onClick={() =>
-                            quickChange({ mode: "per-game", page: 1 })
-                          }
-                        >
-                          Por jogo
-                        </button>
-                      </div>
-                    </fieldset>
-                  </div>
-                </div>
-                <p className="scroll-hint">
-                  Deslize a tabela para ver todas as estatísticas{" "}
-                  <span aria-hidden="true">↔</span>
-                </p>
-                {loading && !data && (
-                  <ResourceState
-                    kind="loading"
-                    title="Carregando estatísticas"
-                    detail="Aguarde um instante."
-                  />
-                )}
-                {error ? (
-                  <ResourceState
-                    kind={
-                      error instanceof ApiFailure && error.status === 404
-                        ? "empty"
-                        : "error"
-                    }
-                    title={
-                      error instanceof ApiFailure && error.status === 404
-                        ? "Ainda não há resultados publicados"
-                        : "Não foi possível consultar as estatísticas"
-                    }
-                    detail={
-                      error instanceof Error
-                        ? error.message
-                        : "Tente novamente em alguns instantes."
-                    }
-                    action={
-                      <button
-                        type="button"
-                        onClick={() => {
-                          focusResult.current = true;
-                          setRetry((n) => n + 1);
-                        }}
-                      >
-                        Tentar novamente
-                      </button>
-                    }
-                  />
-                ) : null}
-                {data && !error && (
-                  <section
-                    aria-label="Resultado da consulta"
-                    aria-busy={loading}
-                  >
-                    <h2
-                      className="statistics-result-heading"
-                      ref={resultHeading}
-                      tabIndex={-1}
                     >
-                      Participações no contexto
-                    </h2>
-                    {!data.total ? (
-                      <ResourceState
-                        kind="empty"
-                        title="Nenhum atleta encontrado"
-                        detail="Nenhuma participação atende à consulta."
-                        action={
+                      Limpar filtros
+                    </button>
+                    <div className="table-display-controls">
+                      <ColumnPicker
+                        options={[
+                          { key: "team", label: "Equipe", name: "" },
+                          ...[...new Set([...scoreKeys, ...draft.columns])].map(
+                            (key) => ({
+                              key,
+                              label: referenceMetric(key).label,
+                              name: STATISTICS_METRICS[key].name,
+                            }),
+                          ),
+                        ]}
+                        value={[
+                          ...(showTeam ? ["team"] : []),
+                          ...draft.columns,
+                        ]}
+                        onChange={(keys) =>
+                          selectColumns(
+                            keys.filter((k): k is StatisticsMetric =>
+                              Object.hasOwn(STATISTICS_METRICS, k),
+                            ),
+                            keys.includes("team"),
+                          )
+                        }
+                      />
+                      <fieldset className="mode-control">
+                        <legend>Arremessos e faltas</legend>
+                        <div className="segmented">
                           <button
                             type="button"
-                            onClick={() => {
-                              quickChange({
-                                search: "",
-                                teams: null,
-                                filters: [],
-                                page: 1,
-                              });
-                              document.getElementById("search")?.focus();
-                            }}
+                            aria-pressed={draft.mode === "total"}
+                            onClick={() =>
+                              quickChange({ mode: "total", page: 1 })
+                            }
                           >
-                            Limpar filtros
+                            Totais
                           </button>
-                        }
-                      />
-                    ) : (
-                      <ScoresheetStatisticsTable
-                        data={data}
-                        showTeam={showTeam}
-                        compare={draft.compare}
-                        comparisonEnabled={
-                          comparisonEnabled || draft.compare.length > 0
-                        }
-                        onCompare={togglePerson}
-                        onSort={(key) =>
-                          quickChange({
-                            sort: key,
-                            direction:
-                              draft.sort === key && draft.direction === "desc"
-                                ? "asc"
-                                : "desc",
-                          })
-                        }
-                      />
-                    )}
-                    <nav
-                      className="statistics-actions"
-                      aria-label="Paginação estatística"
-                    >
-                      <button
-                        className="statistics-secondary"
-                        disabled={data.page <= 1}
-                        onClick={() => change({ page: data.page - 1 }, true)}
-                      >
-                        Página anterior
-                      </button>
-                      <span>
-                        {data.page} / {data.totalPages}
-                      </span>
-                      <button
-                        className="statistics-secondary"
-                        disabled={data.page >= data.totalPages}
-                        onClick={() => change({ page: data.page + 1 }, true)}
-                      >
-                        Próxima página
-                      </button>
-                    </nav>
-                    <StatisticsLegend columns={data.columns} />
-                    {!!draft.compare.length && (
-                      <section aria-label="Comparação de atletas">
-                        <h2>Comparação</h2>
-                        <p>
-                          O resumo considera todas as inscrições do atleta neste
-                          recorte. A tabela seguinte preserva cada inscrição.
-                        </p>
-                        <div
-                          className="statistics-scroll"
-                          role="region"
-                          aria-label="Resumo comparativo rolável"
-                          tabIndex={0}
-                        >
-                          <table aria-label="Resumo comparativo dos atletas">
-                            <thead>
-                              <tr>
-                                <th>Métrica</th>
-                                {data.comparisonSummaries.map((s) => (
-                                  <th key={s.personId}>
-                                    Resumo: {s.names.join(" / ")}
-                                    <small>
-                                      {s.registrationIds.length} inscrições ·{" "}
-                                      {s.gamesPlayed} jogos
-                                    </small>
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {data.columns.map((key) => (
-                                <tr key={key}>
-                                  <th scope="row">
-                                    {STATISTICS_METRICS[key].name}
-                                  </th>
-                                  {data.comparisonSummaries.map((s, i) => {
-                                    const state =
-                                        data.comparisonStates[key][
-                                          i === 0 ? "left" : "right"
-                                        ],
-                                      cell = s.metrics[key],
-                                      description =
-                                        state === "better"
-                                          ? "Melhor valor"
-                                          : state === "worse"
-                                            ? "Pior valor"
-                                            : state === "equal"
-                                              ? "Mesmo valor"
-                                              : "Sem comparação";
-                                    return (
-                                      <td
-                                        key={s.personId}
-                                        className={`statistics-comparison-${state}`}
-                                        aria-label={`${description}: ${cell.status === "available" ? number.format(cell.value) : cell.status === "insufficient-sample" ? "-" : "—"}`}
-                                      >
-                                        <Cell value={cell} />
-                                        <small aria-hidden="true">
-                                          {description}
-                                        </small>
-                                      </td>
-                                    );
-                                  })}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                        <p>
-                          Inscrições são exibidas separadamente. ER, FC e GD têm
-                          melhor valor quando menores. A ausência não recebe
-                          valor nem vence uma comparação.
-                        </p>
-                        {compareNames.map(([id, name]) => (
                           <button
-                            key={id}
-                            className="statistics-secondary"
-                            onClick={() => togglePerson(id)}
+                            type="button"
+                            aria-pressed={draft.mode === "per-game"}
+                            onClick={() =>
+                              quickChange({ mode: "per-game", page: 1 })
+                            }
                           >
-                            Remover {name} da comparação
+                            Por jogo
                           </button>
-                        ))}
-                        {draft.compare.some(
-                          (id) => !data.compared.some((r) => r.personId === id),
-                        ) && (
-                          <p>
-                            Um atleta selecionado não tem participação neste
-                            recorte.
-                          </p>
-                        )}
-                        <div
-                          className="statistics-scroll"
-                          role="region"
-                          aria-label="Tabela comparativa rolável"
-                          tabIndex={0}
+                        </div>
+                      </fieldset>
+                    </div>
+                  </div>
+                  <p className="scroll-hint">
+                    Deslize a tabela para ver todas as estatísticas{" "}
+                    <span aria-hidden="true">↔</span>
+                  </p>
+                  {loading && !data && (
+                    <ResourceState
+                      kind="loading"
+                      title="Carregando estatísticas"
+                      detail="Aguarde um instante."
+                    />
+                  )}
+                  {error ? (
+                    <ResourceState
+                      kind={
+                        error instanceof ApiFailure && error.status === 404
+                          ? "empty"
+                          : "error"
+                      }
+                      title={
+                        error instanceof ApiFailure && error.status === 404
+                          ? "Ainda não há resultados publicados"
+                          : "Não foi possível consultar as estatísticas"
+                      }
+                      detail={
+                        error instanceof Error
+                          ? error.message
+                          : "Tente novamente em alguns instantes."
+                      }
+                      action={
+                        <button
+                          type="button"
+                          onClick={() => {
+                            focusResult.current = true;
+                            setRetry((n) => n + 1);
+                          }}
                         >
-                          <table>
-                            <thead>
-                              <tr>
-                                <th>Atleta</th>
-                                <th>Inscrição</th>
-                                {data.columns.map((key) => (
-                                  <th
-                                    key={key}
-                                    title={STATISTICS_METRICS[key].name}
-                                  >
-                                    {STATISTICS_METRICS[key].label}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {data.compared.map((r) => (
-                                <tr key={`${r.personId}/${r.registrationId}`}>
-                                  <th scope="row" title={r.names.join(" / ")}>
-                                    <a
-                                      href={publicDetailLink(
-                                        `/atleta.html#${r.personId}`,
-                                        data.disputeId,
-                                      )}
-                                    >
-                                      {display(r.names)}
-                                    </a>
-                                  </th>
-                                  <td>
-                                    <a
-                                      href={publicDetailLink(
-                                        `/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`,
-                                        data.disputeId,
-                                      )}
-                                    >
-                                      {display(r.registrationNames)}
-                                    </a>
-                                  </td>
-                                  {data.columns.map((key) => (
-                                    <td key={key}>
-                                      <Cell value={r.metrics[key]} />
-                                    </td>
+                          Tentar novamente
+                        </button>
+                      }
+                    />
+                  ) : null}
+                  {data && !error && (
+                    <section
+                      aria-label="Resultado da consulta"
+                      aria-busy={loading}
+                    >
+                      <h2
+                        className="statistics-result-heading"
+                        ref={resultHeading}
+                        tabIndex={-1}
+                      >
+                        Participações no contexto
+                      </h2>
+                      {!data.total ? (
+                        <ResourceState
+                          kind="empty"
+                          title="Nenhum atleta encontrado"
+                          detail="Nenhuma participação atende à consulta."
+                          action={
+                            <button
+                              type="button"
+                              onClick={() => {
+                                quickChange({
+                                  search: "",
+                                  teams: null,
+                                  filters: [],
+                                  page: 1,
+                                });
+                                document.getElementById("search")?.focus();
+                              }}
+                            >
+                              Limpar filtros
+                            </button>
+                          }
+                        />
+                      ) : (
+                        <ScoresheetStatisticsTable
+                          data={data}
+                          showTeam={showTeam}
+                          compare={draft.compare}
+                          comparisonEnabled={
+                            comparisonEnabled || draft.compare.length > 0
+                          }
+                          onCompare={togglePerson}
+                          onSort={(key) =>
+                            quickChange({
+                              sort: key,
+                              direction:
+                                draft.sort === key && draft.direction === "desc"
+                                  ? "asc"
+                                  : "desc",
+                            })
+                          }
+                        />
+                      )}
+                      <nav
+                        className="statistics-actions"
+                        aria-label="Paginação estatística"
+                      >
+                        <button
+                          className="statistics-secondary"
+                          disabled={data.page <= 1}
+                          onClick={() => change({ page: data.page - 1 }, true)}
+                        >
+                          Página anterior
+                        </button>
+                        <span>
+                          {data.page} / {data.totalPages}
+                        </span>
+                        <button
+                          className="statistics-secondary"
+                          disabled={data.page >= data.totalPages}
+                          onClick={() => change({ page: data.page + 1 }, true)}
+                        >
+                          Próxima página
+                        </button>
+                      </nav>
+                      <StatisticsLegend columns={data.columns} />
+                      {!!draft.compare.length && (
+                        <section aria-label="Comparação de atletas">
+                          <h2>Comparação</h2>
+                          <p>
+                            O resumo considera todas as inscrições do atleta
+                            neste recorte. A tabela seguinte preserva cada
+                            inscrição.
+                          </p>
+                          <div
+                            className="statistics-scroll"
+                            role="region"
+                            aria-label="Resumo comparativo rolável"
+                            tabIndex={0}
+                          >
+                            <table aria-label="Resumo comparativo dos atletas">
+                              <thead>
+                                <tr>
+                                  <th>Métrica</th>
+                                  {data.comparisonSummaries.map((s) => (
+                                    <th key={s.personId}>
+                                      Resumo: {s.names.join(" / ")}
+                                      <small>
+                                        {s.registrationIds.length} inscrições ·{" "}
+                                        {s.gamesPlayed} jogos
+                                      </small>
+                                    </th>
                                   ))}
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </section>
-                    )}
-                  </section>
-                )}
+                              </thead>
+                              <tbody>
+                                {data.columns.map((key) => (
+                                  <tr key={key}>
+                                    <th scope="row">
+                                      {STATISTICS_METRICS[key].name}
+                                    </th>
+                                    {data.comparisonSummaries.map((s, i) => {
+                                      const state =
+                                          data.comparisonStates[key][
+                                            i === 0 ? "left" : "right"
+                                          ],
+                                        cell = s.metrics[key],
+                                        description =
+                                          state === "better"
+                                            ? "Melhor valor"
+                                            : state === "worse"
+                                              ? "Pior valor"
+                                              : state === "equal"
+                                                ? "Mesmo valor"
+                                                : "Sem comparação";
+                                      return (
+                                        <td
+                                          key={s.personId}
+                                          className={`statistics-comparison-${state}`}
+                                          aria-label={`${description}: ${cell.status === "available" ? number.format(cell.value) : cell.status === "insufficient-sample" ? "-" : "—"}`}
+                                        >
+                                          <Cell value={cell} />
+                                          <small aria-hidden="true">
+                                            {description}
+                                          </small>
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <p>
+                            Inscrições são exibidas separadamente. ER, FC e GD
+                            têm melhor valor quando menores. A ausência não
+                            recebe valor nem vence uma comparação.
+                          </p>
+                          {compareNames.map(([id, name]) => (
+                            <button
+                              key={id}
+                              className="statistics-secondary"
+                              onClick={() => togglePerson(id)}
+                            >
+                              Remover {name} da comparação
+                            </button>
+                          ))}
+                          {draft.compare.some(
+                            (id) =>
+                              !data.compared.some((r) => r.personId === id),
+                          ) && (
+                            <p>
+                              Um atleta selecionado não tem participação neste
+                              recorte.
+                            </p>
+                          )}
+                          <div
+                            className="statistics-scroll"
+                            role="region"
+                            aria-label="Tabela comparativa rolável"
+                            tabIndex={0}
+                          >
+                            <table>
+                              <thead>
+                                <tr>
+                                  <th>Atleta</th>
+                                  <th>Inscrição</th>
+                                  {data.columns.map((key) => (
+                                    <th
+                                      key={key}
+                                      title={STATISTICS_METRICS[key].name}
+                                    >
+                                      {STATISTICS_METRICS[key].label}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {data.compared.map((r) => (
+                                  <tr key={`${r.personId}/${r.registrationId}`}>
+                                    <th scope="row" title={r.names.join(" / ")}>
+                                      <a
+                                        href={publicDetailLink(
+                                          `/atleta.html#${r.personId}`,
+                                          data.disputeId,
+                                        )}
+                                      >
+                                        {display(r.names)}
+                                      </a>
+                                    </th>
+                                    <td>
+                                      <a
+                                        href={publicDetailLink(
+                                          `/equipe.html#${r.teamId}?disputeId=${data.disputeId}&registrationId=${r.registrationId}`,
+                                          data.disputeId,
+                                        )}
+                                      >
+                                        {display(r.registrationNames)}
+                                      </a>
+                                    </td>
+                                    {data.columns.map((key) => (
+                                      <td key={key}>
+                                        <Cell value={r.metrics[key]} />
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
+                      )}
+                    </section>
+                  )}
+                </div>
               </section>
             </>
           )}

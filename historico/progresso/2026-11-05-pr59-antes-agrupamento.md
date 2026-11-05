@@ -1,0 +1,29 @@
+# Checkpoint anterior ao agrupamento das demandas
+
+Registro histórico. A sequência de separar PP%/5F foi substituída pela orientação atual de reunir na PR59; consultar docs/PROGRESSO.md para o próximo passo. Estados de CI abaixo refletem consultas anteriores, não o estado atual.
+
+# Progresso atual
+
+Unidade ativa: **tabela de Jogadores compacta e centralizada no desktop de súmula**, plano aprovado em05/11/2026. Branch **codex/jogadores-desktop-centro**, base origin/main85ae37e521367150c498989d8ccdfe5019eb2c30; recuperar HEAD por Git. PR [#59](https://github.com/renato-lucindo/base-do-basquete-next/pull/59) pronta/não draft, HEAD local/remoto **f4587e418d77de68dc2cebfcd956638f585368a6**, push confirmado. CI anterior42064092027 FALHOU (WebKitSUCCESS, gate/designPASS,638browsersPASS/109skips prévios/1falha). Trace mostrou clique após2,4s preso27,6s na estabilidade, com summary renderizado; suspensão de frames reproduzida por CDP. Somente teste de restauração ajustado para abertura nativa por Enter com visibilidade/open, mantendo cobertura de clique nos demais testes. Produto/timeout/skips inalterados. Focal12PASS, lint/tipos/formatoPASS. Correção PUSH confirmada nof4587e4. CI atual **42071357279**: tentativa1 cancelada automaticamente aos30min (anotação real), após gate/design PASS e e2e interrompido. Instalação Chromium/deps consumiu10min14s, com retries/downloads lentos de fontes no mirror Ubuntu. Sem nova falha de asserção demonstrada. Reexecução somente validate autorizada pelo fluxo e confirmada pelo conector, mesmoHEAD; tentativa2 validate127418909440 IN_PROGRESS em05/11 17:39:38UTC (setup/base PASS, setup-node executando). WebKit127418912584 SUCCESS reaproveitado. Sem alterar produto, workflow, timeout ou skips. Não presumir aprovação. PR58 concluída/integrada e CI HEAD/main SUCCESS; [encerramento anterior](../historico/progresso/2026-11-05-pr58-integrada.md).
+
+## Implementação e validação
+
+Aplicação somente a hasBoxscore estritamente false acima1050px: controles/tabela/paginação/legenda centralizados e com largura pelo conteúdo. CSS intrínseco, sem JS novo, API, cálculos ou banco. Mobile, boxscore e filtros principais preservados. [Relatório e limites](design/VALIDACAO-DESKTOP-SUMULA.md). RED368px de sobra interna → GREEN geométrico1366/1920. Chromium62PASS sem skips; rodada de retornos/Equipes26PASS e4asserções antigas de sobra corrigidas, depois4PASS. CSS final:5Chromium+5WebKit PASS. Gate final exit0:704unitários/146arquivos, transporte11,banco13,WorkerHTTP30,PDF1,lint/formato/tipos/build/fronteira/segredos PASS. Logs .preview-artifacts/desktop-center-gate-final.log e desktop-center-*.log. CI WebKit macOS inclui testes novos. Não repetir suítes de artefatos idênticos por documentação.
+
+## Serviços e sequência autorizada
+
+Preview independente ainda deployment6b929376-9a49-4d12-af6b-7ad8118d6eae/versãoa15ebe3b-e20f-4a79-8f46-8e305f78d2c7/fonte85ae37e. Somente atualizar esse Worker após PR e CI integrada aprovadas, usando build fresco limpo e config ignorada .preview-artifacts/uiux-preview/wrangler.json. Conta16b4a5e0a99a031d28051ebadb4811cc, namespace2ac0ffe60c2d490cb7f457c444f24859/segredos/bindings existentes preservar. Nunca chamar uploader canônico. Principal base-do-basquete-next-preview/basedobasquete.com.br permanece deployment00dffb6b-1d5c-4433-9214-768013ed6277/versão139410ce-a8d6-4710-9b94-e1b1222cd3dc; sem mudanças de Access/DB/Auth/dados/segredos.
+
+Depois de FINALIZAR centralização e publicar preview: responsável autorizou ajustar tooltip/legenda de PP% para **Participação nos Pontos**, e5F para **Exclusões por cinco faltas**. Não antecipar a etapa nem ampliar para outras métricas. Equipes somente planejada, sem implementação/republicação13jogos autorizada.
+
+## Continuidade
+
+Automação **retomar-piloto-uiux-pr-51 ACTIVE**, retomada oficial confirmada para05/11 **17:49:38UTC /14:49:38America/Sao_Paulo**, dez minutos após observação real. Espera externa de CI, não cota; nenhum reset manual/crédito consumido. Prompt inclui continuação desta mesma unidade e ajuste textual posterior autorizado. Não presumir CI nem reiniciar por commit documental. Gatilho15%restante5h/reset observado+2min, sem créditos/reset manual. Última cota69%restante5h/52%semanal, reset1793916012; medir antes do gate. Preservar checkout humano sync/trabalho-casa/CONTRIBUTING modificado/skills pessoais, demais worktrees/previews4189/5177/5180. Servidores task-owned5173/5174 em execução; outputs de testes separados. Checkpoint/histórico pós58 reconciliados nesta unidade, sem descartar alterações humanas.
+
+Checkpoint posterior ao HEAD fica local até próxima alteração material/unidade, sem push documental que reinicie CI. Pacote/deploy59 ainda não preparados nem publicados; preview segue85ae37e.
+
+Reprodução/diagnóstico/correção da CI detalhados no relatório; nenhum código do produto mudou após7d57f28. A correção é de teste e documentação. Pré-mapeamento somente leitura dos textos: referenceMetric também é consumido por Equipes; futura alteração deve ser específica de Jogadores, preservando métricas globais/refMetric compartilhado.
+
+Nova autorização05/11 “Vamos otimizar”: implementação da CI em worktree separado ci-proporcional/Base do Basquete-v1, branch codex/ci-proporcional, PR62 HEAD16984e4e7845d63b5930712b03f9637b2fa25e01. CI42079154524 scopePASS/outrosjobs emexecução às17:54:58UTC. PR59 preservada aguardando sua própria CI; não misturar diffs. Próxima retomada da mesma automação18:04:58UTC/15:04:58SP. Ver checkpoint do worktreeCI para unidade ativa.
+
+PR62 integrada1d2505af44dedfacc736d70a88409c2eac354332; CI HEAD42079154524 SUCCESS, CI integrada42080607535 IN_PROGRESS às18:04:14UTC. PR59 CI HEAD42071357279 tentativa2 SUCCESS confirmada. Aguardar consolidar62 e retomar merge59 conforme autorização. Próxima mesmaautomação18:14:14UTC/15:14:14SP.

@@ -15,6 +15,20 @@ export const referenceMetric = (key: StatisticsMetric) =>
   key === "foulsCommitted"
     ? { ...STATISTICS_METRICS[key], label: "F" }
     : STATISTICS_METRICS[key];
+
+// Textos desta tabela pública; referenceMetric também é usado por Equipes.
+const playerMetric = (key: StatisticsMetric) => {
+  const definition = referenceMetric(key);
+  return {
+    ...definition,
+    name:
+      key === "pointsShare"
+        ? "Participação nos Pontos"
+        : key === "fiveFouls"
+          ? "Exclusões por cinco faltas"
+          : definition.name,
+  };
+};
 type Row = StatisticsPage["rows"][number];
 export function MetricCell({
   value,
@@ -74,7 +88,7 @@ function SortHeader({
 }) {
   return (
     <StatisticsSortHeader
-      definition={referenceMetric(metric)}
+      definition={playerMetric(metric)}
       active={data.sort === metric}
       direction={data.direction}
       onSort={() => onSort(metric)}
@@ -259,12 +273,8 @@ export function StatisticsLegend({ columns }: { columns: StatisticsMetric[] }) {
       <dl>
         {columns.map((key) => (
           <div key={key}>
-            <dt>{referenceMetric(key).label}</dt>
-            <dd>
-              {key === "pointsShare"
-                ? "(Participação nos Pontos): percentual dos pontos da equipe marcados pelo atleta."
-                : STATISTICS_METRICS[key].name}
-            </dd>
+            <dt>{playerMetric(key).label}</dt>
+            <dd>{playerMetric(key).name}</dd>
           </div>
         ))}
       </dl>

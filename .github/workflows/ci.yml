@@ -4,15 +4,136 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches: [main]
+  workflow_dispatch:
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      scope: ${{ steps.plan.outputs.scope }}
+      plan: ${{ steps.plan.outputs.plan }}
+      shards: ${{ steps.plan.outputs.shards }}
+      design: ${{ steps.plan.outputs.design }}
+      webkit: ${{ steps.plan.outputs.webkit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Require main as PR base
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+        run: test "$PR_BASE" = main
+      - name: Test verification policy
+        run: node --test tests/ci-plan.test.mjs
+      - name: Detect verification scope
+        id: plan
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node scripts/ci-plan.mjs
+
+  checks:
+    needs: scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Secret scanner regression checks
+        run: node --test tests/check-secrets.test.mjs
+      - name: Documentation checks
+        if: needs.scope.outputs.scope == 'docs'
+        run: npm run format:check && node scripts/check-secrets.mjs --source-only
+      - name: Presentation checks
+        if: needs.scope.outputs.scope == 'ui'
+        run: npm run gate:ui
+      - name: Architecture and skill regression
+        if: needs.scope.outputs.scope == 'full'
+        run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py && python3 -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q
+      - name: Full gate
+        if: needs.scope.outputs.scope == 'full'
+        run: npm run gate
+      - uses: actions/upload-artifact@v4
+        if: success() && needs.scope.outputs.scope != 'docs'
+        with:
+          name: prototipo-${{ github.sha }}
+          path: dist
+
+  browsers:
+    needs: scope
+    if: needs.scope.outputs.scope != 'docs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.scope.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Run selected browser suites
+        env:
+          CI_PLAN: ${{ needs.scope.outputs.plan }}
+          CI_SHARD: ${{ matrix.shard }}
+        run: node scripts/ci-browsers.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence-${{ matrix.shard }}-${{ github.sha }}
+          path: |
+            test-results
+            .preview-artifacts/bordas*.png
+            .preview-artifacts/*after*.png
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  design:
+    needs: scope
+    if: needs.scope.outputs.design == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run design:verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-publico-${{ github.sha }}
+          path: |
+            docs/design/.preview-artifacts/
+            docs/design/prototipos/sumula/*.png
+            docs/design/prototipos/estatisticas/react-prototype/*.png
+            docs/design/prototipos/reforma-uiux/*.png
+          include-hidden-files: true
+
   webkit-boundaries:
-    timeout-minutes: 15
+    needs: scope
+    if: needs.scope.outputs.webkit == 'true'
     runs-on: macos-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,90 +148,18 @@ jobs:
         with:
           name: webkit-boundaries-evidence
           path: test-results
+
   validate:
-    timeout-minutes: 30
+    needs: [scope, checks, browsers, design, webkit-boundaries]
+    if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Require main as PR base
-        if: github.event_name == 'pull_request'
-        env:
-          PR_BASE: ${{ github.event.pull_request.base.ref }}
-        run: test "$PR_BASE" = main
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
-      - name: Detect verification scope
-        id: scope
+      - name: Require every planned job to succeed
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        shell: bash
-        run: |
-          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]] || ! git cat-file -e "${BASE_SHA}^{commit}"; then
-            echo 'code=true' >> "$GITHUB_OUTPUT"
-          else
-            changed_files="$(git diff --name-only "$BASE_SHA" HEAD)"
-            if grep -Ev '^(|docs/.*\.(md|png|jpg|jpeg|svg)|historico/documentacao/.*\.(md|png|jpg|jpeg|svg)|README\.md|CONTRIBUTING\.md|AGENTS\.md|\.github/PULL_REQUEST_TEMPLATE\.md)$' <<< "$changed_files" > /dev/null; then
-              echo 'code=true' >> "$GITHUB_OUTPUT"
-            else
-              echo 'code=false' >> "$GITHUB_OUTPUT"
-            fi
-          fi
-      - run: npm ci --ignore-scripts
-      - name: Secret scanner regression checks
-        run: node --test tests/check-secrets.test.mjs
-      - name: Documentation checks
-        if: steps.scope.outputs.code == 'false'
-        run: npm run format:check && node scripts/check-secrets.mjs --source-only
-      - run: python especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/verificar-pacote.py
-        if: steps.scope.outputs.code == 'true'
-      - name: Validate vendored UI/UX skill
-        if: steps.scope.outputs.code == 'true'
-        run: python3 -m unittest discover -s .agents/skills/ui-ux-pro-max/scripts/tests -q
-      - run: npm run gate
-        if: steps.scope.outputs.code == 'true'
-      - run: npx playwright install --with-deps chromium
-        if: steps.scope.outputs.code == 'true'
-      - run: npm run design:verify
-        if: steps.scope.outputs.code == 'true'
-      - uses: actions/upload-artifact@v4
-        if: always() && steps.scope.outputs.code == 'true'
-        with:
-          name: design-publico-${{ github.sha }}
-          path: |
-            docs/design/.preview-artifacts/
-            docs/design/prototipos/sumula/*.png
-            docs/design/prototipos/sumula/verification*.json
-            docs/design/prototipos/estatisticas/react-prototype/*.png
-            docs/design/prototipos/estatisticas/react-prototype/verification.json
-          include-hidden-files: true
-      - run: npm run test:e2e
-        if: steps.scope.outputs.code == 'true'
-      - uses: actions/upload-artifact@v4
-        if: always() && steps.scope.outputs.code == 'true'
-        with:
-          name: player-scroll-boundaries-${{ github.sha }}
-          path: |
-            .preview-artifacts/bordas*.png
-            test-results/player-statistics-touch-*/video.webm
-          include-hidden-files: true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: evidencias-uiux-desktop-${{ github.sha }}
-          path: .preview-artifacts/*after*.png
-          if-no-files-found: warn
-          include-hidden-files: true
-      - uses: actions/upload-artifact@v4
-        if: steps.scope.outputs.code == 'true'
-        with:
-          name: prototipo-${{ github.sha }}
-          path: dist
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: browser-evidence
-          path: test-results
+          CI_NEEDS: ${{ toJSON(needs) }}
+        run: node scripts/ci-plan.mjs verify

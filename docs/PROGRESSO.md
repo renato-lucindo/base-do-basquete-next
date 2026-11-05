@@ -1,39 +1,21 @@
 # Progresso atual
 
-## Unidade ativa — classificação de jogos nas estatísticas (05/11/2026)
+Atualizado em 05/11/2026. Unidade ativa: [PR #61](https://github.com/renato-lucindo/base-do-basquete-next/pull/61), classificação publicada dos jogos nas estatísticas. Branch `codex/fases-estatisticas-publicadas`, HEAD anterior `0880ca5`, reconciliação por merge explícito da main `6d37e29f7e0712cc02b2155f726e2a213c1f21ee`. Recuperar HEAD atual e CI na PR. [Checkpoint anterior preservado](../historico/progresso/2026-11-05-pr61-antes-reconciliacao.md).
 
-**Branch:** `codex/fases-estatisticas-publicadas` (base `main` `85ae37e521367150c498989d8ccdfe5019eb2c30`). **PR:** [#61](https://github.com/renato-lucindo/base-do-basquete-next/pull/61) (draft; sem merge/deploy). **Projeto:** `base-do-basquete-next-dev`, ID `nizmasjddyrhmevvfviz`, PostgreSQL 17.11, confirmado novamente em 05/11/2026.
+## Código e validação
 
-**DDL aplicado com autorização:** `apply_migration` registrou `20261105220937_confirm_published_game_stages`. Nome do arquivo na PR alinhado exatamente ao histórico aplicado. Foram verificadas as funções de confirmação, RLS e grants (RPC acessível a `authenticated`, não a `anon`/`service_role`). DDL não altera as estatísticas existentes.
+A publicação confirmada copia `games.stage_kind` para as projeções estatísticas. O comando administrativo versionado confirma jogos antigos por disputa, preservando resultados, placares e autoria. O responsável solicitou concluir a PR nesta conversa; merge do código e operações de serviço permanecem distintos. Procedimento em [CONFIRMACAO-FASES-ESTATISTICAS.md](CONFIRMACAO-FASES-ESTATISTICAS.md).
 
-**Preflight atual:** 26 jogos regulares cadastrados; 25 publicados com `phase=null`; 575 projeções individuais com fase ausente. Duas disputas: `b350cd03-73fb-41a6-9887-ef5ea309389e` — head v4, 4 jogos/92 projeções; `b5433b13-a8f9-4baa-b4d9-08066ebf3e96` — head v27, 21 jogos/483 projeções. Preflight anterior (17/391) ficou desatualizado por novas publicações. Baselines somente leitura: `published_games` SHA MD5 agregado `38f56c327a58eed242f4c54c0aeac63d` e fatos dos jogadores sem fase/versão `aec193c2ca766fba9c191ca48fbf1ea5`. Recalcular antes de alterações.
+CI anterior `53fafa9`: SUCCESS [42078598450](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42078598450), sem validar esta reconciliação. Testes HTTP/Workerd foram acrescentados para a rota de confirmação: autenticação, origem, formato, limite do corpo, recibo correlacionado e revogação administrativa. Gate e CI atualizados serão registrados na descrição da mesma PR. Testes isolados não equivalem à publicação autenticada remota nem a um ensaio PostgreSQL concorrente multi-conexão.
 
-**DML autorizado, mas NÃO executado:** `private.confirm_game_stages` exige `auth.uid()` de administrador habilitado; `execute_sql` do conector roda como `postgres`, sem sessão autenticada. Não simular JWT nem usar SQL direto para contornar auditoria. Uma tentativa de preparar operação de manutenção no GitHub foi bloqueada pelas configurações de segurança. O procedimento e a consulta de payloads autenticados estão em [CONFIRMACAO-FASES-ESTATISTICAS.md](CONFIRMACAO-FASES-ESTATISTICAS.md). O banco ainda contém 25 jogos/575 projeções sem fase; nenhum recibo de confirmação foi criado.
+## Banco e sessão real
 
-**CI:** GitHub Actions no SHA anterior `53fafa9edab58e1b3e52a43f8d24ca49733f3a79` aprovado (gate, 706 Vitest, PGlite, design, E2E, WebKit). Revisar novamente checks do HEAD após o ajuste do nome da migration e este checkpoint. Teste PostgreSQL concorrente multi-conexão e publicação autenticada em sessão real permanecem sem execução. Não rebaixar checks.
+Consulta somente leitura nesta conversa confirmou o projeto `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`), migration `20261105220937` aplicada uma vez, RPC `confirm_game_stages(jsonb)` presente e 25 jogos/575 projeções sem fase. O conector usa `postgres`, com `auth.uid()` nulo. Nenhuma migration foi reaplicada e nenhum dado foi atualizado nesta retomada.
 
-**Pendências:** nova validação de SHA da PR, execução do backfill via administrador autenticado, comparações dos totais/placares/origens e revisão/merge/deploy autorizados separadamente. As alterações de outros agentes permanecem intocadas.
+O responsável abriu sessão administrativa real no preview Worker `base-do-basquete-next-uiux`; a área administrativa autenticada foi observada. O domínio principal está bloqueado na rede; utilizar o preview existente sem alterar suas proteções. Conferir a versão publicada e a disponibilidade do novo endpoint antes de qualquer comando. Não simular identidade, extrair credenciais nem editar projeções diretamente. Deploy exige autorização própria sobre o artefato concreto.
 
-## Checkpoint anterior — bordas mobile, já incorporado à main pela PR #58
+## Outras unidades e continuidade
 
-A unidade anterior utilizou a branch `codex/tabela-mobile-bordas`; a PR #58 foi incorporada no commit `85ae37e521367150c498989d8ccdfe5019eb2c30`. O texto abaixo preserva as provas e os serviços então registrados, sem representar validação da nova unidade.
+PR #60 integrada em `6d37e29`, CI do merge [42126275393](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42126275393) SUCCESS; filtros FUT-004 continuam ideia pós-MVP. Contexto das PRs #59/#62 e dos serviços está no [histórico preservado](../historico/progresso/2026-11-05-antes-conclusao-pr60.md), sem nova verificação de deploy nesta retomada.
 
-## Implementação e provas
-
-Implementado `overscroll-behavior:none` apenas nos dois contêineres do ScoresheetStatisticsTable; sincronizador limita offsets/sombras, evita reescritas equivalentes e ajusta a largura útil da barra superior. Altura/scroll interno/inércia/zoom/layout/dados preservados. Pedido adicional: Pos. fixo verticalmente, movimentação horizontal anterior mantida. [Relatório, capturas e limites](design/VALIDACAO-BORDAS-MOBILE.md).
-
-RED→GREEN:2casos originais de bordas/sincronização; Pos. falhou com468px de deslocamento e passou após correção. Chromium56PASS sem skips (Jogadores/bordas/touch/retornos/Equipes), depois6PASS de alinhamento +2touch com CSS final. WebKit Windows3PASS de alinhamento final; não oferece CSS overscroll nem wheel em contexto mobile. CI focal em macOS adicionada para conferir CSS/sincronização desktop/mobile e3casos nativos em larguras mobile, sem simular suporte/introduzir skips. Vídeo touch automatizado não equivale a confirmação física no celular.
-
-Gate local exit0:704unitários/146arquivos, transporte11,banco13,WorkerHTTP30,PDF1,lint/formato/tipos/build/fronteira/segredos. Após ajuste Pos., formato/tipos/browsers focais novamente PASS. CI final no SHA da PR e do merge permanece necessária. Revisão do autor com ui-ux-pro-max/web-design-guidelines vigente, sem parecer independente. Logs `.preview-artifacts/mobile-boundaries-*.log` e `mobile-position-*.log`. Próximo passo: push/PR, conferir CIs/reviews/threads e integrar com expected_head_sha; depois build fresco do merge e deploy autorizado só no Worker independente.
-
-## Serviços preservados
-
-PR57 concluída, CI HEAD/main SUCCESS no41452f9. Preview **base-do-basquete-next-uiux** ainda deploymentd6218ce9-6c00-41dc-9954-e3934908b1cd/versão7fd61d4e-400f-4e45-a86f-16d291c29dc3/fonte41452f9. Não houve novo deploy nesta unidade. Conta16b4a5e0a99a031d28051ebadb4811cc, config local ignorada `.preview-artifacts/uiux-preview/wrangler.json`, origem própria, namespace2ac0ffe60c2d490cb7f457c444f24859/segredos existentes preservar. CLI4.152.0 OAuth/conta correta conferidos, sem relogin/upgrade. Cloudflare Apps exige reautenticação, mas conector Cloudflare direto está disponível/mesmo proprietário; preferir esse para metadata. Nunca chamar uploader canônico.
-
-Principal permanece deployment00dffb6b-1d5c-4433-9214-768013ed6277/versão139410ce-a8d6-4710-9b94-e1b1222cd3dc; preservar domínio principal/Access/banco/Auth/dados. [Encerramento57](../historico/progresso/2026-11-05-jogadores-preview-encerrado.md). Equipes [somente planejada](../historico/progresso/2026-11-05-equipes-planejamento.md), sem implementação/republicação13jogos autorizada.
-
-## Continuidade
-
-Checkout humano sync/trabalho-casa/CONTRIBUTING modificado/skills pessoais, demais worktrees/previews4189/5177/5180 preservados. Servidores de teste task-owned5173/session3470 e5174/session63632 iniciados nesta execução; não confundir com previews herdados. Artefatos dos navegadores devem ter diretórios de saída diferentes se paralelos; execução inicial compartilhada causou ENOENT e servidor encerrado por outro runner, rodada final corrigida sem alterar produto/timeouts.
-
-Última medição real91% restante5h/35% semanal, reset1793907030. Retomada autorizada já ativa nesta conversa; automação retomar-piloto-uiux-pr-51 deve acompanhar esta unidade, sem repetirdiagnóstico. Aos15% restante seguir checkpoint+mesmaautomação reset observado+2min. Sem créditos/reset manual. Pausar somente ao concluir PR+CI integrada+preview validado ou pedido explícito de parar.
+Checkout humano `sync/trabalho-casa` com `CONTRIBUTING.md` modificado e skills pessoais não rastreadas preservado; demais worktrees e automações intocados. Próximo passo: validar e publicar a reconciliação na PR #61, conferir a CI do HEAD, revisar e integrar somente o código validado; registrar separadamente deploy e execução autenticada. Seguir [CONTRIBUTING.md](../CONTRIBUTING.md) para cota/retomada, sem reutilizar percentuais ou horários históricos.

@@ -63,6 +63,38 @@ Exemplo ilustrativo fornecido pelo responsável, sem validação de datas ou dad
 
 **Dependências e aceite futuro:** adaptar a expansão atual da inscrição sem alterar identidade global, vínculos ou contratos de persistência; preservar busca, paginação, foco, teclado e guardas de edição/salvamento. Validar 1366×768, 1920×1080, celular, zoom e nomes longos; dimensionar o ponto de mudança de layout pela legibilidade do conteúdo.
 
+### FUT-004 — Filtros avançados de estatísticas dos jogadores
+
+**Status:** Ideia pós-MVP, com comportamento definido; implementação não iniciada. **Origem e decisão:** conversa com o responsável em 05/11/2026; autorizado somente o registro no roadmap, sem ampliar o MVP.
+
+**Objetivo e benefício:** analisar o desempenho dos jogadores em situações específicas, no perfil individual e na página de estatísticas dos jogadores de um campeonato, recalculando os números conforme o recorte escolhido.
+
+**Comportamento definido:**
+
+| Filtro                         | Perfil do jogador                          | Estatísticas do campeonato                           |
+| ------------------------------ | ------------------------------------------ | ---------------------------------------------------- |
+| Campeonato, edição e categoria | Opções do histórico do atleta              | Omitidos quando já definidos pelo contexto da página |
+| Equipe defendida e adversário  | Opções do histórico do atleta              | Opções daquele campeonato                            |
+| Resultado                      | Vitórias e derrotas                        | Vitórias e derrotas                                  |
+| Etapa                          | Regular e eliminatória                     | Regular e eliminatória                               |
+| Condição na partida            | Titular e reserva                          | Titular e reserva                                    |
+| Margem do placar final         | 1–5, 6–10, 11–15, 16–20 e 21+ pontos       | Mesmas faixas exclusivas                             |
+| Datas                          | Intervalo de datas dos jogos               | Intervalo dentro da edição                           |
+| Mínimo de participações        | Para os agrupamentos estatísticos exibidos | Para qualificação no ranking                         |
+
+- Equipes, adversários, campeonatos, edições e categorias usam seleção múltipla por checkboxes com pesquisa por nome. Pesquisar preserva seleções anteriores e ignora acentos e diferenças entre maiúsculas e minúsculas. Oferecer remoção individual e limpeza das seleções.
+- Na página do campeonato, os filtros avançados ficam em painel expansível, aproveitando os controles existentes sem duplicação. O botão **Aplicar filtros** confirma as seleções; recolher o painel preserva o recorte aplicado, com indicador de filtros ativos e resumo visível.
+- Opções do mesmo campo se somam; campos diferentes se combinam. Exemplo: equipes A ou B, apenas em vitórias nas eliminatórias.
+- Selecionar jogos e participações antes de calcular totais e médias. Recalcular quantidade de participações, números e posições do ranking; aplicar o mínimo de participações depois do recorte. Não selecionar jogadores por uma atuação e manter seus números gerais.
+- Resultado considera a equipe defendida pelo jogador naquela partida; margem corresponde ao placar final, incluindo prorrogações. Titular/reserva corresponde à condição inicial em cada jogo; reserva que não entrou não conta como participação.
+- No perfil, atualizar o resumo estatístico e a lista de jogos. Recordes da Carreira (FUT-002) e conquistas mantêm seus escopos próprios.
+
+**Padrões de referência:** iniciar sem restrições e sem mínimo de participações; datas inicial e final inclusivas; preservar o recorte na navegação e permitir compartilhamento pela URL, sem dados privados.
+
+**Dependências e aceite futuro:** confirmar a integração da classificação cadastrada regular/eliminatória com as fontes estatísticas publicadas, inclusive para jogos anteriores; a investigação desta conversa identificou a necessidade de correção, sem comprovar sua execução. Usar apenas dados publicados elegíveis e informar cobertura e tamanho da amostra; ausência de informação não vira zero nem classificação presumida. Validar combinações de filtros, limites das faixas, jogador alternando entre titular/reserva e passagens por equipes diferentes. Sem filtros, preservar os resultados atuais; com filtros, conferir totais, médias, participações e ranking. Verificar pesquisa, checkboxes, aplicação/limpeza, painel recolhido, resultado vazio, teclado e celular, seguindo os padrões públicos vigentes. Não alterar contratos públicos ou executar migrations/publicações apenas por este registro.
+
+**Ampliações possíveis, fora da primeira entrega:** estatísticas de equipes com os filtros compatíveis; comparação de recortes lado a lado; últimos N jogos; recortes por quarto; condições individuais por atuação, como 20+ pontos. Não constituem compromisso de implementação.
+
 Ao registrar novas ideias, use:
 
 | Campo        | Conteúdo                                                        |
