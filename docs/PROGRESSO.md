@@ -10,6 +10,10 @@ RED→GREEN:2casos originais de bordas/sincronização; Pos. falhou com468px de 
 
 Gate local exit0:704unitários/146arquivos, transporte11,banco13,WorkerHTTP30,PDF1,lint/formato/tipos/build/fronteira/segredos. Após ajuste Pos., formato/tipos/browsers focais novamente PASS. CI final no SHA da PR e do merge permanece necessária. Revisão do autor com ui-ux-pro-max/web-design-guidelines vigente, sem parecer independente. Logs `.preview-artifacts/mobile-boundaries-*.log` e `mobile-position-*.log`. Próximo passo: push/PR, conferir CIs/reviews/threads e integrar com expected_head_sha; depois build fresco do merge e deploy autorizado só no Worker independente.
 
+## Registro documental — filtros avançados
+
+Em 05/11/2026, registrado FUT-004 no [roadmap](ROADMAP.md): filtros do perfil e dos jogadores do campeonato, com recálculo por recorte, checkboxes pesquisáveis e aplicação explícita. Branch `codex/roadmap-filtros-jogadores`, base `85ae37e`; SHA documental e resultado de CI devem ser conferidos na PR desta unidade. Sem implementação, migration, atualização de dados ou deploy; integração de regular/eliminatória permanece dependência a confirmar. Validação documental e CI serão registradas na PR; próximo passo: conferir os checks do SHA e integrar somente com autorização vigente. Checkout humano e trabalho da PR #59 preservados; o restante deste checkpoint pertence à unidade anterior e não foi revalidado nesta atualização.
+
 ## Serviços preservados
 
 PR57 concluída, CI HEAD/main SUCCESS no41452f9. Preview **base-do-basquete-next-uiux** ainda deploymentd6218ce9-6c00-41dc-9954-e3934908b1cd/versão7fd61d4e-400f-4e45-a86f-16d291c29dc3/fonte41452f9. Não houve novo deploy nesta unidade. Conta16b4a5e0a99a031d28051ebadb4811cc, config local ignorada `.preview-artifacts/uiux-preview/wrangler.json`, origem própria, namespace2ac0ffe60c2d490cb7f457c444f24859/segredos existentes preservar. CLI4.152.0 OAuth/conta correta conferidos, sem relogin/upgrade. Cloudflare Apps exige reautenticação, mas conector Cloudflare direto está disponível/mesmo proprietário; preferir esse para metadata. Nunca chamar uploader canônico.
