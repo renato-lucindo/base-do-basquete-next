@@ -93,10 +93,8 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   await expect(page.locator(".legend-notes")).toHaveCount(0);
   const legend = page.getByRole("region", { name: "Legenda", exact: true });
   await expect(legend.locator("dt").filter({ hasText: /^PP%$/ })).toBeVisible();
-  await expect(legend).toContainText("(Participação nos Pontos):");
-  await expect(legend).toContainText(
-    "percentual dos pontos da equipe marcados pelo atleta.",
-  );
+  await expect(legend).toContainText("Participação nos Pontos");
+  await expect(legend).not.toContainText("percentual dos pontos da equipe");
   const pager = page.getByRole("navigation", { name: "Paginação estatística" });
   expect(
     await pager.evaluate(
@@ -176,6 +174,62 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   expect(f.state.queries.every((q) => q.get("pageSize") === "30")).toBe(true);
 });
 
+test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
+  page,
+}, info) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url + "&preset=custom&columns=pointsShare,fiveFouls");
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  const legend = page.getByRole("region", { name: "Legenda", exact: true });
+  for (const [key, label, name] of [
+    ["pointsShare", "PP%", "Participação nos Pontos"],
+    ["fiveFouls", "5F", "Exclusões por cinco faltas"],
+  ]) {
+    const header = table.locator(`thead th[data-public-metric="${key}"]`);
+    await expect(header).toHaveAccessibleName(name);
+    const button = header.getByRole("button");
+    await expect(button).toHaveAccessibleName(`Ordenar por ${label} (${name})`);
+    await button.focus();
+    await expect(button).toBeFocused();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    if (info.project.use.hasTouch) await button.tap();
+    else await button.hover();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    const entry = legend.locator("dl > div").filter({
+      has: page.locator("dt").filter({ hasText: new RegExp(`^${label}$`) }),
+    });
+    await expect(entry.locator("dd")).toHaveText(name);
+    const readable = await entry.locator("dd").evaluate((element) => {
+      const style = getComputedStyle(element);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d")!;
+      context.font = style.font;
+      return (
+        Math.max(
+          ...element
+            .textContent!.split(" ")
+            .map((word) => context.measureText(word).width),
+        ) <=
+        element.clientWidth + 1
+      );
+    });
+    expect(readable).toBe(true);
+    if (key === "fiveFouls")
+      await page.screenshot({
+        path: info.outputPath("rotulos.png"),
+        fullPage: true,
+      });
+    await page.keyboard.press("Escape");
+  }
+  const scan = await new AxeBuilder({ page }).analyze();
+  expect(scan.violations).toEqual([]);
+});
+
 for (const width of [1366, 1920, 390, 320])
   test(`espaçamento, nomes longos, foco, contenção e axe em${width}px`, async ({
     page,
@@ -231,7 +285,13 @@ for (const width of [1366, 1920, 390, 320])
       geometry.documentOverflow,
       JSON.stringify([geometry.widths, geometry.overflow]),
     ).toBe(false);
-    if (width >= 1366) expect(geometry.spare).toBeGreaterThan(30);
+    if (width >= 1366) {
+      const gutter = await table.evaluate((el) => {
+        const viewport = el.closest<HTMLElement>(".statistics-table-wrap")!;
+        return viewport.offsetWidth - viewport.clientWidth;
+      });
+      expect(geometry.spare).toBeLessThanOrEqual(gutter + 1);
+    }
     const region = page.getByRole("region", {
       name: "Tabela estatística rolável",
     });

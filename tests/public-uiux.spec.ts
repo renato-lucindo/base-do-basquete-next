@@ -44,15 +44,22 @@ for (const width of [1366, 1920])
         ...el.querySelectorAll("tbody tr:first-child td[data-public-metric]"),
       ];
       return {
-        spare:
-          region.getBoundingClientRect().right -
-          el.getBoundingClientRect().right,
+        spare: region.clientWidth - el.getBoundingClientRect().width,
+        center: Math.abs(
+          (region.getBoundingClientRect().left +
+            region.getBoundingClientRect().right) /
+            2 -
+            (el.closest(".statistics")!.getBoundingClientRect().left +
+              el.closest(".statistics")!.getBoundingClientRect().right) /
+              2,
+        ),
         player: player.getBoundingClientRect().width,
         fonts: cells.map((c) => parseFloat(getComputedStyle(c).fontSize)),
         align: cells.map((c) => getComputedStyle(c).textAlign),
       };
     });
-    expect(geometry.spare).toBeGreaterThan(100);
+    expect(Math.abs(geometry.spare)).toBeLessThanOrEqual(2);
+    expect(geometry.center).toBeLessThanOrEqual(1);
     expect(geometry.player).toBeLessThanOrEqual(360);
     expect(geometry.fonts.every((n) => n >= 14)).toBe(true);
     expect(geometry.align.every((a) => a === "right")).toBe(true);
