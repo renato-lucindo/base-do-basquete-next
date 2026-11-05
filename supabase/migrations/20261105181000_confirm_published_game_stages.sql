@@ -46,8 +46,7 @@ begin
    left join public.published_statistics_games m on m.game_id=p.game_id and m.dispute_id=p.dispute_id
    where p.dispute_id=did
    on conflict(game_id,dispute_id) do update
-   set publication_version=excluded.publication_version,
-       phase=public.published_statistics_games.phase;
+   set publication_version=excluded.publication_version;
  else
   select * into g from public.published_games where game_id=changed_game and dispute_id=did;
   if found then
