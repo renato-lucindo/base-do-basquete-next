@@ -1,7 +1,11 @@
 import { expect, it } from "vitest";
-import { confirmGameStagesSchema, confirmGameStagesReceiptSchema } from "./stages-contract";
+import {
+  confirmGameStagesSchema,
+  confirmGameStagesReceiptSchema,
+} from "./stages-contract";
 
-const id = (n: number) => `f9200000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+const id = (n: number) =>
+  `f9200000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 const game = (n: number) => ({
   gameId: id(n),
   gameVersion: 3,
