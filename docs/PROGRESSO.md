@@ -1,6 +1,6 @@
 # Progresso atual
 
-Atualizado05/11/2026. Unidade ativa: **Equipes conforme Jogadores**, WIP na branch `codex/equipes-refinamento`, base inicial `76b90da`; worktree `C:/Users/12405304716/.codex/worktrees/equipes-refinamento/Base do Basquete-v1`. Recuperar HEAD por Git; este checkpoint será commitado na mesma unidade. Sem PR criada, CI remota, integração ou deploy desta unidade até aqui.
+Atualizado05/11/2026. Unidade ativa: **Equipes conforme Jogadores**, WIP na branch `codex/equipes-refinamento`, base inicial `76b90da`; worktree `C:/Users/12405304716/.codex/worktrees/equipes-refinamento/Base do Basquete-v1`. Último SHA material WIP publicado: `2853a653706b9ca18302a6a8b202ea39bd9d4acb` (branch remota confirmada, checkout limpo). Recuperar HEAD documental por Git. Sem PR criada, CI remota, integração ou deploy desta unidade até aqui.
 
 ## Implementação e evidências
 
