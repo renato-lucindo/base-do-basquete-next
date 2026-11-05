@@ -5,7 +5,7 @@ create temporary table phase_before_game as
  select game_id,version,snapshot from public.published_games order by game_id;
 create temporary table phase_before_players as
  select person_id,game_id,publication_version,
-        snapshot #- '{fact,phase}' - 'statisticsVersion' as numerical_fact
+        (snapshot #- '{fact,phase}'::text[]) - 'statisticsVersion'::text as numerical_fact
  from public.published_player_games order by person_id,game_id;
 select pg_temp.pu_assert(
  (select count(*)=2 from public.published_statistics_games where dispute_id=pg_temp.pu_id(3)),
@@ -67,9 +67,9 @@ select pg_temp.pu_assert(
 select pg_temp.pu_assert(
  (select count(*)=0 from (
   (select person_id,game_id,publication_version,numerical_fact from phase_before_players
-   except select person_id,game_id,publication_version,snapshot #- '{fact,phase}' - 'statisticsVersion' from public.published_player_games)
+   except select person_id,game_id,publication_version,(snapshot #- '{fact,phase}'::text[]) - 'statisticsVersion'::text from public.published_player_games)
   union all
-  (select person_id,game_id,publication_version,snapshot #- '{fact,phase}' - 'statisticsVersion' from public.published_player_games
+  (select person_id,game_id,publication_version,(snapshot #- '{fact,phase}'::text[]) - 'statisticsVersion'::text from public.published_player_games
    except select person_id,game_id,publication_version,numerical_fact from phase_before_players)
  ) x), 'scores, individual numbers, participation and provenance remain identical');
 -- A new command for the ALREADY published phase is a version-free no-op.
