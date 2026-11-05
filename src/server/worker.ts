@@ -1,4 +1,8 @@
-import { publicationRoute, publicGameRoute, statisticsStageRoute } from "../publication/routes";
+import {
+  publicationRoute,
+  publicGameRoute,
+  statisticsStageRoute,
+} from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
 import { publicCatalogRoute, publicSearchRoute } from "../public-ui/routes";
 import { publicTeamsRoute } from "../team-statistics/routes";
