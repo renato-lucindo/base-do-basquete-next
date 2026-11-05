@@ -1879,3 +1879,63 @@
   display: block;
   visibility: hidden;
 }
+
+/* Scoresheet-only desktop: let the data define the centered block, not its controls. */
+@media (min-width: 1051px) {
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop] {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    :is(
+      .table-toolbar,
+      .table-scroll-hint,
+      .statistics-actions,
+      .table-legend
+    ) {
+    contain: inline-size;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    :is(.table-toolbar, .table-display-controls, .statistics-actions) {
+    flex-wrap: wrap;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .table-display-controls {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .table-toolbar
+    > p {
+    flex-basis: 12rem;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .mode-control
+    .segmented {
+    display: inline-flex;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    :is(.scrollable-table, .statistics-table-wrap) {
+    width: max-content;
+    max-width: 100%;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .scrollable-table-top {
+    contain: inline-size;
+  }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .table-legend
+    dl {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+}
