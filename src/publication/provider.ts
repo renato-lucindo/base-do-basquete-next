@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { confirmGameStagesSchema, confirmGameStagesReceiptSchema, type ConfirmGameStages } from "./stages-contract";
+import {
+  confirmGameStagesSchema,
+  confirmGameStagesReceiptSchema,
+  type ConfirmGameStages,
+} from "./stages-contract";
 import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import { HttpError } from "../server/http";
@@ -159,9 +163,13 @@ export class SupabasePublications {
       receipt.version < command.baseStatisticsVersion ||
       receipt.version > command.baseStatisticsVersion + 1 ||
       receipt.changedGameIds.some(
-        (id) => !command.games.some((game) => game.gameId.toLowerCase() === id.toLowerCase()),
+        (id) =>
+          !command.games.some(
+            (game) => game.gameId.toLowerCase() === id.toLowerCase(),
+          ),
       )
-    ) throw unavailable();
+    )
+      throw unavailable();
     return receipt;
   }
 
