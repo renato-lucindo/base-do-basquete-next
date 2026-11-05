@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure } from "../competition/api";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { usePublicPosition } from "../public-ui/position";
+import { usePublicStandings } from "../regulation/public-page";
 import { TeamFilter } from "../statistics/reference/team-filter";
 import { ColumnPicker } from "../statistics/reference/column-picker";
 import {
@@ -71,6 +72,7 @@ export function TeamsListPublicPage() {
     [search, setSearch] = useState(route.query.search),
     [response, setResponse] = useState<TeamsListPage | null>(null),
     [loading, setLoading] = useState(false),
+    [sourceMissing, setSourceMissing] = useState(false),
     [error, setError] = useState(route.error),
     [retry, setRetry] = useState(0),
     [notice, setNotice] = useState("");
@@ -79,6 +81,21 @@ export function TeamsListPublicPage() {
   const key = serializeTeamsListQuery(route.query),
     id = route.disputeId;
   const data = response && response.disputeId === id ? response : null;
+  const confirmed = usePublicStandings(sourceMissing ? id : null);
+  const withoutResults =
+    sourceMissing &&
+    confirmed.data &&
+    confirmed.data.games.every(
+      (g) => g.state !== "played" && g.state !== "awarded",
+    );
+  const options =
+    data?.options ??
+    (withoutResults
+      ? confirmed.data!.registrations.map((r) => ({
+          registrationId: r.id,
+          name: r.name,
+        }))
+      : []);
   usePublicPosition(!loading && !!data && !error);
   useEffect(() => {
     const read = () => {
@@ -144,10 +161,12 @@ export function TeamsListPublicPage() {
         )
           throw Error("Consulta incompatível.");
         setResponse(next);
+        setSourceMissing(false);
         // Preserve control nodes and focus while replacing only the data.
       })
       .catch((e) => {
         if (!controller.signal.aborted) {
+          setSourceMissing(e instanceof ApiFailure && e.status === 404);
           setError(
             e instanceof ApiFailure
               ? e.message
@@ -175,7 +194,7 @@ export function TeamsListPublicPage() {
   const q = route.query;
   const selected =
     q.selection === "all"
-      ? (data?.options.map((o) => o.registrationId) ?? [])
+      ? options.map((o) => o.registrationId)
       : q.selection === "none"
         ? []
         : q.registrationIds;
@@ -213,23 +232,20 @@ export function TeamsListPublicPage() {
                 />
               </label>
               <TeamFilter
-                options={
-                  data?.options.map((o) => ({
-                    id: o.registrationId,
-                    name: o.name,
-                  })) ?? []
-                }
+                options={options.map((o) => ({
+                  id: o.registrationId,
+                  name: o.name,
+                }))}
                 value={selected}
                 onChange={(ids) =>
                   change({
                     selection:
-                      ids.length === data?.options.length
+                      ids.length === options.length
                         ? "all"
                         : ids.length
                           ? "custom"
                           : "none",
-                    registrationIds:
-                      ids.length === data?.options.length ? [] : ids,
+                    registrationIds: ids.length === options.length ? [] : ids,
                   })
                 }
               />
@@ -346,13 +362,40 @@ export function TeamsListPublicPage() {
                   "Esta seleção está guardada neste navegador e não está integralmente representada no link."}
               </p>
             )}
-            {error && (
-              <div role="alert">
-                <p>{error}</p>
-                <button type="button" onClick={() => setRetry((n) => n + 1)}>
-                  Tentar novamente
-                </button>
-              </div>
+            {withoutResults ? (
+              <section aria-label="Equipes confirmadas">
+                <h2>Participantes confirmados</h2>
+                <ul className="public-results">
+                  {options
+                    .filter(
+                      (o) =>
+                        selected.includes(o.registrationId) &&
+                        o.name
+                          .normalize("NFD")
+                          .replace(/\p{M}/gu, "")
+                          .toLocaleLowerCase("pt-BR")
+                          .includes(
+                            q.search
+                              .normalize("NFD")
+                              .replace(/\p{M}/gu, "")
+                              .toLocaleLowerCase("pt-BR"),
+                          ),
+                    )
+                    .map((o) => (
+                      <li key={o.registrationId}>{o.name}</li>
+                    ))}
+                </ul>
+                <p>Nenhum resultado estatístico publicado nesta disputa.</p>
+              </section>
+            ) : (
+              error && (
+                <div role="alert">
+                  <p>{error}</p>
+                  <button type="button" onClick={() => setRetry((n) => n + 1)}>
+                    Tentar novamente
+                  </button>
+                </div>
+              )
             )}
             <div
               className="statistics-results-block team-list-results"
