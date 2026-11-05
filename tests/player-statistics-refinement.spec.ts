@@ -231,7 +231,13 @@ for (const width of [1366, 1920, 390, 320])
       geometry.documentOverflow,
       JSON.stringify([geometry.widths, geometry.overflow]),
     ).toBe(false);
-    if (width >= 1366) expect(geometry.spare).toBeGreaterThan(30);
+    if (width >= 1366) {
+      const gutter = await table.evaluate((el) => {
+        const viewport = el.closest<HTMLElement>(".statistics-table-wrap")!;
+        return viewport.offsetWidth - viewport.clientWidth;
+      });
+      expect(geometry.spare).toBeLessThanOrEqual(gutter + 1);
+    }
     const region = page.getByRole("region", {
       name: "Tabela estatística rolável",
     });
