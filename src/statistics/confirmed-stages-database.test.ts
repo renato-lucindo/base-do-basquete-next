@@ -9,9 +9,10 @@ it(
     const db = await PGlite.create();
     try {
       await db.exec(platform);
-      for (const file of (await readdir("supabase/migrations"))
+      const migrations = (await readdir("supabase/migrations"))
         .filter((name) => name.endsWith(".sql"))
-        .sort())
+        .sort();
+      for (const file of migrations)
         await db.exec(await readFile(`supabase/migrations/${file}`, "utf8"));
       const fixture = await readFile("supabase/tests/publication.sql", "utf8");
       const boundary = fixture.indexOf("\nset local role anon;");
