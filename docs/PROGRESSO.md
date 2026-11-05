@@ -1,6 +1,14 @@
 # Progresso atual
 
-Unidade ativa: **bordas mobile da tabela de Jogadores + cabeçalho Pos.**, plano e ajuste adicional autorizados em05/11/2026. Branch **codex/tabela-mobile-bordas**, base41452f9a2e450df97e51aa272c5f5187c4c24162; recuperar HEAD pelo Git. Uma PR desta unidade será criada após push do material validado; não integrar sem ambas as CIs.
+## Unidade ativa — classificação de jogos nas estatísticas (05/11/2026)
+
+Branch `codex/fases-estatisticas-publicadas` criada da main `85ae37e521367150c498989d8ccdfe5019eb2c30`; PR para main em preparação. Migration nova `20261105181000_confirm_published_game_stages.sql`, testes SQL/PGlite e integração autenticada de confirmação explícita de fases preparados, **sem aplicação no Supabase, merge ou deploy**. Check GitHub Actions no HEAD desta unidade **pendente**; nenhum `npm run gate` local executado neste ambiente Chat (sem checkout/Node 24). Instruções e impacto: [Confirmação de fases estatísticas](CONFIRMACAO-FASES-ESTATISTICAS.md).
+
+Supabase confirmado: `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`), 23 jogos regulares, 17 jogos publicados com fase nula e 391 projeções individuais sem fase, em duas disputas (4/92 e 13/299). O fluxo atual nunca copia `games.stage_kind` para `published_statistics_games.phase`; jogadores herdam fase de `private.refresh_player_game`. Mudança planejada: publicação nova propaga a fase; correções retrospectivas dependem de comando versionado/autenticado com motivo; migração não faz backfill. Autorização **específica de DDL e DML ainda não recebida**. Próximo passo: PR, CI real e avaliação de impactos/riscos antes de solicitar autorização.
+
+## Checkpoint anterior — bordas mobile, já incorporado à main pela PR #58
+
+A unidade anterior utilizou a branch `codex/tabela-mobile-bordas`; a PR #58 foi incorporada no commit `85ae37e521367150c498989d8ccdfe5019eb2c30`. O texto abaixo preserva as provas e os serviços então registrados, sem representar validação da nova unidade.
 
 ## Implementação e provas
 
