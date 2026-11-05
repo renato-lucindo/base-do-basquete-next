@@ -1,23 +1,21 @@
 # Progresso atual
 
-Atualizado em04/11/2026 22:54America/Sao_Paulo. Unidade: corrigir abertura do Worker de preview, por pedido explícito **“corrija”**, após **“desative access”**. Reforma UI/UX anterior concluída nas PRs51–55 com CI HEAD/main SUCCESS; automação anterior pausada. [Encerramento anterior e Access](../historico/progresso/2026-11-04-uiux-concluida-access-preview.md), [PR55](../historico/progresso/2026-11-04-pr55-integrada.md).
+Unidade ativa: **Estatísticas dos Jogadores**, autorizada pelo plano explícito de05/11/2026. Branch `codex/estatisticas-jogadores`, base main **5d028e5ec97b072ccb37da329da9183999cf2e5e**. PR/HEAD/CI atualizados após push; não presumir aprovação.
 
-## Unidade atual
+Implementado: padding14/10px,30linhas/paginação antes da legenda, máximos positivos de faltas antes de paginar, camisa modal por atleta/inscrição contando relacionados sem jogar, legenda enxuta, remoção de cobertura e de opções avançadas nas disputas exclusivamente de súmula. API mantém20linhas por padrão e acrescenta `hasBoxscore` no opt-in30. Histórico/cálculos compartilhados preservados. [Decisões](design/PUBLICO.md#refinamento-de-jogadores--decisão-de05112026), [provas/capturas/limites](design/VALIDACAO-JOGADORES-REFINAMENTO.md).
 
-Worktree C:/Users/12405304716/.codex/worktrees/reforma-uiux, branch **codex/preview-canonical** criada de origin/main84e641d3838b7ffdc44a2997a2d232920dfaad05 após consultar branches/PRs existentes. Alterações humanas/outros worktrees preservadas. Ainda sem PR/SHA da correção; recuperar Git antes de retomar. Uma unidade/PR por vez.
+## Verificação
 
-Causa: app publicada aceita apenas APP_ORIGIN=https://basedobasquete.com.br; workers.dev retornava421 invalid_host. Correção estrita no wrapper: somente GET/HEAD do hostname exato do preview, fora de /api, redirecionam302/no-store ao domínio canônico, preservando caminho/query. APIs, escritas, outros hosts e validações de sessão/CSRF ficam inalterados. Preparador de pacotes futuros usa a mesma função. Patch do bundle existente exige fonte/estrutura/hash esperados; recusa reaplicação ou bundle inesperado.
+Gate local exit0:704unitários/146arquivos, transporte11, banco isolado13, Worker/HTTP30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos PASS. Browsers57PASS/7skips mobile preexistentes +4capturas finais +2retorno última página +2controles/colunas +10fidelidade PASS. Nenhuma migration, seed, DML ou publicação de dados. Revisão do autor com ui-ux-pro-max/web-design-guidelines; não houve parecer independente.
 
-## Publicação operacional autorizada
+## Serviço e próximo passo
 
-Pedido “corrija” autoriza o reparo deste serviço. Aplicado via PUT /workers/scripts/base-do-basquete-next-preview/content, que substitui somente conteúdo; **nenhum pacote UI/UX novo publicado**. Mesmo bundle de aplicação eff36fe com acréscimo719 caracteres no wrapper; assets/mapa preservados. Deployment **00dffb6b-1d5c-4433-9214-768013ed6277**, versão **139410ce-a8d6-4710-9b94-e1b1222cd3dc**,100%, criado05/11 01:51:43UTC (04/11 22:51:43America/Sao_Paulo). Rollback de código: versão35f5b882-70b1-48f7-8bb3-fda632bd458e, revalidar antes de executar; não desfaz Access/dados.
+Após validar/integrar a única PR e conferir CI do SHA integrado, construir do SHA limpo e atualizar **somente** o Worker de avaliação [base-do-basquete-next-uiux](https://base-do-basquete-next-uiux.renato-lucindo-jr.workers.dev). Publicação expressamente autorizada pelo plano. Preservar sessões/segredos/namespace2ac0ffe60c2d490cb7f457c444f24859 e backend de desenvolvimento. Preview ainda na versão2555feee/deploymentc13c9adf/fonte3ed808b até prova nova.
 
-Hash JS original928e986176a43a3b6323563f701b482c8189aa14d85e9464be098acd9b49e238 → corrigido458590f3878490f86616a0606fc8c6753a2c5a7fe68ae087760770b3c106cb63; releitura remota confirmou. Mapa099f05ac22d17b379389e54eb7b4f3a6e8cac882a670cf146a2b85c722a2df75 preservado. Bindings/namespace0411ac931ca54d289d270606c7e87ef7/compatibilidade/tags/observabilidade conferidos iguais. API regenerou anotações de upload; X-Bdb-Source continuaeff36fe para a aplicação original. Nenhum segredo lido/rotacionado, DML, banco ou Auth alterado.
+Worker principal permanece no deployment00dffb6b-1d5c-4433-9214-768013ed6277; não atualizar domínio principal nem Access. Migrations20261104171445/20261104185633 já aplicadas somente no desenvolvimento; não reaplicar.
 
-Access permanece Bypass/Everyone só no preview, decisão explícita anterior. Outros quatro apps Allow. Backup local .preview-artifacts/access-preview-before-disable.json. O uploader completo ainda exige owner-only Access: futura liberação UI/UX deve reconciliar essa decisão antes de usar o pacote, sem ignorar o gate.
+## Continuidade
 
-## Evidências e próximo passo
+PRs51–56 concluídas, CI HEAD/main SUCCESS. [Checkpoint anterior do preview](../historico/progresso/2026-11-05-preview-independente-aberto.md), [encerramento56](../historico/progresso/2026-11-04-pr56-integrada.md) e [histórico preservado](../historico/progresso/2026-11-05-preview-canonico-encerrado.md) incorporados nesta unidade sem perder contexto.
 
-RED no teste de redirecionamento; GREEN4 cenários (GET/HEAD/path/query/destino fixo/negativas/patch e delegação). Transporte11PASS. Gate local **exit0**,699unitários/145arquivos,transporte11,banco13,Workerd30,PDF1, lint/formato/tipos/build/fronteira/segredos PASS, log .preview-artifacts/preview-canonical-gate.log. Lint focal cobre os scripts finais. Releitura do conteúdo/configuração real PASS. Navegador seguiu o redirecionamento atébasedobasquete.com.br, mas o destino recebeu ERR_CONNECTION_RESET neste ambiente; não contornar restrições de rede nem alegar navegação visual completa.
-
-Próximo passo: revisar diff/formato/segredos, commit e PR da correção, acompanhar CI HEAD/integrada sem repetir código inalterado. Checkpoints anteriores locais incorporados no histórico desta unidade, sem perder contexto. Testes usam fixtures, não dados humanos. Previews4189/5177/5180 e demais worktrees preservados. Última cota real27% restante5h/75% semanal, reset1793848933; medir novamente. Aos15% restante: checkpoint e mesma automação reset observado+2min, sem créditos/reset manual.
+Preservados checkout humano sync/trabalho-casa/CONTRIBUTING modificado/skills pessoais, demais worktrees e previews4189/5177/5180. Automação existente retomar-piloto-uiux-pr-51 PAUSED até necessidade de espera/retomada. Medir cota real; aos15% restante5h checkpoint e mesma automação para reset observado+2min, sem créditos/reset manual.

@@ -1707,7 +1707,7 @@
   .statistics-table
   :is(th, td) {
   height: auto;
-  padding: 5px 10px;
+  padding: 5px 14px;
   border-right: 0;
   font-size: 0.875rem;
 }
@@ -1779,7 +1779,7 @@
     .reference-explorer
     .statistics-table
     :is(th, td) {
-    padding-inline: 8px;
+    padding-inline: 10px;
   }
 }
 

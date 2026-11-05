@@ -97,10 +97,17 @@ export const statisticsPageSchema = z
       .array(statisticsMetricSchema)
       .max(Object.keys(STATISTICS_METRICS).length),
     page: version,
-    pageSize: z.literal(20),
+    pageSize: z.union([z.literal(20), z.literal(30)]),
+    hasBoxscore: z.boolean().optional(),
     total: count,
     totalPages: version,
-    rows: z.array(statisticsRowSchema).max(20),
+    rows: z
+      .array(
+        statisticsRowSchema.safeExtend({
+          jerseys: statisticsRowSchema.shape.jerseys.min(0),
+        }),
+      )
+      .max(30),
     compared: z.array(statisticsRowSchema).max(2000),
     comparisonSummaries: z.array(statisticsSummarySchema).max(2),
     comparisonStates: z.record(
@@ -140,10 +147,14 @@ export const statisticsPageSchema = z
     )
       c.addIssue({ code: "custom", message: "Comparação fora do contexto." });
     if (
-      p.totalPages !== Math.max(1, Math.ceil(p.total / 20)) ||
+      (p.pageSize === 30 && p.hasBoxscore === undefined) ||
+      p.totalPages !== Math.max(1, Math.ceil(p.total / p.pageSize)) ||
       p.page > p.totalPages ||
       p.rows.length !==
-        Math.min(20, Math.max(0, p.total - (p.page - 1) * 20)) ||
+        Math.min(
+          p.pageSize,
+          Math.max(0, p.total - (p.page - 1) * p.pageSize),
+        ) ||
       !uniqueRows(p.rows) ||
       !uniqueRows(p.compared) ||
       new Set(p.compared.map((r) => r.personId)).size > 2 ||

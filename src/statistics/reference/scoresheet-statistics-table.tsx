@@ -178,9 +178,13 @@ export function ScoresheetStatisticsTable({
                     </a>{" "}
                     <span
                       className="player-jersey"
-                      aria-label={`Camisa ${row.jerseys.join(" / ")}`}
+                      aria-label={
+                        row.jerseys.length
+                          ? `Camisa ${row.jerseys.join(" / ")}`
+                          : "Camisa não informada"
+                      }
                     >
-                      #{row.jerseys.join(" / ")}
+                      {row.jerseys.length ? `#${row.jerseys.join(" / ")}` : "—"}
                     </span>
                     {!showTeam && (
                       <span className="player-team-mobile">
@@ -256,33 +260,14 @@ export function StatisticsLegend({ columns }: { columns: StatisticsMetric[] }) {
         {columns.map((key) => (
           <div key={key}>
             <dt>{referenceMetric(key).label}</dt>
-            <dd>{STATISTICS_METRICS[key].name}</dd>
+            <dd>
+              {key === "pointsShare"
+                ? "(Participação nos Pontos): percentual dos pontos da equipe marcados pelo atleta."
+                : STATISTICS_METRICS[key].name}
+            </dd>
           </div>
         ))}
       </dl>
-      <div className="legend-notes">
-        <p>
-          <strong>Por jogo:</strong> somente 2P, 3P, LL, F, T e U são divididos
-          por J. As outras colunas permanecem iguais.
-        </p>
-        <p>
-          <strong>F:</strong> total de faltas cometidas, já incluindo T e U.
-          Essas colunas detalham o total e não devem ser somadas novamente a F.
-        </p>
-        <p>
-          <strong>PP%:</strong> pontos do atleta ÷ pontos da equipe nos mesmos
-          jogos em que participou × 100.
-        </p>
-        <p>
-          <strong>#:</strong> camisas nas participações publicadas.{" "}
-          <strong>0:</strong> valor conhecido. <strong>—:</strong> informação
-          ausente ou incompleta.
-        </p>
-        <p>
-          Empates compartilham posição (1, 1, 3). O ranking considera a precisão
-          completa dos cálculos.
-        </p>
-      </div>
     </section>
   );
 }

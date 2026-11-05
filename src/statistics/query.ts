@@ -6,6 +6,7 @@ import {
 } from "./aggregate";
 import { STATISTICS_METRICS, type StatisticsMetric } from "./metrics";
 import { selectStatisticsFacts } from "./source";
+import type { ConfirmedPlayerFact } from "./confirmed-facts";
 import {
   parseStatisticsQuery,
   serializeStatisticsQuery,
@@ -21,6 +22,36 @@ export {
 } from "./query-contract";
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
 const unique = <T>(values: T[]) => [...new Set(values)];
+const foulHighlights = new Set<StatisticsMetric>([
+  "foulsCommitted",
+  "technicalFouls",
+  "unsportsmanlikeFouls",
+  "fiveFouls",
+  "disqualifications",
+]);
+/** Table projection only. Related players count even when they did not play. */
+function predominantJerseys(facts: ConfirmedPlayerFact[]) {
+  const counts = new Map<string, Map<string, number>>();
+  for (const fact of facts) {
+    if (!fact.jersey?.trim()) continue;
+    const key = `${fact.person.id}/${fact.registration.registrationId}`;
+    const jerseys = counts.get(key) ?? new Map<string, number>();
+    jerseys.set(fact.jersey, (jerseys.get(fact.jersey) ?? 0) + 1);
+    counts.set(key, jerseys);
+  }
+  return new Map(
+    [...counts].map(([key, jerseys]) => {
+      const maximum = Math.max(...jerseys.values());
+      return [
+        key,
+        [...jerseys]
+          .filter(([, count]) => count === maximum)
+          .map(([jersey]) => jersey)
+          .sort(),
+      ];
+    }),
+  );
+}
 function matches(value: number, operator: FilterOperator, target: number) {
   switch (operator) {
     case ">=":
@@ -100,7 +131,8 @@ export function buildStatisticsPage(
       (r) => r.metrics[metric].status === "available",
     );
     if (!covered.length) continue;
-    const lower = STATISTICS_METRICS[metric].lowerIsBetter;
+    const lower =
+      !foulHighlights.has(metric) && STATISTICS_METRICS[metric].lowerIsBetter;
     const best = covered.reduce(
       (winner, row) =>
         lower
@@ -108,12 +140,14 @@ export function buildStatisticsPage(
           : Math.max(winner, row.metrics[metric].value!),
       covered[0].metrics[metric].value!,
     );
+    if (foulHighlights.has(metric) && best <= 0) continue;
     leaders[metric] = covered
       .filter((r) => r.metrics[metric].value === best)
       .map(rowRef);
   }
   const ranked = rankSortedRows(sorted, value);
-  const totalPages = Math.max(1, Math.ceil(sorted.length / 20)),
+  const jerseys = predominantJerseys(selected.facts);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / query.pageSize)),
     page = Math.min(query.page, totalPages);
   const comparisonSummaries = query.compare.length
     ? aggregateComparedStatistics(selected.facts, query.compare, {
@@ -149,10 +183,17 @@ export function buildStatisticsPage(
       (c) => query.mode !== "per-30" || c !== "minutes",
     ),
     page,
-    pageSize: 20 as const,
+    pageSize: query.pageSize,
+    // Opt-in metadata: legacy clients use a strict DTO with 20-row pages.
+    ...(query.pageSize === 30 ? { hasBoxscore: selected.hasBoxscore } : {}),
     total: sorted.length,
     totalPages,
-    rows: ranked.slice((page - 1) * 20, page * 20),
+    rows: ranked
+      .slice((page - 1) * query.pageSize, page * query.pageSize)
+      .map((row) => ({
+        ...row,
+        jerseys: jerseys.get(`${row.personId}/${row.registrationId}`) ?? [],
+      })),
     compared: query.compare.flatMap((id) =>
       all.filter((r) => r.personId === id),
     ),
