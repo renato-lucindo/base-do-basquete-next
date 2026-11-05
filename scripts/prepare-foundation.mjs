@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { blockingWorktreeChanges } from "./deployment-worktree.mjs";
+import { previewCanonicalRedirect } from "./preview-canonical.mjs";
 
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
   encoding: "utf8",
@@ -47,7 +48,7 @@ for (const path of paths) {
 const worker = readFileSync(".worker-artifacts/worker.js", "utf8");
 const assetAdapter = readFileSync("scripts/foundation-assets.mjs", "utf8");
 const modules = {
-  "index.mjs": `import worker,{SessionStore} from './worker.js';import {createFoundationAssets} from './asset-adapter.mjs';import manifest from './assets.mjs';export{SessionStore};const assets=createFoundationAssets(manifest);export default{async fetch(request,env,ctx){const response=await worker.fetch(request,{...env,ASSETS:{fetch:assets}},ctx);response.headers.set('X-Bdb-Source','${sourceCommit}');return response;}};`,
+  "index.mjs": `import worker,{SessionStore} from './worker.js';import {createFoundationAssets} from './asset-adapter.mjs';import manifest from './assets.mjs';export{SessionStore};const assets=createFoundationAssets(manifest);${previewCanonicalRedirect.toString()};export default{async fetch(request,env,ctx){const redirect=previewCanonicalRedirect(request,env.APP_ORIGIN);if(redirect)return redirect;const response=await worker.fetch(request,{...env,ASSETS:{fetch:assets}},ctx);response.headers.set('X-Bdb-Source','${sourceCommit}');return response;}};`,
   "worker.js": worker,
   "asset-adapter.mjs": assetAdapter,
   "assets.mjs": `export default ${JSON.stringify(manifest)};`,
