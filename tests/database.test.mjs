@@ -375,7 +375,10 @@ test("S3 confirmed game stages: new publications and legacy upgrade preserve ato
       await db.exec(platform);
       const apply = async (name) =>
         db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
-      for (const name of names.slice(0, mode === "zero" ? names.length : boundary))
+      for (const name of names.slice(
+        0,
+        mode === "zero" ? names.length : boundary,
+      ))
         await apply(name);
       await db.exec(
         (await readFile("supabase/tests/publication.sql", "utf8")).replace(
@@ -383,7 +386,8 @@ test("S3 confirmed game stages: new publications and legacy upgrade preserve ato
           "\n",
         ),
       );
-      if (mode === "upgrade") for (const name of names.slice(boundary)) await apply(name);
+      if (mode === "upgrade")
+        for (const name of names.slice(boundary)) await apply(name);
       await db.exec(await readFile("supabase/tests/stage_phases.sql", "utf8"));
     } finally {
       await db.close();
