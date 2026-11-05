@@ -75,7 +75,7 @@ Em F/T/U/5F/GD, o negrito identifica o maior valor positivo da consulta filtrada
 
 A camisa apresentada é a mais frequente por atleta/inscrição no recorte consultado, contando todas as súmulas publicadas em que foi relacionado, mesmo sem jogar. Apenas empates na frequência máxima exibem mais de uma;0 e00 permanecem distintos. Histórico de perfil/súmula e demais páginas não muda.
 
-A legenda contém somente definições das colunas visíveis. PP% (Participação nos Pontos): percentual dos pontos da equipe marcados pelo atleta. O cálculo permanece igual. O painel “Cobertura dos dados” é removido; cobertura interna e distinção zero/ausência permanecem.
+A legenda contém somente definições das colunas visíveis. No cabeçalho/tooltip e na legenda de Jogadores, PP% usa **Participação nos Pontos** e5F usa **Exclusões por cinco faltas**, conforme ajuste do responsável em05/11/2026. São nomes curtos de apresentação; substituem a explicação extensa anterior de PP%. Os cálculos e definições compartilhadas com Equipes permanecem iguais. O painel “Cobertura dos dados” é removido; cobertura interna e distinção zero/ausência permanecem.
 
 Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Totais/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20linhas e o formato anterior; a página atual solicita `pageSize=30` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
 

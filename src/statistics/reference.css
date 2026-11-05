@@ -1932,4 +1932,10 @@
     .scrollable-table-top {
     contain: inline-size;
   }
+  .public-site.statistics-public
+    .statistics-results-block[data-compact-desktop]
+    .table-legend
+    dl {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
 }
