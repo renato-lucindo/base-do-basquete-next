@@ -20,7 +20,7 @@
     "format": "prettier --write src tests scripts index.html publico.html foundation.html resultado.html estatisticas.html atleta.html equipes.html equipe.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md CONTRIBUTING.md AGENTS.md",
     "format:check": "prettier --check src tests scripts index.html publico.html foundation.html resultado.html estatisticas.html atleta.html equipes.html equipe.html wrangler.jsonc *.json *.ts *.mjs .github docs README.md CONTRIBUTING.md AGENTS.md",
     "secrets": "node scripts/check-secrets.mjs",
-    "gate": "npm run lint && npm run format:check && npm run types:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run build:foundation && npm run test:access && npm run test:pdf-runtime && node scripts/check-client-boundary.mjs && npm run secrets",
+    "gate": "npm run test:ci && npm run lint && npm run format:check && npm run types:check && npm run typecheck && npm test && npm run test:transport && npm run test:db && npm run build && npm run build:foundation && npm run test:access && npm run test:pdf-runtime && node scripts/check-client-boundary.mjs && npm run secrets",
     "dev:foundation": "vite --config vite.foundation.config.ts",
     "build:foundation": "vite build --config vite.foundation.config.ts",
     "build:worker": "tsc --noEmit -p tsconfig.worker.json && wrangler deploy --dry-run --outdir .worker-artifacts",
@@ -28,7 +28,9 @@
     "types:check": "wrangler types --include-runtime false --strict-vars false --check",
     "test:pdf-runtime": "wrangler deploy --dry-run --config tests/fixtures/pdf-worker.wrangler.jsonc --outdir ../../.preview-artifacts/pdf-worker && node --test tests/pdf-runtime.test.mjs",
     "design:build": "node docs/design/build.cjs",
-    "design:verify": "node docs/design/verify.cjs"
+    "design:verify": "node docs/design/verify.cjs",
+    "test:ci": "node --test tests/ci-plan.test.mjs",
+    "gate:ui": "npm run lint && npm run format:check && npm run typecheck && npm run build && npm run build:foundation && node scripts/check-client-boundary.mjs && node scripts/check-secrets.mjs --source-only"
   },
   "dependencies": {
     "react": "19.3.0",
