@@ -16,33 +16,46 @@
 2. Fazer uma leitura de prévia no Supabase, sem atualizar nada:
 
 ```sql
+with candidates as (
+  select
+    m.dispute_id,
+    h.version as base_statistics_version,
+    g.id as game_id,
+    g.version as game_version,
+    m.publication_version,
+    m.phase as previous_phase,
+    g.stage_kind as target_phase,
+    (select count(*) from public.published_player_games p
+     where p.game_id = m.game_id and p.dispute_id = m.dispute_id)
+      as player_count
+  from public.published_statistics_games m
+  join public.games g on g.id = m.game_id and g.dispute_id = m.dispute_id
+  join public.published_games pg on pg.game_id = m.game_id
+    and pg.dispute_id = m.dispute_id and pg.version = m.publication_version
+  join public.published_statistics h on h.dispute_id = m.dispute_id
+)
 select
-  m.dispute_id,
-  h.version as base_statistics_version,
-  count(distinct m.game_id) filter (where m.phase is distinct from g.stage_kind) as pending_games,
-  count(p.person_id) filter (where m.phase is distinct from g.stage_kind)
+  dispute_id,
+  base_statistics_version,
+  count(*) filter (where previous_phase is distinct from target_phase)
+    as pending_games,
+  sum(player_count) filter (where previous_phase is distinct from target_phase)
     as affected_player_projections,
   jsonb_agg(
     jsonb_build_object(
-      'gameId', g.id,
-      'gameVersion', g.version,
-      'publicationVersion', m.publication_version,
-      'previousPhase', m.phase,
-      'targetPhase', g.stage_kind
-    ) order by g.id
-  ) filter (where m.phase is distinct from g.stage_kind) as proposed_games
-from public.published_statistics_games m
-join public.games g on g.id = m.game_id and g.dispute_id = m.dispute_id
-join public.published_games pg on pg.game_id = m.game_id
-  and pg.dispute_id = m.dispute_id and pg.version = m.publication_version
-join public.published_statistics h on h.dispute_id = m.dispute_id
-left join public.published_player_games p on p.game_id = m.game_id
-  and p.dispute_id = m.dispute_id
-group by m.dispute_id, h.version
-order by m.dispute_id;
+      'gameId', game_id,
+      'gameVersion', game_version,
+      'publicationVersion', publication_version,
+      'previousPhase', previous_phase,
+      'targetPhase', target_phase
+    ) order by game_id
+  ) filter (where previous_phase is distinct from target_phase) as proposed_games
+from candidates
+group by dispute_id, base_statistics_version
+order by dispute_id;
 ```
 
-**Observação:** o total de jogos usa `count(distinct m.game_id)` porque o join às participações multiplica as linhas. A prévia é sempre reexecutada antes de enviar comandos.
+**Observação:** a subconsulta de participações evita duplicar jogos na prévia. O campo `targetPhase` serve apenas à revisão: **não** deve ser incluído no payload do comando. A prévia é sempre reexecutada antes de enviar comandos.
 
 3. Medir antes da alteração os totais sem filtro, a quantidade de linhas `published_games`/`published_player_games`, as versões e os snapshots esportivos das 17 publicações e, onde permitido, armazenar a comparação em artefato de validação com acesso restrito. Não transportar dados pessoais para GitHub ou logs.
 4. Somente após autorização **específica para DDL**, aplicar **uma vez** a migration versionada pela ferramenta de migrations; ela **não** contém DML de backfill e não cria versões de resultados.
