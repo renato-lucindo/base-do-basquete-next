@@ -19,18 +19,29 @@ export function ScrollableTable({
     const viewport = viewportRef.current;
     if (!top || !viewport) return;
 
+    const maximum = (element: HTMLElement) =>
+      Math.max(0, element.scrollWidth - element.clientWidth);
+    const position = (element: HTMLElement) =>
+      Math.min(maximum(element), Math.max(0, element.scrollLeft));
     const update = () => {
-      setScrollWidth(viewport.scrollWidth);
+      // Match the horizontal travel even when the viewport has a vertical scrollbar.
+      setScrollWidth(maximum(viewport) + top.clientWidth);
+      const left = position(viewport);
       setEdges({
-        left: viewport.scrollLeft > 1,
-        right:
-          viewport.scrollLeft + viewport.clientWidth < viewport.scrollWidth - 1,
+        left: left > 1,
+        right: left < maximum(viewport) - 1,
       });
     };
     const sync = (source: HTMLElement, target: HTMLElement) => {
       if (syncing.current) return;
+      const next = Math.min(position(source), maximum(target));
+      // Some engines round scrollLeft; don't rewrite an equivalent subpixel position.
+      if (Math.abs(target.scrollLeft - next) <= 0.5) {
+        update();
+        return;
+      }
       syncing.current = true;
-      target.scrollLeft = source.scrollLeft;
+      target.scrollLeft = next;
       update();
       requestAnimationFrame(() => {
         syncing.current = false;
@@ -43,6 +54,7 @@ export function ScrollableTable({
     top.addEventListener("scroll", fromTop, { passive: true });
     viewport.addEventListener("scroll", fromViewport, { passive: true });
     observer.observe(viewport);
+    observer.observe(top);
     if (viewport.firstElementChild)
       observer.observe(viewport.firstElementChild);
     update();

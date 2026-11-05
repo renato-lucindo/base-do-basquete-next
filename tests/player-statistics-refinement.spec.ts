@@ -12,8 +12,8 @@ test("bordas: tabela e barra superior contêm o deslocamento elástico", async (
     .locator(".scrollable-table-top, .statistics-table-wrap")
     .evaluateAll((elements) =>
       elements.map((el) => ({
-        x: getComputedStyle(el).overscrollBehaviorX,
-        y: getComputedStyle(el).overscrollBehaviorY,
+        x: getComputedStyle(el).getPropertyValue("overscroll-behavior-x"),
+        y: getComputedStyle(el).getPropertyValue("overscroll-behavior-y"),
         touch: getComputedStyle(el).touchAction,
       })),
     );
@@ -51,7 +51,8 @@ test("bordas: sincronização não propaga offsets elásticos nem reescreve o me
         },
       });
       const maximum = viewport.scrollWidth - viewport.clientWidth;
-      for (const value of [-80, 0, 60, 60, maximum + 80]) {
+      const targetMaximum = top.scrollWidth - top.clientWidth;
+      for (const value of [-80, 0, 60.25, 60.25, maximum + 80]) {
         Object.defineProperty(viewport, "scrollLeft", {
           configurable: true,
           get: () => value,
@@ -63,9 +64,13 @@ test("bordas: sincronização não propaga offsets elásticos nem reescreve o me
       }
       delete (viewport as Partial<HTMLElement>).scrollLeft;
       delete (top as Partial<HTMLElement>).scrollLeft;
-      return { writes, maximum, final: top.scrollLeft };
+      return {
+        writes,
+        maximum: Math.min(maximum, targetMaximum),
+        final: top.scrollLeft,
+      };
     });
-  expect(result.writes).toEqual([60, result.maximum]);
+  expect(result.writes).toEqual([60.25, result.maximum]);
   expect(result.final).toBe(result.maximum);
 });
 
