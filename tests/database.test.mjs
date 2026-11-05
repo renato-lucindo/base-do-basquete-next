@@ -360,3 +360,33 @@ test("C3 upgrade preserves C2 registrations and their global identity", async ()
     await db.close();
   }
 });
+
+test("S3 confirmed game stages: new publications and legacy upgrade preserve atomicity", async () => {
+  const names = (await readdir("supabase/migrations"))
+    .filter((name) => name.endsWith(".sql"))
+    .sort();
+  const boundary = names.findIndex((name) =>
+    name.endsWith("_confirm_published_game_stages.sql"),
+  );
+  assert.ok(boundary > 0, "stage migration exists");
+  for (const mode of ["zero", "upgrade"]) {
+    const db = await PGlite.create();
+    try {
+      await db.exec(platform);
+      const apply = async (name) =>
+        db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
+      for (const name of names.slice(0, mode === "zero" ? names.length : boundary))
+        await apply(name);
+      await db.exec(
+        (await readFile("supabase/tests/publication.sql", "utf8")).replace(
+          /\nrollback;\s*$/u,
+          "\n",
+        ),
+      );
+      if (mode === "upgrade") for (const name of names.slice(boundary)) await apply(name);
+      await db.exec(await readFile("supabase/tests/stage_phases.sql", "utf8"));
+    } finally {
+      await db.close();
+    }
+  }
+});
