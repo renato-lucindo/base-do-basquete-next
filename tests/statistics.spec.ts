@@ -211,7 +211,16 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
       30 +
       1,
   );
-  await page.getByText("Mais filtros e opções", { exact: true }).click();
+  // Reload can leave headless Chromium without compositor frames for click's
+  // stability check. Exercise the native keyboard path after restoration;
+  // mouse activation remains covered by the comparison/filter tests above.
+  const advanced = page.getByText("Mais filtros e opções", { exact: true });
+  await expect(advanced).toBeVisible();
+  await advanced.press("Enter");
+  await expect(page.locator(".statistics-advanced")).toHaveAttribute(
+    "open",
+    "",
+  );
   await page
     .getByRole("combobox", { name: "Escopo", exact: true })
     .selectOption("regular");
