@@ -293,3 +293,189 @@
 .public-site.statistics-public .team-statistics-explorer .rank {
   text-align: right;
 }
+/* The opt-in team list owns these overrides; profiles, players and boxscores keep their layout. */
+.team-list-page .team-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-block: 12px;
+}
+.team-list-page .team-list-filters label {
+  font-size: 0.8125rem;
+}
+.team-list-page .team-list-filters input[type="search"] {
+  min-height: 44px;
+  max-width: 280px;
+}
+.team-list-page .team-list-notice {
+  font-size: 0.8125rem;
+  color: #526176;
+}
+.team-list-page .team-list-results {
+  min-width: 0;
+  max-width: 100%;
+}
+.team-list-page .team-list-explorer .statistics-table-wrap {
+  max-height: 70vh;
+}
+.team-list-page .team-list-explorer .statistics-table th[scope="row"] > a {
+  font-weight: 400;
+  color: inherit;
+  text-decoration: none;
+}
+.team-list-page
+  .team-list-explorer
+  .statistics-table
+  th[scope="row"]
+  > a:hover {
+  text-decoration: underline;
+}
+.team-list-page :is(a, button, input, select):focus-visible {
+  outline: 2px solid #075fca;
+  outline-offset: 3px;
+}
+.team-list-page .team-list-maximum {
+  font-weight: 700;
+}
+.team-list-page .team-list-explorer .statistics-table :is(th, td) {
+  font-weight: 400;
+}
+.team-list-page .team-list-explorer .statistics-table td.team-list-maximum {
+  font-weight: 700;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  :is(.statistics-table-wrap, .scrollable-table-top) {
+  overscroll-behavior: none;
+}
+.team-list-page .team-list-explorer[data-scoresheet] .statistics-table {
+  width: max-content;
+  min-width: 0;
+  table-layout: auto;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  :is(th, td) {
+  padding: 5px 14px;
+  white-space: nowrap;
+  text-align: right;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  :is(th, td):first-child {
+  position: static;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  thead
+  th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f3f6fa;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  thead
+  th:nth-child(2) {
+  z-index: 12;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  :is(th[scope="row"], th[data-team-metric="name"]) {
+  position: sticky;
+  left: 0;
+  min-width: 150px;
+  max-width: 260px;
+  text-align: left;
+  white-space: normal;
+  background: #fff;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  th[scope="row"]
+  > a {
+  width: max-content;
+  max-width: 230px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+@media (min-width: 1051px) {
+  .team-list-page .team-list-results[data-sheet-only] {
+    width: fit-content;
+    margin-inline: auto;
+  }
+  .team-list-page
+    .team-list-results[data-sheet-only]
+    :is(.table-toolbar, .table-legend) {
+    contain: inline-size;
+  }
+  .team-list-page
+    .team-list-results[data-sheet-only]
+    :is(.scrollable-table, .statistics-table-wrap) {
+    width: max-content;
+    max-width: 100%;
+  }
+  .team-list-page .team-list-results[data-sheet-only] .scrollable-table-top {
+    contain: inline-size;
+  }
+  .team-list-page .team-list-results[data-sheet-only] .table-legend dl {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+}
+@media (max-width: 1050px) {
+  .team-list-page
+    .team-list-explorer[data-scoresheet]
+    .statistics-table
+    :is(th, td) {
+    padding-inline: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .team-list-page .team-list-filters {
+    align-items: stretch;
+  }
+  .team-list-page .team-list-filters .search-field {
+    flex: 1 1 100%;
+  }
+  .team-list-page .team-list-filters .search-field input {
+    max-width: 100%;
+    width: 100%;
+  }
+  .team-list-page .team-list-filters .mode-control {
+    flex: 1 1 100%;
+  }
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  thead
+  th:first-child {
+  position: sticky;
+  top: 0;
+  left: auto;
+  z-index: 10;
+}
+@media (max-width: 1050px) {
+  .team-list-page
+    .team-list-explorer[data-scoresheet]
+    .statistics-table
+    :is(th[scope="row"], th[data-team-metric="name"]) {
+    min-width: 110px;
+    max-width: 130px;
+  }
+  .team-list-page
+    .team-list-explorer[data-scoresheet]
+    .statistics-table
+    th[scope="row"]
+    > a {
+    max-width: 110px;
+  }
+}

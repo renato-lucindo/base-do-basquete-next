@@ -1,3 +1,5 @@
+import { buildTeamsList } from "./list-domain";
+import { parseTeamsListQuery } from "./list-query";
 import { z } from "zod";
 import { HttpError } from "../server/http";
 import { unavailable } from "../access/provider";
@@ -33,11 +35,17 @@ export class SupabaseTeamStatistics {
   ) {}
   async getPage(id: string, params: URLSearchParams) {
     id = uuid(id);
-    const query = parseTeamsQuery(params),
+    const query =
+        params.get("pageSize") === "all"
+          ? parseTeamsListQuery(params)
+          : parseTeamsQuery(params),
       source = await readPublicStatisticsSource(this.config, this.send, id);
     if (source === null) return null;
     try {
-      const p = buildTeamsPage(source, query);
+      const p =
+        "pageSize" in query
+          ? buildTeamsList(source, query)
+          : buildTeamsPage(source, query);
       if (p.disputeId !== id) throw unavailable();
       return p;
     } catch (e) {

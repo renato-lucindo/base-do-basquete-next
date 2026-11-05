@@ -70,7 +70,7 @@ for (const width of [1366, 1920])
     const teams = await teamPublicFixture(page);
     await page.goto(teams.listUrl + "?preset=custom&columns=games,points");
     const teamTable = page.getByRole("table", {
-      name: "Equipes com resultados confirmados",
+      name: "Estatísticas das equipes",
       exact: true,
     });
     await expect(teamTable.locator("tbody tr")).toHaveCount(2);
@@ -91,7 +91,7 @@ for (const width of [1366, 1920])
           el.closest(".statistics-table-wrap")!.getBoundingClientRect().right -
           el.getBoundingClientRect().right,
       ),
-    ).toBeGreaterThan(100);
+    ).toBeLessThanOrEqual(2);
     await expect(
       page.getByText(/Fonte do nome|Fonte confirmada v|Resultado v/u),
     ).toHaveCount(0);

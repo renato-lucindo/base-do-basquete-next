@@ -7,7 +7,7 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   const f = await teamPublicFixture(page);
   await page.goto(f.listUrl);
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
   await expect(table.getByRole("row")).toHaveCount(3);
@@ -17,15 +17,10 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   await expect(
     table.getByRole("link", { name: "Lobos B", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("combobox", { name: "Modo", exact: true })
-    .selectOption("total");
-  await expect(
-    page.getByRole("heading", {
-      name: "Equipes com resultados confirmados",
-      exact: true,
-    }),
-  ).toBeFocused();
+  const totals = page.getByRole("button", { name: "Totais", exact: true });
+  await totals.focus();
+  await page.keyboard.press("Enter");
+  await expect(totals).toBeFocused();
   const lobos = table
     .getByRole("row")
     .filter({ has: page.getByRole("link", { name: "Lobos", exact: true }) });
@@ -46,10 +41,10 @@ test("busca/ordem/página da lista reaparecem no retorno do detalhe", async ({
     f.listUrl + "?mode=total&scope=all&sort=name&direction=asc&page=2",
   );
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
-  await expect(table.getByRole("row")).toHaveCount(7);
+  await expect(table.getByRole("row")).toHaveCount(27);
   await table.getByRole("link", { name: "Inscrição 20", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Inscrição 20", exact: true }),
@@ -57,16 +52,15 @@ test("busca/ordem/página da lista reaparecem no retorno do detalhe", async ({
   await page
     .getByRole("link", { name: "Voltar às equipes", exact: true })
     .click();
-  await expect(page).toHaveURL(/page=2/);
-  await expect(table.getByRole("row")).toHaveCount(7);
+  await expect(page).toHaveURL(/sort=name/);
+  await expect(table.getByRole("row")).toHaveCount(27);
   await page
-    .getByRole("textbox", { name: "Buscar equipe ou inscrição", exact: true })
+    .getByRole("searchbox", { name: "Buscar equipe ou inscrição", exact: true })
     .fill("Inscrição 25");
-  await page.getByRole("button", { name: "Buscar", exact: true }).click();
   await expect(table.getByRole("row")).toHaveCount(2);
   await page.reload();
   await expect(
-    page.getByRole("textbox", {
+    page.getByRole("searchbox", {
       name: "Buscar equipe ou inscrição",
       exact: true,
     }),
@@ -167,20 +161,13 @@ test("escopo vazio, erro e contaminação têm estados próprios sem placar fict
   const f = await teamPublicFixture(page);
   for (const g of f.source.games) g.phase = null;
   await page.goto(f.listUrl);
-  await page
-    .getByRole("combobox", { name: "Escopo", exact: true })
-    .selectOption("regular");
+  await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect(
-    page.getByText(
-      "Nenhuma inscrição com resultados confirmados neste recorte.",
-      { exact: true },
-    ),
+    page.getByText("Nenhuma inscrição neste recorte.", { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
   f.state.corrupt = true;
-  await page
-    .getByRole("combobox", { name: "Escopo", exact: true })
-    .selectOption("all");
+  await page.getByRole("button", { name: "Todos", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("Não foi possível");
   await expect(page.getByText("do-not-display")).toHaveCount(0);
   f.state.corrupt = false;

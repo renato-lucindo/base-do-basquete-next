@@ -8,12 +8,13 @@ export default defineConfig({
   projects: [
     {
       name: "webkit-desktop",
-      testMatch: /player-statistics-(boundaries|refinement|desktop)\.spec\.ts/,
+      testMatch:
+        /(?:player-statistics-(boundaries|refinement|desktop)|team-refinement)\.spec\.ts/,
       use: { browserName: "webkit", viewport: { width: 1366, height: 768 } },
     },
     {
       name: "webkit-mobile",
-      testMatch: /player-statistics-refinement\.spec\.ts/,
+      testMatch: /(?:player-statistics-refinement|team-refinement)\.spec\.ts/,
       use: {
         browserName: "webkit",
         viewport: { width: 390, height: 844 },

@@ -97,6 +97,7 @@ export function aggregateTeamStatistics(
   appearances: TeamAppearance[],
   mode: "total" | "per-game",
   sheetOnly: boolean,
+  uniform = false,
 ) {
   const observations = appearances.map(observe);
   const metricCoverage = Object.fromEntries(
@@ -133,9 +134,10 @@ export function aggregateTeamStatistics(
       const total = observations.reduce((n, o) => n + o[key]!, 0);
       const scale =
         key === "games" ||
-        (!sheetOnly && key === "points") ||
-        key === "fiveFouls" ||
-        (!sheetOnly && key === "disqualifications")
+        (!uniform &&
+          ((!sheetOnly && key === "points") ||
+            key === "fiveFouls" ||
+            (!sheetOnly && key === "disqualifications")))
           ? 1
           : key === "pointsPerGame" || mode === "per-game"
             ? observations.length

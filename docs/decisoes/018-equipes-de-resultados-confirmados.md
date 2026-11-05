@@ -23,3 +23,11 @@ Revisão e documento compõem o mesmo comando idempotente e a mesma transação 
 A evolução do escritor exige migration própria, preservando as aplicadas. O pedido atual não autoriza sua aplicação remota, deploy ou merge. Estado real e provas ficam no checkpoint e na [evidência desta alteração](../evidencias/2026-11-03-equipes-sumula.md).
 
 Ruling operacional: iniciar ET1 puro na branch sequencial codex/equipes-publicas sobre84baf38 enquanto CI40262045133 verifica o perfil23eede4. Não alterar builds/manifesto/payload do perfil preparado84baf38 nem publicar código ET1 por engano. Deploy do perfil, se CI aprovar, usa exclusivamente esse pacote imutável. Se a CI falhar, diagnosticar/corrigir a unidade anterior com rastreio explícito; não atribuir sua prova à nova unidade.
+
+## Listagem integral optativa —05/11/2026
+
+A decisão atual evolui somente a listagem solicitada com `pageSize=all`: contagens uniformes total/por J para súmula e boxscore, PB/PB%, seleção por inscrição e precisão completa. Não modifica contratos legados nem perfil. A fonte continua publicada/validada integralmente, com limite1000inscrições e transporte paginado existente do ADR019. Sem migrations ou alteração de persistência/publicação.
+
+PB usa titulares confirmados por partida e pontos individuais publicados; coletivo PDF válido prevalece quando possui a mesma autoridade dos pontos. Ausência de titular não confirma reserva. Numerador/denominador correspondem às mesmas partidas; cobertura parcial é —, nunca subtotal. O novo DTO expõe cobertura interna e opções públicas completas sem incluir campos nas respostas legadas. Ordem/UI vigentes em [PUBLICO](../design/PUBLICO.md#refinamento-de-equipes--decisão-de05112026).
+
+A consulta histórica atual está no [quadro por jogo/equipe](../evidencias/2026-11-05-equipes-historico.md). Reconstituições diagnósticas não alteram os documentos nem autorizam republicação; FR e total completo GD continuam exigindo conferência explícita da fonte.
