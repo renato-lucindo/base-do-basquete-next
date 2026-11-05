@@ -1,6 +1,6 @@
 # Publicação controlada da fase dos jogos nas estatísticas
 
-**Unidade:** `codex/fases-estatisticas-publicadas`. **Alvo futuro, somente após autorização específica:** Supabase `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`). **Não há autorização para aplicar a migration nem atualizar dados por esta PR.**
+**Unidade:** `codex/fases-estatisticas-publicadas`. **Projeto confirmado:** Supabase `base-do-basquete-next-dev` (`nizmasjddyrhmevvfviz`). **Em 05/11/2026 a migration `20261105220937_confirm_published_game_stages` foi aplicada com autorização expressa. O backfill ainda NÃO foi executado**: exige uma sessão real de administrador, indisponível nos conectores desta conversa; `execute_sql` conecta como `postgres`, sem `auth.uid()`. Nenhuma sessão administrativa deve ser simulada para contornar esta restrição.
 
 ## Autoridade e fronteira
 
@@ -58,8 +58,8 @@ order by dispute_id;
 **Observação:** a subconsulta de participações evita duplicar jogos na prévia. O campo `targetPhase` serve apenas à revisão: **não** deve ser incluído no payload do comando. A prévia é sempre reexecutada antes de enviar comandos.
 
 3. Medir antes da alteração os totais sem filtro, a quantidade de linhas `published_games`/`published_player_games`, as versões e os snapshots esportivos das 17 publicações e, onde permitido, armazenar a comparação em artefato de validação com acesso restrito. Não transportar dados pessoais para GitHub ou logs.
-4. Somente após autorização **específica para DDL**, aplicar **uma vez** a migration versionada pela ferramenta de migrations; ela **não** contém DML de backfill e não cria versões de resultados.
-5. Somente após autorização **específica para DML/publicação**, confirmar os jogos com diferenças **por disputa** através da API administrativa, usando sessão autenticada e origem permitida. Este endpoint é um comando de publicação explícito, não um salvamento do editor. Exemplo de estrutura (IDs devem ser provenientes da prévia real):
+4. **Concluído em 05/11/2026:** a migration versionada foi aplicada pelo conector `apply_migration` e registrada no histórico em `20261105220937`. O nome do arquivo na branch foi alinhado ao histórico remoto. Ela não efetuou backfill nem criou versões de resultados.
+5. **Autorização de DML recebida em 05/11/2026, execução pendente por limitação do conector.** Confirmar os jogos com diferenças **por disputa** através do RPC `public.confirm_game_stages(p_command jsonb)` com uma sessão *real* de administrador autenticado. Após implantação autorizada do Worker, a rota `POST /api/statistics/stages` oferece o mesmo comando, usando a sessão do aplicativo. O conector nesta conversa só executa SQL como `postgres` sem JWT; a função corretamente rejeita esse contexto. **Não** usar `SET request.jwt.claim.sub`, credenciais simuladas nem modificações diretas nas projeções para contornar o registro de autoria. Este endpoint é um comando de publicação explícito, não um salvamento do editor. Exemplo de estrutura (IDs devem ser provenientes da prévia real):
 
 ```json
 {
@@ -85,15 +85,43 @@ O comando não informa a nova fase: o banco relê e usa `games.stage_kind` sob l
 
 ## Impacto observado antes da aplicação
 
-Em 05/11/2026, a leitura somente consulta registrou 23 jogos cadastrados (todos regulares), 17 jogos publicados com fase ausente, 391 projeções de jogadores também sem fase, distribuídos em duas disputas:
+Em 05/11/2026, a prévia anterior registrou 23 jogos (17 publicados/391 projeções). **Na nova conferência antes da migration**, o banco registrou **26 jogos cadastrados (todos regulares), 25 jogos publicados com fase ausente e 575 projeções individuais também sem fase**, em duas disputas:
 
 | Disputa                                | Head anterior | Jogos pendentes | Participações afetadas |
 | -------------------------------------- | ------------: | --------------: | ---------------------: |
 | `b350cd03-73fb-41a6-9887-ef5ea309389e` |             4 |               4 |                     92 |
-| `b5433b13-a8f9-4baa-b4d9-08066ebf3e96` |            17 |              13 |                    299 |
+| `b5433b13-a8f9-4baa-b4d9-08066ebf3e96` |            27 |              21 |                    483 |
 
-Se esses números permanecerem, a correção controlada exigirá **2 confirmações**, **2 novas versões estatísticas**, **17 linhas de mapeamento de fase corrigidas** e **391 projeções de participação recalculadas**, mantendo placares, contagens de jogos e publicações dos resultados. Ela **não** reclassifica jogos privados nem publica regulamentos privados.
+Se esses números permanecerem, a correção controlada exigirá **2 confirmações**, **2 novas versões estatísticas**, **25 linhas de mapeamento de fase corrigidas** e **575 projeções de participação recalculadas**, mantendo placares, contagens de jogos e publicações dos resultados. Ela **não** reclassifica jogos privados nem publica regulamentos privados.
 
 ## Validação e limitações
 
-A CI roda `npm run gate`, PGlite, teste de contratos e Playwright no SHA da PR. Antes de aplicar a migration no Supabase real, ainda são necessárias validação de execução real do SQL em ambiente isolado compatível, revisão dos privilégios e concorrência multi-conexão; os testes de PGlite não equivalem a esse ensaio real. Nenhum merge, deploy, DDL ou DML está incluído no escopo autorizado desta unidade.
+A CI roda `npm run gate`, PGlite, teste de contratos e Playwright no SHA da PR. Antes de aplicar a migration no Supabase real, ainda são necessárias validação de execução real do SQL em ambiente isolado compatível, revisão dos privilégios e concorrência multi-conexão; os testes de PGlite não equivalem a esse ensaio real. A migration DDL já foi aplicada no projeto de desenvolvimento; DML, merge e deploy **não foram executados**. O backfill requer execução autenticada, revisão da prévia atual e validação posterior. A CI anterior ao alinhamento do nome da migration passou; acompanhar os checks do SHA atual.
+
+## Impedimento de execução autenticada no Chat
+
+O comando SQL existente não recebe um ator arbitrário: `private.confirm_game_stages` lê `auth.uid()` e exige `public.admin_access.enabled`. O conector Supabase disponível possui `apply_migration` e `execute_sql`, mas não possui operação que execute o RPC com **sessão de usuário administrador**; `execute_sql` foi verificado como `current_user=postgres` e `auth.uid()=null`. Por isso os dados foram mantidos intactos, após uma tentativa de preparar a execução de manutenção ser bloqueada pelas configurações de segurança da ferramenta. Não contornar a checagem com identidade simulada, nem substituir o comando versionado por atualizações diretas.
+
+A consulta somente leitura do item 2 gera os valores esperados. Para obter os comandos de forma automática e segura antes da publicação, usar a consulta a seguir (uma linha por disputa, sem JWT ou informações pessoais). O `requestId` deve ser preservado para um eventual retry da mesma intenção:
+
+```sql
+select jsonb_build_object(
+  'requestId',gen_random_uuid(),
+  'disputeId',m.dispute_id,
+  'baseStatisticsVersion',h.version,
+  'reason','Regularização aprovada das fases dos jogos publicados.',
+  'games',jsonb_agg(jsonb_build_object(
+    'gameId',g.id,'gameVersion',g.version,
+    'publicationVersion',m.publication_version,'previousPhase',m.phase
+  ) order by m.game_id)
+) as command
+from public.published_statistics_games m
+join public.games g on g.id=m.game_id and g.dispute_id=m.dispute_id
+join public.published_games p on p.game_id=m.game_id and p.dispute_id=m.dispute_id
+  and p.version=m.publication_version
+join public.published_statistics h on h.dispute_id=m.dispute_id
+where m.phase is distinct from g.stage_kind
+group by m.dispute_id,h.version order by m.dispute_id;
+```
+
+O RPC instalado concede execução a `authenticated`, revoga `anon` e `service_role` e verifica o cadastro administrativo atual. Usar credenciais reais somente no ambiente seguro do aplicativo ou de um cliente autorizado; **não enviar JWT pelo chat ou salvar token na PR**. A PR ainda está draft e o Worker não foi implantado.
