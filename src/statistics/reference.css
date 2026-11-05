@@ -1855,6 +1855,23 @@
   }
 }
 
+.public-site.statistics-public
+  .reference-explorer[data-source-component="ScoresheetStatisticsTable"]
+  .statistics-table
+  thead
+  .statistics-position {
+  position: sticky;
+  top: 0;
+  left: auto;
+  z-index: 10;
+}
+
+.public-site.statistics-public
+  [data-source-component="ScoresheetStatisticsTable"]
+  :is(.statistics-table-wrap, .scrollable-table-top) {
+  overscroll-behavior: none;
+}
+
 /* Reserve the scrollbar strip during measurement and return restoration, avoiding layout jumps. */
 .public-site.statistics-public
   .scrollable-table:not([data-shadow-left]):not([data-shadow-right])

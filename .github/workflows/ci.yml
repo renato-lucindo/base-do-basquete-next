@@ -10,6 +10,23 @@ concurrency:
 permissions:
   contents: read
 jobs:
+  webkit-boundaries:
+    timeout-minutes: 15
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install webkit
+      - run: npx playwright test --config playwright.webkit.config.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: webkit-boundaries-evidence
+          path: test-results
   validate:
     timeout-minutes: 30
     runs-on: ubuntu-latest
@@ -72,6 +89,14 @@ jobs:
           include-hidden-files: true
       - run: npm run test:e2e
         if: steps.scope.outputs.code == 'true'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.scope.outputs.code == 'true'
+        with:
+          name: player-scroll-boundaries-${{ github.sha }}
+          path: |
+            .preview-artifacts/bordas*.png
+            test-results/player-statistics-touch-*/video.webm
+          include-hidden-files: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:

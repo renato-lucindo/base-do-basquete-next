@@ -2,6 +2,78 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 
+test("bordas: tabela e barra superior contêm o deslocamento elástico", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  const behavior = await page
+    .locator(".scrollable-table-top, .statistics-table-wrap")
+    .evaluateAll((elements) =>
+      elements.map((el) => ({
+        x: getComputedStyle(el).getPropertyValue("overscroll-behavior-x"),
+        y: getComputedStyle(el).getPropertyValue("overscroll-behavior-y"),
+        touch: getComputedStyle(el).touchAction,
+      })),
+    );
+  expect(behavior).toEqual([
+    { x: "none", y: "none", touch: "auto" },
+    { x: "none", y: "none", touch: "auto" },
+  ]);
+});
+
+test("bordas: sincronização não propaga offsets elásticos nem reescreve o mesmo valor", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(f.url);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  const result = await page
+    .locator(".scrollable-table")
+    .evaluate(async (el) => {
+      const top = el.querySelector<HTMLElement>(".scrollable-table-top")!;
+      const viewport = el.querySelector<HTMLElement>(".statistics-table-wrap")!;
+      const descriptor = Object.getOwnPropertyDescriptor(
+        Element.prototype,
+        "scrollLeft",
+      )!;
+      const writes: number[] = [];
+      Object.defineProperty(top, "scrollLeft", {
+        configurable: true,
+        get() {
+          return descriptor.get!.call(top);
+        },
+        set(value: number) {
+          writes.push(value);
+          descriptor.set!.call(top, value);
+        },
+      });
+      const maximum = viewport.scrollWidth - viewport.clientWidth;
+      const targetMaximum = top.scrollWidth - top.clientWidth;
+      for (const value of [-80, 0, 60.25, 60.25, maximum + 80]) {
+        Object.defineProperty(viewport, "scrollLeft", {
+          configurable: true,
+          get: () => value,
+        });
+        viewport.dispatchEvent(new Event("scroll"));
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
+      }
+      delete (viewport as Partial<HTMLElement>).scrollLeft;
+      delete (top as Partial<HTMLElement>).scrollLeft;
+      return {
+        writes,
+        maximum: Math.min(maximum, targetMaximum),
+        final: top.scrollLeft,
+      };
+    });
+  expect(result.writes).toEqual([60.25, result.maximum]);
+  expect(result.final).toBe(result.maximum);
+});
+
 test("súmula:30linhas, paginação antes da legenda e controles sem formulário avançado", async ({
   page,
 }) => {

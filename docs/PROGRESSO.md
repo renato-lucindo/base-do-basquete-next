@@ -1,21 +1,23 @@
 # Progresso atual
 
-Unidade ativa: **Estatísticas dos Jogadores**, autorizada pelo plano explícito de05/11/2026. Branch `codex/estatisticas-jogadores`, base main **5d028e5ec97b072ccb37da329da9183999cf2e5e**. PR/HEAD/CI atualizados após push; não presumir aprovação.
+Unidade ativa: **bordas mobile da tabela de Jogadores + cabeçalho Pos.**, plano e ajuste adicional autorizados em05/11/2026. Branch **codex/tabela-mobile-bordas**, base41452f9a2e450df97e51aa272c5f5187c4c24162; recuperar HEAD pelo Git. Uma PR desta unidade será criada após push do material validado; não integrar sem ambas as CIs.
 
-Implementado: padding14/10px,30linhas/paginação antes da legenda, máximos positivos de faltas antes de paginar, camisa modal por atleta/inscrição contando relacionados sem jogar, legenda enxuta, remoção de cobertura e de opções avançadas nas disputas exclusivamente de súmula. API mantém20linhas por padrão e acrescenta `hasBoxscore` no opt-in30. Histórico/cálculos compartilhados preservados. [Decisões](design/PUBLICO.md#refinamento-de-jogadores--decisão-de05112026), [provas/capturas/limites](design/VALIDACAO-JOGADORES-REFINAMENTO.md).
+## Implementação e provas
 
-## Verificação
+Implementado `overscroll-behavior:none` apenas nos dois contêineres do ScoresheetStatisticsTable; sincronizador limita offsets/sombras, evita reescritas equivalentes e ajusta a largura útil da barra superior. Altura/scroll interno/inércia/zoom/layout/dados preservados. Pedido adicional: Pos. fixo verticalmente, movimentação horizontal anterior mantida. [Relatório, capturas e limites](design/VALIDACAO-BORDAS-MOBILE.md).
 
-Gate local exit0:704unitários/146arquivos, transporte11, banco isolado13, Worker/HTTP30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos PASS. Browsers57PASS/7skips mobile preexistentes +4capturas finais +2retorno última página +2controles/colunas +10fidelidade PASS. Nenhuma migration, seed, DML ou publicação de dados. Revisão do autor com ui-ux-pro-max/web-design-guidelines; não houve parecer independente.
+RED→GREEN:2casos originais de bordas/sincronização; Pos. falhou com468px de deslocamento e passou após correção. Chromium56PASS sem skips (Jogadores/bordas/touch/retornos/Equipes), depois6PASS de alinhamento +2touch com CSS final. WebKit Windows3PASS de alinhamento final; não oferece CSS overscroll nem wheel em contexto mobile. CI focal em macOS adicionada para conferir CSS/sincronização desktop/mobile e3casos nativos em larguras mobile, sem simular suporte/introduzir skips. Vídeo touch automatizado não equivale a confirmação física no celular.
 
-## Serviço e próximo passo
+Gate local exit0:704unitários/146arquivos, transporte11,banco13,WorkerHTTP30,PDF1,lint/formato/tipos/build/fronteira/segredos. Após ajuste Pos., formato/tipos/browsers focais novamente PASS. CI final no SHA da PR e do merge permanece necessária. Revisão do autor com ui-ux-pro-max/web-design-guidelines vigente, sem parecer independente. Logs `.preview-artifacts/mobile-boundaries-*.log` e `mobile-position-*.log`. Próximo passo: push/PR, conferir CIs/reviews/threads e integrar com expected_head_sha; depois build fresco do merge e deploy autorizado só no Worker independente.
 
-Após validar/integrar a única PR e conferir CI do SHA integrado, construir do SHA limpo e atualizar **somente** o Worker de avaliação [base-do-basquete-next-uiux](https://base-do-basquete-next-uiux.renato-lucindo-jr.workers.dev). Publicação expressamente autorizada pelo plano. Preservar sessões/segredos/namespace2ac0ffe60c2d490cb7f457c444f24859 e backend de desenvolvimento. Preview ainda na versão2555feee/deploymentc13c9adf/fonte3ed808b até prova nova.
+## Serviços preservados
 
-Worker principal permanece no deployment00dffb6b-1d5c-4433-9214-768013ed6277; não atualizar domínio principal nem Access. Migrations20261104171445/20261104185633 já aplicadas somente no desenvolvimento; não reaplicar.
+PR57 concluída, CI HEAD/main SUCCESS no41452f9. Preview **base-do-basquete-next-uiux** ainda deploymentd6218ce9-6c00-41dc-9954-e3934908b1cd/versão7fd61d4e-400f-4e45-a86f-16d291c29dc3/fonte41452f9. Não houve novo deploy nesta unidade. Conta16b4a5e0a99a031d28051ebadb4811cc, config local ignorada `.preview-artifacts/uiux-preview/wrangler.json`, origem própria, namespace2ac0ffe60c2d490cb7f457c444f24859/segredos existentes preservar. CLI4.152.0 OAuth/conta correta conferidos, sem relogin/upgrade. Cloudflare Apps exige reautenticação, mas conector Cloudflare direto está disponível/mesmo proprietário; preferir esse para metadata. Nunca chamar uploader canônico.
+
+Principal permanece deployment00dffb6b-1d5c-4433-9214-768013ed6277/versão139410ce-a8d6-4710-9b94-e1b1222cd3dc; preservar domínio principal/Access/banco/Auth/dados. [Encerramento57](../historico/progresso/2026-11-05-jogadores-preview-encerrado.md). Equipes [somente planejada](../historico/progresso/2026-11-05-equipes-planejamento.md), sem implementação/republicação13jogos autorizada.
 
 ## Continuidade
 
-PRs51–56 concluídas, CI HEAD/main SUCCESS. [Checkpoint anterior do preview](../historico/progresso/2026-11-05-preview-independente-aberto.md), [encerramento56](../historico/progresso/2026-11-04-pr56-integrada.md) e [histórico preservado](../historico/progresso/2026-11-05-preview-canonico-encerrado.md) incorporados nesta unidade sem perder contexto.
+Checkout humano sync/trabalho-casa/CONTRIBUTING modificado/skills pessoais, demais worktrees/previews4189/5177/5180 preservados. Servidores de teste task-owned5173/session3470 e5174/session63632 iniciados nesta execução; não confundir com previews herdados. Artefatos dos navegadores devem ter diretórios de saída diferentes se paralelos; execução inicial compartilhada causou ENOENT e servidor encerrado por outro runner, rodada final corrigida sem alterar produto/timeouts.
 
-Preservados checkout humano sync/trabalho-casa/CONTRIBUTING modificado/skills pessoais, demais worktrees e previews4189/5177/5180. Automação existente retomar-piloto-uiux-pr-51 PAUSED até necessidade de espera/retomada. Medir cota real; aos15% restante5h checkpoint e mesma automação para reset observado+2min, sem créditos/reset manual.
+Última medição real91% restante5h/35% semanal, reset1793907030. Retomada autorizada já ativa nesta conversa; automação retomar-piloto-uiux-pr-51 deve acompanhar esta unidade, sem repetirdiagnóstico. Aos15% restante seguir checkpoint+mesmaautomação reset observado+2min. Sem créditos/reset manual. Pausar somente ao concluir PR+CI integrada+preview validado ou pedido explícito de parar.
