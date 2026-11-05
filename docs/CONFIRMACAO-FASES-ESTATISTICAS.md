@@ -74,10 +74,10 @@ O comando não informa a nova fase: o banco relê e usa `games.stage_kind` sob l
 
 Em 05/11/2026, a leitura somente consulta registrou 23 jogos cadastrados (todos regulares), 17 jogos publicados com fase ausente, 391 projeções de jogadores também sem fase, distribuídos em duas disputas:
 
-| Disputa | Head anterior | Jogos pendentes | Participações afetadas |
-| --- | ---: | ---: | ---: |
-| `b350cd03-73fb-41a6-9887-ef5ea309389e` | 4 | 4 | 92 |
-| `b5433b13-a8f9-4baa-b4d9-08066ebf3e96` | 17 | 13 | 299 |
+| Disputa                                | Head anterior | Jogos pendentes | Participações afetadas |
+| -------------------------------------- | ------------: | --------------: | ---------------------: |
+| `b350cd03-73fb-41a6-9887-ef5ea309389e` |             4 |               4 |                     92 |
+| `b5433b13-a8f9-4baa-b4d9-08066ebf3e96` |            17 |              13 |                    299 |
 
 Se esses números permanecerem, a correção controlada exigirá **2 confirmações**, **2 novas versões estatísticas**, **17 linhas de mapeamento de fase corrigidas** e **391 projeções de participação recalculadas**, mantendo placares, contagens de jogos e publicações dos resultados. Ela **não** reclassifica jogos privados nem publica regulamentos privados.
 
