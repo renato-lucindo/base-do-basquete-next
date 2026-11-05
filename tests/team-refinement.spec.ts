@@ -299,3 +299,64 @@ test("Equipes: última resposta prevalece e máximos positivos preservam empates
   await expect(table).toContainText("Inscrição 24");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
+
+test("Equipes: armazenamento indisponível preserva consultas curtas e foco", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "sessionStorage", {
+      configurable: true,
+      get() {
+        throw new DOMException("Blocked", "SecurityError");
+      },
+    });
+  });
+  const f = await teamPublicFixture(page);
+  await page.goto(f.listUrl);
+  const table = page.getByRole("table", { name: "Estatísticas das equipes" });
+  await expect(table.locator("tbody tr")).toHaveCount(2);
+  const totals = page.getByRole("button", { name: "Totais", exact: true });
+  await totals.click();
+  await expect(totals).toBeFocused();
+  await expect(page).toHaveURL(/mode=total/);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});
+
+test("Equipes: seleção grande que não pode ser guardada mantém a escolha anterior", async ({
+  page,
+}) => {
+  const f = await teamPublicFixture(page, { longList: true }),
+    seed = f.source.games[0];
+  f.source.games = Array.from({ length: 40 }, (_, i) => {
+    const g = structuredClone(seed);
+    g.snapshot.id = `f9000000-0000-4000-8000-${String(98000 + i).padStart(12, "0")}`;
+    for (const side of ["home", "away"] as const) {
+      const n = i * 2 + (side === "home" ? 0 : 1),
+        id = `f9000000-0000-4000-8000-${String(97000 + n).padStart(12, "0")}`;
+      g.snapshot.game[side].registrationId = id;
+      for (const p of g.snapshot.facts.players.filter((p) => p.side === side))
+        p.registrationId = id;
+    }
+    return g;
+  });
+  await page.addInitScript(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key.startsWith("team-list:"))
+        throw new DOMException("Full", "QuotaExceededError");
+      original.call(this, key, value);
+    };
+  });
+  await page.goto(f.listUrl);
+  const table = page.getByRole("table", { name: "Estatísticas das equipes" });
+  await expect(table.locator("tbody tr")).toHaveCount(80);
+  await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
+  await page.getByRole("checkbox").first().click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Não foi possível guardar" }),
+  ).toBeVisible();
+  await expect(page.getByRole("checkbox").first()).toBeChecked();
+  await expect(table.locator("tbody tr")).toHaveCount(80);
+  await expect(page).not.toHaveURL(/stateRef=|registrationId=/);
+  await page.keyboard.press("Escape");
+});

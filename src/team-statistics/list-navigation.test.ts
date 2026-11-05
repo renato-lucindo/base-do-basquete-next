@@ -31,3 +31,25 @@ it("preserva1000IDs em referência local compacta e acusa referência ausente", 
     }),
   ).toThrow();
 });
+
+it("consulta curta funciona quando o navegador bloqueia acesso ao armazenamento", () => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "sessionStorage",
+  );
+  Object.defineProperty(globalThis, "sessionStorage", {
+    configurable: true,
+    get() {
+      throw new Error("bloqueado");
+    },
+  });
+  try {
+    const q = parseTeamsListQuery(new URLSearchParams());
+    const hash = serializeTeamsListRoute(pubId(801), q);
+    expect(readTeamsListRoute(hash).query).toEqual(q);
+  } finally {
+    if (descriptor)
+      Object.defineProperty(globalThis, "sessionStorage", descriptor);
+    else Reflect.deleteProperty(globalThis, "sessionStorage");
+  }
+});

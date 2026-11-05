@@ -106,6 +106,7 @@ export function TeamsListPublicPage() {
       setNotice(
         e instanceof Error ? e.message : "Não foi possível guardar a seleção.",
       );
+      return;
     }
     routeRef.current = next;
     setRoute(next);
@@ -302,6 +303,40 @@ export function TeamsListPublicPage() {
                       <option value="custom">Personalizadas</option>
                     </select>
                   </label>
+                  <label>
+                    Ordenar por
+                    <select
+                      value={q.sort}
+                      onChange={(e) =>
+                        change({
+                          sort: e.target.value as TeamsListQuery["sort"],
+                        })
+                      }
+                    >
+                      <option value="name">Inscrição</option>
+                      <option value="pointsFor">Pontos a favor</option>
+                      {LIST_METRIC_KEYS.map((key) => (
+                        <option key={key} value={key}>
+                          {listMetric(key).name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Direção
+                    <select
+                      value={q.direction}
+                      onChange={(e) =>
+                        change({
+                          direction: e.target
+                            .value as TeamsListQuery["direction"],
+                        })
+                      }
+                    >
+                      <option value="asc">Crescente</option>
+                      <option value="desc">Decrescente</option>
+                    </select>
+                  </label>
                 </details>
               )}
             </div>
@@ -360,6 +395,7 @@ export function TeamsListPublicPage() {
               {data && (
                 <div aria-busy={loading}>
                   <TeamsListTable
+                    canNavigate={!notice || key.length <= 1800}
                     data={data}
                     onSort={(sort) =>
                       change({

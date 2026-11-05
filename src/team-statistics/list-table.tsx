@@ -17,8 +17,10 @@ const decimal = new Intl.NumberFormat("pt-BR", {
 export function TeamsListTable({
   data: d,
   onSort,
+  canNavigate = true,
 }: {
   data: TeamsListPage;
+  canNavigate?: boolean;
   onSort: (key: TeamsListPage["query"]["sort"]) => void;
 }) {
   const maxima = Object.fromEntries(
@@ -75,10 +77,15 @@ export function TeamsListTable({
                     <td className="rank">{r.rank ?? "—"}</td>
                     <th scope="row">
                       <a
-                        href={publicDetailLink(
-                          `/equipe.html#${r.teamId}?disputeId=${d.disputeId}&registrationId=${r.registrationId}&mode=${d.query.mode}&scope=${d.query.scope}`,
-                          d.disputeId,
-                        )}
+                        href={
+                          canNavigate
+                            ? publicDetailLink(
+                                `/equipe.html#${r.teamId}?disputeId=${d.disputeId}&registrationId=${r.registrationId}&mode=${d.query.mode}&scope=${d.query.scope}`,
+                                d.disputeId,
+                              )
+                            : undefined
+                        }
+                        aria-disabled={!canNavigate || undefined}
                       >
                         {r.name}
                       </a>
@@ -103,7 +110,8 @@ export function TeamsListTable({
                               —
                             </span>
                           ) : (
-                            (d.query.mode === "per-game" &&
+                            (cell.value !== 0 &&
+                            d.query.mode === "per-game" &&
                             key !== "games" &&
                             !key.endsWith("Percentage") &&
                             !key.endsWith("Share")
