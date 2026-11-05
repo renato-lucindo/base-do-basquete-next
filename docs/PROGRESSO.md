@@ -23,3 +23,7 @@ Origin/main avançou externamente para `6d37e29` (PR60 documental); incorporar m
 Cota real **13%5h/30%semanal**, reset `1793934163`. Retomada oficial `retomar-refinamento-de-equipes` **ACTIVE**, confirmada por view e arquivo da automação para este chat: **06/11/2026 às00:04:43 America/Sao_Paulo** (03:04:43UTC), reset+2min. Não usar créditos/resetmanual. Não iniciar outro gate nesta janela.
 
 Ao retomar:medir cota; conferir Git/PRs/CI/main/serviço; concluir revisão e focais pendentes; uma única PR com CI; merge commit e CI integrada; build fresco limpo e deploy exclusivamente base-do-basquete-next-uiux, seguido de smoke/fonte/configuração. Autorizações específicas constam no pedido; não inferir deployprincipal, Access/segredos/DB/DML. [Checkpoint anterior](../historico/progresso/2026-11-05-antes-equipes-refinamento.md).
+
+## Retomada em05/11/2026
+
+Cota real99%5h/22%semanal no início da retomada. Main6d37e29 incorporada por merge explícito; contexto documental da PR60 [arquivado](../historico/progresso/2026-11-05-main-pr60-na-retomada-equipes.md). Correção final ccc5de5: consultas curtas não dependem do armazenamento; seleção extensa com falha de storage conserva escolha anterior e alerta, zero comprovado aparece0. Focais48unitáriosPASS;20browsersPASS mais2de armazenamento cheioPASS após corrigir o teste para clicar sem exigir desmarcação rejeitada. Tipos/lint/formato/diffPASS; WebKit completo focal/CI remota pendentes. PR61 está separada e idle, CI42128700378SUCCESS/ab3c461, sem integração por este agente. Nenhum deploy ou dado alterado.
