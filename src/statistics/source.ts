@@ -117,6 +117,7 @@ export function selectStatisticsFacts(
     version: source.version,
     confirmedAt: source.confirmedAt,
     minimumSeconds: source.minimumSeconds,
+    hasBoxscore: normalized.some((g) => g.boxscore),
     coverage: {
       regularGames: eligible.filter((g) => g.phase === "round_robin").length,
       playoffGames: eligible.filter((g) => g.phase === "knockout").length,

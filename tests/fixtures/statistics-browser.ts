@@ -12,6 +12,7 @@ export async function statisticsBrowserFixture(
     multipleRegistrations?: boolean;
     insufficient?: boolean;
     empty?: boolean;
+    withBoxscore?: boolean;
   } = {},
 ) {
   const source = statisticsSourceSchema.parse(
@@ -33,6 +34,15 @@ export async function statisticsBrowserFixture(
     snapshot.disputeId = source.disputeId;
     source.games = [{ phase: null, snapshot }];
     source.minimumSeconds = 2147483647;
+  }
+  if (options.withBoxscore) {
+    const snapshot = await confirmedPdfFixture();
+    snapshot.disputeId = source.disputeId;
+    snapshot.id = "f9300000-0000-4000-8000-000000000999";
+    snapshot.context = structuredClone(source.games[0].snapshot.context);
+    for (const p of snapshot.facts.players)
+      p.person.name = `Atleta do boxscore ${p.jersey}`;
+    source.games.push({ snapshot, phase: null });
   }
   const state = {
     failNext: false,

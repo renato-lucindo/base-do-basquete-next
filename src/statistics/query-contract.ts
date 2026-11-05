@@ -21,6 +21,7 @@ export interface StatisticsQuery {
     value: number;
   }[];
   page: number;
+  pageSize: 20 | 30;
   compare: string[];
   preset: "essentials" | "simple" | "all" | "custom";
   /** Remembered preference: MIN is hidden, not removed, in per-30. */
@@ -122,6 +123,7 @@ export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
       Number.isSafeInteger(page)
         ? page
         : 1,
+    pageSize: params.get("pageSize") === "30" ? 30 : 20,
     compare: unique(
       (params.get("compare") ?? "").split(",").flatMap(uuid),
     ).slice(0, 2),
@@ -149,6 +151,7 @@ export function serializeStatisticsQuery(
     preset: query.preset,
     columns: query.columns.join(","),
   });
+  if (query.pageSize === 30) p.set("pageSize", "30");
   if (query.search) p.set("q", query.search);
   if (query.teams !== null)
     for (const id of query.teams.length ? query.teams : [""])
@@ -174,7 +177,8 @@ export function updateStatisticsQuery(
       page:
         (patch.dataset !== undefined && patch.dataset !== query.dataset) ||
         (patch.mode !== undefined && patch.mode !== query.mode) ||
-        (patch.scope !== undefined && patch.scope !== query.scope)
+        (patch.scope !== undefined && patch.scope !== query.scope) ||
+        (patch.pageSize !== undefined && patch.pageSize !== query.pageSize)
           ? 1
           : (patch.page ?? query.page),
     }),

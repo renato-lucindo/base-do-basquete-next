@@ -107,7 +107,7 @@ test("disputa salva oferece estatísticas em outra aba sem substituir edição a
 test("seleção por teclado mantém foco após consulta e limita comparação a dois atletas", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url);
   const table = page.getByRole("table", {
     name: "Estatísticas dos atletas",
@@ -129,7 +129,7 @@ test("seleção por teclado mantém foco após consulta e limita comparação a 
         name: "Resumo comparativo dos atletas",
         exact: true,
       })
-      .getByRole("columnheader", { name: /Resumo: João 1-0/u }),
+      .getByRole("columnheader", { name: /Resumo:/u }),
   ).toBeVisible();
   await expect(first).toBeFocused();
   await boxes.nth(1).check();
@@ -138,7 +138,7 @@ test("seleção por teclado mantém foco após consulta e limita comparação a 
 test("adicionar filtro foca a métrica e permite remover filtro ainda incompleto", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url);
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
@@ -178,7 +178,7 @@ test("atalho para conteúdo preserva URL da consulta e permite foco por teclado"
 test("consulta estatística pagina, compartilha URL e restaura recorte ao recarregar", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url + "&preset=simple&mode=total");
   await expect(
     page.getByRole("heading", {
@@ -190,17 +190,27 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.getByRole("row")).toHaveCount(21);
+  await expect(table.getByRole("row")).toHaveCount(31);
   await expect(
-    page.getByRole("status").filter({ hasText: "33 registros por equipe" }),
+    page.getByRole("status").filter({
+      hasText: `${f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0)} registros por equipe`,
+    }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Próxima página", exact: true })
     .click();
-  await expect(table.getByRole("row")).toHaveCount(14);
+  await expect(table.getByRole("row")).toHaveCount(
+    f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0) -
+      30 +
+      1,
+  );
   await expect(page).toHaveURL(/page=2/u);
   await page.reload();
-  await expect(table.getByRole("row")).toHaveCount(14);
+  await expect(table.getByRole("row")).toHaveCount(
+    f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0) -
+      30 +
+      1,
+  );
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("combobox", { name: "Escopo", exact: true })
@@ -216,7 +226,7 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
 test("MIN oculta por30 preserva coluna e remove filtro/ordem incompatíveis", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url + "&preset=all&sort=minutes&filters=minutes:%3E:0");
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await expect(
@@ -279,7 +289,7 @@ test("comparação fora da página mantém todas inscrições do atleta e permit
 test("busca/filtros por teclado, equipes vazias e líderes antes da página têm estados claros", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url);
   const search = page.getByLabel("Buscar atleta ou equipe", { exact: true });
   await search.fill("joao");
@@ -326,8 +336,9 @@ test("amostra insuficiente difere de ausência sem esconder atleta e filtros nã
     page.getByLabel("Amostra insuficiente", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByText("—", { exact: true }).first()).toBeVisible();
-  await page.getByText("Cobertura dos dados", { exact: true }).click();
-  await expect(page.getByText(/Mínimo para o cálculo por 30/u)).toBeVisible();
+  await expect(
+    page.getByText("Cobertura dos dados", { exact: true }),
+  ).toHaveCount(0);
   await page.getByText("Mais filtros e opções", { exact: true }).click();
   await page
     .getByRole("button", { name: "Adicionar filtro", exact: true })
@@ -367,7 +378,7 @@ test("falha de consulta permite retry e contexto sem publicação não finge tab
 test("resposta antiga não substitui recorte novo;320px conserva controles e tabela rolável", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto(f.url);
   await expect(page.getByRole("table")).toBeVisible();
@@ -380,7 +391,9 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
     .getByRole("combobox", { name: "Escopo", exact: true })
     .selectOption("all");
   await expect(
-    page.getByRole("status").filter({ hasText: "33 registros por equipe" }),
+    page.getByRole("status").filter({
+      hasText: `${f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0)} registros por equipe`,
+    }),
   ).toBeVisible();
   await page.waitForTimeout(350);
   await expect(
@@ -406,7 +419,7 @@ test("resposta antiga não substitui recorte novo;320px conserva controles e tab
 test("filtro em edição resiste à confirmação tardia da navegação de busca", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url);
   await page
     .getByRole("table", { name: "Estatísticas dos atletas", exact: true })

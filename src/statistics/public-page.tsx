@@ -58,6 +58,7 @@ function location() {
   const params = new URLSearchParams(search);
   if (params.get("view") === "boxscore") params.set("dataset", "boxscore");
   if (!params.has("mode")) params.set("mode", "total");
+  params.set("pageSize", "30");
   const query = parseStatisticsQuery(params);
   const saved = sessionStorage.getItem("statistics-selected-columns");
   if (!params.has("columns") && saved !== null) {
@@ -164,6 +165,7 @@ export function StatisticsPageView() {
           next.mode !== requested.mode ||
           next.scope !== requested.scope ||
           next.dataset !== requested.dataset ||
+          next.pageSize !== requested.pageSize ||
           next.compared.some((r) => !requested.compare.includes(r.personId))
         )
           throw new ApiFailure(
@@ -198,7 +200,11 @@ export function StatisticsPageView() {
     }
   }, [data]);
   function navigate(next: StatisticsQuery, focus = false, validate = true) {
-    if (!route.id || (validate && !form.current?.reportValidity())) return;
+    if (
+      !route.id ||
+      (validate && form.current && !form.current.reportValidity())
+    )
+      return;
     const normalized = parseStatisticsQuery(serializeStatisticsQuery(next));
     focusResult.current = focus;
     // Commit the query before the browser delivers its queued fragment event.
@@ -596,7 +602,6 @@ export function StatisticsPageView() {
                         }
                       />
                     )}
-                    <StatisticsLegend columns={data.columns} />
                     <nav
                       className="statistics-actions"
                       aria-label="Paginação estatística"
@@ -619,6 +624,7 @@ export function StatisticsPageView() {
                         Próxima página
                       </button>
                     </nav>
+                    <StatisticsLegend columns={data.columns} />
                     {!!draft.compare.length && (
                       <section aria-label="Comparação de atletas">
                         <h2>Comparação</h2>
@@ -768,370 +774,341 @@ export function StatisticsPageView() {
               </section>
             </>
           )}
-          {data && (
-            <>
-              <details className="statistics-explanation">
-                <summary>Cobertura dos dados</summary>
-                <p>
-                  Cobertura de fases: {data.coverage.regularGames} regulares,{" "}
-                  {data.coverage.playoffGames} eliminatórias e{" "}
-                  {data.coverage.unclassifiedGames} sem fase confirmada. Jogos
-                  sem fase aparecem somente em Todos.
-                </p>
-                {data.scope !== "all" &&
-                  data.coverage.unclassifiedGames > 0 && (
-                    <button
-                      className="statistics-secondary"
-                      onClick={() => change({ scope: "all" })}
-                    >
-                      Ver todos os jogos confirmados
-                    </button>
-                  )}
-                <p>
-                  Mínimo para o cálculo por 30:{" "}
-                  {number.format(data.minimumSeconds)} segundos cobertos. PTS e
-                  cestas por30 usam a fonte avançada com minutos; o fallback
-                  manual não fornece minutos.
-                </p>
-                <p>
-                  “—” = não informado; “-” = amostra insuficiente; “var.” =
-                  varia entre as ocasiões confirmadas. Células destacadas são
-                  líderes da consulta antes da paginação, incluindo empates.
-                  REB/AST e demais médias usam apenas os jogos que cobrem aquela
-                  métrica.
-                </p>
-              </details>
-            </>
-          )}
-          <details className="statistics-advanced">
-            <summary>Mais filtros e opções</summary>
-            <form
-              ref={form}
-              className="statistics-controls"
-              onSubmit={(e) => {
-                e.preventDefault();
-                change({ page: 1 }, true);
-              }}
-            >
-              <label className="statistics-check">
-                <input
-                  type="checkbox"
-                  checked={comparisonEnabled || draft.compare.length > 0}
-                  onChange={(e) => setComparisonEnabled(e.target.checked)}
-                />
-                Comparar atletas na tabela
-              </label>
-              <div className="statistics-fields">
-                <label>
-                  Modo
-                  <select
-                    value={draft.mode}
-                    onChange={(e) =>
-                      change({
-                        mode: e.target.value as StatisticsQuery["mode"],
-                      })
-                    }
-                  >
-                    <option value="per-game">Por jogo</option>
-                    <option value="total">Total</option>
-                    <option value="per-30">Por 30 minutos</option>
-                  </select>
-                </label>
-                <label>
-                  Escopo
-                  <select
-                    value={draft.scope}
-                    onChange={(e) =>
-                      change({
-                        scope: e.target.value as StatisticsQuery["scope"],
-                      })
-                    }
-                  >
-                    <option value="regular">Fase regular</option>
-                    <option value="playoffs">Eliminatórias</option>
-                    <option value="all">Todos</option>
-                  </select>
-                </label>
-                <label>
-                  Busca avançada
-                  <input
-                    type="search"
-                    maxLength={80}
-                    value={draft.search}
-                    onChange={(e) =>
-                      setDraft({ ...draft, search: e.target.value })
-                    }
-                  />
-                </label>
-                <label>
-                  Ordenar por
-                  <select
-                    value={draft.sort}
-                    onChange={(e) =>
-                      change({
-                        sort: e.target.value as StatisticsQuery["sort"],
-                      })
-                    }
-                  >
-                    <option value="player">Atleta</option>
-                    <option value="team">Inscrição</option>
-                    {metricKeys
-                      .filter((k) => draft.mode !== "per-30" || k !== "minutes")
-                      .map((k) => (
-                        <option key={k} value={k}>
-                          {STATISTICS_METRICS[k].name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <label>
-                  Direção
-                  <select
-                    value={draft.direction}
-                    onChange={(e) =>
-                      change({ direction: e.target.value as "asc" | "desc" })
-                    }
-                  >
-                    <option value="desc">Decrescente</option>
-                    <option value="asc">Crescente</option>
-                  </select>
-                </label>
-                <label>
-                  Conjunto de colunas
-                  <select
-                    value={draft.preset}
-                    onChange={(e) => {
-                      responsiveColumns.current = false;
-                      const preset = e.target
-                        .value as StatisticsQuery["preset"];
-                      const columns =
-                        preset === "custom"
-                          ? draft.columns
-                          : [...STATISTICS_COLUMN_PRESETS[preset]];
-                      sessionStorage.setItem(
-                        "statistics-selected-columns",
-                        columns.join(","),
-                      );
-                      change({ preset, columns });
-                    }}
-                  >
-                    <option value="essentials">Essenciais do boxscore</option>
-                    <option value="simple">Súmula</option>
-                    <option value="all">Todas</option>
-                    <option value="custom">Personalizadas</option>
-                  </select>
-                </label>
-              </div>
-              <details>
-                <summary>Personalizar colunas</summary>
-                <fieldset className="statistics-column-options">
-                  <legend>Colunas visíveis</legend>
-                  {metricKeys.map((key) => (
-                    <label key={key}>
-                      <input
-                        type="checkbox"
-                        checked={draft.columns.includes(key)}
-                        disabled={key === "minutes" && draft.mode === "per-30"}
-                        onChange={(e) =>
-                          selectColumns(
-                            e.target.checked
-                              ? [...draft.columns, key]
-                              : draft.columns.filter((k) => k !== key),
-                          )
-                        }
-                      />
-                      {STATISTICS_METRICS[key].name} (
-                      {STATISTICS_METRICS[key].label})
-                    </label>
-                  ))}
-                </fieldset>
-              </details>
-              {draft.mode === "per-30" && (
-                <p>
-                  MIN fica oculta neste modo e volta ao trocar de modo. J,
-                  percentuais, GD e saldo em quadra não são escalados.
-                </p>
-              )}
-              <fieldset>
-                <legend>Equipes</legend>
+          {data?.hasBoxscore && (
+            <details className="statistics-advanced">
+              <summary>Mais filtros e opções</summary>
+              <form
+                ref={form}
+                className="statistics-controls"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  change({ page: 1 }, true);
+                }}
+              >
                 <label className="statistics-check">
                   <input
                     type="checkbox"
-                    checked={draft.teams === null}
-                    onChange={(e) =>
-                      change({ teams: e.target.checked ? null : [], page: 1 })
-                    }
+                    checked={comparisonEnabled || draft.compare.length > 0}
+                    onChange={(e) => setComparisonEnabled(e.target.checked)}
                   />
-                  Todas as equipes
+                  Comparar atletas na tabela
                 </label>
-                {(data?.teams ?? []).map((team) => (
-                  <label key={team.id} className="statistics-check">
-                    <input
-                      type="checkbox"
-                      checked={
-                        draft.teams === null || draft.teams.includes(team.id)
-                      }
-                      onChange={(e) => {
-                        const current =
-                          draft.teams ?? data!.teams.map((t) => t.id);
+                <div className="statistics-fields">
+                  <label>
+                    Modo
+                    <select
+                      value={draft.mode}
+                      onChange={(e) =>
                         change({
-                          teams: e.target.checked
-                            ? [...new Set([...current, team.id])]
-                            : current.filter((v) => v !== team.id),
-                          page: 1,
-                        });
-                      }}
-                    />
-                    {team.names.join(" / ")}
+                          mode: e.target.value as StatisticsQuery["mode"],
+                        })
+                      }
+                    >
+                      <option value="per-game">Por jogo</option>
+                      <option value="total">Total</option>
+                      <option value="per-30">Por 30 minutos</option>
+                    </select>
                   </label>
-                ))}
-                {draft.teams?.length === 0 && (
-                  <p>Nenhuma equipe selecionada.</p>
-                )}
-              </fieldset>
-              <fieldset>
-                <legend>Filtros numéricos</legend>
-                {draft.filters.map((f, i) => (
-                  <div className="statistics-filter" key={i}>
-                    <label>
-                      Métrica do filtro {i + 1}
-                      <select
-                        id={`statistics-filter-${i}`}
-                        value={f.metric}
-                        onChange={(e) =>
-                          filter(i, {
-                            metric: e.target.value as StatisticsMetric,
-                          })
-                        }
-                      >
-                        {metricKeys
-                          .filter(
-                            (k) => draft.mode !== "per-30" || k !== "minutes",
-                          )
-                          .map((k) => (
-                            <option key={k} value={k}>
-                              {STATISTICS_METRICS[k].name}
-                            </option>
-                          ))}
-                      </select>
-                    </label>
-                    <label>
-                      Operador do filtro {i + 1}
-                      <select
-                        value={f.operator}
-                        onChange={(e) =>
-                          filter(i, {
-                            operator: e.target
-                              .value as StatisticsQuery["filters"][number]["operator"],
-                          })
-                        }
-                      >
-                        {[">=", ">", "<=", "<", "="].map((op) => (
-                          <option key={op} value={op}>
-                            {op}
+                  <label>
+                    Escopo
+                    <select
+                      value={draft.scope}
+                      onChange={(e) =>
+                        change({
+                          scope: e.target.value as StatisticsQuery["scope"],
+                        })
+                      }
+                    >
+                      <option value="regular">Fase regular</option>
+                      <option value="playoffs">Eliminatórias</option>
+                      <option value="all">Todos</option>
+                    </select>
+                  </label>
+                  <label>
+                    Busca avançada
+                    <input
+                      type="search"
+                      maxLength={80}
+                      value={draft.search}
+                      onChange={(e) =>
+                        setDraft({ ...draft, search: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Ordenar por
+                    <select
+                      value={draft.sort}
+                      onChange={(e) =>
+                        change({
+                          sort: e.target.value as StatisticsQuery["sort"],
+                        })
+                      }
+                    >
+                      <option value="player">Atleta</option>
+                      <option value="team">Inscrição</option>
+                      {metricKeys
+                        .filter(
+                          (k) => draft.mode !== "per-30" || k !== "minutes",
+                        )
+                        .map((k) => (
+                          <option key={k} value={k}>
+                            {STATISTICS_METRICS[k].name}
                           </option>
                         ))}
-                      </select>
-                    </label>
-                    <label>
-                      Valor do filtro {i + 1}
-                      <input
-                        required
-                        type="number"
-                        step="any"
-                        value={Number.isFinite(f.value) ? f.value : ""}
-                        onChange={(e) =>
-                          filter(i, { value: e.target.valueAsNumber })
-                        }
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className="statistics-secondary"
-                      onClick={() => {
-                        const next = {
-                          ...draft,
-                          filters: draft.filters.filter(
-                            (_, index) => index !== i,
-                          ),
-                          page: 1,
-                        };
-                        setDraft(next);
-                        if (
-                          next.filters.every((item) =>
-                            Number.isFinite(item.value),
-                          )
-                        )
-                          navigate(next, false, false);
-                        requestAnimationFrame(() =>
-                          document
-                            .getElementById("statistics-add-filter")
-                            ?.focus(),
+                    </select>
+                  </label>
+                  <label>
+                    Direção
+                    <select
+                      value={draft.direction}
+                      onChange={(e) =>
+                        change({ direction: e.target.value as "asc" | "desc" })
+                      }
+                    >
+                      <option value="desc">Decrescente</option>
+                      <option value="asc">Crescente</option>
+                    </select>
+                  </label>
+                  <label>
+                    Conjunto de colunas
+                    <select
+                      value={draft.preset}
+                      onChange={(e) => {
+                        responsiveColumns.current = false;
+                        const preset = e.target
+                          .value as StatisticsQuery["preset"];
+                        const columns =
+                          preset === "custom"
+                            ? draft.columns
+                            : [...STATISTICS_COLUMN_PRESETS[preset]];
+                        sessionStorage.setItem(
+                          "statistics-selected-columns",
+                          columns.join(","),
                         );
+                        change({ preset, columns });
                       }}
                     >
-                      Remover filtro {i + 1}
-                    </button>
-                  </div>
-                ))}
-                <button
-                  id="statistics-add-filter"
-                  type="button"
-                  className="statistics-secondary"
-                  disabled={draft.filters.length >= 5}
-                  onClick={() => {
-                    setDraft({
-                      ...draft,
-                      filters: [
-                        ...draft.filters,
-                        { metric: "points", operator: ">=", value: 0 },
-                      ],
-                    });
-                    requestAnimationFrame(() =>
-                      document
-                        .getElementById(
-                          `statistics-filter-${draft.filters.length}`,
-                        )
-                        ?.focus(),
-                    );
-                  }}
-                >
-                  Adicionar filtro
-                </button>
-                <p>
-                  Até cinco filtros. Ausências e amostras insuficientes ficam
-                  fora do filtro e da liderança daquela métrica.
-                </p>
-              </fieldset>
-              <div className="statistics-actions">
-                <button type="submit">Aplicar consulta</button>
-                <button
-                  type="button"
-                  className="statistics-secondary"
-                  onClick={() => {
-                    setShare(true);
-                    requestAnimationFrame(() => {
-                      shareInput.current?.focus();
-                      shareInput.current?.select();
-                    });
-                  }}
-                >
-                  Compartilhar consulta
-                </button>
-              </div>
-              {share && (
-                <label>
-                  Endereço desta consulta
-                  <input
-                    ref={shareInput}
-                    readOnly
-                    value={window.location.href}
-                    onFocus={(e) => e.currentTarget.select()}
-                  />
-                </label>
-              )}
-            </form>
-          </details>
+                      <option value="essentials">Essenciais do boxscore</option>
+                      <option value="simple">Súmula</option>
+                      <option value="all">Todas</option>
+                      <option value="custom">Personalizadas</option>
+                    </select>
+                  </label>
+                </div>
+                <details>
+                  <summary>Personalizar colunas</summary>
+                  <fieldset className="statistics-column-options">
+                    <legend>Colunas visíveis</legend>
+                    {metricKeys.map((key) => (
+                      <label key={key}>
+                        <input
+                          type="checkbox"
+                          checked={draft.columns.includes(key)}
+                          disabled={
+                            key === "minutes" && draft.mode === "per-30"
+                          }
+                          onChange={(e) =>
+                            selectColumns(
+                              e.target.checked
+                                ? [...draft.columns, key]
+                                : draft.columns.filter((k) => k !== key),
+                            )
+                          }
+                        />
+                        {STATISTICS_METRICS[key].name} (
+                        {STATISTICS_METRICS[key].label})
+                      </label>
+                    ))}
+                  </fieldset>
+                </details>
+                {draft.mode === "per-30" && (
+                  <p>
+                    MIN fica oculta neste modo e volta ao trocar de modo. J,
+                    percentuais, GD e saldo em quadra não são escalados.
+                  </p>
+                )}
+                <fieldset>
+                  <legend>Equipes</legend>
+                  <label className="statistics-check">
+                    <input
+                      type="checkbox"
+                      checked={draft.teams === null}
+                      onChange={(e) =>
+                        change({ teams: e.target.checked ? null : [], page: 1 })
+                      }
+                    />
+                    Todas as equipes
+                  </label>
+                  {(data?.teams ?? []).map((team) => (
+                    <label key={team.id} className="statistics-check">
+                      <input
+                        type="checkbox"
+                        checked={
+                          draft.teams === null || draft.teams.includes(team.id)
+                        }
+                        onChange={(e) => {
+                          const current =
+                            draft.teams ?? data!.teams.map((t) => t.id);
+                          change({
+                            teams: e.target.checked
+                              ? [...new Set([...current, team.id])]
+                              : current.filter((v) => v !== team.id),
+                            page: 1,
+                          });
+                        }}
+                      />
+                      {team.names.join(" / ")}
+                    </label>
+                  ))}
+                  {draft.teams?.length === 0 && (
+                    <p>Nenhuma equipe selecionada.</p>
+                  )}
+                </fieldset>
+                <fieldset>
+                  <legend>Filtros numéricos</legend>
+                  {draft.filters.map((f, i) => (
+                    <div className="statistics-filter" key={i}>
+                      <label>
+                        Métrica do filtro {i + 1}
+                        <select
+                          id={`statistics-filter-${i}`}
+                          value={f.metric}
+                          onChange={(e) =>
+                            filter(i, {
+                              metric: e.target.value as StatisticsMetric,
+                            })
+                          }
+                        >
+                          {metricKeys
+                            .filter(
+                              (k) => draft.mode !== "per-30" || k !== "minutes",
+                            )
+                            .map((k) => (
+                              <option key={k} value={k}>
+                                {STATISTICS_METRICS[k].name}
+                              </option>
+                            ))}
+                        </select>
+                      </label>
+                      <label>
+                        Operador do filtro {i + 1}
+                        <select
+                          value={f.operator}
+                          onChange={(e) =>
+                            filter(i, {
+                              operator: e.target
+                                .value as StatisticsQuery["filters"][number]["operator"],
+                            })
+                          }
+                        >
+                          {[">=", ">", "<=", "<", "="].map((op) => (
+                            <option key={op} value={op}>
+                              {op}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Valor do filtro {i + 1}
+                        <input
+                          required
+                          type="number"
+                          step="any"
+                          value={Number.isFinite(f.value) ? f.value : ""}
+                          onChange={(e) =>
+                            filter(i, { value: e.target.valueAsNumber })
+                          }
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="statistics-secondary"
+                        onClick={() => {
+                          const next = {
+                            ...draft,
+                            filters: draft.filters.filter(
+                              (_, index) => index !== i,
+                            ),
+                            page: 1,
+                          };
+                          setDraft(next);
+                          if (
+                            next.filters.every((item) =>
+                              Number.isFinite(item.value),
+                            )
+                          )
+                            navigate(next, false, false);
+                          requestAnimationFrame(() =>
+                            document
+                              .getElementById("statistics-add-filter")
+                              ?.focus(),
+                          );
+                        }}
+                      >
+                        Remover filtro {i + 1}
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    id="statistics-add-filter"
+                    type="button"
+                    className="statistics-secondary"
+                    disabled={draft.filters.length >= 5}
+                    onClick={() => {
+                      setDraft({
+                        ...draft,
+                        filters: [
+                          ...draft.filters,
+                          { metric: "points", operator: ">=", value: 0 },
+                        ],
+                      });
+                      requestAnimationFrame(() =>
+                        document
+                          .getElementById(
+                            `statistics-filter-${draft.filters.length}`,
+                          )
+                          ?.focus(),
+                      );
+                    }}
+                  >
+                    Adicionar filtro
+                  </button>
+                  <p>
+                    Até cinco filtros. Ausências e amostras insuficientes ficam
+                    fora do filtro e da liderança daquela métrica.
+                  </p>
+                </fieldset>
+                <div className="statistics-actions">
+                  <button type="submit">Aplicar consulta</button>
+                  <button
+                    type="button"
+                    className="statistics-secondary"
+                    onClick={() => {
+                      setShare(true);
+                      requestAnimationFrame(() => {
+                        shareInput.current?.focus();
+                        shareInput.current?.select();
+                      });
+                    }}
+                  >
+                    Compartilhar consulta
+                  </button>
+                </div>
+                {share && (
+                  <label>
+                    Endereço desta consulta
+                    <input
+                      ref={shareInput}
+                      readOnly
+                      value={window.location.href}
+                      onFocus={(e) => e.currentTarget.select()}
+                    />
+                  </label>
+                )}
+              </form>
+            </details>
+          )}
         </main>
         <PublicFooter />
       </TooltipProvider>

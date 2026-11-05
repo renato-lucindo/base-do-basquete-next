@@ -36,7 +36,7 @@ for (const width of [1366, 1920])
       name: "Estatísticas dos atletas",
       exact: true,
     });
-    await expect(table.locator("tbody tr")).toHaveCount(20);
+    await expect(table.locator("tbody tr")).toHaveCount(30);
     const geometry = await table.evaluate((el) => {
       const region = el.closest(".statistics-table-wrap")!;
       const player = el.querySelector("tbody .reference-player")!;
@@ -159,7 +159,7 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.locator("tbody tr")).toHaveCount(20);
+  await expect(table.locator("tbody tr")).toHaveCount(30);
   const region = page.getByRole("region", {
     name: "Tabela estatística rolável",
     exact: true,
@@ -185,7 +185,7 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
   await page
     .getByRole("link", { name: "Voltar à origem", exact: true })
     .click();
-  await expect(table.locator("tbody tr")).toHaveCount(20);
+  await expect(table.locator("tbody tr")).toHaveCount(30);
   await expect
     .poll(() =>
       region.evaluate((el) => ({
@@ -195,4 +195,30 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
       })),
     )
     .toEqual(before);
+});
+
+test("perfil retorna à última página de30 preservando a consulta", async ({
+  page,
+}) => {
+  await publicNavigationFixture(page);
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url + "&page=2&sort=player&dir=asc");
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  await expect(table.locator("tbody tr")).toHaveCount(3);
+  const origin = page.url();
+  await table.locator('a[href^="/atleta.html"]').last().click();
+  await expect(
+    page.getByRole("table", {
+      name: "Resumo de temporada e carreira",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Voltar à origem", exact: true })
+    .click();
+  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(page).toHaveURL(origin);
 });
