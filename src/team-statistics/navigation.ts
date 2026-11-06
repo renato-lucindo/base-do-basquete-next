@@ -48,9 +48,7 @@ export function readTeamRoute(
         ? uuid(p.get("registrationId"))
         : null,
       query: parseTeamDetailQuery(p),
-      listState: from
-        ? parseTeamsQuery(new URLSearchParams(from.slice(0, 1000)))
-        : null,
+      listState: from ? parseTeamsQuery(new URLSearchParams(from)) : null,
     };
   } catch {
     return { kind: "invalid" };

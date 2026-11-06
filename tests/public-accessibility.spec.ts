@@ -77,7 +77,7 @@ test("axe: lista de equipes longa e escolha explícita da inscrição", async ({
   await page.goto(f.listUrl);
   await expect(
     page.getByRole("table", {
-      name: "Equipes com resultados confirmados",
+      name: "Estatísticas das equipes",
       exact: true,
     }),
   ).toBeVisible();

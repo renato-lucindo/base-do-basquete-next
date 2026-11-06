@@ -324,6 +324,47 @@ test("public team list/detail use confirmed source and require explicit registra
       400,
     );
     assert.equal("games" in p, false);
+    const all = await f.mf.dispatchFetch(
+      origin +
+        path +
+        "?pageSize=all&registrationId=" +
+        team.registrationId +
+        "&registrationId=" +
+        source.games[0].snapshot.game.away.registrationId,
+    );
+    assert.equal(all.status, 200);
+    const list = await all.json();
+    assert.equal(list.kind, "confirmed-teams-list-v2");
+    assert.equal(list.pageSize, "all");
+    assert.equal(list.options.length, 2);
+    assert.equal(list.rows.length, 2);
+    assert.equal(list.query.registrationIds.length, 2);
+    const large = new URLSearchParams("pageSize=all&selection=custom");
+    large.append("registrationId", team.registrationId);
+    for (let i = 0; i < 999; i++)
+      large.append(
+        "registrationId",
+        `f9000000-0000-4000-8000-${String(100000 + i).padStart(12, "0")}`,
+      );
+    const posted = await f.mf.dispatchFetch(origin + path + "?pageSize=all", {
+      method: "POST",
+      headers: { origin, "content-type": "application/json" },
+      body: JSON.stringify({ query: large.toString() }),
+    });
+    assert.equal(posted.status, 200);
+    const extensive = await posted.json();
+    assert.equal(extensive.query.registrationIds.length, 1000);
+    assert.equal(extensive.rows.length, 1);
+    for (const tail of [
+      "?pageSize=all&registrationId=bad",
+      "?pageSize=all&scope=all&scope=regular",
+      "?pageSize=all&selection=bad",
+    ])
+      assert.equal(
+        (await f.mf.dispatchFetch(origin + path + tail)).status,
+        400,
+      );
+
     const selection = await f.mf.dispatchFetch(
       origin + path + `/${team.team.id}`,
     );

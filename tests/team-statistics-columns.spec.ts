@@ -26,14 +26,16 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
   ];
   await page.goto(f.listUrl);
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
   const labels = [
-    "Pos",
+    "Pos.",
     "Equipe",
     "J",
     "PTS",
+    "PB",
+    "PB%",
     "2P",
     "3P",
     "FC",
@@ -53,15 +55,17 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
       .locator("tbody tr")
       .filter({ has: page.getByRole("link", { name: "Lobos", exact: true }) });
   await expect(row().locator("td")).toHaveText([
-    "—",
+    "1",
     "2",
     "2,0",
+    "0",
+    "0",
     "1,0",
-    "0,0",
+    "0",
     "3,0",
     "9,0",
-    "0,0",
-    "0,0",
+    "0",
+    "0",
     "—",
     "5,0",
     "2,0",
@@ -88,13 +92,13 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
   await expect(
     table.locator('[data-team-metric="technicalFouls"]'),
   ).toHaveAttribute("aria-sort", "descending");
-  await page
-    .getByRole("combobox", { name: "Modo", exact: true })
-    .selectOption("total");
+  await page.getByRole("button", { name: "Totais", exact: true }).click();
   await expect(row().locator("td")).toHaveText([
     "1",
     "2",
     "4",
+    "0",
+    "0",
     "2",
     "0",
     "6",
@@ -127,25 +131,10 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
     path: `.preview-artifacts/team-sheet-${info.project.name}.png`,
     fullPage: true,
   });
-  await page.getByRole("button", { name: /Colunas ·/ }).click();
-  await page.getByRole("button", { name: "Nenhuma", exact: true }).click();
-  await page.keyboard.press("Escape");
-  await expect(table.locator("thead th")).toHaveText([
-    /^Pos$/,
-    /^Equipe[↑↓]?$/,
-  ]);
-  await page.goto(f.listUrl);
-  await expect(table.locator("thead th")).toHaveText([
-    /^Pos$/,
-    /^Equipe[↑↓]?$/,
-  ]);
+  await expect(page.getByRole("button", { name: /Colunas ·/ })).toHaveCount(0);
+  await expect(page.getByText("Mais opções", { exact: true })).toHaveCount(0);
   await page.goto(f.listUrl + "?columns=games,points");
-  await expect(table.locator("thead th")).toHaveText([
-    /^Pos$/,
-    /^Equipe[↑↓]?$/,
-    /^J$/,
-    /^PTS$/,
-  ]);
+  await expect(table.locator("thead th")).toHaveCount(16);
 });
 
 test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", async ({
@@ -169,7 +158,7 @@ test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", a
   }
   await page.goto(f.listUrl);
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
   const cell = () =>
@@ -177,7 +166,7 @@ test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", a
       .locator("tbody tr")
       .filter({ has: page.getByRole("link", { name: "Lobos", exact: true }) })
       .locator("td")
-      .nth(9);
+      .nth(11);
   await expect(cell()).toHaveText("10");
   const sort = table.getByRole("button", {
     name: "Ordenar por LL% (Aproveitamento de lances livres)",
@@ -189,13 +178,9 @@ test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", a
   await expect(
     table.locator('[data-team-metric="freeThrowPercentage"]'),
   ).toHaveAttribute("aria-sort", "descending");
-  await page
-    .getByRole("combobox", { name: "Escopo", exact: true })
-    .selectOption("regular");
+  await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect(cell()).toHaveText("100");
-  await page
-    .getByRole("combobox", { name: "Modo", exact: true })
-    .selectOption("total");
+  await page.getByRole("button", { name: "Totais", exact: true }).click();
   await expect(cell()).toHaveText("100");
   await page.reload();
   await expect(cell()).toHaveText("100");
@@ -219,7 +204,7 @@ test("colunas de boxscore mantêm LL% único e retorno do perfil preserva contro
     .getByRole("combobox", { name: "Colunas", exact: true })
     .selectOption("boxscore");
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
   await expect(
@@ -254,11 +239,15 @@ test("muitas colunas, nomes longos, picker, teclado, axe e 320px/zoom ficam cont
   page,
 }, info) => {
   const f = await teamPublicFixture(page);
+  f.source.games.push({
+    snapshot: await confirmedPdfFixture(),
+    phase: "knockout",
+  });
   for (const g of f.source.games)
     g.snapshot.game.home.name = "Equipe " + "NomeMuitoLongo".repeat(6);
   await page.goto(f.listUrl + "?preset=all");
   const table = page.getByRole("table", {
-    name: "Equipes com resultados confirmados",
+    name: "Estatísticas das equipes",
     exact: true,
   });
   await expect(
@@ -281,9 +270,7 @@ test("muitas colunas, nomes longos, picker, teclado, axe e 320px/zoom ficam cont
   ).toBeLessThan(240);
   await page.getByRole("button", { name: /Colunas ·/ }).click();
   await expect(
-    page.getByText(
-      "A equipe inscrita e a posição estatística ficam sempre visíveis.",
-    ),
+    page.getByText("A equipe e a posição estatística ficam sempre visíveis."),
   ).toBeVisible();
   await expect(
     page.getByRole("checkbox", { name: "FC · Faltas cometidas", exact: true }),

@@ -167,6 +167,27 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     page.getByText("Nenhum resultado estatístico publicado nesta disputa."),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
+  const participants = page.getByRole("region", {
+    name: "Equipes confirmadas",
+  });
+  await expect(participants.getByRole("listitem")).toHaveText(
+    s.registrations.map((r) => r.name),
+  );
+  const search = page.getByRole("searchbox", {
+    name: "Buscar equipe ou inscrição",
+  });
+  await search.fill("inexistente");
+  await expect(participants.getByRole("listitem")).toHaveCount(0);
+  await expect(search).toBeFocused();
+  await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
+  await expect(page.getByRole("checkbox")).toHaveCount(s.registrations.length);
+  await page
+    .getByRole("button", { name: "Não selecionar nenhuma equipe" })
+    .click();
+  await page.keyboard.press("Escape");
+  await search.fill("");
+  await expect(participants.getByRole("listitem")).toHaveCount(0);
+  await expect(page.getByRole("alert")).toHaveCount(0);
 });
 
 test("correção publicada altera a tabela e fases mantêm confrontos em revisão", async ({
