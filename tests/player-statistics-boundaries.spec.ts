@@ -114,7 +114,9 @@ test("a barra superior alcança a última coluna e acompanha redução de coluna
   await page.getByRole("button", { name: /^Colunas ·/ }).click();
   const options = page.locator("input[data-column-choice]");
   const optionCount = await options.count();
-  await expect(page.locator('input[data-column-choice="team"]')).not.toBeChecked();
+  await expect(
+    page.locator('input[data-column-choice="team"]'),
+  ).not.toBeChecked();
   await expect(page.locator("input[data-column-choice]:checked")).toHaveCount(
     optionCount - 1,
   );
