@@ -65,3 +65,28 @@ it("legacy B2 is not a technical or a count of bench disqualifications", () => {
     foulsReceived: 0,
   });
 });
+it("counts compensated legacy bank/coach/player technicals and the final successor", () => {
+  const legacy = publicationSheet();
+  legacy.staff.home.coachStaffEntryId = pubId(200);
+  legacy.events.unshift(
+    { id: pubId(2060), side: "home", period: 1, target: "0", code: "TC" },
+    { id: pubId(2061), side: "home", period: 1, target: "C", code: "CC" },
+    { id: pubId(2062), side: "home", period: 1, target: "B", code: "BC" },
+    { id: pubId(2063), side: "home", period: 1, target: "B", code: "B2" },
+  );
+  expect(
+    deriveManualFacts(legacy).teams.home.teamStatistics.technicalFouls,
+  ).toBe(3);
+  const current = disciplinarySheet();
+  current.events.splice(-1, 0, {
+    id: pubId(2064),
+    side: "home",
+    period: 1,
+    target: "C",
+    code: "CC",
+    actorId: pubId(3),
+  });
+  expect(
+    deriveManualFacts(current).teams.home.teamStatistics.technicalFouls,
+  ).toBe(6);
+});

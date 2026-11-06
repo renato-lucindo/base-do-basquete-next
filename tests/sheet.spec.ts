@@ -651,15 +651,38 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
   await panel
     .getByLabel(/GD — total da equipe/)
     .first()
+    .fill("-1");
+  await expect(
+    panel.getByLabel(/GD — total da equipe/).first(),
+  ).toHaveAttribute("aria-invalid", "true");
+  await expect(panel.getByText(/Informe um total inteiro de GD/)).toBeVisible();
+  await panel
+    .getByLabel(/GD — total da equipe/)
+    .first()
     .fill("3");
   await expect(checks.first()).not.toBeChecked();
   await expect(publish).toBeDisabled();
   await checks.first().check();
   await scan(page, info, "admin-team-statistics-review");
-  for (const width of [1366, 390]) {
-    await page.setViewportSize({ width, height: 900 });
+  for (const width of [1366, 1920, 390]) {
+    await page.setViewportSize({ width, height: width === 1920 ? 1080 : 900 });
     await panel.screenshot({
       path: `.preview-artifacts/team-statistics-review-${width}.png`,
+    });
+    const input = panel.getByLabel(/GD — total da equipe/).first();
+    await input.scrollIntoViewIfNeeded();
+    await input.focus();
+    await expect(input).toBeFocused();
+    const field = await input.boundingBox(),
+      nav = await page.locator(".sheet-navigation").boundingBox();
+    expect(field!.y).toBeGreaterThanOrEqual(nav!.y + nav!.height);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `.preview-artifacts/team-statistics-viewport-${width}.png`,
     });
   }
   f.lose();
@@ -681,6 +704,129 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
   expect(f.attempts.at(-1)).toBe(f.attempts.at(-2));
   expect(f.commands.at(-1)).toBe(f.commands.at(-2));
 });
+test("coletivos: alterar e desfazer a súmula exige nova conferência de GD", async ({
+  page,
+}) => {
+  await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await confirmGD(page);
+  const publish = page.getByRole("button", {
+    name: "Publicar este jogo",
+    exact: true,
+  });
+  await expect(publish).toBeEnabled();
+  const played = page.getByLabel("Entrou Atleta home 5", { exact: true });
+  await played.check();
+  await expect(publish).toBeDisabled();
+  await played.uncheck();
+  await expect(publish).toBeDisabled();
+  await expect(
+    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }).first(),
+  ).not.toBeChecked();
+  await page
+    .getByRole("button", {
+      name: "Recarregar estado da publicação",
+      exact: true,
+    })
+    .click();
+  await confirmGD(page);
+  await expect(publish).toBeEnabled();
+});
+
+test("coletivos: cancelamento preserva conferência e publicação concorrente exige recarga", async ({
+  page,
+  context,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await confirmGD(page);
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  const reviewButton = page.getByRole("button", {
+    name: "Conferir estatísticas publicadas",
+    exact: true,
+  });
+  await reviewButton.click();
+  const panel = page.getByRole("region", {
+    name: "Revisão das estatísticas publicadas",
+    exact: true,
+  });
+  const reason = panel.getByLabel(
+    "Motivo da revisão das estatísticas publicadas",
+  );
+  await reason.fill("Conferência da primeira aba para publicar.");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await panel
+    .getByRole("button", { name: "Cancelar conferência", exact: true })
+    .click();
+  await expect(reason).toHaveValue(
+    "Conferência da primeira aba para publicar.",
+  );
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await reviewButton.click();
+  await expect(reason).toHaveValue(
+    "Conferência da primeira aba para publicar.",
+  );
+  for (const checkbox of await panel.getByRole("checkbox").all())
+    await checkbox.check();
+  const second = await context.newPage();
+  await f.attach(second);
+  await open(second);
+  await second
+    .getByRole("button", {
+      name: "Conferir estatísticas publicadas",
+      exact: true,
+    })
+    .click();
+  const other = second.getByRole("region", {
+    name: "Revisão das estatísticas publicadas",
+    exact: true,
+  });
+  await other
+    .getByLabel("Motivo da revisão das estatísticas publicadas")
+    .fill("Conferência concorrente confirmada na segunda aba.");
+  await expect(other.getByRole("checkbox")).toHaveCount(2);
+  for (const checkbox of await other.getByRole("checkbox").all())
+    await checkbox.check();
+  await other
+    .getByRole("button", {
+      name: "Publicar estatísticas conferidas",
+      exact: true,
+    })
+    .click();
+  await expect(
+    other.getByRole("status").filter({ hasText: /^Estatísticas publicadas/ }),
+  ).toContainText("versão 2");
+  const live = structuredClone(f.source());
+  await panel
+    .getByRole("button", {
+      name: "Publicar estatísticas conferidas",
+      exact: true,
+    })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("A publicação mudou");
+  await expect(reason).toHaveCount(0);
+  expect(f.published()!.version).toBe(2);
+  expect(f.source()).toEqual(live);
+  page.once("dialog", (dialog) => dialog.accept());
+  await reviewButton.click();
+  await expect(
+    panel.getByRole("heading", { name: "Conferir estatísticas da versão 2" }),
+  ).toBeFocused();
+  await expect(panel.getByRole("checkbox").first()).not.toBeChecked();
+  await second.close();
+});
+
 async function confirmGD(page: Page) {
   await expect(
     page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),

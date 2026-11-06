@@ -48,6 +48,7 @@ export function SheetPublicationPanel(p: Props) {
   const [historyEpoch, setHistoryEpoch] = useState(0);
   const historicalGuard = useRef<() => boolean>(() => true);
   const reviewDocument = useRef("");
+  const documentKey = JSON.stringify(p.document);
   const [state, setState] = useState<PublicationState | null>(null),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -61,6 +62,15 @@ export function SheetPublicationPanel(p: Props) {
   const blocked = busy || uncertain || ack !== null || historicalLocked;
   const totals = aggregate(toEngineSheet(p.document));
   const collective = deriveSheetTeamStatistics(p.document);
+  useEffect(() => {
+    if (reviewDocument.current && reviewDocument.current !== documentKey) {
+      reviewDocument.current = "";
+      setTeamReview((v) => ({
+        home: { ...v.home, confirmed: false },
+        away: { ...v.away, confirmed: false },
+      }));
+    }
+  }, [documentKey]);
   useEffect(() => {
     p.onLock(blocked);
   }, [blocked, p.onLock]);
@@ -315,6 +325,12 @@ export function SheetPublicationPanel(p: Props) {
             disabled={blocked || p.disabled}
             names={{ home: p.game.home.name, away: p.game.away.name }}
           />
+          {reviewDocument.current !== documentKey && (
+            <p role="status">
+              A súmula mudou. Recarregue o estado da publicação e confira GD
+              novamente.
+            </p>
+          )}
           {!p.confirmed && needsReason && (
             <label>
               Motivo da publicação

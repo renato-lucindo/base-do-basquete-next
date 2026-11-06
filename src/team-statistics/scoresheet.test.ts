@@ -3,9 +3,12 @@ import {
   disciplinarySheet,
   teamReview,
 } from "../../tests/fixtures/sheet-team-statistics";
-import { confirmedManualFixture } from "../../tests/fixtures/statistics-publications";
+import {
+  confirmedManualFixture,
+  confirmedPdfFixture,
+} from "../../tests/fixtures/statistics-publications";
 import { teamStatisticsFixture } from "../../tests/fixtures/team-statistics";
-import { pubId } from "../../tests/fixtures/publication";
+import { publicationSheet, pubId } from "../../tests/fixtures/publication";
 import { buildTeamsPage } from "./domain";
 import { parseTeamsQuery } from "./query-contract";
 import { SHEET_TEAM_COLUMNS } from "./metrics";
@@ -29,6 +32,89 @@ function source() {
   ];
   return s;
 }
+it("crosses FR before aggregation for distinct opponents, zero, phases and mixed PDF authority", async () => {
+  const s = teamStatisticsFixture();
+  s.games = [
+    [1, 2, "round_robin"],
+    [2, 3, "knockout"],
+    [0, 0, null],
+  ].map(([own, opposing, phase], index) => {
+    const d = publicationSheet();
+    for (const [side, count] of [
+      ["home", Number(own)],
+      ["away", Number(opposing)],
+    ] as const)
+      d.events.unshift(
+        ...Array.from({ length: count }, (_, n) => ({
+          id: pubId(31000 + index * 100 + (side === "home" ? 0 : 10) + n),
+          side,
+          period: 1,
+          target: "0",
+          code: "P",
+        })),
+      );
+    const snapshot = confirmedManualFixture(false, d, {
+      home: { disqualifications: 0, foulsReceived: null },
+      away: { disqualifications: 0, foulsReceived: null },
+    });
+    snapshot.id = pubId(32000 + index);
+    const opponent = pubId(32100 + index);
+    snapshot.game.away.registrationId = opponent;
+    for (const p of snapshot.facts.players.filter((p) => p.side === "away")) {
+      p.registrationId = opponent;
+    }
+    // 0 and 00 are separate people; retain those identities independently.
+    snapshot.facts.players
+      .filter((p) => p.side === "away")
+      .forEach((p, n) => {
+        p.person.id = pubId(33000 + index * 100 + n);
+      });
+    const captain = snapshot.facts.players.find(
+      (p) => p.side === "away" && p.captain,
+    )!.person;
+    snapshot.staff.away.captain = captain;
+    snapshot.staff.away.coach = captain;
+    return { snapshot, phase: phase as "round_robin" | "knockout" | null };
+  });
+  const get = (text = "", id = pubId(5)) =>
+    buildTeamsPage(s, query(text)).rows.find((r) => r.registrationId === id)!;
+  expect(get().statistics.foulsReceived.value).toBe(5);
+  expect(get("mode=per-game").statistics.foulsReceived.value).toBe(5 / 3);
+  expect(get("scope=regular").statistics.foulsReceived.value).toBe(2);
+  expect(get("scope=playoffs").statistics.foulsReceived.value).toBe(3);
+  for (const [index, expected] of [1, 2, 0].entries())
+    expect(get("", pubId(32100 + index)).statistics.foulsReceived.value).toBe(
+      expected,
+    );
+  const pdf = await confirmedPdfFixture(
+    "Box Score FIBA ALC vs AVA 09 maio.pdf",
+  );
+  pdf.id = pubId(34000);
+  const ownFR = pdf.facts.players
+    .filter((p) => p.side === "home" && p.played)
+    .reduce((n, p) => n + p.foulsReceived!, 0);
+  expect(ownFR).toBeGreaterThan(0);
+  const pdfFC = pdf.facts.players
+    .filter((p) => p.side === "away" && p.played)
+    .reduce((n, p) => n + p.advanced!.foulsCommitted, 0);
+  // A distinct authoritative FR proves that no opponent-FC inference touches PDFs.
+  pdf.facts.players.find(
+    (p) => p.side === "home" && p.played,
+  )!.foulsReceived! += 7;
+  const authoritativeFR = ownFR + 7;
+  expect(authoritativeFR).not.toBe(pdfFC);
+  const pdfPlayers = structuredClone(pdf.facts.players);
+  s.games.push({ snapshot: pdf, phase: "knockout" });
+  expect(get().statistics.foulsReceived.value).toBe(5 + authoritativeFR);
+  expect(get("mode=per-game").statistics.foulsReceived.value).toBe(
+    (5 + authoritativeFR) / 4,
+  );
+  expect(get("dataset=boxscore").statistics.foulsReceived.value).toBe(
+    authoritativeFR,
+  );
+  expect(get("dataset=boxscore&mode=per-game").gamesPlayed).toBe(1);
+  expect(pdf.facts.players).toEqual(pdfPlayers);
+});
 it("sheet column order and every quantitative total/average use the selected complete games", () => {
   const s = source();
   const total = buildTeamsPage(s, query());

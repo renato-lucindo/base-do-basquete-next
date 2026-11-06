@@ -456,6 +456,12 @@
 .collective-gd-total input {
   scroll-margin-top: 100px;
 }
+@media (max-width: 600px) {
+  .team-statistics-review h4,
+  .collective-gd-total input {
+    scroll-margin-top: 220px;
+  }
+}
 
 /* Dense desktop action history: use available width rather than stacking every event. */
 .sheet-history > h4 {
