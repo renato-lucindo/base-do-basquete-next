@@ -202,7 +202,7 @@ test("diálogo de equipe mantém nome largo e sigla curta na mesma linha", async
     short = page.getByLabel("Sigla (opcional)", { exact: true });
   const a = await name.boundingBox(),
     b = await short.boundingBox();
-  expect(b!.width).toBeLessThanOrEqual(180);
+  expect(b!.width).toBeLessThanOrEqual(180 * 1.5);
   expect(Math.abs(a!.y - b!.y)).toBeLessThan(2);
   await name.fill("Clube de teste");
   await short.fill("CLT");
@@ -269,10 +269,14 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
     name: "Elenco de Lobos B",
     exact: true,
   });
+  await expect(
+    page.getByRole("status").filter({ hasText: "Equipe global salva." }),
+  ).toBeVisible();
   await expect(selectedPanel).toBeVisible();
   await expect(
     selectedPanel.getByText("Equipe: Lobos Renomeados", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  expect([...f.teams.values()][0].name).toBe("Lobos Renomeados");
   expect([...f.registrations.values()].map((r) => r.name)).toEqual([
     "Lobos",
     "Lobos B",

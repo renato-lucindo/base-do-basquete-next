@@ -30,8 +30,8 @@
   margin: 1rem 0;
 }
 .achievements :is(h2, h3, [role="status"]):focus {
-  outline: 2px solid #235ea4;
-  outline-offset: 4px;
+  outline: 0.125rem solid #235ea4;
+  outline-offset: 0.25rem;
 }
 .achievements label.reg-check {
   display: grid;

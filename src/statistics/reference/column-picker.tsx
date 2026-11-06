@@ -1,7 +1,7 @@
 // Fonte: docs/design/prototipos/estatisticas/react-prototype/adapted/column-picker.tsx
 // Column-options JSX extracted from upstream/boxscore-statistics-explorer.tsx.
 // Controlled adapter: responsive defaults, optional team and metrics, accessible popup/focus.
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 export function ColumnPicker({
   options,
   value,
@@ -14,41 +14,64 @@ export function ColumnPicker({
   identityNote?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [panelHeight, setPanelHeight] = useState(560);
+  const [panelPosition, setPanelPosition] = useState<CSSProperties>({});
   const container = useRef<HTMLDivElement>(null),
-    trigger = useRef<HTMLButtonElement>(null);
+    trigger = useRef<HTMLButtonElement>(null),
+    panel = useRef<HTMLDivElement>(null);
   const selectedColumns = value;
   const columnOptions = options.map((m) => ({
     label: m.name ? m.label + " · " + m.name : m.label,
     metrics: [m.key],
   }));
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
-    const resize = () =>
-      setPanelHeight(
-        Math.max(
-          160,
+    const resize = () => {
+      if (!trigger.current || !panel.current) return;
+      const anchor = trigger.current.getBoundingClientRect();
+      const scale =
+        parseFloat(getComputedStyle(document.documentElement).fontSize) / 16;
+      const margin = 8 * scale,
+        gap = 7 * scale;
+      const below = innerHeight - anchor.bottom - gap - margin;
+      const above = anchor.top - gap - margin;
+      const opensAbove = below < 160 * scale && above > below;
+      const next: CSSProperties = {
+        position: "fixed",
+        left: Math.max(
+          margin,
           Math.min(
-            560,
-            window.innerHeight -
-              (trigger.current?.getBoundingClientRect().bottom ?? 0) -
-              24,
+            anchor.right - panel.current.getBoundingClientRect().width,
+            innerWidth - panel.current.getBoundingClientRect().width - margin,
           ),
         ),
+        right: "auto",
+        top: opensAbove ? "auto" : anchor.bottom + gap,
+        bottom: opensAbove ? innerHeight - anchor.top + gap : "auto",
+        maxHeight: Math.max(
+          1,
+          Math.min(560 * scale, opensAbove ? above : below),
+        ),
+      };
+      setPanelPosition((previous) =>
+        JSON.stringify(previous) === JSON.stringify(next) ? previous : next,
       );
+    };
     resize();
     const outside = (event: PointerEvent) => {
       if (!container.current?.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", outside);
     window.addEventListener("resize", resize);
-    window.addEventListener("scroll", resize);
+    window.addEventListener("scroll", resize, true);
+    const observer = new ResizeObserver(resize);
+    if (container.current) observer.observe(container.current);
     return () => {
       document.removeEventListener("pointerdown", outside);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("scroll", resize);
+      window.removeEventListener("scroll", resize, true);
+      observer.disconnect();
     };
-  }, [open]);
+  }, [open, value]);
   return (
     <div
       className="column-picker"
@@ -83,8 +106,9 @@ export function ColumnPicker({
       {open ? (
         <div
           id="column-picker-panel"
+          ref={panel}
           className="team-filter-panel column-picker-panel"
-          style={{ maxHeight: panelHeight }}
+          style={panelPosition}
         >
           <fieldset className="column-picker-fieldset">
             <legend>Colunas da tabela</legend>

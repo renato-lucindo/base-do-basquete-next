@@ -151,7 +151,6 @@ export function TeamsTable({
                         >
                           {r.name}
                         </a>
-                        {r.teamName !== r.name && <small>{r.teamName}</small>}
                       </th>
                       {d.query.columns.map((metric: TeamMetric) => (
                         <td

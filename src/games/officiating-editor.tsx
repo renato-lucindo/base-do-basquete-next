@@ -308,8 +308,8 @@ function OfficialPicker({
               aria-hidden="true"
               focusable="false"
               viewBox="0 0 16 16"
-              width="14"
-              height="14"
+              width=".875rem"
+              height=".875rem"
             >
               <path
                 d="M4 4l8 8M4 12l8-8"

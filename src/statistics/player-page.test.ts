@@ -47,12 +47,44 @@ function sourceFixture() {
           captainIsCoach: true,
         };
       }
-      return { snapshot, phase: null };
+      return { snapshot, phase: null as null | "round_robin" | "knockout" };
     }),
   };
 }
-const query = (s = "") =>
-  parseStatisticsQuery(new URLSearchParams(`scope=all&mode=total&${s}`));
+const query = (s = "") => {
+  const params = new URLSearchParams(s);
+  if (!params.has("scope")) params.set("scope", "all");
+  if (!params.has("mode")) params.set("mode", "total");
+  return parseStatisticsQuery(params);
+};
+
+it("rótulo de equipe usa a inscrição mais recentemente publicada sem duplicar nome global", () => {
+  const source = sourceFixture();
+  for (const [i, game] of source.games.entries()) {
+    game.phase = i === 3 ? "knockout" : "round_robin";
+    game.snapshot.publishedAt = `2026-11-0${i + 1}T12:00:00Z`;
+    game.snapshot.game.home.name = i === 3 ? "LUSB" : "Nome histórico";
+    game.snapshot.game.home.team.name = "Liga Urbana Social de Basquete";
+    game.snapshot.game.away.team.id = pubId(7000);
+  }
+  const result = buildStatisticsPage(
+    source,
+    query("scope=regular&pageSize=30"),
+  );
+  const id = source.games[0].snapshot.game.home.team.id;
+  expect(result.teams.find((t) => t.id === id)?.names).toEqual(["LUSB"]);
+  expect(
+    buildStatisticsPage(source, query("scope=regular&q=LUSB")).total,
+  ).toBeGreaterThan(0);
+  expect(
+    buildStatisticsPage(source, query("scope=playoffs&q=Nome%20histórico"))
+      .total,
+  ).toBeGreaterThan(0);
+  expect(
+    buildStatisticsPage(source, query("q=Liga%20Urbana")).total,
+  ).toBeGreaterThan(0);
+  expect(source.games[0].snapshot.game.home.name).toBe("Nome histórico");
+});
 
 it("preserva DTO legado de20 e valida30 linhas, última página incompleta e tamanho inválido", () => {
   const source = sourceFixture();

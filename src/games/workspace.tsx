@@ -159,7 +159,7 @@ export function GamesWorkspace(props: Props) {
           '.game-editor-dialog input[aria-label="Inscrição mandante"]',
         )
         ?.focus();
-    } else heading.current?.focus();
+    } else heading.current?.parentElement?.focus();
   }, [props.enabled, editor?.game.id, auxiliary]);
   useEffect(() => {
     if (error && props.enabled) alert.current?.focus();
@@ -507,8 +507,8 @@ export function GamesWorkspace(props: Props) {
             : ""
         }
       />
-      <div className="competition-title">
-        <h3 ref={heading} tabIndex={-1}>
+      <div className="competition-title" tabIndex={-1}>
+        <h3 ref={heading} className="sr-only">
           Jogos
         </h3>
         {!editor && !auxiliary && !sheetVisible && (
@@ -1004,7 +1004,11 @@ export function GamesWorkspace(props: Props) {
             <details
               className="game-officiating"
               open={officialsOpen}
-              onToggle={(e) => setOfficialsOpen(e.currentTarget.open)}
+              onToggle={(e) => {
+                const section = e.currentTarget;
+                setOfficialsOpen(section.open);
+                if (section.open) section.scrollIntoView({ block: "start" });
+              }}
             >
               <summary>
                 Arbitragem e mesa{" "}

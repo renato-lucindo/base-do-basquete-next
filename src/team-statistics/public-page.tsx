@@ -146,7 +146,14 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
     return () => controller.abort();
   }, [route, key, retry]);
   useLayoutEffect(() => {
-    const target = error ? alert.current : data ? heading.current : null;
+    const title = heading.current;
+    const target = error
+      ? alert.current
+      : data
+        ? title?.classList.contains("sr-only")
+          ? title.parentElement
+          : title
+        : null;
     if (!loading && focus.current && target) {
       focus.current = false;
       target.focus();
@@ -231,7 +238,9 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
         tabIndex={-1}
         className="access-main statistics-page team-public-page"
       >
-        <h1>{name}</h1>
+        <h1 className={current.kind === "list" ? "sr-only" : undefined}>
+          {name}
+        </h1>
         {current.kind === "list" && confirmed.data && (
           <section aria-label="Equipes confirmadas">
             <h2>Participantes confirmados</h2>
@@ -622,14 +631,13 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                             >
                               {r.name}
                             </a>
-                            <small>{r.teamName}</small>
                           </li>
                         ))}
                       </ul>
                     </section>
                   ) : (
-                    <section>
-                      <h2 ref={heading} tabIndex={-1}>
+                    <section tabIndex={-1}>
+                      <h2 ref={heading} className="sr-only">
                         {
                           sections.find((s) => s.id === data.query.section)
                             ?.label
@@ -637,10 +645,6 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
                       </h2>
                       {data.query.section === "resumo" && (
                         <>
-                          <p>
-                            Equipe: {data.identity.teamName} · inscrição:{" "}
-                            {data.identity.name}.
-                          </p>
                           {data.statistics ? (
                             <>
                               <p>

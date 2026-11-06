@@ -77,6 +77,7 @@ export function buildStatisticsPage(
 ) {
   const query = parseStatisticsQuery(serializeStatisticsQuery(requested)),
     selected = selectStatisticsFacts(input, query.scope, query.dataset),
+    labels = selected.registrationLabels,
     all = aggregateConfirmedStatistics(selected.facts, {
       mode: query.mode,
       minimumSeconds: selected.minimumSeconds,
@@ -91,6 +92,7 @@ export function buildStatisticsPage(
             ...r.nicknames.filter((v) => v !== null),
             ...r.teamNames,
             ...r.registrationNames,
+            ...(labels.get(r.registrationId)?.aliases ?? []),
           ].join(" "),
         ).includes(normalize(query.search))) &&
       (query.teams === null || query.teams.includes(r.teamId)) &&
@@ -106,7 +108,7 @@ export function buildStatisticsPage(
     query.sort === "player"
       ? publicPlayerHistoryName(r.names, r.nicknames)
       : query.sort === "team"
-        ? r.registrationNames.join(" / ")
+        ? (labels.get(r.registrationId)?.name ?? r.registrationNames[0])
         : r.metrics[query.sort].value;
   const sorted = [...searched].sort((a, b) => {
     const av = value(a),
@@ -196,21 +198,36 @@ export function buildStatisticsPage(
       .slice((page - 1) * query.pageSize, page * query.pageSize)
       .map((row) => ({
         ...row,
+        registrationNames: [
+          labels.get(row.registrationId)?.name ?? row.registrationNames[0],
+        ],
         jerseys: jerseys.get(`${row.personId}/${row.registrationId}`) ?? [],
       })),
     compared: query.compare.flatMap((id) =>
-      all.filter((r) => r.personId === id),
+      all
+        .filter((r) => r.personId === id)
+        .map((r) => ({
+          ...r,
+          registrationNames: [
+            labels.get(r.registrationId)?.name ?? r.registrationNames[0],
+          ],
+        })),
     ),
     comparisonSummaries,
     comparisonStates,
     leaders,
     teams: unique(all.map((r) => r.teamId)).map((id) => ({
       id,
-      names: unique(
-        all
+      names: [
+        [...labels.values()]
           .filter((r) => r.teamId === id)
-          .flatMap((r) => [...r.teamNames, ...r.registrationNames]),
-      ),
+          .sort(
+            (a, b) =>
+              Date.parse(b.publishedAt) - Date.parse(a.publishedAt) ||
+              b.gameId.localeCompare(a.gameId) ||
+              b.name.localeCompare(a.name, "pt-BR"),
+          )[0].name,
+      ],
     })),
     coverage: selected.coverage,
   };

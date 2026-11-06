@@ -71,11 +71,10 @@ for (const kind of ["estatisticas", "sumula"] as const) {
     }
     // Shared navigation now follows the accepted reform pilot. Preserve the scoresheet body and reference controls;
     // player names follow the explicit 14px legibility requirement.
-    const approved = expected.map((item) =>
-      item.selector.includes(".reference-player")
-        ? { ...item, size: "14px" }
-        : item,
-    );
+    const approved = expected.map((item) => ({
+      ...item,
+      size: `${(item.selector.includes(".reference-player") ? 14 : parseFloat(item.size!)) * (info.project.name === "desktop" ? 1.5 : 1)}px`,
+    }));
     expect(await read()).toEqual(approved);
     expect(
       await page.evaluate(

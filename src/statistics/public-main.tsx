@@ -1,3 +1,4 @@
+import "../ui-system/readability.css";
 import { useEffect, useState } from "react";
 import { SimpleStatisticsPageView } from "./simple-page";
 import { createRoot } from "react-dom/client";

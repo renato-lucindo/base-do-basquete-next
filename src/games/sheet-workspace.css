@@ -5,22 +5,22 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  padding: 8px 0;
+  padding: 0.5rem 0;
   background: #fff;
   border-bottom: 1px solid #d9e1ec;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 16px;
+  gap: 0.5rem 1rem;
 }
 .sheet-navigation h3,
 .sheet-navigation .competition-actions {
   margin: 0;
 }
 .access-main:has(.game-sheet) {
-  max-width: 1560px;
-  padding-top: 20px;
+  max-width: 97.5rem;
+  padding-top: 1.25rem;
 }
 .sheet-team-card {
   color: #172033;
@@ -28,21 +28,21 @@
 .game-sheet .sheet-preparation-table input[type="checkbox"],
 .game-sheet .sheet-preparation-table input[type="radio"],
 .game-sheet .sheet-live-table input {
-  min-height: 17px;
+  min-height: 1.0625rem;
 }
 .game-sheet .sheet-preparation-table td button {
-  min-height: 24px;
-  line-height: 20px;
+  min-height: 1.5rem;
+  line-height: 1.25rem;
 }
 .sheet-preparation-table th:nth-child(4) {
-  min-width: 56px;
+  min-width: 3.5rem;
 }
 .sheet-desktop-teams {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 0.75rem;
   align-items: start;
-  margin: 12px 0;
+  margin: 0.75rem 0;
 }
 .sheet-team-card {
   min-width: 0;
@@ -51,13 +51,13 @@
 }
 .sheet-team-card h4 {
   margin: 0;
-  padding: 8px;
+  padding: 0.5rem;
   background: #edf2f8;
 }
 .sheet-source {
   margin: 0;
-  padding: 5px 8px;
-  min-height: 44px;
+  padding: 0.3125rem 0.5rem;
+  min-height: 2.75rem;
   font-size: 0.85rem;
 }
 .sheet-preparation-table,
@@ -72,20 +72,20 @@
 .sheet-live-table th,
 .sheet-live-table td {
   border: 1px solid #b1bac6;
-  padding: 3px;
-  height: 29px;
+  padding: 0.1875rem;
+  height: 1.8125rem;
   text-align: center;
 }
 .sheet-preparation-table th:nth-child(1) {
-  width: 44px;
+  width: 2.75rem;
 }
 .sheet-preparation-table th:nth-child(3),
 .sheet-preparation-table th:nth-child(4),
 .sheet-preparation-table th:nth-child(5) {
-  width: 48px;
+  width: 3rem;
 }
 .sheet-preparation-table th:last-child {
-  width: 30px;
+  width: 1.875rem;
 }
 .game-sheet
   .sheet-preparation-table
@@ -93,20 +93,20 @@
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  min-height: 28px;
-  padding: 3px 5px;
+  min-height: 1.75rem;
+  padding: 0.1875rem 0.3125rem;
   font-size: 0.9rem;
 }
 .game-sheet .sheet-preparation-table input[type="checkbox"],
 .game-sheet .sheet-preparation-table input[type="radio"],
 .game-sheet .sheet-live-table input {
-  width: 17px;
-  height: 17px;
-  margin: 2px;
+  width: 1.0625rem;
+  height: 1.0625rem;
+  margin: 0.125rem;
   padding: 0;
 }
 .game-sheet .sheet-preparation-table button {
-  padding: 3px 7px;
+  padding: 0.1875rem 0.4375rem;
 }
 .sheet-athlete-picker {
   position: relative;
@@ -118,12 +118,12 @@
   top: 100%;
   left: 0;
   right: 0;
-  max-height: 240px;
+  max-height: 15rem;
   overflow-y: auto;
   border: 1px solid #455d7e;
-  box-shadow: 0 3px 8px #0003;
+  box-shadow: 0 0.1875rem 0.5rem #0003;
   background: white;
-  min-width: 180px;
+  min-width: 11.25rem;
 }
 .sheet-athlete-options button {
   display: block;
@@ -137,42 +137,42 @@
   background: #e5edfb;
 }
 .sheet-staff-footer {
-  padding: 6px;
+  padding: 0.375rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 0.375rem;
   align-items: end;
   font-size: 0.85rem;
 }
 .sheet-staff-footer label {
   flex: 1;
-  min-width: 140px;
+  min-width: 8.75rem;
 }
 .game-sheet .sheet-staff-footer select {
   width: 100%;
-  padding: 4px;
-  min-height: 30px;
+  padding: 0.25rem;
+  min-height: 1.875rem;
 }
 .sheet-staff-footer p {
-  margin: 4px;
+  margin: 0.25rem;
 }
 .sheet-step-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
 .sheet-live-table {
   font-size: 0.8rem;
 }
 .sheet-live-table th:first-child {
-  width: 27px;
+  width: 1.6875rem;
 }
 .sheet-live-table th:nth-child(2) {
   width: 26%;
 }
 .sheet-live-table th:nth-child(3) {
-  width: 46px;
+  width: 2.875rem;
 }
 .sheet-live-table th:nth-child(9) {
   width: 22%;
@@ -197,13 +197,13 @@
   font-weight: 700;
 }
 .sheet-first-half {
-  box-shadow: inset 0 0 0 2px #172033;
+  box-shadow: inset 0 0 0 0.125rem #172033;
 }
 .sheet-player-state {
   font-weight: 700;
 }
 .sheet-team-score {
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
 .sheet-team-score table {
   width: 100%;
@@ -211,41 +211,41 @@
 }
 .sheet-team-score th,
 .sheet-team-score td {
-  padding: 5px;
+  padding: 0.3125rem;
   border: 1px solid #a7b4c5;
   text-align: center;
 }
 .sheet-team-score p {
-  margin: 5px 0;
+  margin: 0.3125rem 0;
   font-weight: 600;
 }
 .sheet-current-period {
   background: #fff1bd;
-  box-shadow: inset 0 0 0 2px #8c6413;
+  box-shadow: inset 0 0 0 0.125rem #8c6413;
 }
 .sheet-coach-fouls {
-  padding: 5px;
+  padding: 0.3125rem;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-height: 29px;
+  gap: 0.25rem;
+  min-height: 1.8125rem;
 }
 .sheet-staff-line {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .sheet-staff-identity {
-  min-width: 160px;
+  min-width: 10rem;
 }
 .sheet-acting-coach,
 .sheet-staff-status {
-  margin-left: 6px;
-  padding: 1px 4px;
+  margin-left: 0.375rem;
+  padding: 1px 0.25rem;
   border: 1px solid #a7b4c5;
-  border-radius: 3px;
+  border-radius: 0.1875rem;
 }
 .sheet-acting-coach {
   color: #07599b;
@@ -257,50 +257,50 @@
 .sheet-successor-choice {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 6px 0;
+  gap: 0.5rem;
+  margin: 0.375rem 0;
 }
 .sheet-foul-mark {
   display: inline-block;
-  min-width: 24px;
-  margin: 0 2px;
-  padding: 3px;
+  min-width: 1.5rem;
+  margin: 0 0.125rem;
+  padding: 0.1875rem;
   text-align: center;
 }
 .game-sheet .sheet-history-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  padding: 6px;
+  gap: 0.625rem;
+  padding: 0.375rem;
 }
 .game-sheet .sheet-history-filters fieldset {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   margin: 0;
-  padding: 4px 7px;
+  padding: 0.25rem 0.4375rem;
 }
 .sheet-history-filters label {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 0.1875rem;
 }
 .sheet-history-filters input {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 .sheet-history-filters select {
-  max-width: 220px;
-  padding: 4px;
+  max-width: 13.75rem;
+  padding: 0.25rem;
 }
 .sheet-history h5 {
-  margin: 8px 0 4px;
+  margin: 0.5rem 0 0.25rem;
 }
 .sheet-history .sheet-actions li {
-  padding: 5px 8px;
+  padding: 0.3125rem 0.5rem;
 }
 .sheet-history .sheet-actions button {
-  padding: 3px 9px;
+  padding: 0.1875rem 0.5625rem;
 }
 .sr-only {
   position: absolute;
@@ -322,27 +322,26 @@
   }
   .sheet-roster li {
     display: grid;
-    grid-template-columns: minmax(140px, 2fr) minmax(90px, 180px) minmax(
-        200px,
-        1fr
-      );
-    gap: 12px;
+    grid-template-columns:
+      minmax(8.75rem, 2fr) minmax(5.625rem, 11.25rem)
+      minmax(12.5rem, 1fr);
+    gap: 0.75rem;
     align-items: center;
   }
 }
 .game-sheet fieldset {
   min-width: 0;
-  margin: 20px 0;
-  padding: 16px;
+  margin: 1.25rem 0;
+  padding: 1rem;
   border: 1px solid #d9e2ee;
 }
 .sheet-team {
-  margin: 16px 0 28px;
+  margin: 1rem 0 1.75rem;
   border-bottom: 1px solid #d9e2ee;
-  padding-bottom: 16px;
+  padding-bottom: 1rem;
 }
 .sheet-candidate {
-  padding: 12px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #e5ebf3;
 }
 .sheet-roster {
@@ -350,36 +349,36 @@
   padding: 0;
 }
 .sheet-roster li {
-  padding: 12px;
-  margin: 8px 0;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
   background: #f5f8fc;
   overflow-wrap: anywhere;
 }
 .sheet-checks {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 1rem;
 }
 .game-sheet .sheet-check {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
+  gap: 0.5rem;
+  min-height: 2.75rem;
 }
 .game-sheet .sheet-check input {
-  width: 20px;
-  height: 20px;
-  min-height: 20px;
-  flex: 0 0 20px;
+  width: 1.25rem;
+  height: 1.25rem;
+  min-height: 1.25rem;
+  flex: 0 0 1.25rem;
 }
 .sheet-actions {
   padding: 0;
   list-style: none;
 }
 .sheet-actions li {
-  margin: 8px 0;
-  padding: 12px;
-  border-left: 4px solid;
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  border-left: 0.25rem solid;
   overflow-wrap: anywhere;
 }
 .sheet-period-red {
@@ -395,93 +394,93 @@
     grid-template-columns: 1fr;
   }
   .game-sheet fieldset {
-    padding: 8px;
+    padding: 0.5rem;
   }
 }
 
 .sheet-publication {
-  margin: 24px 0;
-  padding: 16px;
+  margin: 1.5rem 0;
+  padding: 1rem;
   border: 1px solid #cbd8e8;
   background: #f4f7fb;
 }
 .sheet-publication label {
   display: block;
-  margin: 12px 0;
+  margin: 0.75rem 0;
 }
 .game-sheet textarea {
   display: block;
   width: 100%;
-  max-width: 640px;
-  min-height: 80px;
+  max-width: 40rem;
+  min-height: 5rem;
   font: inherit;
 }
 .sheet-publication button {
-  margin: 6px 8px 6px 0;
+  margin: 0.375rem 0.5rem 0.375rem 0;
 }
 .sheet-publication .collective-review {
   min-width: 0;
 }
 .collective-review-teams {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18.75rem), 1fr));
+  gap: 1rem;
 }
 .sheet-publication .collective-gd-total input {
   display: block;
-  width: 120px;
+  width: 7.5rem;
   max-width: 100%;
 }
 .sheet-publication .team-statistics-review textarea {
   display: block;
   width: 100%;
-  max-width: 640px;
-  min-height: 80px;
+  max-width: 40rem;
+  min-height: 5rem;
   font: inherit;
 }
 .team-statistics-review h4,
 .collective-gd-total input {
-  scroll-margin-top: 100px;
+  scroll-margin-top: 6.25rem;
 }
 @media (max-width: 600px) {
   .team-statistics-review h4,
   .collective-gd-total input {
-    scroll-margin-top: 220px;
+    scroll-margin-top: 13.75rem;
   }
 }
 
 /* Dense desktop action history: use available width rather than stacking every event. */
 .sheet-history > h4 {
-  margin: 12px 0 6px;
+  margin: 0.75rem 0 0.375rem;
 }
 .sheet-history > p[role="status"] {
-  margin: 6px 0;
+  margin: 0.375rem 0;
   font-size: 0.875rem;
   color: #42526b;
 }
 .sheet-history-groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26.25rem), 1fr));
   align-items: start;
-  gap: 8px 14px;
+  gap: 0.5rem 0.875rem;
 }
 .sheet-history-groups > section {
   min-width: 0;
 }
 .sheet-history .sheet-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.375rem;
   margin: 0;
 }
 .sheet-history .sheet-actions li {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 5px;
+  gap: 0.3125rem;
   min-width: 0;
   margin: 0;
-  padding: 6px 8px;
+  padding: 0.375rem 0.5rem;
   line-height: 1.35;
   font-size: 0.875rem;
 }
@@ -489,40 +488,40 @@
   overflow-wrap: anywhere;
 }
 .sheet-history .sheet-actions .competition-actions {
-  gap: 6px;
+  gap: 0.375rem;
   margin: 0;
 }
 .sheet-history .sheet-actions button {
-  padding: 3px 8px;
-  min-height: 30px;
+  padding: 0.1875rem 0.5rem;
+  min-height: 1.875rem;
 }
 .game-sheet fieldset.sheet-history-filters,
 .game-sheet fieldset.sheet-input {
-  margin: 8px 0;
-  padding: 10px 12px;
+  margin: 0.5rem 0;
+  padding: 0.625rem 0.75rem;
 }
 .game-sheet .sheet-history-filters {
-  gap: 6px 10px;
+  gap: 0.375rem 0.625rem;
   align-items: end;
 }
 .game-sheet .sheet-history-filters fieldset {
   margin: 0;
-  padding: 4px 7px;
+  padding: 0.25rem 0.4375rem;
   flex-wrap: wrap;
 }
 .sheet-input > p {
-  margin: 4px 0 8px;
+  margin: 0.25rem 0 0.5rem;
   font-size: 0.8125rem;
   color: #42526b;
 }
 .sheet-delete-dialog {
-  width: min(520px, calc(100vw - 48px));
+  width: min(32.5rem, calc(100vw - 3rem));
 }
 .sheet-delete-dialog .competition-actions {
   justify-content: flex-end;
 }
 .sheet-delete-context {
-  margin: 0 0 8px;
+  margin: 0 0 0.5rem;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -530,23 +529,23 @@
 @media (min-width: 1000px) {
   .sheet-input .competition-fields {
     grid-template-columns:
-      minmax(260px, 3fr) minmax(170px, 1.2fr) minmax(90px, 0.6fr)
-      minmax(90px, 0.6fr);
-    gap: 8px 12px;
+      minmax(16.25rem, 3fr) minmax(10.625rem, 1.2fr) minmax(5.625rem, 0.6fr)
+      minmax(5.625rem, 0.6fr);
+    gap: 0.5rem 0.75rem;
   }
 }
 
 .sheet-edit-dialog {
-  width: min(700px, calc(100vw - 48px));
+  width: min(43.75rem, calc(100vw - 3rem));
 }
 .sheet-edit-dialog .admin-dialog-body > p {
-  margin: 0 0 12px;
+  margin: 0 0 0.75rem;
   font-size: 0.875rem;
 }
 .sheet-edit-dialog .sheet-edit-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 14px;
+  gap: 0.625rem 0.875rem;
   margin: 0;
   padding: 0;
   border: 0;
@@ -557,11 +556,11 @@
 }
 .sheet-edit-dialog .sheet-edit-fields :is(input, select) {
   width: 100%;
-  min-height: 36px;
+  min-height: 2.25rem;
 }
 .sheet-edit-dialog .competition-actions {
   justify-content: flex-end;
-  gap: 8px;
+  gap: 0.5rem;
 }
 @media (max-width: 540px) {
   .sheet-edit-dialog .sheet-edit-fields {
@@ -579,11 +578,11 @@
     overflow-x: auto;
   }
   .game-sheet .sheet-live-table {
-    min-width: 820px;
+    min-width: 51.25rem;
   }
 }
 
 .game-sheet .sheet-team-card:focus-visible {
-  outline: 3px solid #075fca;
-  outline-offset: 2px;
+  outline: 0.1875rem solid #075fca;
+  outline-offset: 0.125rem;
 }

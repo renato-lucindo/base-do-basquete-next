@@ -32,7 +32,8 @@ for (const width of [1366, 1920]) {
           overflow: document.documentElement.scrollWidth > innerWidth,
         };
       });
-    expect(Math.abs(geometry.spare)).toBeLessThanOrEqual(2);
+    // Larger text can require internal horizontal scrolling; no empty strip is added.
+    expect(geometry.spare).toBeLessThanOrEqual(2);
     expect(geometry.center).toBeLessThanOrEqual(1);
     expect(Math.abs(geometry.width - geometry.toolbar)).toBeLessThanOrEqual(2);
     expect(Math.abs(geometry.width - geometry.legend)).toBeLessThanOrEqual(2);

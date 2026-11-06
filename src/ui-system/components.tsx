@@ -20,8 +20,8 @@ const paths = {
 export function Icon({ name }: { name: keyof typeof paths }) {
   return (
     <svg
-      width="18"
-      height="18"
+      width="1.125rem"
+      height="1.125rem"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

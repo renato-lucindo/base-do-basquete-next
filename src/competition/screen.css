@@ -1,8 +1,8 @@
 .competition-workspace {
-  margin-top: 28px;
+  margin-top: 1.75rem;
   background: #fff;
-  padding: 24px;
-  border-top: 2px solid #d9e2ee;
+  padding: 1.5rem;
+  border-top: 0.125rem solid #d9e2ee;
 }
 .competition-workspace h2 {
   font-size: 1.5rem;
@@ -11,12 +11,12 @@
 }
 .competition-workspace h3 {
   font-size: 1.125rem;
-  margin-top: 28px;
+  margin-top: 1.75rem;
 }
 .competition-title,
 .competition-actions {
   display: flex;
-  gap: 12px;
+  gap: 0.75rem;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -25,14 +25,14 @@
   justify-content: flex-start;
 }
 .competition-title {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 }
 .competition-title > label {
-  max-width: 200px;
+  max-width: 12.5rem;
 }
 .competition-workspace label {
   display: grid;
-  gap: 6px;
+  gap: 0.375rem;
   font-size: 1rem;
   min-width: 0;
 }
@@ -40,12 +40,12 @@
 .competition-workspace select {
   min-width: 0;
   width: 100%;
-  min-height: 44px;
-  padding: 9px 10px;
+  min-height: 2.75rem;
+  padding: 0.5625rem 0.625rem;
   border: 1px solid #74839b;
   background: #fff;
   color: inherit;
-  border-radius: 3px;
+  border-radius: 0.1875rem;
   font: inherit;
 }
 .competition-workspace fieldset {
@@ -58,34 +58,34 @@
 }
 .competition-form > legend {
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 .competition-season {
   border: 1px solid #9caac0;
-  margin: 24px 0;
-  padding: 16px;
+  margin: 1.5rem 0;
+  padding: 1rem;
 }
 .competition-season > legend {
   font-weight: 700;
-  padding: 0 8px;
+  padding: 0 0.5rem;
 }
 .competition-dispute {
   border: 1px solid #d9e2ee;
-  border-left: 3px solid #9caac0;
-  padding: 16px;
-  margin: 16px 0;
+  border-left: 0.1875rem solid #9caac0;
+  padding: 1rem;
+  margin: 1rem 0;
 }
 .competition-dispute.selected {
   border-left-color: #075fca;
 }
 .competition-dispute > legend {
-  padding: 0 6px;
+  padding: 0 0.375rem;
 }
 .competition-fields {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
 }
 .competition-fields label > span {
   font-size: 0.875rem;
@@ -94,22 +94,31 @@
 .competition-radio {
   display: flex !important;
   align-items: center;
-  min-height: 44px;
+  min-height: 2.75rem;
   cursor: pointer;
 }
 .competition-radio input {
-  width: 20px;
-  min-height: 20px;
-  height: 20px;
+  width: 1.25rem;
+  min-height: 1.25rem;
+  height: 1.25rem;
 }
 .competition-save {
-  padding-top: 20px;
+  padding-top: 1.25rem;
   border-top: 1px solid #d9e2ee;
 }
+.competition-title,
+.competition-title > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.competition-title > button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .competition-context {
-  border-left: 3px solid #075fca;
+  border-left: 0.1875rem solid #075fca;
   background: #eef6ff;
-  padding: 12px;
+  padding: 0.75rem;
   overflow-wrap: anywhere;
 }
 .competition-list {
@@ -118,12 +127,12 @@
   margin: 0;
 }
 .competition-list li {
-  padding: 16px 0;
+  padding: 1rem 0;
   border-bottom: 1px solid #d9e2ee;
   overflow-wrap: anywhere;
 }
 .competition-list p {
-  margin: 4px 0;
+  margin: 0.25rem 0;
 }
 .competition-list small {
   color: #42526b;
@@ -134,7 +143,7 @@
   border: 0;
   border-radius: 0;
   color: #075fca;
-  padding: 6px 0;
+  padding: 0.375rem 0;
   text-align: left;
   font-weight: 650;
   text-decoration: underline;
@@ -142,7 +151,7 @@
   max-width: 100%;
 }
 .competition-search {
-  margin: 16px 0 24px;
+  margin: 1rem 0 1.5rem;
 }
 .competition-workspace .secondary {
   background: #fff;
@@ -152,25 +161,25 @@
 .competition-public-link {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 9px 18px;
+  min-height: 2.75rem;
+  padding: 0.5625rem 1.125rem;
   border: 1px solid #74839b;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: #fff;
   color: #172033;
   text-decoration: none;
 }
 @media (max-width: 650px) {
   .competition-workspace {
-    padding: 16px 0;
+    padding: 1rem 0;
   }
   .competition-fields {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 0.75rem;
   }
   .competition-season,
   .competition-dispute {
-    padding: 12px;
+    padding: 0.75rem;
   }
   .competition-title {
     align-items: flex-start;

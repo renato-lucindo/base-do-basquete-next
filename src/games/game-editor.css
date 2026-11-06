@@ -1,21 +1,21 @@
 .game-editor-dialog {
-  width: min(848px, calc(100vw - 32px));
-  border-radius: 9px;
+  width: min(53rem, calc(100vw - 2rem));
+  border-radius: 0.5625rem;
 }
 .game-editor-dialog .admin-dialog-header {
-  padding: 19px 25px;
+  padding: 1.1875rem 1.5625rem;
 }
 .game-editor-dialog .admin-dialog-header h3 {
   font-size: 1.4rem;
 }
 .game-editor-dialog .admin-dialog-body {
-  padding: 18px 25px 0;
+  padding: 1.125rem 1.5625rem 0;
 }
 .game-editor-dialog .teams-inline {
   display: block;
 }
 .game-editor-dialog .game-context {
-  margin: 0 0 18px;
+  margin: 0 0 1.125rem;
   color: #42526b;
   font-size: 0.8125rem;
 }
@@ -31,7 +31,7 @@
   font-size: 0.8125rem;
   font-weight: 650;
   padding: 0;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
   width: 100%;
 }
 .game-editor-dialog legend.admin-visually-hidden {
@@ -45,7 +45,7 @@
 .game-editor-dialog .game-agenda legend {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .game-editor-dialog .game-agenda legend span {
   font-weight: 400;
@@ -55,7 +55,7 @@
 .game-editor-dialog .game-opponents {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
+  gap: 1.75rem;
 }
 .game-editor-dialog :is(label, .game-picker) {
   max-width: none;
@@ -65,37 +65,37 @@
   display: flex;
   flex-direction: column;
   font-size: 0.8125rem;
-  gap: 7px;
+  gap: 0.4375rem;
 }
 .game-editor-dialog input:not([type="checkbox"]) {
   width: 100%;
   min-width: 0;
-  min-height: 41px;
-  padding: 9px 10px;
+  min-height: 2.5625rem;
+  padding: 0.5625rem 0.625rem;
   font-size: 0.875rem;
   border: 1px solid #8998ad;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
 }
 .game-editor-dialog input:focus-visible {
-  outline: 2px solid #075fca;
-  outline-offset: 2px;
+  outline: 0.125rem solid #075fca;
+  outline-offset: 0.125rem;
 }
 .game-editor-dialog .game-picker > label {
-  margin-bottom: 7px;
+  margin-bottom: 0.4375rem;
   line-height: 1.25rem;
 }
 .game-editor-dialog .game-picker-input {
   position: relative;
 }
 .game-editor-dialog .game-picker-input input {
-  padding-right: 35px;
+  padding-right: 2.1875rem;
 }
 .game-editor-dialog .game-picker-clear {
   position: absolute;
-  right: 2px;
-  top: 2px;
-  min-height: 37px;
-  width: 32px;
+  right: 0.125rem;
+  top: 0.125rem;
+  min-height: 2.3125rem;
+  width: 2rem;
   padding: 0;
   border: 0;
   background: transparent;
@@ -109,8 +109,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin: 9px 0 19px;
+  gap: 1rem;
+  margin: 0.5625rem 0 1.1875rem;
 }
 .game-editor-dialog .game-registration-tools p {
   color: #42526b;
@@ -121,8 +121,8 @@
   background: transparent;
   color: #075fca;
   border: 0;
-  padding: 5px 0;
-  min-height: 32px;
+  padding: 0.3125rem 0;
+  min-height: 2rem;
   font-size: 0.75rem;
 }
 .game-editor-dialog .game-add-registration:hover {
@@ -130,30 +130,30 @@
 }
 .game-editor-dialog .game-agenda {
   border-top: 1px solid #d9e2ee;
-  padding-top: 17px;
+  padding-top: 1.0625rem;
 }
 .game-editor-dialog .game-agenda-grid {
   display: grid;
-  grid-template-columns: 136px 110px 110px minmax(0, 1fr) 105px;
-  gap: 12px;
+  grid-template-columns: 8.5rem 6.875rem 6.875rem minmax(0, 1fr) 6.5625rem;
+  gap: 0.75rem;
 }
 .game-editor-dialog .game-agenda-hint {
   font-size: 0.75rem;
   color: #42526b;
-  margin: 9px 0 18px;
+  margin: 0.5625rem 0 1.125rem;
 }
 .game-editor-dialog .game-classification {
   display: grid;
-  grid-template-columns: 135px minmax(0, 1fr);
-  gap: 18px;
-  margin: 0 0 17px;
+  grid-template-columns: 8.4375rem minmax(0, 1fr);
+  gap: 1.125rem;
+  margin: 0 0 1.0625rem;
   align-items: start;
 }
 .game-editor-dialog .game-knockout-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: minmax(68px, auto) auto;
-  column-gap: 18px;
+  grid-template-rows: minmax(4.25rem, auto) auto;
+  column-gap: 1.125rem;
   align-items: end;
   min-width: 0;
 }
@@ -161,15 +161,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  min-height: 41px;
-  gap: 8px;
+  min-height: 2.5625rem;
+  gap: 0.5rem;
   font-weight: 600;
   cursor: pointer;
 }
 .game-editor-dialog .game-knockout-check input {
-  width: 17px;
-  height: 17px;
-  min-height: 17px;
+  width: 1.0625rem;
+  height: 1.0625rem;
+  min-height: 1.0625rem;
   margin: 0;
   accent-color: #075fca;
   flex: none;
@@ -183,7 +183,7 @@
 .game-editor-dialog .game-field-error {
   color: #a12720;
   font-size: 0.75rem;
-  margin: 6px 0 0;
+  margin: 0.375rem 0 0;
 }
 .game-editor-dialog input[aria-invalid="true"] {
   border-color: #a12720;
@@ -195,12 +195,12 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 0.625rem;
   font-size: 0.8125rem;
   font-weight: 650;
   cursor: pointer;
-  min-height: 49px;
-  padding: 12px 0;
+  min-height: 3.0625rem;
+  padding: 0.75rem 0;
 }
 .game-editor-dialog .game-officiating summary::after {
   content: "⌄";
@@ -217,16 +217,16 @@
 .game-editor-dialog .game-publication-note {
   color: #42526b;
   font-size: 0.75rem;
-  margin: 0 0 18px;
+  margin: 0 0 1.125rem;
 }
 .game-editor-dialog .admin-dialog-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   flex: none;
   border-top: 1px solid #d9e2ee;
-  padding: 15px 25px;
+  padding: 0.9375rem 1.5625rem;
   background: #fafbfd;
 }
 .game-editor-dialog .game-save-note {
@@ -236,14 +236,14 @@
 }
 .game-editor-dialog .game-footer-actions {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 .game-editor-dialog .game-footer-actions button {
-  min-height: 41px;
+  min-height: 2.5625rem;
   font-size: 0.8125rem;
-  padding: 9px 13px;
+  padding: 0.5625rem 0.8125rem;
 }
 .game-editor-dialog .game-cancel {
   border-color: transparent;
@@ -258,37 +258,37 @@
 }
 @media (min-width: 1000px) {
   .compact-pilot .games-workspace .game-editor-dialog {
-    width: min(848px, calc(100vw - 48px));
+    width: min(53rem, calc(100vw - 3rem));
   }
   .compact-pilot .game-editor-dialog .game-opponents {
-    gap: 28px;
+    gap: 1.75rem;
   }
   .compact-pilot .game-editor-dialog .game-context {
-    margin: 0 0 18px;
+    margin: 0 0 1.125rem;
   }
 }
 @media (max-width: 760px) {
   .game-editor-dialog {
-    width: calc(100vw - 20px);
-    max-height: calc(100dvh - 20px);
+    width: calc(100vw - 1.25rem);
+    max-height: calc(100dvh - 1.25rem);
   }
   .game-editor-dialog :is(.admin-dialog-header, .admin-dialog-footer) {
-    padding: 14px 16px;
+    padding: 0.875rem 1rem;
   }
   .game-editor-dialog .admin-dialog-header > button {
     font-size: 0.75rem;
-    padding: 7px;
+    padding: 0.4375rem;
   }
   .game-editor-dialog .admin-dialog-body {
-    padding: 16px 16px 0;
+    padding: 1rem 1rem 0;
   }
   .game-editor-dialog .game-opponents {
     grid-template-columns: minmax(0, 1fr);
-    gap: 13px;
+    gap: 0.8125rem;
   }
   .game-editor-dialog .game-agenda-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px 12px;
+    gap: 0.8125rem 0.75rem;
   }
   .game-editor-dialog .game-agenda-grid .venue-picker {
     grid-row: 3;
@@ -296,24 +296,24 @@
   }
   .game-editor-dialog .game-classification {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: 0.75rem;
   }
   .game-editor-dialog .game-classification > .game-picker {
     grid-column: 1/-1;
-    max-width: 135px;
+    max-width: 8.4375rem;
   }
   .game-editor-dialog .game-knockout-fields {
-    column-gap: 12px;
+    column-gap: 0.75rem;
   }
   .game-editor-dialog .game-knockout-check {
     font-size: 0.75rem;
   }
   .game-editor-dialog .game-registration-tools {
     align-items: flex-start;
-    gap: 10px;
+    gap: 0.625rem;
   }
   .game-editor-dialog .game-registration-tools p {
-    max-width: 140px;
+    max-width: 8.75rem;
   }
   .game-editor-dialog .game-add-registration {
     text-align: right;
@@ -323,7 +323,7 @@
   }
   .game-editor-dialog .game-save-note {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
   }
   .game-editor-dialog .game-footer-actions {
     display: grid;
@@ -331,12 +331,12 @@
   }
   .game-editor-dialog .game-footer-actions button {
     font-size: 0.75rem;
-    padding: 8px;
-    min-height: 44px;
+    padding: 0.5rem;
+    min-height: 2.75rem;
   }
   .game-editor-dialog .game-footer-actions .game-cancel {
     grid-row: 2;
     grid-column: 1/-1;
-    min-height: 30px;
+    min-height: 1.875rem;
   }
 }

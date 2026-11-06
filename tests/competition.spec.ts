@@ -165,7 +165,7 @@ for (const width of [1366, 1920])
       exact: true,
     });
     const box = await save.boundingBox();
-    expect(year!.width).toBeLessThanOrEqual(150);
+    expect(year!.width).toBeLessThanOrEqual(150 * 1.5);
     expect(name!.width).toBeGreaterThan(year!.width * 3);
     expect(box!.y + box!.height).toBeLessThan(width === 1366 ? 768 : 1080);
     expect(

@@ -64,6 +64,8 @@ test("atalhos trocam equipe/quarto, mantêm 0 e 00 e erros não avançam nem dup
   await page.goto("/#/sumula");
   const target = page.getByLabel("Camisa / alvo", { exact: true });
   const code = page.getByLabel("Código", { exact: true });
+  await target.focus();
+  await expect(target).toBeFocused();
   await page.keyboard.press("Alt+b");
   await expect(page.getByLabel("Equipe", { exact: true })).toHaveValue("away");
   await expect(target).toBeFocused();

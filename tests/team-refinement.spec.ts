@@ -90,9 +90,11 @@ test("Equipes: largura intrínseca, sticky, barra superior e bordas", async ({
       };
     });
     expect(geometry.maxHeight).toBeCloseTo((width > 1050 ? 768 : 844) * 0.7, 0);
-    expect(geometry.padding).toBe(width > 1050 ? 14 : 10);
+    expect(geometry.padding).toBe(
+      (width > 1050 ? 14 : 10) * (width >= 640 ? 1.5 : 1),
+    );
     if (width > 1050) {
-      expect(Math.abs(geometry.gap)).toBeLessThanOrEqual(2);
+      expect(geometry.gap).toBeLessThanOrEqual(2);
       expect(geometry.center).toBeLessThanOrEqual(1);
     }
     if (browserName !== "webkit" || process.platform !== "win32")
@@ -142,10 +144,27 @@ test("Equipes: largura intrínseca, sticky, barra superior e bordas", async ({
   await page.evaluate(() => {
     document.documentElement.style.zoom = "2";
   });
+  const zoomOverflow = await page.evaluate(() =>
+    [...document.querySelectorAll("body *")]
+      .filter(
+        (el) =>
+          el.getBoundingClientRect().right > innerWidth &&
+          !el.closest(".statistics-table-wrap, .scrollable-table-top"),
+      )
+      .slice(0, 15)
+      .map((el) => ({
+        tag: el.tagName,
+        css: el.className,
+        text: el.textContent,
+        parent: el.parentElement?.outerHTML.slice(0, 200),
+        right: el.getBoundingClientRect().right,
+      })),
+  );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
+    JSON.stringify(zoomOverflow),
   ).toBe(true);
   await page.screenshot({
     path: `.preview-artifacts/equipes-zoom200-${info.project.name}.png`,

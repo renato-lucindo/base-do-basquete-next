@@ -135,7 +135,9 @@ test("Informacoes mantem categoria proporcional em desktop e reflow no celular",
   });
   await expect(category).toBeVisible();
   if (info.project.name === "desktop")
-    expect((await category.boundingBox())!.width).toBeLessThanOrEqual(240);
+    expect((await category.boundingBox())!.width).toBeLessThanOrEqual(
+      240 * 1.5,
+    );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

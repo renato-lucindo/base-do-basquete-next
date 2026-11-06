@@ -24,3 +24,5 @@ Decisão de 03/11/2026: reorganizar tarefas preservando as abas atuais, padroniz
 No desktop, conferir **1366×768** e **1920×1080** com nomes longos, listas representativas (12 atletas quando houver elenco), dropdowns e diálogos abertos. Verificar o percurso completo, cancelamento, teclado, zoom, foco, vazios, erro, recuperação e retorno. Validar mobile se a alteração o afetar.
 
 Registrar SHA, ambiente, comando, resultado e limites. Revisão do autor, axe ou fixtures não substituem revisão independente, aceite humano ou prova autenticada remota. Nenhuma sugestão estética amplia o MVP. Evidências anteriores ficam no [índice histórico](../../historico/documentacao/README.md) e são consultadas somente quando pertinentes.
+
+A escala compartilhada de 06/11/2026 também vale para acesso, formulários, menus e diálogos administrativos: 150% a partir de 640 CSS px, tamanho anterior até 639 px. Títulos que repetem a aba ficam somente semânticos, com foco em uma área visível. No contexto da disputa, listas e seletores mostram a inscrição; a distinção de nome global permanece nos formulários em que é necessária.

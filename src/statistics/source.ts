@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publishedRegistrationLabels } from "../public-ui/registration-labels";
 import { publicResultSchema } from "../publication/pdf-contract";
 import { normalizeParsedConfirmedGame } from "./confirmed-facts";
 import { aggregationOptionsSchema } from "./aggregate";
@@ -119,6 +120,7 @@ export function selectStatisticsFacts(
     confirmedAt: source.confirmedAt,
     minimumSeconds: source.minimumSeconds,
     hasBoxscore: normalized.some((g) => g.boxscore),
+    registrationLabels: publishedRegistrationLabels(source.games),
     coverage: {
       regularGames: eligible.filter((g) => g.phase === "round_robin").length,
       playoffGames: eligible.filter((g) => g.phase === "knockout").length,

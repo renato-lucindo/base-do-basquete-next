@@ -216,7 +216,7 @@ export function TeamsListPublicPage() {
         tabIndex={-1}
         className="access-main statistics-page team-public-page team-list-page"
       >
-        <h1>Equipes</h1>
+        <h1 className="sr-only">Equipes</h1>
         {id && (
           <div className="public-site statistics-public">
             <div className="team-list-filters">

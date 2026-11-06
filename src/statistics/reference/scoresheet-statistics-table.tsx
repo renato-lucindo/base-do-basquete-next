@@ -20,19 +20,7 @@ export const referenceMetric = (key: StatisticsMetric) =>
     ? { ...STATISTICS_METRICS[key], label: "F" }
     : STATISTICS_METRICS[key];
 
-// Textos desta tabela pública; referenceMetric também é usado por Equipes.
-const playerMetric = (key: StatisticsMetric) => {
-  const definition = referenceMetric(key);
-  return {
-    ...definition,
-    name:
-      key === "pointsShare"
-        ? "Participação nos Pontos"
-        : key === "fiveFouls"
-          ? "Exclusões por cinco faltas"
-          : definition.name,
-  };
-};
+const playerMetric = referenceMetric;
 type Row = StatisticsPage["rows"][number];
 export function MetricCell({
   value,

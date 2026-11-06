@@ -96,7 +96,14 @@ for (const width of [1366, 1920])
       );
       if (process.env.ADMIN_CAPTURE_BASELINE) return;
       expect(metrics.overflow).toBe(false);
-      expect(metrics.firstRowY).toBeLessThan(area === "jogos" ? 300 : 420);
+      if (area === "jogos") expect(metrics.firstRowY / 1.5).toBeLessThan(300);
+      else {
+        // Larger controls may wrap; the first roster row must still start in view.
+        const line = await row.evaluate(
+          (el) => parseFloat(getComputedStyle(el).fontSize) * 1.5,
+        );
+        expect(metrics.firstRowY).toBeLessThan(metrics.viewportHeight - line);
+      }
       if (area === "jogos") {
         await expect(
           page.getByRole("table", { name: "Jogos da disputa", exact: true }),
@@ -170,7 +177,7 @@ for (const width of [1366, 1920]) {
         document.documentElement.clientWidth,
     }));
     expect(metrics.compact).toBe(true);
-    expect(metrics.minWidth).toBe("1220px");
+    expect(metrics.minWidth).toBe("1830px");
     expect(metrics.pageOverflow).toBe(false);
     await page.screenshot({
       path: `.preview-artifacts/admin-after-importacao-${width}.png`,

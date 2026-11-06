@@ -104,7 +104,7 @@ test("axe: escolha e seções do detalhe da equipe", async ({ page }, info) => {
     await link.focus();
     await page.keyboard.press("Enter");
     await expect(
-      page.getByRole("heading", { name: section, exact: true }),
+      page.getByRole("heading", { name: section, exact: true }).locator(".."),
     ).toBeFocused();
     await scan(page, info, `team-${state}`);
   }

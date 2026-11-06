@@ -104,7 +104,9 @@ test("súmula compartilha pesquisa e ordenação; boxscore restringe a amostra a
       exact: true,
     }),
   ).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("registro por equipe");
+  await expect(
+    page.locator(".table-toolbar").getByRole("status"),
+  ).toContainText("registro por equipe");
   const table = page.getByRole("table", {
     name: "Estatísticas dos atletas",
     exact: true,
@@ -194,6 +196,7 @@ test("súmula pagina e filtra equipes sem perder o estado da URL", async ({
     page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
   ).toBeVisible();
 });
+
 test("falha simples permite nova consulta sem oferecer tabela de zeros", async ({
   page,
 }) => {

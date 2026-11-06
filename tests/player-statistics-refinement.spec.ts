@@ -279,7 +279,9 @@ for (const width of [1366, 1920, 390, 320])
         .slice(0, 15),
     }));
     expect(
-      geometry.padding.every((p) => p === (width > 600 ? "14px" : "10px")),
+      geometry.padding.every(
+        (p) => p === (width >= 640 ? "21px" : width > 600 ? "14px" : "10px"),
+      ),
     ).toBe(true);
     expect(
       geometry.documentOverflow,
