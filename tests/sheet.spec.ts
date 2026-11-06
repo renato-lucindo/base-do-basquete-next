@@ -636,6 +636,15 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
   await panel
     .getByLabel("Motivo da revisão das estatísticas publicadas")
     .fill("Conferência de GD sem alterar a súmula atual.");
+  await expect(
+    page.getByRole("button", {
+      name: "Salvar rascunho da súmula",
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Recarregar súmula", exact: true }),
+  ).toBeDisabled();
   const publish = panel.getByRole("button", {
     name: "Publicar estatísticas conferidas",
     exact: true,
@@ -693,6 +702,12 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
   await expect(
     panel.getByRole("status").filter({ hasText: /^Estatísticas publicadas/ }),
   ).toContainText("Estatísticas publicadas na versão 2");
+  await expect(
+    page.getByRole("button", {
+      name: "Salvar rascunho da súmula",
+      exact: true,
+    }),
+  ).toBeEnabled();
   expect(f.source()).toEqual(live);
   expect(f.published()!.facts.players).toEqual(frozen.facts.players);
   expect(f.published()!.facts.teams.home.points).toBe(

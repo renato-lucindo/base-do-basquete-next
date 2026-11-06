@@ -31,7 +31,7 @@ Ruling: reutilizar refresh integral para correções exclusivamente coletivas, p
 
 ## Revisão de interface
 
-Revisão autoral com [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md), consultadas novamente06/11; sem parecer independente ou celular físico.
+Revisão autoral com [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md), consultadas novamente06/11; sem revisão humana independente ou celular físico. Revisão automática Codex do HEADbc43bf9 identificou perda de conferência ao salvar a súmula atual. Reprodução RED no browser e correção: estado dirty também bloqueia edição/salvamento/recarga da súmula, com aviso; publicação ou cancelamento libera a guarda. Suíte de súmula18PASS e gate:ui exit0 após o ajuste, sem alterar SQL aplicado. Logs locais collective-review-save-red/green/gate. CIbc43bf9/42213471509 passou integralmente; consultar checks da PR64 para o HEAD posterior e SHA integrado.
 
 - src/publication/collective-review.tsx: controles com nomes/rótulos, erro de GD junto ao campo, aria-invalid/descrição; checks explícitos conforme plano.
 - src/publication/sheet-panel.tsx: conferência permanentemente invalidada na primeira mudança do documento, com aviso de recarga.

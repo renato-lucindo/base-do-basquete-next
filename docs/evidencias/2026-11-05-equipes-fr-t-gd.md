@@ -57,4 +57,4 @@ As fontes são documentos congelados da mesma gameId/versão publicada, sem rasc
 | fdeb5e5b-7b8b-4822-b029-fda071aa9ba2 (27) | 1 | AMPRL | 15 | 0 | 0 | 0 |
 | fdeb5e5b-7b8b-4822-b029-fda071aa9ba2 (27) | 1 | Saldanha da Gama | 12 | 0 | 0 | 0 |
 
-Resumo:25jogos/50lados; T=15; mínimoGD=4. Confirmar zero explicitamente nas linhas propostas com0; totais maiores podem ser informados após conferência da equipe/banco. A publicação usa a RPC restrita de correção estatística, preservando a súmula atual, inclusive a divergência conhecida do jogo15.
+Resumo:25jogos/50lados; T=15; GD confirmada=4. Os46totais zero e os4totais um foram confirmados pelo responsável. A publicação usa a RPC restrita de correção estatística, preservando a súmula atual, inclusive a divergência conhecida do jogo15. Comprovantes de execução e cobertura final na PR64.

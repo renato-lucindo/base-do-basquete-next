@@ -1,5 +1,7 @@
 # Progresso atual
 
+Atualização operacional06/11: CIbc43bf9/42213471509 SUCCESS. Revisão automática encontrou perda da conferência ao salvar a súmula atual; reprodução RED e ajuste da guarda dirty, aviso e regressão18browsers PASS, gate:ui exit0. SQL aplicado permanece idêntico. Este ajuste pertence à mesmaPR64; recuperar HEAD final por Git e resultados posteriores de CI/merge/deploy/regularização na PR. Não presumir conclusão das operações pendentes.
+
 Atualizado em 06/11/2026. Unidade **FR, T e GD em Equipes**, branch `codex/equipes-fr-t-gd`, [PR64 draft](https://github.com/renato-lucindo/base-do-basquete-next/pull/64). Base inicial fb3f26b; main 860742e/PR61 incorporada por merge 808ebda. Material atual **03d8b329536d1bd99d85d13338186e4e78a224ee**; recuperar HEAD documental por Git. Worktree C:/Users/12405304716/.codex/worktrees/equipes-fr-t-gd/Base do Basquete-v1. Uma unidade/PR, sem pilha.
 
 FR coletiva de súmula = FC adversária na mesma partida; T automática, inclusive sucessões e sem B2; GD mínima sugerida e total explicitamente confirmado por equipe, inclusive zero. Boxscore e métricas individuais preservados. Formulário invalida a conferência mesmo após desfazer a edição; endpoint autenticado corrige somente os três totais no documento congelado. [Plano](superpowers/plans/2026-11-05-equipes-fr-t-gd.md), [provas e operação](design/VALIDACAO-EQUIPES-COLETIVOS.md).

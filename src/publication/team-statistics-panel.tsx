@@ -49,8 +49,8 @@ export function TeamStatisticsPanel(p: Props) {
       : null;
   const facts = document ? deriveSheetTeamStatistics(document) : null;
   useEffect(() => {
-    p.onLock(busy || uncertain);
-  }, [busy, uncertain, p.onLock]);
+    p.onLock(busy || uncertain || dirty);
+  }, [busy, uncertain, dirty, p.onLock]);
   useEffect(() => {
     p.guard.current = () =>
       !busy &&
@@ -229,6 +229,12 @@ export function TeamStatisticsPanel(p: Props) {
             Esta revisão usa a súmula publicada e preserva as alterações da
             súmula atual.
           </p>
+          {dirty && (
+            <p>
+              Conclua ou cancele esta conferência antes de editar ou salvar a
+              súmula atual.
+            </p>
+          )}
           <CollectiveReview
             facts={facts}
             review={review}
