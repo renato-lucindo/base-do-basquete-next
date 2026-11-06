@@ -37,6 +37,23 @@ end$$;
 revoke all on function private.publish_sheet_game_before_collective_guard(jsonb),private.publish_sheet_game(jsonb) from public,anon,authenticated,service_role;
 grant execute on function private.publish_sheet_game(jsonb) to authenticated;
 
+-- A collective-only correction must not publish a pending editor stage (PR61).
+-- Reuse the existing whole-context refresh, which preserves every public phase;
+-- the following player trigger still rebuilds this game's unchanged player facts.
+create or replace function private.on_confirmed_game_statistics() returns trigger
+language plpgsql volatile security definer set search_path='' as $$begin
+ if tg_op='UPDATE' and new.version=old.version and new.snapshot=old.snapshot then return new;end if;
+ if tg_op='DELETE' then perform private.refresh_confirmed_statistics(old.dispute_id,old.game_id);return old;end if;
+ if tg_op='UPDATE' and new.game_id=old.game_id and new.dispute_id=old.dispute_id and new.version=old.version+1
+    and new.snapshot#>>'{source,kind}'='sheet'
+    and ((new.snapshot-'version'-'publishedAt')#-'{facts,teams,home,teamStatistics}'#-'{facts,teams,away,teamStatistics}')
+      = ((old.snapshot-'version'-'publishedAt')#-'{facts,teams,home,teamStatistics}'#-'{facts,teams,away,teamStatistics}') then
+  perform private.refresh_confirmed_statistics(new.dispute_id);return new;
+ end if;
+ perform private.refresh_confirmed_statistics(new.dispute_id,new.game_id);return new;
+end$$;
+revoke all on function private.on_confirmed_game_statistics() from public,anon,authenticated,service_role;
+
 -- Revisit only the frozen, currently published sheet. Never save or replace a live sheet.
 create function private.revise_sheet_team_statistics(p_command jsonb) returns jsonb
 language plpgsql volatile security definer set search_path='' as $$
