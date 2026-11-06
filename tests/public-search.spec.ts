@@ -103,7 +103,8 @@ test("busca global mantém nome completo em destaque e apelido como complemento"
   const player = f.hits.find(
     (hit) => hit.kind === "players" && hit.name === "Álvares",
   );
-  if (!player || player.kind !== "players") throw Error("Atleta de teste ausente.");
+  if (!player || player.kind !== "players")
+    throw Error("Atleta de teste ausente.");
   player.nickname = "Alvinho";
   await page.goto(base + "/publico.html#?q=alvares&type=players");
   const results = page.getByRole("region", { name: "Resultados da busca" });
