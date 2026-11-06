@@ -50,6 +50,15 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
   await expect(table.locator("thead th")).toHaveText(
     labels.map((label) => new RegExp("^" + label + "[↑↓]?$")),
   );
+  expect(
+    await table
+      .locator('thead th[data-team-metric="name"]')
+      .evaluate((el) => getComputedStyle(el).backgroundColor),
+  ).toBe(
+    await table
+      .locator('thead th[data-team-metric="games"]')
+      .evaluate((el) => getComputedStyle(el).backgroundColor),
+  );
   const row = () =>
     table
       .locator("tbody tr")

@@ -173,7 +173,7 @@ test("colunas padrão acompanham largura até uma escolha manual", async ({
   });
   await expect(table.getByRole("columnheader")).toHaveCount(15);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(table.getByRole("columnheader")).toHaveCount(10);
+  await expect(table.getByRole("columnheader")).toHaveCount(14);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(table.getByRole("columnheader")).toHaveCount(15);
 });
