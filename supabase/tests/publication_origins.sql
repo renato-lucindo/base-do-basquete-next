@@ -4,7 +4,7 @@ select pg_temp.pu_assert((select bool_and(sheet_game_id=bound_game_id and id=she
 update public.admin_access set enabled=true where user_id=pg_temp.pu_id(98);
 set local role authenticated;
 set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098';
-select pg_temp.pu_assert(public.publish_sheet_game(jsonb_build_object('requestId',pg_temp.pu_id(950),'gameId',pg_temp.pu_id(8),'gameVersion',3,'basePublicationVersion',2,'source',jsonb_build_object('kind','sheet','baseSheetVersion',3,'document',public.get_game_sheet(pg_temp.pu_id(8))->'document'),'reason','Correção confirmada da participação.','fallback',false))->'version'='3','new manual versions still use registered typed source');
+select pg_temp.pu_assert(public.publish_sheet_game(jsonb_build_object('requestId',pg_temp.pu_id(950),'gameId',pg_temp.pu_id(8),'gameVersion',3,'basePublicationVersion',2,'source',(pg_temp.pu_command()->'source')||jsonb_build_object('baseSheetVersion',3,'document',public.get_game_sheet(pg_temp.pu_id(8))->'document'),'reason','Correção confirmada da participação.','fallback',false))->'version'='3','new manual versions still use registered typed source');
 select pg_temp.pu_error('select * from private.publication_sources','42501');
 reset role;
 insert into private.game_publication_versions(game_id,version,source_kind,source_id,source_version,snapshot,document,reason,published_by,published_at) select pg_temp.pu_id(8),4,'pdf',pg_temp.pu_id(800),1,snapshot,'{}','Fixture of typed FK only',pg_temp.pu_id(98),clock_timestamp() from public.published_games where game_id=pg_temp.pu_id(8);

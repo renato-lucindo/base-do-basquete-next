@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { publishSheetSchema } from "./contract";
+import { reviseTeamStatisticsSchema } from "./team-statistics-contract";
 import { confirmGameStagesSchema } from "./stages-contract";
 import { publishPdfSchema } from "./pdf-contract";
 import { SupabasePublications } from "./provider";
@@ -78,6 +79,17 @@ export async function publicationRoute(request: Request, env: Env, url: URL) {
     const n = Number(version[1]);
     if (!Number.isSafeInteger(n) || n < 1 || n > 2147483647) throw badInput();
     const r = await session.getPublicationVersion(id.data, n);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
+  if (tail === "/team-statistics" && request.method === "POST") {
+    const command = await readMutationJson(
+      request,
+      reviseTeamStatisticsSchema,
+      { origin: env.APP_ORIGIN, maxBytes: 8192 },
+    );
+    if (command.gameId !== id.data) throw badInput();
+    const r = await session.reviseTeamStatistics(command);
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }

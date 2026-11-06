@@ -57,7 +57,7 @@ it("SQL and engine agree on whole-team coverage; only atomic authorized publicat
       "reset role; set local role authenticated; set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098'",
     );
     await db.exec(
-      'select public.publish_sheet_game(jsonb_set(pg_temp.pu_command(),\'{source,teamReview}\', \'{"home":{"disqualifications":2,"foulsReceived":7},"away":{"disqualifications":0,"foulsReceived":0}}\'))',
+      'select public.publish_sheet_game(jsonb_set(pg_temp.pu_command(),\'{source,teamReview}\', \'{"home":{"disqualifications":2,"foulsReceived":0},"away":{"disqualifications":0,"foulsReceived":0}}\'))',
     );
     const current = async () =>
       (
@@ -70,14 +70,14 @@ it("SQL and engine agree on whole-team coverage; only atomic authorized publicat
       version: 1,
       technicalFouls: 0,
       disqualifications: 2,
-      foulsReceived: 7,
+      foulsReceived: 0,
     });
     await db.exec(
       "select public.save_game_sheet(jsonb_build_object('requestId',pg_temp.pu_id(820),'gameId',pg_temp.pu_id(8),'gameVersion',2,'baseVersion',1,'document',jsonb_set(pg_temp.pu_doc(),'{events,0,code}','\"3\"'),'confirm',false,'reason','Conferência de rascunho da súmula.'))",
     );
     expect(await current()).toEqual(initial);
     await db.exec(
-      'select public.publish_sheet_game(jsonb_set(jsonb_set(pg_temp.pu_revision(821),\'{source,baseSheetVersion}\',\'2\'),\'{source,teamReview}\', \'{"home":{"disqualifications":1,"foulsReceived":3},"away":{"disqualifications":null,"foulsReceived":null}}\'))',
+      'select public.publish_sheet_game(jsonb_set(jsonb_set(pg_temp.pu_revision(821),\'{source,baseSheetVersion}\',\'2\'),\'{source,teamReview}\', \'{"home":{"disqualifications":1,"foulsReceived":0},"away":{"disqualifications":0,"foulsReceived":null}}\'))',
     );
     await db.exec("reset role; set local role anon");
     const corrected = publicGameSchema.parse(await current());

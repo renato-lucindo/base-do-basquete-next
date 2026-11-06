@@ -2,8 +2,8 @@ import { it, expect } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { readFile, readdir } from "node:fs/promises";
 import { platform } from "../../tests/fixtures/database-platform";
-import { finalCases, pubId } from "../../tests/fixtures/publication";
-import { prepareManualPublication } from "./manual";
+import { finalCases } from "../../tests/fixtures/publication";
+import { deriveManualFacts } from "./manual";
 import { validatePersistedSheet } from "../games/sheet-contract";
 it("PostgreSQL closure agrees with engine on overtime, FT, captains and starting five", async () => {
   const db = await PGlite.create();
@@ -35,17 +35,7 @@ it("PostgreSQL closure agrees with engine on overtime, FT, captains and starting
       }
       expect(postgres, `case ${index}`).toBe(valid);
       if (valid)
-        expect(facts, `facts case ${index}`).toEqual(
-          prepareManualPublication({
-            requestId: pubId(900),
-            gameId: pubId(901),
-            gameVersion: 1,
-            basePublicationVersion: 0,
-            source: { kind: "sheet", baseSheetVersion: 0, document: d },
-            reason: "",
-            fallback: false,
-          }).facts,
-        );
+        expect(facts, `facts case ${index}`).toEqual(deriveManualFacts(d));
     }
   } finally {
     await db.close();

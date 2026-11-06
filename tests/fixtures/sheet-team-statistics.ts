@@ -34,6 +34,6 @@ export function disciplinarySheet(): PersistedSheet {
   return d;
 }
 export const teamReview = () => ({
-  home: { disqualifications: 6, foulsReceived: 9 },
-  away: { disqualifications: 0, foulsReceived: 0 },
+  home: { disqualifications: 6, foulsReceived: null as number | null },
+  away: { disqualifications: 0, foulsReceived: null as number | null },
 });

@@ -13,6 +13,15 @@ export function prepareManualPublication(
 ) {
   const command = publishSheetSchema.parse(input),
     document = validatePersistedSheet(command.source.document, true);
+  if (
+    !command.source.teamReview ||
+    (["home", "away"] as const).some(
+      (side) => command.source.teamReview![side].disqualifications === null,
+    )
+  )
+    throw Error(
+      "Confira e confirme o total de GD das duas equipes, incluindo zero.",
+    );
   if (requiresFallback && (!command.fallback || command.reason.length < 10))
     throw Error(
       "Escolha explicitamente a fonte manual e informe o motivo do fallback (10 a 500 caracteres).",

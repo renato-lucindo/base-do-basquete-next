@@ -505,7 +505,15 @@ it("a confirmed jersey correction requires a reason and explicit republication; 
       gameId: id(8),
       gameVersion: 2,
       basePublicationVersion: 1,
-      source: { kind: "sheet", baseSheetVersion: 2, document: next },
+      source: {
+        kind: "sheet",
+        baseSheetVersion: 2,
+        document: next,
+        teamReview: {
+          home: { disqualifications: 0, foulsReceived: null },
+          away: { disqualifications: 0, foulsReceived: null },
+        },
+      },
       reason: save.reason,
       fallback: false,
     };

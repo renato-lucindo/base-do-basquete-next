@@ -947,6 +947,7 @@ async function fixture(options = {}) {
             "get_pdf_publication_preparation",
             "save_pdf_publication_preparation",
             "publish_sheet_game",
+            "revise_sheet_team_statistics",
             "publish_pdf_game",
           ].some((n) => url.pathname === `/rest/v1/rpc/${n}`)
         ) {
@@ -993,18 +994,26 @@ async function fixture(options = {}) {
               );
             return Response.json(prior.result);
           }
-          const result = {
-            requestId: c.requestId,
-            gameId: c.gameId,
-            version: c.basePublicationVersion + 1,
-            gameVersion: c.gameVersion + 1,
-            sourceVersion:
-              c.source.kind === "sheet" ? c.source.baseSheetVersion + 1 : 2,
-            ...(c.source.kind === "pdf"
-              ? { reviewVersion: c.source.reviewVersion }
-              : {}),
-            publishedAt: "2026-10-24T09:00:00Z",
-          };
+          const result = url.pathname.endsWith("/revise_sheet_team_statistics")
+            ? {
+                requestId: c.requestId,
+                gameId: c.gameId,
+                version: c.basePublicationVersion + 1,
+                sourceVersion: 1,
+                publishedAt: "2026-10-24T09:00:00Z",
+              }
+            : {
+                requestId: c.requestId,
+                gameId: c.gameId,
+                version: c.basePublicationVersion + 1,
+                gameVersion: c.gameVersion + 1,
+                sourceVersion:
+                  c.source.kind === "sheet" ? c.source.baseSheetVersion + 1 : 2,
+                ...(c.source.kind === "pdf"
+                  ? { reviewVersion: c.source.reviewVersion }
+                  : {}),
+                publishedAt: "2026-10-24T09:00:00Z",
+              };
           publicationReceipts.set(c.requestId, { fingerprint, result });
           options.publicationCommits = (options.publicationCommits ?? 0) + 1;
           if (options.failPublicationAfterCommit) {
@@ -1413,6 +1422,10 @@ test("publication routes enforce fresh sessions, correlate commands and recover 
           staff: { home: sideStaff("home"), away: sideStaff("away") },
           events: [{ id, side: "home", period: 4, target: "0", code: "2" }],
         },
+        teamReview: {
+          home: { disqualifications: 0, foulsReceived: null },
+          away: { disqualifications: 0, foulsReceived: null },
+        },
       },
       reason: "",
       fallback: false,
@@ -1552,6 +1565,61 @@ test("publication routes enforce fresh sessions, correlate commands and recover 
         "/rest/v1/admin_access?select=user_id,enabled&user_id=eq." + id,
       ) < f.calls.indexOf("/rest/v1/rpc/publish_sheet_game"),
     );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+test("team statistics revision is authenticated, origin checked, bounded, idempotent and freshly authorized", async () => {
+  const options = { failPublicationAfterCommit: true },
+    f = await fixture(options);
+  try {
+    const path = `/api/games/${id}/publication/team-statistics`;
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path, { method: "POST" })).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const c = {
+      requestId: id,
+      gameId: id,
+      basePublicationVersion: 1,
+      disqualifications: { home: 0, away: 0 },
+      reason: "Conferência explícita dos totais publicados.",
+    };
+    const send = (body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path, {
+        method: "POST",
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        body: typeof body === "string" ? body : JSON.stringify(body),
+      });
+    assert.equal((await send(c, { origin: "https://evil.test" })).status, 403);
+    assert.equal((await send(" ".repeat(8193))).status, 413);
+    assert.equal(
+      (await send({ ...c, disqualifications: { home: 0, away: null } })).status,
+      400,
+    );
+    assert.equal(
+      (await send({ ...c, gameId: "10000000-0000-4000-8000-000000000002" }))
+        .status,
+      400,
+    );
+    assert.equal((await send({ ...c, document: {} })).status, 400);
+    assert.equal((await send(c)).status, 503);
+    const retried = await send(c);
+    assert.equal(retried.status, 200, await retried.clone().text());
+    assert.equal((await retried.json()).version, 2);
+    assert.equal(options.publicationCommits, 1);
+    assert.equal(
+      (await send({ ...c, reason: "Outra intenção de publicação." })).status,
+      409,
+    );
+    options.denied = true;
+    assert.equal((await send(c)).status, 403);
   } finally {
     await f.mf.dispose();
   }

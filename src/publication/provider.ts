@@ -11,6 +11,11 @@ import type { Database } from "../server/database.types";
 import { publishSheetSchema, type PublishSheet } from "./contract";
 import { prepareManualPublication } from "./manual";
 import {
+  reviseTeamStatisticsSchema,
+  teamStatisticsRevisionAckSchema,
+  type ReviseTeamStatistics,
+} from "./team-statistics-contract";
+import {
   savePreparationSchema,
   preparationSchema,
   preparationAckSchema,
@@ -35,13 +40,18 @@ type Rpc =
   | "get_pdf_publication_preparation"
   | "save_pdf_publication_preparation"
   | "publish_sheet_game"
+  | "revise_sheet_team_statistics"
   | "publish_pdf_game"
   | "confirm_game_stages";
 const messages = {
+  team_disqualifications_review_required:
+    "Confira e confirme o total de GD das duas equipes, incluindo zero.",
+  fouls_received_mismatch:
+    "FR deve ser igual às faltas cometidas pela equipe adversária nesta partida.",
   team_disqualifications_below_known:
     "O total de desqualificações da equipe é menor que as ocorrências identificadas na súmula.",
   invalid_team_statistics:
-    "Confira os totais coletivos; deixe em branco os valores desconhecidos.",
+    "Confira os totais de GD das duas equipes e recarregue a revisão se a publicação mudou.",
   idempotency_conflict:
     "Este envio já foi usado com outros dados. Recarregue para continuar.",
   version_conflict:
@@ -202,6 +212,23 @@ export class SupabasePublications {
       r.version !== c.basePublicationVersion + 1 ||
       r.gameVersion !== c.gameVersion + 1 ||
       r.sourceVersion !== c.source.baseSheetVersion + 1
+    )
+      throw unavailable();
+    return r;
+  }
+  async reviseTeamStatistics(token: string, input: ReviseTeamStatistics) {
+    const c = reviseTeamStatisticsSchema.safeParse(input);
+    if (!c.success) throw badInput();
+    const r = await this.rpc(
+      teamStatisticsRevisionAckSchema,
+      "revise_sheet_team_statistics",
+      { p_command: c.data },
+      token,
+    );
+    if (
+      r.gameId !== c.data.gameId ||
+      r.requestId !== c.data.requestId ||
+      r.version !== c.data.basePublicationVersion + 1
     )
       throw unavailable();
     return r;

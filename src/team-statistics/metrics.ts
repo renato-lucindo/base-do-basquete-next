@@ -33,7 +33,15 @@ export const SHEET_TEAM_COLUMNS: TeamMetric[] = [
 ];
 export const sheetTeamMetric = (key: TeamMetric) => {
   const def = TEAM_METRICS[key];
-  return { ...def, name: key === "points" ? "Pontos marcados" : def.name };
+  return {
+    ...def,
+    name:
+      key === "points"
+        ? "Pontos marcados"
+        : key === "foulsReceived"
+          ? "Faltas recebidas — FC da adversária"
+          : def.name,
+  };
 };
 export const TEAM_METRIC_KEYS = Object.keys(TEAM_METRICS) as TeamMetric[];
 const simple = STATISTICS_COLUMN_PRESETS.essentials.filter(

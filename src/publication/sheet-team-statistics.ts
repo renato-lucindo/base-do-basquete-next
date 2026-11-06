@@ -28,6 +28,14 @@ export function deriveSheetTeamStatistics(
             ? 1
             : 0);
       const disqualifications = review?.[side].disqualifications ?? null;
+      const foulsReceived = totals.players
+        .filter((p) => p.side !== side)
+        .reduce((n, p) => n + p.fouls, 0);
+      const suppliedFR = review?.[side].foulsReceived;
+      if (suppliedFR != null && suppliedFR !== foulsReceived)
+        throw Error(
+          "FR deve ser igual às faltas cometidas pela equipe adversária nesta partida.",
+        );
       if (
         disqualifications !== null &&
         disqualifications < minimumDisqualifications
@@ -52,7 +60,7 @@ export function deriveSheetTeamStatistics(
           version: 1 as const,
           technicalFouls,
           disqualifications,
-          foulsReceived: review?.[side].foulsReceived ?? null,
+          foulsReceived,
           minimumDisqualifications,
         },
       ];

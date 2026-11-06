@@ -13,6 +13,13 @@ import { prepareManualPublication } from "./manual";
 import type { PublishSheet } from "./contract";
 import { deriveSheetTeamStatistics } from "./sheet-team-statistics";
 import {
+  CollectiveReview,
+  gdReviewReady,
+  initialGDReview,
+  publishedGD,
+} from "./collective-review";
+import { TeamStatisticsPanel } from "./team-statistics-panel";
+import {
   publicationStateSchema,
   publicationSheetResultSchema,
   type PublicationState,
@@ -34,12 +41,14 @@ type Props = {
   onPublished: (r: Ack, explicitReload: boolean) => Promise<void>;
 };
 export function SheetPublicationPanel(p: Props) {
-  const emptyReview = () => ({
-    home: { disqualifications: "", foulsReceived: "" },
-    away: { disqualifications: "", foulsReceived: "" },
-  });
-  const [teamReview, setTeamReview] = useState(emptyReview);
+  const [teamReview, setTeamReview] = useState(() =>
+    initialGDReview(deriveSheetTeamStatistics(p.document)),
+  );
+  const [historicalLocked, setHistoricalLocked] = useState(false);
+  const [historyEpoch, setHistoryEpoch] = useState(0);
+  const historicalGuard = useRef<() => boolean>(() => true);
   const reviewDocument = useRef("");
+  const documentKey = JSON.stringify(p.document);
   const [state, setState] = useState<PublicationState | null>(null),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -50,15 +59,25 @@ export function SheetPublicationPanel(p: Props) {
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     epoch = useRef(0);
-  const blocked = busy || uncertain || ack !== null;
+  const blocked = busy || uncertain || ack !== null || historicalLocked;
   const totals = aggregate(toEngineSheet(p.document));
   const collective = deriveSheetTeamStatistics(p.document);
+  useEffect(() => {
+    if (reviewDocument.current && reviewDocument.current !== documentKey) {
+      reviewDocument.current = "";
+      setTeamReview((v) => ({
+        home: { ...v.home, confirmed: false },
+        away: { ...v.away, confirmed: false },
+      }));
+    }
+  }, [documentKey]);
   useEffect(() => {
     p.onLock(blocked);
   }, [blocked, p.onLock]);
   useEffect(() => {
     p.guard.current = () =>
       !busy &&
+      historicalGuard.current() &&
       (!(uncertain || ack) ||
         window.confirm(
           "Há uma publicação sem reconciliação concluída. Deseja sair e conferir depois?",
@@ -117,7 +136,15 @@ export function SheetPublicationPanel(p: Props) {
       setState(s);
       setFallback(false);
       reviewDocument.current = JSON.stringify(p.document);
-      setTeamReview(emptyReview());
+      setTeamReview(
+        initialGDReview(
+          collective,
+          s.published?.source.kind === "sheet" &&
+            s.published.source.version === p.sourceVersion
+            ? publishedGD(s.published)
+            : undefined,
+        ),
+      );
     } catch (e) {
       if (n === epoch.current) {
         if (e instanceof ApiFailure && e.status === 409) p.onConflict();
@@ -137,6 +164,12 @@ export function SheetPublicationPanel(p: Props) {
   async function publish() {
     if (p.disabled || busy || !state || ack) return;
     setError("");
+    if (!pending.current && !gdReviewReady(teamReview, collective)) {
+      setError(
+        "Confira e confirme o total de GD das duas equipes, incluindo zero.",
+      );
+      return;
+    }
     if (
       !pending.current &&
       reviewDocument.current !== JSON.stringify(p.document)
@@ -162,12 +195,10 @@ export function SheetPublicationPanel(p: Props) {
               teamReview: Object.fromEntries(
                 (["home", "away"] as const).map((side) => [
                   side,
-                  Object.fromEntries(
-                    Object.entries(teamReview[side]).map(([key, value]) => [
-                      key,
-                      value.trim() === "" ? null : Number(value),
-                    ]),
-                  ),
+                  {
+                    disqualifications: Number(teamReview[side].total),
+                    foulsReceived: collective[side].foulsReceived,
+                  },
                 ]),
               ) as NonNullable<PublishSheet["source"]["teamReview"]>,
             },
@@ -242,6 +273,7 @@ export function SheetPublicationPanel(p: Props) {
     ready =
       !!state &&
       reviewDocument.current === JSON.stringify(p.document) &&
+      gdReviewReady(teamReview, collective) &&
       (!state.requiresFallback || fallback) &&
       (!needsReason || p.reason.trim().length >= 10);
   return (
@@ -286,56 +318,19 @@ export function SheetPublicationPanel(p: Props) {
               Usar súmula manual em vez do PDF
             </label>
           )}
-          <fieldset disabled={blocked || p.disabled}>
-            <legend>Estatísticas coletivas a publicar</legend>
-            <p>
-              Confira a súmula completa. Informe o total de GD de toda a equipe,
-              incluindo jogadores, técnico, assistente e banco, sem contar a
-              mesma pessoa duas vezes. FR exige contagem própria da fonte. Em
-              branco significa desconhecido; zero deve ser confirmado
-              explicitamente.
+          <CollectiveReview
+            facts={collective}
+            review={teamReview}
+            onChange={setTeamReview}
+            disabled={blocked || p.disabled}
+            names={{ home: p.game.home.name, away: p.game.away.name }}
+          />
+          {reviewDocument.current !== documentKey && (
+            <p role="status">
+              A súmula mudou. Recarregue o estado da publicação e confira GD
+              novamente.
             </p>
-            {(["home", "away"] as const).map((side) => (
-              <div key={side}>
-                <h5>{p.game[side].name}</h5>
-                <p>
-                  T: {collective[side].technicalFouls}. GD identificadas:{" "}
-                  {collective[side].minimumDisqualifications}. B2 não conta
-                  outra técnica nem informa o total de pessoas desqualificadas.
-                </p>
-                {(["disqualifications", "foulsReceived"] as const).map(
-                  (metric) => (
-                    <label key={metric}>
-                      {metric === "disqualifications"
-                        ? "GD — total da equipe"
-                        : "FR — faltas recebidas"}{" "}
-                      · {p.game[side].name}
-                      <input
-                        name={`${side}-${metric}`}
-                        autoComplete="off"
-                        inputMode="numeric"
-                        type="number"
-                        min={
-                          metric === "disqualifications"
-                            ? collective[side].minimumDisqualifications
-                            : 0
-                        }
-                        max={2147483647}
-                        step={1}
-                        value={teamReview[side][metric]}
-                        onChange={(e) =>
-                          setTeamReview((v) => ({
-                            ...v,
-                            [side]: { ...v[side], [metric]: e.target.value },
-                          }))
-                        }
-                      />
-                    </label>
-                  ),
-                )}
-              </div>
-            ))}
-          </fieldset>
+          )}
           {!p.confirmed && needsReason && (
             <label>
               Motivo da publicação
@@ -391,10 +386,24 @@ export function SheetPublicationPanel(p: Props) {
         </p>
       )}
       <PublicationHistory
+        key={historyEpoch}
         gameId={p.game.id}
         enabled={!p.disabled && !busy}
         onSessionLost={p.onSessionLost}
       />
+      {(p.confirmed || state?.published || ack) && (
+        <TeamStatisticsPanel
+          gameId={p.game.id}
+          disabled={p.disabled || busy || uncertain || ack !== null}
+          onLock={setHistoricalLocked}
+          guard={historicalGuard}
+          onSessionLost={p.onSessionLost}
+          onUpdated={() => {
+            setState(null);
+            setHistoryEpoch((n) => n + 1);
+          }}
+        />
+      )}
     </section>
   );
 }
