@@ -287,7 +287,10 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                                     r.disputeId,
                                   )}
                                 >
-                                  {publicPlayerName(p.person.name, p.person.nickname)}
+                                  {publicPlayerName(
+                                    p.person.name,
+                                    p.person.nickname,
+                                  )}
                                 </a>
                                 {p.starter && (
                                   <span className="starter-symbol"> *</span>

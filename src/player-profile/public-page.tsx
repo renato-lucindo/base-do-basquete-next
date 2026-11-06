@@ -699,6 +699,9 @@ export function PlayerPublicPage() {
     view.page,
     Math.max(1, Math.ceil(filteredGames.length / 20)),
   );
+  const displayName = ready
+    ? publicPlayerName(ready.page.identity.name, ready.page.identity.nickname)
+    : "Perfil do atleta";
   return (
     <>
       <a
@@ -714,11 +717,7 @@ export function PlayerPublicPage() {
       <PublicHeader
         disputeId={origin}
         section="jogadores"
-        detail={
-          ready
-            ? publicPlayerName(ready.page.identity.name, ready.page.identity.nickname)
-            : "Perfil do atleta"
-        }
+        detail={displayName}
       />
       <main
         id="player-content"
@@ -746,18 +745,12 @@ export function PlayerPublicPage() {
               className={`player-overview ${ready.page.honors.length || ready.page.teamPlacements.length ? "player-with-honors" : ""}`}
             >
               <header className="player-identity">
-                <h1>
-                  {publicPlayerName(
-                    ready.page.identity.name,
-                    ready.page.identity.nickname,
-                  )}
-                </h1>
-                {ready.page.identity.nickname?.trim() &&
-                  ready.page.identity.nickname.trim() !== ready.page.identity.name && (
-                    <p className="player-full-name">
-                      {ready.page.identity.name}
-                    </p>
-                  )}
+                <h1>{displayName}</h1>
+                {displayName !== ready.page.identity.name && (
+                  <p className="player-full-name">
+                    {ready.page.identity.name}
+                  </p>
+                )}
                 <Metadata career={ready} />
               </header>
               <Honors career={ready} />

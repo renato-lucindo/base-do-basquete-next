@@ -1,5 +1,8 @@
 /** Central public label rule. Global search deliberately uses full names. */
-export function publicPlayerName(name: string, nickname?: string | null): string {
+export function publicPlayerName(
+  name: string,
+  nickname?: string | null,
+): string {
   return nickname?.trim() || name;
 }
 

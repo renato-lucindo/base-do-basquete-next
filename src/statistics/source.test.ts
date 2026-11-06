@@ -62,7 +62,11 @@ it("apelido publicado mais recente substitui o antigo mesmo no recorte de jogos 
   const page = buildStatisticsPage(
     input,
     parseStatisticsQuery(
-      new URLSearchParams({ scope: "regular", q: "Pedro Pessoti", compare: personId }),
+      new URLSearchParams({
+        scope: "regular",
+        q: "Pedro Pessoti",
+        compare: personId,
+      }),
     ),
   );
   expect(page.rows).toHaveLength(1);

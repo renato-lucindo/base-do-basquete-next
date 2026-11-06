@@ -319,11 +319,14 @@ export function StatisticsPageView() {
   const minimumGames =
     draft.filters.find((f) => f.metric === "games" && f.operator === ">=")
       ?.value ?? 0;
-  const compareNames = (data?.comparisonSummaries ?? []).map((summary) => [
-    summary.personId,
-    publicPlayerHistoryName(summary.names, summary.nicknames),
-    publicPlayerHistoryAccessibleName(summary.names, summary.nicknames),
-  ] as const);
+  const compareNames = (data?.comparisonSummaries ?? []).map((summary) => ({
+    id: summary.personId,
+    name: publicPlayerHistoryName(summary.names, summary.nicknames),
+    accessibleName: publicPlayerHistoryAccessibleName(
+      summary.names,
+      summary.nicknames,
+    ),
+  }));
   return (
     <div className="public-site statistics-public">
       <TooltipProvider>
@@ -654,8 +657,15 @@ export function StatisticsPageView() {
                                 <tr>
                                   <th>Métrica</th>
                                   {data.comparisonSummaries.map((s) => (
-                                    <th key={s.personId} title={s.names.join(" / ")}>
-                                      Resumo: {publicPlayerHistoryName(s.names, s.nicknames)}
+                                    <th
+                                      key={s.personId}
+                                      title={s.names.join(" / ")}
+                                    >
+                                      Resumo:{" "}
+                                      {publicPlayerHistoryName(
+                                        s.names,
+                                        s.nicknames,
+                                      )}
                                       <small>
                                         {s.registrationIds.length} inscrições ·{" "}
                                         {s.gamesPlayed} jogos
@@ -707,7 +717,7 @@ export function StatisticsPageView() {
                             têm melhor valor quando menores. A ausência não
                             recebe valor nem vence uma comparação.
                           </p>
-                          {compareNames.map(([id, name, accessibleName]) => (
+                          {compareNames.map(({ id, name, accessibleName }) => (
                             <button
                               key={id}
                               className="statistics-secondary"

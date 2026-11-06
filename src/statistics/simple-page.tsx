@@ -1,3 +1,7 @@
+import {
+  publicPlayerHistoryAccessibleName,
+  publicPlayerHistoryName,
+} from "../public-ui/player-name";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -326,12 +330,17 @@ export function SimpleStatisticsPageView() {
                             </td>
                             <th scope="row">
                               <a
+                                title={r.names.join(" / ")}
+                                aria-label={publicPlayerHistoryAccessibleName(
+                                  r.names,
+                                  r.nicknames,
+                                )}
                                 href={publicDetailLink(
                                   `/atleta.html#${r.personId}`,
                                   data.disputeId,
                                 )}
                               >
-                                {display(r.names)}
+                                {publicPlayerHistoryName(r.names, r.nicknames)}
                               </a>
                               {r.gamesPlayed === 0 && <small>Não jogou</small>}
                             </th>
