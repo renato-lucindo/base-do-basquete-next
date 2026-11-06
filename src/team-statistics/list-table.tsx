@@ -1,14 +1,16 @@
 import type { TeamsListPage } from "./list-contract";
 import { LIST_METRICS, type ListMetric } from "./list-query";
-import { sheetTeamMetric } from "./metrics";
+import { sheetTeamMetric, TEAM_METRICS } from "./metrics";
 import { ScrollableTable } from "../statistics/reference/scrollable-table";
 import { StatisticsSortHeader } from "../statistics/reference/sort-header";
 import { TooltipProvider } from "../statistics/reference/tooltip";
 import { publicDetailLink } from "../public-ui/navigation";
-export const listMetric = (key: ListMetric) =>
+export const listMetric = (key: ListMetric, scoresheet = false) =>
   key === "benchPoints" || key === "benchPointsShare"
     ? LIST_METRICS[key]
-    : sheetTeamMetric(key);
+    : key === "foulsReceived" && !scoresheet
+      ? TEAM_METRICS[key]
+      : sheetTeamMetric(key);
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const decimal = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 1,
@@ -61,7 +63,7 @@ export function TeamsListTable({
                   {d.query.columns.map((key) => (
                     <StatisticsSortHeader
                       key={key}
-                      definition={listMetric(key)}
+                      definition={listMetric(key, d.scoresheet)}
                       metricKey={key}
                       metricAttribute="data-team-metric"
                       active={d.query.sort === key}
@@ -138,8 +140,8 @@ export function TeamsListTable({
         <dl>
           {d.query.columns.map((key) => (
             <div key={key}>
-              <dt>{listMetric(key).label}</dt>
-              <dd>{listMetric(key).name}</dd>
+              <dt>{listMetric(key, d.scoresheet).label}</dt>
+              <dd>{listMetric(key, d.scoresheet).name}</dd>
             </div>
           ))}
         </dl>

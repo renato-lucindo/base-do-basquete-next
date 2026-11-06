@@ -22,7 +22,7 @@ reset role;
 -- A correction interleaved between two reads invalidates the old precondition.
 update public.admin_access set enabled=true where user_id=pg_temp.pu_id(98);
 set local role authenticated;
-select public.publish_sheet_game(jsonb_build_object('requestId',pg_temp.pu_id(9900),'gameId',pg_temp.pu_id(8),'gameVersion',(public.get_game(pg_temp.pu_id(8))->>'version')::integer,'basePublicationVersion',2,'source',jsonb_build_object('kind','sheet','baseSheetVersion',(public.get_game_sheet(pg_temp.pu_id(8))->>'version')::integer,'document',jsonb_set(public.get_game_sheet(pg_temp.pu_id(8))->'document','{events,0,code}','"2"')),'reason','Conferência para contrato paginado.','fallback',false));
+select public.publish_sheet_game(jsonb_build_object('requestId',pg_temp.pu_id(9900),'gameId',pg_temp.pu_id(8),'gameVersion',(public.get_game(pg_temp.pu_id(8))->>'version')::integer,'basePublicationVersion',2,'source',(pg_temp.pu_command()->'source')||jsonb_build_object('baseSheetVersion',(public.get_game_sheet(pg_temp.pu_id(8))->>'version')::integer,'document',jsonb_set(public.get_game_sheet(pg_temp.pu_id(8))->'document','{events,0,code}','"2"')),'reason','Conferência para contrato paginado.','fallback',false));
 reset role;
 select pg_temp.pu_error('select public.get_public_statistics_page(pg_temp.pu_id(3),(select (head->>''version'')::integer from paged_head_before),null)','PT409');
 select pg_temp.pu_assert((select h.version=(select (head->>'version')::integer+1 from paged_head_before) from public.published_statistics h where dispute_id=pg_temp.pu_id(3)),'new current version');

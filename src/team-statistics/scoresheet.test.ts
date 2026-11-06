@@ -41,7 +41,7 @@ it("sheet column order and every quantitative total/average use the selected com
     twoMade: 2,
     threeMade: 0,
     foulsCommitted: 6,
-    foulsReceived: 18,
+    foulsReceived: 0,
     freeThrowsAttempted: 0,
     freeThrowsMade: 0,
     technicalFouls: 10,
@@ -95,7 +95,7 @@ it("statistical ranking shares exact ties and null stays unranked in either dire
   for (const direction of ["asc", "desc"] as const)
     expect(
       buildTeamsPage(s, {
-        ...query("sort=foulsReceived"),
+        ...query("sort=disqualifications"),
         direction,
       }).rows.every((r) => r.rank === null),
     ).toBe(true);
@@ -103,9 +103,20 @@ it("statistical ranking shares exact ties and null stays unranked in either dire
 it("corrected public snapshots replace one game's facts without blending versions or altering registrations", () => {
   const s = source();
   const old = buildTeamsPage(s, query()).rows[0];
-  const revised = confirmedManualFixture(false, disciplinarySheet(), {
+  const document = disciplinarySheet();
+  document.events.unshift(
+    ...Array.from({ length: 3 }, (_, i) => ({
+      id: pubId(29900 + i),
+      side: "away" as const,
+      period: 1,
+      target: "0",
+      code: "P",
+      playerRosterEntryId: pubId(11),
+    })),
+  );
+  const revised = confirmedManualFixture(false, document, {
     ...teamReview(),
-    home: { disqualifications: 4, foulsReceived: 5 },
+    home: { disqualifications: 4, foulsReceived: null },
   });
   revised.version = 2;
   revised.id = s.games[0].snapshot.id;
@@ -113,7 +124,7 @@ it("corrected public snapshots replace one game's facts without blending version
   const row = buildTeamsPage(s, query()).rows[0];
   expect(old.statistics.disqualifications.value).toBe(12);
   expect(row.statistics.disqualifications.value).toBe(10);
-  expect(row.statistics.foulsReceived.value).toBe(14);
+  expect(row.statistics.foulsReceived.value).toBe(3);
   expect(row.gamesPlayed).toBe(2);
   s.games.push({ snapshot: revised, phase: "round_robin" });
   expect(() => buildTeamsPage(s, query())).toThrow();

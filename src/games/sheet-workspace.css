@@ -419,6 +419,43 @@
 .sheet-publication button {
   margin: 6px 8px 6px 0;
 }
+.sheet-publication .collective-review {
+  min-width: 0;
+}
+.collective-review-teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+.sheet-publication .collective-gd-total input {
+  display: block;
+  width: 120px;
+  max-width: 100%;
+}
+.sheet-publication .collective-gd-confirmation {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 44px;
+}
+.sheet-publication .collective-gd-confirmation input[type="checkbox"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  margin-top: 2px;
+}
+.sheet-publication .team-statistics-review textarea {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  min-height: 80px;
+  font: inherit;
+}
+.team-statistics-review h4,
+.collective-gd-total input {
+  scroll-margin-top: 100px;
+}
 
 /* Dense desktop action history: use available width rather than stacking every event. */
 .sheet-history > h4 {

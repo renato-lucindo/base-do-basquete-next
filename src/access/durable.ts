@@ -1,5 +1,6 @@
 import type { GameOrder } from "../games/contract";
 import { SupabasePublications } from "../publication/provider";
+import type { ReviseTeamStatistics } from "../publication/team-statistics-contract";
 import { SupabaseAchievements } from "../achievements/provider";
 import {
   saveAchievementDraftSchema,
@@ -758,6 +759,13 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.publications.getVersion(accessToken, gameId, version),
+      ),
+    );
+  }
+  reviseTeamStatistics(command: ReviseTeamStatistics) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.reviseTeamStatistics(accessToken, command),
       ),
     );
   }

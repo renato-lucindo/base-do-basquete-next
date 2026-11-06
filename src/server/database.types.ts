@@ -1043,6 +1043,10 @@ export type Database = {
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
       publish_pdf_game: { Args: { p_command: Json }; Returns: Json };
       publish_sheet_game: { Args: { p_command: Json }; Returns: Json };
+      revise_sheet_team_statistics: {
+        Args: { p_command: Json };
+        Returns: Json;
+      };
       remove_registration: { Args: { p_command: Json }; Returns: Json };
       save_achievement_draft: { Args: { p_command: Json }; Returns: Json };
       save_competition: { Args: { p_command: Json }; Returns: Json };

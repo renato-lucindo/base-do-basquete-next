@@ -16,14 +16,14 @@ it("counts technical occurrences across players and all acting staff, excludes B
     technicalFouls: 5,
     minimumDisqualifications: 4,
     disqualifications: null,
-    foulsReceived: null,
+    foulsReceived: 0,
   });
   const facts = deriveManualFacts(d, teamReview());
   expect(facts.teams.home.teamStatistics).toEqual({
     version: 1,
     technicalFouls: 5,
     disqualifications: 6,
-    foulsReceived: 9,
+    foulsReceived: 0,
   });
   expect(facts.players.reduce((n, p) => n + p.fouls, 0)).toBe(3);
   expect(facts.teams.home).not.toHaveProperty("staffPeople");
@@ -33,7 +33,7 @@ it("counts technical occurrences across players and all acting staff, excludes B
       .success,
   ).toBe(true);
 });
-it("allows explicit zero, rejects totals below identified dismissals, and never infers received fouls", () => {
+it("allows explicit zero, rejects GD below identified dismissals, and derives FR from opposing FC", () => {
   const review = teamReview();
   review.home.disqualifications = 3;
   expect(() => deriveManualFacts(disciplinarySheet(), review)).toThrow(/menor/);
@@ -62,6 +62,6 @@ it("legacy B2 is not a technical or a count of bench disqualifications", () => {
     version: 1,
     technicalFouls: 0,
     disqualifications: null,
-    foulsReceived: null,
+    foulsReceived: 0,
   });
 });

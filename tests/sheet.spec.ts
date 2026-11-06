@@ -1,6 +1,8 @@
 import { publishedSheet } from "./fixtures/published-game";
 import { publicationSheetResultSchema } from "../src/publication/data-contract";
 import { publishSheetSchema } from "../src/publication/contract";
+import { reviseTeamStatisticsSchema } from "../src/publication/team-statistics-contract";
+import { deriveManualFacts } from "../src/publication/manual";
 import { test, expect, type Page } from "@playwright/test";
 test.skip(
   ({ isMobile }) => isMobile,
@@ -570,6 +572,124 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
   ).toBeVisible();
 });
 
+test("coletivos: confirma GD, preserva fonte divergente e repete revisão publicada sem duplicar", async ({
+  page,
+}, info) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Publicar este jogo", exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByLabel(/GD — total da equipe/)
+    .first()
+    .fill("2");
+  await confirmGD(page);
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  const frozen = structuredClone(f.published()!);
+  await page
+    .getByRole("button", { name: "Salvar e republicar", exact: true })
+    .click();
+  await expect(page.getByLabel(/GD — total da equipe/).first()).toHaveValue(
+    "2",
+  );
+  await expect(
+    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }).first(),
+  ).not.toBeChecked();
+  f.source().document = structuredClone(f.source().document);
+  f.source().document.events[0].code = "3";
+  f.source().version++;
+  await page
+    .getByRole("button", { name: "Recarregar súmula", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Conferir estatísticas publicadas",
+      exact: true,
+    }),
+  ).toBeEnabled();
+  const live = structuredClone(f.source());
+  await page
+    .getByRole("button", {
+      name: "Conferir estatísticas publicadas",
+      exact: true,
+    })
+    .click();
+  const panel = page.getByRole("region", {
+    name: "Revisão das estatísticas publicadas",
+    exact: true,
+  });
+  await expect(
+    panel.getByRole("heading", { name: "Conferir estatísticas da versão 1" }),
+  ).toBeVisible();
+  await expect(panel.getByLabel(/FR — faltas recebidas/).first()).toHaveText(
+    "FR: 0",
+  );
+  await panel
+    .getByLabel("Motivo da revisão das estatísticas publicadas")
+    .fill("Conferência de GD sem alterar a súmula atual.");
+  const publish = panel.getByRole("button", {
+    name: "Publicar estatísticas conferidas",
+    exact: true,
+  });
+  await expect(publish).toBeDisabled();
+  const checks = panel.getByRole("checkbox", {
+    name: /Conferi o total de GD de/,
+  });
+  await checks.first().check();
+  await expect(publish).toBeDisabled();
+  await checks.last().check();
+  await expect(publish).toBeEnabled();
+  await panel
+    .getByLabel(/GD — total da equipe/)
+    .first()
+    .fill("3");
+  await expect(checks.first()).not.toBeChecked();
+  await expect(publish).toBeDisabled();
+  await checks.first().check();
+  await scan(page, info, "admin-team-statistics-review");
+  for (const width of [1366, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await panel.screenshot({
+      path: `.preview-artifacts/team-statistics-review-${width}.png`,
+    });
+  }
+  f.lose();
+  await publish.click();
+  await panel
+    .getByRole("button", { name: "Repetir revisão", exact: true })
+    .click();
+  await expect(
+    panel.getByRole("status").filter({ hasText: /^Estatísticas publicadas/ }),
+  ).toContainText("Estatísticas publicadas na versão 2");
+  expect(f.source()).toEqual(live);
+  expect(f.published()!.facts.players).toEqual(frozen.facts.players);
+  expect(f.published()!.facts.teams.home.points).toBe(
+    frozen.facts.teams.home.points,
+  );
+  expect(
+    f.published()!.facts.teams.home.teamStatistics?.disqualifications,
+  ).toBe(3);
+  expect(f.attempts.at(-1)).toBe(f.attempts.at(-2));
+  expect(f.commands.at(-1)).toBe(f.commands.at(-2));
+});
+async function confirmGD(page: Page) {
+  await expect(
+    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),
+  ).toHaveCount(2);
+  for (const checkbox of await page
+    .getByRole("checkbox", { name: /Conferi o total de GD de/ })
+    .all())
+    if (!(await checkbox.isChecked())) await checkbox.check();
+}
 async function publicationFixture(page: Page) {
   const f = await fixture(page),
     game = f.games.get(tid(80))!,
@@ -642,6 +762,14 @@ async function publicationFixture(page: Page) {
     attempts: string[] = [],
     commands: string[] = [];
   let publicSnapshot: ReturnType<typeof publishedSheet> | null = null;
+  const versions = new Map<
+    number,
+    {
+      snapshot: ReturnType<typeof publishedSheet>;
+      document: SheetSnapshot["document"];
+      reason: string;
+    }
+  >();
   async function attach(targetPage: Page) {
     if (targetPage !== page) await fixture(targetPage);
     await targetPage.route(`**/api/games/${game.id}`, (route) =>
@@ -686,6 +814,93 @@ async function publicationFixture(page: Page) {
           requiresFallback: fallback,
         },
       }),
+    );
+    await targetPage.route(
+      `**/api/games/${game.id}/publication/versions/*`,
+      (route) => {
+        const n = Number(
+            new URL(route.request().url()).pathname.split("/").at(-1),
+          ),
+          v = versions.get(n)!;
+        return route.fulfill({
+          json: {
+            gameId: game.id,
+            version: n,
+            sourceKind: "sheet",
+            sourceVersion: v.snapshot.source.version,
+            reason: v.reason,
+            actorId: tid(999),
+            publishedAt: stamp,
+            snapshot: v.snapshot,
+            document: v.document,
+          },
+        });
+      },
+    );
+    await targetPage.route(
+      `**/api/games/${game.id}/publication/team-statistics`,
+      (route) => {
+        const c = reviseTeamStatisticsSchema.parse(
+          route.request().postDataJSON(),
+        );
+        attempts.push(c.requestId);
+        commands.push(route.request().postData()!);
+        if (receipts.has(c.requestId))
+          return route.fulfill({ json: receipts.get(c.requestId) });
+        if (c.basePublicationVersion !== publicVersion)
+          return route.fulfill({
+            status: 409,
+            json: {
+              error: {
+                code: "version_conflict",
+                message: "A publicação mudou. Recarregue a conferência.",
+              },
+            },
+          });
+        const frozen = versions.get(publicVersion)!,
+          facts = deriveManualFacts(frozen.document, {
+            home: {
+              disqualifications: c.disqualifications.home,
+              foulsReceived: null,
+            },
+            away: {
+              disqualifications: c.disqualifications.away,
+              foulsReceived: null,
+            },
+          });
+        publicVersion++;
+        publicSnapshot = structuredClone(frozen.snapshot);
+        publicSnapshot.version = publicVersion;
+        for (const side of ["home", "away"] as const)
+          publicSnapshot.facts.teams[side].teamStatistics =
+            facts.teams[side].teamStatistics;
+        versions.set(publicVersion, {
+          snapshot: structuredClone(publicSnapshot),
+          document: structuredClone(frozen.document),
+          reason: c.reason,
+        });
+        const ack = {
+          requestId: c.requestId,
+          gameId: c.gameId,
+          version: publicVersion,
+          sourceVersion: frozen.snapshot.source.version,
+          publishedAt: stamp,
+        };
+        receipts.set(c.requestId, ack);
+        if (lost) {
+          lost = false;
+          return route.fulfill({
+            status: 503,
+            json: {
+              error: {
+                code: "access_unavailable",
+                message: "Resposta não confirmada.",
+              },
+            },
+          });
+        }
+        return route.fulfill({ json: ack });
+      },
     );
     await targetPage.route(
       `**/api/games/${game.id}/publication/sheet`,
@@ -735,6 +950,14 @@ async function publicationFixture(page: Page) {
           source.version,
           source.gameVersion,
         );
+        for (const side of ["home", "away"] as const)
+          publicSnapshot.facts.teams[side].teamStatistics!.disqualifications =
+            c.source.teamReview![side].disqualifications;
+        versions.set(publicVersion, {
+          snapshot: structuredClone(publicSnapshot),
+          document: structuredClone(source.document),
+          reason: c.reason,
+        });
         f.games.set(game.id, {
           ...game,
           version: source.gameVersion,
@@ -808,10 +1031,10 @@ test("manual publication confirms identities, keeps participation editable and r
     .getByLabel(/GD — total da equipe/)
     .first()
     .fill("2");
-  await page
-    .getByLabel(/FR — faltas recebidas/)
-    .first()
-    .fill("7");
+  await expect(page.getByLabel(/FR — faltas recebidas/).first()).toHaveText(
+    "FR: 0",
+  );
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -829,8 +1052,8 @@ test("manual publication confirms identities, keeps participation editable and r
   ).toBeDisabled();
   const reviewed = publishSheetSchema.parse(JSON.parse(f.commands[0]));
   expect(reviewed.source.teamReview).toEqual({
-    home: { disqualifications: 2, foulsReceived: 7 },
-    away: { disqualifications: null, foulsReceived: null },
+    home: { disqualifications: 2, foulsReceived: 0 },
+    away: { disqualifications: 0, foulsReceived: 0 },
   });
   const firstPublic = structuredClone(f.published());
   const publicPlayerId = firstPublic!.facts.players.find(
@@ -857,6 +1080,7 @@ test("manual publication confirms identities, keeps participation editable and r
   await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
     .click();
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Republicar este jogo", exact: true })
     .click();
@@ -899,6 +1123,7 @@ test("manual fallback requires an explicit decision and uncertain publication re
   await page
     .getByLabel("Motivo da publicação", { exact: true })
     .fill("Súmula oficial revisada pelo responsável.");
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -926,6 +1151,7 @@ test("known publication with failed source retrieval retries only the read", asy
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
   f.failRead();
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -961,12 +1187,14 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
     await tab
       .getByRole("button", { name: "Confirmar e publicar", exact: true })
       .click();
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
+  await confirmGD(second);
   await second
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -1005,6 +1233,7 @@ test("expired publication session preserves the frozen command and protects leav
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
   f.expirePublication();
+  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();

@@ -11,6 +11,10 @@ const command = () => ({
     kind: "sheet" as const,
     baseSheetVersion: 0,
     document: publicationSheet(),
+    teamReview: {
+      home: { disqualifications: 0, foulsReceived: null },
+      away: { disqualifications: 0, foulsReceived: null },
+    },
   },
   reason: "",
   fallback: false,

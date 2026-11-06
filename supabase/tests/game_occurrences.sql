@@ -86,7 +86,7 @@ reset role;
 insert into oc_frozen values('source_changed',pg_temp.oc_command(60,4));
 -- G4 source correction is still possible and does not rewrite the administrative decision.
 set local role authenticated;
-select pg_temp.pu_assert(public.publish_sheet_game(pg_temp.pu_command(80)||jsonb_build_object('gameVersion',(public.get_game(pg_temp.pu_id(8))->>'version')::integer,'basePublicationVersion',(public.get_public_game(pg_temp.pu_id(8))->>'version')::integer,'source',jsonb_build_object('kind','sheet','baseSheetVersion',(public.get_game_sheet(pg_temp.pu_id(8))->>'version')::integer,'document',jsonb_set(pg_temp.pu_doc(),'{events,0,code}','"2"')),'reason','Nova conferência do placar da partida.'))->'version'='3','G4 correction preserves independent occurrence');
+select pg_temp.pu_assert(public.publish_sheet_game(pg_temp.pu_command(80)||jsonb_build_object('gameVersion',(public.get_game(pg_temp.pu_id(8))->>'version')::integer,'basePublicationVersion',(public.get_public_game(pg_temp.pu_id(8))->>'version')::integer,'source',(pg_temp.pu_command()->'source')||jsonb_build_object('baseSheetVersion',(public.get_game_sheet(pg_temp.pu_id(8))->>'version')::integer,'document',jsonb_set(pg_temp.pu_doc(),'{events,0,code}','"2"')),'reason','Nova conferência do placar da partida.'))->'version'='3','G4 correction preserves independent occurrence');
 select pg_temp.pu_error('select public.save_game_occurrence((select command from oc_frozen where label=''source_changed''))','PT409');
 select pg_temp.pu_assert(public.get_game_occurrence_state(pg_temp.pu_id(8))#>'{head,publicationVersion}'='2','old source version remains recorded for review');
 select public.get_game_occurrence_state(pg_temp.pu_id(8)) as occurrence_state;
