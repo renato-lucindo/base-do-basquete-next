@@ -43,8 +43,7 @@ function Segments<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <fieldset className="mode-control">
-      <legend>{label}</legend>
+    <fieldset className="mode-control" aria-label={label}>
       <div className="segmented">
         {options.map(([key, text]) => (
           <button
@@ -402,13 +401,13 @@ export function TeamsListPublicPage() {
               data-sheet-only={data?.scoresheet || undefined}
             >
               <div className="table-toolbar">
-                <p aria-live="polite">
+                <span className="sr-only" role="status">
                   {loading
                     ? "Consultando…"
                     : data
                       ? `${data.total} inscrições`
                       : ""}
-                </p>
+                </span>
                 <Segments
                   label="Modo"
                   value={q.mode}
