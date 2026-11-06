@@ -43,6 +43,7 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     "PP",
     "PC",
     "SLD",
+    "Últimos 5",
   ]);
   await page.screenshot({
     path: `.preview-artifacts/standings-columns-after-${info.project.name}.png`,
@@ -125,6 +126,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     "PP",
     "PC",
     "SLD",
+    "Últimos 5",
   ]);
   await expect(
     table.getByRole("row").nth(1).getByRole("cell").nth(4),

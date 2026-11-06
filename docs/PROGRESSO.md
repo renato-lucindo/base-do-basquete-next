@@ -1,9 +1,17 @@
 # Progresso atual
 
-Unidade anterior conclu�da: PR66 integrada em `7d08d682b332a13f76b1f5625efccabd1b925f93`, CI PR42273035778 e integrada42274999615 SUCCESS. Preview UIUX nessa origem, deployment3e3c574c-3c41-4f8f-8a63-2171371141b9/versionf86ae9be-1b9f-44fa-ad51-6c4abdf3f553; principal/Access/bindings preservados. Evid�ncias finais no corpo da [PR66](https://github.com/renato-lucindo/base-do-basquete-next/pull/66).
+## Classificação e Últimos 5 — 06/11/2026
 
-Unidade atual: `codex/colunas-jogadores-cabecalho`, base origin/main7d08d68, worktree `C:/Users/12405304716/.codex/worktrees/colunas-jogadores-cabecalho`. Pedido direto: esfor�o m�nimo para liberar todas as colunas de s�mula no mobile, exceto Equipe, e igualar a cor do cabe�alho Equipe em Equipes. Removida redu��o autom�tica de T/U/5F/GD na entrada/redimensionamento; escolhas manuais e URLs preservadas. Fundo branco limitado �s linhas de dados, deixando o cabe�alho seguir sua regra comum. Somente dois arquivos de produto; sem dados, API ou migration.
+Unidade `codex/classificacao-ultimos-cinco`, base `origin/main` **95d40ff787f49565d6f8c0e6e1ca0bdac19ec5ac** (PR #70). Worktree isolado `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. Plano integral aprovado pelo responsável: tabela no padrão de Equipes, seleção de fase/grupo na URL e últimos cinco resultados exclusivamente do grupo/fase. Sem alterações de contrato público, cálculos oficiais, banco ou publicação de dados.
 
-Verifica��o em andamento: tipos/lint e browsers focais; CI proporcional � apresenta��o, seguida da CI integrada antes do preview UIUX. Estado final e SHA/servi�o ser�o registrados no corpo da PR desta unidade. N�o declarar conclus�o antes dessas provas. Respons�vel autorizou explicitamente terminar esta tarefa ap�s atingir15% restante5h; sem consumir cr�ditos ou reset. Automa��o de retomada continua pausada.
+Derivação: **5 testes RED→GREEN**; público anterior **17 PASS**. Interface nova: **14 browsers PASS**, incluindo grupos/fases, recarga/voltar, cinco resultados, administrativo sem placar, correção/cancelamento, foco/hover/toque e quatro resoluções. Revisão autoral e gate consolidado em preparação; CI remota, integração e preview desta unidade **ainda pendentes**. Não confundir esses testes com aceite humano ou WCAG integral. Evidências detalhadas serão registradas na mesma PR.
 
-Checkout humano sync/trabalho-casa, CONTRIBUTING/skills/skills-lock e demais worktrees preservados. node_modules usa junction existente; lock intacto. Pr�ximo: concluir checks, integrar uma PR e entregar os dois ajustes somente no preview UIUX.
+## Entrega anterior encerrada
+
+PR #68 integrada em **bc13c0a030a8266da10bfadfb57b9bd268452884**; CI integrada [42298430642](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42298430642) **SUCCESS**, conferida nesta execução. Preview UI/UX antes ainda na PR #66; publicado agora no SHA da PR #68, versão **1dec3d76-f451-4d4c-b5e5-d6438297c0ac**. Conferidos **34 hashes remotos**, `/`, `/admin`, `/admin/`, `/api/health` HTTP 200 e API privada sem sessão HTTP 401. Não houve mudança de Access, bindings, segredos, domínio principal ou dados. Depois dessa prova, outra execução publicou as PRs #69/#70: versão **9e69a80d-0373-4c7e-ad70-950b3f1ff942**, deployment **4a31d9e5-9df4-40b5-bb41-fe8f46ba75fa**, origem **95d40ff**, confirmada pela API Cloudflare e cabeçalho remoto. Essa origem já está na base desta unidade. A versão deste parágrafo antecede a entrega da Classificação.
+
+## Preservação e próximo passo
+
+Checkout principal `sync/trabalho-casa`, alterações humanas em `CONTRIBUTING.md`, skills locais e `skills-lock.json` preservados; demais worktrees preservados. Sem migration/DDL/DML ou publicação de jogos. Deploy autorizado **somente** em `base-do-basquete-next-uiux`, após CI do SHA integrado; configuração da raiz aponta ao principal e não deve ser usada para deploy.
+
+Próximo: concluir gate/revisão, abrir uma PR para `main`, integrar após checks e publicar o SHA integrado no preview UI/UX; verificar versão e entregar capturas reais. Cota consultada pela ferramenta oficial; pausa em 15% restante/5h conforme [CONTRIBUTING.md](../CONTRIBUTING.md), sem consumir resets/créditos. Contexto anterior preservado no [histórico](../historico/progresso/2026-11-06-antes-classificacao.md).

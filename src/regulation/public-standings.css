@@ -1,0 +1,185 @@
+.public-standings.public-site.statistics-public {
+  min-height: 0;
+}
+.public-standings .statistics-table-wrap {
+  scroll-padding-top: 3rem;
+  scroll-padding-inline: 16.5rem 0.5rem;
+}
+.public-standings.public-site.statistics-public p {
+  margin-block: 0.5rem;
+}
+.public-standings.public-site.statistics-public .standings-group-control {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 0.75rem;
+  font-size: 0.8125rem;
+}
+.public-standings.public-site.statistics-public
+  .standings-group-control
+  select {
+  width: auto;
+  max-width: 100%;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid #74839b;
+  background: #fff;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  :is(th, td) {
+  font-weight: 400;
+  padding: 0.3125rem 0.875rem;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  thead
+  th {
+  position: sticky;
+  top: 0;
+  background: #f3f6fa;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  thead
+  th:first-child {
+  position: sticky;
+  left: auto;
+  z-index: 10;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  .standings-team {
+  position: sticky;
+  left: 0;
+  min-width: 9.375rem;
+  max-width: 16.25rem;
+  white-space: normal;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  th[scope="row"] {
+  background: #fff;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  th[scope="row"]
+  a {
+  display: block;
+  max-width: 14.375rem;
+}
+.public-standings
+  .standings-explorer
+  .statistics-table
+  th[scope="row"]
+  a:hover {
+  text-decoration: underline;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .standings-header-help {
+  min-height: 2rem;
+  font: inherit;
+  white-space: nowrap;
+}
+.standings-results {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.public-standings.public-site.statistics-public .standings-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #fff;
+  --result-color: #18733b;
+}
+.public-standings.public-site.statistics-public
+  .standings-result[data-result="loss"] {
+  --result-color: #b42332;
+}
+.standings-result-circle {
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--result-color);
+}
+.public-standings .standings-result:hover .standings-result-circle {
+  box-shadow: 0 0 0 0.125rem #17203326;
+}
+.public-standings .standings-header-help:hover {
+  text-decoration: underline;
+}
+.public-standings :is(button, select) {
+  touch-action: manipulation;
+}
+.standings-result-circle svg {
+  width: 100%;
+  height: 100%;
+}
+.standings-result[data-latest] .standings-result-circle {
+  outline: 0.0625rem solid var(--result-color);
+  outline-offset: 0.125rem;
+}
+@media (max-width: 1050px) {
+  .public-standings .statistics-table-wrap {
+    scroll-padding-inline-start: 8.25rem;
+  }
+  .public-standings.public-site.statistics-public
+    .standings-explorer
+    .statistics-table
+    :is(th, td) {
+    padding-inline: 0.625rem;
+  }
+  .public-standings.public-site.statistics-public
+    .standings-explorer
+    .statistics-table
+    .standings-team {
+    min-width: 6.875rem;
+    max-width: 8.125rem;
+  }
+  .public-standings.public-site.statistics-public
+    .standings-explorer
+    .statistics-table
+    th[scope="row"]
+    a {
+    max-width: 6.875rem;
+  }
+}
+@media (min-width: 1051px) {
+  .public-standings .standings-explorer {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+  .public-standings .standings-explorer .statistics-table-wrap {
+    width: max-content;
+    max-width: 100%;
+  }
+  .public-standings .standings-explorer .scrollable-table-top {
+    contain: inline-size;
+  }
+}
+@media (max-width: 600px) {
+  .public-standings.public-site.statistics-public
+    .standings-group-control
+    select {
+    font-size: 1rem;
+  }
+}
