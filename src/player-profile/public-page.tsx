@@ -560,7 +560,7 @@ export function PlayerPublicPage() {
         g.history.registration.team.id,
         {
           id: g.history.registration.team.id,
-          name: g.history.teamNames.join(" / "),
+          name: g.history.registration.team.name,
         },
       ]),
     ).values(),
@@ -597,7 +597,7 @@ export function PlayerPublicPage() {
     const value = (g: typeof a): string | number | null => {
       if (view.sort === "competition")
         return `${g.history.context.name} ${g.history.context.year} ${g.history.context.category}`;
-      if (view.sort === "team") return g.history.registrationNames.join(" / ");
+      if (view.sort === "team") return g.history.registration.name;
       if (view.sort === "jersey") return g.history.jerseys.join(" / ");
       if (view.sort === "games")
         return g.games.filter((p) => p.fact.played).length;
@@ -649,7 +649,7 @@ export function PlayerPublicPage() {
               : ""}
             <span className="player-mobile-id">
               <br />
-              {g.history.registrationNames.join(" / ")} · Camisa{" "}
+              {g.history.registration.name} · Camisa{" "}
               {g.history.jerseys.join(" / ")}
             </span>
           </small>
@@ -667,7 +667,7 @@ export function PlayerPublicPage() {
               g.history.disputeId,
             )}
           >
-            {g.history.registrationNames.join(" / ")}
+            {g.history.registration.name}
           </a>
         </span>
       ),
@@ -1096,7 +1096,7 @@ export function PlayerPublicPage() {
                                   {g.history.context.name}
                                 </strong>
                                 <span>
-                                  {g.history.registrationNames.join(" / ")} ·{" "}
+                                  {g.history.registration.name} ·{" "}
                                   {g.history.context.gender} ·{" "}
                                   {g.history.context.category} · Camisa{" "}
                                   {g.history.jerseys.join(" / ")}

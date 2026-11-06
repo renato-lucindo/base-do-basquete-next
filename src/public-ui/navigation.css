@@ -20,14 +20,14 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  min-height: 44px;
-  padding: 4px 0;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0;
 }
 .public-header .brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   margin-right: auto;
   font-weight: 750;
   text-decoration: none;
@@ -35,17 +35,17 @@
 .public-header .brand-mark {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
   background: var(--public-blue);
   color: #fff;
-  border-radius: 7px;
+  border-radius: 0.4375rem;
 }
 .public-header .wrap,
 .public-home .public-main,
 .public-home .footer {
-  width: calc(100% - 48px);
-  max-width: 1600px;
+  width: calc(100% - 3rem);
+  max-width: 100rem;
   margin-inline: auto;
 }
 .public-header a,
@@ -53,39 +53,39 @@
   color: var(--public-blue);
 }
 .public-context {
-  padding-block: 0 4px;
+  padding-block: 0 0.25rem;
 }
 .public-context-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
 }
 .public-context-line p {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 .public-header .public-context-line > a {
   flex-shrink: 0;
-  font-size: 14px;
-  padding-block: 12px;
+  font-size: 0.875rem;
+  padding-block: 0.75rem;
 }
 .dispute-navigation {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 0.25rem;
 }
 .public-header .dispute-navigation a {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 16px;
-  min-height: 44px;
+  padding: 0.625rem 1rem;
+  min-height: 2.75rem;
   color: #334155;
   text-decoration: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 0.1875rem solid transparent;
 }
 .public-header .dispute-navigation [aria-current="page"] {
   color: var(--public-blue);
@@ -94,27 +94,27 @@
   background: #edf5ff;
 }
 .public-header .public-return {
-  font-size: 14px;
+  font-size: 0.875rem;
   margin: 0;
 }
 .public-header .breadcrumb {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 14px;
-  padding: 4px 0;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.25rem 0;
   color: #526176;
   grid-column: 1 / -1;
 }
 .public-header .public-return a {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
+  min-height: 1.75rem;
 }
 .public-header a:focus-visible,
 .public-home :focus-visible {
-  outline: 3px solid #075fca;
-  outline-offset: 3px;
+  outline: 0.1875rem solid #075fca;
+  outline-offset: 0.1875rem;
 }
 .public-header a:hover,
 .public-home a:hover {
@@ -122,50 +122,50 @@
 }
 .public-home {
   min-height: 100vh;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 .public-home .public-main {
-  padding-block: 16px 32px;
+  padding-block: 1rem 2rem;
   min-height: 60vh;
 }
 .public-home h1 {
-  font-size: 26px;
-  margin: 8px 0 20px;
+  font-size: 1.625rem;
+  margin: 0.5rem 0 1.25rem;
 }
 .public-home h2 {
-  font-size: 19px;
-  margin: 20px 0 12px;
+  font-size: 1.1875rem;
+  margin: 1.25rem 0 0.75rem;
 }
 .public-home .breadcrumb {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 14px;
+  gap: 0.5rem;
+  font-size: 0.875rem;
   color: #526176;
 }
 .public-home .footer {
   border-top: 1px solid var(--public-line);
-  padding-block: 20px;
+  padding-block: 1.25rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   color: #526176;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .public-search {
-  max-width: 800px;
-  margin-bottom: 24px;
+  max-width: 50rem;
+  margin-bottom: 1.5rem;
 }
 .public-search label {
   display: block;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 0.375rem;
 }
 .public-search > div {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 .public-home input {
   min-width: 0;
@@ -174,10 +174,10 @@
 .public-home input,
 .public-home button {
   font: inherit;
-  min-height: 44px;
+  min-height: 2.75rem;
   border: 1px solid #8b9bb0;
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
 }
 .public-home button {
   cursor: pointer;
@@ -190,33 +190,33 @@
 }
 .competition-tree summary {
   cursor: pointer;
-  min-height: 44px;
-  padding: 10px 8px;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.5rem;
   font-weight: 600;
 }
 .competition-tree details > details {
-  margin-left: 20px;
+  margin-left: 1.25rem;
 }
 .gender-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 12px 40px;
-  padding: 0 12px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18.75rem), 1fr));
+  gap: 0.75rem 2.5rem;
+  padding: 0 0.75rem 1rem;
 }
 .gender-columns h3 {
   color: #526176;
-  font-size: 14px;
-  margin: 8px 0;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
 }
 .gender-columns a {
   display: flex;
-  min-height: 44px;
+  min-height: 2.75rem;
   align-items: center;
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--public-line);
 }
 .gender-columns details a {
-  margin-left: 20px;
+  margin-left: 1.25rem;
 }
 .public-results,
 .public-games {
@@ -226,7 +226,7 @@
 }
 .public-results li,
 .public-games li {
-  padding: 12px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--public-line);
 }
 .public-results small,
@@ -237,16 +237,16 @@
 }
 .public-games li {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr) 180px;
+  grid-template-columns: 11.25rem minmax(0, 1fr) 11.25rem;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
 }
 .public-games a {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 16px;
+  gap: 1rem;
   align-items: center;
-  padding-block: 8px;
+  padding-block: 0.5rem;
 }
 .public-games a span:last-child {
   text-align: right;
@@ -255,22 +255,22 @@
   overflow-wrap: anywhere;
 }
 .public-games time {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .public-empty {
   border-block: 1px solid var(--public-line);
-  padding: 12px 0;
+  padding: 0.75rem 0;
 }
 .public-skip {
   position: absolute;
-  left: 12px;
-  top: -100px;
+  left: 0.75rem;
+  top: -6.25rem;
   z-index: 20;
   background: white;
-  padding: 12px;
+  padding: 0.75rem;
 }
 .public-skip:focus {
-  top: 8px;
+  top: 0.5rem;
 }
 .public-quick-selector {
   position: relative;
@@ -278,63 +278,63 @@
 }
 .public-quick-selector > summary {
   cursor: pointer;
-  min-height: 44px;
-  padding: 10px 4px;
-  font-size: 14px;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.25rem;
+  font-size: 0.875rem;
   color: var(--public-blue);
 }
 .public-selector-panel {
   position: absolute;
   z-index: 10;
   right: 0;
-  width: min(700px, calc(100vw - 32px));
+  width: min(43.75rem, calc(100vw - 2rem));
   max-height: 70vh;
   overflow: auto;
-  padding: 16px;
+  padding: 1rem;
   background: #fff;
   border: 1px solid var(--public-line);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px #17203324;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.5rem #17203324;
 }
 .public-selector-panel input {
   display: block;
   width: 100%;
-  min-height: 44px;
+  min-height: 2.75rem;
   font: inherit;
-  padding: 8px;
-  margin-block: 6px 12px;
+  padding: 0.5rem;
+  margin-block: 0.375rem 0.75rem;
 }
 .public-selector-panel a {
   overflow-wrap: anywhere;
 }
 .public-selector-panel > a {
   display: block;
-  min-height: 44px;
-  padding-block: 12px;
+  min-height: 2.75rem;
+  padding-block: 0.75rem;
 }
 .public-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 12px;
-  width: calc(100% - 48px);
-  max-width: 1600px;
-  margin: 24px auto 0;
-  padding: 20px 0;
+  gap: 0.75rem;
+  width: calc(100% - 3rem);
+  max-width: 100rem;
+  margin: 1.5rem auto 0;
+  padding: 1.25rem 0;
   border-top: 1px solid var(--public-line);
   color: #526176;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .access-main.statistics-page.team-public-page,
 .access-main.statistics-page.player-page {
-  width: calc(100% - 48px);
-  max-width: 1600px;
+  width: calc(100% - 3rem);
+  max-width: 100rem;
 }
 @media (max-width: 700px) {
   .public-header .wrap,
   .public-home .public-main,
   .public-home .footer {
-    width: calc(100% - 24px);
+    width: calc(100% - 1.5rem);
   }
   .public-header .public-admin {
     display: none;
@@ -342,22 +342,22 @@
   .public-footer,
   .access-main.statistics-page.team-public-page,
   .access-main.statistics-page.player-page {
-    width: calc(100% - 24px);
+    width: calc(100% - 1.5rem);
   }
   .public-context-line {
     align-items: flex-start;
   }
   .public-header .public-context-line > a {
-    max-width: 90px;
+    max-width: 5.625rem;
   }
   .public-header .dispute-navigation a {
-    padding: 8px 2px;
-    font-size: 12px;
+    padding: 0.5rem 0.125rem;
+    font-size: 0.75rem;
   }
   .dispute-navigation {
     display: grid;
     grid-template-columns: 1.2fr 0.7fr 0.85fr 1fr;
-    gap: 2px;
+    gap: 0.125rem;
   }
   .gender-columns {
     grid-template-columns: 1fr;
@@ -371,7 +371,7 @@
   .public-context {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 24px;
+    column-gap: 1.5rem;
     align-items: center;
   }
   .public-context-line {
@@ -382,7 +382,7 @@
     margin: 0;
   }
   .public-header .public-return a {
-    min-height: 28px;
+    min-height: 1.75rem;
   }
 }
 /* Confirmed standings: compact tables with scrolling confined to their region. */
@@ -390,22 +390,22 @@
   overflow-x: auto;
   max-width: 100%;
   border: 1px solid #dce3ec;
-  border-radius: 6px;
+  border-radius: 0.375rem;
 }
 .public-standings-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
 }
 .public-standings-table caption {
   text-align: left;
-  padding: 12px;
+  padding: 0.75rem;
   font-weight: 600;
 }
 .public-standings-table th,
 .public-standings-table td {
-  padding: 9px 12px;
+  padding: 0.5625rem 0.75rem;
   text-align: right;
   border-top: 1px solid #dce3ec;
   white-space: nowrap;
@@ -413,7 +413,7 @@
 .public-standings-table th[scope="row"] {
   text-align: left;
   white-space: normal;
-  min-width: 140px;
+  min-width: 8.75rem;
   overflow-wrap: anywhere;
 }
 .public-standings-table thead th:nth-child(2) {
@@ -422,14 +422,14 @@
 .public-phase-navigation {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 16px 0;
+  gap: 0.5rem;
+  margin: 1rem 0;
 }
 .public-phase-navigation a {
-  min-height: 44px;
-  padding: 8px 14px;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.875rem;
   border: 1px solid #52647b;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: white;
   color: #143b68;
   cursor: pointer;
@@ -446,19 +446,19 @@
 }
 .public-source,
 .public-table-legend {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #46566a;
 }
 .public-series {
-  padding: 12px 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #dce3ec;
 }
 .public-game-pending {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
 }
 .public-game-pending span {
   overflow-wrap: anywhere;
@@ -486,38 +486,38 @@
 }
 .public-header.site-header > .header-inner.wrap {
   display: grid;
-  grid-template-columns: auto minmax(200px, 560px) 1fr auto;
+  grid-template-columns: auto minmax(12.5rem, 35rem) 1fr auto;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
   height: auto;
-  min-height: 68px;
-  width: calc(100% - 48px);
-  max-width: 1600px;
-  padding-block: 10px;
+  min-height: 4.25rem;
+  width: calc(100% - 3rem);
+  max-width: 100rem;
+  padding-block: 0.625rem;
 }
 .public-header.site-header .header-inner .brand {
   font-size: 1rem;
   letter-spacing: 0;
   margin: 0;
-  gap: 10px;
+  gap: 0.625rem;
 }
 .public-header.site-header .header-inner .brand-mark {
-  width: 30px;
-  height: 30px;
+  width: 1.875rem;
+  height: 1.875rem;
   font-size: 1.125rem;
   padding: 0;
 }
 .public-header.site-header .public-header-search {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
-  max-width: 560px;
+  max-width: 35rem;
   margin: 0;
   min-width: 0;
-  padding: 0 10px;
+  padding: 0 0.625rem;
   border: 1px solid #bdcbdc;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
   background: #f8fafc;
 }
 .public-header.site-header .public-header-search svg {
@@ -527,8 +527,8 @@
 .public-header.site-header .public-header-search input {
   min-width: 0;
   width: 100%;
-  min-height: 40px;
-  padding: 7px 0;
+  min-height: 2.5rem;
+  padding: 0.4375rem 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -537,9 +537,9 @@
 }
 .public-header.site-header .public-header-search button {
   flex: none;
-  min-height: 36px;
+  min-height: 2.25rem;
   border: 0;
-  padding: 6px;
+  padding: 0.375rem;
   background: transparent;
   color: #075fca;
   font: inherit;
@@ -556,7 +556,7 @@
   white-space: nowrap;
 }
 .public-header.site-header .header-inner > a:not(.brand) {
-  min-height: 36px;
+  min-height: 2.25rem;
   display: inline-flex;
   align-items: center;
   text-decoration: none;
@@ -566,23 +566,23 @@
 }
 .public-home h1 {
   font-size: 1.3125rem;
-  margin-bottom: 14px;
+  margin-bottom: 0.875rem;
 }
 .public-home h2 {
   font-size: 1.0625rem;
 }
 .public-home .public-main {
-  max-width: 1600px;
+  max-width: 100rem;
 }
 .public-standings-table table {
   width: max-content;
 }
 .public-standings-table th[scope="row"] {
-  max-width: 320px;
+  max-width: 20rem;
 }
 .public-standings-table th,
 .public-standings-table td {
-  padding: 7px 12px;
+  padding: 0.4375rem 0.75rem;
 }
 .public-standings-table {
   border-radius: 0;
@@ -590,9 +590,9 @@
 @media (max-width: 800px) {
   .public-header.site-header > .header-inner.wrap {
     grid-template-columns: 1fr auto;
-    gap: 8px 12px;
+    gap: 0.5rem 0.75rem;
     min-height: 0;
-    width: calc(100% - 32px);
+    width: calc(100% - 2rem);
   }
   .public-header.site-header .public-header-search {
     grid-column: 1 / -1;
@@ -600,11 +600,11 @@
     max-width: none;
   }
   .public-header.site-header .public-header-search input {
-    min-height: 44px;
+    min-height: 2.75rem;
     font-size: 1rem;
   }
   .public-header.site-header .public-header-search button {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
   .public-header.site-header .public-admin {
     display: none !important;
@@ -614,7 +614,7 @@
     grid-row: 1;
   }
   .public-home .public-main {
-    width: calc(100% - 32px);
+    width: calc(100% - 2rem);
   }
 }
 
@@ -622,22 +622,22 @@
   display: flex;
   flex-wrap: wrap;
   align-items: end;
-  gap: 16px;
-  margin: 12px 0;
+  gap: 1rem;
+  margin: 0.75rem 0;
 }
 .public-games-tools label {
   display: grid;
-  gap: 4px;
+  gap: 0.25rem;
   font-size: 0.8125rem;
-  width: min(320px, 100%);
+  width: min(20rem, 100%);
 }
 .public-games-tools input {
   font: inherit;
-  padding: 7px 10px;
-  min-height: 38px;
+  padding: 0.4375rem 0.625rem;
+  min-height: 2.375rem;
 }
 .public-games-tools p {
-  margin: 0 0 8px;
+  margin: 0 0 0.5rem;
   color: #526176;
 }
 .public-table-scroll {
@@ -652,7 +652,7 @@
   font-variant-numeric: tabular-nums;
 }
 .public-table-scroll :is(th, td) {
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid #e7ecf2;
   vertical-align: middle;
@@ -665,8 +665,8 @@
 }
 .public-table-scroll tbody th {
   font-weight: 500;
-  min-width: 180px;
-  max-width: 340px;
+  min-width: 11.25rem;
+  max-width: 21.25rem;
   overflow-wrap: anywhere;
 }
 .public-table-scroll tbody th a {
@@ -678,7 +678,7 @@
   white-space: nowrap;
 }
 .public-table-scroll td:last-child {
-  max-width: 300px;
+  max-width: 18.75rem;
   overflow-wrap: anywhere;
 }
 .public-table-scroll small {
@@ -691,33 +691,33 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
 }
 @media (max-width: 600px) {
   .public-table-scroll tbody th {
-    min-width: 170px;
-    max-width: 190px;
+    min-width: 10.625rem;
+    max-width: 11.875rem;
   }
   .public-table-scroll :is(th, td) {
-    padding-inline: 8px;
+    padding-inline: 0.5rem;
   }
   .public-games-tools input {
-    min-height: 44px;
+    min-height: 2.75rem;
     font-size: 1rem;
   }
 }
 
 @media (max-width: 800px) {
   .public-header.site-header > .header-inner.wrap {
-    padding-block: 5px;
+    padding-block: 0.3125rem;
   }
   .public-header.site-header .public-context-line p {
     font-size: 0.8125rem;
     font-weight: 500;
   }
   .public-header.site-header .dispute-navigation a {
-    min-height: 40px;
+    min-height: 2.5rem;
   }
 }
 

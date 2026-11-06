@@ -2,24 +2,24 @@
   margin: 0;
 }
 .teams-workspace h4 {
-  font-size: 18px;
-  margin: 0 0 12px;
+  font-size: 1.125rem;
+  margin: 0 0 0.75rem;
 }
 .teams-inline {
   border-block: 1px solid #9caac0;
-  padding: 20px 0;
-  margin: 20px 0;
+  padding: 1.25rem 0;
+  margin: 1.25rem 0;
 }
 .teams-inline fieldset {
   display: grid;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 .teams-inline fieldset button {
   justify-self: start;
 }
 .teams-inline label {
-  max-width: 640px;
+  max-width: 40rem;
 }
 .teams-workspace .competition-list button {
   max-width: 100%;
@@ -28,25 +28,25 @@
 }
 .competition-tabs {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   flex-wrap: wrap;
   border-bottom: 1px solid #9caac0;
-  padding-bottom: 12px;
-  margin: 24px 0;
+  padding-bottom: 0.75rem;
+  margin: 1.5rem 0;
 }
 .competition-tabs button[aria-current="page"] {
   background: #075fca;
   color: #fff;
 }
 .competition-destination {
-  margin: 20px 0;
-  max-width: 680px;
+  margin: 1.25rem 0;
+  max-width: 42.5rem;
 }
 
 .teams-split {
   display: grid;
-  grid-template-columns: minmax(230px, 3fr) minmax(0, 7fr);
-  gap: 20px;
+  grid-template-columns: minmax(14.375rem, 3fr) minmax(0, 7fr);
+  gap: 1.25rem;
   align-items: start;
 }
 .teams-master,
@@ -59,17 +59,17 @@
 .teams-master .competition-list > li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2px 8px;
-  padding: 6px 8px;
+  gap: 0.125rem 0.5rem;
+  padding: 0.375rem 0.5rem;
   border-bottom: 1px solid #d9e2ee;
-  border-left: 3px solid transparent;
+  border-left: 0.1875rem solid transparent;
 }
 .teams-master .competition-list > li.is-selected {
   background: #edf5ff;
   border-left-color: #075fca;
 }
 .teams-master .competition-open {
-  min-height: 36px;
+  min-height: 2.25rem;
   font-size: 0.875rem;
   text-align: left;
 }
@@ -87,25 +87,25 @@
 }
 .teams-master .registration-actions button {
   font-size: 0.8125rem;
-  padding: 4px 6px;
+  padding: 0.25rem 0.375rem;
 }
 .teams-detail {
   border-left: 1px solid #d9e2ee;
-  padding-left: 20px;
+  padding-left: 1.25rem;
 }
 .teams-detail > div > h4 {
-  margin: 0 0 6px;
+  margin: 0 0 0.375rem;
 }
 .teams-detail .registration-actions {
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 .teams-detail .members-workspace {
-  margin-top: 6px;
-  padding-top: 6px;
+  margin-top: 0.375rem;
+  padding-top: 0.375rem;
 }
 .teams-selection-empty {
   margin: 0;
-  padding: 16px 0;
+  padding: 1rem 0;
   color: #42526b;
 }
 .teams-return {
@@ -113,7 +113,7 @@
 }
 @media (min-width: 1000px) {
   .teams-master {
-    max-height: calc(100dvh - 240px);
+    max-height: calc(100dvh - 15rem);
     overflow-y: auto;
     scrollbar-gutter: stable;
   }
@@ -131,14 +131,14 @@
   }
   .teams-return {
     display: inline-flex;
-    margin-bottom: 12px;
+    margin-bottom: 0.75rem;
   }
   .teams-has-selection > .competition-title > :is(label, button) {
     display: none;
   }
   .teams-master .competition-open,
   .teams-master .registration-actions button {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
 }
 

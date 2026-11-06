@@ -1,5 +1,7 @@
 # UI/UX público — decisões do MVP
 
+Decisão de06/11/2026: aplicar escala/cabeçalhos dos padrões comuns. Na disputa, somente o nome publicado da inscrição, pela publicação mais recente antes dos recortes, com desempate estável. Preservar aliases/histórico; não concatenar nome global/inscrição/sigla. Fora da disputa, manter o nome principal. PP% e5F compartilham Participação nos Pontos e Exclusões por cinco faltas em todos os controles/explicações. O título visível Equipes é substituído pela identificação semântica sem repetição da aba.
+
 Decisões da conversa de 29/10/2026, atualizadas com os contratos aprovados pelo responsável em 02/11/2026: ordem fixa de navegação e publicação explícita do regulamento completo, inclusive participantes e agenda sem resultados. Orientam a implementação; aceite dessas regras não constitui prova de que o fluxo esteja implementado, implantado ou validado pelo responsável. Consulte [MATRIZ-ESCOPO.md](../MATRIZ-ESCOPO.md) e [PROGRESSO.md](../PROGRESSO.md) para o estado real.
 
 ## Encontrar e abrir uma disputa

@@ -1,3 +1,4 @@
+import "../ui-system/readability.css";
 import { PublicGamesTable } from "./games-table";
 import { usePublicPosition } from "./position";
 import { createRoot } from "react-dom/client";
@@ -53,7 +54,7 @@ function PublicHome() {
       />
       <main id="public-content" className="public-main" tabIndex={-1}>
         {!route.id && <PublicBreadcrumb page="Consulta pública" />}
-        <h1>
+        <h1 className={route.id ? "sr-only" : undefined}>
           {route.id
             ? route.section === "jogos"
               ? "Jogos publicados"

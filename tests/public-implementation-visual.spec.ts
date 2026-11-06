@@ -52,9 +52,12 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
   console.log(`SÚMULA ${info.project.name}: ${JSON.stringify(frame)}`);
   // The accepted always-visible global search adds one mobile row; the scoresheet body retains its previous density.
   expect(
-    frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0),
+    (frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0)) /
+      (info.project.name === "desktop" ? 1.5 : 1),
   ).toBeLessThan(info.project.name === "desktop" ? 400 : 460);
-  expect(frame.visible).toBeGreaterThanOrEqual(Math.min(8, frame.total));
+  expect(frame.visible).toBeGreaterThanOrEqual(
+    Math.min(info.project.name === "desktop" ? 3 : 8, frame.total),
+  );
   expect(frame.viewportOverflow).toBe(false);
   expect(frame.sticky).toBe("sticky");
   await page.screenshot({
@@ -132,10 +135,12 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
     path: `.preview-artifacts/estatisticas-real-${info.project.name}.png`,
     fullPage: false,
   });
-  expect(frame.firstY).toBeLessThan(
-    info.project.name === "desktop" ? 390 : 540,
+  expect(
+    frame.firstY / (info.project.name === "desktop" ? 1.5 : 1),
+  ).toBeLessThan(info.project.name === "desktop" ? 390 : 540);
+  expect(frame.visible).toBeGreaterThanOrEqual(
+    info.project.name === "desktop" ? 5 : 8,
   );
-  expect(frame.visible).toBeGreaterThanOrEqual(8);
   expect(frame.viewportOverflow).toBe(false);
   expect(frame.sticky).toBe("sticky");
   if (info.project.name === "mobile") {

@@ -231,7 +231,9 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
         tabIndex={-1}
         className="access-main statistics-page team-public-page"
       >
-        <h1>{name}</h1>
+        <h1 className={current.kind === "list" ? "sr-only" : undefined}>
+          {name}
+        </h1>
         {current.kind === "list" && confirmed.data && (
           <section aria-label="Equipes confirmadas">
             <h2>Participantes confirmados</h2>

@@ -1,39 +1,39 @@
 .statistics-page {
-  max-width: 1320px;
+  max-width: 82.5rem;
   overflow-wrap: anywhere;
-  padding: 12px 16px 28px;
+  padding: 0.75rem 1rem 1.75rem;
 }
 .statistics-page > h1 {
   display: inline-block;
   font-size: 1.32rem;
-  margin: 4px 16px 9px 0;
+  margin: 0.25rem 1rem 0.5625rem 0;
 }
 .statistics-page > nav {
   display: inline-block;
-  margin-bottom: 9px;
+  margin-bottom: 0.5625rem;
   font-size: 0.86rem;
 }
 .statistics-quickbar {
   display: grid;
   grid-template-columns:
-    minmax(155px, 2fr) minmax(100px, 1fr) minmax(105px, 1fr)
-    minmax(85px, 0.7fr) minmax(130px, 1.25fr) auto auto auto;
+    minmax(9.6875rem, 2fr) minmax(6.25rem, 1fr) minmax(6.5625rem, 1fr)
+    minmax(5.3125rem, 0.7fr) minmax(8.125rem, 1.25fr) auto auto auto;
   align-items: end;
-  gap: 6px;
-  padding: 8px;
+  gap: 0.375rem;
+  padding: 0.5rem;
   background: #f6f9fd;
   border: 1px solid #cfdae8;
-  border-radius: 6px;
+  border-radius: 0.375rem;
 }
 .statistics-quickbar label {
   font-size: 0.8rem;
   font-weight: 600;
-  gap: 2px;
+  gap: 0.125rem;
 }
 .statistics-page .statistics-quickbar input:not([type="checkbox"]),
 .statistics-page .statistics-quickbar select {
-  min-height: 36px;
-  padding: 5px 7px;
+  min-height: 2.25rem;
+  padding: 0.3125rem 0.4375rem;
   font-size: 0.9rem;
 }
 .statistics-quickbar > .statistics-popover {
@@ -42,11 +42,11 @@
 }
 .statistics-page .statistics-popover summary,
 .statistics-page .statistics-advanced > summary {
-  min-height: 36px;
-  padding: 7px 9px;
+  min-height: 2.25rem;
+  padding: 0.4375rem 0.5625rem;
   border: 1px solid #8798b0;
   background: #fff;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   font-size: 0.88rem;
 }
 .statistics-popover-content {
@@ -54,13 +54,13 @@
   top: 100%;
   right: 0;
   z-index: 12;
-  width: min(310px, 80vw);
-  max-height: 340px;
+  width: min(19.375rem, 80vw);
+  max-height: 21.25rem;
   overflow: auto;
-  padding: 10px;
+  padding: 0.625rem;
   background: white;
   border: 1px solid #8798b0;
-  box-shadow: 0 6px 24px #17203324;
+  box-shadow: 0 0.375rem 1.5rem #17203324;
 }
 .statistics-page fieldset.statistics-popover-content {
   margin: 0;
@@ -72,18 +72,18 @@
   font-size: 0.85rem;
 }
 .statistics-page .statistics-search-action {
-  min-height: 36px;
-  padding: 7px 11px;
+  min-height: 2.25rem;
+  padding: 0.4375rem 0.6875rem;
   white-space: nowrap;
 }
 .statistics-advanced {
-  margin-top: 5px;
+  margin-top: 0.3125rem;
 }
 .statistics-advanced > summary {
   display: inline-block;
 }
 .statistics-advanced .statistics-controls {
-  margin-top: 5px;
+  margin-top: 0.3125rem;
 }
 .statistics-result-heading {
   position: absolute;
@@ -98,20 +98,20 @@
 .statistics-page
   section[aria-label="Resultado da consulta"]
   > p[role="status"] {
-  margin: 3px 0;
+  margin: 0.1875rem 0;
   font-size: 0.8rem;
 }
 .statistics-explanation {
-  margin: 2px 0;
+  margin: 0.125rem 0;
   font-size: 0.8rem;
 }
 .statistics-page .statistics-explanation > summary {
   color: #285586;
-  min-height: 24px;
-  padding: 2px 0;
+  min-height: 1.5rem;
+  padding: 0.125rem 0;
 }
 .statistics-scroll {
-  margin: 5px 0;
+  margin: 0.3125rem 0;
 }
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] {
   min-width: 0;
@@ -119,7 +119,7 @@
 }
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] th,
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] td {
-  padding: 4px 7px;
+  padding: 0.25rem 0.4375rem;
   line-height: 1.2;
 }
 .statistics-scroll table[aria-label="Estatísticas dos atletas"] td {
@@ -135,8 +135,8 @@
   .statistics-position {
   position: sticky;
   left: 0;
-  width: 60px;
-  min-width: 60px;
+  width: 3.75rem;
+  min-width: 3.75rem;
   text-align: center;
   z-index: 3;
   background: #f0f5fa;
@@ -145,13 +145,13 @@
   table[aria-label="Estatísticas dos atletas"]
   .statistics-player {
   position: sticky;
-  left: 60px;
-  width: 230px;
-  min-width: 180px;
-  max-width: 230px;
+  left: 3.75rem;
+  width: 14.375rem;
+  min-width: 11.25rem;
+  max-width: 14.375rem;
   z-index: 3;
   background: #fff;
-  box-shadow: 2px 0 0 #d9e2ee;
+  box-shadow: 0.125rem 0 0 #d9e2ee;
   white-space: normal;
 }
 .statistics-scroll
@@ -168,7 +168,7 @@
 .statistics-player-inner {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 0.4375rem;
 }
 .statistics-player-inner > div {
   min-width: 0;
@@ -187,7 +187,7 @@
 .statistics-scroll
   table[aria-label="Estatísticas dos atletas"]
   .statistics-team {
-  max-width: 170px;
+  max-width: 10.625rem;
   overflow-wrap: anywhere;
   white-space: normal;
   text-align: left;
@@ -195,7 +195,7 @@
 .statistics-scroll
   table[aria-label="Estatísticas dos atletas"]
   .statistics-sort {
-  min-height: 32px;
+  min-height: 2rem;
   white-space: nowrap;
 }
 .statistics-scroll
@@ -205,25 +205,25 @@
 }
 .statistics-quickbar :focus-visible,
 .statistics-scroll :focus-visible {
-  outline: 3px solid #075fca;
-  outline-offset: 2px;
+  outline: 0.1875rem solid #075fca;
+  outline-offset: 0.125rem;
 }
 .statistics-controls {
   background: #fff;
   border: 1px solid #d9e2ee;
-  border-radius: 6px;
-  padding: 20px;
+  border-radius: 0.375rem;
+  padding: 1.25rem;
   display: grid;
-  gap: 16px;
+  gap: 1rem;
 }
 .statistics-fields {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 .statistics-page label {
   display: grid;
-  gap: 5px;
+  gap: 0.3125rem;
   min-width: 0;
 }
 .statistics-page input:not([type="checkbox"]),
@@ -233,49 +233,49 @@
   background: #fff;
   width: 100%;
   min-width: 0;
-  min-height: 44px;
+  min-height: 2.75rem;
   border: 1px solid #74839b;
-  padding: 8px;
-  border-radius: 4px;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 .statistics-page fieldset {
   min-width: 0;
   border: 1px solid #d9e2ee;
   margin: 0;
-  padding: 14px;
+  padding: 0.875rem;
 }
 .statistics-page input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   flex-shrink: 0;
   accent-color: #075fca;
 }
 .statistics-page .statistics-check,
 .statistics-column-options label {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
-  min-height: 44px;
+  min-height: 2.75rem;
 }
 .statistics-column-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 .statistics-filter {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
   align-items: end;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 .statistics-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin: 12px 0;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
 }
 .statistics-page .statistics-secondary {
   background: #fff;
@@ -284,15 +284,15 @@
 }
 .statistics-page summary {
   cursor: pointer;
-  min-height: 44px;
-  padding: 10px 0;
+  min-height: 2.75rem;
+  padding: 0.625rem 0;
 }
 .statistics-scroll {
   max-width: 100%;
   overflow: auto;
   border: 1px solid #d9e2ee;
   background: #fff;
-  margin: 16px 0;
+  margin: 1rem 0;
 }
 .statistics-scroll table {
   border-collapse: collapse;
@@ -303,12 +303,12 @@
 }
 .statistics-scroll caption {
   text-align: left;
-  padding: 12px;
-  min-width: 240px;
+  padding: 0.75rem;
+  min-width: 15rem;
 }
 .statistics-scroll td,
 .statistics-scroll th {
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   border-bottom: 1px solid #d9e2ee;
   white-space: nowrap;
   text-align: left;
@@ -328,8 +328,8 @@
   background: transparent;
   color: #172033;
   border: 0;
-  padding: 5px 2px;
-  min-height: 44px;
+  padding: 0.3125rem 0.125rem;
+  min-height: 2.75rem;
   font-weight: 700;
 }
 .statistics-leader {
@@ -338,7 +338,7 @@
 }
 .statistics-insufficient {
   text-decoration: underline dotted;
-  text-underline-offset: 4px;
+  text-underline-offset: 0.25rem;
 }
 .statistics-comparison-better {
   background: #e2edff;
@@ -348,7 +348,7 @@
   background: #f5f6f8;
 }
 .statistics-empty {
-  padding: 20px;
+  padding: 1.25rem;
   background: #fff;
   border: 1px solid #d9e2ee;
 }
@@ -369,19 +369,19 @@
 @media (max-width: 480px) {
   .statistics-page {
     min-width: 0;
-    padding: 5px 10px 20px;
+    padding: 0.3125rem 0.625rem 1.25rem;
   }
   .statistics-page > h1 {
     font-size: 1.13rem;
-    margin: 2px 8px 5px 0;
+    margin: 0.125rem 0.5rem 0.3125rem 0;
   }
   .statistics-page > nav {
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem;
   }
   .statistics-quickbar {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 4px;
-    padding: 5px;
+    gap: 0.25rem;
+    padding: 0.3125rem;
   }
   .statistics-quickbar > * {
     min-width: 0;
@@ -392,26 +392,26 @@
   .statistics-page .statistics-popover summary,
   .statistics-page .statistics-search-action {
     min-width: 0;
-    min-height: 32px;
+    min-height: 2rem;
   }
   .statistics-page .statistics-quickbar select {
     max-width: 100%;
   }
   .statistics-page .statistics-popover summary {
     overflow-wrap: anywhere;
-    padding: 5px 7px;
+    padding: 0.3125rem 0.4375rem;
   }
   .statistics-page .statistics-search-action {
     white-space: normal;
     overflow-wrap: anywhere;
-    padding-inline: 3px;
+    padding-inline: 0.1875rem;
   }
   .statistics-advanced {
-    margin-top: 3px;
+    margin-top: 0.1875rem;
   }
   .statistics-page .statistics-advanced > summary {
-    min-height: 32px;
-    padding: 5px 7px;
+    min-height: 2rem;
+    padding: 0.3125rem 0.4375rem;
   }
   .statistics-quickbar > label:first-child {
     grid-column: 1 / 5;
@@ -443,9 +443,9 @@
   .statistics-scroll
     table[aria-label="Estatísticas dos atletas"]
     .statistics-player {
-    width: 155px;
-    min-width: 155px;
-    max-width: 155px;
+    width: 9.6875rem;
+    min-width: 9.6875rem;
+    max-width: 9.6875rem;
   }
   .statistics-fields,
   .statistics-filter,
@@ -453,44 +453,44 @@
     grid-template-columns: 1fr;
   }
   .statistics-controls {
-    padding: 12px;
+    padding: 0.75rem;
   }
   .statistics-page fieldset {
-    padding: 10px;
+    padding: 0.625rem;
   }
 }
 
 /* Compact public scoresheet reference: one numeric row, totals and PTS/J together. */
 .simple-statistics {
-  max-width: 1200px;
+  max-width: 75rem;
 }
 .simple-statistics-heading {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 .simple-statistics-heading h1 {
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 .simple-statistics-heading p {
   margin: 0;
 }
 .simple-statistics-view {
   white-space: nowrap;
-  padding: 8px 0;
+  padding: 0.5rem 0;
 }
 .simple-statistics-controls {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
   align-items: end;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
 }
 .simple-statistics-result {
   font-size: 1.15rem;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 .simple-statistics-table {
   width: max-content;
@@ -499,7 +499,7 @@
 }
 .simple-statistics-table th,
 .simple-statistics-table td {
-  padding: 10px 8px;
+  padding: 0.625rem 0.5rem;
   border-bottom: 1px solid #d9e2ee;
   text-align: right;
 }
@@ -514,20 +514,20 @@
 }
 .simple-statistics-table th:first-child,
 .simple-statistics-table td:first-child {
-  width: 44px;
+  width: 2.75rem;
   color: #536176;
   text-align: center;
 }
 .simple-statistics-table tbody th {
-  min-width: 180px;
+  min-width: 11.25rem;
   font-weight: 500;
 }
 .simple-statistics-table td:nth-child(3) {
-  min-width: 145px;
+  min-width: 9.0625rem;
 }
 .simple-statistics-table .statistics-sort {
   padding: 0;
-  min-height: 30px;
+  min-height: 1.875rem;
   color: inherit;
 }
 .simple-statistics-table small {
@@ -536,6 +536,6 @@
   color: #536176;
 }
 .simple-statistics-note {
-  max-width: 850px;
+  max-width: 53.125rem;
   color: #536176;
 }

@@ -4,7 +4,7 @@ export const STATISTICS_METRICS = {
   ...BOXSCORE_METRICS,
   pointsShare: {
     label: "PP%",
-    name: "Participação nos pontos da equipe nos jogos em que atuou",
+    name: "Participação nos Pontos",
     normalizable: false,
     lowerIsBetter: false,
   },
@@ -22,7 +22,7 @@ export const STATISTICS_METRICS = {
   },
   fiveFouls: {
     label: "5F",
-    name: "Exclusões por cinco faltas confirmadas",
+    name: "Exclusões por cinco faltas",
     normalizable: false,
     lowerIsBetter: true,
   },

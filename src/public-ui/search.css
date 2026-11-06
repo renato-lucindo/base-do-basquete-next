@@ -9,31 +9,31 @@
   max-height: 72dvh;
   position: absolute;
   z-index: 40;
-  inset: calc(100% + 6px) 0 auto;
+  inset: calc(100% + 0.375rem) 0 auto;
   min-width: 0;
   background: #fff;
   border: 1px solid #bdcbdc;
-  border-radius: 5px;
-  box-shadow: 0 8px 24px #1720331a;
-  padding: 10px;
+  border-radius: 0.3125rem;
+  box-shadow: 0 0.5rem 1.5rem #1720331a;
+  padding: 0.625rem;
   color: #172033;
   font-size: 0.875rem;
 }
 .public-search-types {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 0.25rem;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 .public-search-types a,
 .public-header.site-header .public-header-search .public-search-types button {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
+  min-height: 2rem;
   border: 1px solid #dce4ee;
-  border-radius: 4px;
-  padding: 4px 8px;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
   color: #42556c;
   background: #fff;
   font: inherit;
@@ -52,11 +52,11 @@
 .public-autocomplete p {
   font-size: 0.8125rem;
   line-height: 1.5;
-  margin: 6px 0;
+  margin: 0.375rem 0;
   color: #526176;
 }
 .public-suggestion-list {
-  max-height: min(56vh, 480px);
+  max-height: min(56vh, 30rem);
   overflow: auto;
   overscroll-behavior: contain;
 }
@@ -65,13 +65,13 @@
   text-transform: uppercase;
   font-weight: 600;
   color: #526176;
-  padding: 8px 8px 3px;
+  padding: 0.5rem 0.5rem 0.1875rem;
 }
 .public-suggestion-list [role="option"] {
   display: block;
-  min-height: 44px;
-  padding: 7px 8px;
-  border-radius: 3px;
+  min-height: 2.75rem;
+  padding: 0.4375rem 0.5rem;
+  border-radius: 0.1875rem;
   color: #172033;
   text-decoration: none;
   overflow-wrap: anywhere;
@@ -94,14 +94,14 @@
 .public-search-all {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
-  margin-top: 6px;
+  min-height: 2.25rem;
+  margin-top: 0.375rem;
 }
 .public-search-results {
   font-size: 0.875rem;
 }
 .public-search-results h2 {
-  margin: 16px 0 6px;
+  margin: 1rem 0 0.375rem;
 }
 .public-search-results h2 small {
   font-size: 0.8125rem;
@@ -112,16 +112,16 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 1000px;
+  max-width: 62.5rem;
 }
 .public-search-entity-list > li {
   border-bottom: 1px solid #e7ecf2;
-  padding: 8px 0;
+  padding: 0.5rem 0;
 }
 .public-search-entity-list > li > a {
   display: inline-block;
-  min-height: 36px;
-  padding: 4px 0;
+  min-height: 2.25rem;
+  padding: 0.25rem 0;
 }
 .public-search-entity-list small {
   display: block;
@@ -130,49 +130,49 @@
   font-weight: 400;
 }
 .public-search-entity summary {
-  padding: 5px 0;
-  min-height: 32px;
+  padding: 0.3125rem 0;
+  min-height: 2rem;
   cursor: pointer;
   overflow-wrap: anywhere;
 }
 .public-search-entity > ul {
-  margin: 4px 0 4px 16px;
-  padding-left: 12px;
-  max-height: 360px;
+  margin: 0.25rem 0 0.25rem 1rem;
+  padding-left: 0.75rem;
+  max-height: 22.5rem;
   overflow: auto;
 }
 .public-search-entity li > a {
   display: block;
-  padding: 6px 0;
-  min-height: 32px;
+  padding: 0.375rem 0;
+  min-height: 2rem;
   overflow-wrap: anywhere;
 }
 .public-search-genders {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-  gap: 16px;
-  max-width: 700px;
-  padding-left: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 1rem;
+  max-width: 43.75rem;
+  padding-left: 1rem;
 }
 .public-search-genders h3 {
-  margin: 4px 0;
+  margin: 0.25rem 0;
   font-size: 0.875rem;
 }
 .public-search-genders ul {
   margin: 0;
-  padding-left: 16px;
+  padding-left: 1rem;
 }
 .public-search-pager {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 .public-search-pager a {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 2.25rem;
 }
 .public-search-pager [aria-disabled="true"] {
   color: #526176;
@@ -180,27 +180,27 @@
 }
 .public-autocomplete a:focus-visible,
 .public-search-results :is(a, button, summary):focus-visible {
-  outline: 2px solid #075fca;
-  outline-offset: 2px;
+  outline: 0.125rem solid #075fca;
+  outline-offset: 0.125rem;
 }
 @media (max-width: 600px) {
   .public-header.site-header .public-header-search .public-search-types button {
-    min-height: 44px;
-    padding-inline: 6px;
+    min-height: 2.75rem;
+    padding-inline: 0.375rem;
     font-size: 0.8125rem;
   }
   .public-autocomplete {
-    padding: 8px;
+    padding: 0.5rem;
   }
   .public-search-genders {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 0.5rem;
   }
   .public-search-entity li > a {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
   .public-search-types a {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
 }
 
@@ -214,7 +214,7 @@
 @media (max-width: 340px) {
   header.public-header.site-header > .header-inner.wrap {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    gap: 0.25rem;
   }
   header.public-header.site-header .header-inner .brand {
     width: 100%;

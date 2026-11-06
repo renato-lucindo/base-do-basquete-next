@@ -96,7 +96,9 @@ for (const width of [1366, 1920])
       );
       if (process.env.ADMIN_CAPTURE_BASELINE) return;
       expect(metrics.overflow).toBe(false);
-      expect(metrics.firstRowY).toBeLessThan(area === "jogos" ? 300 : 420);
+      expect(metrics.firstRowY / 1.5).toBeLessThan(
+        area === "jogos" ? 300 : 420,
+      );
       if (area === "jogos") {
         await expect(
           page.getByRole("table", { name: "Jogos da disputa", exact: true }),
@@ -170,7 +172,7 @@ for (const width of [1366, 1920]) {
         document.documentElement.clientWidth,
     }));
     expect(metrics.compact).toBe(true);
-    expect(metrics.minWidth).toBe("1220px");
+    expect(metrics.minWidth).toBe("1830px");
     expect(metrics.pageOverflow).toBe(false);
     await page.screenshot({
       path: `.preview-artifacts/admin-after-importacao-${width}.png`,

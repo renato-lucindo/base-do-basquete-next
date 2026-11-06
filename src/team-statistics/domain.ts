@@ -1,4 +1,5 @@
 import { statisticsSourceSchema } from "../statistics/source";
+import { publishedRegistrationLabels } from "../public-ui/registration-labels";
 import { normalizeParsedConfirmedGame } from "../statistics/confirmed-facts";
 import { validateParsedConfirmedFacts } from "../statistics/aggregate";
 import { normalizeStatisticsSearch } from "../statistics/query-contract";
@@ -48,6 +49,7 @@ export function teamRows(
   q: Pick<TeamsQuery, "mode" | "scope"> & { dataset?: TeamsQuery["dataset"] },
 ): TeamRow[] {
   const { source } = checked;
+  const labels = publishedRegistrationLabels(source.games);
   const sheetOnly =
     q.dataset !== "boxscore" &&
     source.games.length > 0 &&
@@ -95,7 +97,7 @@ export function teamRows(
     return {
       registrationId: r.registrationId,
       teamId: r.team.id,
-      name: r.name,
+      name: labels.get(r.registrationId)!.name,
       teamName: r.team.name,
       names: distinct(g.map((a) => a.snapshot.game[a.side].name)),
       teamNames: distinct(g.map((a) => a.snapshot.game[a.side].team.name)),

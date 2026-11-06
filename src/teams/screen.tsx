@@ -113,7 +113,7 @@ export function TeamsWorkspace({
   useEffect(() => {
     if (!enabled || removing) return;
     if (editor) input.current?.focus();
-    else heading.current?.focus();
+    else heading.current?.parentElement?.focus();
   }, [
     editor?.kind,
     editor?.command.commandId,
@@ -234,7 +234,7 @@ export function TeamsWorkspace({
     setUncertain(false);
     setConflict(false);
     setError("");
-    heading.current?.focus();
+    heading.current?.parentElement?.focus();
   }
   function changeName(value: string) {
     setEditor((e) =>
@@ -448,8 +448,8 @@ export function TeamsWorkspace({
           />
         </AdminDialog>
       )}
-      <div className="competition-title">
-        <h3 ref={heading} tabIndex={-1}>
+      <div className="competition-title" tabIndex={-1}>
+        <h3 ref={heading} className="sr-only">
           Equipes e elencos
         </h3>
         <label className="competition-search">

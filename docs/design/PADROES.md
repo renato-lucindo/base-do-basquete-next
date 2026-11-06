@@ -4,6 +4,10 @@ Aplicam-se às áreas pública e administrativa da Base do Basquete Next. Leia t
 
 ## Prioridade da primeira tela
 
+Decisão de06/11/2026: escala compartilhada próxima ao zoom150% com navegador100%, pública e administrativa. Até639CSSpx conservar tamanhos atuais;640+ampliar50% textos e dimensões relacionadas. Usar unidades relativas, alturas pelo conteúdo e reflow, preservando zoom adicional e tabelas com rolagem interna. Substitui medidas compactas anteriores quando conflitarem com a legibilidade ampliada.
+
+Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar altura. Contexto, entidades e tarefas/diálogos continuam visíveis. Foco deve ir para contêineres identificáveis, sem deslocamento para títulos ocultos.
+
 - Identifique a principal tarefa e o primeiro dado útil antes de projetar. Contexto, filtros e controles devem ajudar a encontrá-lo.
 - Tema claro, azul como destaque, linguagem visual sóbria, tabelas, listas, divisores e alinhamento consistente. Consulte tokens e componentes reais; sugestões externas não substituem identidade aprovada.
 - Aproveite a largura desktop para reduzir rolagem e espaços vazios. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.

@@ -50,8 +50,8 @@
 .public-site.scoresheet-public a:focus-visible,
 .public-site.scoresheet-public summary:focus-visible,
 .public-site.scoresheet-public [tabindex]:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 3px;
+  outline: 0.125rem solid var(--blue);
+  outline-offset: 0.1875rem;
 }
 .public-site.scoresheet-public h1,
 .public-site.scoresheet-public h2,
@@ -60,26 +60,26 @@
   margin: 0;
 }
 .public-site.scoresheet-public button {
-  border-radius: 5px;
+  border-radius: 0.3125rem;
 }
 .public-site.scoresheet-public .wrap {
-  width: calc(100% - 96px);
-  max-width: 1280px;
+  width: calc(100% - 6rem);
+  max-width: 80rem;
   margin-inline: auto;
   min-width: 0;
 }
 .public-site.scoresheet-public .skip {
   position: fixed;
-  top: -100px;
-  left: 16px;
-  padding: 10px 16px;
+  top: -6.25rem;
+  left: 1rem;
+  padding: 0.625rem 1rem;
   z-index: 20;
   background: #fff;
   color: var(--blue);
   border: 1px solid var(--blue);
 }
 .public-site.scoresheet-public .skip:focus {
-  top: 8px;
+  top: 0.5rem;
 }
 .public-site.scoresheet-public .prototype {
   font-size: 0.625rem;
@@ -90,13 +90,13 @@
 .public-site.scoresheet-public .prototype .wrap {
   display: flex;
   justify-content: space-between;
-  padding-block: 5px;
+  padding-block: 0.3125rem;
 }
 .public-site.scoresheet-public .site-header {
   border-bottom: 1px solid var(--line);
 }
 .public-site.scoresheet-public .header-inner {
-  height: 68px;
+  height: 4.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -104,22 +104,22 @@
 .public-site.scoresheet-public .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   font-weight: 700;
   font-size: 1.125rem;
   letter-spacing: -0.5px;
 }
 .public-site.scoresheet-public .brand-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
   background: var(--blue);
   color: #fff;
   font-size: 1.75rem;
   display: grid;
   place-items: center;
-  line-height: 28px;
-  padding-bottom: 4px;
+  line-height: 1.75rem;
+  padding-bottom: 0.25rem;
 }
 .public-site.scoresheet-public .public-label {
   color: var(--muted);
@@ -129,16 +129,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 11px;
+  gap: 0.6875rem;
   font-size: 0.6875rem;
   color: var(--muted);
-  padding-block: 22px;
+  padding-block: 1.375rem;
 }
 .public-site.scoresheet-public .breadcrumb [aria-hidden] {
   color: #748398;
 }
 .public-site.scoresheet-public .page-heading {
-  padding-bottom: 20px;
+  padding-bottom: 1.25rem;
 }
 .public-site.scoresheet-public h1 {
   font-size: 1.75rem;
@@ -150,8 +150,8 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 9px;
+  gap: 0.5rem;
+  margin-top: 0.5625rem;
   font-size: 0.75rem;
   color: var(--muted);
 }
@@ -163,7 +163,7 @@
   color: #748398;
 }
 .public-site.scoresheet-public .game-summary {
-  padding: 20px 0 24px;
+  padding: 1.25rem 0 1.5rem;
   border-block: 1px solid var(--line);
 }
 .public-site.scoresheet-public .game-eyebrow {
@@ -172,15 +172,15 @@
   color: var(--muted);
 }
 .public-site.scoresheet-public .game-eyebrow > span {
-  margin-inline: 5px;
+  margin-inline: 0.3125rem;
 }
 .public-site.scoresheet-public .scoreboard {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 34px;
-  max-width: 760px;
-  margin: 12px auto 16px;
+  gap: 2.125rem;
+  max-width: 47.5rem;
+  margin: 0.75rem auto 1rem;
 }
 .public-site.scoresheet-public .score-team h2 {
   font-size: 1.5625rem;
@@ -196,23 +196,23 @@
 }
 .public-site.scoresheet-public .team-abbreviation {
   font-size: 0.625rem;
-  letter-spacing: 1.2px;
+  letter-spacing: 0.075rem;
   color: var(--muted);
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem;
 }
 .public-site.scoresheet-public .score-center {
   text-align: center;
-  min-width: 212px;
+  min-width: 13.25rem;
 }
 .public-site.scoresheet-public .score {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 0.9375rem;
   font-size: 3rem;
   font-weight: 700;
-  letter-spacing: -1.8px;
+  letter-spacing: -0.1125rem;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--blue);
@@ -226,29 +226,29 @@
 .public-site.scoresheet-public .game-status {
   font-size: 0.6875rem;
   color: var(--muted);
-  margin-top: 9px;
+  margin-top: 0.5625rem;
 }
 .public-site.scoresheet-public .game-status > span[aria-hidden] {
-  margin-inline: 4px;
+  margin-inline: 0.25rem;
 }
 .public-site.scoresheet-public .game-meta {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 5px 8px;
+  gap: 0.3125rem 0.5rem;
   font-size: 0.75rem;
   color: var(--muted);
 }
 .public-site.scoresheet-public .period-section {
-  padding-top: 22px;
+  padding-top: 1.375rem;
 }
 .public-site.scoresheet-public .section-heading {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 .public-site.scoresheet-public .section-heading h2,
 .public-site.scoresheet-public .teams-heading h2 {
@@ -264,7 +264,7 @@
   max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   isolation: isolate;
 }
 .public-site.scoresheet-public .period-table {
@@ -272,7 +272,7 @@
   border-spacing: 0;
   table-layout: fixed;
   width: 100%;
-  min-width: 360px;
+  min-width: 22.5rem;
   font-variant-numeric: tabular-nums;
 }
 .public-site.scoresheet-public .period-table th,
@@ -280,19 +280,19 @@
   text-align: center;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  padding: 10px 6px;
+  padding: 0.625rem 0.375rem;
 }
 .public-site.scoresheet-public .period-table thead th {
   background: var(--surface);
   font-weight: 500;
   font-size: 0.6875rem;
   color: #33415c;
-  padding-block: 8px;
+  padding-block: 0.5rem;
 }
 .public-site.scoresheet-public .period-table th:first-child {
-  width: 150px;
+  width: 9.375rem;
   text-align: left;
-  padding-left: 14px;
+  padding-left: 0.875rem;
 }
 .public-site.scoresheet-public .period-table tbody th {
   font-size: 0.75rem;
@@ -316,7 +316,7 @@
   font-size: 0.625rem;
   line-height: 1.5;
   color: var(--muted);
-  margin-top: 3px;
+  margin-top: 0.1875rem;
 }
 .public-site.scoresheet-public .period-table .period-total {
   background: var(--active);
@@ -328,7 +328,7 @@
 .public-site.scoresheet-public .period-note {
   font-size: 0.625rem;
   color: var(--muted);
-  margin-top: 6px;
+  margin-top: 0.375rem;
 }
 .public-site.scoresheet-public .period-table .overtime {
   background: #f9fbfe;
@@ -337,8 +337,8 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
-  margin: 24px 0 16px;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem;
 }
 .public-site.scoresheet-public .teams-heading > p {
   font-size: 0.6875rem;
@@ -347,7 +347,7 @@
 .public-site.scoresheet-public .teams-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 28px;
+  gap: 1.75rem;
 }
 .public-site.scoresheet-public .team-section {
   min-width: 0;
@@ -357,8 +357,8 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 0.75rem;
+  margin-bottom: 0.625rem;
 }
 .public-site.scoresheet-public .team-heading h3 {
   font-size: 1.125rem;
@@ -375,7 +375,7 @@
   max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   isolation: isolate;
   scrollbar-width: thin;
   scrollbar-color: #b0bfd1 #f4f8fd;
@@ -385,22 +385,22 @@
   border-spacing: 0;
   table-layout: fixed;
   width: 100%;
-  min-width: 500px;
+  min-width: 31.25rem;
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 .public-site.scoresheet-public .jersey-col {
-  width: 36px;
+  width: 2.25rem;
 }
 .public-site.scoresheet-public .stat-col {
-  width: 48px;
+  width: 3rem;
 }
 .public-site.scoresheet-public .roster-table th,
 .public-site.scoresheet-public .roster-table td {
-  height: 44px;
+  height: 2.75rem;
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
-  padding: 5px 9px;
+  padding: 0.3125rem 0.5625rem;
   text-align: right;
   vertical-align: middle;
   background: #fff;
@@ -409,7 +409,7 @@
   border-right: 0;
 }
 .public-site.scoresheet-public .roster-table thead th {
-  height: 36px;
+  height: 2.25rem;
   background: var(--surface);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -423,11 +423,11 @@
   text-align: center;
   font-size: 0.6875rem;
   color: var(--muted);
-  padding-inline: 4px;
+  padding-inline: 0.25rem;
 }
 .public-site.scoresheet-public .roster-table .athlete-cell {
   position: sticky;
-  left: 36px;
+  left: 2.25rem;
   z-index: 2;
   text-align: left;
   line-height: 1.4;
@@ -464,11 +464,11 @@
   color: #18528f;
   background: #edf5ff;
   border: 1px solid #c9dbf3;
-  border-radius: 3px;
-  line-height: 15px;
-  padding: 0 4px;
+  border-radius: 0.1875rem;
+  line-height: 0.9375rem;
+  padding: 0 0.25rem;
   vertical-align: 1px;
-  margin-left: 5px;
+  margin-left: 0.3125rem;
   white-space: nowrap;
 }
 .public-site.scoresheet-public .roster-table tbody tr:hover > * {
@@ -494,11 +494,11 @@
   color: #65758a;
 }
 .public-site.scoresheet-public .roster-table .foul-cell {
-  padding: 2px 5px;
+  padding: 0.125rem 0.3125rem;
 }
 .public-site.scoresheet-public .foul-button {
-  min-width: 32px;
-  min-height: 34px;
+  min-width: 2rem;
+  min-height: 2.125rem;
   border: 1px solid transparent;
   background: transparent;
   font-size: 0.75rem;
@@ -509,7 +509,7 @@
   position: relative;
   text-decoration: underline;
   text-decoration-color: #acb9ca;
-  text-underline-offset: 4px;
+  text-underline-offset: 0.25rem;
   font-variant-numeric: tabular-nums;
 }
 .public-site.scoresheet-public .foul-button:hover {
@@ -534,17 +534,17 @@
   background: #f4f8fd;
   border-bottom: 0;
   border-top: 1px solid #c9d6e7;
-  height: 52px;
+  height: 3.25rem;
 }
 .public-site.scoresheet-public .roster-table tfoot .total-label {
-  padding-left: 10px;
+  padding-left: 0.625rem;
   text-align: left;
   font-size: 0.75rem;
 }
 .public-site.scoresheet-public .roster-table .total-free {
   white-space: normal;
   font-size: 0.75rem;
-  padding-inline: 3px;
+  padding-inline: 0.1875rem;
 }
 .public-site.scoresheet-public .total-free small {
   display: block;
@@ -552,15 +552,15 @@
   font-weight: 400;
   color: #526176;
   line-height: 1.45;
-  margin-top: 2px;
+  margin-top: 0.125rem;
 }
 .public-site.scoresheet-public .staff {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 18px;
+  gap: 0.125rem 1.125rem;
   color: var(--muted);
   font-size: 0.6875rem;
-  padding-top: 10px;
+  padding-top: 0.625rem;
 }
 .public-site.scoresheet-public .staff dt {
   display: inline;
@@ -585,24 +585,24 @@
   display: none;
 }
 .public-site.scoresheet-public .legend {
-  padding-top: 24px;
+  padding-top: 1.5rem;
 }
 .public-site.scoresheet-public .legend > h2 {
   font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
 }
 .public-site.scoresheet-public .legend dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px 24px;
+  gap: 0.5625rem 1.5rem;
   margin: 0;
   font-size: 0.6875rem;
   color: var(--muted);
 }
 .public-site.scoresheet-public .legend dl > div {
   display: flex;
-  gap: 7px;
+  gap: 0.4375rem;
   align-items: baseline;
 }
 .public-site.scoresheet-public .legend dt {
@@ -618,45 +618,45 @@
   margin: 0;
 }
 .public-site.scoresheet-public .legend-notes {
-  margin-top: 15px;
-  padding-top: 12px;
+  margin-top: 0.9375rem;
+  padding-top: 0.75rem;
   border-top: 1px solid #e7edf4;
   font-size: 0.6875rem;
   color: var(--muted);
   line-height: 1.7;
   display: grid;
-  gap: 3px;
+  gap: 0.1875rem;
 }
 .public-site.scoresheet-public .legend-notes strong {
   font-weight: 600;
   color: #34445c;
 }
 .public-site.scoresheet-public .demo-controls {
-  margin-top: 22px;
+  margin-top: 1.375rem;
   border-top: 1px solid var(--line);
   font-size: 0.6875rem;
 }
 .public-site.scoresheet-public .demo-controls summary {
   cursor: pointer;
-  min-height: 44px;
-  padding: 13px 0;
+  min-height: 2.75rem;
+  padding: 0.8125rem 0;
   color: var(--muted);
 }
 .public-site.scoresheet-public .demo-inner {
-  padding: 2px 0 16px;
+  padding: 0.125rem 0 1rem;
   color: var(--muted);
 }
 .public-site.scoresheet-public .demo-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
 }
 .public-site.scoresheet-public .demo-buttons button {
   border: 1px solid #becbdc;
   background: #fff;
-  min-height: 36px;
-  padding: 7px 12px;
+  min-height: 2.25rem;
+  padding: 0.4375rem 0.75rem;
   font-size: 0.6875rem;
 }
 .public-site.scoresheet-public .demo-buttons button[aria-pressed="true"] {
@@ -665,27 +665,27 @@
   background: #f1f6fd;
 }
 .public-site.scoresheet-public .scenario-feedback:not(:empty) {
-  margin-top: 10px;
+  margin-top: 0.625rem;
 }
 .public-site.scoresheet-public .footer {
   border-top: 1px solid var(--line);
-  margin-top: 4px;
-  padding-block: 18px 24px;
+  margin-top: 0.25rem;
+  padding-block: 1.125rem 1.5rem;
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
   font-size: 0.625rem;
   color: var(--muted);
 }
 .public-site.scoresheet-public dialog {
-  width: min(410px, calc(100vw - 32px));
-  max-height: calc(100dvh - 40px);
+  width: min(25.625rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2.5rem);
   overflow-y: auto;
-  padding: 22px;
+  padding: 1.375rem;
   border: 1px solid #bdccdf;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   color: #172033;
-  box-shadow: 0 12px 48px #17203326;
+  box-shadow: 0 0.75rem 3rem #17203326;
 }
 .public-site.scoresheet-public dialog::backdrop {
   background: #172d4b45;
@@ -694,8 +694,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
 }
 .public-site.scoresheet-public .dialog-header h2 {
   font-size: 1rem;
@@ -705,8 +705,8 @@
 .public-site.scoresheet-public .close-dialog {
   background: #fff;
   border: 1px solid #bccbdd;
-  min-height: 36px;
-  padding: 5px 10px;
+  min-height: 2.25rem;
+  padding: 0.3125rem 0.625rem;
   font-size: 0.75rem;
   color: #34445c;
 }
@@ -722,16 +722,16 @@
 .public-site.scoresheet-public .dialog-team {
   font-size: 0.6875rem;
   color: var(--muted);
-  margin-top: 3px;
+  margin-top: 0.1875rem;
 }
 .public-site.scoresheet-public .foul-summary {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   border-block: 1px solid var(--line);
-  padding: 12px 0;
-  margin-top: 16px;
-  gap: 16px;
+  padding: 0.75rem 0;
+  margin-top: 1rem;
+  gap: 1rem;
 }
 .public-site.scoresheet-public .foul-summary strong {
   font-size: 1.5625rem;
@@ -745,13 +745,13 @@
 }
 .public-site.scoresheet-public .foul-breakdown {
   margin: 0;
-  padding: 8px 0;
+  padding: 0.5rem 0;
 }
 .public-site.scoresheet-public .foul-breakdown > div {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  padding: 6px 0;
+  gap: 1.25rem;
+  padding: 0.375rem 0;
   font-size: 0.75rem;
 }
 .public-site.scoresheet-public .foul-breakdown dt {
@@ -763,9 +763,9 @@
   font-variant-numeric: tabular-nums;
 }
 .public-site.scoresheet-public .discipline-status {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border-radius: 4px;
+  margin-top: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.25rem;
   background: #f4f8fd;
   font-size: 0.6875rem;
   color: #34445c;
@@ -778,7 +778,7 @@
 .public-site.scoresheet-public .missing-note {
   font-size: 0.75rem;
   color: var(--muted);
-  padding: 16px 0 6px;
+  padding: 1rem 0 0.375rem;
 }
 .public-site.scoresheet-public .sr-only {
   position: absolute;
@@ -808,10 +808,10 @@
 @media (max-width: 1199px) {
   .public-site.scoresheet-public .teams-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+    gap: 1.75rem;
   }
   .public-site.scoresheet-public .wrap {
-    width: calc(100% - 64px);
+    width: calc(100% - 4rem);
   }
   .public-site.scoresheet-public .legend dl {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -819,18 +819,18 @@
 }
 @media (max-width: 600px) {
   .public-site.scoresheet-public .wrap {
-    width: calc(100% - 32px);
+    width: calc(100% - 2rem);
   }
   .public-site.scoresheet-public .header-inner {
-    height: 60px;
+    height: 3.75rem;
   }
   .public-site.scoresheet-public .brand {
     font-size: 1rem;
-    gap: 8px;
+    gap: 0.5rem;
   }
   .public-site.scoresheet-public .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 1.875rem;
+    height: 1.875rem;
     font-size: 1.625rem;
   }
   .public-site.scoresheet-public .public-label {
@@ -838,29 +838,29 @@
   }
   .public-site.scoresheet-public .breadcrumb {
     font-size: 0.625rem;
-    gap: 8px;
-    padding-block: 19px;
+    gap: 0.5rem;
+    padding-block: 1.1875rem;
   }
   .public-site.scoresheet-public .page-heading {
-    padding-bottom: 18px;
+    padding-bottom: 1.125rem;
   }
   .public-site.scoresheet-public h1 {
     font-size: 1.5625rem;
   }
   .public-site.scoresheet-public .competition {
     font-size: 0.6875rem;
-    gap: 5px 7px;
-    margin-top: 8px;
+    gap: 0.3125rem 0.4375rem;
+    margin-top: 0.5rem;
   }
   .public-site.scoresheet-public .game-summary {
-    padding: 17px 0 18px;
+    padding: 1.0625rem 0 1.125rem;
   }
   .public-site.scoresheet-public .game-eyebrow {
     font-size: 0.625rem;
   }
   .public-site.scoresheet-public .scoreboard {
-    gap: 10px;
-    margin: 15px auto 15px;
+    gap: 0.625rem;
+    margin: 0.9375rem auto 0.9375rem;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   }
   .public-site.scoresheet-public .score-team h2 {
@@ -870,14 +870,14 @@
   }
   .public-site.scoresheet-public .team-abbreviation {
     font-size: 0.5625rem;
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
   .public-site.scoresheet-public .score-center {
-    min-width: 122px;
+    min-width: 7.625rem;
   }
   .public-site.scoresheet-public .score {
     font-size: 2.25rem;
-    gap: 8px;
+    gap: 0.5rem;
     letter-spacing: -1px;
   }
   .public-site.scoresheet-public .score-divider {
@@ -885,11 +885,11 @@
   }
   .public-site.scoresheet-public .game-status {
     font-size: 0.625rem;
-    margin-top: 7px;
+    margin-top: 0.4375rem;
   }
   .public-site.scoresheet-public .game-meta {
     font-size: 0.6875rem;
-    gap: 3px 6px;
+    gap: 0.1875rem 0.375rem;
   }
   .public-site.scoresheet-public .game-meta > span:last-child {
     flex-basis: 100%;
@@ -899,25 +899,25 @@
     display: none;
   }
   .public-site.scoresheet-public .section-heading {
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
   .public-site.scoresheet-public .section-heading > span {
     font-size: 0.625rem;
   }
   .public-site.scoresheet-public .period-section {
-    padding-top: 19px;
+    padding-top: 1.1875rem;
   }
   .public-site.scoresheet-public .period-table {
-    min-width: 354px;
+    min-width: 22.125rem;
   }
   .public-site.scoresheet-public .period-table th:first-child {
-    width: 91px;
-    padding-left: 10px;
+    width: 5.6875rem;
+    padding-left: 0.625rem;
   }
   .public-site.scoresheet-public .period-table th,
   .public-site.scoresheet-public .period-table td {
-    padding: 9px 3px;
+    padding: 0.5625rem 0.1875rem;
   }
   .public-site.scoresheet-public .period-table thead th {
     font-size: 0.625rem;
@@ -936,17 +936,17 @@
   }
   .public-site.scoresheet-public .teams-heading {
     display: block;
-    margin: 23px 0 14px;
+    margin: 1.4375rem 0 0.875rem;
   }
   .public-site.scoresheet-public .teams-heading > p {
     font-size: 0.625rem;
-    margin-top: 4px;
+    margin-top: 0.25rem;
   }
   .public-site.scoresheet-public .team-heading h3 {
     font-size: 1.0625rem;
   }
   .public-site.scoresheet-public .team-heading {
-    margin-bottom: 6px;
+    margin-bottom: 0.375rem;
   }
   .public-site.scoresheet-public .team-heading > p {
     font-size: 0.625rem;
@@ -954,10 +954,10 @@
   .public-site.scoresheet-public .scroll-hint {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 0.75rem;
     font-size: 0.625rem;
     color: var(--muted);
-    padding: 0 0 8px;
+    padding: 0 0 0.5rem;
   }
   .public-site.scoresheet-public .scroll-hint span:last-child {
     white-space: nowrap;
@@ -965,42 +965,42 @@
   }
   .public-site.scoresheet-public .roster-table .athlete-cell {
     font-size: 0.75rem;
-    padding-inline: 8px;
+    padding-inline: 0.5rem;
   }
   .public-site.scoresheet-public .roster-table th,
   .public-site.scoresheet-public .roster-table td {
-    min-height: 46px;
-    height: 46px;
+    min-height: 2.875rem;
+    height: 2.875rem;
   }
   .public-site.scoresheet-public .roster-table .foul-button {
-    min-height: 36px;
-    min-width: 34px;
+    min-height: 2.25rem;
+    min-width: 2.125rem;
   }
   .public-site.scoresheet-public .roster-table tfoot > * {
-    height: 56px;
+    height: 3.5rem;
   }
   .public-site.scoresheet-public .staff {
     font-size: 0.625rem;
     display: grid;
-    gap: 3px;
+    gap: 0.1875rem;
   }
   .public-site.scoresheet-public .legend {
-    padding-top: 23px;
+    padding-top: 1.4375rem;
   }
   .public-site.scoresheet-public .legend dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px 15px;
+    gap: 0.75rem 0.9375rem;
     font-size: 0.625rem;
   }
   .public-site.scoresheet-public .legend-notes {
     font-size: 0.625rem;
-    gap: 6px;
+    gap: 0.375rem;
   }
   .public-site.scoresheet-public .footer {
     font-size: 0.5625rem;
   }
   .public-site.scoresheet-public dialog {
-    padding: 20px;
+    padding: 1.25rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1023,7 +1023,7 @@
   }
   .public-site.scoresheet-public .team-section {
     break-inside: avoid;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
   }
   .public-site.scoresheet-public .table-scroll,
   .public-site.scoresheet-public .period-scroll {
@@ -1033,10 +1033,10 @@
     min-width: 0;
   }
   .public-site.scoresheet-public .site-header {
-    margin-bottom: 12px;
+    margin-bottom: 0.75rem;
   }
   .public-site.scoresheet-public .footer {
-    margin-top: 20px;
+    margin-top: 1.25rem;
   }
   .public-site.scoresheet-public button {
     border: 0 !important;
@@ -1048,25 +1048,25 @@
 .public-site.scoresheet-public .teams-heading {
   align-items: center;
   flex-wrap: wrap;
-  row-gap: 12px;
-  margin-top: 22px;
+  row-gap: 0.75rem;
+  margin-top: 1.375rem;
 }
 .public-site.scoresheet-public .period-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 0.1875rem;
   background: #eef1f5;
-  border-radius: 6px;
-  padding: 3px;
+  border-radius: 0.375rem;
+  padding: 0.1875rem;
   max-width: 100%;
   width: max-content;
 }
 .public-site.scoresheet-public .period-filter button {
   font-size: 0.6875rem;
-  line-height: 20px;
+  line-height: 1.25rem;
   font-weight: 500;
-  padding: 5px 10px;
-  min-height: 32px;
+  padding: 0.3125rem 0.625rem;
+  min-height: 2rem;
   white-space: nowrap;
   border: 0;
   background: transparent;
@@ -1075,7 +1075,7 @@
 .public-site.scoresheet-public .period-filter button[aria-pressed="true"] {
   background: #fff;
   color: var(--blue);
-  box-shadow: 0 1px 3px #0d74fc1f;
+  box-shadow: 0 1px 0.1875rem #0d74fc1f;
 }
 .public-site.scoresheet-public .period-filter button:hover {
   color: var(--blue);
@@ -1085,9 +1085,9 @@
 }
 .public-site.scoresheet-public .period-link {
   font: inherit;
-  min-height: 34px;
+  min-height: 2.125rem;
   width: 100%;
-  padding: 8px 3px;
+  padding: 0.5rem 0.1875rem;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1110,15 +1110,15 @@
   .public-site.scoresheet-public .teams-heading {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 0.75rem;
   }
   .public-site.scoresheet-public .period-filter {
     width: max-content;
   }
   .public-site.scoresheet-public .period-filter button {
     font-size: 0.6875rem;
-    padding: 6px 8px;
-    min-height: 34px;
+    padding: 0.375rem 0.5rem;
+    min-height: 2.125rem;
   }
 }
 /* Revisão 3: destaque tipográfico e códigos da súmula */
@@ -1127,7 +1127,7 @@
 }
 .public-site.scoresheet-public .roster-table .foul-button {
   width: 100%;
-  min-height: 43px;
+  min-height: 2.6875rem;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1147,14 +1147,14 @@
   background: transparent;
   border: 0;
   border-radius: 0;
-  padding: 10px 0;
+  padding: 0.625rem 0;
 }
 .public-site.scoresheet-public .foul-codes {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 1rem;
   list-style: none;
-  padding: 16px 0 8px;
+  padding: 1rem 0 0.5rem;
   margin: 0;
   font-size: 1.1875rem;
   font-weight: 650;
@@ -1170,7 +1170,7 @@
 }
 @media (max-width: 600px) {
   .public-site.scoresheet-public .roster-table .foul-button {
-    min-height: 45px;
+    min-height: 2.8125rem;
   }
 }
 /* Revisão 4: CAP à direita e registros completos da súmula */
@@ -1187,7 +1187,7 @@
 .public-site.scoresheet-public .athlete-line {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 0.5rem;
   width: 100%;
   min-width: 0;
 }
@@ -1202,31 +1202,31 @@
 }
 .public-site.scoresheet-public .foul-halves {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-  margin: 16px 0 4px;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 0.625rem;
+  margin: 1rem 0 0.25rem;
 }
 .public-site.scoresheet-public .foul-half {
-  border: 1.5px solid #8290a4;
-  border-radius: 3px;
-  padding: 10px;
+  border: 0.09375rem solid #8290a4;
+  border-radius: 0.1875rem;
+  padding: 0.625rem;
   min-width: 0;
 }
 .public-site.scoresheet-public .foul-half h3 {
   font-size: 0.625rem;
   font-weight: 500;
   color: var(--muted);
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
 }
 .public-site.scoresheet-public .foul-half .foul-codes {
   padding: 0;
-  gap: 10px;
+  gap: 0.625rem;
   font-size: 1.25rem;
   line-height: 1.5;
 }
 .public-site.scoresheet-public .foul-codes abbr {
   display: inline-block;
-  min-width: 28px;
+  min-width: 1.75rem;
   white-space: nowrap;
 }
 .public-site.scoresheet-public .foul-codes sub {
@@ -1246,18 +1246,18 @@
 
 /* Revisão 5: jogadores como informação principal */
 .public-site.scoresheet-public .header-inner {
-  height: 48px;
+  height: 3rem;
 }
 .public-site.scoresheet-public .breadcrumb {
-  padding-block: 10px;
+  padding-block: 0.625rem;
 }
 .public-site.scoresheet-public .game-context {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 18px;
-  padding: 2px 0 8px;
-  max-width: 760px;
+  gap: 0.25rem 1.125rem;
+  padding: 0.125rem 0 0.5rem;
+  max-width: 47.5rem;
   font-size: 0.6875rem;
   color: var(--muted);
 }
@@ -1271,60 +1271,60 @@
 }
 .public-site.scoresheet-public .period-section {
   padding-top: 0;
-  max-width: 760px;
+  max-width: 47.5rem;
 }
 .public-site.scoresheet-public .period-table thead th {
   padding-block: 0;
 }
 .public-site.scoresheet-public .period-link {
-  min-height: 28px;
-  padding-block: 4px;
+  min-height: 1.75rem;
+  padding-block: 0.25rem;
 }
 .public-site.scoresheet-public .period-table th,
 .public-site.scoresheet-public .period-table td {
-  padding-block: 7px;
+  padding-block: 0.4375rem;
 }
 .public-site.scoresheet-public .period-points {
   display: inline;
   font-size: 0.875rem;
-  line-height: 18px;
+  line-height: 1.125rem;
 }
 .public-site.scoresheet-public .period-fouls {
   display: inline-flex;
   align-items: center;
   font-size: 0.5625rem;
-  line-height: 13px;
+  line-height: 0.8125rem;
   border: 1px solid #ccd8e7;
-  border-radius: 2px;
-  padding: 0 2px;
-  margin: 0 0 0 5px;
+  border-radius: 0.125rem;
+  padding: 0 0.125rem;
+  margin: 0 0 0 0.3125rem;
   background: #f6f8fb;
   color: #526176;
 }
 .public-site.scoresheet-public .teams-heading {
-  margin: 10px 0 10px;
+  margin: 0.625rem 0 0.625rem;
   justify-content: flex-end;
 }
 .public-site.scoresheet-public .team-heading {
-  margin-bottom: 6px;
+  margin-bottom: 0.375rem;
 }
 .public-site.scoresheet-public .team-heading h3 {
   font-size: 1rem;
 }
 .public-site.scoresheet-public .period-filter button {
-  min-height: 30px;
-  padding-block: 4px;
+  min-height: 1.875rem;
+  padding-block: 0.25rem;
 }
 @media (max-width: 600px) {
   .public-site.scoresheet-public .header-inner {
-    height: 44px;
+    height: 2.75rem;
   }
   .public-site.scoresheet-public .breadcrumb {
-    padding-block: 8px;
+    padding-block: 0.5rem;
   }
   .public-site.scoresheet-public .game-context {
-    gap: 3px 10px;
-    padding-bottom: 8px;
+    gap: 0.1875rem 0.625rem;
+    padding-bottom: 0.5rem;
     font-size: 0.625rem;
   }
   .public-site.scoresheet-public .game-context p {
@@ -1332,24 +1332,24 @@
   }
   .public-site.scoresheet-public .period-table th,
   .public-site.scoresheet-public .period-table td {
-    padding-block: 6px;
+    padding-block: 0.375rem;
   }
   .public-site.scoresheet-public .period-points {
     font-size: 0.8125rem;
   }
   .public-site.scoresheet-public .period-fouls {
-    margin-left: 3px;
+    margin-left: 0.1875rem;
     font-size: 0.5rem;
-    line-height: 12px;
+    line-height: 0.75rem;
     padding-inline: 1px;
   }
   .public-site.scoresheet-public .teams-heading {
-    margin: 9px 0;
+    margin: 0.5625rem 0;
     justify-content: flex-start;
   }
   .public-site.scoresheet-public .period-filter button {
-    min-height: 30px;
-    padding-block: 4px;
+    min-height: 1.875rem;
+    padding-block: 0.25rem;
   }
   .public-site.scoresheet-public .team-heading h3 {
     font-size: 1rem;
@@ -1363,8 +1363,8 @@
 }
 .public-site.scoresheet-public .period-heading {
   display: block;
-  min-height: 28px;
-  padding: 4px 3px;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.1875rem;
 }
 .public-site.scoresheet-public .discipline-label {
   color: #b42318;
@@ -1375,13 +1375,13 @@
   cursor: help;
 }
 .public-site.scoresheet-public .footer {
-  margin-top: 24px;
+  margin-top: 1.5rem;
 }
 
 .public-site.scoresheet-public .header-inner {
   height: auto;
-  min-height: 48px;
-  gap: 12px;
+  min-height: 3rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 .public-site.scoresheet-public .brand {
@@ -1397,7 +1397,7 @@
 }
 @media (max-width: 600px) {
   .public-site.scoresheet-public .header-inner {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
 }
 

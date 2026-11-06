@@ -1,34 +1,34 @@
 .player-page.bb-ui {
   font-size: 0.875rem;
-  max-width: 1328px;
-  padding: 24px 28px 40px;
+  max-width: 83rem;
+  padding: 1.5rem 1.75rem 2.5rem;
   min-height: 70vh;
   background: #fff;
 }
 .player-overview {
   display: grid;
-  gap: 20px 36px;
-  padding-bottom: 22px;
+  gap: 1.25rem 2.25rem;
+  padding-bottom: 1.375rem;
 }
 .player-page.bb-ui h1 {
   font-size: 1.75rem;
-  margin: 0 0 6px;
+  margin: 0 0 0.375rem;
   overflow-wrap: anywhere;
 }
 .player-nickname {
   color: var(--bb-muted);
-  margin-bottom: 12px !important;
+  margin-bottom: 0.75rem !important;
 }
 .player-metadata {
-  margin: 10px 0 0;
+  margin: 0.625rem 0 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 20px;
-  max-width: 760px;
+  gap: 0.375rem 1.25rem;
+  max-width: 47.5rem;
 }
 .player-metadata div {
   display: flex;
-  gap: 5px;
+  gap: 0.3125rem;
 }
 .player-metadata dt {
   font-weight: 600;
@@ -37,9 +37,9 @@
   margin: 0;
 }
 .player-biography {
-  margin-top: 12px !important;
+  margin-top: 0.75rem !important;
   white-space: pre-wrap;
-  max-width: 760px;
+  max-width: 47.5rem;
 }
 .player-page h2 {
   font-size: 1.0625rem;
@@ -48,14 +48,14 @@
   color: var(--bb-muted);
   font-size: 0.8125rem;
   font-weight: 400;
-  margin-left: 10px;
+  margin-left: 0.625rem;
 }
 .player-honors h2 {
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 .player-honors h3 {
   font-size: 0.8125rem;
-  margin: 12px 0 6px;
+  margin: 0.75rem 0 0.375rem;
 }
 .player-honors ul {
   padding: 0;
@@ -63,7 +63,7 @@
   list-style: none;
 }
 .player-honors li {
-  padding: 6px 0;
+  padding: 0.375rem 0;
 }
 .player-honors small {
   display: block;
@@ -76,12 +76,12 @@
 }
 .player-summary {
   border-top: 1px solid var(--bb-line);
-  padding: 16px 0;
+  padding: 1rem 0;
 }
 .player-scroll {
   overflow-x: auto;
   max-width: 100%;
-  margin-top: 10px;
+  margin-top: 0.625rem;
   border-block: 1px solid var(--bb-line);
 }
 .player-scroll table {
@@ -92,7 +92,7 @@
 }
 .player-scroll th,
 .player-scroll td {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   text-align: left;
   border-bottom: 1px solid var(--bb-line);
   white-space: nowrap;
@@ -108,7 +108,7 @@
 }
 .player-scroll abbr {
   text-decoration: underline dotted;
-  text-underline-offset: 3px;
+  text-underline-offset: 0.1875rem;
 }
 .player-sr-only {
   position: absolute;
@@ -120,38 +120,38 @@
 }
 .player-navigation {
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
   overflow-x: auto;
   border-block: 1px solid var(--bb-line);
-  margin: 6px 0 22px;
+  margin: 0.375rem 0 1.375rem;
 }
 .player-navigation a {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 2.75rem;
   white-space: nowrap;
   font-size: 0.8125rem;
   text-decoration: none;
 }
 .player-page :is(h2, summary)[id] {
-  scroll-margin-top: 16px;
+  scroll-margin-top: 1rem;
 }
 .player-section-title {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 .player-section-title a {
-  min-height: 36px;
+  min-height: 2.25rem;
   display: inline-flex;
   align-items: center;
   font-size: 0.8125rem;
 }
 .player-recent {
-  margin-bottom: 28px;
+  margin-bottom: 1.75rem;
 }
 .player-page .bb-table {
   font-size: 0.875rem;
@@ -166,8 +166,8 @@
   font-weight: 400;
 }
 .player-page .bb-table .bb-primary-cell {
-  min-width: 190px;
-  max-width: 340px;
+  min-width: 11.875rem;
+  max-width: 21.25rem;
 }
 .player-page .bb-table a {
   text-decoration: none;
@@ -177,8 +177,8 @@
 }
 .player-team-cell {
   display: block;
-  min-width: 120px;
-  max-width: 210px;
+  min-width: 7.5rem;
+  max-width: 13.125rem;
   white-space: normal;
   overflow-wrap: anywhere;
 }
@@ -189,32 +189,32 @@
   display: flex;
   align-items: end;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 14px 0;
+  gap: 0.625rem;
+  margin: 0.875rem 0;
 }
 .player-filters > label {
   display: grid;
-  gap: 4px;
+  gap: 0.25rem;
   color: var(--bb-muted);
   font-size: 0.8125rem;
-  max-width: 230px;
+  max-width: 14.375rem;
 }
 .player-page .player-filters select {
   width: auto;
   max-width: 100%;
-  min-height: 40px;
+  min-height: 2.5rem;
 }
 .player-options {
   position: relative;
 }
 .player-options > summary {
-  min-height: 40px;
-  padding: 8px 10px;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.625rem;
   border: 1px solid #9cabbc;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
 }
 .player-options summary span {
-  margin-left: 6px;
+  margin-left: 0.375rem;
   font-size: 0.75rem;
   color: var(--bb-muted);
 }
@@ -224,14 +224,14 @@
   z-index: 8;
   top: 100%;
   left: 0;
-  width: min(280px, 75vw);
-  max-height: 300px;
+  width: min(17.5rem, 75vw);
+  max-height: 18.75rem;
   overflow: auto;
-  padding: 10px;
-  margin: 2px 0 0;
+  padding: 0.625rem;
+  margin: 0.125rem 0 0;
   border: 1px solid #9cabbc;
   background: #fff;
-  box-shadow: 0 6px 20px #17203320;
+  box-shadow: 0 0.375rem 1.25rem #17203320;
 }
 .player-options:last-child fieldset {
   left: auto;
@@ -240,65 +240,65 @@
 .player-options fieldset label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 6px 2px;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.375rem 0.125rem;
 }
 .player-option-actions {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   border-bottom: 1px solid var(--bb-line);
 }
 .player-page .player-option-actions button {
-  min-height: 40px;
-  padding: 6px 10px;
+  min-height: 2.5rem;
+  padding: 0.375rem 0.625rem;
   color: var(--bb-blue);
 }
 .player-note {
   font-size: 0.8125rem;
   color: var(--bb-muted);
-  margin: 10px 0 !important;
-  max-width: 900px;
+  margin: 0.625rem 0 !important;
+  max-width: 56.25rem;
 }
 .player-extras {
-  margin-top: 24px;
+  margin-top: 1.5rem;
   border-top: 1px solid var(--bb-line);
 }
 .player-extras > details {
   border-bottom: 1px solid var(--bb-line);
 }
 .player-extras > details > summary {
-  min-height: 44px;
-  padding: 12px 0;
+  min-height: 2.75rem;
+  padding: 0.75rem 0;
   color: var(--bb-blue);
 }
 .player-extra-content {
-  padding: 4px 0 20px;
+  padding: 0.25rem 0 1.25rem;
 }
 .player-pager {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
   font-size: 0.8125rem;
 }
 .player-page .player-pager button {
   border: 1px solid var(--bb-line);
-  padding: 8px 14px;
-  min-height: 40px;
+  padding: 0.5rem 0.875rem;
+  min-height: 2.5rem;
 }
 .player-history {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 900px;
+  max-width: 56.25rem;
 }
 .player-history li {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 20px;
-  padding: 12px 0;
+  gap: 0.375rem 1.25rem;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--bb-line);
 }
 .player-history li span {
@@ -306,34 +306,34 @@
 }
 @media (min-width: 960px) {
   .player-with-honors {
-    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(16.25rem, 1fr);
   }
   .player-with-honors .player-honors {
     border-left: 1px solid var(--bb-line);
-    padding-left: 24px;
+    padding-left: 1.5rem;
   }
 }
 @media (max-width: 600px) {
   .player-page.bb-ui {
-    padding: 20px 16px 32px;
+    padding: 1.25rem 1rem 2rem;
   }
   .player-page.bb-ui h1 {
     font-size: 1.5rem;
   }
   .player-overview {
-    gap: 20px;
+    gap: 1.25rem;
   }
   .player-metadata {
     display: grid;
-    gap: 6px;
+    gap: 0.375rem;
   }
   .player-page h2 small {
     display: block;
-    margin: 4px 0 0;
+    margin: 0.25rem 0 0;
   }
   .player-scroll th,
   .player-scroll td {
-    padding: 8px 10px;
+    padding: 0.5rem 0.625rem;
   }
   .player-filters {
     display: grid;
@@ -346,7 +346,7 @@
     width: 100%;
   }
   .player-options > summary {
-    min-height: 44px;
+    min-height: 2.75rem;
   }
   .player-mobile-id {
     display: inline;
@@ -356,8 +356,8 @@
     display: none;
   }
   .player-page .bb-table .bb-primary-cell {
-    min-width: 155px;
-    max-width: 190px;
+    min-width: 9.6875rem;
+    max-width: 11.875rem;
   }
 }
 
@@ -369,26 +369,26 @@
   color: var(--bb-blue);
 }
 .player-glossary {
-  margin-top: 12px;
+  margin-top: 0.75rem;
   color: var(--bb-muted);
   font-size: 0.8125rem;
-  max-width: 760px;
+  max-width: 47.5rem;
 }
 .player-glossary > summary {
-  min-height: 36px;
-  padding-block: 6px;
+  min-height: 2.25rem;
+  padding-block: 0.375rem;
   color: var(--bb-blue);
 }
 .player-glossary dl {
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
 .player-glossary dl > div {
   display: flex;
-  gap: 8px;
-  margin: 5px 0;
+  gap: 0.5rem;
+  margin: 0.3125rem 0;
 }
 .player-glossary dt {
-  min-width: 32px;
+  min-width: 2rem;
   font-weight: 600;
 }
 .player-glossary dd {
@@ -397,7 +397,7 @@
 .player-page .access-error button {
   background: var(--bb-blue);
   color: white;
-  margin-top: 12px;
+  margin-top: 0.75rem;
 }
 
 .player-recent-date {
@@ -411,11 +411,11 @@
     display: inline;
   }
   .player-recent .bb-table .bb-primary-cell {
-    min-width: 140px;
-    max-width: 170px;
+    min-width: 8.75rem;
+    max-width: 10.625rem;
   }
   .player-recent .bb-table th,
   .player-recent .bb-table td {
-    padding-inline: 8px;
+    padding-inline: 0.5rem;
   }
 }

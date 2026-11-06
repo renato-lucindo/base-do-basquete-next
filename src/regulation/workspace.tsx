@@ -182,7 +182,7 @@ export function RegulationWorkspace({
         if (c.signal.aborted) return;
         setRegistrations(rows);
         accept(v);
-        heading.current?.focus();
+        heading.current?.parentElement?.focus();
       } catch (e) {
         if (!c.signal.aborted) failure(e);
       } finally {
@@ -402,7 +402,7 @@ export function RegulationWorkspace({
         onSaved={onSaved}
         onClose={() => {
           setShowAchievements(false);
-          requestAnimationFrame(() => heading.current?.focus());
+          requestAnimationFrame(() => heading.current?.parentElement?.focus());
         }}
       />
     );
@@ -413,8 +413,8 @@ export function RegulationWorkspace({
           enabled && !busy && !uncertain && !readPending && !dirty ? status : ""
         }
       />
-      <div className="competition-title">
-        <h3 ref={heading} tabIndex={-1}>
+      <div className="competition-title" tabIndex={-1}>
+        <h3 ref={heading} className="sr-only">
           Regulamento da disputa
         </h3>
         <button

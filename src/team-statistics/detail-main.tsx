@@ -1,3 +1,4 @@
+import "../ui-system/readability.css";
 import { createRoot } from "react-dom/client";
 import { TeamsPublicPage } from "./public-page";
 import "../access/screen.css";

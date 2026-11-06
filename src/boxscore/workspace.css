@@ -9,17 +9,17 @@
   overflow-wrap: anywhere;
 }
 .pdf-workspace fieldset {
-  margin-block: 18px;
-  padding: 14px;
+  margin-block: 1.125rem;
+  padding: 0.875rem;
   border: 1px solid #a5b2c8;
 }
 .pdf-workspace label {
-  margin-block: 10px;
+  margin-block: 0.625rem;
 }
 .pdf-workspace textarea {
   width: 100%;
-  padding: 12px;
-  min-height: 90px;
+  padding: 0.75rem;
+  min-height: 5.625rem;
   font: inherit;
   border: 1px solid #74839b;
 }
@@ -27,28 +27,28 @@
   max-width: 100%;
 }
 .pdf-workspace summary {
-  min-height: 44px;
+  min-height: 2.75rem;
   cursor: pointer;
-  padding: 12px 0;
+  padding: 0.75rem 0;
 }
 .pdf-jobs {
   padding-inline: 0;
   list-style: none;
 }
 .pdf-jobs li {
-  padding: 12px;
-  border-left: 3px solid #53677f;
-  margin-block: 12px;
+  padding: 0.75rem;
+  border-left: 0.1875rem solid #53677f;
+  margin-block: 0.75rem;
 }
 .pdf-rows {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 0.75rem;
   padding: 0;
   list-style: none;
 }
 .pdf-rows li {
-  padding: 14px;
+  padding: 0.875rem;
   border: 1px solid #c1cddd;
   min-width: 0;
 }
@@ -57,7 +57,7 @@
 }
 .pdf-workspace .pdf-reference {
   background: #f5f7fa;
-  padding: 14px;
+  padding: 0.875rem;
 }
 .pdf-workspace [hidden] {
   display: none;
@@ -65,8 +65,8 @@
 .pdf-publication {
   background: #f5f7fb;
   border: 1px solid #b8c6db;
-  padding: 14px;
-  margin-block: 20px;
+  padding: 0.875rem;
+  margin-block: 1.25rem;
   min-width: 0;
 }
 .pdf-publication fieldset {

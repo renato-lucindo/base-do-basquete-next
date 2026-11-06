@@ -46,7 +46,6 @@ function SearchEntity({ hit }: { hit: SearchHit }) {
       <details className="public-search-entity" open>
         <summary>
           <strong>{hit.name}</strong>
-          {hit.abbreviation && <span> · {hit.abbreviation}</span>}
           <small>{hit.participations.length} participações públicas</small>
         </summary>
         <ul>
