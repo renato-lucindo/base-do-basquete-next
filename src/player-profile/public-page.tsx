@@ -747,9 +747,7 @@ export function PlayerPublicPage() {
               <header className="player-identity">
                 <h1>{displayName}</h1>
                 {displayName !== ready.page.identity.name && (
-                  <p className="player-full-name">
-                    {ready.page.identity.name}
-                  </p>
+                  <p className="player-full-name">{ready.page.identity.name}</p>
                 )}
                 <Metadata career={ready} />
               </header>
