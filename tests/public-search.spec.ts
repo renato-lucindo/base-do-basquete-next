@@ -96,6 +96,22 @@ test("autocomplete exige2 caracteres, agrupa5/tipo e permite navegar por teclado
     fullPage: false,
   });
 });
+test("busca global mantém nome completo em destaque e apelido como complemento", async ({
+  page,
+}) => {
+  const f = await setup(page);
+  const player = f.hits.find(
+    (hit) => hit.kind === "players" && hit.name === "Álvares",
+  );
+  if (!player || player.kind !== "players") throw Error("Atleta de teste ausente.");
+  player.nickname = "Alvinho";
+  await page.goto(base + "/publico.html#?q=alvares&type=players");
+  const results = page.getByRole("region", { name: "Resultados da busca" });
+  const first = results.locator(".public-search-entity-list > li").first();
+  await expect(first.locator("strong")).toHaveText("Álvares");
+  await expect(first.locator("small")).toHaveText("Alvinho");
+});
+
 test("debounce/cancelamento descarta resposta atrasada e retry mantém foco e termo", async ({
   page,
 }) => {
