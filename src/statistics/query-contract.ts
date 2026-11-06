@@ -73,7 +73,10 @@ export const normalizeStatisticsSearch = (v: string) =>
     .trim();
 
 /** Adapted from the portable parser; public identities are UUIDs in this implementation. */
-export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
+export function parseStatisticsQuery(
+  params: URLSearchParams,
+  defaultPreset: "essentials" | "all" = "essentials",
+): StatisticsQuery {
   const mode = parseBoxscoreStatisticsMode(params.get("mode")),
     requestedSort = params.get("sort") ?? "points",
     sort =
@@ -89,7 +92,7 @@ export function parseStatisticsQuery(params: URLSearchParams): StatisticsQuery {
           ? "all"
           : params.get("preset") === "custom"
             ? "custom"
-            : "essentials",
+            : defaultPreset,
     columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
     page = Number(params.get("page"));
   return {
