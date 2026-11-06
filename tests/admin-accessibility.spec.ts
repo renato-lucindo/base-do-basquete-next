@@ -112,7 +112,7 @@ test("axe importador em 320px com texto ampliado e rolagem por teclado", async (
   );
   await page.addStyleTag({
     content:
-      "html { font-size: 200% !important; letter-spacing: .12em; word-spacing: .16em; }",
+      "html { font-size: 200% !important; letter-spacing: .2em; word-spacing: .3em; }",
   });
   await page.screenshot({
     path: `.preview-artifacts/a11y-admin-text200-before-${info.project.name}.png`,

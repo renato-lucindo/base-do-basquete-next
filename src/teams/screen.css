@@ -34,6 +34,12 @@
   padding-bottom: 0.75rem;
   margin: 1.5rem 0;
 }
+.competition-tabs > :is(a, button) {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .competition-tabs button[aria-current="page"] {
   background: #075fca;
   color: #fff;
