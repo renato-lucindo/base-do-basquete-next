@@ -138,8 +138,8 @@ export function PublicSearchForm() {
       </label>
       <svg
         aria-hidden="true"
-        width="18"
-        height="18"
+        width="1.125rem"
+        height="1.125rem"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

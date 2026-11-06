@@ -722,7 +722,6 @@ export function TeamsWorkspace({
                 >
                   {r.name}
                 </button>
-                <p className="registration-origin">Equipe: {r.team.name}</p>
                 <div className="competition-actions registration-actions">
                   <button
                     id={`remove-registration-${r.id}`}
@@ -798,9 +797,6 @@ export function TeamsWorkspace({
           {selectedRegistration ? (
             [selectedRegistration].map((r) => (
               <div key={r.id}>
-                {r.name !== r.team.name && (
-                  <p className="registration-origin">Equipe: {r.team.name}</p>
-                )}
                 <div className="competition-actions registration-actions">
                   {expanded === r.id && (
                     <>

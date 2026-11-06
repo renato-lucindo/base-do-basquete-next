@@ -82,6 +82,7 @@ export function SimpleStatisticsPageView() {
             "A resposta não corresponde à consulta. Tente novamente.",
           );
         setData(next);
+        setLoading(false);
         window.history.replaceState(
           null,
           "",

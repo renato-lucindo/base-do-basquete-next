@@ -196,6 +196,7 @@ test("súmula pagina e filtra equipes sem perder o estado da URL", async ({
     page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
   ).toBeVisible();
 });
+
 test("falha simples permite nova consulta sem oferecer tabela de zeros", async ({
   page,
 }) => {

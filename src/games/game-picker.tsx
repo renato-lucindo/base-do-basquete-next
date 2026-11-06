@@ -260,8 +260,8 @@ export function GamePicker(props: Props) {
             <svg
               aria-hidden="true"
               viewBox="0 0 16 16"
-              width="14"
-              height="14"
+              width=".875rem"
+              height=".875rem"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"

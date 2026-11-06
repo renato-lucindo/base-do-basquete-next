@@ -110,7 +110,10 @@ test("axe importador em 320px com texto ampliado e rolagem por teclado", async (
   const headingBefore = await heading.evaluate((el) =>
     Number.parseFloat(getComputedStyle(el).fontSize),
   );
-  await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+  await page.addStyleTag({
+    content:
+      "html { font-size: 200% !important; letter-spacing: .12em; word-spacing: .16em; }",
+  });
   await page.screenshot({
     path: `.preview-artifacts/a11y-admin-text200-before-${info.project.name}.png`,
     fullPage: true,

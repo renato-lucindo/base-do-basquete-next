@@ -51,8 +51,12 @@ function sourceFixture() {
     }),
   };
 }
-const query = (s = "") =>
-  parseStatisticsQuery(new URLSearchParams(`scope=all&mode=total&${s}`));
+const query = (s = "") => {
+  const params = new URLSearchParams(s);
+  if (!params.has("scope")) params.set("scope", "all");
+  if (!params.has("mode")) params.set("mode", "total");
+  return parseStatisticsQuery(params);
+};
 
 it("rótulo de equipe usa a inscrição mais recentemente publicada sem duplicar nome global", () => {
   const source = sourceFixture();
@@ -69,6 +73,13 @@ it("rótulo de equipe usa a inscrição mais recentemente publicada sem duplicar
   );
   const id = source.games[0].snapshot.game.home.team.id;
   expect(result.teams.find((t) => t.id === id)?.names).toEqual(["LUSB"]);
+  expect(
+    buildStatisticsPage(source, query("scope=regular&q=LUSB")).total,
+  ).toBeGreaterThan(0);
+  expect(
+    buildStatisticsPage(source, query("scope=playoffs&q=Nome%20histórico"))
+      .total,
+  ).toBeGreaterThan(0);
   expect(
     buildStatisticsPage(source, query("q=Liga%20Urbana")).total,
   ).toBeGreaterThan(0);

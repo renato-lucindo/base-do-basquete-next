@@ -3,6 +3,21 @@ import AxeBuilder from "@axe-core/playwright";
 import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
+import { teamPublicFixture } from "./fixtures/team-public-browser";
+
+test("página fora do intervalo termina o carregamento após canonicalizar", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.goto(f.url + "&view=simple&page=99");
+  await expect(page).not.toHaveURL(/page=99/);
+  await expect(
+    page.getByRole("table", { name: "Dados simples dos jogos publicados" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Carregando estatísticas…", { exact: true }),
+  ).toHaveCount(0);
+});
 
 test("admin conserva leitura, reflow e foco nas abas sem título repetido", async ({
   page,
@@ -21,6 +36,9 @@ test("admin conserva leitura, reflow e foco nas abas sem título repetido", asyn
     await expect(
       page.getByText("Carregando inscrições…", { exact: true }),
     ).toHaveCount(0);
+    await expect(
+      page.getByText("Equipe: Lobos Clube", { exact: true }),
+    ).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -30,6 +48,30 @@ test("admin conserva leitura, reflow e foco nas abas sem título repetido", asyn
       path: `.preview-artifacts/readability-admin-${width}-${test.info().project.name}.png`,
     });
   }
+});
+
+test("perfil da equipe mostra somente a inscrição e foca a seção visível", async ({
+  page,
+}) => {
+  const f = await teamPublicFixture(page);
+  await page.goto(f.detailUrl);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Lobos", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Equipe: Lobos Clube · inscrição: Lobos.", { exact: true }),
+  ).toHaveCount(0);
+  const tab = page
+    .getByRole("navigation", { name: "Seções da equipe" })
+    .getByRole("link", { name: "Jogos", exact: true });
+  await tab.click();
+  const title = page.getByRole("heading", {
+    level: 2,
+    name: "Jogos",
+    exact: true,
+  });
+  await expect(title).toHaveClass(/sr-only/);
+  await expect(title.locator("..")).toBeFocused();
 });
 
 test("filtro apresenta somente a inscrição e preserva a pesquisa pelo nome global", async ({
@@ -169,6 +211,15 @@ test("escala compartilhada amplia desktop e conserva celular", async ({
       ),
       JSON.stringify({ zoom, overflow }),
     ).toBe(true);
+    const context = page.locator(".public-context-line");
+    const label = context.locator("p");
+    const labelHeight = await label.evaluate(
+      (el) => el.getBoundingClientRect().height,
+    );
+    const lineHeight = await label.evaluate((el) =>
+      parseFloat(getComputedStyle(el).lineHeight),
+    );
+    expect(labelHeight).toBeLessThanOrEqual(lineHeight * 3);
     await page.screenshot({
       path: `.preview-artifacts/readability-additional-${zoom}-${info.project.name}.png`,
     });

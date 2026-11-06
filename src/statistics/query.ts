@@ -91,6 +91,7 @@ export function buildStatisticsPage(
             ...r.nicknames.filter((v) => v !== null),
             ...r.teamNames,
             ...r.registrationNames,
+            ...(labels.get(r.registrationId)?.aliases ?? []),
           ].join(" "),
         ).includes(normalize(query.search))) &&
       (query.teams === null || query.teams.includes(r.teamId)) &&

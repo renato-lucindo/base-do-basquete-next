@@ -272,7 +272,8 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
   await expect(selectedPanel).toBeVisible();
   await expect(
     selectedPanel.getByText("Equipe: Lobos Renomeados", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  expect([...f.teams.values()][0].name).toBe("Lobos Renomeados");
   expect([...f.registrations.values()].map((r) => r.name)).toEqual([
     "Lobos",
     "Lobos B",

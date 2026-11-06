@@ -725,6 +725,22 @@
   margin: 0;
 }
 @media (min-width: 640px) {
+  .public-header .public-context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1.5rem;
+  }
+  .public-header .public-context-line {
+    flex: 1 1 24rem;
+    flex-wrap: wrap;
+  }
+  .public-header .public-context-line p {
+    flex: 1 1 12rem;
+  }
+  .public-header .public-return {
+    flex-basis: 100%;
+  }
   .public-header.site-header > .header-inner.wrap {
     display: flex;
     flex-wrap: wrap;

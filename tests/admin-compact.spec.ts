@@ -96,9 +96,14 @@ for (const width of [1366, 1920])
       );
       if (process.env.ADMIN_CAPTURE_BASELINE) return;
       expect(metrics.overflow).toBe(false);
-      expect(metrics.firstRowY / 1.5).toBeLessThan(
-        area === "jogos" ? 300 : 420,
-      );
+      if (area === "jogos") expect(metrics.firstRowY / 1.5).toBeLessThan(300);
+      else {
+        // Larger controls may wrap; the first roster row must still start in view.
+        const line = await row.evaluate(
+          (el) => parseFloat(getComputedStyle(el).fontSize) * 1.5,
+        );
+        expect(metrics.firstRowY).toBeLessThan(metrics.viewportHeight - line);
+      }
       if (area === "jogos") {
         await expect(
           page.getByRole("table", { name: "Jogos da disputa", exact: true }),

@@ -85,8 +85,11 @@ test("ambiguidade exige inscrição e navegação conserva URL, foco e históric
       .getByRole("link", { name, exact: true })
       .focus();
     await page.keyboard.press("Enter");
+    await expect(page.getByRole("heading", { name, exact: true })).toHaveClass(
+      /sr-only/,
+    );
     await expect(
-      page.getByRole("heading", { name, exact: true }),
+      page.getByRole("heading", { name, exact: true }).locator(".."),
     ).toBeFocused();
   }
   await page.goBack();
@@ -192,7 +195,9 @@ test("resposta atrasada e320px/texto200% preservam rota/foco/controles", async (
     .click();
   await page.getByRole("link", { name: "Participantes", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Participantes", exact: true }),
+    page
+      .getByRole("heading", { name: "Participantes", exact: true })
+      .locator(".."),
   ).toBeFocused();
   await page
     .getByRole("link", { name: "Pular para o conteúdo", exact: true })
