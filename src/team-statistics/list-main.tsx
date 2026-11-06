@@ -1,9 +1,7 @@
 import { createRoot } from "react-dom/client";
-import { TeamsPublicPage } from "./public-page";
+import { TeamsListPublicPage } from "./list-page";
 import "../access/screen.css";
 import "../statistics/screen.css";
 import "../statistics/reference.css";
 import "./screen.css";
-createRoot(document.getElementById("root")!).render(
-  <TeamsPublicPage kind="list" />,
-);
+createRoot(document.getElementById("root")!).render(<TeamsListPublicPage />);

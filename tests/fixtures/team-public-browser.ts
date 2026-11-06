@@ -1,3 +1,5 @@
+import { buildTeamsList } from "../../src/team-statistics/list-domain";
+import { parseTeamsListQuery } from "../../src/team-statistics/list-query";
 import type { Page } from "@playwright/test";
 import { teamStatisticsFixture } from "./team-statistics";
 import { pubId } from "./publication";
@@ -82,6 +84,9 @@ export async function teamPublicFixture(
         .catch(() => undefined);
       return;
     }
+    if (route.request().method() === "POST") {
+      url.search = route.request().postDataJSON().query;
+    }
     const data = parts[5]
       ? buildTeamDetail(
           source,
@@ -89,7 +94,9 @@ export async function teamPublicFixture(
           url.searchParams.get("registrationId"),
           parseTeamDetailQuery(url.searchParams),
         )
-      : buildTeamsPage(source, parseTeamsQuery(url.searchParams));
+      : url.searchParams.get("pageSize") === "all"
+        ? buildTeamsList(source, parseTeamsListQuery(url.searchParams))
+        : buildTeamsPage(source, parseTeamsQuery(url.searchParams));
     await route
       .fulfill({
         json: state.corrupt

@@ -1,21 +1,23 @@
 # Progresso atual
 
-Atualizado em 05/11/2026 para a conclusão documental da [PR #60](https://github.com/renato-lucindo/base-do-basquete-next/pull/60). Relatos anteriores de serviços e entregas estão [preservados no histórico](../historico/progresso/2026-11-05-antes-conclusao-pr60.md); não representam nova verificação desses ambientes.
+Atualizado05/11/2026. **Equipes conforme Jogadores**, branch `codex/equipes-refinamento`, [PR63](https://github.com/renato-lucindo/base-do-basquete-next/pull/63) única para main. Base inicial76b90da; main6d37e29 incorporada por merge explícito em6b41ac1. Último materialccc5de5; recuperar HEAD documental por Git. Checkout isolado `C:/Users/12405304716/.codex/worktrees/equipes-refinamento/Base do Basquete-v1`.
 
-## Unidade documental — filtros avançados
+## Implementação e provas
 
-- FUT-004 registrado no [roadmap](ROADMAP.md): perfil do jogador e estatísticas dos jogadores do campeonato, seleção múltipla pesquisável e recálculo por recorte. Continua **ideia pós-MVP**, sem autorização de implementação.
-- Mesma branch `codex/roadmap-filtros-jogadores`, commit original `aad3c14`, atualizada por merge explícito da `origin/main` em `76b90da142ed6ffc6331e9cd47852ee5c4519c07`; recuperar o HEAD corrente pelo Git/PR. Conflito limitado a este checkpoint, preservando o roadmap e o contexto anterior no histórico.
-- CI original: `validate` SUCCESS, WebKit CANCELLED na [execução 42073877143](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42073877143). Essa execução não valida a reconciliação atual. As verificações documentais locais e os resultados reais da CI do HEAD e do merge são registrados na descrição da PR #60 após cada execução.
-- Próximo passo: validar o diff documental, conferir a CI atual, integrar por merge commit conforme autorização do responsável nesta conversa e conferir a CI do SHA integrado. A evidência final de encerramento permanece na PR #60.
+Contrato pageSize=all/v2 separado do legado20, PB/PB%, médias uniformes/precisão integral, opções/hasBoxscore completos, seleção porregistrationId/referência local/POST de consulta extensa. UI com busca/debounce/cancelamento, segmentados, tabela integral/legenda/máximos, CSS só súmula. Perfil/Jogadores/paginação/cálculos legados e ScrollableTable global preservados. Falha de storage mantém escolha anterior e aviso; consultas curtas independem do storage. Zero conhecido apresenta0. [Spec/plano](superpowers/plans/2026-11-05-equipes-refinamento.md), [relatório/capturas](design/VALIDACAO-EQUIPES-REFINAMENTO.md).
 
-## Outras unidades e serviços
+Gate consolidado local exit0:715unitários/149arquivos, política11, transporte11, banco descartável13, WorkerHTTP30, PDF1, lint/formato/tipos/build/fronteira/segredos (.equipes-gate.log). Ajustes finais focalmente conferidos:48unitáriosPASS,20ChromiumPASS+2de armazenamento cheioPASS, WebKitWindows12PASS+4finais de foco/bordasPASS (recortes sobrepostos). CI42131019462/a40472a passou gate completo e WebKitmacOS, mas shard2 encontrou regressão real no fallback de disputa sem resultados. Corrigido usando regulamento publicado, com busca/seleção/nomes públicos simples. Teste RED→GREEN desktop/mobile, TypeScript/ESLint PASS. Aguardar nova CI integral; não presumir sucesso. Logs de ENOSPC/temporários e expectativas antigas de foco Safari preservados no relatório. Sem skips/retries/timeouts novos.
 
-- PR #59 integrada em `76b90da`; CI do SHA integrado [42086467499](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42086467499) **SUCCESS**, consultada nesta execução. Não houve verificação nem atualização do preview por esta unidade documental.
-- PR #61 permanece aberta e Draft; HEAD observado `0880ca5cfe85ed30074b696ae67ba00c9df5990b`. A integração de regular/eliminatória continua uma dependência a confirmar para implementação futura dos filtros. Não foi incluída nem validada nesta PR.
-- Checkout humano `sync/trabalho-casa` preservado com `CONTRIBUTING.md` modificado, `.agents/skills/web-design-guidelines/` e `skills-lock.json` não rastreados. Demais worktrees e automações de outras unidades não foram alterados.
-- Sem deploy, migrations, DDL/DML ou publicação de dados. Versão dos serviços publicados não consultada nesta tarefa; o histórico preserva os últimos relatos com seus limites.
+Revisão autoral/ui-ux-pro-max/web-design-guidelines atualizada; sem alegar parecer independente ou celular físico. WebKitWindows não prova overscroll nativo; CI macOS inclui14cenários de Equipes. DiscoC cerca450MB livres, execuções locais sequenciais/traceoff; arquivos humanos/alheios preservados.
 
-## Continuidade
+Diagnóstico somente leitura:25jogos/50lados,34sem coletivo novo,15T/mínimoGD4,PBdisponível50. [Quadro](evidencias/2026-11-05-equipes-historico.md). Originais congelados publicados apenas diagnóstico; sem rascunhos na API, DDL/DML ou republicação.
 
-O procedimento vigente de cota/retomada está em [CONTRIBUTING.md](../CONTRIBUTING.md). Não reutilizar percentuais, horários ou autorizações operacionais de checkpoints antigos. Ao retomar outra unidade, consultar Git, PRs, CI e serviço reais antes de agir.
+## Serviços, continuidade e próximo passo
+
+UIUX observado por API:deployment79cd9d59-cc65-4437-b44f-55a1f2f859b5/version82ee666f-3ebe-4d0c-b931-0fe020b2c8d3/source76b90da. Principal00dffb6b-1d5c-4433-9214-768013ed6277/version139410ce-a8d6-4710-9b94-e1b1222cd3dc. Config/Access/segredos/banco preservados. ConfigUIUX existente em `C:/Users/12405304716/.codex/worktrees/reforma-uiux/.preview-artifacts/uiux-preview/wrangler.json`. Sem deploy desta unidade até aqui.
+
+PR61 independente permanece draft/idle, CI42128700378/ab3c461SUCCESS; não integrada por este agente. Conferir main/serviço novamente antes do merge/deploy; não empilhar61 nem publicar build antigo sobre mais novo. Checkout humano sync/trabalho-casa/CONTRIBUTING/skills locais e outrosworktrees preservados.
+
+Retomada manual autorizada em05/11, cota inicial99%5h/22%semanal. Automação `retomar-refinamento-de-equipes` permaneceACTIVE para06/11 00:04:43 America/Sao_Paulo; pausar ao concluir, sem duplicatas/créditos/resets. Gatilho15%real conforme CONTRIBUTING.
+
+Próximo:publicar correção do fallback na mesma PR63, aguardar CI completa, revisar checks/conversas/diff, merge commit autorizado e CI integrada. Depois build fresco limpo do SHAintegrado e deploy exclusivamente base-do-basquete-next-uiux com smoke/fonte/configuração. Nenhum deployprincipal/Access/segredo/DDL/DML ou republicação autorizados por inferência. [Checkpoint anterior](../historico/progresso/2026-11-05-equipes-apos-retomada.md).

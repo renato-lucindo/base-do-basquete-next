@@ -1,3 +1,4 @@
+import { safePublicReturn } from "../public-ui/navigation";
 import { usePublicPosition } from "../public-ui/position";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { usePublicStandings } from "../regulation/public-page";
@@ -268,7 +269,22 @@ export function TeamsPublicPage({ kind }: { kind: "list" | "detail" }) {
             {current.kind === "detail" && (
               <p>
                 <a
-                  href={`/equipes.html#${current.disputeId}?${serializeTeamsQuery(listState!)}`}
+                  href={
+                    (safePublicReturn(
+                      new URLSearchParams(window.location.search).get(
+                        "returnTo",
+                      ),
+                      current.disputeId,
+                    )?.startsWith("/equipes.html#")
+                      ? safePublicReturn(
+                          new URLSearchParams(window.location.search).get(
+                            "returnTo",
+                          ),
+                          current.disputeId,
+                        )
+                      : null) ??
+                    `/equipes.html#${current.disputeId}?${serializeTeamsQuery(listState!)}`
+                  }
                 >
                   Voltar às equipes
                 </a>
