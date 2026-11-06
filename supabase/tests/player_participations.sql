@@ -29,7 +29,7 @@ select pg_temp.pu_error('insert into public.published_player_games select * from
 select pg_temp.pu_error('update public.published_player_games set publication_version=4','42501');
 reset role;
 select pg_temp.pu_assert((select count(*) from public.published_player_games where game_id=pg_temp.pu_id(8))=11,'correction replaces rather than duplicates participant rows');
-select pg_temp.pu_assert((select bool_and(snapshot#>>'{fact,phase}' is null) from public.published_player_games),'private regulation is not inferred as phase');
+select pg_temp.pu_assert((select bool_and(p.snapshot#>>'{fact,phase}' is not distinct from m.phase) from public.published_player_games p join public.published_statistics_games m on m.game_id=p.game_id and m.dispute_id=p.dispute_id),'player phase follows the explicitly published statistics source');
 select pg_temp.pu_assert(exists(select 1 from public.published_player_games p join private.game_publication_entries e on e.person_id=p.person_id and e.game_id=p.game_id and e.version=p.publication_version where p.snapshot#>>'{fact,jersey}'='00'),'zero-zero jersey preserves immutable identity lineage');
 select pg_temp.pu_assert((select snapshot#>>'{facts,teams,home,points}' from private.game_publication_versions where game_id=pg_temp.pu_id(8) and version=2)='3','prior public result remains immutable');
 select pg_temp.pu_assert((select relrowsecurity from pg_class where oid='public.published_player_games'::regclass),'projection has RLS');

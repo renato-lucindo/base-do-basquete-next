@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  confirmGameStagesSchema,
+  confirmGameStagesReceiptSchema,
+  type ConfirmGameStages,
+} from "./stages-contract";
 import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import { HttpError } from "../server/http";
@@ -36,7 +41,8 @@ type Rpc =
   | "save_pdf_publication_preparation"
   | "publish_sheet_game"
   | "revise_sheet_team_statistics"
-  | "publish_pdf_game";
+  | "publish_pdf_game"
+  | "confirm_game_stages";
 const messages = {
   team_disqualifications_review_required:
     "Confira e confirme o total de GD das duas equipes, incluindo zero.",
@@ -153,6 +159,30 @@ export class SupabasePublications {
     if (r.gameId !== gameId || r.version !== version) throw unavailable();
     return r;
   }
+  async confirmStages(token: string, input: ConfirmGameStages) {
+    const command = confirmGameStagesSchema.parse(input);
+    const receipt = await this.rpc(
+      confirmGameStagesReceiptSchema,
+      "confirm_game_stages",
+      { p_command: command },
+      token,
+    );
+    if (
+      receipt.requestId.toLowerCase() !== command.requestId.toLowerCase() ||
+      receipt.disputeId.toLowerCase() !== command.disputeId.toLowerCase() ||
+      receipt.version < command.baseStatisticsVersion ||
+      receipt.version > command.baseStatisticsVersion + 1 ||
+      receipt.changedGameIds.some(
+        (id) =>
+          !command.games.some(
+            (game) => game.gameId.toLowerCase() === id.toLowerCase(),
+          ),
+      )
+    )
+      throw unavailable();
+    return receipt;
+  }
+
   async getPublic(gameId: string) {
     if (!z.uuid().safeParse(gameId).success) throw badInput();
     const r = await this.rpc(publicResultSchema.nullable(), "get_public_game", {

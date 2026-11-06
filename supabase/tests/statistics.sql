@@ -2,7 +2,7 @@
 reset role;
 create temporary table statistics_before as select public.get_public_statistics_source(pg_temp.pu_id(3)) as snapshot;
 select pg_temp.pu_assert((select snapshot is not null and snapshot->'minimumSeconds'='600' and jsonb_array_length(snapshot->'games')=2 from statistics_before),'current confirmed source');
-select pg_temp.pu_assert((select bool_and(g.value->'phase'='null') from statistics_before b cross join lateral jsonb_array_elements(b.snapshot->'games') g),'private regulation does not infer phase');
+select pg_temp.pu_assert((select bool_and((g.value->>'phase') is not distinct from m.phase) from statistics_before b cross join lateral jsonb_array_elements(b.snapshot->'games') g join public.published_statistics_games m on m.game_id=(g.value#>>'{snapshot,id}')::uuid),'statistics source uses frozen published phases');
 select pg_temp.pu_assert(not(public.get_public_statistics_source(pg_temp.pu_id(3))::text~'"(sex|birthDate|birth_date|reason|actorId|createdBy|storagePath)"'),'public privacy');
 -- Live edits are not new statistical publications.
 update public.persons set name='Private current name' where id=pg_temp.pu_id(201);

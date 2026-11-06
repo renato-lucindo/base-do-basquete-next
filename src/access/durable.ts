@@ -36,6 +36,7 @@ import {
 } from "../regulation/view-contract";
 import type { PublishSheet } from "../publication/contract";
 import type { PublishPdf } from "../publication/pdf-contract";
+import type { ConfirmGameStages } from "../publication/stages-contract";
 import { SupabasePeople } from "../people/provider";
 import { SupabasePlayerProfiles } from "../player-profile/provider";
 import {
@@ -497,6 +498,13 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.save(accessToken, saveGameSchema.parse(command)),
+      ),
+    );
+  }
+  confirmGameStages(command: ConfirmGameStages) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.confirmStages(accessToken, command),
       ),
     );
   }

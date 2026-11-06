@@ -807,6 +807,7 @@ export type Database = {
         Returns: Json;
       };
       confirm_achievements: { Args: { p_command: Json }; Returns: Json };
+      confirm_game_stages: { Args: { p_command: Json }; Returns: Json };
       confirm_player_profile: { Args: { p_command: Json }; Returns: Json };
       confirm_text_row: { Args: { p_command: Json }; Returns: Json };
       finish_pdf_source: { Args: { p_command: Json }; Returns: Json };

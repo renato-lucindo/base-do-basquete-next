@@ -360,3 +360,75 @@ test("C3 upgrade preserves C2 registrations and their global identity", async ()
     await db.close();
   }
 });
+
+test("S3 confirmed game stages: new publications and legacy upgrade preserve atomicity", async () => {
+  const names = (await readdir("supabase/migrations"))
+    .filter((name) => name.endsWith(".sql"))
+    .sort();
+  const boundary = names.findIndex((name) =>
+    name.endsWith("_confirm_published_game_stages.sql"),
+  );
+  assert.ok(boundary > 0, "stage migration exists");
+  for (const mode of ["zero", "upgrade"]) {
+    const db = await PGlite.create();
+    try {
+      await db.exec(platform);
+      const apply = async (name) =>
+        db.exec(await readFile(`supabase/migrations/${name}`, "utf8"));
+      for (const name of names.slice(
+        0,
+        mode === "zero" ? names.length : boundary,
+      ))
+        await apply(name);
+      await db.exec(
+        (await readFile("supabase/tests/publication.sql", "utf8")).replace(
+          /\nrollback;\s*$/u,
+          "\n",
+        ),
+      );
+      if (mode === "upgrade")
+        for (const name of names.slice(boundary)) await apply(name);
+      await db.exec(await readFile("supabase/tests/stage_phases.sql", "utf8"));
+    } finally {
+      await db.close();
+    }
+  }
+});
+
+test("newly published knockout games retain their phase in statistics and players", async () => {
+  const db = await PGlite.create();
+  try {
+    await db.exec(platform);
+    for (const migration of migrations) await db.exec(migration);
+    const fixture = await readFile("supabase/tests/publication.sql", "utf8");
+    const boundary = fixture.indexOf("\nset local role anon;");
+    assert.ok(boundary > 0);
+    await db.exec(fixture.slice(0, boundary));
+    await db.exec(
+      "update public.games set stage_kind='knockout' where id=pg_temp.pu_id(8)",
+    );
+    await db.exec(fixture.slice(boundary).replace(/\nrollback;\s*$/u, "\n"));
+    assert.deepEqual(
+      (
+        await db.query(
+          "select phase from public.published_statistics_games order by game_id",
+        )
+      ).rows,
+      [{ phase: "knockout" }, { phase: "round_robin" }],
+    );
+    assert.deepEqual(
+      (
+        await db.query(
+          "select snapshot#>>'{fact,phase}' as phase,count(*)::integer as count from public.published_player_games group by 1 order by 1",
+        )
+      ).rows,
+      [
+        { phase: "knockout", count: 11 },
+        { phase: "round_robin", count: 11 },
+      ],
+    );
+    await db.exec("rollback");
+  } finally {
+    await db.close();
+  }
+});
