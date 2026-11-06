@@ -63,7 +63,11 @@ function location() {
   if (params.get("view") === "boxscore") params.set("dataset", "boxscore");
   if (!params.has("mode")) params.set("mode", "total");
   params.set("pageSize", "30");
-  const query = parseStatisticsQuery(params);
+  // Mobile starts with all metrics enabled; explicit URLs and saved choices win.
+  const query = parseStatisticsQuery(
+    params,
+    window.matchMedia("(max-width: 600px)").matches ? "all" : "essentials",
+  );
   const saved = sessionStorage.getItem("statistics-selected-columns");
   if (!params.has("columns") && saved !== null) {
     query.preset = "custom";
