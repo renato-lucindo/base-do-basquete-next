@@ -873,7 +873,7 @@ for (const width of [1366, 1920])
     const weight = await dialog
       .getByLabel("Peso (kg)", { exact: true })
       .boundingBox();
-    expect(height!.width).toBeLessThan(200);
+    expect(height!.width).toBeLessThan(200 * 1.5);
     expect(Math.abs(height!.y - weight!.y)).toBeLessThan(2);
     await dialog.getByLabel("Altura (cm)", { exact: true }).fill("180.5");
     await dialog.getByLabel("Camisa", { exact: true }).fill("0");

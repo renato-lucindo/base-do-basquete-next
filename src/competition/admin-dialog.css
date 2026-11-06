@@ -57,6 +57,14 @@
   gap: 0.625rem;
   margin-bottom: 0;
 }
+.member-dialog .member-editor > .competition-actions {
+  position: sticky;
+  bottom: -1rem;
+  z-index: 5;
+  background: #fff;
+  padding-block: 0.75rem;
+  border-top: 1px solid #d9e2ee;
+}
 .member-dialog .member-editor h5 {
   margin: 0 0 0.75rem;
 }

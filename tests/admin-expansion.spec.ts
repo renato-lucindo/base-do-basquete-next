@@ -64,7 +64,7 @@ for (const width of [1366, 1920])
     const win = page.getByLabel("Pontos por vitória", { exact: true });
     await win.fill("2");
     await page.getByLabel("Pontos por derrota", { exact: true }).fill("1");
-    expect((await win.boundingBox())!.width).toBeLessThanOrEqual(160);
+    expect((await win.boundingBox())!.width).toBeLessThanOrEqual(160 * 1.5);
     await expect(
       page.getByLabel("Nome da fase", { exact: true }),
     ).toBeVisible();
@@ -139,7 +139,7 @@ for (const width of [1366, 1920]) {
     expect(
       (await page.getByLabel("Número do jogo", { exact: true }).boundingBox())!
         .width,
-    ).toBeLessThanOrEqual(140);
+    ).toBeLessThanOrEqual(140 * 1.5);
     const effect = page.getByRole("combobox", {
       name: "Efeito administrativo",
       exact: true,
@@ -185,7 +185,7 @@ for (const width of [1366, 1920]) {
     const x = await mode.boundingBox(),
       y = await final.boundingBox(),
       z = await bronze.boundingBox();
-    expect(x!.width).toBeLessThan(550);
+    expect(x!.width).toBeLessThan(550 * 1.5);
     expect(Math.abs(x!.y - y!.y)).toBeLessThan(3);
     expect(Math.abs(y!.y - z!.y)).toBeLessThan(3);
     expect(z!.x).toBeGreaterThan(y!.x);
@@ -212,7 +212,7 @@ for (const width of [1366, 1920]) {
     });
     const x = await destination.boundingBox(),
       y = await jersey.boundingBox();
-    expect(y!.width).toBeLessThanOrEqual(140);
+    expect(y!.width).toBeLessThanOrEqual(140 * 1.5);
     expect(Math.abs(x!.y - y!.y)).toBeLessThan(3);
     expect(y!.x).toBeGreaterThan(x!.x);
     await jersey.fill("00");

@@ -1004,7 +1004,11 @@ export function GamesWorkspace(props: Props) {
             <details
               className="game-officiating"
               open={officialsOpen}
-              onToggle={(e) => setOfficialsOpen(e.currentTarget.open)}
+              onToggle={(e) => {
+                const section = e.currentTarget;
+                setOfficialsOpen(section.open);
+                if (section.open) section.scrollIntoView({ block: "start" });
+              }}
             >
               <summary>
                 Arbitragem e mesa{" "}

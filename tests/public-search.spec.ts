@@ -65,8 +65,12 @@ test("autocomplete exige2 caracteres, agrupa5/tipo e permite navegar por teclado
       listTop: el.getBoundingClientRect().top,
     };
   });
-  expect(geometry.list).toBeGreaterThanOrEqual(geometry.panel - 24);
-  expect(geometry.option).toBeGreaterThanOrEqual(geometry.panel - 24);
+  expect(geometry.list).toBeGreaterThanOrEqual(
+    geometry.panel - (info.project.name === "desktop" ? 36 : 24),
+  );
+  expect(geometry.option).toBeGreaterThanOrEqual(
+    geometry.panel - (info.project.name === "desktop" ? 36 : 24),
+  );
   expect(geometry.listTop).toBeGreaterThan(geometry.typesBottom);
   await expect(input).toBeFocused();
   await page.keyboard.press("ArrowDown");

@@ -104,7 +104,9 @@ test("súmula compartilha pesquisa e ordenação; boxscore restringe a amostra a
       exact: true,
     }),
   ).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("registro por equipe");
+  await expect(
+    page.locator(".table-toolbar").getByRole("status"),
+  ).toContainText("registro por equipe");
   const table = page.getByRole("table", {
     name: "Estatísticas dos atletas",
     exact: true,

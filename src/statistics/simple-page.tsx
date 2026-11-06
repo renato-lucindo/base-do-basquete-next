@@ -53,6 +53,14 @@ export function SimpleStatisticsPageView() {
       return;
     }
     const controller = new AbortController();
+    const currentRequest = () => {
+      const current = readRoute();
+      return (
+        !controller.signal.aborted &&
+        current.id === route.id &&
+        serializeStatisticsQuery(current.query).toString() === serialized
+      );
+    };
     setLoading(true);
     setError(null);
     setData(null);
@@ -63,7 +71,7 @@ export function SimpleStatisticsPageView() {
       controller.signal,
     )
       .then((next) => {
-        if (controller.signal.aborted) return;
+        if (!currentRequest()) return;
         if (
           next.disputeId !== route.id ||
           next.mode !== "total" ||
@@ -81,7 +89,7 @@ export function SimpleStatisticsPageView() {
         );
       })
       .catch((e: unknown) => {
-        if (!controller.signal.aborted)
+        if (currentRequest())
           setError(
             e instanceof Error
               ? e.message
@@ -89,7 +97,7 @@ export function SimpleStatisticsPageView() {
           );
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (currentRequest()) setLoading(false);
       });
     return () => controller.abort();
   }, [route.id, serialized, retry]);

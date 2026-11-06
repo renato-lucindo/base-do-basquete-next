@@ -106,6 +106,15 @@
   padding-top: 1.25rem;
   border-top: 1px solid #d9e2ee;
 }
+.competition-title,
+.competition-title > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.competition-title > button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .competition-context {
   border-left: 0.1875rem solid #075fca;
   background: #eef6ff;

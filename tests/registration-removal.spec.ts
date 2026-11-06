@@ -96,7 +96,9 @@ test("bloqueia histórico e exclui apenas inscrição vazia por teclado", async 
     .getByRole("button", { name: "Voltar às inscrições", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Equipes e elencos", exact: true }),
+    page
+      .getByRole("heading", { name: "Equipes e elencos", exact: true })
+      .locator(".."),
   ).toBeFocused();
   await expect(
     page.getByRole("button", { name: "Expandir Lobos B", exact: true }),
@@ -221,7 +223,7 @@ test("reauth preserva comando no desktop e texto ampliado", async ({
   const size = await heading.evaluate((el) =>
     Number.parseFloat(getComputedStyle(el).fontSize),
   );
-  await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+  await page.addStyleTag({ content: "html { font-size: 300% !important; }" });
   expect(
     await heading.evaluate((el) =>
       Number.parseFloat(getComputedStyle(el).fontSize),

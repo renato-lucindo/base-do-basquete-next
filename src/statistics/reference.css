@@ -1091,6 +1091,9 @@
 }
 .public-site.statistics-public .table-display-controls {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 1rem;
 }

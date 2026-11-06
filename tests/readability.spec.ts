@@ -18,6 +18,9 @@ test("admin conserva leitura, reflow e foco nas abas sem título repetido", asyn
       exact: true,
     });
     await expect(title).toHaveClass(/sr-only/);
+    await expect(
+      page.getByText("Carregando inscrições…", { exact: true }),
+    ).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -105,6 +108,71 @@ test("escala compartilhada amplia desktop e conserva celular", async ({
   });
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
+  for (const width of [320, 639, 640, 1366]) {
+    await page.setViewportSize({ width, height: 1080 });
+    await expect(page.locator("html")).toHaveCSS(
+      "font-size",
+      width < 640 ? "16px" : "24px",
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      JSON.stringify(
+        await page.evaluate(
+          (width) => ({
+            width,
+            overflow: [...document.querySelectorAll("body *")]
+              .filter(
+                (el) =>
+                  el.getBoundingClientRect().right > innerWidth &&
+                  !el.closest(".statistics-table-wrap,.scrollable-table-top"),
+              )
+              .slice(0, 10)
+              .map((el) => ({
+                css: el.className,
+                tag: el.tagName,
+                text: el.textContent?.slice(0, 50),
+                parent: el.parentElement?.className,
+                right: el.getBoundingClientRect().right,
+              })),
+          }),
+          width,
+        ),
+      ),
+    ).toBe(true);
+  }
+  await page.setViewportSize({ width: 1366, height: 768 });
+  for (const zoom of [1.5, 2]) {
+    await page.addStyleTag({
+      content: `html { font-size: ${150 * zoom}% !important; }`,
+    });
+    const overflow = await page.evaluate(() =>
+      [...document.querySelectorAll("body *")]
+        .filter(
+          (el) =>
+            el.getBoundingClientRect().right > innerWidth &&
+            !el.closest(".statistics-table-wrap,.scrollable-table-top"),
+        )
+        .slice(0, 12)
+        .map((el) => ({
+          css: el.className,
+          tag: el.tagName,
+          text: el.textContent?.slice(0, 50),
+          parent: el.parentElement?.className,
+          right: el.getBoundingClientRect().right,
+        })),
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      JSON.stringify({ zoom, overflow }),
+    ).toBe(true);
+    await page.screenshot({
+      path: `.preview-artifacts/readability-additional-${zoom}-${info.project.name}.png`,
+    });
+  }
 });
 
 test("colunas usam os mesmos nomes curtos da legenda", async ({ page }) => {

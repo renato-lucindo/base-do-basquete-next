@@ -345,6 +345,11 @@
   .compact-pilot .competition-save {
     margin-top: 0.5rem;
     padding-top: 0.625rem;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    background: #fff;
+    padding-bottom: 0.625rem;
   }
 
   .compact-pilot .regulation {
