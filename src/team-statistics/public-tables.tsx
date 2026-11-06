@@ -1,3 +1,7 @@
+import {
+  publicPlayerHistoryAccessibleName,
+  publicPlayerHistoryName,
+} from "../public-ui/player-name";
 import { publicDetailLink } from "../public-ui/navigation";
 import type { TeamsPage } from "./contract";
 import type { TeamDetailPage } from "./detail-contract";
@@ -234,16 +238,18 @@ export function TeamParticipants({
                 <td>{r.jerseys.join(" / ")}</td>
                 <th scope="row">
                   <a
+                    title={r.names.join(" / ")}
+                    aria-label={publicPlayerHistoryAccessibleName(
+                      r.names,
+                      r.nicknames,
+                    )}
                     href={publicDetailLink(
                       `/atleta.html#${r.personId}`,
                       d.disputeId,
                     )}
                   >
-                    {r.names.join(" / ")}
+                    {publicPlayerHistoryName(r.names, r.nicknames)}
                   </a>
-                  {r.nicknames.some(Boolean) && (
-                    <small>{r.nicknames.filter(Boolean).join(" / ")}</small>
-                  )}
                 </th>
                 <td>
                   {r.playedGames

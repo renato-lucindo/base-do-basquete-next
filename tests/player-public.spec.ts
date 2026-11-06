@@ -15,8 +15,9 @@ test("perfil contínuo público: dados disponíveis, ordem dos blocos e atalhos 
   const f = await playerPublicFixture(page);
   await page.goto(f.url);
   await expect(
-    page.getByRole("heading", { name: "Ana Pública", exact: true }),
+    page.getByRole("heading", { name: "AP", exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
   await expect(page.getByText("180 cm", { exact: true })).toBeVisible();
   await expect(
     page.getByText("Ano de nascimento:", { exact: true }),

@@ -22,7 +22,11 @@ test("nome corrigido é único na tabela e tooltip; células e equipes não têm
   await expect(table.locator("tbody tr")).toHaveCount(1);
   const name = table.locator("tbody th[scope=row]");
   await expect(name).toHaveAttribute("title", "Nome corrigido");
-  await expect(name.locator(".player-name")).toHaveText("Nome corrigido");
+  await expect(name.locator(".player-name")).toHaveText("MJ");
+  await expect(name.locator(".player-name")).toHaveAttribute(
+    "aria-label",
+    "MJ — nome completo: Nome corrigido",
+  );
   await expect(
     table.locator(
       "tbody td[title], tbody .player-jersey[title], tbody .missing[title]",
@@ -281,19 +285,31 @@ test("comparação fora da página mantém todas inscrições do atleta e permit
   await expect(
     comparison.getByText("Outra inscrição", { exact: true }),
   ).toBeVisible();
-  await expect(comparison.getByText("João 1-0", { exact: true })).toHaveCount(
-    0,
-  );
-  await expect(comparison.getByText("João 3-0", { exact: true })).toHaveCount(
-    2,
-  );
-  await expect(comparison.getByText("João 2-0", { exact: true })).toBeVisible();
-  await comparison.getByRole("button", { name: /Remover João 3-0/u }).click();
+  await expect(
+    comparison.getByRole("link", {
+      name: "MJ — nome completo: João 3-0",
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  await expect(
+    comparison.getByRole("link", {
+      name: "MJ — nome completo: João 2-0",
+      exact: true,
+    }),
+  ).toHaveCount(1);
+  await comparison
+    .getByRole("button", { name: /Remover MJ — nome completo: João 3-0/u })
+    .click();
   await expect(
     comparison.getByText("Outra inscrição", { exact: true }),
   ).toHaveCount(0);
   await page.reload();
-  await expect(comparison.getByText("João 2-0", { exact: true })).toBeVisible();
+  await expect(
+    comparison.getByRole("link", {
+      name: "MJ — nome completo: João 2-0",
+      exact: true,
+    }),
+  ).toHaveCount(1);
 });
 test("busca/filtros por teclado, equipes vazias e líderes antes da página têm estados claros", async ({
   page,

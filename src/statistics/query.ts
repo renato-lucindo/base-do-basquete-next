@@ -1,3 +1,4 @@
+import { publicPlayerHistoryName } from "../public-ui/player-name";
 import { rankSortedRows } from "./ranking";
 import {
   aggregateConfirmedStatistics,
@@ -105,7 +106,7 @@ export function buildStatisticsPage(
   );
   const value = (r: StatisticsRow) =>
     query.sort === "player"
-      ? r.names.join(" / ")
+      ? publicPlayerHistoryName(r.names, r.nicknames)
       : query.sort === "team"
         ? (labels.get(r.registrationId)?.name ?? r.registrationNames[0])
         : r.metrics[query.sort].value;
@@ -113,7 +114,10 @@ export function buildStatisticsPage(
     const av = value(a),
       bv = value(b);
     const tied = () =>
-      a.names.join().localeCompare(b.names.join(), "pt-BR") ||
+      publicPlayerHistoryName(a.names, a.nicknames).localeCompare(
+        publicPlayerHistoryName(b.names, b.nicknames),
+        "pt-BR",
+      ) ||
       a.personId.localeCompare(b.personId) ||
       a.registrationId.localeCompare(b.registrationId);
     if (av === null) return bv === null ? tied() : 1;

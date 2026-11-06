@@ -44,8 +44,9 @@ test("axe: perfil contínuo, painéis e seleção por checkboxes", async ({
   const f = await playerPublicFixture(page);
   await page.goto(f.url);
   await expect(
-    page.getByRole("heading", { name: "Ana Pública", exact: true }),
+    page.getByRole("heading", { name: "AP", exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
   await scan(page, info, "player-continuous");
   for (const [name, target] of [
     ["Jogos", "#jogos"],

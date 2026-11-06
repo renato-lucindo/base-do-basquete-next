@@ -269,6 +269,9 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
     name: "Elenco de Lobos B",
     exact: true,
   });
+  await expect(
+    page.getByRole("status").filter({ hasText: "Equipe global salva." }),
+  ).toBeVisible();
   await expect(selectedPanel).toBeVisible();
   await expect(
     selectedPanel.getByText("Equipe: Lobos Renomeados", { exact: true }),

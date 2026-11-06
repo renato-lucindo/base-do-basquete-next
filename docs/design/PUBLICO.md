@@ -28,6 +28,10 @@ Decisões da conversa de 29/10/2026, atualizadas com os contratos aprovados pelo
 
 Exemplo ilustrativo; respeitar dados reais de cada edição.
 
+## Identificação dos atletas no público
+
+Nas tabelas e demais páginas públicas, a identificação visível prioriza o apelido cadastrado (após remover espaços nas extremidades); sem apelido, exibe o nome completo. O nome completo deve permanecer disponível ao foco de teclado/leitor de tela e para consulta no perfil. A busca global é exceção: apresenta sempre o nome completo como principal e o apelido como complemento, sem restringir a pesquisa. Dados cadastrais e fatos publicados não são substituídos pelo apelido; este é apenas uma regra de apresentação.
+
 ## Páginas da disputa
 
 | Página        | Regra de experiência                                                                                                              |
