@@ -92,7 +92,9 @@ export function parseStatisticsQuery(
           ? "all"
           : params.get("preset") === "custom"
             ? "custom"
-            : defaultPreset,
+            : params.get("preset") === "essentials"
+              ? "essentials"
+              : defaultPreset,
     columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
     page = Number(params.get("page"));
   return {
