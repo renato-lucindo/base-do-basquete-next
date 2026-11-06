@@ -65,10 +65,6 @@ export function SheetPublicationPanel(p: Props) {
   useEffect(() => {
     if (reviewDocument.current && reviewDocument.current !== documentKey) {
       reviewDocument.current = "";
-      setTeamReview((v) => ({
-        home: { ...v.home, confirmed: false },
-        away: { ...v.away, confirmed: false },
-      }));
     }
   }, [documentKey]);
   useEffect(() => {
@@ -165,9 +161,7 @@ export function SheetPublicationPanel(p: Props) {
     if (p.disabled || busy || !state || ack) return;
     setError("");
     if (!pending.current && !gdReviewReady(teamReview, collective)) {
-      setError(
-        "Confira e confirme o total de GD das duas equipes, incluindo zero.",
-      );
+      setError("Não foi possível calcular os totais coletivos da súmula.");
       return;
     }
     if (
@@ -320,15 +314,20 @@ export function SheetPublicationPanel(p: Props) {
           )}
           <CollectiveReview
             facts={collective}
-            review={teamReview}
+            review={
+              reviewDocument.current === documentKey
+                ? teamReview
+                : initialGDReview(collective)
+            }
             onChange={setTeamReview}
             disabled={blocked || p.disabled}
+            readOnly
             names={{ home: p.game.home.name, away: p.game.away.name }}
           />
           {reviewDocument.current !== documentKey && (
             <p role="status">
-              A súmula mudou. Recarregue o estado da publicação e confira GD
-              novamente.
+              A súmula mudou. Recarregue o estado da publicação para atualizar
+              os totais automáticos.
             </p>
           )}
           {!p.confirmed && needsReason && (

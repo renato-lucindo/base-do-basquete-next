@@ -572,7 +572,99 @@ test("recupera envio incerto, conflito e reautenticação sem substituir o docum
   ).toBeVisible();
 });
 
-test("coletivos: confirma GD, preserva fonte divergente e repete revisão publicada sem duplicar", async ({
+test("coletivos automáticos: publica zero sem campos nem confirmação de faltas", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  f.source().document.periods = 5;
+  f.source().document.events[0].period = 5;
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  const panel = page.getByRole("region", {
+    name: "Publicação deste jogo",
+    exact: true,
+  });
+  await expect(
+    panel.getByRole("heading", { name: "Conferir publicação deste jogo" }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("checkbox", { name: /Conferi o total de GD/ }),
+  ).toHaveCount(0);
+  await expect(panel.getByLabel(/GD — total da equipe/)).toHaveCount(0);
+  await expect(panel.getByLabel(/GD — desqualificações/).first()).toHaveText(
+    "GD: 0",
+  );
+  const publish = panel.getByRole("button", {
+    name: "Publicar este jogo",
+    exact: true,
+  });
+  await expect(publish).toBeEnabled();
+  await scan(page, test.info(), "admin-automatic-collective-publication");
+  for (const width of [1366, 1920, 390]) {
+    await page.setViewportSize({ width, height: width === 1920 ? 1080 : 844 });
+    await publish.scrollIntoViewIfNeeded();
+    await publish.focus();
+    await expect(publish).toBeFocused();
+    const button = await publish.boundingBox(),
+      nav = await page.locator(".sheet-navigation").boundingBox();
+    expect(button!.y).toBeGreaterThanOrEqual(nav!.y + nav!.height);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await panel.screenshot({
+      path: `.preview-artifacts/automatic-collectives-${width}.png`,
+    });
+  }
+  await publish.click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  expect(
+    publishSheetSchema.parse(JSON.parse(f.commands[0])).source.teamReview,
+  ).toEqual({
+    home: { disqualifications: 0, foulsReceived: 0 },
+    away: { disqualifications: 0, foulsReceived: 0 },
+  });
+});
+
+test("coletivos automáticos: publica GD e T identificadas sem confirmação manual", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  const d = f.source().document;
+  const jersey = d.participants.find((p) => p.side === "home")!.jersey;
+  d.events.push(
+    { id: tid(3001), side: "home", period: 4, target: jersey, code: "TC" },
+    { id: tid(3002), side: "home", period: 4, target: jersey, code: "TC" },
+  );
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
+    "GD: 1",
+  );
+  await expect(page.getByLabel(/T — faltas técnicas/).first()).toHaveText(
+    "T: 2",
+  );
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  const command = publishSheetSchema.parse(JSON.parse(f.commands[0]));
+  expect(command.source.teamReview).toEqual({
+    home: { disqualifications: 1, foulsReceived: 0 },
+    away: { disqualifications: 0, foulsReceived: 2 },
+  });
+});
+
+test("coletivos: preserva GD publicada, fonte divergente e repetição sem duplicar", async ({
   page,
 }, info) => {
   const f = await publicationFixture(page);
@@ -582,28 +674,24 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
     .click();
   await expect(
     page.getByRole("button", { name: "Publicar este jogo", exact: true }),
-  ).toBeDisabled();
-  await page
-    .getByLabel(/GD — total da equipe/)
-    .first()
-    .fill("2");
-  await confirmGD(page);
+  ).toBeEnabled();
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
+  f.setPublishedGD(2, 0);
   const frozen = structuredClone(f.published()!);
   await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
     .click();
-  await expect(page.getByLabel(/GD — total da equipe/).first()).toHaveValue(
-    "2",
+  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
+    "GD: 2",
   );
   await expect(
-    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }).first(),
-  ).not.toBeChecked();
+    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),
+  ).toHaveCount(0);
   f.source().document = structuredClone(f.source().document);
   f.source().document.events[0].code = "3";
   f.source().version++;
@@ -649,13 +737,7 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
     name: "Publicar estatísticas conferidas",
     exact: true,
   });
-  await expect(publish).toBeDisabled();
-  const checks = panel.getByRole("checkbox", {
-    name: /Conferi o total de GD de/,
-  });
-  await checks.first().check();
-  await expect(publish).toBeDisabled();
-  await checks.last().check();
+  await expect(panel.getByRole("checkbox")).toHaveCount(0);
   await expect(publish).toBeEnabled();
   await panel
     .getByLabel(/GD — total da equipe/)
@@ -665,13 +747,12 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
     panel.getByLabel(/GD — total da equipe/).first(),
   ).toHaveAttribute("aria-invalid", "true");
   await expect(panel.getByText(/Informe um total inteiro de GD/)).toBeVisible();
+  await expect(publish).toBeDisabled();
   await panel
     .getByLabel(/GD — total da equipe/)
     .first()
     .fill("3");
-  await expect(checks.first()).not.toBeChecked();
-  await expect(publish).toBeDisabled();
-  await checks.first().check();
+  await expect(publish).toBeEnabled();
   await scan(page, info, "admin-team-statistics-review");
   for (const width of [1366, 1920, 390]) {
     await page.setViewportSize({ width, height: width === 1920 ? 1080 : 900 });
@@ -719,7 +800,7 @@ test("coletivos: confirma GD, preserva fonte divergente e repete revisão public
   expect(f.attempts.at(-1)).toBe(f.attempts.at(-2));
   expect(f.commands.at(-1)).toBe(f.commands.at(-2));
 });
-test("coletivos: alterar e desfazer a súmula exige nova conferência de GD", async ({
+test("coletivos: alterar e desfazer a súmula exige recarregar a versão para publicar", async ({
   page,
 }) => {
   await publicationFixture(page);
@@ -727,7 +808,6 @@ test("coletivos: alterar e desfazer a súmula exige nova conferência de GD", as
   await page
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
-  await confirmGD(page);
   const publish = page.getByRole("button", {
     name: "Publicar este jogo",
     exact: true,
@@ -739,15 +819,14 @@ test("coletivos: alterar e desfazer a súmula exige nova conferência de GD", as
   await played.uncheck();
   await expect(publish).toBeDisabled();
   await expect(
-    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }).first(),
-  ).not.toBeChecked();
+    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),
+  ).toHaveCount(0);
   await page
     .getByRole("button", {
       name: "Recarregar estado da publicação",
       exact: true,
     })
     .click();
-  await confirmGD(page);
   await expect(publish).toBeEnabled();
 });
 
@@ -760,7 +839,6 @@ test("coletivos: cancelamento preserva conferência e publicação concorrente e
   await page
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -792,8 +870,7 @@ test("coletivos: cancelamento preserva conferência e publicação concorrente e
   await expect(reason).toHaveValue(
     "Conferência da primeira aba para publicar.",
   );
-  for (const checkbox of await panel.getByRole("checkbox").all())
-    await checkbox.check();
+  await expect(panel.getByRole("checkbox")).toHaveCount(0);
   const second = await context.newPage();
   await f.attach(second);
   await open(second);
@@ -810,9 +887,7 @@ test("coletivos: cancelamento preserva conferência e publicação concorrente e
   await other
     .getByLabel("Motivo da revisão das estatísticas publicadas")
     .fill("Conferência concorrente confirmada na segunda aba.");
-  await expect(other.getByRole("checkbox")).toHaveCount(2);
-  for (const checkbox of await other.getByRole("checkbox").all())
-    await checkbox.check();
+  await expect(other.getByRole("checkbox")).toHaveCount(0);
   await other
     .getByRole("button", {
       name: "Publicar estatísticas conferidas",
@@ -838,19 +913,10 @@ test("coletivos: cancelamento preserva conferência e publicação concorrente e
   await expect(
     panel.getByRole("heading", { name: "Conferir estatísticas da versão 2" }),
   ).toBeFocused();
-  await expect(panel.getByRole("checkbox").first()).not.toBeChecked();
+  await expect(panel.getByRole("checkbox")).toHaveCount(0);
   await second.close();
 });
 
-async function confirmGD(page: Page) {
-  await expect(
-    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),
-  ).toHaveCount(2);
-  for (const checkbox of await page
-    .getByRole("checkbox", { name: /Conferi o total de GD de/ })
-    .all())
-    if (!(await checkbox.isChecked())) await checkbox.check();
-}
 async function publicationFixture(page: Page) {
   const f = await fixture(page),
     game = f.games.get(tid(80))!,
@@ -1160,6 +1226,12 @@ async function publicationFixture(page: Page) {
     },
     source: () => source,
     published: () => publicSnapshot,
+    setPublishedGD: (home: number, away: number) => {
+      if (!publicSnapshot) throw Error("Publication required");
+      publicSnapshot.facts.teams.home.teamStatistics!.disqualifications = home;
+      publicSnapshot.facts.teams.away.teamStatistics!.disqualifications = away;
+      versions.get(publicVersion)!.snapshot = structuredClone(publicSnapshot);
+    },
     fallback: () => {
       fallback = true;
     },
@@ -1188,14 +1260,9 @@ test("manual publication confirms identities, keeps participation editable and r
     .screenshot({
       path: `.preview-artifacts/manual-publication-320-${test.info().project.name}.png`,
     });
-  await page
-    .getByLabel(/GD — total da equipe/)
-    .first()
-    .fill("2");
   await expect(page.getByLabel(/FR — faltas recebidas/).first()).toHaveText(
     "FR: 0",
   );
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -1213,7 +1280,7 @@ test("manual publication confirms identities, keeps participation editable and r
   ).toBeDisabled();
   const reviewed = publishSheetSchema.parse(JSON.parse(f.commands[0]));
   expect(reviewed.source.teamReview).toEqual({
-    home: { disqualifications: 2, foulsReceived: 0 },
+    home: { disqualifications: 0, foulsReceived: 0 },
     away: { disqualifications: 0, foulsReceived: 0 },
   });
   const firstPublic = structuredClone(f.published());
@@ -1241,7 +1308,6 @@ test("manual publication confirms identities, keeps participation editable and r
   await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
     .click();
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Republicar este jogo", exact: true })
     .click();
@@ -1284,7 +1350,6 @@ test("manual fallback requires an explicit decision and uncertain publication re
   await page
     .getByLabel("Motivo da publicação", { exact: true })
     .fill("Súmula oficial revisada pelo responsável.");
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -1312,7 +1377,6 @@ test("known publication with failed source retrieval retries only the read", asy
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
   f.failRead();
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -1348,14 +1412,12 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
     await tab
       .getByRole("button", { name: "Confirmar e publicar", exact: true })
       .click();
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
-  await confirmGD(second);
   await second
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
@@ -1394,7 +1456,6 @@ test("expired publication session preserves the frozen command and protects leav
     .getByRole("button", { name: "Confirmar e publicar", exact: true })
     .click();
   f.expirePublication();
-  await confirmGD(page);
   await page
     .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();

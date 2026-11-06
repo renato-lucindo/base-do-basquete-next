@@ -20,7 +20,7 @@ export function prepareManualPublication(
     )
   )
     throw Error(
-      "Confira e confirme o total de GD das duas equipes, incluindo zero.",
+      "Os totais de GD das duas equipes devem estar calculados antes de publicar.",
     );
   if (requiresFallback && (!command.fallback || command.reason.length < 10))
     throw Error(

@@ -36,8 +36,8 @@ export function TeamStatisticsPanel(p: Props) {
     [success, setSuccess] = useState(""),
     [reason, setReason] = useState("");
   const [review, setReview] = useState<GDReview>({
-    home: { total: "", confirmed: false },
-    away: { total: "", confirmed: false },
+    home: { total: "" },
+    away: { total: "" },
   });
   const pending = useRef<ReviseTeamStatistics | null>(null),
     controller = useRef<AbortController | null>(null),
