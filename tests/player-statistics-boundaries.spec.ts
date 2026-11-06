@@ -112,19 +112,14 @@ test("a barra superior alcança a última coluna e acompanha redução de coluna
     )
     .toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: /^Colunas ·/ }).click();
-  for (const column of [
-    "pointsPerGame",
-    "pointsShare",
-    "twoMade",
-    "threeMade",
-    "freeMade",
-    "foulsCommitted",
-    "technicalFouls",
-    "unsportsmanlikeFouls",
-    "fiveFouls",
-    "disqualifications",
-  ])
-    await page.locator(`input[data-column-choice="${column}"]`).uncheck();
+  const options = page.locator("input[data-column-choice]");
+  const optionCount = await options.count();
+  await expect(page.locator('input[data-column-choice="team"]')).not.toBeChecked();
+  await expect(page.locator("input[data-column-choice]:checked")).toHaveCount(
+    optionCount - 1,
+  );
+  // All metrics start selected on mobile. Remove all to verify scroll clamping.
+  await page.getByRole("button", { name: "Nenhuma" }).click();
   await page.keyboard.press("Escape");
   await expect.poll(() => region.evaluate((el) => el.scrollLeft)).toBe(0);
   await expect.poll(() => top.evaluate((el) => el.scrollLeft)).toBe(0);
