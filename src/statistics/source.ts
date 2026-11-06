@@ -88,7 +88,7 @@ export function selectStatisticsFacts(
       };
     }),
   }));
-  // A corrected public name replaces earlier spellings for this identity,
+  // Corrected public names and nicknames replace earlier spellings for this identity,
   // including when the selected phase/dataset contains only older games.
   const currentNames = new Map<
     string,
@@ -110,6 +110,7 @@ export function selectStatisticsFacts(
       fact.person = {
         ...fact.person,
         name: currentNames.get(fact.person.id)!.person.name,
+        nickname: currentNames.get(fact.person.id)!.person.nickname,
       };
   const eligible = normalized.filter((g) => dataset === "all" || g.boxscore);
   return {

@@ -1,3 +1,7 @@
+import {
+  publicPlayerAccessibleName,
+  publicPlayerName,
+} from "../public-ui/player-name";
 import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -273,12 +277,20 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                               <span className="athlete-text">
                                 <a
                                   className="athlete-name"
+                                  title={p.person.name}
+                                  aria-label={publicPlayerAccessibleName(
+                                    p.person.name,
+                                    p.person.nickname,
+                                  )}
                                   href={publicDetailLink(
                                     `/atleta.html#${p.person.id}`,
                                     r.disputeId,
                                   )}
                                 >
-                                  {p.person.nickname || p.person.name}
+                                  {publicPlayerName(
+                                    p.person.name,
+                                    p.person.nickname,
+                                  )}
                                 </a>
                                 {p.starter && (
                                   <span className="starter-symbol"> *</span>
@@ -423,8 +435,16 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
               Fechar
             </button>
           </div>
-          <p id="foul-player" className="dialog-athlete">
-            {selected.person.name}
+          <p
+            id="foul-player"
+            className="dialog-athlete"
+            title={selected.person.name}
+            aria-label={publicPlayerAccessibleName(
+              selected.person.name,
+              selected.person.nickname,
+            )}
+          >
+            {publicPlayerName(selected.person.name, selected.person.nickname)}
           </p>
           <p className="dialog-team">
             {r.game[selected.side].name} · Camisa {selected.jersey}
