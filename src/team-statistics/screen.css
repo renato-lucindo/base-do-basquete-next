@@ -395,6 +395,11 @@
   max-width: 16.25rem;
   text-align: left;
   white-space: normal;
+}
+.team-list-page
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  th[scope="row"] {
   background: #fff;
 }
 .team-list-page

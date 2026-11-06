@@ -72,20 +72,6 @@ function location() {
       .filter((key): key is StatisticsMetric =>
         Object.hasOwn(STATISTICS_METRICS, key),
       );
-  } else if (
-    !params.has("columns") &&
-    window.matchMedia("(max-width: 600px)").matches
-  ) {
-    query.preset = "custom";
-    query.columns = query.columns.filter(
-      (key) =>
-        ![
-          "technicalFouls",
-          "unsportsmanlikeFouls",
-          "fiveFouls",
-          "disqualifications",
-        ].includes(key),
-    );
   }
   return {
     id: z.uuid().safeParse(id).success ? id.toLowerCase() : null,
@@ -115,12 +101,7 @@ export function StatisticsPageView() {
     resultHeading = useRef<HTMLHeadingElement>(null),
     focusResult = useRef(false),
     focusTarget = useRef<string | null>(null),
-    shareInput = useRef<HTMLInputElement>(null),
-    responsiveColumns = useRef(
-      !new URLSearchParams(window.location.hash.split("?")[1] ?? "").has(
-        "columns",
-      ) && sessionStorage.getItem("statistics-selected-columns") === null,
-    );
+    shareInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const read = () => {
       const next = location();
@@ -237,33 +218,6 @@ export function StatisticsPageView() {
     return () => window.clearTimeout(timer);
   }, [draft.search, route.query.search]);
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 600px)");
-    const resize = () => {
-      if (
-        !responsiveColumns.current ||
-        (draft.preset !== "essentials" && draft.preset !== "custom")
-      )
-        return;
-      const columns = scoreKeys.filter(
-        (key) =>
-          !media.matches ||
-          ![
-            "technicalFouls",
-            "unsportsmanlikeFouls",
-            "fiveFouls",
-            "disqualifications",
-          ].includes(key),
-      );
-      navigate(
-        updateStatisticsQuery(draft, { preset: "custom", columns }),
-        false,
-        false,
-      );
-    };
-    media.addEventListener("change", resize);
-    return () => media.removeEventListener("change", resize);
-  }, [serialized]);
-  useEffect(() => {
     const media = window.matchMedia("(max-width:600px)");
     const resize = () => {
       if (sessionStorage.getItem("statistics-team-column") === null)
@@ -273,7 +227,6 @@ export function StatisticsPageView() {
     return () => media.removeEventListener("change", resize);
   }, []);
   function selectColumns(columns: StatisticsMetric[], team = showTeam) {
-    responsiveColumns.current = false;
     setShowTeam(team);
     sessionStorage.setItem(
       "statistics-team-column",
@@ -907,7 +860,6 @@ export function StatisticsPageView() {
                     <select
                       value={draft.preset}
                       onChange={(e) => {
-                        responsiveColumns.current = false;
                         const preset = e.target
                           .value as StatisticsQuery["preset"];
                         const columns =
