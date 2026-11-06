@@ -432,19 +432,6 @@
   width: 120px;
   max-width: 100%;
 }
-.sheet-publication .collective-gd-confirmation {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  min-height: 44px;
-}
-.sheet-publication .collective-gd-confirmation input[type="checkbox"] {
-  flex: none;
-  width: 20px;
-  height: 20px;
-  min-height: 20px;
-  margin-top: 2px;
-}
 .sheet-publication .team-statistics-review textarea {
   display: block;
   width: 100%;

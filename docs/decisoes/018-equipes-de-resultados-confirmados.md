@@ -1,5 +1,7 @@
 # 018 — Consulta de equipes conserva inscrição e fontes publicadas
 
+**Decisão atual,06/11/2026:** o responsável retirou a confirmação manual de faltas/GD. O fluxo normal apresenta FR/T/GD para leitura e envia os totais automaticamente. Esta decisão substitui os trechos anteriores que exigiam entrada ou check explícito de zero; detalhes abaixo.
+
 **Vigência (01/11/2026):** identidade por inscrição e fontes publicadas permanecem vigentes. A leitura do agregado foi evoluída para paginação no [019](019-fonte-estatistica-limitada-por-pagina.md). O parágrafo de ordem de branches/CI é registro da execução passada, sem autorizar empilhamento ou publicação agora.
 
 26/10/2026. ESCOPO§8 pede tabela de equipes com busca/ordem/totais/médias e detalhe com estatísticas, elenco e jogos. Esta unidade independente consome somente os resultados já publicados na fonte confirmed-statistics-v1. Política para inscritos sem resultado e agenda futura permanece sem resposta; não antecipar sua exposição nem buscar elenco/cadastro live para preencher lacunas.
@@ -34,4 +36,12 @@ A decisão atual evolui somente a listagem solicitada com `pageSize=all`: contag
 
 PB usa titulares confirmados por partida e pontos individuais publicados; coletivo PDF válido prevalece quando possui a mesma autoridade dos pontos. Ausência de titular não confirma reserva. Numerador/denominador correspondem às mesmas partidas; cobertura parcial é —, nunca subtotal. O novo DTO expõe cobertura interna e opções públicas completas sem incluir campos nas respostas legadas. Ordem/UI vigentes em [PUBLICO](../design/PUBLICO.md#refinamento-de-equipes--decisão-de05112026).
 
-A consulta histórica anterior está no [quadro por jogo/equipe](../evidencias/2026-11-05-equipes-historico.md). A decisão substitutiva acima calcula FR pela FC adversária e mantém a confirmação explícita do total completo de GD. O [quadro atualizado](../evidencias/2026-11-05-equipes-fr-t-gd.md) não altera documentos nem autoriza republicação. A composição com PR61 também preserva a fase já publicada nas correções exclusivamente coletivas.
+A consulta histórica anterior está no [quadro por jogo/equipe](../evidencias/2026-11-05-equipes-historico.md). A PR64 passou a calcular FR pela FC adversária e exigia confirmação explícita do total completo de GD. O [quadro atualizado](../evidencias/2026-11-05-equipes-fr-t-gd.md) foi confirmado pelo responsável e regularizado naquela unidade; seu registro não autoriza repetir a operação. A composição com PR61 também preserva a fase já publicada nas correções exclusivamente coletivas.
+
+## Publicação com totais automáticos —06/11/2026
+
+O pedido posterior do responsável remove os campos e checks de confirmação na publicação normal. FR continua sendo a FC dos atletas adversários na mesma partida; T e as pessoas desqualificadas registradas são calculadas pelo motor, incluindo sucessões e sem duplicar capitão/treinador. GD usa a contagem identificada; B2 isolado não inventa uma quantidade de pessoas. Totais GD já publicados para a mesma versão documental são conservados. Editar a súmula exige recarregar o estado da publicação, inclusive após desfazer a alteração.
+
+O comando existente recebe automaticamente os números de GD/FR. Não existe flag de confirmação humana no contrato externo; permanecem a validação SQL de números obrigatórios, mínimo identificado, FR cruzada, versões e recibos. Para conservar GD anterior,não basta sourceVersion igual: o documento local normalizado deve corresponder à versão congelada publicada. Edição ainda não salva recalcula GD; indisponibilidade dessa leitura exige repetir o preparo,sem supor valores. Portanto, esta mudança de fluxo não exige migration, alteração de API ou nova escrita nos históricos.
+
+Correções administrativas de estatísticas congeladas continuam com total GD editável, validação de intervalo/mínimo e motivo; os checks redundantes também foram removidos. A ação permite complementar ocorrências não representadas pelos eventos sem alterar a súmula atual. A disponibilidade automática não promete detectar pessoas ausentes dos registros. Históricos incompletos mantêm sua compatibilidade, e nenhuma publicação é repetida automaticamente.

@@ -7,6 +7,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
 import {
   validatePersistedSheet,
+  persistedSheetSchema,
   type PersistedSheet,
 } from "../games/sheet-contract";
 import { prepareManualPublication } from "./manual";
@@ -21,6 +22,7 @@ import {
 import { TeamStatisticsPanel } from "./team-statistics-panel";
 import {
   publicationStateSchema,
+  publicationVersionSchema,
   publicationSheetResultSchema,
   type PublicationState,
 } from "./data-contract";
@@ -65,10 +67,6 @@ export function SheetPublicationPanel(p: Props) {
   useEffect(() => {
     if (reviewDocument.current && reviewDocument.current !== documentKey) {
       reviewDocument.current = "";
-      setTeamReview((v) => ({
-        home: { ...v.home, confirmed: false },
-        away: { ...v.away, confirmed: false },
-      }));
     }
   }, [documentKey]);
   useEffect(() => {
@@ -106,6 +104,7 @@ export function SheetPublicationPanel(p: Props) {
   async function prepare() {
     if (p.disabled || blocked) return;
     setError("");
+    setState(null);
     try {
       validatePersistedSheet(p.document, true);
     } catch {
@@ -133,18 +132,37 @@ export function SheetPublicationPanel(p: Props) {
           409,
           "O jogo mudou. Recarregue a súmula antes de publicar.",
         );
+      let previous: ReturnType<typeof publishedGD> | undefined;
+      if (
+        s.published?.source.kind === "sheet" &&
+        s.published.source.version === p.sourceVersion
+      ) {
+        const frozen = await api(
+          `/api/games/${p.game.id}/publication/versions/${s.version}`,
+          publicationVersionSchema,
+        );
+        if (n !== epoch.current) return;
+        if (
+          frozen.gameId !== p.game.id ||
+          frozen.version !== s.version ||
+          frozen.sourceKind !== "sheet" ||
+          frozen.sourceVersion !== p.sourceVersion ||
+          JSON.stringify(frozen.snapshot) !== JSON.stringify(s.published)
+        )
+          throw new ApiFailure(
+            409,
+            "A publicação mudou. Recarregue o estado antes de publicar.",
+          );
+        if (
+          JSON.stringify(persistedSheetSchema.parse(frozen.document)) ===
+          JSON.stringify(persistedSheetSchema.parse(p.document))
+        )
+          previous = publishedGD(s.published);
+      }
       setState(s);
       setFallback(false);
       reviewDocument.current = JSON.stringify(p.document);
-      setTeamReview(
-        initialGDReview(
-          collective,
-          s.published?.source.kind === "sheet" &&
-            s.published.source.version === p.sourceVersion
-            ? publishedGD(s.published)
-            : undefined,
-        ),
-      );
+      setTeamReview(initialGDReview(collective, previous));
     } catch (e) {
       if (n === epoch.current) {
         if (e instanceof ApiFailure && e.status === 409) p.onConflict();
@@ -165,9 +183,7 @@ export function SheetPublicationPanel(p: Props) {
     if (p.disabled || busy || !state || ack) return;
     setError("");
     if (!pending.current && !gdReviewReady(teamReview, collective)) {
-      setError(
-        "Confira e confirme o total de GD das duas equipes, incluindo zero.",
-      );
+      setError("Não foi possível calcular os totais coletivos da súmula.");
       return;
     }
     if (
@@ -320,15 +336,20 @@ export function SheetPublicationPanel(p: Props) {
           )}
           <CollectiveReview
             facts={collective}
-            review={teamReview}
+            review={
+              reviewDocument.current === documentKey
+                ? teamReview
+                : initialGDReview(collective)
+            }
             onChange={setTeamReview}
             disabled={blocked || p.disabled}
+            readOnly
             names={{ home: p.game.home.name, away: p.game.away.name }}
           />
           {reviewDocument.current !== documentKey && (
             <p role="status">
-              A súmula mudou. Recarregue o estado da publicação e confira GD
-              novamente.
+              A súmula mudou. Recarregue o estado da publicação para atualizar
+              os totais automáticos.
             </p>
           )}
           {!p.confirmed && needsReason && (

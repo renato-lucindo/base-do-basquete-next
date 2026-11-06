@@ -64,3 +64,30 @@ it("requires explicit GD from both sides for writing while legacy derivation rem
     }),
   ).toThrow(/GD/);
 });
+
+import { disciplinarySheet } from "../../tests/fixtures/sheet-team-statistics";
+import { gdReviewReady, initialGDReview } from "./collective-review";
+it("accepts automatic zero and identified dismissals without human confirmation", () => {
+  for (const d of [publicationSheet(), disciplinarySheet()]) {
+    const facts = deriveSheetTeamStatistics(d);
+    const review = initialGDReview(facts);
+    expect(gdReviewReady(review, facts)).toBe(true);
+    expect(Number(review.home.total)).toBe(facts.home.minimumDisqualifications);
+    expect(Number(review.away.total)).toBe(facts.away.minimumDisqualifications);
+  }
+});
+
+it("preserves known published totals and validates incomplete or below-minimum corrections", () => {
+  const facts = deriveSheetTeamStatistics(disciplinarySheet());
+  const review = initialGDReview(facts, { home: 6, away: 0 });
+  expect(gdReviewReady(review, facts)).toBe(true);
+  expect(review.home.total).toBe("6");
+  for (const invalid of ["", " ", "-1", "3", "1.5", "2147483648"]) {
+    expect(
+      gdReviewReady(
+        { ...review, home: { ...review.home, total: invalid } },
+        facts,
+      ),
+    ).toBe(false);
+  }
+});
