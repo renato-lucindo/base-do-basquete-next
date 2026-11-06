@@ -484,3 +484,18 @@
     max-width: 6.875rem;
   }
 }
+
+/* Keep the team list controls compact without removing accessible names or status. */
+.team-list-page .team-list-results .table-toolbar {
+  justify-content: flex-end;
+}
+
+/* The fixed team header shares the background of the other statistics headers. */
+.team-list-page
+  .public-site.statistics-public
+  .team-list-explorer[data-scoresheet]
+  .statistics-table
+  thead
+  th[data-team-metric="name"]:not(.active-column) {
+  background: #f3f6fa;
+}
