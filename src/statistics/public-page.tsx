@@ -661,7 +661,7 @@ export function StatisticsPageView() {
                                       key={s.personId}
                                       title={s.names.join(" / ")}
                                     >
-                                      Resumo:{" "}
+                                      <span>Resumo: </span>
                                       {publicPlayerHistoryName(
                                         s.names,
                                         s.nicknames,
@@ -717,14 +717,14 @@ export function StatisticsPageView() {
                             têm melhor valor quando menores. A ausência não
                             recebe valor nem vence uma comparação.
                           </p>
-                          {compareNames.map(({ id, name, accessibleName }) => (
+                          {compareNames.map((comparison) => (
                             <button
-                              key={id}
+                              key={comparison.id}
                               className="statistics-secondary"
-                              aria-label={`Remover ${accessibleName} da comparação`}
-                              onClick={() => togglePerson(id)}
+                              aria-label={`Remover ${comparison.accessibleName} da comparação`}
+                              onClick={() => togglePerson(comparison.id)}
                             >
-                              Remover {name} da comparação
+                              Remover {comparison.name} da comparação
                             </button>
                           ))}
                           {draft.compare.some(
@@ -772,7 +772,10 @@ export function StatisticsPageView() {
                                           data.disputeId,
                                         )}
                                       >
-                                        {publicPlayerHistoryName(r.names, r.nicknames)}
+                                        {publicPlayerHistoryName(
+                                          r.names,
+                                          r.nicknames,
+                                        )}
                                       </a>
                                     </th>
                                     <td>

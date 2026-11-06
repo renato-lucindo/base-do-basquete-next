@@ -37,7 +37,5 @@ it("tabelas históricas mostram apelido, sem descartar variantes do nome", () =>
   ).toBe(
     "Pedro Pessoti — nome completo: Pedro Gabriel Amorim / Pedro Gabriel Amorim Pessoti",
   );
-  expect(publicPlayerHistoryName(names, [null, "   "])).toBe(
-    names.join(" / "),
-  );
+  expect(publicPlayerHistoryName(names, [null, "   "])).toBe(names.join(" / "));
 });

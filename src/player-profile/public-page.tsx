@@ -714,11 +714,7 @@ export function PlayerPublicPage() {
       >
         Pular para o perfil
       </a>
-      <PublicHeader
-        disputeId={origin}
-        section="jogadores"
-        detail={displayName}
-      />
+      <PublicHeader disputeId={origin} section="jogadores" detail={displayName} />
       <main
         id="player-content"
         tabIndex={-1}
