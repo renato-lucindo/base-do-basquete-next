@@ -252,18 +252,21 @@ it("padrão mobile seleciona todas as métricas sem substituir seleção explíc
   );
   expect(mobile.columns.length).toBeGreaterThan(desktop.columns.length);
 
-  expect(
-    parseStatisticsQuery(new URLSearchParams("preset=essentials"), "all").columns,
-  ).toEqual(desktop.columns);
-  expect(
-    parseStatisticsQuery(new URLSearchParams("columns=games,points"), "all").columns,
-  ).toEqual(["games", "points"]);
-  expect(
-    parseStatisticsQuery(
-      new URLSearchParams("preset=custom&columns="),
-      "all",
-    ).columns,
-  ).toEqual([]);
+  const explicitPreset = parseStatisticsQuery(
+    new URLSearchParams("preset=essentials"),
+    "all",
+  );
+  const explicitColumns = parseStatisticsQuery(
+    new URLSearchParams("columns=games,points"),
+    "all",
+  );
+  const empty = parseStatisticsQuery(
+    new URLSearchParams("preset=custom&columns="),
+    "all",
+  );
+  expect(explicitPreset.columns).toEqual(desktop.columns);
+  expect(explicitColumns.columns).toEqual(["games", "points"]);
+  expect(empty.columns).toEqual([]);
 });
 
 it("preset de súmula exibe apenas dados simples e compartilha a preferência na URL", () => {
