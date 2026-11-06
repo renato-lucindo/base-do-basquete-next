@@ -1,5 +1,7 @@
 # Progresso atual
 
+Revisão06/11 na [PR65](https://github.com/renato-lucindo/base-do-basquete-next/pull/65): comparação apenas por sourceVersion reaproveitava GD antiga após edição ainda não salva. RED→GREEN corrigido lendo a versão congelada e comparando o documento normalizado; só documento idêntico conserva GD anterior. Leitura indisponível limpa o preparo e permite repetir apenas a leitura.22browsers de súmula PASS após correção. Gate anterior eacc36c exit0:729unitários/152arquivos,política11,transporte11,banco15,HTTP33,PDF1 e verificações estáticas; não atesta o HEAD revisado. Gate final e CI do novo HEAD ainda pendentes; consultar a PR para conclusão operacional.
+
 Atualizado em06/11/2026. Unidade **publicação com totais coletivos automáticos**, branch `codex/publicacao-coletivos-automatica`,base `origin/main ce882f87c0cd838014bd600618de285b1d3b6ad6`; recuperar HEAD por Git. Worktree C:/Users/12405304716/.codex/worktrees/publicacao-coletivos-automatica/Base do Basquete-v1. Nenhuma PR aberta no inventário inicial. Uma unidade,sem pilha.
 
 Pedido humano após PR64: verificar publicação bloqueada e retirar confirmação manual de faltas. Browser real encontrou Saldanha da Gama54×AMPRL45,5períodos,111ações,FR18/25,T0/0,GD0/0 e dois checks desmarcados. A aba e o jogo humano foram preservados,sem envio de publicação.

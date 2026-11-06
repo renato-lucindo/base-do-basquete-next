@@ -18,4 +18,6 @@ Revisão autoral com ui-ux-pro-max e [Web Interface Guidelines](https://raw.gith
 
 ## Operação
 
+Revisão automática Codex na PR65/HEAD eacc36c encontrou reaproveitamento indevido de GD em edição ainda não salva. SourceVersion pode continuar igual enquanto o documento local muda. Prova RED→GREEN em collective-auto-unsaved-red.log e collective-auto-sheet-reviewed-final.log: preparar a republicação lê a versão congelada,confere identidade/snapshot e compara o documento normalizado antes de reutilizar GD. Documento alterado recalcula; falha na leitura não libera publicação com valores presumidos e permite repetir só a leitura.22testes de súmula PASS após ajuste. O gate completo anterior passou em eacc36c (729unitários/152arquivos,política11,transporte11,banco15,HTTP33,PDF1); gate do código revisado e CI devem ser conferidos na PR,sem herdar a aprovação anterior.
+
 Preview anterior:ce882f8/deploymentb7f1ba34-3716-4a5e-9800-f1b82336dc31/versionc994ffd2-b835-43e3-bdf1-cdbdeafbb311. Conferir CI da PR e do SHA integrado antes de publicar código somente no UIUX. Preservar principal/Access/segredos/DO. A aba humana e dados do jogo não são teste de escrita. Provas finais e versão efetivamente publicada ficam na PR apontada por PROGRESSO, evitando um novo commit só para repetir CI de código inalterado.

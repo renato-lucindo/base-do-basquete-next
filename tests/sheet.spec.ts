@@ -664,6 +664,109 @@ test("coletivos automáticos: publica GD e T identificadas sem confirmação man
   });
 });
 
+test("coletivos automáticos: recalcula GD ao republicar edição ainda não salva", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  const savedVersion = f.source().version;
+  await page
+    .getByLabel("Quarto ou prorrogação", { exact: true })
+    .selectOption("4");
+  for (let n = 0; n < 2; n++) {
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("00");
+    await page.getByLabel("Camisa ou alvo", { exact: true }).press("Enter");
+    await page.getByLabel("Ação", { exact: true }).fill("TC");
+    await page.getByLabel("Ação", { exact: true }).press("Enter");
+  }
+  expect(f.source().version).toBe(savedVersion);
+  await page
+    .getByLabel("Motivo da revisão da súmula", { exact: true })
+    .fill("Inclusão das técnicas registradas no fim da partida.");
+  await page
+    .getByRole("button", { name: "Salvar e republicar", exact: true })
+    .click();
+  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
+    "GD: 1",
+  );
+  await expect(
+    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
+  ).toBeEnabled();
+  await page
+    .getByRole("button", { name: "Republicar este jogo", exact: true })
+    .click();
+  await expect.poll(() => f.published()?.version).toBe(2);
+  expect(
+    f.published()!.facts.teams.home.teamStatistics?.disqualifications,
+  ).toBe(1);
+});
+
+test("coletivos automáticos: falha ao ler a fonte publicada permite repetir apenas a leitura", async ({
+  page,
+}) => {
+  const f = await publicationFixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Confirmar e publicar", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  f.setPublishedGD(2, 0);
+  const before = structuredClone(f.source());
+  let unavailable = true;
+  await page.route("**/publication/versions/1", (route) => {
+    if (unavailable) {
+      unavailable = false;
+      return route.fulfill({
+        status: 503,
+        json: {
+          error: {
+            code: "access_unavailable",
+            message: "Fonte publicada indisponível.",
+          },
+        },
+      });
+    }
+    return route.fallback();
+  });
+  await page
+    .getByLabel("Motivo da revisão da súmula", { exact: true })
+    .fill("Conferência dos totais já publicados.");
+  const prepare = page.getByRole("button", {
+    name: "Salvar e republicar",
+    exact: true,
+  });
+  await prepare.click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Fonte publicada indisponível",
+  );
+  await expect(
+    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
+  ).toHaveCount(0);
+  await prepare.click();
+  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
+    "GD: 2",
+  );
+  await expect(
+    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
+  ).toBeEnabled();
+  expect(f.commands).toHaveLength(1);
+  expect(f.source()).toEqual(before);
+});
+
 test("coletivos: preserva GD publicada, fonte divergente e repetição sem duplicar", async ({
   page,
 }, info) => {

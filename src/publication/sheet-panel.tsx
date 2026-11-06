@@ -7,6 +7,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
 import {
   validatePersistedSheet,
+  persistedSheetSchema,
   type PersistedSheet,
 } from "../games/sheet-contract";
 import { prepareManualPublication } from "./manual";
@@ -21,6 +22,7 @@ import {
 import { TeamStatisticsPanel } from "./team-statistics-panel";
 import {
   publicationStateSchema,
+  publicationVersionSchema,
   publicationSheetResultSchema,
   type PublicationState,
 } from "./data-contract";
@@ -102,6 +104,7 @@ export function SheetPublicationPanel(p: Props) {
   async function prepare() {
     if (p.disabled || blocked) return;
     setError("");
+    setState(null);
     try {
       validatePersistedSheet(p.document, true);
     } catch {
@@ -129,18 +132,37 @@ export function SheetPublicationPanel(p: Props) {
           409,
           "O jogo mudou. Recarregue a súmula antes de publicar.",
         );
+      let previous: ReturnType<typeof publishedGD> | undefined;
+      if (
+        s.published?.source.kind === "sheet" &&
+        s.published.source.version === p.sourceVersion
+      ) {
+        const frozen = await api(
+          `/api/games/${p.game.id}/publication/versions/${s.version}`,
+          publicationVersionSchema,
+        );
+        if (n !== epoch.current) return;
+        if (
+          frozen.gameId !== p.game.id ||
+          frozen.version !== s.version ||
+          frozen.sourceKind !== "sheet" ||
+          frozen.sourceVersion !== p.sourceVersion ||
+          JSON.stringify(frozen.snapshot) !== JSON.stringify(s.published)
+        )
+          throw new ApiFailure(
+            409,
+            "A publicação mudou. Recarregue o estado antes de publicar.",
+          );
+        if (
+          JSON.stringify(persistedSheetSchema.parse(frozen.document)) ===
+          JSON.stringify(persistedSheetSchema.parse(p.document))
+        )
+          previous = publishedGD(s.published);
+      }
       setState(s);
       setFallback(false);
       reviewDocument.current = JSON.stringify(p.document);
-      setTeamReview(
-        initialGDReview(
-          collective,
-          s.published?.source.kind === "sheet" &&
-            s.published.source.version === p.sourceVersion
-            ? publishedGD(s.published)
-            : undefined,
-        ),
-      );
+      setTeamReview(initialGDReview(collective, previous));
     } catch (e) {
       if (n === epoch.current) {
         if (e instanceof ApiFailure && e.status === 409) p.onConflict();
