@@ -724,3 +724,19 @@
 .public-header.site-header .public-header-search input {
   margin: 0;
 }
+@media (min-width: 640px) {
+  .public-header.site-header > .header-inner.wrap {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .public-header.site-header .header-inner .brand,
+  .public-header.site-header .header-inner > a {
+    flex-shrink: 0;
+  }
+  .public-header.site-header .public-header-search {
+    flex: 1 1 20rem;
+  }
+  .public-header.site-header .public-catalog-link {
+    margin-left: auto;
+  }
+}
