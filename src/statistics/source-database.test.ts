@@ -43,11 +43,11 @@ it.each(["zero", "upgrade"] as const)(
       expect(initial.games).toHaveLength(2);
       expect(initial.minimumSeconds).toBe(600);
       const selected = selectStatisticsFacts(initial, "all");
-      expect(selected.coverage).toEqual({
-        regularGames: 0,
-        playoffGames: 0,
-        unclassifiedGames: 2,
-      });
+      expect(selected.coverage).toEqual(
+        mode === "zero"
+          ? { regularGames: 2, playoffGames: 0, unclassifiedGames: 0 }
+          : { regularGames: 0, playoffGames: 0, unclassifiedGames: 2 },
+      );
       expect(
         aggregateConfirmedStatistics(selected.facts, {
           mode: "total",

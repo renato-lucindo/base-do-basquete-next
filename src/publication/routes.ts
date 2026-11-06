@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { publishSheetSchema } from "./contract";
+import { confirmGameStagesSchema } from "./stages-contract";
 import { publishPdfSchema } from "./pdf-contract";
 import { SupabasePublications } from "./provider";
 import { savePreparationSchema } from "./preparation-contract";
@@ -120,4 +121,31 @@ export async function publicGameRoute(request: Request, env: Env, url: URL) {
       "Resultado não publicado ou não encontrado.",
     );
   return jsonResponse(r);
+}
+
+/** Explicit administrative publication, never called when a game form is saved. */
+export async function statisticsStageRoute(
+  request: Request,
+  env: Env,
+  url: URL,
+) {
+  if (url.pathname !== "/api/statistics/stages" || url.search) throw badInput();
+  if (request.method !== "POST")
+    throw new HttpError(405, "invalid_method", "Método não permitido.");
+  const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
+  if (!name)
+    throw new HttpError(
+      401,
+      "invalid_session",
+      "Entre para acessar a área administrativa.",
+    );
+  const session = env.SESSIONS.getByName(name);
+  const command = await readMutationJson(request, confirmGameStagesSchema, {
+    origin: env.APP_ORIGIN,
+    maxBytes: 32768,
+  });
+  const result = await session.confirmGameStages(command);
+  if (!result.ok)
+    throw new HttpError(result.status, result.code, result.message);
+  return jsonResponse(result.value);
 }

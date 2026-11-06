@@ -630,6 +630,19 @@ async function fixture(options = {}) {
       outboundService: async (request) => {
         const url = new URL(request.url);
         calls.push(url.pathname + url.search);
+        if (
+          options.stageConfirmation &&
+          url.pathname === "/rest/v1/rpc/confirm_game_stages"
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          assert.equal(request.headers.get("cookie"), null);
+          options.stageBody = await request.json();
+          return Response.json(options.stageReceipt);
+        }
+
         if (reuse) {
           const response = await reuse.handler(request);
           if (response) return response;
@@ -3095,6 +3108,119 @@ test("transfer routes authorize before body, derive previews and recover frozen 
     });
     assert.equal(revoked.status, 403);
     assert.equal(calls(), before);
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("statistics phase confirmation enforces HTTP boundaries before calling its RPC", async () => {
+  const f = await fixture({});
+  const path = origin + "/api/statistics/stages";
+  try {
+    assert.equal(
+      (await f.mf.dispatchFetch(path, { method: "POST", body: "{}" })).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const headers = { cookie, origin, "content-type": "application/json" };
+    const before = f.calls.length;
+    for (const [url, init, status] of [
+      [path, { method: "GET", headers }, 405],
+      [path + "?unexpected=1", { method: "POST", headers, body: "{}" }, 400],
+      [
+        path,
+        {
+          method: "POST",
+          headers: { ...headers, origin: "https://evil.test" },
+          body: "{}",
+        },
+        403,
+      ],
+      [
+        path,
+        {
+          method: "POST",
+          headers: { ...headers, "content-type": "text/plain" },
+          body: "{}",
+        },
+        415,
+      ],
+      [path, { method: "POST", headers, body: "{}" }, 400],
+      [
+        path,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ reason: "a".repeat(32769) }),
+        },
+        413,
+      ],
+    ]) {
+      assert.equal((await f.mf.dispatchFetch(url, init)).status, status);
+    }
+    assert.equal(
+      f.calls.slice(before).filter((call) => call.includes("/rpc/")).length,
+      0,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("statistics phase confirmation uses the session and rejects revoked access before publication", async () => {
+  const gameId = "10000000-0000-4000-8000-000000000002";
+  const command = {
+    requestId: id,
+    disputeId: id,
+    baseStatisticsVersion: 1,
+    reason: "Classificação conferida pelo administrador.",
+    games: [
+      { gameId, gameVersion: 3, publicationVersion: 2, previousPhase: null },
+    ],
+  };
+  const receipt = {
+    requestId: id,
+    disputeId: id,
+    version: 2,
+    changedGameCount: 1,
+    changedGameIds: [gameId],
+  };
+  const options = { stageConfirmation: true, stageReceipt: receipt };
+  const f = await fixture(options);
+  try {
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = () =>
+      f.mf.dispatchFetch(origin + "/api/statistics/stages", {
+        method: "POST",
+        headers: { cookie, origin, "content-type": "application/json" },
+        body: JSON.stringify(command),
+      });
+    const response = await send();
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), receipt);
+    assert.deepEqual(options.stageBody, { p_command: command });
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.equal(response.headers.get("authorization"), null);
+    options.stageReceipt = { ...receipt, disputeId: gameId };
+    assert.equal(
+      (await send()).status,
+      503,
+      "uncorrelated RPC receipt must fail closed",
+    );
+    const before = f.calls.filter((call) =>
+      call.endsWith("/confirm_game_stages"),
+    ).length;
+    options.denied = true;
+    assert.equal((await send()).status, 403);
+    assert.equal(
+      f.calls.filter((call) => call.endsWith("/confirm_game_stages")).length,
+      before,
+    );
+    assert.equal(
+      (await send()).status,
+      401,
+      "revoked session must be discarded",
+    );
   } finally {
     await f.mf.dispose();
   }

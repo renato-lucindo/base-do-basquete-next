@@ -52,16 +52,27 @@ it.each(["zero", "upgrade"] as const)(
           "select snapshot from public.published_games order by game_id",
         )
       ).rows;
+      const phaseRows = (
+        await db.query<{
+          game_id: string;
+          phase: "round_robin" | "knockout" | null;
+        }>("select game_id,phase from public.published_statistics_games")
+      ).rows;
+      const publishedPhase = new Map(
+        phaseRows.map((row) => [row.game_id, row.phase]),
+      );
       for (const { snapshot } of games) {
         const expected = normalizeConfirmedGame(snapshot);
-        for (const fact of expected)
+        for (const fact of expected) {
+          expect(publishedPhase.has(fact.gameId)).toBe(true);
           expect(
             initial.find(
               (p) =>
                 p.fact.gameId === fact.gameId &&
                 p.fact.person.id === fact.person.id,
             )?.fact,
-          ).toEqual(fact);
+          ).toEqual({ ...fact, phase: publishedPhase.get(fact.gameId) });
+        }
       }
       await db.exec(
         (

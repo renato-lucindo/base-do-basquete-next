@@ -1,4 +1,8 @@
-import { publicationRoute, publicGameRoute } from "../publication/routes";
+import {
+  publicationRoute,
+  publicGameRoute,
+  statisticsStageRoute,
+} from "../publication/routes";
 import { publicStatisticsRoute } from "../statistics/routes";
 import { publicCatalogRoute, publicSearchRoute } from "../public-ui/routes";
 import { publicTeamsRoute } from "../team-statistics/routes";
@@ -85,6 +89,8 @@ export default {
         url.pathname.startsWith("/api/public/games/")
       )
         response = await publicGameRoute(request, env, url);
+      else if (url.pathname === "/api/statistics/stages")
+        response = await statisticsStageRoute(request, env, url);
       else if (/^\/api\/games\/[^/]+\/publication(?:\/|$)/u.test(url.pathname))
         response = await publicationRoute(request, env, url);
       else if (
