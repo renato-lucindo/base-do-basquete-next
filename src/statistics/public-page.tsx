@@ -1,3 +1,7 @@
+import {
+  publicPlayerHistoryAccessibleName,
+  publicPlayerHistoryName,
+} from "../public-ui/player-name";
 import { usePublicPosition } from "../public-ui/position";
 import { publicDetailLink } from "../public-ui/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -315,14 +319,11 @@ export function StatisticsPageView() {
   const minimumGames =
     draft.filters.find((f) => f.metric === "games" && f.operator === ">=")
       ?.value ?? 0;
-  const namesByPerson = new Map<string, string[]>();
-  for (const r of data?.compared ?? [])
-    namesByPerson.set(r.personId, [
-      ...new Set([...(namesByPerson.get(r.personId) ?? []), ...r.names]),
-    ]);
-  const compareNames = [...namesByPerson.entries()].map(
-    ([id, names]) => [id, names.join(" / ")] as const,
-  );
+  const compareNames = (data?.comparisonSummaries ?? []).map((summary) => [
+    summary.personId,
+    publicPlayerHistoryName(summary.names, summary.nicknames),
+    publicPlayerHistoryAccessibleName(summary.names, summary.nicknames),
+  ] as const);
   return (
     <div className="public-site statistics-public">
       <TooltipProvider>
@@ -653,8 +654,8 @@ export function StatisticsPageView() {
                                 <tr>
                                   <th>Métrica</th>
                                   {data.comparisonSummaries.map((s) => (
-                                    <th key={s.personId}>
-                                      Resumo: {s.names.join(" / ")}
+                                    <th key={s.personId} title={s.names.join(" / ")}>
+                                      Resumo: {publicPlayerHistoryName(s.names, s.nicknames)}
                                       <small>
                                         {s.registrationIds.length} inscrições ·{" "}
                                         {s.gamesPlayed} jogos
@@ -706,10 +707,11 @@ export function StatisticsPageView() {
                             têm melhor valor quando menores. A ausência não
                             recebe valor nem vence uma comparação.
                           </p>
-                          {compareNames.map(([id, name]) => (
+                          {compareNames.map(([id, name, accessibleName]) => (
                             <button
                               key={id}
                               className="statistics-secondary"
+                              aria-label={`Remover ${accessibleName} da comparação`}
                               onClick={() => togglePerson(id)}
                             >
                               Remover {name} da comparação
@@ -750,12 +752,17 @@ export function StatisticsPageView() {
                                   <tr key={`${r.personId}/${r.registrationId}`}>
                                     <th scope="row" title={r.names.join(" / ")}>
                                       <a
+                                        title={r.names.join(" / ")}
+                                        aria-label={publicPlayerHistoryAccessibleName(
+                                          r.names,
+                                          r.nicknames,
+                                        )}
                                         href={publicDetailLink(
                                           `/atleta.html#${r.personId}`,
                                           data.disputeId,
                                         )}
                                       >
-                                        {display(r.names)}
+                                        {publicPlayerHistoryName(r.names, r.nicknames)}
                                       </a>
                                     </th>
                                     <td>

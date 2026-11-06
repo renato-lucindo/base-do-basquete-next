@@ -1,3 +1,4 @@
+import { publicPlayerName } from "../public-ui/player-name";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
@@ -713,7 +714,11 @@ export function PlayerPublicPage() {
       <PublicHeader
         disputeId={origin}
         section="jogadores"
-        detail={ready?.page.identity.name ?? "Perfil do atleta"}
+        detail={
+          ready
+            ? publicPlayerName(ready.page.identity.name, ready.page.identity.nickname)
+            : "Perfil do atleta"
+        }
       />
       <main
         id="player-content"
@@ -741,12 +746,18 @@ export function PlayerPublicPage() {
               className={`player-overview ${ready.page.honors.length || ready.page.teamPlacements.length ? "player-with-honors" : ""}`}
             >
               <header className="player-identity">
-                <h1>{ready.page.identity.name}</h1>
-                {ready.page.identity.nickname && (
-                  <p className="player-nickname">
-                    {ready.page.identity.nickname}
-                  </p>
-                )}
+                <h1>
+                  {publicPlayerName(
+                    ready.page.identity.name,
+                    ready.page.identity.nickname,
+                  )}
+                </h1>
+                {ready.page.identity.nickname?.trim() &&
+                  ready.page.identity.nickname.trim() !== ready.page.identity.name && (
+                    <p className="player-full-name">
+                      {ready.page.identity.name}
+                    </p>
+                  )}
                 <Metadata career={ready} />
               </header>
               <Honors career={ready} />

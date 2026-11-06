@@ -1,3 +1,7 @@
+import {
+  publicPlayerHistoryAccessibleName,
+  publicPlayerHistoryName,
+} from "../../public-ui/player-name";
 import { publicDetailLink } from "../../public-ui/navigation";
 // Adaptado do ScoresheetStatisticsTable aprovado: mantém estrutura e estilos;
 // valores, cobertura e posições são fornecidos pela projeção pública.
@@ -163,7 +167,7 @@ export function ScoresheetStatisticsTable({
                 <th
                   scope="row"
                   className="reference-player statistics-player"
-                  title={row.names[0]}
+                  title={row.names.join(" / ")}
                 >
                   <span className="player">
                     {comparisonEnabled && (
@@ -183,12 +187,17 @@ export function ScoresheetStatisticsTable({
                     )}
                     <a
                       className="player-name"
+                      title={row.names.join(" / ")}
+                      aria-label={publicPlayerHistoryAccessibleName(
+                        row.names,
+                        row.nicknames,
+                      )}
                       href={publicDetailLink(
                         `/atleta.html#${row.personId}`,
                         data.disputeId,
                       )}
                     >
-                      {row.names[0]}
+                      {publicPlayerHistoryName(row.names, row.nicknames)}
                     </a>{" "}
                     <span
                       className="player-jersey"

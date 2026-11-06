@@ -51,6 +51,25 @@ it("correção do nome substitui grafias antigas inclusive em fases anteriores e
   ).toEqual([]);
   expect(input).toEqual(before);
 });
+it("apelido publicado mais recente substitui o antigo mesmo no recorte de jogos anteriores", () => {
+  const input = sourceFixture();
+  const personId = input.games[0].snapshot.facts.players[0].person.id;
+  for (const game of input.games)
+    game.snapshot.facts.players[0].person.nickname = null;
+  input.games[1].snapshot.publishedAt = "2026-10-27T13:00:00Z";
+  input.games[1].snapshot.facts.players[0].person.nickname = "Pedro Pessoti";
+  const before = structuredClone(input);
+  const page = buildStatisticsPage(
+    input,
+    parseStatisticsQuery(
+      new URLSearchParams({ scope: "regular", q: "Pedro Pessoti", compare: personId }),
+    ),
+  );
+  expect(page.rows).toHaveLength(1);
+  expect(page.rows[0].nicknames).toEqual(["Pedro Pessoti"]);
+  expect(page.comparisonSummaries[0].nicknames).toEqual(["Pedro Pessoti"]);
+  expect(input).toEqual(before);
+});
 it("nove cruzamentos modo/escopo contam só fases congeladas, desconhecidas sóall", () => {
   const input = sourceFixture(),
     before = structuredClone(input);

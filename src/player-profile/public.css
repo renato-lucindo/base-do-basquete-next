@@ -15,7 +15,7 @@
   margin: 0 0 6px;
   overflow-wrap: anywhere;
 }
-.player-nickname {
+.player-full-name {
   color: var(--bb-muted);
   margin-bottom: 12px !important;
 }
