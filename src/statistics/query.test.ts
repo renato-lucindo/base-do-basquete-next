@@ -241,6 +241,31 @@ it("comparação usa direção de melhor valor e não inventa empate com ausênc
     right: "unavailable",
   });
 });
+it("padrão mobile seleciona todas as métricas sem substituir seleção explícita", () => {
+  const desktop = parseStatisticsQuery(new URLSearchParams());
+  const mobile = parseStatisticsQuery(new URLSearchParams(), "all");
+
+  expect(desktop.preset).toBe("essentials");
+  expect(mobile.preset).toBe("all");
+  expect(mobile.columns).toEqual(
+    parseStatisticsQuery(new URLSearchParams("preset=all")).columns,
+  );
+  expect(mobile.columns.length).toBeGreaterThan(desktop.columns.length);
+
+  expect(
+    parseStatisticsQuery(new URLSearchParams("preset=essentials"), "all").columns,
+  ).toEqual(desktop.columns);
+  expect(
+    parseStatisticsQuery(new URLSearchParams("columns=games,points"), "all").columns,
+  ).toEqual(["games", "points"]);
+  expect(
+    parseStatisticsQuery(
+      new URLSearchParams("preset=custom&columns="),
+      "all",
+    ).columns,
+  ).toEqual([]);
+});
+
 it("preset de súmula exibe apenas dados simples e compartilha a preferência na URL", () => {
   const query = parseStatisticsQuery(
     new URLSearchParams("preset=simple&scope=all"),
