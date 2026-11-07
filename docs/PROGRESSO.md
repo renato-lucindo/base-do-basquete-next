@@ -12,6 +12,10 @@ Provas locais: **741 unitários/155 arquivos PASS**, incluindo cinco novos RED�
 
 PR #68 integrada em **bc13c0a**; CI integrada [42298430642](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42298430642) **SUCCESS**, conferida nesta execução. Preview antes na PR #66; entregue no SHA da PR #68, versão **1dec3d76-f451-4d4c-b5e5-d6438297c0ac**, com 34 hashes remotos e cinco rotas conferidos. Outra execução depois publicou PRs #69/#70: origem **95d40ff**, versão **9e69a80d-0373-4c7e-ad70-950b3f1ff942**, deployment **4a31d9e5-9df4-40b5-bb41-fe8f46ba75fa**, confirmados pela Cloudflare e cabeçalho remoto. Essa origem já compõe a base da Classificação. Serviço principal observado: versão **139410ce-a8d6-4710-9b94-e1b1222cd3dc**, preservada. Este parágrafo registra a origem anterior à entrega da PR #71.
 
+## Complemento recebido na mesma PR #71
+
+Commit remoto **e98b927** preservado por merge explícito: FR reutiliza **Faltas recebidas**, sem complemento técnico; os padrões comuns distinguem significado público e explicações técnicas, com definição compartilhada entre tabela, seletor, legenda e tooltip. Cálculos preservados. A composição é validada nesta mesma PR, sem nova unidade ou deploy separado.
+
 ## Preservação e continuidade
 
 Checkout principal `sync/trabalho-casa`, alterações humanas em `CONTRIBUTING.md`, skills locais, `skills-lock.json` e demais worktrees preservados. Sem migration/DDL/DML, publicação de jogos, mudanças em Access, segredos, bindings ou domínio principal. Cota real acompanhada pela ferramenta oficial; pausa em 15% restante/5h conforme [CONTRIBUTING.md](../CONTRIBUTING.md), sem consumir resets/créditos.

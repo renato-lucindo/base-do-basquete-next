@@ -14,6 +14,11 @@ Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar alt
 - Compactar nunca autoriza texto ilegível, alvos pequenos, omissão de contexto necessário ou etapas escondidas. Prefira hierarquia por proximidade, tamanho, peso e contraste.
 - Rótulos em português brasileiro natural; siglas recebem explicação acessível também por teclado e toque.
 
+## Textos de apresentação
+
+- Legendas e tooltips explicam o significado dos indicadores para o público. Fórmulas, origem dos dados e instruções de implementação ficam na documentação técnica, salvo necessidade explicitamente solicitada pelo responsável. Por exemplo, exibir **FR — Faltas recebidas**; a equivalência com FC da adversária permanece na especificação técnica.
+- Reutilizar uma definição aprovada por indicador, compartilhada entre tabela, seletor de colunas, legenda e tooltip. Evitar complementos locais que alterem o nome apresentado em apenas um desses lugares.
+
 ## Tabelas e ações
 
 - Identificação e nomes são prioritários; alinhamento, cabeçalhos, ordenação e filtros previsíveis. A rolagem horizontal, se necessária, deve ser interna à tabela; a página não pode transbordar.
