@@ -58,3 +58,11 @@ Somente criadas e testadas localmente, em ordem:
 A segunda migration contém tabelas/recibos privados de rascunho, validação fechada de documentos incompletos, RPCs autenticadas, auditoria e redação do candidato público. Privilégios diretos são revogados e RLS permanece ativo. Não foi executado DDL/DML remoto, seed, deploy, alteração de Access/bindings ou publicação de dados humanos.
 
 A autorização permanente para migrations somente de leitura no desenvolvimento não cobre estas tabelas/escritas. Aplicação remota e liberação permanecem pendentes; pela regra de `AGENTS.md`, esta PR fica fora da main enquanto houver migration não aplicada. Estado real de CI/serviço e próximo passo no [checkpoint](PROGRESSO.md).
+
+## Liberação autorizada em 07/11/2026
+
+O responsável respondeu “Autorizo” às pendências concretas de migrations e deploy. Aplicadas no projeto de desenvolvimento `nizmasjddyrhmevvfviz`, sem DML nos dados da aplicação. O MCP gerou versões de aplicação diferentes das datas de criação: `20261107055635` para a política FIBA e `20261107055642` para o fluxo privado. Os arquivos locais foram renomeados para essas versões, com conteúdo idêntico e os mesmos SHA-256 da tabela anterior. Os nomes remotos mantêm os IDs originais como prefixo. Não reaplicar os arquivos de criação anteriores.
+
+RLS e privilégios conferidos: tabelas de rascunho/recibos privadas, sem leitura direta por anon/authenticated; helpers de validação sem EXECUTE para esses papéis; RPCs de rascunho com EXECUTE authenticated e sem anon, verificações de admin no servidor e search_path vazio. Advisors de segurança antes/depois mantiveram os mesmos grupos e contagens (4 INFO de tabelas privadas antigas; 3+3 WARN de consultas públicas deliberadas; 1 WARN de proteção de senha vazada). Nenhum novo apontamento. Nenhum regulamento, rascunho, recibo ou classificação real foi criado pela liberação.
+
+[CI final cdefbaf](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42342954644): todos os jobs SUCCESS; 758 unitários, 714 Chromium, 116 skips existentes e 28 WebKit. Checks da atualização de liberação e do SHA integrado devem ser conferidos antes do deploy. Alvo autorizado: preview UIUX existente, com bindings/sessão preservados; serviço principal fora deste deploy.
