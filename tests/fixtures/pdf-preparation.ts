@@ -3,12 +3,13 @@ import { pdfFixture } from "./pdf";
 import { pdfPublicationFixture } from "./pdf-publication";
 import { publishedSite } from "./published-game";
 import { tid } from "./text-import";
+import { finalizePdfSchema } from "../../src/publication/finalization";
 import { publishPdfSchema } from "../../src/publication/pdf-contract";
 import {
   savePreparationSchema,
   type Preparation,
 } from "../../src/publication/preparation-contract";
-export async function pdfPreparationFixture(page: Page) {
+export async function pdfPreparationFixture(page: Page, automatic = false) {
   const f = await pdfFixture(page),
     sample = await pdfPublicationFixture(),
     stamp = "2026-10-24T14:10:00Z";
@@ -168,90 +169,95 @@ export async function pdfPreparationFixture(page: Page) {
       });
     },
   );
-  await page.route(`**/api/games/${tid(8)}/publication/pdf`, async (route) => {
-    const c = publishPdfSchema.parse(route.request().postDataJSON());
-    publishAttempts.push(route.request().postData()!);
-    if (expired) {
-      expired = false;
-      return route.fulfill({
-        status: 401,
-        json: {
-          error: { code: "invalid_session", message: "Entre novamente." },
-        },
-      });
-    }
-    if (receipts.has(c.requestId))
-      return route.fulfill({ json: receipts.get(c.requestId) });
-    const game = f.games.get(tid(8))!;
-    if (
-      c.basePublicationVersion !== publicVersion ||
-      c.gameVersion !== game.version
-    )
-      return route.fulfill({
-        status: 409,
-        json: {
-          error: {
-            code: "version_conflict",
-            message: "Outra aba alterou a publicação.",
+  await page.route(
+    `**/api/games/${tid(8)}/publication/${automatic ? "finalize-pdf" : "pdf"}`,
+    async (route) => {
+      const c = (automatic ? finalizePdfSchema : publishPdfSchema).parse(
+        route.request().postDataJSON(),
+      );
+      publishAttempts.push(route.request().postData()!);
+      if (expired) {
+        expired = false;
+        return route.fulfill({
+          status: 401,
+          json: {
+            error: { code: "invalid_session", message: "Entre novamente." },
           },
-        },
-      });
-    publicVersion++;
-    projection = {
-      ...template,
-      source: { ...template.source, version: 2 },
-      id: game.id,
-      disputeId: game.disputeId,
-      version: publicVersion,
-      gameVersion: game.version + 1,
-      game: {
-        ...template.game,
-        home: { ...template.game.home, registrationId: game.home.id },
-        away: { ...template.game.away, registrationId: game.away.id },
-      },
-      facts: {
-        ...template.facts,
-        origins: Object.fromEntries(
-          Object.entries(template.facts.origins).map(([key, value]) => [
-            key,
-            value ? { ...value, version: 2 } : null,
-          ]),
-        ) as typeof template.facts.origins,
-        players: template.facts.players.map((p) => ({
-          ...p,
-          registrationId: p.side === "home" ? game.home.id : game.away.id,
-        })),
-      },
-    };
-    f.games.set(game.id, {
-      ...game,
-      state: "finished",
-      version: game.version + 1,
-    });
-    const ack = {
-      requestId: c.requestId,
-      gameId: game.id,
-      gameVersion: game.version + 1,
-      version: publicVersion,
-      sourceVersion: 2,
-      reviewVersion: review.version,
-      publishedAt: stamp,
-    };
-    receipts.set(c.requestId, ack);
-    if (lostPublish) {
-      lostPublish = false;
-      return route.fulfill({
-        status: 503,
-        json: {
-          error: {
-            code: "access_unavailable",
-            message: "Resposta não confirmada.",
+        });
+      }
+      if (receipts.has(c.requestId))
+        return route.fulfill({ json: receipts.get(c.requestId) });
+      const game = f.games.get(tid(8))!;
+      if (
+        c.basePublicationVersion !== publicVersion ||
+        c.gameVersion !== game.version
+      )
+        return route.fulfill({
+          status: 409,
+          json: {
+            error: {
+              code: "version_conflict",
+              message: "Outra aba alterou a publicação.",
+            },
           },
+        });
+      publicVersion++;
+      projection = {
+        ...template,
+        source: { ...template.source, version: 2 },
+        id: game.id,
+        disputeId: game.disputeId,
+        version: publicVersion,
+        gameVersion: game.version + 1,
+        game: {
+          ...template.game,
+          home: { ...template.game.home, registrationId: game.home.id },
+          away: { ...template.game.away, registrationId: game.away.id },
         },
+        facts: {
+          ...template.facts,
+          origins: Object.fromEntries(
+            Object.entries(template.facts.origins).map(([key, value]) => [
+              key,
+              value ? { ...value, version: 2 } : null,
+            ]),
+          ) as typeof template.facts.origins,
+          players: template.facts.players.map((p) => ({
+            ...p,
+            registrationId: p.side === "home" ? game.home.id : game.away.id,
+          })),
+        },
+      };
+      f.games.set(game.id, {
+        ...game,
+        state: "finished",
+        version: game.version + 1,
       });
-    }
-    return route.fulfill({ json: ack });
-  });
+      const ack = {
+        requestId: c.requestId,
+        gameId: game.id,
+        gameVersion: game.version + 1,
+        version: publicVersion,
+        sourceVersion: 2,
+        reviewVersion: review.version,
+        publishedAt: stamp,
+      };
+      receipts.set(c.requestId, ack);
+      if (lostPublish) {
+        lostPublish = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            error: {
+              code: "access_unavailable",
+              message: "Resposta não confirmada.",
+            },
+          },
+        });
+      }
+      return route.fulfill({ json: ack });
+    },
+  );
   return {
     ...f,
     review,

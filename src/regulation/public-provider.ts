@@ -4,6 +4,7 @@ import { invalidSession } from "../access/vault";
 import { HttpError } from "../server/http";
 import { publicStandingsSourceSchema } from "./public-contract";
 import { buildPublicStandings } from "./public";
+import { SupabaseCompetitionSetups } from "./setup-provider";
 import {
   confirmStandingsSchema,
   standingsPublicationPreviewSchema,
@@ -15,7 +16,7 @@ import {
 /** No private context is requested by the anonymous reader. */
 export class SupabasePublicStandings {
   constructor(
-    private config: { url: string; key: string },
+    private config: { url: string; key: string; flexible?: boolean },
     private send: (url: string, init: RequestInit) => Promise<Response> = (
       url,
       init,
@@ -99,6 +100,11 @@ export class SupabasePublicStandings {
     return r.data;
   }
   async get(disputeId: string) {
+    if (this.config.flexible)
+      return new SupabaseCompetitionSetups(
+        this.config,
+        this.send,
+      ).publicStandings(disputeId);
     const s = publicStandingsSourceSchema.nullable().safeParse(
       await this.rpc("get_public_standings", {
         p_dispute_id: z.uuid().parse(disputeId),
@@ -114,6 +120,10 @@ export class SupabasePublicStandings {
     }
   }
   async disputes(disputeId: string | null) {
+    if (this.config.flexible)
+      return new SupabaseCompetitionSetups(this.config, this.send).disputes(
+        disputeId,
+      );
     const s = z
       .array(publicDisputeSchema)
       .max(1000)

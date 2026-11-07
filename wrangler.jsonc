@@ -14,6 +14,7 @@
     "run_worker_first": true,
   },
   "vars": {
+    "FLEXIBLE_COMPETITION": "false",
     "APP_ORIGIN": "https://basedobasquete.com.br",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
   },

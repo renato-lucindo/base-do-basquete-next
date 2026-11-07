@@ -4,7 +4,7 @@ import { publicGameSchema } from "../publication/contract";
 import { catalogGameSchema, searchPlayerSchema } from "./catalog-contract";
 import { SupabasePublicStandings } from "../regulation/public-provider";
 
-type Config = { url: string; key: string };
+type Config = { url: string; key: string; flexible?: boolean };
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 const uuid = z.uuid();
 /** Fixed projections over existing anonymous, RLS protected publication tables only. */

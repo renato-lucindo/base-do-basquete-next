@@ -43,6 +43,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
     context: publicGameSchema.shape.context,
     definition: publicDefinition,
     registrations: z.array(registration).max(1000),
+    organizationPendingGameIds: z.array(uuid).max(10000).optional(),
   };
 
 const source = z
@@ -105,10 +106,11 @@ export const publicStandingsSourceSchema = source.superRefine((s, c) => {
     ) &&
     sameIds(
       s.games.map((g) => g.id),
-      assignedIds(d),
+      [...assignedIds(d), ...(s.organizationPendingGameIds ?? [])],
     ) &&
     organizedInputSchema.safeParse({
       context: publicCompetitiveContext(s),
+      qualificationPools: d.qualificationPools,
       groupPhases: d.groupPhases.map((p) => ({
         phaseId: p.phaseId,
         rules: p.rules,

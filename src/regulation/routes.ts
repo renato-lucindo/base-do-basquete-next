@@ -21,6 +21,7 @@ export async function publicStandingsRoute(
     await new SupabasePublicStandings({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
+      flexible: env.FLEXIBLE_COMPETITION === "true",
     }).get(id.data.toLowerCase()),
   );
 }

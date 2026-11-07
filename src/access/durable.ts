@@ -12,6 +12,11 @@ import {
 } from "../achievements/publication-contract";
 import { previewAchievementsSchema } from "../achievements/view-contract";
 import { SupabaseRegulations } from "../regulation/provider";
+import { SupabaseCompetitionSetups } from "../regulation/setup-provider";
+import {
+  saveCompetitionSetupSchema,
+  type SaveCompetitionSetup,
+} from "../regulation/setup-contract";
 import {
   saveRegulationDraftSchema,
   type SaveRegulationDraft,
@@ -127,6 +132,7 @@ export class SessionStore extends DurableObject<Env> {
   private readonly officiating: SupabaseOfficiating;
   private readonly publications: SupabasePublications;
   private readonly regulations: SupabaseRegulations;
+  private readonly competitionSetups: SupabaseCompetitionSetups;
   private readonly publicStandings: SupabasePublicStandings;
   private readonly decisions: SupabaseDecisions;
   private readonly pdfSources: SupabasePdfSources;
@@ -139,6 +145,10 @@ export class SessionStore extends DurableObject<Env> {
   private readonly textImport: SupabaseTextImport;
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    this.competitionSetups = new SupabaseCompetitionSetups({
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    });
     this.playerProfiles = new SupabasePlayerProfiles({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
@@ -166,6 +176,7 @@ export class SessionStore extends DurableObject<Env> {
     this.publicStandings = new SupabasePublicStandings({
       url: env.SUPABASE_URL,
       key: env.SUPABASE_PUBLISHABLE_KEY,
+      flexible: env.FLEXIBLE_COMPETITION === "true",
     });
     this.pdfSources = new SupabasePdfSources({
       url: env.SUPABASE_URL,
@@ -486,6 +497,7 @@ export class SessionStore extends DurableObject<Env> {
           this.officiating.save(
             accessToken,
             saveGameEditorSchema.parse(command),
+            this.env.FLEXIBLE_COMPETITION === "true",
           ),
         "game.save",
       ),
@@ -767,6 +779,23 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  getCompetitionSetup(disputeId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitionSetups.get(accessToken, disputeId),
+      ),
+    );
+  }
+  saveCompetitionSetup(command: SaveCompetitionSetup) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitionSetups.save(
+          accessToken,
+          saveCompetitionSetupSchema.parse(command),
+        ),
+      ),
+    );
+  }
   getRegulationDraft(disputeId: string) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
@@ -795,6 +824,20 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.publications.reviseTeamStatistics(accessToken, command),
+      ),
+    );
+  }
+  finalizeSheet(command: PublishSheet) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.publishSheet(accessToken, command, true),
+      ),
+    );
+  }
+  finalizePdf(command: PublishPdf) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.publications.publishPdf(accessToken, command, true),
       ),
     );
   }
@@ -914,7 +957,11 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(
         ({ accessToken }) =>
-          this.games.saveSheet(accessToken, saveSheetSchema.parse(command)),
+          this.games.saveSheet(
+            accessToken,
+            saveSheetSchema.parse(command),
+            this.env.FLEXIBLE_COMPETITION === "true",
+          ),
         "sheet.save",
       ),
     );

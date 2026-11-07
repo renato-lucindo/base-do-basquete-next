@@ -145,6 +145,13 @@ export function PublicStandingsTables({
           Resultados publicados atualizam esta consulta. Empates e pendências
           não confirmam colocações finais.
         </p>
+        {!!value.organizationPendingGameIds?.length && (
+          <p role="status">
+            {value.organizationPendingGameIds.length} jogo(s) aguardam
+            associação a um grupo ou confronto. Os resultados continuam
+            disponíveis em Jogos.
+          </p>
+        )}
         {phases.length > 1 && (
           <nav
             className="public-phase-navigation"

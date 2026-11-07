@@ -125,7 +125,7 @@ export class SupabaseGames {
     }
     return r;
   }
-  async saveSheet(token: string, input: SaveSheet) {
+  async saveSheet(token: string, input: SaveSheet, automatic = false) {
     const parsed = saveSheetSchema.safeParse(input);
     if (!parsed.success)
       throw new HttpError(400, "invalid_input", "Dados inválidos da súmula.");
@@ -141,7 +141,7 @@ export class SupabaseGames {
     }
     const r = await this.checked(
       sheetSaveResultSchema,
-      "save_game_sheet",
+      automatic ? "save_flexible_game_sheet" : "save_game_sheet",
       { p_command: command },
       token,
     );

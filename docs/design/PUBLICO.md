@@ -4,6 +4,8 @@ Decisão de06/11/2026: aplicar escala/cabeçalhos dos padrões comuns. Na disput
 
 Decisões da conversa de 29/10/2026, atualizadas com os contratos aprovados pelo responsável em 02/11/2026: ordem fixa de navegação e publicação explícita do regulamento completo, inclusive participantes e agenda sem resultados. Orientam a implementação; aceite dessas regras não constitui prova de que o fluxo esteja implementado, implantado ou validado pelo responsável. Consulte [MATRIZ-ESCOPO.md](../MATRIZ-ESCOPO.md) e [PROGRESSO.md](../PROGRESSO.md) para o estado real.
 
+Decisão de07/11/2026: no novo percurso de [campeonato flexível](../decisoes/022-campeonato-flexivel.md), a classificação acompanha configuração aplicada e resultados finalizados, sem publicação adicional. Pendências de associação são explícitas e os jogos continuam disponíveis. Rascunhos e justificativas privadas continuam invisíveis. O contrato anterior permanece nos serviços ainda sem a feature.
+
 ## Encontrar e abrir uma disputa
 
 1. A página inicial lista as **competições**, com busca no topo. A busca global cobre competições, disputas, equipes e jogadores; **não** busca jogos no MVP.

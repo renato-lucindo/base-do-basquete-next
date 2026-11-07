@@ -34,6 +34,7 @@
     "src/publication/routes.ts",
     "src/regulation/routes.ts",
     "src/regulation/decision-routes.ts",
+    "src/regulation/setup-routes.ts",
     "src/boxscore/routes.ts",
     "src/people/routes.ts",
     "src/people/transfer-routes.ts",
