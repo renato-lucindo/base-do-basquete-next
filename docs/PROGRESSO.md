@@ -1,23 +1,34 @@
 # Progresso atual
 
-## Classificação e Últimos 5 — 06/11/2026
+## Regulamento simplificado — WIP, 06/11/2026
 
-Unidade `codex/classificacao-ultimos-cinco`, [PR #71](https://github.com/renato-lucindo/base-do-basquete-next/pull/71), base **95d40ff** (PR #70), implementação material **c9279e6**. Worktree isolado `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. Tabela no padrão de Equipes; fase/grupo na URL; últimos cinco exclusivamente da lineage contabilizada no grupo/fase. APIs públicas, cálculos oficiais, posições e desempates preservados. Padrão vigente em [PUBLICO.md](design/PUBLICO.md).
+Unidade `codex/regulamento-fiba`, [PR #72 draft](https://github.com/renato-lucindo/base-do-basquete-next/pull/72), base `39ed1c42975c44d775460517c15ff66211a9f7ac`, implementação parcial `83ef12bfb2f88d2ef9838272500cbc2f49f0db56`. HEAD real pode incluir checkpoint posterior. Worktree: `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. Plano autorizado: [PLAN-REGULAMENTO-FIBA.md](PLAN-REGULAMENTO-FIBA.md).
 
-Provas locais: **741 unitários/155 arquivos PASS**, incluindo cinco novos RED→GREEN; etapas do gate concluídas em segmentos: formato/lint/tipos, 11 testes de política CI, 11 transportes, 15 PostgreSQL isolado, 33 Workerd, quatro PDFs em um teste de runtime, builds, fronteira e segredos (1249 arquivos). Primeiro gate concorrente teve OOM nativo no host; todos os unitários foram repetidos com um worker, sem mudar testes/timeouts/skips. Browsers novos **14 PASS**, mais navegação/acessibilidade/estados anteriores; um timeout de axe sob concorrência foi preservado e repetido isoladamente. Revisão **autoral** com web-design-guidelines, sem parecer independente alegado. Axe e capturas não constituem aceite humano/WCAG integral.
+Implementado: política opcional `calculationPolicy: fiba-2026` reinicia desempates nos dois motores; ausência mantém algoritmo legado. Contratos distinguem versões. Factories com pontos 2/1, W.O. 20–0/0 e turnos 1/2; novos rascunhos/fases da tela usam os padrões. Migration `20261107010722_regulation_fiba_policy.sql` criada pela CLI e testada apenas no PostgreSQL isolado, preservando OID/ACL e validação antiga.
 
-**CI, integração e versão publicada:** a [PR #71](https://github.com/renato-lucindo/base-do-basquete-next/pull/71) concentra os resultados reais do HEAD e SHA integrado, versão/deployment remotos, hashes e capturas finais. Não usar a prova local como substituta da CI. Publicação autorizada exclusivamente no preview UI/UX, após CI do SHA integrado; configuração da raiz aponta ao principal. As duas disputas consultadas no catálogo remoto retornaram classificação pública `null`: capturas da tabela usam fixtures sintéticas no navegador, sem publicar dados.
+Provas locais: `npx vitest run src/regulation --maxWorkers=1`: **141 PASS/21 arquivos**. Inclui exemplo D.2.2, cenário que distingue reinício, empate completo, placar desconhecido e paridade SQL/TypeScript; testes novos RED→GREEN. Typecheck, ESLint/Prettier focal e diff check PASS. Chromium desktop `--grep 'nova configuração recebe FIBA'`: **1 PASS**, após RED; verifica padrões e gravação de dois turnos. Sem publicação real.
 
-## Entrega anterior encerrada
+[CI de 83ef12b](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42322720923) **IN_PROGRESS** na última consulta, sem conclusão alegada. Gate consolidado, browsers completos, revisão final e aceite pendentes. Não integrar WIP.
 
-PR #68 integrada em **bc13c0a**; CI integrada [42298430642](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42298430642) **SUCCESS**, conferida nesta execução. Preview antes na PR #66; entregue no SHA da PR #68, versão **1dec3d76-f451-4d4c-b5e5-d6438297c0ac**, com 34 hashes remotos e cinco rotas conferidos. Outra execução depois publicou PRs #69/#70: origem **95d40ff**, versão **9e69a80d-0373-4c7e-ad70-950b3f1ff942**, deployment **4a31d9e5-9df4-40b5-bb41-fe8f46ba75fa**, confirmados pela Cloudflare e cabeçalho remoto. Essa origem já compõe a base da Classificação. Serviço principal observado: versão **139410ce-a8d6-4710-9b94-e1b1222cd3dc**, preservada. Este parágrafo registra a origem anterior à entrega da PR #71.
+## Pendências e próximo passo
 
-## Complemento recebido na mesma PR #71
+- Implementar decisão manual de empate: ordem/quem avançou, comentário privado, autor/data/contexto; sem bloquear salvar/publicar se não houver decisão. Sinalizar revisão ao mudar fatos relevantes; comentário não entra na fonte pública.
+- Persistir rascunhos incompletos privadamente sem enfraquecer validação oficial/publicação; preservar idempotência, sessão, recuperação e conflitos.
+- Reorganizar a tela: participantes, grupos/formato/jogos e revisão/publicação; regras avançadas recolhidas, exceções justificadas e identificação personalizada; adoção explícita em versões antigas.
+- Integrar contratos e persistência das pendências. Migration atual cobre apenas política/turnos. Nunca modificar migrations já aplicadas.
+- Adaptar browsers antigos que esperam W.O. inicialmente vazio e critérios manuais, preservando cobertura de exceções, sessão e legado. Suíte completa de browsers ainda não executada.
+- Próxima operação concreta: contratos/persistência privada de desempate manual e testes da aplicação somente no contexto vigente, sem justificativa pública. Continuar na mesma branch/PR.
 
-Commit remoto **e98b927** preservado por merge explícito: FR reutiliza **Faltas recebidas**, sem complemento técnico; os padrões comuns distinguem significado público e explicações técnicas, com definição compartilhada entre tabela, seletor, legenda e tooltip. Cálculos preservados. A composição é validada nesta mesma PR, sem nova unidade ou deploy separado.
+Fora: insuficiência de jogadores, reincidência de W.O., sorteio, geração de jogos, copiar edições, automatizar cruzamentos, comparar grupos e mudanças no mata-mata. Sem nova autorização para deploy, banco remoto ou publicação de dados reais.
 
-## Preservação e continuidade
+## Pausa por cota e retomada
 
-Checkout principal `sync/trabalho-casa`, alterações humanas em `CONTRIBUTING.md`, skills locais, `skills-lock.json` e demais worktrees preservados. Sem migration/DDL/DML, publicação de jogos, mudanças em Access, segredos, bindings ou domínio principal. Cota real acompanhada pela ferramenta oficial; pausa em 15% restante/5h conforme [CONTRIBUTING.md](../CONTRIBUTING.md), sem consumir resets/créditos.
+Ferramenta oficial: **85% usados/15% restantes em 5h**, semanal 43% usado. Reset observado `2026-11-07T04:22:54Z`. Retomada mais dois minutos: **07/11/2026 01:24:54 America/Sao_Paulo** (`04:24:54Z`). Automação oficial **retomar-regulamento-fiba**, ACTIVE, criada e conferida, vinculada à conversa `01a1b339-dfb6-7d91-9870-aa77645ef27f`. Nenhum crédito/reset consumido. Conferir cota/Git/PR/CI ao retomar; pausar automação ao concluir.
 
-Próximo passo: aceite visual do responsável após conferir na PR #71 a CI do SHA integrado, a origem remota e as capturas; principal permanece fora da autorização de deploy. Contexto anterior no [histórico](../historico/progresso/2026-11-06-antes-classificacao.md).
+## Serviços e preservação
+
+Sem deploy ou banco remoto nesta unidade. Última publicação comprovada nesta conversa: preview UIUX origem `39ed1c4`, versão `c2ffca6b-66a5-4cfd-8925-edc6fc6be4f3`, deployment `61ed1489-8811-4af0-909c-3fceef987f7d`. Principal preservado em `139410ce-a8d6-4710-9b94-e1b1222cd3dc`; sem nova consulta remota nesta pausa.
+
+Checkout principal `sync/trabalho-casa`, alteração humana em CONTRIBUTING.md, skills/skills-lock e demais worktrees preservados. Revisão final ainda pendente, sem revisão independente alegada. Pesquisa UI de progressive disclosure retornou resultado irrelevante; seguir padrões do projeto e pesquisar pontualmente na etapa visual, sem alegar recomendação verificada.
+
+Contexto anterior no [histórico](../historico/progresso/2026-11-06-antes-regulamento-fiba.md).
