@@ -277,3 +277,30 @@ test("falha do leitor permite repetir consulta; nomes longos não transbordam em
     ),
   ).toBe(true);
 });
+
+test("resultados sem associação continuam acessíveis na agenda pública", async ({
+  page,
+}) => {
+  await publicNavigationFixture(page);
+  const source = publicRegulationFixture();
+  source.definition.groupPhases = [];
+  source.definition.knockoutPhases = [];
+  source.definition.series = [];
+  const value = buildPublicStandings({
+    ...source,
+    organizationPendingGameIds: source.games.map((g) => g.id),
+  });
+  await page.route("**/api/public/standings/**", (r) =>
+    r.fulfill({ json: value }),
+  );
+  await page.goto(
+    `${origin}/publico.html#${source.disputeId}?secao=classificacao`,
+  );
+  await expect(
+    page.getByRole("status").filter({ hasText: "aguardam associação" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Jogos", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Lobos × Águias", exact: true }),
+  ).toBeVisible();
+});

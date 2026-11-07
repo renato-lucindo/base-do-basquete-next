@@ -204,11 +204,18 @@ export const publicStandingsSchema = z
     const d = s.definition,
       p = s.projection,
       regs = new Set(d.registrationIds),
-      games = new Set(assignedIds(d)),
+      games = new Set([
+        ...assignedIds(d),
+        ...(s.organizationPendingGameIds ?? []),
+      ]),
       gameCatalog = new Map(s.games.map((g) => [g.id, g])),
       phaseCatalog = new Map(d.groupPhases.map((p) => [p.phaseId, p])),
       seriesCatalog = new Map(d.series.map((n) => [n.id, n]));
     let valid =
+      sameIds(
+        [...games],
+        [...assignedIds(d), ...(s.organizationPendingGameIds ?? [])],
+      ) &&
       p.disputeId === s.disputeId &&
       p.regulationVersion === s.regulationVersion &&
       sameIds(

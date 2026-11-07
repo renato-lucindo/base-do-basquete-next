@@ -161,6 +161,30 @@ it("finalizes and corrects without a user comment; public data follows the commi
     expect(
       await json(db, "public.get_public_standings($1)", [id(3)]),
     ).toBeNull();
+    const state = competitionSetupStateSchema.parse(
+      await json(db, "public.get_competition_setup($1)", [id(3)]),
+    );
+    const { createDefaultDefinition } = await import("./defaults");
+    await json(db, "public.save_competition_setup($1)", [
+      {
+        commandId: id(9800),
+        disputeId: id(3),
+        expectedVersion: 0,
+        expectedContextFingerprint: state.contextFingerprint,
+        document: {
+          ...defaultCompetitionSetup(),
+          mode: "custom",
+          customDefinition: createDefaultDefinition(),
+        },
+      },
+    ]);
+    const unorganized = await buildLivePublicStandings(
+      await json(db, "public.get_live_competition_source($1)", [id(3)]),
+    );
+    expect(
+      unorganized.games.find((g) => g.id === id(8))?.score?.homePoints,
+    ).toBe(3);
+    expect(unorganized.organizationPendingGameIds).toContain(id(8));
   } finally {
     await db.exec(
       "rollback to savepoint setup_case;release savepoint setup_case",

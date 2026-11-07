@@ -1,3 +1,7 @@
+import {
+  saveRegulationDraftSchema,
+  type RegulationDraft,
+} from "../../src/regulation/draft-contract";
 import type { Page } from "@playwright/test";
 import { gamesFixture } from "./games";
 import { tid } from "./text-import";
@@ -19,6 +23,10 @@ export async function competitionSetupFixture(page: Page) {
   let document: CompetitionSetup | null = null,
     version = 0,
     loseAck = false;
+  let draft: RegulationDraft | null = null,
+    loseDraftAck = false;
+  const draftAttempts: unknown[] = [],
+    draftReceipts = new Map<string, unknown>();
   const attempts: unknown[] = [],
     receipts = new Map<string, unknown>();
   const freshContext = () => ({
@@ -74,6 +82,40 @@ export async function competitionSetupFixture(page: Page) {
       ),
     });
   });
+  await page.route("**/api/regulations/*/draft", async (route) => {
+    if (route.request().method() === "GET")
+      return route.fulfill({ json: draft });
+    const c = saveRegulationDraftSchema.parse(route.request().postDataJSON());
+    draftAttempts.push(c);
+    if (draftReceipts.has(c.commandId))
+      return route.fulfill({ json: draftReceipts.get(c.commandId) });
+    draft = {
+      disputeId: c.disputeId,
+      version: c.expectedVersion + 1,
+      baseRegulationVersion: c.baseRegulationVersion,
+      document: c.document,
+      actorId: tid(99),
+      savedAt: "2026-11-07T18:00:00Z",
+    };
+    const r = {
+      commandId: c.commandId,
+      disputeId: c.disputeId,
+      version: draft.version,
+      baseRegulationVersion: c.baseRegulationVersion,
+      savedAt: draft.savedAt,
+    };
+    draftReceipts.set(c.commandId, r);
+    if (loseDraftAck) {
+      loseDraftAck = false;
+      return route.fulfill({
+        status: 503,
+        json: {
+          error: { code: "access_unavailable", message: "Resposta perdida." },
+        },
+      });
+    }
+    return route.fulfill({ json: r });
+  });
   await page.route("**/api/competition-setups/**", async (route) => {
     if (route.request().method() === "GET")
       return route.fulfill({ json: await db.get("fixture", tid(3)) });
@@ -107,6 +149,10 @@ export async function competitionSetupFixture(page: Page) {
   return {
     ...f,
     setupAttempts: attempts,
+    draftAttempts,
+    loseDraftAck: () => {
+      loseDraftAck = true;
+    },
     getDocument: () => document,
     loseAck: () => {
       loseAck = true;

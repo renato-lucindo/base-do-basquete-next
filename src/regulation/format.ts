@@ -179,7 +179,10 @@ export async function buildCompetitionDefinition(
       "A configuração contém equipe ou jogo de outra disputa. Recarregue os dados.",
     );
   if (setup.mode === "custom" && setup.customDefinition) {
-    const definition = structuredClone(setup.customDefinition),
+    const definition = {
+        ...structuredClone(setup.customDefinition),
+        registrationIds: [...context.registrationIds],
+      },
       groups = definition.groupPhases.flatMap((p) => p.groups),
       catalog = new Map(context.games.map((g) => [g.id, g])),
       overrides = new Map(setup.assignments.map((a) => [a.gameId, a])),

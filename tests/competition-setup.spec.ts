@@ -198,3 +198,40 @@ for (const fail of [false, true])
     expect(f.getDocument()?.assignments[0].kind).toBe("unassigned");
     expect(f.games.size).toBe(1);
   });
+
+test("estrutura livre incompleta é privada e repete o mesmo rascunho", async ({
+  page,
+}) => {
+  const f = await competitionSetupFixture(page);
+  await page.goto(path);
+  await page
+    .locator("summary")
+    .filter({ hasText: /^Opções avançadas$/ })
+    .click();
+  await page.getByText("Estrutura livre", { exact: true }).click();
+  await page
+    .getByRole("button", { name: "Configurar estrutura livre", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Adicionar pontos corridos", exact: true })
+    .click();
+  const phase = page.getByRole("textbox", {
+    name: "Nome da fase",
+    exact: true,
+  });
+  await phase.fill("");
+  f.loseDraftAck();
+  await page
+    .getByRole("button", { name: "Salvar rascunho privado", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Repetir envio do rascunho", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Rascunho privado salvo" }),
+  ).toBeVisible();
+  expect(f.draftAttempts).toHaveLength(2);
+  expect(f.draftAttempts[0]).toEqual(f.draftAttempts[1]);
+  expect(f.setupAttempts).toHaveLength(0);
+  expect(f.getDocument()).toBeNull();
+});

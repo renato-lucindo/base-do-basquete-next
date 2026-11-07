@@ -120,9 +120,12 @@ declare d jsonb;legacy jsonb;legacy_saved timestamptz;legacy_reg integer;ctx jso
  if d is not null then d:=d-'tieNotes';if d->'customDefinition'<>'null'::jsonb then d:=jsonb_set(d,'{customDefinition}',(d->'customDefinition')-array['tieNotes','customReason']);end if;end if;
  legacy:=legacy-array['tieNotes','customReason'];
  if d->>'mode'='custom' then legacy:=d->'customDefinition';end if;
- if legacy is not null and legacy<>'null'::jsonb and (d is null or d->>'mode'='custom') then select coalesce(array_agg(value::uuid),'{}') into rids from jsonb_array_elements_text(legacy->'registrationIds');
- elsif d is not null then select coalesce(array_agg(id),'{}') into rids from public.registrations where dispute_id=did;
- else select coalesce(array_agg(distinct rid),'{}') into rids from(select g.home_registration_id rid from public.games g join public.published_games p on p.game_id=g.id where g.dispute_id=did union select g.away_registration_id from public.games g join public.published_games p on p.game_id=g.id where g.dispute_id=did) q;end if;
+ if d is not null then select coalesce(array_agg(id),'{}') into rids from public.registrations where dispute_id=did;
+ else select coalesce(array_agg(distinct rid),'{}') into rids from(
+  select value::uuid rid from jsonb_array_elements_text(coalesce(legacy->'registrationIds','[]'))
+  union select g.home_registration_id from public.games g join public.published_games p on p.game_id=g.id where g.dispute_id=did
+  union select g.away_registration_id from public.games g join public.published_games p on p.game_id=g.id where g.dispute_id=did
+ ) q;end if;
  select coalesce(array_agg(g.id),'{}') into gids from public.games g where g.dispute_id=did and g.home_registration_id=any(rids) and g.away_registration_id=any(rids) and (d is not null or exists(select 1 from public.published_games p where p.game_id=g.id) or exists(select 1 from private.public_standings_heads h join private.public_standings_versions v on v.dispute_id=h.dispute_id and v.version=h.version cross join lateral jsonb_array_elements(v.snapshot->'games') game where h.dispute_id=did and game.value->>'id'=g.id::text));
  select coalesce(jsonb_agg(jsonb_build_object('id',r.id,'name',r.name,'team',jsonb_build_object('id',t.id,'name',t.name,'abbreviation',t.abbreviation)) order by r.id),'[]') into regs from public.registrations r join public.teams t on t.id=r.team_id where r.id=any(rids) and r.dispute_id=did;
  select coalesce(jsonb_agg(jsonb_build_object('id',g.id,'disputeId',did,'version',g.version,'homeRegistrationId',g.home_registration_id,'awayRegistrationId',g.away_registration_id,'date',g.scheduled_date,'time',to_char(g.scheduled_time,'HH24:MI'),'venue',g.venue,'number',g.game_number,'stageKind',g.stage_kind,'round',g.round_number,'knockoutStage',g.knockout_stage,'timeZone','America/Sao_Paulo') order by g.id),'[]') into games from public.games g where g.id=any(gids);
