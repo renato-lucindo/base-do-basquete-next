@@ -2,6 +2,7 @@ import type { RegulationDefinition } from "./persistence-contract";
 import type { RegistrationSnapshot } from "../teams/contract";
 import type { GameSnapshot } from "../games/contract";
 import type { TieCriterion } from "./contract";
+import { createFibaRules } from "./defaults";
 export const criteriaLabels: Record<TieCriterion, string> = {
   wins: "Vitórias",
   point_difference: "Saldo de pontos",
@@ -160,11 +161,7 @@ export function DefinitionEditor({
       v.groupPhases.push({
         phaseId: crypto.randomUUID(),
         name: `Fase ${v.groupPhases.length + 1}`,
-        rules: {
-          format: "round_robin",
-          points: { win: NaN, loss: NaN },
-          tieBreakers: [],
-        },
+        rules: createFibaRules(),
         groups: Array.from({ length: groups }, (_, i) => ({
           id: crypto.randomUUID(),
           name: `Grupo ${i + 1}`,
@@ -411,6 +408,22 @@ export function DefinitionEditor({
                 })
               }
             />
+          </label>
+          <label>
+            Turnos da fase
+            <select
+              aria-label="Turnos da fase"
+              value={p.rules.turns ?? 1}
+              onChange={(e) =>
+                change((v) => {
+                  v.groupPhases[pi].rules.turns = Number(e.target.value) as
+                    1 | 2;
+                })
+              }
+            >
+              <option value="1">Turno único</option>
+              <option value="2">Ida e volta</option>
+            </select>
           </label>
           <div className="reg-columns">
             {(["win", "loss"] as const).map((key) => (

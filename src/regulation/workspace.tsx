@@ -19,19 +19,14 @@ import {
   type RegulationPreviewResult,
 } from "./view-contract";
 import { DefinitionEditor } from "./definition-editor";
+import { createDefaultDefinition } from "./defaults";
 import { AdminToast } from "../competition/admin-toast";
 import { RegulationProjection } from "./projection";
 import { AchievementPanel } from "../achievements/panel";
 import { StandingsPublicationPanel } from "./publication-panel";
 import "./screen.css";
 type VersionView = ReturnType<typeof regulationVersionViewSchema.parse>;
-const empty = (): RegulationDefinition => ({
-  registrationIds: [],
-  occurrenceRules: { wo: null },
-  groupPhases: [],
-  knockoutPhases: [],
-  series: [],
-});
+const empty = createDefaultDefinition;
 
 async function loadRegistrationCatalog(
   disputeId: string,

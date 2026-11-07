@@ -2,6 +2,48 @@ import { test, expect, type Page } from "@playwright/test";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
 
+test("nova configuração recebe FIBA e permite definir os turnos sem preencher pontos", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page);
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
+  );
+  await page
+    .getByRole("heading", { name: "Regulamento da disputa", exact: true })
+    .waitFor();
+  await expect(
+    page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("spinbutton", {
+      name: "Placar do vencedor por W.O.",
+      exact: true,
+    }),
+  ).toHaveValue("20");
+  await page.getByLabel("Incluir Lobos", { exact: true }).check();
+  await page.getByLabel("Incluir Lobos B", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Adicionar pontos corridos", exact: true })
+    .click();
+  await expect(
+    page.getByRole("spinbutton", { name: "Pontos por vitória", exact: true }),
+  ).toHaveValue("2");
+  await expect(
+    page.getByRole("spinbutton", { name: "Pontos por derrota", exact: true }),
+  ).toHaveValue("1");
+  const turns = page.getByLabel("Turnos da fase", { exact: true });
+  await expect(turns).toHaveValue("1");
+  await turns.selectOption("2");
+  expect(f.getState().version).toBe(0);
+  await saveRules(page, "Organização inicial com dois turnos");
+  expect(f.getState().definition?.groupPhases[0].rules).toMatchObject({
+    calculationPolicy: "fiba-2026",
+    turns: 2,
+    points: { win: 2, loss: 1 },
+  });
+});
+
 test("permissão de transferência começa pendente e só muda por confirmação do regulamento", async ({
   page,
 }) => {
