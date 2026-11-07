@@ -5,6 +5,7 @@ import { saveRegulationSchema } from "./persistence-contract";
 import { previewRegulationSchema } from "./view-contract";
 import { SupabasePublicStandings } from "./public-provider";
 import { confirmStandingsSchema } from "./publication-contract";
+import { saveRegulationDraftSchema } from "./draft-contract";
 export async function publicStandingsRoute(
   request: Request,
   env: Env,
@@ -57,6 +58,21 @@ export async function regulationRoute(request: Request, env: Env, url: URL) {
     return jsonResponse(r.value);
   }
   if (url.search) throw bad();
+  if (tail === "/draft" && request.method === "GET") {
+    const r = await session.getRegulationDraft(id.data);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
+  if (tail === "/draft" && request.method === "POST") {
+    const c = await readMutationJson(request, saveRegulationDraftSchema, {
+      origin: env.APP_ORIGIN,
+      maxBytes: 1048576,
+    });
+    if (c.disputeId !== id.data) throw bad();
+    const r = await session.saveRegulationDraft(c);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
   if (tail === "/publication" && request.method === "GET") {
     const r = await session.previewStandingsPublication(id.data);
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);

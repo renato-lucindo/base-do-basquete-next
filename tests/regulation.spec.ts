@@ -2,6 +2,55 @@ import { test, expect, type Page } from "@playwright/test";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
 
+test("nova configuração recebe FIBA e permite definir os turnos sem preencher pontos", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page);
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
+  );
+  await page
+    .getByRole("heading", { name: "Regulamento da disputa", exact: true })
+    .waitFor();
+  await expect(
+    page.getByText("Classificação: padrão FIBA 2026", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("spinbutton", { name: "Pontos por vitória", exact: true }),
+  ).toHaveCount(0);
+  await advanced(page);
+  await expect(
+    page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("spinbutton", {
+      name: "Placar do vencedor por W.O.",
+      exact: true,
+    }),
+  ).toHaveValue("20");
+  await page.getByLabel("Incluir Lobos", { exact: true }).check();
+  await page.getByLabel("Incluir Lobos B", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Adicionar pontos corridos", exact: true })
+    .click();
+  await expect(
+    page.getByRole("spinbutton", { name: "Pontos por vitória", exact: true }),
+  ).toHaveValue("2");
+  await expect(
+    page.getByRole("spinbutton", { name: "Pontos por derrota", exact: true }),
+  ).toHaveValue("1");
+  const turns = page.getByLabel("Turnos da fase", { exact: true });
+  await expect(turns).toHaveValue("1");
+  await turns.selectOption("2");
+  expect(f.getState().version).toBe(0);
+  await saveRules(page, "Organização inicial com dois turnos");
+  expect(f.getState().definition?.groupPhases[0].rules).toMatchObject({
+    calculationPolicy: "fiba-2026",
+    turns: 2,
+    points: { win: 2, loss: 1 },
+  });
+});
+
 test("permissão de transferência começa pendente e só muda por confirmação do regulamento", async ({
   page,
 }) => {
@@ -34,6 +83,7 @@ test("permissão de transferência começa pendente e só muda por confirmação
   ).toBeVisible();
   expect(f.getState().definition?.transfers).toBe("allowed");
   await page.reload();
+  await advanced(page);
   await expect(permission).toHaveValue("allowed");
 });
 
@@ -42,6 +92,10 @@ test("placar opcional de W.O. exige valores coerentes e retirada da regra é exp
 }) => {
   const f = await regulationBrowserFixture(page);
   await prepare(page);
+  await page
+    .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
+    .uncheck();
+
   await page
     .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
     .check();
@@ -101,11 +155,16 @@ test("placar opcional de W.O. exige valores coerentes e retirada da regra é exp
   expect(f.getState().definition?.occurrenceRules.wo).toBeNull();
   expect(f.getState().version).toBe(2);
   await page.reload();
+  await advanced(page);
   await expect(
     page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
   ).not.toBeChecked();
 });
 async function saveRules(page: Page, reason: string) {
+  const exception = page.getByLabel("Justificativa das regras personalizadas", {
+    exact: true,
+  });
+  if (await exception.isVisible()) await exception.fill(reason);
   await page
     .getByRole("button", { name: "Conferir impacto", exact: true })
     .click();
@@ -137,6 +196,10 @@ test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", as
   await prepare(page);
   await page
     .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
+    .uncheck();
+
+  await page
+    .getByRole("checkbox", { name: "Definir regra de W.O.", exact: true })
     .check();
   await expect(
     page.getByRole("spinbutton", {
@@ -156,6 +219,9 @@ test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", as
       exact: true,
     })
     .fill("0");
+  await page
+    .getByLabel("Justificativa das regras personalizadas", { exact: true })
+    .fill("Regra administrativa sem placar acordada pela organização");
   await page
     .getByRole("button", { name: "Conferir impacto", exact: true })
     .click();
@@ -185,6 +251,7 @@ test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", as
     score: null,
   });
   await page.reload();
+  await advanced(page);
   await expect(
     page.getByRole("checkbox", { name: "Definir regra de W.O.", exact: true }),
   ).toBeChecked();
@@ -195,6 +262,14 @@ test("regra de W.O. exige pontos explícitos e conserva placar desconhecido", as
     }),
   ).not.toBeChecked();
 });
+async function advanced(page: Page) {
+  const button = page.getByRole("button", {
+    name: "Regras avançadas",
+    exact: true,
+  });
+  if ((await button.getAttribute("aria-expanded")) === "false")
+    await button.click();
+}
 async function prepare(page: Page) {
   await page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
@@ -202,6 +277,7 @@ async function prepare(page: Page) {
   await page
     .getByRole("heading", { name: "Regulamento da disputa", exact: true })
     .waitFor();
+  await advanced(page);
   await page.getByLabel("Incluir Lobos", { exact: true }).check();
   await page.getByLabel("Incluir Lobos B", { exact: true }).check();
   await page
@@ -252,6 +328,7 @@ test("organiza pontos corridos, confere impacto, salva e retoma a classificaçã
   ).toBeVisible();
   expect(f.getState().version).toBe(1);
   await page.reload();
+  await advanced(page);
   await expect(
     page.getByLabel("Pontos por vitória", { exact: true }),
   ).toHaveValue("2");
@@ -552,6 +629,11 @@ test("resolve inscrições do grupo na prévia de eliminatória sem inventar res
 });
 
 async function reviewForSave(page: Page) {
+  const exception = page.getByLabel("Justificativa das regras personalizadas", {
+    exact: true,
+  });
+  if (await exception.isVisible())
+    await exception.fill("Pontuação específica da edição conferida");
   await page
     .getByRole("button", { name: "Conferir impacto", exact: true })
     .click();
@@ -689,6 +771,7 @@ test("histórico paginado abre versão antiga sem substituir rascunho nem gravar
   ).toBeVisible();
   f.addHistory(25);
   await page.reload();
+  await advanced(page);
   await page.getByLabel("Pontos por vitória", { exact: true }).fill("9");
   await page.getByRole("button", { name: "Mais versões", exact: true }).click();
   await page.getByRole("button", { name: "Ver versão 1", exact: true }).click();

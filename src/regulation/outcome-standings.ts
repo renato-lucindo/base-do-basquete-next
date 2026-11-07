@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { restartTieCriteria } from "./tie-restart";
 import {
   roundRobinRulesSchema,
   type RoundRobinRules,
@@ -145,53 +146,68 @@ export function calculateOutcomeStandings(input: unknown) {
     ids.map((id) => table.get(id)!),
     (r) => r.leaguePoints,
   );
-  if (s.outcomes.length)
-    for (const criterion of s.rules.tieBreakers)
-      groups = groups.flatMap((group) => {
-        const registrations = group.map((r) => r.registrationId).sort(),
-          key = registrations.join(",");
-        if (group.length < 2 || blocked.has(key)) return [group];
-        const pool = new Set(registrations),
-          direct = criterion.startsWith("head_to_head_"),
-          games = s.outcomes.filter((g) =>
-            direct
-              ? pool.has(g.homeRegistrationId) && pool.has(g.awayRegistrationId)
-              : pool.has(g.homeRegistrationId) ||
-                pool.has(g.awayRegistrationId),
+  const refine = (group: Totals[], criterion: TieCriterion): Totals[][] => {
+    const registrations = group.map((r) => r.registrationId).sort(),
+      key = registrations.join(",");
+    if (group.length < 2 || blocked.has(key)) return [group];
+    const pool = new Set(registrations),
+      direct = criterion.startsWith("head_to_head_"),
+      games = s.outcomes.filter((g) =>
+        direct
+          ? pool.has(g.homeRegistrationId) && pool.has(g.awayRegistrationId)
+          : pool.has(g.homeRegistrationId) || pool.has(g.awayRegistrationId),
+      ),
+      values = direct ? totals(registrations, games, s.rules) : table;
+    const metric = (r: Totals): number | null => {
+      const t = values.get(r.registrationId)!;
+      switch (criterion) {
+        case "wins":
+          return t.wins;
+        case "point_difference":
+        case "head_to_head_difference":
+          return t.difference;
+        case "points_for":
+        case "head_to_head_for":
+          return t.pointsFor;
+        case "head_to_head_points":
+          return t.leaguePoints;
+      }
+    };
+    const unknown = group.some((r) => metric(r) === null);
+    tieSteps.push({
+      criterion,
+      registrationIds: registrations,
+      gameCount: games.length,
+      blocked: unknown,
+      values: registrations.map((id) => ({
+        registrationId: id,
+        value: metric(table.get(id)!),
+      })),
+    });
+    if (unknown) {
+      blocked.add(key);
+      return [group];
+    }
+    return partition(group, (r) => metric(r)!);
+  };
+  if (s.outcomes.length) {
+    if (s.rules.calculationPolicy === "fiba-2026")
+      groups = restartTieCriteria(
+        groups,
+        s.rules.tieBreakers,
+        refine,
+        (group) =>
+          blocked.has(
+            group
+              .map((r) => r.registrationId)
+              .sort()
+              .join(","),
           ),
-          values = direct ? totals(registrations, games, s.rules) : table;
-        const metric = (r: Totals): number | null => {
-          const t = values.get(r.registrationId)!;
-          switch (criterion) {
-            case "wins":
-              return t.wins;
-            case "point_difference":
-            case "head_to_head_difference":
-              return t.difference;
-            case "points_for":
-            case "head_to_head_for":
-              return t.pointsFor;
-            case "head_to_head_points":
-              return t.leaguePoints;
-          }
-        };
-        const unknown = group.some((r) => metric(r) === null);
-        tieSteps.push({
-          criterion,
-          registrationIds: registrations,
-          gameCount: games.length,
-          blocked: unknown,
-          values: registrations.map((id) => ({
-            registrationId: id,
-            value: metric(table.get(id)!),
-          })),
-        });
-        if (unknown) {
-          blocked.add(key);
-          return [group];
-        }
-        return partition(group, (r) => metric(r)!);
-      });
+      );
+    else
+      for (const criterion of s.rules.tieBreakers)
+        groups = groups.flatMap((group) => refine(group, criterion));
+  }
   const rows: (Totals & { position: number | null; tied: boolean })[] = [],
     unresolvedTies: string[][] = [];
   for (const group of groups) {
@@ -201,7 +217,10 @@ export function calculateOutcomeStandings(input: unknown) {
     group.forEach((r) => rows.push({ ...r, position, tied }));
   }
   return {
-    algorithmVersion: "outcome-standings-v1" as const,
+    algorithmVersion:
+      s.rules.calculationPolicy === "fiba-2026"
+        ? ("outcome-standings-fiba-2026-v1" as const)
+        : ("outcome-standings-v1" as const),
     status: s.outcomes.length ? ("provisional" as const) : ("empty" as const),
     rows,
     unresolvedTies,

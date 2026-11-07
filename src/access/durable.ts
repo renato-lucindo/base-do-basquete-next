@@ -12,6 +12,10 @@ import {
 } from "../achievements/publication-contract";
 import { previewAchievementsSchema } from "../achievements/view-contract";
 import { SupabaseRegulations } from "../regulation/provider";
+import {
+  saveRegulationDraftSchema,
+  type SaveRegulationDraft,
+} from "../regulation/draft-contract";
 import { SupabasePublicStandings } from "../regulation/public-provider";
 import {
   confirmStandingsSchema,
@@ -760,6 +764,23 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.regulations.save(accessToken, saveRegulationSchema.parse(command)),
+      ),
+    );
+  }
+  getRegulationDraft(disputeId: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.getDraft(accessToken, disputeId),
+      ),
+    );
+  }
+  saveRegulationDraft(command: SaveRegulationDraft) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.regulations.saveDraft(
+          accessToken,
+          saveRegulationDraftSchema.parse(command),
+        ),
       ),
     );
   }

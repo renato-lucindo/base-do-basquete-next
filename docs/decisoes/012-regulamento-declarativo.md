@@ -1,5 +1,7 @@
 # 012 — Regulamento declarativo e classificação explicável
 
+Evolução em 06/11/2026: o [ADR 021](021-regulamento-fiba-simplificado.md) adota padrões FIBA e decisão administrativa para novas configurações. Este algoritmo permanece aplicável às definições históricas sem a nova política.
+
 Estado: núcleo inicial da etapa5, independente da avaliação humana pendente da etapa4. Fontes: ESCOPO.md§4/7 e VALIDACAO.md do ZIP, arquitetura atual e feedback aceito. Nenhum motor pronto de classificação foi localizado nos módulos fornecidos; não consultar outro repositório.
 
 Reutilizar TypeScript/Zod e a projeção publicada estrita da etapa4. A classificação recebe explicitamente inscrições e partidas atribuídas à fase/grupo, todas da mesma disputa. Duas inscrições da mesma equipe global continuam distintas. Rascunhos, ocorrências administrativas e jogos de outra fase não entram por semelhança de nome/data; W.O., cancelamento e desistência terão modelos próprios, sem pontos ou estatísticas individuais fabricados.

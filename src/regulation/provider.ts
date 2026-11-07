@@ -18,9 +18,19 @@ import {
   regulationPreviewResultSchema,
   regulationProjectionSchema,
 } from "./view-contract";
+import {
+  regulationDraftSchema,
+  saveRegulationDraftSchema,
+  regulationDraftResultSchema,
+  type SaveRegulationDraft,
+} from "./draft-contract";
 type Functions = Database["public"]["Functions"];
 type Rpc =
-  "get_regulation_state" | "get_regulation_version" | "save_regulation";
+  | "get_regulation_state"
+  | "get_regulation_version"
+  | "save_regulation"
+  | "get_regulation_draft"
+  | "save_regulation_draft";
 const messages = {
   context_conflict:
     "Os jogos ou resultados mudaram. Confira uma nova prévia antes de salvar o regulamento.",
@@ -34,6 +44,10 @@ const messages = {
     "Uma inscrição selecionada não pertence a esta disputa. Confira os participantes.",
   invalid_regulation_assignment:
     "Confira os jogos atribuídos e os adversários de cada grupo.",
+  draft_version_conflict:
+    "O rascunho mudou em outra edição. Recarregue o rascunho antes de salvar novamente.",
+  custom_reason_required: "Informe a justificativa das regras personalizadas.",
+  tie_comment_required: "Informe a justificativa do desempate administrativo.",
 } as const;
 const bad = () =>
   new HttpError(
@@ -79,6 +93,35 @@ export class SupabaseRegulations {
       init: RequestInit,
     ) => Promise<Response> = (url, init) => fetch(url, init),
   ) {}
+  async getDraft(token: string, disputeId: string) {
+    disputeId = canonicalId(disputeId);
+    const d = await this.rpc(
+      regulationDraftSchema.nullable(),
+      "get_regulation_draft",
+      { p_dispute_id: disputeId },
+      token,
+    );
+    if (d && d.disputeId !== disputeId) throw unavailable();
+    return d;
+  }
+  async saveDraft(token: string, input: SaveRegulationDraft) {
+    const c = saveRegulationDraftSchema.safeParse(input);
+    if (!c.success) throw bad();
+    const r = await this.rpc(
+      regulationDraftResultSchema,
+      "save_regulation_draft",
+      { p_command: c.data },
+      token,
+    );
+    if (
+      r.commandId !== c.data.commandId ||
+      r.disputeId !== c.data.disputeId ||
+      r.version !== c.data.expectedVersion + 1 ||
+      r.baseRegulationVersion !== c.data.baseRegulationVersion
+    )
+      throw unavailable();
+    return r;
+  }
   async getState(token: string, disputeId: string, offset = 0) {
     disputeId = canonicalId(disputeId);
     if (

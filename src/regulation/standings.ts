@@ -1,4 +1,5 @@
 import { publicResultSchema } from "../publication/pdf-contract";
+import { restartTieCriteria } from "./tie-restart";
 import {
   competitiveFactSchema,
   standingsInputSchema,
@@ -104,46 +105,50 @@ export function calculateStandings(input: unknown) {
     ids.map((id) => table.get(id)!),
     (r) => r.leaguePoints,
   );
-  if (s.games.length)
-    for (const criterion of s.rules.tieBreakers) {
-      groups = groups.flatMap((group) => {
-        if (group.length === 1) return [group];
-        const registrations = group.map((r) => r.registrationId).sort(),
-          pool = new Set(registrations),
-          direct = criterion.startsWith("head_to_head_");
-        const games = s.games.filter((g) =>
-          direct
-            ? pool.has(g.homeRegistrationId) && pool.has(g.awayRegistrationId)
-            : pool.has(g.homeRegistrationId) || pool.has(g.awayRegistrationId),
-        );
-        const values = direct ? totals(registrations, games, s.rules) : table;
-        const metric = (r: Totals) => {
-          const t = values.get(r.registrationId)!;
-          switch (criterion) {
-            case "wins":
-              return t.wins;
-            case "point_difference":
-            case "head_to_head_difference":
-              return t.difference;
-            case "points_for":
-            case "head_to_head_for":
-              return t.pointsFor;
-            case "head_to_head_points":
-              return t.leaguePoints;
-          }
-        };
-        tieSteps.push({
-          criterion,
-          registrationIds: registrations,
-          gameCount: games.length,
-          values: registrations.map((id) => ({
-            registrationId: id,
-            value: metric(table.get(id)!),
-          })),
-        });
-        return partition(group, metric);
-      });
-    }
+  const refine = (group: Totals[], criterion: TieCriterion): Totals[][] => {
+    if (group.length === 1) return [group];
+    const registrations = group.map((r) => r.registrationId).sort(),
+      pool = new Set(registrations),
+      direct = criterion.startsWith("head_to_head_");
+    const games = s.games.filter((g) =>
+      direct
+        ? pool.has(g.homeRegistrationId) && pool.has(g.awayRegistrationId)
+        : pool.has(g.homeRegistrationId) || pool.has(g.awayRegistrationId),
+    );
+    const values = direct ? totals(registrations, games, s.rules) : table;
+    const metric = (r: Totals) => {
+      const t = values.get(r.registrationId)!;
+      switch (criterion) {
+        case "wins":
+          return t.wins;
+        case "point_difference":
+        case "head_to_head_difference":
+          return t.difference;
+        case "points_for":
+        case "head_to_head_for":
+          return t.pointsFor;
+        case "head_to_head_points":
+          return t.leaguePoints;
+      }
+    };
+    tieSteps.push({
+      criterion,
+      registrationIds: registrations,
+      gameCount: games.length,
+      values: registrations.map((id) => ({
+        registrationId: id,
+        value: metric(table.get(id)!),
+      })),
+    });
+    return partition(group, metric);
+  };
+  if (s.games.length) {
+    if (s.rules.calculationPolicy === "fiba-2026")
+      groups = restartTieCriteria(groups, s.rules.tieBreakers, refine);
+    else
+      for (const criterion of s.rules.tieBreakers)
+        groups = groups.flatMap((group) => refine(group, criterion));
+  }
   const rows: Row[] = [],
     unresolvedTies: string[][] = [];
   for (const group of groups) {
@@ -153,7 +158,10 @@ export function calculateStandings(input: unknown) {
     for (const row of group) rows.push({ ...row, position, tied });
   }
   return {
-    algorithmVersion: "round-robin-v1" as const,
+    algorithmVersion:
+      s.rules.calculationPolicy === "fiba-2026"
+        ? ("round-robin-fiba-2026-v1" as const)
+        : ("round-robin-v1" as const),
     status: s.games.length ? ("provisional" as const) : ("empty" as const),
     rows,
     unresolvedTies,

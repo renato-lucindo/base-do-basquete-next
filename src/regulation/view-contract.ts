@@ -57,7 +57,10 @@ const outcomeLineage = z.discriminatedUnion("kind", [
 ]);
 const standings = z
   .object({
-    algorithmVersion: z.literal("outcome-standings-v1"),
+    algorithmVersion: z.enum([
+      "outcome-standings-v1",
+      "outcome-standings-fiba-2026-v1",
+    ]),
     status: z.enum(["empty", "provisional"]),
     rows: z.array(row).max(1000),
     unresolvedTies: z.array(z.array(uuid).max(1000)).max(1000),
@@ -145,6 +148,9 @@ export const regulationProjectionSchema = z
                     groupId: uuid,
                     pendingGameIds: ids,
                     excludedGameIds: ids,
+                    tieContext: z.string().max(2097152).optional(),
+                    appliedTieDecisionIds: z.array(uuid).max(1000).optional(),
+                    staleTieDecisionIds: z.array(uuid).max(1000).optional(),
                     standings,
                   })
                   .strict(),

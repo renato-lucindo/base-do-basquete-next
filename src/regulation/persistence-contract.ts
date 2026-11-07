@@ -4,6 +4,7 @@ import { seriesDependencyOrder } from "./crossing-graph";
 import { groupPhaseInputSchema } from "./groups";
 import { occurrencesInputSchema, occurrenceRulesSchema } from "./occurrences";
 import { organizedInputSchema, previewOrganizedCompetition } from "./organized";
+import { tieDecisionSchema, tieNoteSchema } from "./tie-decisions";
 const uuid = z.uuid().transform((v) => v.toLowerCase()),
   version = z.number().int().min(1).max(2147483647),
   fingerprint = z.string().regex(/^[a-f0-9]{64}$/u),
@@ -22,6 +23,10 @@ const definitionShape = z
   .object({
     registrationIds: z.array(uuid).max(1000),
     transfers: z.enum(["allowed", "forbidden"]).nullable().optional(),
+    customized: z.boolean().optional(),
+    customReason: z.string().trim().max(2000).optional(),
+    tieDecisions: z.array(tieDecisionSchema).max(1000).optional(),
+    tieNotes: z.array(tieNoteSchema).max(1000).optional(),
     occurrenceRules: occurrenceRulesSchema,
     groupPhases: z
       .array(
@@ -46,6 +51,7 @@ const definitionShape = z
   })
   .strict();
 const structure = (d: z.infer<typeof definitionShape>) => ({
+  ...(d.tieDecisions ? { tieDecisions: d.tieDecisions } : {}),
   groupPhases: d.groupPhases.map((p) => ({
     phaseId: p.phaseId,
     rules: p.rules,
@@ -112,6 +118,39 @@ export const regulationDefinitionSchema = definitionShape.superRefine(
       assigned.push(...n.games.map((g) => g.gameId));
     }
     if (assigned.length > 10000 || new Set(assigned).size !== assigned.length)
+      issue();
+    const decisions = d.tieDecisions ?? [],
+      notes = d.tieNotes ?? [];
+    if (
+      decisions.some((v, i) =>
+        decisions
+          .slice(i + 1)
+          .some(
+            (other) =>
+              v.phaseId === other.phaseId &&
+              v.groupId === other.groupId &&
+              v.order.some((id) => other.order.includes(id)),
+          ),
+      )
+    )
+      issue();
+    if (
+      new Set(decisions.map((v) => v.id)).size !== decisions.length ||
+      new Set(notes.map((v) => v.id)).size !== notes.length ||
+      notes.some((n) => !decisions.some((v) => v.id === n.id)) ||
+      decisions.some(
+        (v) =>
+          !d.groupPhases.some(
+            (p) =>
+              p.phaseId === v.phaseId &&
+              p.groups.some(
+                (g) =>
+                  g.id === v.groupId &&
+                  v.order.every((id) => g.registrationIds.includes(id)),
+              ),
+          ),
+      )
+    )
       issue();
     try {
       seriesDependencyOrder(d.series);

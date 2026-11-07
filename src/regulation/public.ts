@@ -65,7 +65,10 @@ export function buildPublicStandings(input: unknown): PublicStandings {
       status: "provisional",
       disputeId: projection.disputeId,
       regulationVersion: projection.regulationVersion,
-      groupPhases: projection.groupPhases,
+      groupPhases: projection.groupPhases.map((p) => ({
+        ...p,
+        groups: p.groups.map((g) => ({ ...g, tieContext: undefined })),
+      })),
       series: projection.series,
       lineage: projection.lineage,
     },

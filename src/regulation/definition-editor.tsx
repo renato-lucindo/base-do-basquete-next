@@ -1,7 +1,9 @@
+import { useState } from "react";
 import type { RegulationDefinition } from "./persistence-contract";
 import type { RegistrationSnapshot } from "../teams/contract";
 import type { GameSnapshot } from "../games/contract";
 import type { TieCriterion } from "./contract";
+import { createFibaRules, adoptFibaDefaults } from "./defaults";
 export const criteriaLabels: Record<TieCriterion, string> = {
   wins: "Vitórias",
   point_difference: "Saldo de pontos",
@@ -152,6 +154,8 @@ export function DefinitionEditor({
   games,
   change,
 }: Props) {
+  const [advanced, setAdvanced] = useState(false);
+  const legacy = d.groupPhases.some((p) => !p.rules.calculationPolicy);
   const selected = registrations.filter((r) =>
     d.registrationIds.includes(r.id),
   );
@@ -160,11 +164,7 @@ export function DefinitionEditor({
       v.groupPhases.push({
         phaseId: crypto.randomUUID(),
         name: `Fase ${v.groupPhases.length + 1}`,
-        rules: {
-          format: "round_robin",
-          points: { win: NaN, loss: NaN },
-          tieBreakers: [],
-        },
+        rules: createFibaRules(),
         groups: Array.from({ length: groups }, (_, i) => ({
           id: crypto.randomUUID(),
           name: `Grupo ${i + 1}`,
@@ -210,140 +210,201 @@ export function DefinitionEditor({
     });
   return (
     <>
-      <fieldset className="reg-setting">
-        <legend>Transferências de atletas</legend>
-        <label>
-          Transferências entre inscrições
-          <select
-            aria-label="Transferências entre inscrições"
-            value={d.transfers ?? ""}
-            onChange={(e) =>
-              change((v) => {
-                v.transfers =
-                  e.target.value === ""
-                    ? null
-                    : (e.target.value as "allowed" | "forbidden");
-              })
-            }
+      <div className="reg-summary">
+        <p>
+          <strong>
+            {legacy
+              ? "Regulamento anterior"
+              : d.customized
+                ? "Classificação: regulamento personalizado"
+                : "Classificação: padrão FIBA 2026"}
+          </strong>
+        </p>
+        {!legacy && !d.customized && (
+          <p>
+            Vitória: 2 pontos · Derrota: 1 ponto · W.O.: 20–0 e 0 ponto para a
+            equipe derrotada por W.O. Desempates preenchidos automaticamente.
+          </p>
+        )}
+        {legacy && (
+          <p>
+            As regras salvas foram preservadas. Você pode adotar o padrão FIBA e
+            conferir as diferenças antes de salvar.
+          </p>
+        )}
+        <div className="reg-actions">
+          <button
+            type="button"
+            aria-expanded={advanced}
+            onClick={() => setAdvanced((v) => !v)}
           >
-            <option value="">Não definido</option>
-            <option value="allowed">Permitidas</option>
-            <option value="forbidden">Proibidas</option>
-          </select>
-        </label>
-        <p>
-          Sem definição, novos períodos por transferência ou retorno ficam
-          bloqueados. As participações anteriores são preservadas. A mudança só
-          passa a valer depois de conferir e salvar o regulamento.
-        </p>
-      </fieldset>
-      <fieldset className="reg-setting">
-        <legend>Regra de W.O.</legend>
-        <label className="reg-check">
-          <input
-            type="checkbox"
-            checked={!!d.occurrenceRules.wo}
-            onChange={(e) =>
-              change((v) => {
-                v.occurrenceRules.wo = e.target.checked
-                  ? {
-                      winnerLeaguePoints: NaN,
-                      loserLeaguePoints: NaN,
-                      score: null,
-                    }
-                  : null;
-              })
-            }
-          />
-          Definir regra de W.O.
-        </label>
-        <p>
-          Preencha os efeitos previstos no regulamento. Nenhum placar será
-          presumido; a decisão de cada jogo exige conferência própria.
-        </p>
-        {d.occurrenceRules.wo && (
-          <>
-            <div className="reg-columns">
-              {(["winnerLeaguePoints", "loserLeaguePoints"] as const).map(
-                (key) => (
-                  <label key={key}>
-                    {key === "winnerLeaguePoints"
-                      ? "Pontos de classificação do vencedor por W.O."
-                      : "Pontos de classificação do perdedor por W.O."}
-                    <input
-                      type="number"
-                      required
-                      min={-1000000}
-                      max={1000000}
-                      step={1}
-                      value={
-                        Number.isFinite(d.occurrenceRules.wo![key])
-                          ? d.occurrenceRules.wo![key]
-                          : ""
-                      }
-                      onChange={(e) =>
-                        change((v) => {
-                          v.occurrenceRules.wo![key] =
-                            e.target.value === ""
-                              ? NaN
-                              : Number(e.target.value);
-                        })
-                      }
-                    />
-                  </label>
-                ),
-              )}
-            </div>
+            Regras avançadas
+          </button>
+          {(legacy || d.customized) && (
+            <button
+              type="button"
+              onClick={() =>
+                change((v) => Object.assign(v, adoptFibaDefaults(v)))
+              }
+            >
+              Aplicar padrão FIBA
+            </button>
+          )}
+        </div>
+        {d.customized && (
+          <label>
+            Justificativa das regras personalizadas
+            <textarea
+              required
+              maxLength={2000}
+              value={d.customReason ?? ""}
+              onChange={(e) =>
+                change((v) => {
+                  v.customReason = e.target.value;
+                })
+              }
+            />
+          </label>
+        )}
+      </div>
+      {advanced && (
+        <div className="reg-advanced">
+          <fieldset className="reg-setting">
+            <legend>Transferências de atletas</legend>
+            <label>
+              Transferências entre inscrições
+              <select
+                aria-label="Transferências entre inscrições"
+                value={d.transfers ?? ""}
+                onChange={(e) =>
+                  change((v) => {
+                    v.transfers =
+                      e.target.value === ""
+                        ? null
+                        : (e.target.value as "allowed" | "forbidden");
+                  })
+                }
+              >
+                <option value="">Não definido</option>
+                <option value="allowed">Permitidas</option>
+                <option value="forbidden">Proibidas</option>
+              </select>
+            </label>
+            <p>
+              Sem definição, novos períodos por transferência ou retorno ficam
+              bloqueados. As participações anteriores são preservadas. A mudança
+              só passa a valer depois de conferir e salvar o regulamento.
+            </p>
+          </fieldset>
+          <fieldset className="reg-setting">
+            <legend>Regra de W.O.</legend>
             <label className="reg-check">
               <input
                 type="checkbox"
-                checked={!!d.occurrenceRules.wo.score}
+                checked={!!d.occurrenceRules.wo}
                 onChange={(e) =>
                   change((v) => {
-                    v.occurrenceRules.wo!.score = e.target.checked
-                      ? { winner: NaN, loser: NaN }
+                    v.occurrenceRules.wo = e.target.checked
+                      ? {
+                          winnerLeaguePoints: NaN,
+                          loserLeaguePoints: NaN,
+                          score: null,
+                        }
                       : null;
                   })
                 }
               />
-              Definir placar administrativo do W.O.
+              Definir regra de W.O.
             </label>
-            {d.occurrenceRules.wo.score && (
-              <div className="reg-columns">
-                {(["winner", "loser"] as const).map((key) => (
-                  <label key={key}>
-                    {key === "winner"
-                      ? "Placar do vencedor por W.O."
-                      : "Placar do perdedor por W.O."}
-                    <input
-                      type="number"
-                      required
-                      min={0}
-                      max={2147483647}
-                      step={1}
-                      value={
-                        Number.isFinite(d.occurrenceRules.wo!.score![key])
-                          ? d.occurrenceRules.wo!.score![key]
-                          : ""
-                      }
-                      onChange={(e) =>
-                        change((v) => {
-                          v.occurrenceRules.wo!.score![key] =
-                            e.target.value === ""
-                              ? NaN
-                              : Number(e.target.value);
-                        })
-                      }
-                    />
-                  </label>
-                ))}
-              </div>
+            <p>
+              Preencha os efeitos previstos no regulamento. Nenhum placar será
+              presumido; a decisão de cada jogo exige conferência própria.
+            </p>
+            {d.occurrenceRules.wo && (
+              <>
+                <div className="reg-columns">
+                  {(["winnerLeaguePoints", "loserLeaguePoints"] as const).map(
+                    (key) => (
+                      <label key={key}>
+                        {key === "winnerLeaguePoints"
+                          ? "Pontos de classificação do vencedor por W.O."
+                          : "Pontos de classificação do perdedor por W.O."}
+                        <input
+                          type="number"
+                          required
+                          min={-1000000}
+                          max={1000000}
+                          step={1}
+                          value={
+                            Number.isFinite(d.occurrenceRules.wo![key])
+                              ? d.occurrenceRules.wo![key]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            change((v) => {
+                              v.occurrenceRules.wo![key] =
+                                e.target.value === ""
+                                  ? NaN
+                                  : Number(e.target.value);
+                            })
+                          }
+                        />
+                      </label>
+                    ),
+                  )}
+                </div>
+                <label className="reg-check">
+                  <input
+                    type="checkbox"
+                    checked={!!d.occurrenceRules.wo.score}
+                    onChange={(e) =>
+                      change((v) => {
+                        v.occurrenceRules.wo!.score = e.target.checked
+                          ? { winner: NaN, loser: NaN }
+                          : null;
+                      })
+                    }
+                  />
+                  Definir placar administrativo do W.O.
+                </label>
+                {d.occurrenceRules.wo.score && (
+                  <div className="reg-columns">
+                    {(["winner", "loser"] as const).map((key) => (
+                      <label key={key}>
+                        {key === "winner"
+                          ? "Placar do vencedor por W.O."
+                          : "Placar do perdedor por W.O."}
+                        <input
+                          type="number"
+                          required
+                          min={0}
+                          max={2147483647}
+                          step={1}
+                          value={
+                            Number.isFinite(d.occurrenceRules.wo!.score![key])
+                              ? d.occurrenceRules.wo!.score![key]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            change((v) => {
+                              v.occurrenceRules.wo!.score![key] =
+                                e.target.value === ""
+                                  ? NaN
+                                  : Number(e.target.value);
+                            })
+                          }
+                        />
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
-      </fieldset>
+          </fieldset>
+        </div>
+      )}
       <fieldset className="reg-registrations">
-        <legend>Inscrições na organização</legend>
+        <legend>1. Participantes</legend>
         {registrations.map((r) => {
           const used =
             d.groupPhases.some((p) =>
@@ -379,22 +440,34 @@ export function DefinitionEditor({
           );
         })}
       </fieldset>
+      <h4>2. Grupos e formato</h4>
+      <p>
+        Distribua as equipes nos grupos e escolha os turnos. Os jogos são
+        associados após o cadastro na aba Jogos.
+      </p>
       <div className="reg-actions">
         <button type="button" onClick={() => addRound(1)}>
           Adicionar pontos corridos
         </button>
-        <button type="button" onClick={addKnock}>
-          Adicionar eliminatória
+        <button type="button" onClick={() => addRound(2)}>
+          Adicionar fase com grupos
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            addRound(2);
-            addKnock();
-          }}
-        >
-          Adicionar grupos e mata-mata
-        </button>
+        {advanced && (
+          <>
+            <button type="button" onClick={addKnock}>
+              Adicionar eliminatória
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                addRound(2);
+                addKnock();
+              }}
+            >
+              Adicionar grupos e mata-mata
+            </button>
+          </>
+        )}
       </div>
       {d.groupPhases.map((p, pi) => (
         <fieldset className="reg-phase" key={p.phaseId}>
@@ -412,101 +485,130 @@ export function DefinitionEditor({
               }
             />
           </label>
-          <div className="reg-columns">
-            {(["win", "loss"] as const).map((key) => (
-              <label key={key}>
-                {key === "win" ? "Pontos por vitória" : "Pontos por derrota"}
-                <input
-                  required
-                  type="number"
-                  min={-1000000}
-                  max={1000000}
-                  step={1}
-                  value={
-                    Number.isFinite(p.rules.points[key])
-                      ? p.rules.points[key]
-                      : ""
-                  }
-                  onChange={(e) =>
-                    change((v) => {
-                      v.groupPhases[pi].rules.points[key] =
-                        e.target.value === "" ? NaN : Number(e.target.value);
-                    })
-                  }
-                />
-              </label>
-            ))}
-          </div>
-          <fieldset>
-            <legend>Critérios de desempate, na ordem de aplicação</legend>
-            <p>Empates sem critério suficiente continuam pendentes.</p>
-            {p.rules.tieBreakers.map((criterion, i) => (
-              <div className="reg-actions" key={criterion}>
-                <span>
-                  {i + 1}. {criteriaLabels[criterion]}
-                </span>
-                <button
-                  type="button"
-                  disabled={!i}
-                  aria-label={`Subir ${criteriaLabels[criterion]}`}
-                  onClick={() =>
-                    change((v) => {
-                      const a = v.groupPhases[pi].rules.tieBreakers;
-                      [a[i - 1], a[i]] = [a[i], a[i - 1]];
-                    })
-                  }
-                >
-                  Subir
-                </button>
-                <button
-                  type="button"
-                  disabled={i === p.rules.tieBreakers.length - 1}
-                  aria-label={`Descer ${criteriaLabels[criterion]}`}
-                  onClick={() =>
-                    change((v) => {
-                      const a = v.groupPhases[pi].rules.tieBreakers;
-                      [a[i], a[i + 1]] = [a[i + 1], a[i]];
-                    })
-                  }
-                >
-                  Descer
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    change((v) => {
-                      v.groupPhases[pi].rules.tieBreakers.splice(i, 1);
-                    })
-                  }
-                >
-                  Remover critério
-                </button>
+          <label>
+            Turnos da fase
+            <select
+              aria-label="Turnos da fase"
+              value={p.rules.turns ?? ""}
+              onChange={(e) =>
+                change((v) => {
+                  v.groupPhases[pi].rules.turns = Number(e.target.value) as
+                    1 | 2;
+                })
+              }
+            >
+              {!p.rules.turns && (
+                <option value="" disabled>
+                  Não definido no regulamento anterior
+                </option>
+              )}
+              <option value="1">Turno único</option>
+              <option value="2">Ida e volta</option>
+            </select>
+          </label>
+          {advanced && (
+            <>
+              <div className="reg-columns">
+                {(["win", "loss"] as const).map((key) => (
+                  <label key={key}>
+                    {key === "win"
+                      ? "Pontos por vitória"
+                      : "Pontos por derrota"}
+                    <input
+                      required
+                      type="number"
+                      min={-1000000}
+                      max={1000000}
+                      step={1}
+                      value={
+                        Number.isFinite(p.rules.points[key])
+                          ? p.rules.points[key]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        change((v) => {
+                          v.groupPhases[pi].rules.points[key] =
+                            e.target.value === ""
+                              ? NaN
+                              : Number(e.target.value);
+                        })
+                      }
+                    />
+                  </label>
+                ))}
               </div>
-            ))}
-            <label>
-              Adicionar critério
-              <select
-                value=""
-                onChange={(e) => {
-                  if (e.target.value)
-                    change((v) =>
-                      v.groupPhases[pi].rules.tieBreakers.push(
-                        e.target.value as TieCriterion,
-                      ),
-                    );
-                }}
-              >
-                <option value="">Escolha um critério</option>
-                {(Object.keys(criteriaLabels) as TieCriterion[])
-                  .filter((c) => !p.rules.tieBreakers.includes(c))
-                  .map((c) => (
-                    <option key={c} value={c}>
-                      {criteriaLabels[c]}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          </fieldset>
+              <fieldset>
+                <legend>Critérios de desempate, na ordem de aplicação</legend>
+                <p>Empates sem critério suficiente continuam pendentes.</p>
+                {p.rules.tieBreakers.map((criterion, i) => (
+                  <div className="reg-actions" key={criterion}>
+                    <span>
+                      {i + 1}. {criteriaLabels[criterion]}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={!i}
+                      aria-label={`Subir ${criteriaLabels[criterion]}`}
+                      onClick={() =>
+                        change((v) => {
+                          const a = v.groupPhases[pi].rules.tieBreakers;
+                          [a[i - 1], a[i]] = [a[i], a[i - 1]];
+                        })
+                      }
+                    >
+                      Subir
+                    </button>
+                    <button
+                      type="button"
+                      disabled={i === p.rules.tieBreakers.length - 1}
+                      aria-label={`Descer ${criteriaLabels[criterion]}`}
+                      onClick={() =>
+                        change((v) => {
+                          const a = v.groupPhases[pi].rules.tieBreakers;
+                          [a[i], a[i + 1]] = [a[i + 1], a[i]];
+                        })
+                      }
+                    >
+                      Descer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        change((v) => {
+                          v.groupPhases[pi].rules.tieBreakers.splice(i, 1);
+                        })
+                      }
+                    >
+                      Remover critério
+                    </button>
+                  </div>
+                ))}
+                <label>
+                  Adicionar critério
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value)
+                        change((v) =>
+                          v.groupPhases[pi].rules.tieBreakers.push(
+                            e.target.value as TieCriterion,
+                          ),
+                        );
+                    }}
+                  >
+                    <option value="">Escolha um critério</option>
+                    {(Object.keys(criteriaLabels) as TieCriterion[])
+                      .filter((c) => !p.rules.tieBreakers.includes(c))
+                      .map((c) => (
+                        <option key={c} value={c}>
+                          {criteriaLabels[c]}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              </fieldset>
+            </>
+          )}
           {p.groups.map((g, gi) => (
             <fieldset className="reg-group" key={g.id}>
               <legend>{g.name || "Grupo"}</legend>
@@ -546,7 +648,12 @@ export function DefinitionEditor({
                   {r.name}
                 </label>
               ))}
-              <p>{g.gameIds.length} jogo(s) atribuído(s).</p>
+              <p>
+                {g.gameIds.length} jogo(s) atribuído(s).
+                {p.rules.turns
+                  ? ` ${((g.registrationIds.length * (g.registrationIds.length - 1)) / 2) * p.rules.turns} previsto(s) no formato escolhido.`
+                  : " Turnos ainda não definidos."}
+              </p>
               <button
                 type="button"
                 disabled={d.series.some((n) =>

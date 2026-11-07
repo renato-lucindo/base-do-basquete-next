@@ -85,6 +85,56 @@ it("agrees with the closed TypeScript definition contract across valid formats a
       ["empty", initial, true],
       ["single", { ...initial, series: [node] }, true],
       ["groups", { ...initial, groupPhases: [group] }, true],
+      ...[1, 2].map((turns): [string, unknown, boolean] => [
+        `FIBA ${turns} turn(s)`,
+        {
+          ...initial,
+          groupPhases: [
+            {
+              ...group,
+              rules: {
+                ...group.rules,
+                calculationPolicy: "fiba-2026",
+                turns,
+              },
+            },
+          ],
+        },
+        true,
+      ]),
+      ...[null, 0, 3, "2"].map((turns): [string, unknown, boolean] => [
+        `invalid turns ${String(turns)}`,
+        {
+          ...initial,
+          groupPhases: [
+            {
+              ...group,
+              rules: {
+                ...group.rules,
+                calculationPolicy: "fiba-2026",
+                turns,
+              },
+            },
+          ],
+        },
+        false,
+      ]),
+      [
+        "unknown calculation policy",
+        {
+          ...initial,
+          groupPhases: [
+            {
+              ...group,
+              rules: {
+                ...group.rules,
+                calculationPolicy: "fiba-2027",
+              },
+            },
+          ],
+        },
+        false,
+      ],
       [
         "rank reference",
         {

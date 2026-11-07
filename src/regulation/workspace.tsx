@@ -19,19 +19,23 @@ import {
   type RegulationPreviewResult,
 } from "./view-contract";
 import { DefinitionEditor } from "./definition-editor";
+import { createDefaultDefinition, hasCustomRules } from "./defaults";
 import { AdminToast } from "../competition/admin-toast";
 import { RegulationProjection } from "./projection";
 import { AchievementPanel } from "../achievements/panel";
 import { StandingsPublicationPanel } from "./publication-panel";
+import { TiePanel } from "./tie-panel";
+import {
+  draftDocumentSchema,
+  definitionKey,
+  regulationDraftSchema,
+  regulationDraftResultSchema,
+  type RegulationDraft,
+  type SaveRegulationDraft,
+} from "./draft-contract";
 import "./screen.css";
 type VersionView = ReturnType<typeof regulationVersionViewSchema.parse>;
-const empty = (): RegulationDefinition => ({
-  registrationIds: [],
-  occurrenceRules: { wo: null },
-  groupPhases: [],
-  knockoutPhases: [],
-  series: [],
-});
+const empty = createDefaultDefinition;
 
 async function loadRegistrationCatalog(
   disputeId: string,
@@ -113,10 +117,20 @@ export function RegulationWorkspace({
     alert = useRef<HTMLParagraphElement>(null),
     panel = useRef<HTMLElement>(null);
   const achievementGuard = useRef(() => true);
+  const [storedDraft, setStoredDraft] = useState<RegulationDraft | null>(null),
+    [draftVersion, setDraftVersion] = useState<number | null>(null),
+    [savedDraftBaseline, setSavedDraftBaseline] = useState(""),
+    [draftMessage, setDraftMessage] = useState(""),
+    [draftUncertain, setDraftUncertain] = useState(false);
+  const draftPending = useRef<SaveRegulationDraft | null>(null);
+  const [tieEditing, setTieEditing] = useState(false);
   const publicationGuard = useRef(() => true);
   const [publicationLocked, setPublicationLocked] = useState(false);
-  const dirty = !!view && JSON.stringify(draft) !== baseline,
-    locked = busy || !!pending.current || publicationLocked;
+  const currentKey = definitionKey(draft);
+  const dirty = !!view && currentKey !== baseline,
+    locked =
+      busy || !!pending.current || !!draftPending.current || publicationLocked,
+    unsaved = dirty && currentKey !== savedDraftBaseline;
   const names = new Map(registrations.map((r) => [r.id, r.name]));
   const path = `/api/regulations/${disputeId}`;
   useEffect(() => {
@@ -129,7 +143,7 @@ export function RegulationWorkspace({
   useEffect(() => {
     guard.current = () =>
       !busy &&
-      (!(dirty || pending.current) ||
+      (!(unsaved || tieEditing || pending.current || draftPending.current) ||
         window.confirm(
           "Há alterações no regulamento ou um envio não confirmado. Sair desta edição?",
         )) &&
@@ -140,14 +154,15 @@ export function RegulationWorkspace({
     };
   });
   useEffect(() => {
-    if (!dirty && !pending.current) return;
+    if (!unsaved && !tieEditing && !pending.current && !draftPending.current)
+      return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, uncertain, readPending, busy]);
+  }, [unsaved, uncertain, readPending, busy, draftUncertain, tieEditing]);
   useEffect(() => {
     if (error && enabled) alert.current?.focus();
   }, [error, enabled]);
@@ -161,8 +176,12 @@ export function RegulationWorkspace({
   }
   function accept(v: RegulationView, preserve = false) {
     setView(v);
-    if (!preserve) setDraft(structuredClone(v.definition ?? empty()));
-    setBaseline(JSON.stringify(v.definition ?? empty()));
+    if (!preserve) {
+      setDraft(structuredClone(v.definition ?? empty()));
+      setSavedDraftBaseline("");
+      setDraftMessage("");
+    }
+    setBaseline(definitionKey(v.definition ?? empty()));
     setHistory(v.history);
     setHistoryMore(v.hasMore);
     setHistoryOffset(0);
@@ -180,8 +199,35 @@ export function RegulationWorkspace({
         const v = await api(path, regulationViewSchema, undefined, c.signal),
           rows = await loadRegistrationCatalog(disputeId, v, c.signal);
         if (c.signal.aborted) return;
-        setRegistrations(rows);
-        accept(v);
+        try {
+          const stored = await api(
+            path + "/draft",
+            regulationDraftSchema.nullable(),
+            undefined,
+            c.signal,
+          );
+          if (c.signal.aborted) return;
+          if (stored && stored.disputeId !== disputeId)
+            throw Error("Rascunho fora desta disputa.");
+          setRegistrations(rows);
+          accept(v);
+          setStoredDraft(stored);
+          setDraftVersion(stored?.version ?? 0);
+          if (stored?.baseRegulationVersion === v.version) {
+            setDraft(stored.document.definition);
+            setSavedDraftBaseline(definitionKey(stored.document.definition));
+            setDraftMessage("Rascunho recuperado. Ainda não publicado.");
+          }
+        } catch (e) {
+          if (!c.signal.aborted) {
+            setRegistrations(rows);
+            accept(v);
+            setDraftMessage(
+              "Não foi possível carregar o rascunho. Recarregue antes de salvar um rascunho.",
+            );
+            if (isSessionFailure(e)) onSessionLost();
+          }
+        }
         heading.current?.parentElement?.focus();
       } catch (e) {
         if (!c.signal.aborted) failure(e);
@@ -227,15 +273,133 @@ export function RegulationWorkspace({
     setDraft((old) => {
       const next = structuredClone(old);
       f(next);
+      const validDecisions = (next.tieDecisions ?? []).filter((d) =>
+        next.groupPhases.some(
+          (p) =>
+            p.phaseId === d.phaseId &&
+            p.groups.some(
+              (g) =>
+                g.id === d.groupId &&
+                d.order.every((id) => g.registrationIds.includes(id)),
+            ),
+        ),
+      );
+      if (validDecisions.length !== (next.tieDecisions?.length ?? 0)) {
+        next.tieDecisions = validDecisions;
+        next.tieNotes = next.tieNotes?.filter((n) =>
+          validDecisions.some((d) => d.id === n.id),
+        );
+      }
+      if (
+        view?.version === 0 ||
+        next.groupPhases.some((p) => p.rules.calculationPolicy === "fiba-2026")
+      ) {
+        next.customized = hasCustomRules(next);
+        if (!next.customized) delete next.customReason;
+      }
       return next;
     });
     setProposal(null);
     setImpact(false);
     setStatus("");
+    setDraftMessage("");
+  }
+  async function saveDraft() {
+    if (!view || busy || tieEditing || draftVersion === null) return;
+    if (!draftPending.current) {
+      const doc = draftDocumentSchema.safeParse(
+        JSON.parse(JSON.stringify({ definition: draft })),
+      );
+      if (!doc.success) {
+        setError("Confira os campos do rascunho antes de salvar.");
+        return;
+      }
+      draftPending.current = {
+        commandId: crypto.randomUUID(),
+        disputeId,
+        expectedVersion: draftVersion,
+        baseRegulationVersion: view.version,
+        document: doc.data,
+      };
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const c = draftPending.current,
+        r = await api(path + "/draft", regulationDraftResultSchema, c);
+      if (
+        r.commandId !== c.commandId ||
+        r.disputeId !== disputeId ||
+        r.version !== c.expectedVersion + 1 ||
+        r.baseRegulationVersion !== c.baseRegulationVersion
+      )
+        throw new ApiFailure(503, "Não foi possível confirmar o rascunho.");
+      if (!alive.current) return;
+      setDraftVersion(r.version);
+      setDraft(structuredClone(c.document.definition));
+      setSavedDraftBaseline(definitionKey(c.document.definition));
+      setStoredDraft(null);
+      setDraftMessage("Rascunho salvo. Ainda não publicado.");
+      draftPending.current = null;
+      setDraftUncertain(false);
+    } catch (e) {
+      if (alive.current) {
+        if (e instanceof ApiFailure && (e.status === 400 || e.status === 409)) {
+          draftPending.current = null;
+          setDraftUncertain(false);
+          setDraftVersion(null);
+        } else setDraftUncertain(true);
+        failure(e);
+      }
+    } finally {
+      if (alive.current) setBusy(false);
+    }
+  }
+  async function reloadDraft() {
+    if (busy || draftPending.current) return;
+    setBusy(true);
+    setError("");
+    try {
+      const stored = await api(
+        path + "/draft",
+        regulationDraftSchema.nullable(),
+      );
+      if (stored && stored.disputeId !== disputeId)
+        throw Error("Rascunho fora desta disputa.");
+      const current = await api(path, regulationViewSchema);
+      const rows = await loadRegistrationCatalog(disputeId, current);
+      if (!alive.current) return;
+      setRegistrations(rows);
+      accept(current, true);
+      setStoredDraft(stored);
+      setDraftVersion(stored?.version ?? 0);
+      setDraftMessage(
+        "Rascunho recarregado. Sua edição foi preservada para conferência.",
+      );
+    } catch (e) {
+      if (alive.current) failure(e);
+    } finally {
+      if (alive.current) setBusy(false);
+    }
   }
   async function confer() {
-    if (!view || locked) return;
+    if (!view || locked || tieEditing) return;
     const parsed = regulationDefinitionSchema.safeParse(draft);
+    if (draft.customized && !draft.customReason?.trim()) {
+      setError("Informe a justificativa das regras personalizadas.");
+      panel.current
+        ?.querySelector<HTMLTextAreaElement>("textarea[required]")
+        ?.focus();
+      return;
+    }
+    if (
+      (draft.tieDecisions ?? []).some(
+        (d) => !draft.tieNotes?.some((n) => n.id === d.id && n.comment.trim()),
+      )
+    ) {
+      setError("Informe a justificativa do desempate administrativo.");
+      return;
+    }
     if (!parsed.success) {
       setError(
         "Complete nomes, pontuação e inscrições. Confira referências, grupos e jogos atribuídos.",
@@ -308,7 +472,7 @@ export function RegulationWorkspace({
     }
   }
   async function save() {
-    if (!view || busy) return;
+    if (!view || busy || tieEditing) return;
     if (!pending.current) {
       if (!proposal) return;
       if (proposal.hasPublishedResults && (!impact || reason.trim().length < 3))
@@ -392,6 +556,15 @@ export function RegulationWorkspace({
       if (alive.current) setBusy(false);
     }
   }
+  const tieProjection = proposal?.after ?? (!dirty ? view?.preview : null);
+  const hasTiePanel = tieProjection?.groupPhases.some((p) =>
+    p.groups.some(
+      (g) =>
+        g.standings.unresolvedTies.length ||
+        (g.appliedTieDecisionIds?.length ?? 0) ||
+        (g.staleTieDecisionIds?.length ?? 0),
+    ),
+  );
   if (showAchievements)
     return (
       <AchievementPanel
@@ -419,7 +592,7 @@ export function RegulationWorkspace({
         </h3>
         <button
           type="button"
-          disabled={!view || locked || dirty || !enabled}
+          disabled={!view || locked || dirty || tieEditing || !enabled}
           onClick={() => setShowAchievements(true)}
         >
           Colocações e honrarias
@@ -448,7 +621,9 @@ export function RegulationWorkspace({
                     ? "Carregando regulamento…"
                     : "Não foi possível carregar."
                   : dirty
-                    ? "Alterações não salvas."
+                    ? unsaved
+                      ? "Alterações não salvas."
+                      : "Rascunho salvo. Regulamento ainda não confirmado."
                     : view.version
                       ? "Regulamento salvo."
                       : "Regulamento ainda não configurado.")}
@@ -465,7 +640,10 @@ export function RegulationWorkspace({
       )}
       {view && (
         <>
-          <fieldset disabled={locked || !enabled} className="reg-editor">
+          <fieldset
+            disabled={locked || tieEditing || !enabled}
+            className="reg-editor"
+          >
             <legend>Organização da disputa</legend>
             <DefinitionEditor
               definition={draft}
@@ -478,6 +656,15 @@ export function RegulationWorkspace({
                 {showGames
                   ? "Ocultar jogos para atribuir"
                   : "Ver jogos para atribuir"}
+              </button>
+            </div>
+            <div className="reg-actions">
+              <button
+                type="button"
+                disabled={draftVersion === null}
+                onClick={() => void saveDraft()}
+              >
+                Salvar rascunho
               </button>
             </div>
             {showGames && (
@@ -516,10 +703,78 @@ export function RegulationWorkspace({
                 </div>
               </div>
             )}
-            <button type="button" onClick={() => void confer()}>
+            <h4>3. Revisão e publicação</h4>
+            <p>
+              Confira a classificação antes de salvar. A publicação pública
+              exige sua confirmação e pode ocorrer antes do primeiro resultado.
+            </p>
+            <button type="button" data-reg-review onClick={() => void confer()}>
               Conferir impacto
             </button>
           </fieldset>
+          {draftMessage && <p role="status">{draftMessage}</p>}
+          {draftVersion === null && !draftPending.current && (
+            <button disabled={busy} onClick={() => void reloadDraft()}>
+              Recarregar rascunho
+            </button>
+          )}
+          {draftUncertain && (
+            <button
+              disabled={busy || !enabled}
+              onClick={() => void saveDraft()}
+            >
+              Repetir envio do rascunho
+            </button>
+          )}
+          {storedDraft && (
+            <button
+              disabled={locked || !enabled}
+              onClick={() => {
+                if (
+                  unsaved &&
+                  !window.confirm("Substituir sua edição pelo rascunho salvo?")
+                )
+                  return;
+                setDraft(structuredClone(storedDraft.document.definition));
+                setProposal(null);
+                setImpact(false);
+                setStatus("");
+                setSavedDraftBaseline(
+                  definitionKey(storedDraft.document.definition),
+                );
+                setDraftMessage(
+                  storedDraft.baseRegulationVersion === view.version
+                    ? "Rascunho recuperado. Ainda não publicado."
+                    : "Rascunho de uma versão anterior recuperado. Confira as diferenças antes de salvar.",
+                );
+              }}
+            >
+              Usar rascunho salvo
+            </button>
+          )}
+          {(storedDraft || !!draftVersion) && (
+            <button
+              disabled={locked || tieEditing || !enabled}
+              onClick={() => {
+                if (
+                  unsaved &&
+                  !window.confirm(
+                    "Substituir sua edição pelo regulamento confirmado?",
+                  )
+                )
+                  return;
+                setDraft(structuredClone(view.definition ?? empty()));
+                setProposal(null);
+                setImpact(false);
+                setStatus("");
+                setDraftMessage(
+                  "Regulamento confirmado carregado. Salve um rascunho para manter esta escolha na próxima visita.",
+                );
+              }}
+            >
+              Usar regulamento confirmado
+            </button>
+          )}
           {conflict && (
             <button disabled={busy} onClick={() => void reload(true)}>
               Recarregar dados para nova prévia
@@ -568,6 +823,7 @@ export function RegulationWorkspace({
                 <button
                   disabled={
                     busy ||
+                    tieEditing ||
                     !enabled ||
                     (proposal.hasPublishedResults &&
                       (!impact || reason.trim().length < 3))
@@ -578,6 +834,30 @@ export function RegulationWorkspace({
                 </button>
               )}
             </section>
+          )}
+          {tieProjection && hasTiePanel && (
+            <fieldset disabled={locked || !enabled}>
+              <legend className="sr-only">Decisões de classificação</legend>
+              <TiePanel
+                value={tieProjection}
+                definition={draft}
+                names={names}
+                onEditingChange={setTieEditing}
+                change={(f) => {
+                  change(f);
+                  setDraftMessage(
+                    "Alteração do desempate preparada. Confira o impacto antes de salvar.",
+                  );
+                  requestAnimationFrame(() =>
+                    panel.current
+                      ?.querySelector<HTMLButtonElement>(
+                        "button[data-reg-review]",
+                      )
+                      ?.focus(),
+                  );
+                }}
+              />
+            </fieldset>
           )}
           {pending.current && (
             <button disabled={busy || !enabled} onClick={() => void save()}>
@@ -602,6 +882,8 @@ export function RegulationWorkspace({
               !dirty &&
               !busy &&
               !pending.current &&
+              !draftPending.current &&
+              !tieEditing &&
               !readPending &&
               !!view.version
             }

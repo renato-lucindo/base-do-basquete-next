@@ -13,6 +13,9 @@ export const tieCriterionSchema = z.enum([
 export const roundRobinRulesSchema = z
   .object({
     format: z.literal("round_robin"),
+    // Absent on historical definitions: retain the original sequential algorithm.
+    calculationPolicy: z.literal("fiba-2026").optional(),
+    turns: z.union([z.literal(1), z.literal(2)]).optional(),
     points: z
       .object({
         win: z.number().int().min(-1000000).max(1000000),

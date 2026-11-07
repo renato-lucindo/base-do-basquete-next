@@ -10,6 +10,13 @@ import {
 } from "./public-contract";
 import { buildPublicStandings } from "./public";
 describe("fonte e classificação públicas mínimas", () => {
+  it("recusa campos privados mesmo quando as listas de notas estão vazias", () => {
+    for (const extra of [{ tieNotes: [] }, { customReason: "" }]) {
+      const s = fixture();
+      Object.assign(s.definition, extra);
+      expect(publicStandingsSourceSchema.safeParse(s).success).toBe(false);
+    }
+  });
   it("aceita o limite de mil inscrições e dez mil jogos sem truncar cobertura", () => {
     const s = fixture(),
       count = 1000,
