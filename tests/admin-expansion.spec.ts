@@ -47,6 +47,12 @@ for (const width of [1366, 1920])
       exact: true,
     });
     const wo = page.getByRole("group", { name: "Regra de W.O.", exact: true });
+    const advanced = page.getByRole("button", {
+      name: "Regras avançadas",
+      exact: true,
+    });
+    await expect(advanced).toHaveAttribute("aria-expanded", "false");
+    await advanced.click();
     await expect(transfers).toBeVisible();
     await page.evaluate(() => scrollTo(0, 0));
     const phase = process.env.ADMIN_CAPTURE_BASELINE ? "before" : "after";
