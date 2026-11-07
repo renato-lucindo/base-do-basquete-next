@@ -2,6 +2,21 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 
+const scoresheetColumnOrder = [
+  "games",
+  "points",
+  "pointsPerGame",
+  "pointsShare",
+  "twoMade",
+  "threeMade",
+  "freeMade",
+  "foulsCommitted",
+  "technicalFouls",
+  "unsportsmanlikeFouls",
+  "fiveFouls",
+  "disqualifications",
+];
+
 for (const width of [390, 1366]) {
   for (const preference of ["default", "session", "url"] as const) {
     test(`súmula oferece somente 13 colunas em ${width}px com preferência ${preference}`, async ({
@@ -37,6 +52,18 @@ for (const width of [390, 1366]) {
       await expect(page.locator("thead th[data-public-metric]")).toHaveCount(
         12,
       );
+      const displayedColumns = await page
+        .locator("thead th[data-public-metric]")
+        .evaluateAll((cells) =>
+          cells.map((cell) => cell.getAttribute("data-public-metric")),
+        );
+      expect(displayedColumns).toEqual(scoresheetColumnOrder);
+      const bodyColumns = await page
+        .locator("tbody tr:first-child td[data-public-metric]")
+        .evaluateAll((cells) =>
+          cells.map((cell) => cell.getAttribute("data-public-metric")),
+        );
+      expect(bodyColumns).toEqual(scoresheetColumnOrder);
     });
   }
 }
@@ -58,11 +85,18 @@ test("súmula preserva seleção explícita válida, inclusive nenhuma coluna", 
 }) => {
   const f = await statisticsBrowserFixture(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(f.url + "&preset=custom&columns=games,minutes,points");
+  await page.goto(f.url + "&preset=custom&columns=points,minutes,games");
   await expect(
     page.getByRole("button", { name: /^Colunas · 2 de 13/ }),
   ).toBeVisible();
   await expect(page.locator("thead th[data-public-metric]")).toHaveCount(2);
+  expect(
+    await page
+      .locator("thead th[data-public-metric]")
+      .evaluateAll((cells) =>
+        cells.map((cell) => cell.getAttribute("data-public-metric")),
+      ),
+  ).toEqual(["games", "points"]);
   await page.goto(f.url + "&preset=custom&columns=");
   await expect(
     page.getByRole("button", { name: /^Colunas · 0 de 13/ }),
