@@ -1,34 +1,27 @@
 # Progresso atual
 
-## Regulamento simplificado — WIP, 06/11/2026
+## Regulamento simplificado — 07/11/2026
 
-Unidade `codex/regulamento-fiba`, [PR #72 draft](https://github.com/renato-lucindo/base-do-basquete-next/pull/72), base `39ed1c42975c44d775460517c15ff66211a9f7ac`, implementação parcial `83ef12bfb2f88d2ef9838272500cbc2f49f0db56`. HEAD real pode incluir checkpoint posterior. Worktree: `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. Plano autorizado: [PLAN-REGULAMENTO-FIBA.md](PLAN-REGULAMENTO-FIBA.md).
+Unidade `codex/regulamento-fiba`, [PR #72 draft](https://github.com/renato-lucindo/base-do-basquete-next/pull/72), base `39ed1c4`, material implementado **16734b3e5231847c1767dc1336e50a04dc9ab8a2**. Worktree `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. HEAD real inclui este checkpoint posterior. [Plano autorizado](PLAN-REGULAMENTO-FIBA.md), [decisão vigente](decisoes/021-regulamento-fiba-simplificado.md), [validação detalhada](VALIDACAO-REGULAMENTO-FIBA.md).
 
-Implementado: política opcional `calculationPolicy: fiba-2026` reinicia desempates nos dois motores; ausência mantém algoritmo legado. Contratos distinguem versões. Factories com pontos 2/1, W.O. 20–0/0 e turnos 1/2; novos rascunhos/fases da tela usam os padrões. Migration `20261107010722_regulation_fiba_policy.sql` criada pela CLI e testada apenas no PostgreSQL isolado, preservando OID/ACL e validação antiga.
+Implementados: política FIBA versionada com legado preservado; padrões 2/1 e W.O. 20–0/0; grupos/turnos; tela em três seções e regras avançadas recolhidas; exceções justificadas; adoção explícita em versões antigas; rascunhos privados com CAS/recibos, recuperação e escolha da versão confirmada; desempate manual com comentário privado e auditoria de autor/data no servidor. Decisão obsoleta deixa de valer sem bloquear consulta/publicação. Candidato e contrato públicos excluem/rejeitam notas privadas. Fora do escopo original preservado (sem insuficiência, reincidência, sorteio, geração, cópia ou mudanças no mata-mata).
 
-Provas locais: `npx vitest run src/regulation --maxWorkers=1`: **141 PASS/21 arquivos**. Inclui exemplo D.2.2, cenário que distingue reinício, empate completo, placar desconhecido e paridade SQL/TypeScript; testes novos RED→GREEN. Typecheck, ESLint/Prettier focal e diff check PASS. Chromium desktop `--grep 'nova configuração recebe FIBA'`: **1 PASS**, após RED; verifica padrões e gravação de dois turnos. Sem publicação real.
+## Evidências e pendências reais
 
-[CI de 83ef12b](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42322720923) **IN_PROGRESS** na última consulta, sem conclusão alegada. Gate consolidado, browsers completos, revisão final e aceite pendentes. Não integrar WIP.
+Gate equivalente ao npm run gate, unitários com um worker: **758 PASS/159 arquivos**, transporte **11**, PostgreSQL isolado **15**, HTTP/Worker **33**, runtime PDF **1**; lint/formato/tipos/builds/fronteira/segredos PASS. O comando de fronteira via npm exec resolveu Node alpha no cache; repetido diretamente em **Node 24.18.0**, PASS, sem mudar dependências do projeto. Logs ignorados em `.preview-artifacts/regulation-full-gate.log`. Ajustes finais de UI (guarda/cancelamento do desempate e recarga de rascunho) tiveram tipos/lint/build/fronteira e browsers focais próprios PASS. HTTP novo de rascunho **1 PASS**, incluindo sessão/CSRF/corpo fechado/ACK incerto.
 
-## Pendências e próximo passo
+HTTP/Worker final: **34 PASS**. Chromium completo: **712 PASS, 116 SKIP existentes, 2 FAIL** por expectativas antigas de regras abertas. A adaptação preservou as asserções e revelou desalinhamento desktop, corrigido em `16734b3`: repetição **2/2 PASS**. Suíte final dos consumidores do regulamento: **69 PASS, 11 SKIP existentes** (80 casos), incluindo publicação e expansão administrativa. Fluxo novo isolado: **18 PASS**. Logs em `.preview-artifacts/regulation-{all-browsers,consumers-final,workflow-final}.log`. Capturas/axe em 1366, 1920, 390 e 320 px passaram. Fixtures sintéticas e SQL PGlite isolado, sem dados humanos.
 
-- Implementar decisão manual de empate: ordem/quem avançou, comentário privado, autor/data/contexto; sem bloquear salvar/publicar se não houver decisão. Sinalizar revisão ao mudar fatos relevantes; comentário não entra na fonte pública.
-- Persistir rascunhos incompletos privadamente sem enfraquecer validação oficial/publicação; preservar idempotência, sessão, recuperação e conflitos.
-- Reorganizar a tela: participantes, grupos/formato/jogos e revisão/publicação; regras avançadas recolhidas, exceções justificadas e identificação personalizada; adoção explícita em versões antigas.
-- Integrar contratos e persistência das pendências. Migration atual cobre apenas política/turnos. Nunca modificar migrations já aplicadas.
-- Adaptar browsers antigos que esperam W.O. inicialmente vazio e critérios manuais, preservando cobertura de exceções, sessão e legado. Suíte completa de browsers ainda não executada.
-- Próxima operação concreta: contratos/persistência privada de desempate manual e testes da aplicação somente no contexto vigente, sem justificativa pública. Continuar na mesma branch/PR.
+[CI f610ce2](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42341718405) **FAILURE** somente nos dois cenários de expansão corrigidos; demais jobs, inclusive WebKit, passaram. Nova CI acompanha o HEAD deste checkpoint nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/72/checks), fonte vigente para a conclusão final, também registrada na descrição da PR. Sem remoção de cobertura, alteração de timeouts ou novos skips.
 
-Fora: insuficiência de jogadores, reincidência de W.O., sorteio, geração de jogos, copiar edições, automatizar cruzamentos, comparar grupos e mudanças no mata-mata. Sem nova autorização para deploy, banco remoto ou publicação de dados reais.
+Revisão autoral separada do diff concluída; nenhuma ferramenta de revisor independente disponível. Próximo passo: conferir a CI do HEAD e entregar esta mesma PR. Manter fora da main enquanto migrations remotas estiverem pendentes, conforme AGENTS.md; não iniciar outra unidade dependente. A liberação exige autorização própria para banco e deploy.
 
-## Pausa por cota e retomada
+## Banco, serviços e preservação
 
-Ferramenta oficial: **85% usados/15% restantes em 5h**, semanal 43% usado. Reset observado `2026-11-07T04:22:54Z`. Retomada mais dois minutos: **07/11/2026 01:24:54 America/Sao_Paulo** (`04:24:54Z`). Automação oficial **retomar-regulamento-fiba**, ACTIVE, criada e conferida, vinculada à conversa `01a1b339-dfb6-7d91-9870-aa77645ef27f`. Nenhum crédito/reset consumido. Conferir cota/Git/PR/CI ao retomar; pausar automação ao concluir.
+Migrations **somente locais**, não aplicadas remotamente: `20261107010722_regulation_fiba_policy.sql` e `20261107042840_regulation_private_workflow.sql`. A segunda acrescenta estado/recibos privados de rascunho, funções autenticadas e auditoria/redação dos comentários. Aplicação remota, deploy e publicação de dados reais não estão autorizados por este plano. Autorização permanente de funções somente de leitura não cobre esta DDL de escrita/tabelas.
 
-## Serviços e preservação
+Sem deploy nesta unidade. Última publicação comprovada nesta conversa: preview UIUX origem `39ed1c4`, versão `c2ffca6b-66a5-4cfd-8925-edc6fc6be4f3`, deployment `61ed1489-8811-4af0-909c-3fceef987f7d`. Principal preservado em `139410ce-a8d6-4710-9b94-e1b1222cd3dc`. Não houve nova consulta ao serviço nesta retomada.
 
-Sem deploy ou banco remoto nesta unidade. Última publicação comprovada nesta conversa: preview UIUX origem `39ed1c4`, versão `c2ffca6b-66a5-4cfd-8925-edc6fc6be4f3`, deployment `61ed1489-8811-4af0-909c-3fceef987f7d`. Principal preservado em `139410ce-a8d6-4710-9b94-e1b1222cd3dc`; sem nova consulta remota nesta pausa.
-
-Checkout principal `sync/trabalho-casa`, alteração humana em CONTRIBUTING.md, skills/skills-lock e demais worktrees preservados. Revisão final ainda pendente, sem revisão independente alegada. Pesquisa UI de progressive disclosure retornou resultado irrelevante; seguir padrões do projeto e pesquisar pontualmente na etapa visual, sem alegar recomendação verificada.
+Checkout principal `sync/trabalho-casa`, alteração humana em CONTRIBUTING.md, skills/skills-lock e outros worktrees preservados. A automação **retomar-regulamento-fiba** retomou esta mesma unidade após o reset real, sem créditos/resets manuais; pausar ao encerrar a implementação e entregar a pendência de liberação. Cota inicial desta retomada: 0% usado/5h; acompanhar pela ferramenta oficial e respeitar 15% restante.
 
 Contexto anterior no [histórico](../historico/progresso/2026-11-06-antes-regulamento-fiba.md).
