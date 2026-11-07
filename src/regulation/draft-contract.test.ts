@@ -31,6 +31,14 @@ it("accepts unfinished names and null numeric draft fields without weakening off
   };
   const d = draftDocumentSchema.parse({ definition });
   expect(Number.isNaN(d.definition.groupPhases[0].rules.points.win)).toBe(true);
+  const command = saveRegulationDraftSchema.parse({
+    commandId: id(3),
+    disputeId: id(90),
+    expectedVersion: 0,
+    baseRegulationVersion: 0,
+    document: d,
+  });
+  expect(saveRegulationDraftSchema.safeParse(command).success).toBe(true);
   expect(regulationDefinitionSchema.safeParse(d.definition).success).toBe(
     false,
   );

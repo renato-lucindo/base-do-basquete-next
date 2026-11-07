@@ -3382,7 +3382,13 @@ test("regulation drafts enforce session, CSRF, closed bodies and receipt replay 
     assert.equal(await (await send("/draft")).json(), null);
     const definition = {
       registrationIds: [],
-      occurrenceRules: { wo: null },
+      occurrenceRules: {
+        wo: {
+          winnerLeaguePoints: null,
+          loserLeaguePoints: 0,
+          score: { winner: 20, loser: 0 },
+        },
+      },
       groupPhases: [],
       knockoutPhases: [],
       series: [],

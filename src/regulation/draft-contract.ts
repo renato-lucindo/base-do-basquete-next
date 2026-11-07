@@ -19,6 +19,8 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
     .int()
     .min(-1000000)
     .max(2147483647)
+    // Keep the editor sentinel valid through route, Durable Object and RPC parsing.
+    .or(z.nan())
     .nullable()
     .transform((n) => n ?? NaN),
   label = z.string().max(100),

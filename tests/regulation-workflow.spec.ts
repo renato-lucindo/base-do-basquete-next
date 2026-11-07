@@ -7,11 +7,76 @@ import { regulationId } from "./fixtures/regulation";
 import { buildPublicStandings } from "../src/regulation/public";
 import type { PublicStandingsSource } from "../src/regulation/public-contract";
 import AxeBuilder from "@axe-core/playwright";
-import { createDefaultDefinition } from "../src/regulation/defaults";
+import {
+  createDefaultDefinition,
+  createFibaRules,
+} from "../src/regulation/defaults";
 const open = (page: Page) =>
   page.goto(
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/regulamento`,
   );
+test("mantém decisão existente protegida durante outra edição de desempate", async ({
+  page,
+}) => {
+  const f = await regulationBrowserFixture(page),
+    definition = createDefaultDefinition();
+  definition.registrationIds = [tid(5), tid(6)];
+  definition.groupPhases = [
+    {
+      phaseId: tid(200),
+      name: "Fase",
+      rules: createFibaRules(),
+      groups: [
+        {
+          id: tid(201),
+          name: "Grupo",
+          registrationIds: [tid(5), tid(6)],
+          gameIds: [],
+        },
+      ],
+    },
+  ];
+  definition.tieDecisions = [
+    {
+      id: tid(202),
+      phaseId: tid(200),
+      groupId: tid(201),
+      order: [tid(5), tid(6)],
+      basis: "contexto anterior",
+    },
+  ];
+  definition.tieNotes = [{ id: tid(202), comment: "Decisão anterior" }];
+  Object.assign(f.getState(), {
+    version: 1,
+    definition,
+    savedAt: "2026-10-24T20:01:00Z",
+  });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Definir desempate", exact: true })
+    .click();
+  await page
+    .getByLabel("Justificativa do desempate", { exact: true })
+    .fill("Nova justificativa");
+  await expect(
+    page.getByRole("button", {
+      name: "Retirar decisão de desempate",
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Cancelar edição do desempate", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Retirar decisão de desempate",
+      exact: true,
+    }),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Salvar rascunho", exact: true }),
+  ).toBeEnabled();
+});
 test("edição do desempate pode ser cancelada sem perder texto por um salvamento paralelo", async ({
   page,
 }) => {

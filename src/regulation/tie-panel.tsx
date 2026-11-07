@@ -137,6 +137,7 @@ export function TiePanel({
                     )}
                     <button
                       type="button"
+                      disabled={!!editing}
                       onClick={() =>
                         change((v) => {
                           v.tieDecisions = v.tieDecisions?.filter(
