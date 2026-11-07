@@ -22,10 +22,10 @@ const standingsColumns = [
   ["J", "Jogos contabilizados"],
   ["V", "Vitórias"],
   ["D", "Derrotas"],
-  ["Aprov.", "Aproveitamento de vitórias: V / J × 100; indefinido sem jogos"],
+  ["Aprov.", "Aproveitamento de vitórias"],
   ["PP", "Pontos pró"],
   ["PC", "Pontos contra"],
-  ["SLD", "Saldo de pontos: PP − PC"],
+  ["SLD", "Saldo de pontos"],
   [
     "Últimos 5",
     "Até cinco resultados contabilizados nesta fase e grupo, do mais antigo ao mais recente",
@@ -319,13 +319,18 @@ export function PublicStandingsTables({
                         </ScrollableTable>
                       </div>
                       <p className="public-table-legend">
-                        J: jogos computados · V: vitórias · D: derrotas ·
-                        Aprov.: V/J × 100 · PP/PC: pontos pró/contra · SLD: PP −
-                        PC. —: posição ou valor indefinido. O aproveitamento não
-                        representa os pontos de classificação do regulamento.{" "}
-                        Últimos 5: somente esta fase e grupo, do mais antigo à
-                        esquerda ao mais recente à direita (anel externo). ✓:
-                        vitória; ×: derrota.
+                        {standingsColumns
+                          .slice(2, 9)
+                          .map(([label, description], index) => (
+                            <span key={label}>
+                              {index > 0 ? " · " : ""}
+                              {label}: {description}
+                            </span>
+                          ))}
+                        . —: posição ou valor indefinido. Últimos 5: somente
+                        esta fase e grupo, do mais antigo à esquerda ao mais
+                        recente à direita (anel externo). ✓: vitória; ×:
+                        derrota.
                       </p>
                       {!!g.standings.tieSteps.length && (
                         <details>
