@@ -34,12 +34,12 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 
 ## Páginas da disputa
 
-| Página        | Regra de experiência                                                                                                              |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Classificação | Tabelas por grupo e abas de fase quando aplicável. Se indisponível/não publicada, explicar e manter as demais páginas acessíveis. |
-| Jogos         | Lista **única e compacta, ordenada por data**; rodadas não são obrigatórias. Acesso ao detalhe com contexto preservado.           |
-| Equipes       | Listagem/tabela de desempenho e entrada no perfil da equipe.                                                                      |
-| Jogadores     | Tabela pesquisável de estatísticas individuais e acesso ao perfil do atleta.                                                      |
+| Página        | Regra de experiência                                                                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Classificação | Uma tabela por vez, seletor de grupo quando houver vários e navegação por fase. Se indisponível/não publicada, explicar e manter as demais páginas acessíveis. |
+| Jogos         | Lista **única e compacta, ordenada por data**; rodadas não são obrigatórias. Acesso ao detalhe com contexto preservado.                                        |
+| Equipes       | Listagem/tabela de desempenho e entrada no perfil da equipe.                                                                                                   |
+| Jogadores     | Tabela pesquisável de estatísticas individuais e acesso ao perfil do atleta.                                                                                   |
 
 ## Estatísticas e publicação
 
@@ -100,3 +100,13 @@ Contrato optativo pageSize=all fornece todas as inscrições filtradas (limite10
 PB — Pontos do banco; PB% — Participação dos pontos do banco. Titulares/reservas são da partida publicada, nunca do elenco atual ou inferidos. PB total soma pontos dos reservas durante a partida inteira; PB por jogo divide por J; PB% divide PB pelos pontos da equipe nas mesmas partidas. Cobertura parcial conserva —; zero confirmado é0, percentual com denominador zero é—. Fonte coletiva PDF válida tem precedência sem duplicar atletas/partidas.
 
 A listagem de súmula herda o bloco intrínseco centralizado acima1050px, sem sobra após GD, padding14/10px, max-height70vh, rolagem interna nos dois eixos, sticky vertical inclusive Pos. e identificação horizontal. Preservar gestos nativos/zoom/página externa e barras sincronizadas; nenhuma alteração global em Jogadores ou boxscore. Seleções excepcionalmente grandes usam referência local no navegador, com aviso discreto e nenhum corte de IDs. [Provas e limites](VALIDACAO-EQUIPES-REFINAMENTO.md).
+
+## Classificação — decisão de 06/11/2026
+
+Uma tabela por vez, na ordem **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD, Últimos 5**. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada de 150% a partir de 640 CSS px e os tamanhos móveis. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
+
+Fase e grupo ficam na URL e acompanham recarga/voltar. O seletor **Grupo** só aparece com vários grupos, na ordem publicada; seleção ausente/inválida abre o primeiro grupo publicado da fase válida (ou primeira fase quando inválida).
+
+**Últimos 5** considera somente a lineage contabilizada do grupo e fase exibidos, usando os jogos da resposta pública existente e IDs de inscrição. Incluir `played` e `awarded` confirmados; excluir pendências, cancelamentos/exclusões e conflitos. Ordenar por data, hora e ID estável, priorizar jogos datados sobre os sem data e conservar até cinco, do mais antigo à esquerda ao mais recente à direita. Não inventar datas/placares; sem resultados mostrar —.
+
+Vitória: círculo verde e ✓ branco; derrota: círculo vermelho e × branco. Anel da mesma cor marca o mais recente. Ícones compactos informativos, sem navegação, com descrição e tooltip por hover/foco/toque: resultado, adversário, data/hora quando existentes e placar disponível. Indicar resultado administrativo sem motivos privados. Cor não é o único sinal. Evidências e limites na PR da unidade.
