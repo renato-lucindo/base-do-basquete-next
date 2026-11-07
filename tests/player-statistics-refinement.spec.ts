@@ -2,6 +2,74 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 
+for (const width of [390, 1366]) {
+  for (const preference of ["default", "session", "url"] as const) {
+    test(`súmula oferece somente 13 colunas em ${width}px com preferência ${preference}`, async ({
+      page,
+    }) => {
+      const f = await statisticsBrowserFixture(page);
+      await page.setViewportSize({ width, height: 844 });
+      if (preference === "session") {
+        await page.addInitScript(() =>
+          sessionStorage.setItem(
+            "statistics-selected-columns",
+            "games,minutes,points,assists",
+          ),
+        );
+      }
+      await page.goto(f.url + (preference === "url" ? "&preset=all" : ""));
+      await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+      await expect(
+        page.getByRole("button", { name: /^Colunas · .* de 13/ }),
+      ).toBeVisible();
+      await expect(
+        page.locator(
+          'thead th[data-public-metric="minutes"], thead th[data-public-metric="assists"]',
+        ),
+      ).toHaveCount(0);
+      await page.getByRole("button", { name: /^Colunas ·/ }).click();
+      await expect(page.locator("input[data-column-choice]")).toHaveCount(13);
+      await page.getByRole("button", { name: "Todas", exact: true }).click();
+      await expect(
+        page.locator("input[data-column-choice]:checked"),
+      ).toHaveCount(13);
+      await page.keyboard.press("Escape");
+      await expect(page.locator("thead th[data-public-metric]")).toHaveCount(
+        12,
+      );
+    });
+  }
+}
+
+test("boxscore mantém opções completas no mobile", async ({ page }) => {
+  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(f.url);
+  await expect(
+    page.getByRole("button", { name: /^Colunas · 32 de 33/ }),
+  ).toBeVisible();
+  await expect(
+    page.locator('thead th[data-public-metric="minutes"]'),
+  ).toHaveCount(1);
+});
+
+test("súmula preserva seleção explícita válida, inclusive nenhuma coluna", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(f.url + "&preset=custom&columns=games,minutes,points");
+  await expect(
+    page.getByRole("button", { name: /^Colunas · 2 de 13/ }),
+  ).toBeVisible();
+  await expect(page.locator("thead th[data-public-metric]")).toHaveCount(2);
+  await page.goto(f.url + "&preset=custom&columns=");
+  await expect(
+    page.getByRole("button", { name: /^Colunas · 0 de 13/ }),
+  ).toBeVisible();
+  await expect(page.locator("thead th[data-public-metric]")).toHaveCount(0);
+});
+
 test("bordas: tabela e barra superior contêm o deslocamento elástico", async ({
   page,
 }) => {

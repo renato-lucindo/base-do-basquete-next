@@ -4,7 +4,7 @@ import {
 } from "../public-ui/player-name";
 import { usePublicPosition } from "../public-ui/position";
 import { publicDetailLink } from "../public-ui/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { TeamFilter } from "./reference/team-filter";
@@ -85,7 +85,7 @@ function location() {
 export function StatisticsPageView() {
   const [route, setRoute] = useState(location),
     [draft, setDraft] = useState(route.query),
-    [data, setData] = useState<StatisticsPage | null>(null),
+    [loadedData, setData] = useState<StatisticsPage | null>(null),
     [error, setError] = useState<unknown>(null),
     [loading, setLoading] = useState(true),
     [retry, setRetry] = useState(0),
@@ -100,6 +100,24 @@ export function StatisticsPageView() {
         (saved === null && !window.matchMedia("(max-width: 600px)").matches)
       );
     });
+  // Source capability bounds presentation, including old URL/session preferences.
+  // Keep the saved selection intact for disputes that do provide boxscores.
+  const scoresheetOnly = loadedData?.hasBoxscore === false;
+  const data = useMemo(
+    () =>
+      loadedData?.hasBoxscore === false
+        ? {
+            ...loadedData,
+            columns: loadedData.columns.filter((key) =>
+              scoreKeys.includes(key),
+            ),
+          }
+        : loadedData,
+    [loadedData],
+  );
+  const selectedColumns = scoresheetOnly
+    ? draft.columns.filter((key) => scoreKeys.includes(key))
+    : draft.columns;
   const latestRoute = useRef(route);
   const form = useRef<HTMLFormElement>(null),
     resultHeading = useRef<HTMLHeadingElement>(null),
@@ -431,17 +449,20 @@ export function StatisticsPageView() {
                       <ColumnPicker
                         options={[
                           { key: "team", label: "Equipe", name: "" },
-                          ...[...new Set([...scoreKeys, ...draft.columns])].map(
-                            (key) => ({
-                              key,
-                              label: referenceMetric(key).label,
-                              name: STATISTICS_METRICS[key].name,
-                            }),
-                          ),
+                          ...[
+                            ...new Set([
+                              ...scoreKeys,
+                              ...(scoresheetOnly ? [] : draft.columns),
+                            ]),
+                          ].map((key) => ({
+                            key,
+                            label: referenceMetric(key).label,
+                            name: STATISTICS_METRICS[key].name,
+                          })),
                         ]}
                         value={[
                           ...(showTeam ? ["team"] : []),
-                          ...draft.columns,
+                          ...selectedColumns,
                         ]}
                         onChange={(keys) =>
                           selectColumns(
