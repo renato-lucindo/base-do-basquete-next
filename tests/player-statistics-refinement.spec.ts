@@ -59,7 +59,7 @@ for (const width of [390, 1366]) {
         );
       expect(displayedColumns).toEqual(scoresheetColumnOrder);
       const bodyColumns = await page
-        .locator(".statistics-table tbody tr:first-child td[data-public-metric]")
+        .locator("tbody tr:first-child td[data-public-metric]")
         .evaluateAll((cells) =>
           cells.map((cell) => cell.getAttribute("data-public-metric")),
         );
