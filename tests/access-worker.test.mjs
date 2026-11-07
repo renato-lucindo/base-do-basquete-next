@@ -583,6 +583,8 @@ async function fixture(options = {}) {
     reviewVersion = 0;
   const regulation = regulationFixture(),
     regulationReceipts = new Map();
+  let regulationDraft = null;
+  const regulationDraftReceipts = new Map();
   const decisionResponse = decisionBackend(regulation, options);
   const transferResponse = transferBackend(options);
   const achievementResponse = achievementOutbound(options);
@@ -758,6 +760,67 @@ async function fixture(options = {}) {
         }
         if (url.pathname === "/auth/v1/logout")
           return new Response(null, { status: 204 });
+        if (
+          options.regulation &&
+          url.pathname === "/rest/v1/rpc/get_regulation_draft"
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          return Response.json(regulationDraft);
+        }
+        if (
+          options.regulation &&
+          url.pathname === "/rest/v1/rpc/save_regulation_draft"
+        ) {
+          assert.equal(
+            request.headers.get("authorization"),
+            "Bearer fixture-access",
+          );
+          const { p_command: c } = await request.json(),
+            previous = regulationDraftReceipts.get(c.commandId);
+          if (previous) {
+            assert.deepEqual(previous.command, c);
+            return Response.json(previous.ack);
+          }
+          if (
+            c.expectedVersion !== (regulationDraft?.version ?? 0) ||
+            c.baseRegulationVersion !== regulation.version
+          )
+            return Response.json(
+              { message: "draft_version_conflict" },
+              { status: 409 },
+            );
+          regulationDraft = {
+            disputeId: c.disputeId,
+            version: c.expectedVersion + 1,
+            baseRegulationVersion: c.baseRegulationVersion,
+            document: c.document,
+            actorId: id,
+            savedAt: regulation.savedAt,
+          };
+          const ack = {
+            commandId: c.commandId,
+            disputeId: c.disputeId,
+            version: regulationDraft.version,
+            baseRegulationVersion: c.baseRegulationVersion,
+            savedAt: regulation.savedAt,
+          };
+          regulationDraftReceipts.set(c.commandId, {
+            command: structuredClone(c),
+            ack,
+          });
+          options.draftCommits = (options.draftCommits ?? 0) + 1;
+          if (options.loseDraftAck) {
+            options.loseDraftAck = false;
+            return Response.json(
+              { message: "fixture-private-value" },
+              { status: 503 },
+            );
+          }
+          return Response.json(ack);
+        }
         if (
           options.regulation &&
           [
@@ -3289,6 +3352,93 @@ test("statistics phase confirmation uses the session and rejects revoked access 
       401,
       "revoked session must be discarded",
     );
+  } finally {
+    await f.mf.dispose();
+  }
+});
+
+test("regulation drafts enforce session, CSRF, closed bodies and receipt replay without changing official state", async () => {
+  const options = { regulation: true, loseDraftAck: true },
+    f = await fixture(options),
+    did = regulationId(90),
+    path = `/api/regulations/${did}`;
+  try {
+    assert.equal(
+      (await f.mf.dispatchFetch(origin + path + "/draft")).status,
+      401,
+    );
+    const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
+    const send = (tail, method = "GET", body, extra = {}) =>
+      f.mf.dispatchFetch(origin + path + tail, {
+        method,
+        headers: {
+          cookie,
+          origin,
+          "content-type": "application/json",
+          ...extra,
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    assert.equal(await (await send("/draft")).json(), null);
+    const definition = {
+      registrationIds: [],
+      occurrenceRules: { wo: null },
+      groupPhases: [],
+      knockoutPhases: [],
+      series: [],
+    };
+    const command = {
+      commandId: regulationId(990),
+      disputeId: did,
+      expectedVersion: 0,
+      baseRegulationVersion: 1,
+      document: { definition },
+    };
+    assert.equal(
+      (await send("/draft", "POST", command, { origin: "https://evil.test" }))
+        .status,
+      403,
+    );
+    assert.equal(
+      (await send("/draft", "POST", command, { "content-type": "text/plain" }))
+        .status,
+      415,
+    );
+    assert.equal(
+      (
+        await send("/draft", "POST", {
+          ...command,
+          disputeId: regulationId(991),
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await send("/draft", "POST", {
+          ...command,
+          document: { definition: {} },
+        })
+      ).status,
+      400,
+    );
+    assert.equal((await send("/draft?offset=0")).status, 400);
+    assert.equal((await send("/draft", "POST", command)).status, 503);
+    const retry = await send("/draft", "POST", command);
+    assert.equal(retry.status, 200);
+    assert.equal((await retry.json()).version, 1);
+    assert.equal(options.draftCommits, 1);
+    const draft = await (await send("/draft")).json();
+    assert.deepEqual(draft.document, command.document);
+    assert.equal((await (await send("")).json()).version, 1);
+    const before = f.calls.filter((v) => v.includes("regulation_draft")).length;
+    options.denied = true;
+    assert.equal((await send("/draft")).status, 403);
+    assert.equal(
+      f.calls.filter((v) => v.includes("regulation_draft")).length,
+      before,
+    );
+    assert.ok(!JSON.stringify(draft).includes("fixture-access"));
   } finally {
     await f.mf.dispose();
   }

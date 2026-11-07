@@ -6,6 +6,10 @@ import { gameOccurrenceSchema } from "./occurrences";
 import { organizedInputSchema } from "./organized";
 import { regulationDefinitionSchema } from "./persistence-contract";
 import { regulationProjectionSchema } from "./view-contract";
+const publicDefinition = regulationDefinitionSchema.superRefine((d, c) => {
+  if (d.tieNotes !== undefined || d.customReason !== undefined)
+    c.addIssue({ code: "custom", message: "Justificativas são privadas." });
+});
 
 const uuid = z.uuid().transform((v) => v.toLowerCase()),
   version = z.number().int().min(1).max(2147483647),
@@ -37,7 +41,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
     regulationVersion: version,
     publishedAt: z.iso.datetime({ offset: true }),
     context: publicGameSchema.shape.context,
-    definition: regulationDefinitionSchema,
+    definition: publicDefinition,
     registrations: z.array(registration).max(1000),
   };
 

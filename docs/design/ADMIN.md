@@ -4,6 +4,8 @@ Leia os [padrões comuns](PADROES.md), os [componentes e comportamentos administ
 
 ## Percursos
 
+Regulamento: participantes → grupos e turnos → revisão e publicação, na mesma tela. Pontuação e desempates recebem o padrão adotado em [ADR 021](../decisoes/021-regulamento-fiba-simplificado.md); exceções ficam em regras avançadas recolhidas. Rascunhos incompletos são privados. Empate pendente não bloqueia salvar/publicar; escolher a ordem exige justificativa privada e revisão antes de salvar o regulamento.
+
 Antes de escolher componentes, explicite **entrada → edição → validação → confirmação/feedback → retorno**, incluindo cancelamento, falha de salvamento, reautenticação e conflito de versão.
 
 | Tarefa                        | Jornada e resultado esperado                                                                                                                                         |

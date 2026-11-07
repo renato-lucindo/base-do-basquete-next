@@ -4,6 +4,10 @@ import { tid } from "./text-import";
 import { regulationFixture, regulationId } from "./regulation";
 import { SupabaseRegulations } from "../../src/regulation/provider";
 import { saveRegulationSchema } from "../../src/regulation/persistence-contract";
+import {
+  saveRegulationDraftSchema,
+  type RegulationDraft,
+} from "../../src/regulation/draft-contract";
 export async function regulationBrowserFixture(page: Page) {
   const f = await gamesFixture(page),
     raw = JSON.stringify(regulationFixture());
@@ -40,6 +44,10 @@ export async function regulationBrowserFixture(page: Page) {
     failReadAfterSave = false,
     readUnavailable = false;
   const reads: string[] = [];
+  let draft: RegulationDraft | null = null;
+  const draftReceipts = new Map<string, unknown>();
+  const draftAttempts: string[] = [];
+  let loseDraftAck = false;
   const db = new SupabaseRegulations(
     { url: "https://db.example.test", key: "fixture" },
     async (url, init) => {
@@ -76,6 +84,47 @@ export async function regulationBrowserFixture(page: Page) {
         url = new URL(req.url()),
         tail = url.pathname.slice(("/api/regulations/" + tid(3)).length);
       try {
+        if (tail === "/draft") {
+          if (req.method() === "GET") return route.fulfill({ json: draft });
+          const c = saveRegulationDraftSchema.parse(req.postDataJSON());
+          draftAttempts.push(req.postData()!);
+          if (draftReceipts.has(c.commandId))
+            return route.fulfill({ json: draftReceipts.get(c.commandId) });
+          if (
+            c.expectedVersion !== (draft?.version ?? 0) ||
+            c.baseRegulationVersion !== s.version
+          )
+            return route.fulfill({
+              status: 409,
+              json: {
+                error: {
+                  code: "draft_version_conflict",
+                  message: "O rascunho mudou.",
+                },
+              },
+            });
+          draft = {
+            disputeId: tid(3),
+            version: c.expectedVersion + 1,
+            baseRegulationVersion: c.baseRegulationVersion,
+            document: c.document,
+            savedAt: "2026-11-07T04:30:00Z",
+            actorId: regulationId(500),
+          };
+          const ack = {
+            commandId: c.commandId,
+            disputeId: tid(3),
+            version: draft.version,
+            baseRegulationVersion: draft.baseRegulationVersion,
+            savedAt: draft.savedAt,
+          };
+          draftReceipts.set(c.commandId, ack);
+          if (loseDraftAck) {
+            loseDraftAck = false;
+            return route.abort();
+          }
+          return route.fulfill({ json: ack });
+        }
         if (req.method() === "GET") {
           reads.push(url.pathname + url.search);
           if (readUnavailable) {
@@ -206,6 +255,11 @@ export async function regulationBrowserFixture(page: Page) {
     attempts,
     reads,
     getState: () => s,
+    getDraft: () => draft,
+    draftAttempts,
+    loseDraftAck: () => {
+      loseDraftAck = true;
+    },
     addTab: async (target: Page) => {
       await gamesFixture(target);
       await attach(target);

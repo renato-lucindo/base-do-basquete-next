@@ -148,6 +148,9 @@ export const regulationProjectionSchema = z
                     groupId: uuid,
                     pendingGameIds: ids,
                     excludedGameIds: ids,
+                    tieContext: z.string().max(2097152).optional(),
+                    appliedTieDecisionIds: z.array(uuid).max(1000).optional(),
+                    staleTieDecisionIds: z.array(uuid).max(1000).optional(),
                     standings,
                   })
                   .strict(),

@@ -1068,6 +1068,8 @@ export type Database = {
         Returns: Json;
       };
       save_regulation: { Args: { p_command: Json }; Returns: Json };
+      get_regulation_draft: { Args: { p_dispute_id: string }; Returns: Json };
+      save_regulation_draft: { Args: { p_command: Json }; Returns: Json };
       save_roster_entry: { Args: { p_command: Json }; Returns: Json };
       save_staff_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };

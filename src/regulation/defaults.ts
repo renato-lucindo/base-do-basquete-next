@@ -33,3 +33,32 @@ export function createDefaultDefinition(): RegulationDefinition {
     series: [],
   };
 }
+
+export function hasCustomRules(d: RegulationDefinition) {
+  const base = createFibaRules(),
+    wo = createDefaultDefinition().occurrenceRules.wo;
+  return (
+    JSON.stringify(d.occurrenceRules.wo) !== JSON.stringify(wo) ||
+    d.groupPhases.some(
+      (p) =>
+        p.rules.calculationPolicy !== "fiba-2026" ||
+        p.rules.points.win !== 2 ||
+        p.rules.points.loss !== 1 ||
+        JSON.stringify(p.rules.tieBreakers) !==
+          JSON.stringify(base.tieBreakers),
+    )
+  );
+}
+export function adoptFibaDefaults(
+  d: RegulationDefinition,
+): RegulationDefinition {
+  const next = structuredClone(d);
+  next.occurrenceRules = createDefaultDefinition().occurrenceRules;
+  next.groupPhases = next.groupPhases.map((p) => ({
+    ...p,
+    rules: createFibaRules(p.rules.turns ?? 1),
+  }));
+  next.customized = false;
+  delete next.customReason;
+  return next;
+}

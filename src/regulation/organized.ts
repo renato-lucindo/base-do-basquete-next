@@ -7,10 +7,16 @@ import { resolveOutcomeSeries } from "./outcome-series";
 import { previewEntrantGraph } from "./crossing-graph";
 import { seriesFormatSchema } from "./series";
 import type { OutcomeGame } from "./outcome";
+import {
+  tieDecisionSchema,
+  tieDecisionContext,
+  applyTieDecisions,
+} from "./tie-decisions";
 const uuid = z.uuid().transform((v) => v.toLowerCase());
 export const organizedInputSchema = z
   .object({
     context: occurrencesInputSchema,
+    tieDecisions: z.array(tieDecisionSchema).max(1000).optional(),
     groupPhases: z
       .array(
         z
@@ -129,26 +135,43 @@ export function previewOrganizedCompetition(input: unknown) {
       phaseId: phase.phaseId,
       groups: [...phase.groups]
         .sort((a, b) => a.id.localeCompare(b.id))
-        .map((g) => ({
-          groupId: g.id,
-          pendingGameIds: g.gameIds
-            .filter((id) =>
-              ["pending", "conflict"].includes(games.get(id)!.state),
-            )
-            .sort(),
-          excludedGameIds: g.gameIds
-            .filter((id) => games.get(id)!.state === "excluded")
-            .sort(),
-          standings: calculateOutcomeStandings({
-            disputeId: s.context.disputeId,
-            registrationIds: g.registrationIds,
-            rules: phase.rules,
-            outcomes: g.gameIds.flatMap((id) => {
-              const o = outcome(id);
-              return o ? [o] : [];
+        .map((g) => {
+          const outcomes = g.gameIds.flatMap((id) => {
+            const o = outcome(id);
+            return o ? [o] : [];
+          });
+          const tieContext = tieDecisionContext(
+            phase.rules,
+            g.registrationIds,
+            g.gameIds,
+            outcomes,
+          );
+          const resolved = applyTieDecisions(
+            calculateOutcomeStandings({
+              disputeId: s.context.disputeId,
+              registrationIds: g.registrationIds,
+              rules: phase.rules,
+              outcomes,
             }),
-          }),
-        })),
+            (s.tieDecisions ?? []).filter(
+              (d) => d.phaseId === phase.phaseId && d.groupId === g.id,
+            ),
+            tieContext,
+          );
+          return {
+            groupId: g.id,
+            pendingGameIds: g.gameIds
+              .filter((id) =>
+                ["pending", "conflict"].includes(games.get(id)!.state),
+              )
+              .sort(),
+            excludedGameIds: g.gameIds
+              .filter((id) => games.get(id)!.state === "excluded")
+              .sort(),
+            tieContext,
+            ...resolved,
+          };
+        }),
     }))
     .sort((a, b) => a.phaseId.localeCompare(b.phaseId));
   const series = previewEntrantGraph(
