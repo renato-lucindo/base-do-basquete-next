@@ -108,8 +108,9 @@ export function StatisticsPageView() {
       loadedData?.hasBoxscore === false
         ? {
             ...loadedData,
-            columns: loadedData.columns.filter((key) =>
-              scoreKeys.includes(key),
+            // Apply the desktop order even for mobile's "all" preset.
+            columns: scoreKeys.filter((key) =>
+              loadedData.columns.includes(key),
             ),
           }
         : loadedData,
