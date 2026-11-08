@@ -33,3 +33,29 @@ Nesta redação, o serviço publicado continua sendo a fonte b3908fb, versão b6
 HEAD82b658bc48b5cb01475a6d26fb4220240fbcc262; CI42526714531 em andamento, design/scope SUCCESS e demais jobs ainda em andamento na consulta real. Sem tópicos de revisão. Regressão local encerrada:762PASS,118skipped,6FAIL, exit1 em21,6min. As6falhas desktop (flows145/214, public-accessibility18/41, withdrawals469/538) são ENOENT de traces/ENOSPC ao escrever relatórios/traces, sem asserção de bracket falha. Não declarar integralPASS nem corrigir produto para contornar artefatos; verificar capacidade e saídas independentes antes de rerun focal ou registrar prova equivalente integral da CI. Nenhum upload/deploy novo.
 
 Pausa conforme limite do responsável:14%restante5h,95%usado semanal. Reset real23:13:58UTC; retomada na mesma automação para23:15:58UTC (20:15:58Brasília) em08/11/2026, sem créditos/reset manual.
+
+## Release do bracket — 23:21UTC
+
+Retomada após o reset real: HEAD limpo **4f0e99768c7f7d4f363a814ed8a72d202b4f51ef**, material56488576. [CI42527229564](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42527229564) desse HEAD conferida inteiramente SUCCESS: validate128876885477, checks128873686416, design128873686422, scope128873646813, WebKit128873686432 e Chromium128873686521/128873686510.
+
+Os logs Chromium confirmam443PASS no lote1 (11,1min) e325PASS/118skipped no lote2 (6,3min): **768PASS e118skipped,886casos**, prova integral equivalente utilizada para liberar o preview. O resultado local permanece762PASS/118skipped/6FAIL por gravação de artefatos; não se declara PASS local nem se altera produto para contornar ENOENT/ENOSPC. Capacidade livre na retomada cerca de4,47GB; não houve exclusão de artefatos alheios. Evitar runners concorrentes com o mesmo outputDir.
+
+### Publicação efetiva
+
+Executados sequencialmente, exit0: `npm run build:foundation`, `npm run build:worker` (dry-run), `node scripts/prepare-foundation.mjs`, `node .preview-artifacts/prepare-pr75-release.mjs 4f0e99768c7f7d4f363a814ed8a72d202b4f51ef` e dry-run de versions upload. Artefatos NOVOS com35assets e source4f0e997; hash worker.js **0e5c714cc48c0f715326684e8a92a72487ba9ddbf793c6690b4245dc591c0609**, backend igual ao anterior.
+
+Upload real e deploy explícito somente por `.worker-artifacts/pr75-release/wrangler.jsonc`, Wrangler4.152.0, alvo **base-do-basquete-next-pr75**. Versão **f8f2ad0c-f6d5-4298-baeb-b420f9e227b4**, tag pr75-bracket-4f0e997, deployment **ae0c2a37-bab8-47db-a6c7-3a06534df745** a100%, criado **2026-11-08T23:21:03.956976Z**. Inspeção da versão antes do deploy confirmou os dois segredos existentes e DO/rate limit/origem/feature preservados, migration_tag v1 sem alteração.
+
+[Classificação no preview isolado](https://base-do-basquete-next-pr75.renato-lucindo-jr.workers.dev/publico.html#b5433b13-a8f9-4baa-b4d9-08066ebf3e96?secao=classificacao).
+
+### Provas remotas e encerramento
+
+Smoke Node local contra o serviço remoto, script ignorado `.preview-artifacts/pr75-standings-smoke.cjs`, SHA obrigatório e manifesto novo: **PASS/exit0**. Conferidos35assets status200/hash/source, metadado flexible=true,26jogos públicos e ausência de tieNotes/customReason. Endpoints sessão/configuração/rascunho/finalização anônima retornaram401; última requisição não autenticada não gravou dados. Anônimo retorna302 para o domínio Access.
+
+Acesso de teste por token efêmero de30min com política non_identity exclusiva do app PR75; credenciais apenas em memória e entrada TTY raw sem eco, sem arquivos/argumentos/logs. Revogada **primeiro a política, depois o token**, em operações sequenciais. Consulta final: **zero service tokens**, somente política owner-only original, sessão8h, subdomain enabled=true/previews_enabled=false.
+
+Comparação canônica antes/depois dos settings/bindings dos3Workers: MATCH. Deployments do principal **base-do-basquete-next-preview** (139410ce-a8d6-4710-9b94-e1b1222cd3dc) e UIUX (1d839a25-c0f7-4e24-8602-63c8eb67fd20) inalterados. PR75 preservou SESSIONS3552464a1346403ab7132137b7b39e6d, LOGIN_LIMITER751107202611, origem exata, featuretrue e nomes dos dois segredos; Access/políticas iguais ao baseline. Sem rotação de segredos, DDL/DML ou mudança de serviço alheio.
+
+Evidências locais ignoradas: `bracket-release-build.log`, `bracket-release-worker-build.log`, `pr75-bracket-baseline.json`, `pr75-standings-smoke-result.json` em .preview-artifacts; manifesto em .worker-artifacts. A prova não cobre escrita autenticada remota; os confrontos fictícios permanecem exclusivamente nas fixtures locais. Disponibilidade da aba no campeonato real depende de confrontos publicados com duas inscrições resolvidas.
+
+PR75 continua aberta/draft para aceite humano, sem merge. Commits posteriores a4f0e997 são somente documentação; acompanhar sua CI atual sem recompilar/republicar o produto por checkpoint. Automação existente acompanha a CI documental e pausa ao restar somente aceite.
