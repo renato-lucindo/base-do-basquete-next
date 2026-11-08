@@ -23,3 +23,15 @@ Logs locais ignorados: `.preview-artifacts/standings-copy-red.log`, `standings-c
 ## Liberação
 
 Somente o Worker isolado `base-do-basquete-next-pr75` pode receber esta revisão após validate SUCCESS. Regerar builds/pacote/proveniência do SHA conferido; preservar Access owner-only, segredo, sessões e rate limit existentes. Não reaplicar migrations, executar DML de teste remoto ou alterar principal/UIUX. PR permanece aberta para validação humana. Ao aguardar CI, programar a mesma automação de checagem conforme decisão de08/11 e pausá-la após a entrega ou quando depender apenas do aceite humano.
+
+## Preview atualizado
+
+Material de produto51ec8ee e checkpoint b3908fbef221032de5b7c804056d0fbc82c7d17d. [CI42515060673](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42515060673) inteiramente SUCCESS no HEAD b3908fb: checks, dois shards Chromium, WebKit, design, scope e validate; validate concluído em08/11/2026 19:38:46UTC. Sem revisões/comentários na consulta anterior ao release.
+
+Builds novamente gerados após a CI: `npm run build:foundation`, `npm run build:worker` (dry-run), `node scripts/prepare-foundation.mjs` e helper local de extração com SHA explícito. Fonte b3908fb,35assets, workerHash `0e5c714cc48c0f715326684e8a92a72487ba9ddbf793c6690b4245dc591c0609`, pacote5541.71KiB/gzip1324.41KiB. Payload original não foi publicado.
+
+`wrangler versions upload` com config exclusiva `.worker-artifacts/pr75-release/wrangler.jsonc`, tag pr75-b3908fb, produziu **b6161cb7-a16f-4f6c-978e-4d3f3d608f06**. Recursos da versão lidos antes do deploy: ambos os segredos existentes, DO/rate limit/origem/flag preservados e has_preview=false. `wrangler versions deploy b6161cb7-a16f-4f6c-978e-4d3f3d608f06@100%` na mesma config publicou a versão em08/11/2026 19:47:39UTC; deployment **8d28edc0-7c7f-4f9b-a11d-c4e4497bea8c**. Nenhum segredo gerado/rotacionado, migration ou DML remoto executado.
+
+[Classificação para validar](https://base-do-basquete-next-pr75.renato-lucindo-jr.workers.dev/publico.html#b5433b13-a8f9-4baa-b4d9-08066ebf3e96?secao=classificacao), protegida pelo Access. Smoke às19:48:21UTC:35assets HTTP200, X-Bdb-Source=b3908fb e hashes SHA256 correspondentes ao manifesto; foundation.html recompõe exatamente o hash do build ao retirar somente o metadado true da feature. Quatro endpoints privados401 após passar pelo Access, leitor público200/26jogos sem tieNotes/customReason. Entrada do token em memória/sem eco; política temporária e token revogados em sequência. Resultado local ignorado `.preview-artifacts/pr75-standings-smoke-result.json`.
+
+Comparação remota com baseline: configurações/deployments de principal e UIUX iguais; bindings do preview iguais, incluindo SESSIONS3552464a1346403ab7132137b7b39e6d, rate limit751107202611 e nomes dos dois segredos; Access owner-only e sessão8h iguais, URLs alternativas desabilitadas. Zero tokens temporários restantes e GET anônimo/admin302 ao Access após revogação. Escrita autenticada remota continua pendente do responsável, em banco dev compartilhado. PR75 aberta/draft, sem merge. Commits seguintes desta entrega são documentais e não alteram a fonte publicada.

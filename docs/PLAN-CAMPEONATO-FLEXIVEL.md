@@ -38,7 +38,7 @@ Responsável determinou duas etapas sequenciais nesta mesma unidade/PR75. A prim
 - [x] Etapa2: renomear Últimos5 para **Últimos jogos**, centralizar o cabeçalho e manter até cinco resultados e a ordem atual.
 - [x] Etapa2: aplicar o tooltip compacto `LUSB 56 x 66 IVV/Cetaf - 20/09`, sigla cadastrada ou nome publicado da inscrição, sem horário/ano/explicações; ausência conforme Público e identificação acessível separada.
 - [x] Etapa2: verificar texto/alinhamento/legenda e teclado/toque/responsividade nos testes e capturas pertinentes:28cenários desktop/mobile PASS. [Evidências](evidencias/2026-11-08-classificacao-apresentacao.md).
-- [ ] Etapa2: atualizar somente o preview isolado após CI, mantendo a PR aberta para validação humana.
+- [x] Etapa2: atualizar somente o preview isolado após CI, mantendo a PR aberta para validação humana. Publicado b3908fb, versão b6161cb7-a16f-4f6c-978e-4d3f3d608f06; smoke remoto PASS em08/11/2026. [Provas](evidencias/2026-11-08-classificacao-apresentacao.md#preview-atualizado).
 
 A primeira etapa foi entregue isoladamente no conteúdo1714f39/checkpoint46a8274. Após confirmar a CI42512523431 SUCCESS, o responsável autorizou prosseguir com a etapa2 e determinou programar checagem sempre que houver espera por CI; regra permanente em CONTRIBUTING. Não criar outra branch/PR dependente nem mesclar/fechar PR75 antes do aceite humano.
 
