@@ -10,6 +10,8 @@ import {
 } from "../statistics/reference/tooltip";
 import { recentGroupResults } from "./recent-results";
 import { RecentResultsCell } from "./recent-results-cell";
+import { standingsSelection } from "./public-bracket-model";
+import { PublicBracket } from "./public-bracket";
 import "../statistics/reference.css";
 import "./public-standings.css";
 
@@ -101,29 +103,28 @@ export function PublicStandingsTables({
   publishedRegistrationIds?: ReadonlySet<string>;
 }) {
   const params = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
-  const selected = params.get("fase");
-  const phases = [
-    ...value.definition.groupPhases.map((p) => ({
-      id: p.phaseId,
-      name: p.name,
-    })),
-    ...value.definition.knockoutPhases,
-  ];
-  const active = phases.some((p) => p.id === selected)
-    ? selected
-    : phases[0]?.id;
-  const phase = value.definition.groupPhases.find((p) => p.phaseId === active);
-  const group =
-    phase?.groups.find((g) => g.id === params.get("grupo")) ?? phase?.groups[0];
-  const selectionLink = (phaseId: string, groupId?: string) => {
+  const { stage, phase, group, knockoutAvailable } = standingsSelection(
+    value,
+    params,
+  );
+  const active = stage === "classificatoria" ? phase?.phaseId : null;
+  const phases = value.definition.groupPhases;
+  const selectionLink = (phaseId?: string, groupId?: string) => {
     const query = new URLSearchParams(params);
     query.set("secao", "classificacao");
-    query.set("fase", phaseId);
+    query.set("etapa", phaseId ? "classificatoria" : "eliminatoria");
+    if (phaseId) query.set("fase", phaseId);
+    else query.delete("fase");
     if (groupId) query.set("grupo", groupId);
     else query.delete("grupo");
     return `#${value.disputeId}?${query}`;
   };
-  const canonical = active ? selectionLink(active, group?.id) : null;
+  const canonical =
+    stage === "eliminatoria"
+      ? selectionLink()
+      : active
+        ? selectionLink(active, group?.id)
+        : null;
   useEffect(() => {
     if (canonical && window.location.hash !== canonical)
       window.history.replaceState(window.history.state, "", canonical);
@@ -151,51 +152,68 @@ export function PublicStandingsTables({
             disponíveis em Jogos.
           </p>
         )}
-        {phases.length > 1 && (
+        {(!!phases.length || knockoutAvailable) && (
           <nav
             className="public-phase-navigation"
-            aria-label="Fases da classificação"
+            aria-label="Etapas da classificação"
           >
-            {phases.map((p) => (
+            {!!phases.length && (
               <a
-                key={p.id}
-                href={selectionLink(
-                  p.id,
-                  value.definition.groupPhases.find((n) => n.phaseId === p.id)
-                    ?.groups[0]?.id,
-                )}
-                aria-current={p.id === active ? "page" : undefined}
+                href={selectionLink(phase?.phaseId, group?.id)}
+                aria-current={stage === "classificatoria" ? "page" : undefined}
               >
-                {p.name}
+                Classificatória
               </a>
-            ))}
+            )}
+            {knockoutAvailable && (
+              <a
+                href={selectionLink()}
+                aria-current={stage === "eliminatoria" ? "page" : undefined}
+              >
+                Eliminatória
+              </a>
+            )}
           </nav>
         )}
+        {stage === "eliminatoria" && <PublicBracket value={value} />}
         {value.projection.groupPhases
           .filter((p) => p.phaseId === active)
           .map((p) => (
             <section key={p.phaseId}>
               <h2 className="sr-only">
-                {phases.find((n) => n.id === p.phaseId)?.name}
+                {phases.find((n) => n.phaseId === p.phaseId)?.name}
               </h2>
-              {phase && phase.groups.length > 1 && (
+              {phase && (phase.groups.length > 1 || phases.length > 1) && (
                 <label className="standings-group-control">
                   Grupo
                   <select
                     name="grupo"
                     value={group?.id}
                     onChange={(e) => {
+                      const selectedPhase = phases.find((n) =>
+                        n.groups.some((g) => g.id === e.target.value),
+                      )!;
                       window.location.hash = selectionLink(
-                        p.phaseId,
+                        selectedPhase.phaseId,
                         e.target.value,
                       );
                     }}
                   >
-                    {phase.groups.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.name}
-                      </option>
-                    ))}
+                    {phases.length > 1
+                      ? phases.map((n) => (
+                          <optgroup key={n.phaseId} label={n.name}>
+                            {n.groups.map((g) => (
+                              <option key={g.id} value={g.id}>
+                                {g.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))
+                      : phase.groups.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.name}
+                          </option>
+                        ))}
                   </select>
                 </label>
               )}
@@ -385,35 +403,12 @@ export function PublicStandingsTables({
                 })}
             </section>
           ))}
-        {value.projection.series
-          .filter((n) => n.phaseId === active)
-          .map((n) => (
-            <article key={n.id} className="public-series">
-              <h2>
-                {value.definition.series.find((s) => s.id === n.id)?.name}
-              </h2>
-              <p>
-                {label(n.home.registrationId)} × {label(n.away.registrationId)}
-              </p>
-              <p>
-                {n.status === "conflict"
-                  ? "Confronto em revisão após alteração dos resultados."
-                  : n.result?.winnerRegistrationId
-                    ? `Vencedor da série: ${label(n.result.winnerRegistrationId)}`
-                    : n.status === "tied"
-                      ? "Empate agregado: decisão pendente."
-                      : "Aguardando definição ou resultados."}
-              </p>
-              {n.result?.totals && (
-                <p>
-                  Placar competitivo: {n.result.totals.homePoints} ×{" "}
-                  {n.result.totals.awayPoints}
-                </p>
-              )}
-            </article>
-          ))}
-        {!phases.length && (
-          <p>Nenhuma fase configurada nesta versão pública.</p>
+        {!phases.length && !knockoutAvailable && (
+          <p>
+            {value.definition.knockoutPhases.length
+              ? "Os confrontos da eliminatória ainda não foram definidos."
+              : "Nenhuma fase configurada nesta versão pública."}
+          </p>
         )}
       </TooltipProvider>
     </section>

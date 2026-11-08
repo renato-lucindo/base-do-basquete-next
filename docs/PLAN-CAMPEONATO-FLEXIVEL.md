@@ -28,6 +28,19 @@ Classificação usa os dados calculáveis. Classificados automáticos aguardam c
 - [x] Classificação pública automática e pendências independentes.
 - [x] Gate, PR, CI e preview isolado para aceite. [Provas da entrega](evidencias/2026-11-07-preview-isolado-pr75.md); aceite humano pendente, PR aberta.
 
+## Classificatória e bracket — protótipo aceito em 08/11/2026
+
+Executar na mesma PR75, sem integrar antes da validação do Worker isolado. Referência aprovada: protótipo local `eliminatoria-md3/index.html` desta conversa, com cabeçalhos **dentro** dos cartões, placares compactos e maior separação entre confrontos e etapas. Aprovação visual não é aceite da implementação remota.
+
+- [ ] Navegação apenas **Classificatória** e **Eliminatória**; esta última aparece quando ao menos um confronto tem as duas inscrições resolvidas, mesmo sem jogo associado. Abrir Classificatória por padrão; campeonato apenas eliminatório abre o bracket quando disponível. Links antigos por fase continuam funcionando; URLs novas usam `etapa=classificatoria|eliminatoria`.
+- [ ] Preservar a tabela e a seleção de grupos dentro da Classificatória; várias fases classificatórias usam opções agrupadas por fase, sem novas abas raiz.
+- [ ] Bracket único com todas as etapas, duas linhas por confronto, cabeçalhos internos Jogo1…N, placares por inscrição/slot e vencedor de cada jogo em negrito. Jogo único, ida-volta com Total e MD3/5/7; ausências são `—`, inscrições futuras são A definir. Somente vencedor confirmado recebe destaque de classificada.
+- [ ] Conexões seguem referências reais de vencedor/perdedor, incluindo terceiro lugar e estruturas manuais; não inferir cruzamentos pela posição visual. Resultados de adversários antigos não aparecem sob novas inscrições em revisão. Estados concretos de conflito/empate permanecem visíveis, sem avisos genéricos permanentes.
+- [ ] Desktop e celular usam o mesmo quadro, com rolagem horizontal interna, controles por teclado/toque e nomes acessíveis. Nomes longos e formatos maiores adaptam o tamanho/afastamento sem sobreposição.
+- [ ] Testes focais RED→GREEN, regressão e gate completo; revisar padrões de textos/tooltips, capturas1366/1920/390/320/zoom e atualizar apenas o Worker PR75 após validate SUCCESS. Ao esperar CI, programar checagem na automação existente.
+
+Contrato público e cálculo existentes são suficientes: sem API nova, migration, geração de partidas, alteração de participantes ou de publicação. Não alterar principal/UIUX, Access, sessões, segredos, rate limit ou dados reais. Estado de execução e provas no checkpoint, separado destas decisões.
+
 ## Refinamento de apresentação — 08/11/2026
 
 Responsável determinou duas etapas sequenciais nesta mesma unidade/PR75. A primeira entrega é **somente documental**, sem componentes, CSS, testes de produto, Worker ou deploy. O padrão fica nos documentos de referência; esta lista registra o trabalho restante, sem confundir decisão com execução.

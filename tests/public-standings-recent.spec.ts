@@ -142,11 +142,13 @@ test("grupo e fase na URL, recarga, voltar e seleção inválida preservam uma �
   await expect(
     page.getByRole("combobox", { name: "Grupo", exact: true }),
   ).toHaveValue(id(12));
-  await page.getByRole("link", { name: "Segunda fase", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Grupo", exact: true })
+    .selectOption(id(41));
   await expect(page).toHaveURL(new RegExp(`fase=${id(40)}&grupo=${id(41)}`));
   await expect(
     page.getByRole("combobox", { name: "Grupo", exact: true }),
-  ).toHaveCount(0);
+  ).toHaveValue(id(41));
   await expect(page.getByRole("rowheader")).toHaveText(["Águias", "Lobos"]);
   await expect(
     page.getByRole("button", {

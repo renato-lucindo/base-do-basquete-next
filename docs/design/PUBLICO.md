@@ -105,6 +105,14 @@ PB — Pontos do banco; PB% — Participação dos pontos do banco. Titulares/re
 
 A listagem de súmula herda o bloco intrínseco centralizado acima1050px, sem sobra após GD, padding14/10px, max-height70vh, rolagem interna nos dois eixos, sticky vertical inclusive Pos. e identificação horizontal. Preservar gestos nativos/zoom/página externa e barras sincronizadas; nenhuma alteração global em Jogadores ou boxscore. Seleções excepcionalmente grandes usam referência local no navegador, com aviso discreto e nenhum corte de IDs. [Provas e limites](VALIDACAO-EQUIPES-REFINAMENTO.md).
 
+## Eliminatória — protótipo aceito em 08/11/2026
+
+Na Classificação, navegação raiz somente **Classificatória** e **Eliminatória**. Esta última fica disponível a partir do primeiro confronto com as duas inscrições resolvidas, sem exigir jogo ou resultado. Classificatória conserva tabela e grupos, com opções agrupadas por fase quando necessário. Campeonatos apenas eliminatórios abrem o quadro disponível; links antigos por fase conservam o destino correspondente.
+
+Eliminatória mostra todas as etapas num bracket com conexões reais de vencedor/perdedor. Cada confronto tem duas linhas de equipes e colunas **Jogo1…N** (com espaço entre palavra e número na tela), com cabeçalhos dentro da borda do cartão. Fonte dos placares compacta, sem ampliar a altura do cartão para acomodar o cabeçalho; separar claramente confrontos e etapas. MD3 sempre mostra três posições, inclusive terceiro jogo dispensado como `—`; aplicar o equivalente a jogo único, ida-volta, MD5 e MD7. Ida-volta acrescenta Total somente da projeção oficial. Vitória em cada jogo em negrito; nome da classificada recebe destaque discreto apenas com decisão confirmada. Não repetir uma lista de jogos abaixo nem exigir clique para consultar placares.
+
+Usar inscrição publicada, `A definir` para participante desconhecido e `—` para placar ausente, preservando zero. Corrigir a orientação dos placares pela inscrição, inclusive mandos alternados. Não atribuir resultado antigo a adversários recalculados em conflito. Preservar avisos concretos de revisão/empate; nenhum aviso permanente sobre funcionamento normal. Sem tooltips nos cabeçalhos completos. Mesmo quadro no celular, rolagem horizontal interna e controles por teclado/toque; nomes longos não se sobrepõem. Execução e autorização de preview na mesma PR75 estão no plano e checkpoint.
+
 ## Classificação — decisão de 06/11/2026
 
 Apresentação atualizada por decisão de08/11/2026. A documentação foi consolidada antes das mudanças de tela. Execução, verificações e preview ficam no [plano da unidade](../PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026) e no checkpoint; padrão aprovado não constitui evidência de deploy ou aceite humano.

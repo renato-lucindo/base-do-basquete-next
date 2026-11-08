@@ -216,16 +216,16 @@ test("correção publicada altera a tabela e fases mantêm confrontos em revisã
       .getByRole("cell")
       .nth(5),
   ).toHaveText("95");
-  await page.getByRole("link", { name: "Finais", exact: true }).click();
+  await page.getByRole("link", { name: "Eliminatória", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Final", exact: true }),
+    page.getByRole("article", { name: "Final", exact: true }),
   ).toBeVisible();
   const semi = s.publishedGames.find((g) => g.gameId.endsWith("000000000103"))!;
   semi.publicationVersion++;
   semi.homePoints = 50;
   semi.awayPoints = 60;
   await page.reload();
-  await page.getByRole("link", { name: "Finais", exact: true }).click();
+  await page.getByRole("link", { name: "Eliminatória", exact: true }).click();
   await expect(
     page
       .getByText("Confronto em revisão após alteração dos resultados.")
