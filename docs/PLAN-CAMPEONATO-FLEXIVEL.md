@@ -26,6 +26,6 @@ Classificação usa os dados calculáveis. Classificados automáticos aguardam c
 - [x] Tela simplificada, vagas extras e opções manuais.
 - [x] Finalização e correções sem publicação adicional.
 - [x] Classificação pública automática e pendências independentes.
-- [ ] Gate, PR, CI e preview isolado para aceite.
+- [x] Gate, PR, CI e preview isolado para aceite. [Provas da entrega](evidencias/2026-11-07-preview-isolado-pr75.md); aceite humano pendente, PR aberta.
 
 Base observada: `903dc9cb2ab17db8fd892bf9eea3593e906ab34a` (PR74 integrada); nenhuma PR aberta ao iniciar. Unidade `codex/campeonato-flexivel`, worktree reutilizado `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. Branch local anterior e commit documental `12ca471` preservados. Protótipo de referência fora do repositório: `C:/Users/12405304716/.codex/visualizations/2026/11/06/01a1b339-dfb6-7d91-9870-aa77645ef27f/configuracao-campeonato/index.html`.
