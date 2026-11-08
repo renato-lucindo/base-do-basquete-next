@@ -107,7 +107,7 @@ A listagem de súmula herda o bloco intrínseco centralizado acima1050px, sem so
 
 ## Classificação — decisão de 06/11/2026
 
-Apresentação atualizada por decisão de08/11/2026. Nesta primeira etapa, somente a documentação é alterada; as correções da tela permanecem pendentes no [plano da unidade](../PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026). Padrão aprovado não constitui evidência de implementação ou deploy.
+Apresentação atualizada por decisão de08/11/2026. A documentação foi consolidada antes das mudanças de tela. Execução, verificações e preview ficam no [plano da unidade](../PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026) e no checkpoint; padrão aprovado não constitui evidência de deploy ou aceite humano.
 
 Uma tabela por vez, na ordem **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD, Últimos jogos**. O cabeçalho **Últimos jogos** é centralizado; o limite continua sendo cinco resultados. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada de 150% a partir de 640 CSS px e os tamanhos móveis. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
 

@@ -30,6 +30,12 @@ Se existir WIP ou alteração alheia, reconciliar antes. Não usar `reset --hard
 - A CI sempre produz o check obrigatório `validate`, que agrega os jobs previstos e falha se um deles falhar, cancelar ou não executar. O escopo vem do diff real e de uma lista conservadora de arquivos de apresentação, não do título, tamanho ou declaração de que a mudança é simples. Documentação e capturas, inclusive checkpoints, fazem formato e segredos; arquivos de apresentação desconhecidos, scripts/workflows e testes sem apresentação correspondente ou fora de suas suítes exigem o gate completo. Consulte [CI.md](docs/CI.md) para matriz, comandos e limites.
 - Não desativar testes ou aumentar timeouts para encobrir defeitos. Diagnostique focalmente e preserve o histórico das falhas relevantes.
 
+### Espera por CI
+
+Decisão do responsável em08/11/2026: sempre que for necessário aguardar uma CI, programar uma checagem antes de encerrar a execução. Usar a ferramenta oficial de automações, preferindo atualizar a mesma automação heartbeat desta conversa, e confirmar o agendamento. Registrar PR, SHA/run, próximo passo autorizado e limites no checkpoint e no prompt; uma nova rodada deve conferir o HEAD real, não continuar com evidência de um SHA substituído.
+
+Enquanto o resultado estiver pendente ou inalterado, manter a checagem sem avisos repetidos. Retomar o trabalho autorizado quando houver resultado acionável; comunicar conclusão, falha ou necessidade de ação humana. Pausar a checagem quando a espera terminar ou restar apenas o aceite humano. O agendamento não concede autorização para merge, deploy, migrations ou publicação. Se falhar, registrar e informar que não ficou programado, sem declarar acompanhamento inexistente. A pausa por cota segue o reset real+2min descrito abaixo.
+
 ## Revisar e integrar
 
 Toda PR de trabalho destina-se à `main`. O template pede problema/resultado, evidências, migrations/deploy e pendências. Draft sinaliza WIP, não um estacionamento indefinido de funcionalidades já concluídas.

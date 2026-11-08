@@ -1,14 +1,22 @@
 import { useNameTooltip } from "../statistics/reference/tooltip";
 import type { RecentResult } from "./recent-results";
 
+const compactDate = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "UTC",
+});
+
 function ResultIcon({
   result: { game, won, opponentId },
   latest,
   label,
+  compactLabel,
 }: {
   result: RecentResult;
   latest: boolean;
   label: (id: string) => string;
+  compactLabel: (id: string) => string;
 }) {
   const date = game.date
     ? game.date.split("-").reverse().join("/")
@@ -22,7 +30,11 @@ function ResultIcon({
     ...(game.state === "awarded" ? ["Resultado administrativo"] : []),
     ...(latest ? ["Resultado mais recente"] : []),
   ].join(" · ");
-  const tip = useNameTooltip(description);
+  const dateSuffix = game.date
+    ? ` - ${compactDate.format(new Date(`${game.date}T00:00:00Z`))}`
+    : "";
+  const tooltip = `${compactLabel(game.homeRegistrationId)} ${game.score?.homePoints ?? "—"} x ${game.score?.awayPoints ?? "—"} ${compactLabel(game.awayRegistrationId)}${dateSuffix}`;
+  const tip = useNameTooltip(tooltip);
   return (
     <button
       type="button"
@@ -52,10 +64,12 @@ export function RecentResultsCell({
   results,
   teamName,
   label,
+  compactLabel,
 }: {
   results: RecentResult[];
   teamName: string;
   label: (id: string) => string;
+  compactLabel: (id: string) => string;
 }) {
   if (!results.length) return <>—</>;
   return (
@@ -69,6 +83,7 @@ export function RecentResultsCell({
             result={result}
             latest={index === results.length - 1}
             label={label}
+            compactLabel={compactLabel}
           />
         </li>
       ))}

@@ -89,8 +89,8 @@ test("cinco resultados em ordem, anel recente e decisão administrativa sem plac
     /Vitória.*Placar não informado.*administrativo.*mais recente/,
   );
   await icons.last().focus();
-  await expect(page.getByRole("tooltip")).toContainText(
-    "Resultado administrativo",
+  await expect(page.getByRole("tooltip")).toHaveText(
+    "LOB — x — Águias - 17/11",
   );
   await expect(row.getByRole("cell").nth(1)).toHaveText("8");
   s.publishedGames.find((g) => g.gameId === id(116))!.homePoints = 50;
@@ -166,7 +166,7 @@ test("grupo e fase na URL, recarga, voltar e seleção inválida preservam uma �
   await expect(page).toHaveURL(new RegExp(`fase=${id(10)}&grupo=${id(11)}`));
 });
 
-test("ícones oferecem resultado, adversário, data e placar por foco, hover e toque, sem navegar", async ({
+test("ícones oferecem tooltip compacto por foco, hover e toque e descrição acessível completa, sem navegar", async ({
   page,
 }, info) => {
   await publicNavigationFixture(page);
@@ -186,8 +186,8 @@ test("ícones oferecem resultado, adversário, data e placar por foco, hover e t
     await result.locator("svg").evaluate((el) => getComputedStyle(el).stroke),
   ).toBe("rgb(255, 255, 255)");
   await result.focus();
-  await expect(page.getByRole("tooltip")).toContainText(
-    "Vitória contra Águias",
+  await expect(page.getByRole("tooltip")).toHaveText(
+    "LOB 80 x 70 Águias - 10/11",
   );
   await expect(result).toBeFocused();
   await page.keyboard.press("Escape");
@@ -195,11 +195,112 @@ test("ícones oferecem resultado, adversário, data e placar por foco, hover e t
   await result.blur();
   if (info.project.name === "mobile") await result.tap();
   else await result.hover();
-  await expect(page.getByRole("tooltip")).toContainText("Lobos 80 × 70 Águias");
+  await expect(page.getByRole("tooltip")).toHaveText(
+    "LOB 80 x 70 Águias - 10/11",
+  );
   const url = page.url();
   await result.click();
   await expect(page).toHaveURL(url);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("cabeçalhos e legenda usam apenas significados curtos e dispensam avisos genéricos", async ({
+  page,
+}, info) => {
+  await publicNavigationFixture(page);
+  const s = source();
+  await page.route("**/api/public/standings/**", (r) =>
+    r.fulfill({ json: buildPublicStandings(s) }),
+  );
+  await page.goto(`${origin}/publico.html#${s.disputeId}`);
+  const table = page.getByRole("table");
+  await expect(table).toBeVisible();
+  await expect(
+    page.getByText("Classificação provisória", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText(/Resultados publicados atualizam esta consulta/),
+  ).toHaveCount(0);
+  for (const label of ["Equipe", "Últimos jogos"]) {
+    const header = table.getByRole("columnheader", {
+      name: label,
+      exact: true,
+    });
+    await expect(header).toHaveText(label);
+    await expect(header.getByRole("button")).toHaveCount(0);
+    await expect(header.locator("[title], [aria-describedby]")).toHaveCount(0);
+  }
+  const meanings = [
+    ["Pos.", "Posição"],
+    ["J", "Jogos"],
+    ["V", "Vitórias"],
+    ["D", "Derrotas"],
+    ["Aprov.", "Aproveitamento"],
+    ["PP", "Pontos pró"],
+    ["PC", "Pontos contra"],
+    ["SLD", "Saldo de pontos"],
+  ];
+  for (const [label, meaning] of meanings) {
+    const help = table
+      .locator("thead")
+      .getByRole("button", { name: `${label}: ${meaning}`, exact: true });
+    await help.focus();
+    await expect(page.getByRole("tooltip")).toHaveText(meaning);
+    await page.keyboard.press("Escape");
+  }
+  const help = table
+    .locator("thead")
+    .getByRole("button", { name: "V: Vitórias", exact: true });
+  await help.blur();
+  if (info.project.name === "mobile") await help.tap();
+  else await help.hover();
+  await expect(page.getByRole("tooltip")).toHaveText("Vitórias");
+  const legend = page.getByRole("region", { name: "Legenda da classificação" });
+  await expect(
+    legend.getByRole("heading", { name: "Legenda", exact: true }),
+  ).toBeVisible();
+  await expect(legend.locator("dt")).toHaveText(
+    meanings.map(([label]) => label),
+  );
+  await expect(legend.locator("dd")).toHaveText(
+    meanings.map(([, meaning]) => meaning),
+  );
+  await expect(legend.locator("p")).toHaveCount(0);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("tooltip usa siglas, ordem do confronto e DD/MM; ausência de sigla ou data não acrescenta explicações", async ({
+  page,
+}) => {
+  await publicNavigationFixture(page);
+  const s = source();
+  s.registrations[0].team.abbreviation = "LUSB";
+  s.registrations[1].team.abbreviation = "IVV/Cetaf";
+  s.games[0].date = "2026-09-20";
+  s.publishedGames[0].homePoints = 56;
+  s.publishedGames[0].awayPoints = 66;
+  await page.route("**/api/public/standings/**", (r) =>
+    r.fulfill({ json: buildPublicStandings(s) }),
+  );
+  await page.goto(`${origin}/publico.html#${s.disputeId}`);
+  const icon = page
+    .getByRole("row")
+    .filter({
+      has: page.getByRole("rowheader", { name: "Lobos", exact: true }),
+    })
+    .locator(".standings-result");
+  await icon.focus();
+  await expect(page.getByRole("tooltip")).toHaveText(
+    "LUSB 56 x 66 IVV/Cetaf - 20/09",
+  );
+  await expect(icon).toHaveAccessibleName(/Derrota.*Lobos 56 × 66 Águias/);
+  s.games[0].date = null;
+  s.registrations[1].team.abbreviation = null;
+  s.publishedGames[0].homePoints = 0;
+  await page.reload();
+  await icon.focus();
+  await expect(page.getByRole("tooltip")).toHaveText("LUSB 0 x 66 Águias");
+  await expect(icon).toHaveAccessibleName(/Data não informada/);
 });
 
 for (const viewport of [
@@ -242,7 +343,7 @@ for (const viewport of [
       "PP",
       "PC",
       "SLD",
-      "Últimos 5",
+      "Últimos jogos",
     ]);
     expect(
       await page
@@ -255,6 +356,10 @@ for (const viewport of [
       ),
     ).toBe(true);
     const identity = table.locator("thead th").nth(1);
+    await expect(table.getByRole("columnheader").last()).toHaveCSS(
+      "text-align",
+      "center",
+    );
     await region.evaluate((el) => {
       el.scrollLeft = 500;
       el.scrollTop = 300;

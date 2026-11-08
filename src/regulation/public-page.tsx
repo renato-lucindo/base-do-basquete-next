@@ -17,19 +17,16 @@ const standingsNumber = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 });
 const standingsColumns = [
-  ["Pos.", "Posição na classificação; empates permanecem explícitos"],
-  ["Equipe", "Equipe inscrita nesta disputa"],
-  ["J", "Jogos contabilizados"],
+  ["Pos.", "Posição"],
+  ["Equipe", null],
+  ["J", "Jogos"],
   ["V", "Vitórias"],
   ["D", "Derrotas"],
-  ["Aprov.", "Aproveitamento de vitórias"],
+  ["Aprov.", "Aproveitamento"],
   ["PP", "Pontos pró"],
   ["PC", "Pontos contra"],
   ["SLD", "Saldo de pontos"],
-  [
-    "Últimos 5",
-    "Até cinco resultados contabilizados nesta fase e grupo, do mais antigo ao mais recente",
-  ],
+  ["Últimos jogos", null],
 ] as const;
 
 function StandingsHeader({
@@ -39,7 +36,7 @@ function StandingsHeader({
   label: string;
   description: string;
 }) {
-  const tip = useNameTooltip(`${label}: ${description}`);
+  const tip = useNameTooltip(description);
   return (
     <button
       type="button"
@@ -132,19 +129,21 @@ export function PublicStandingsTables({
       window.history.replaceState(window.history.state, "", canonical);
   }, [canonical]);
   const names = new Map(value.registrations.map((r) => [r.id, r.name]));
+  const compactNames = new Map(
+    value.registrations.map((r) => [
+      r.id,
+      r.team.abbreviation?.trim() || r.name,
+    ]),
+  );
   const label = (id: string | null) =>
     id ? (names.get(id) ?? "Equipe confirmada") : "A definir";
+  const compactLabel = (id: string) => compactNames.get(id) ?? label(id);
   return (
     <section
       className="public-standings public-site statistics-public"
       aria-label="Classificação publicada"
     >
       <TooltipProvider>
-        <p className="public-source">Classificação provisória</p>
-        <p>
-          Resultados publicados atualizam esta consulta. Empates e pendências
-          não confirmam colocações finais.
-        </p>
         {!!value.organizationPendingGameIds?.length && (
           <p role="status">
             {value.organizationPendingGameIds.length} jogo(s) aguardam
@@ -253,13 +252,19 @@ export function PublicStandingsTables({
                                       className={
                                         label === "Equipe"
                                           ? "standings-team"
-                                          : undefined
+                                          : label === "Últimos jogos"
+                                            ? "standings-recent"
+                                            : undefined
                                       }
                                     >
-                                      <StandingsHeader
-                                        label={label}
-                                        description={description}
-                                      />
+                                      {description ? (
+                                        <StandingsHeader
+                                          label={label}
+                                          description={description}
+                                        />
+                                      ) : (
+                                        label
+                                      )}
                                     </th>
                                   ),
                                 )}
@@ -317,6 +322,7 @@ export function PublicStandingsTables({
                                         }
                                         teamName={label(r.registrationId)}
                                         label={label}
+                                        compactLabel={compactLabel}
                                       />
                                     </td>
                                   </tr>
@@ -324,21 +330,23 @@ export function PublicStandingsTables({
                             </tbody>
                           </table>
                         </ScrollableTable>
+                        <section
+                          className="table-legend reference-legend"
+                          aria-label="Legenda da classificação"
+                        >
+                          <h2>Legenda</h2>
+                          <dl>
+                            {standingsColumns.map(([label, description]) =>
+                              description ? (
+                                <div key={label}>
+                                  <dt>{label}</dt>
+                                  <dd>{description}</dd>
+                                </div>
+                              ) : null,
+                            )}
+                          </dl>
+                        </section>
                       </div>
-                      <p className="public-table-legend">
-                        {standingsColumns
-                          .slice(2, 9)
-                          .map(([label, description], index) => (
-                            <span key={label}>
-                              {index > 0 ? " · " : ""}
-                              {label}: {description}
-                            </span>
-                          ))}
-                        . —: posição ou valor indefinido. Últimos 5: somente
-                        esta fase e grupo, do mais antigo à esquerda ao mais
-                        recente à direita (anel externo). ✓: vitória; ×:
-                        derrota.
-                      </p>
                       {!!g.standings.tieSteps.length && (
                         <details>
                           <summary>Critérios de desempate aplicados</summary>
