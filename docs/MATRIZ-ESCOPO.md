@@ -21,6 +21,8 @@ Reconciliado documentalmente em 01/11/2026 a partir da main `89a1b9f`, decisões
 
 ## Decisões de continuidade
 
+Refinamento de apresentação aprovado em08/11/2026, na mesma PR75: primeiro consolidar documentação e conferência obrigatória; depois corrigir os textos, cabeçalhos/legenda, alinhamento de **Últimos jogos** e tooltip compacto. As mudanças de tela e o novo deploy permanecem pendentes na [lista da unidade](PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026). A primeira entrega é exclusivamente documental; não representa aceite humano do preview nem execução da etapa2.
+
 Pendência histórica continua visível nesta matriz mesmo após arquivar seu plano. Ela não autoriza nova unidade, deploy, DDL ou publicação. Se restarem apenas decisões humanas, registrar o próximo passo no checkpoint; não repetir gates nem gerar trabalho para preencher a espera. Sugestões de reaproveitamento da auditoria anterior entram somente por lacuna demonstrada e prioridade explícita, sem importar arquitetura/schema/serviços antigos.
 
 Navegação pública: contrato aprovado em 02/11/2026 fixa **Competição → Ano → Naipe → Categoria → Divisão** para todas as edições, substituindo a configuração por edição prevista anteriormente. Divisão ausente não cria nível vazio; nenhum campo de ordenação novo. Regras vigentes em [Público](design/PUBLICO.md).
