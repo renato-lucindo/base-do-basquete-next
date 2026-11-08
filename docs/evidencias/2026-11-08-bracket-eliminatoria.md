@@ -27,3 +27,9 @@ Os cenários de quartas usam fixtures locais, sem seed, Auth/admin, DML remoto o
 Enviar na mesma PR75 após validação local; conferir o HEAD/run real. Ao aguardar CI, atualizar a automação existente, sem duplicata. O release autorizado continua restrito a `base-do-basquete-next-pr75.renato-lucindo-jr.workers.dev`, com novos builds/pacote do SHA cujo validate passou. Preservar Access, bindings, sessões, segredos, rate limit e banco compartilhado. Sem merge/fechamento, deploy principal/UIUX, migration ou DML remoto.
 
 Nesta redação, o serviço publicado continua sendo a fonte b3908fb, versão b6161cb7-a16f-4f6c-978e-4d3f3d608f06. Ainda não houve upload/deploy do bracket; registrar provas remotas e novo SHA/versão apenas após execução efetiva.
+
+## Retomada de21:49UTC
+
+HEAD82b658bc48b5cb01475a6d26fb4220240fbcc262; CI42526714531 em andamento, design/scope SUCCESS e demais jobs ainda em andamento na consulta real. Sem tópicos de revisão. Regressão local encerrada:762PASS,118skipped,6FAIL, exit1 em21,6min. As6falhas desktop (flows145/214, public-accessibility18/41, withdrawals469/538) são ENOENT de traces/ENOSPC ao escrever relatórios/traces, sem asserção de bracket falha. Não declarar integralPASS nem corrigir produto para contornar artefatos; verificar capacidade e saídas independentes antes de rerun focal ou registrar prova equivalente integral da CI. Nenhum upload/deploy novo.
+
+Pausa conforme limite do responsável:14%restante5h,95%usado semanal. Reset real23:13:58UTC; retomada na mesma automação para23:15:58UTC (20:15:58Brasília) em08/11/2026, sem créditos/reset manual.
