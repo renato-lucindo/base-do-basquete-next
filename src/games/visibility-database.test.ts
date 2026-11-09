@@ -283,6 +283,10 @@ it("legacy published standings keep remaining group results when a published sem
     );
     expect(filtered.games.map((g) => g.id)).toEqual([id(9)]);
     expect(filtered.publishedGames.map((g) => g.gameId)).toEqual([id(9)]);
+    expect(filtered.publishedGames).toEqual(
+      original.publishedGames.filter((g) => g.gameId === id(9)),
+    );
+    expect(filtered.registrations).toEqual(original.registrations);
     expect(filtered.definition.groupPhases[0].groups[0].gameIds).toEqual([
       id(9),
     ]);
