@@ -89,6 +89,10 @@ import {
   type RegistrationRemoval,
 } from "../teams/removal-contract";
 import { SupabaseGames } from "../games/provider";
+import {
+  saveGameVisibilitySchema,
+  type SaveGameVisibility,
+} from "../games/visibility-contract";
 import { SupabaseOfficiating } from "../games/officiating-provider";
 import {
   saveGameEditorSchema,
@@ -514,6 +518,26 @@ export class SessionStore extends DurableObject<Env> {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.games.save(accessToken, saveGameSchema.parse(command)),
+      ),
+    );
+  }
+  getGameVisibility(gameId: string) {
+    return safely(() =>
+      this.session.runAuthorized(
+        ({ accessToken }) => this.games.getVisibility(accessToken, gameId),
+        "game.read",
+      ),
+    );
+  }
+  saveGameVisibility(command: SaveGameVisibility) {
+    return safely(() =>
+      this.session.runAuthorized(
+        ({ accessToken }) =>
+          this.games.saveVisibility(
+            accessToken,
+            saveGameVisibilitySchema.parse(command),
+          ),
+        "game.save",
       ),
     );
   }
