@@ -65,7 +65,9 @@ test("published semifinal becomes a private draft and can be republished without
     .getByRole("textbox", { name: "Motivo da alteração" })
     .fill("Semifinal antecipada: classificação ainda incompleta");
   await panel.getByRole("button", { name: "Mover para rascunho" }).click();
-  await expect(panel.getByRole("status").first()).toContainText("Rascunho privado");
+  await expect(panel.getByRole("status").first()).toContainText(
+    "Rascunho privado",
+  );
   expect(visibility).toBe("draft");
   expect(fixture.games.size).toBe(1);
 
