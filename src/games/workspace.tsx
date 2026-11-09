@@ -1062,7 +1062,9 @@ export function GamesWorkspace(props: Props) {
               <GameVisibilityPanel
                 key={savedGame.id}
                 game={savedGame}
-                enabled={props.enabled && !busy && !dirty && !uncertain && !conflict}
+                enabled={
+                  props.enabled && !busy && !dirty && !uncertain && !conflict
+                }
                 onSessionLost={props.onSessionLost}
                 onSaved={() => {
                   setEpoch((v) => v + 1);
@@ -1187,7 +1189,9 @@ export function GamesWorkspace(props: Props) {
                     <td>{g.venue ?? "A definir"}</td>
                     <td className="nowrap">
                       {g.state === "finished"
-                        ? flexible ? "Resultado registrado" : "Resultado publicado"
+                        ? flexible
+                          ? "Resultado registrado"
+                          : "Resultado publicado"
                         : "Sem resultado"}
                     </td>
                   </tr>
