@@ -582,7 +582,7 @@ export function GamesWorkspace(props: Props) {
         </>
       ) : sheetVisible && savedGame ? (
         <GameSheetWorkspace
-          key={savedGame.id}
+          key={`visibility-${savedGame.id}`}
           game={savedGame}
           gender={props.gender}
           enabled={props.enabled}
@@ -1049,7 +1049,7 @@ export function GamesWorkspace(props: Props) {
             </details>
             {flexible && (
               <GameFormatAssignment
-                key={editor.game.id}
+                key={`format-${editor.game.id}`}
                 disputeId={props.disputeId}
                 gameId={editor.game.id}
                 disabled={busy || uncertain || conflict || !props.enabled}
@@ -1060,7 +1060,7 @@ export function GamesWorkspace(props: Props) {
             )}
             {flexible && savedGame && (
               <GameVisibilityPanel
-                key={savedGame.id}
+                key={`occurrence-${savedGame.id}`}
                 game={savedGame}
                 enabled={
                   props.enabled && !busy && !dirty && !uncertain && !conflict
