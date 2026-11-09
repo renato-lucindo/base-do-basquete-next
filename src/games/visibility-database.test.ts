@@ -157,14 +157,22 @@ it("denies draft controls to anonymous callers and non-administrators", async ()
   await db.exec("savepoint visibility_auth");
   try {
     await anon();
+    await db.exec("savepoint anonymous_denial");
     await expect(
       query("public.get_game_visibility($1)", [id(8)]),
     ).rejects.toMatchObject({ code: "42501" });
+    await db.exec(
+      "rollback to savepoint anonymous_denial;release savepoint anonymous_denial",
+    );
     await auth();
     await db.exec(`set local request.jwt.claim.sub='${id(99)}'`);
+    await db.exec("savepoint unauthorized_denial");
     await expect(
       query("public.get_game_visibility($1)", [id(8)]),
     ).rejects.toMatchObject({ code: "PT403" });
+    await db.exec(
+      "rollback to savepoint unauthorized_denial;release savepoint unauthorized_denial",
+    );
   } finally {
     await db.exec(
       "rollback to savepoint visibility_auth;release savepoint visibility_auth",
