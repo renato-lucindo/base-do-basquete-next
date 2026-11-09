@@ -60,12 +60,12 @@ test("published semifinal becomes a private draft and can be republished without
   await expect.poll(() => fixture.games.size).toBe(1);
 
   const panel = page.getByRole("region", { name: "Visibilidade do jogo" });
-  await expect(panel.getByRole("status")).toContainText("Publicado");
+  await expect(panel.getByRole("status").first()).toContainText("Publicado");
   await panel
     .getByRole("textbox", { name: "Motivo da alteração" })
     .fill("Semifinal antecipada: classificação ainda incompleta");
   await panel.getByRole("button", { name: "Mover para rascunho" }).click();
-  await expect(panel.getByRole("status")).toContainText("Rascunho privado");
+  await expect(panel.getByRole("status").first()).toContainText("Rascunho privado");
   expect(visibility).toBe("draft");
   expect(fixture.games.size).toBe(1);
 
@@ -73,7 +73,7 @@ test("published semifinal becomes a private draft and can be republished without
     .getByRole("textbox", { name: "Motivo da alteração" })
     .fill("Classificatória concluída e confrontos validados");
   await panel.getByRole("button", { name: "Publicar jogo" }).click();
-  await expect(panel.getByRole("status")).toContainText("Publicado");
+  await expect(panel.getByRole("status").first()).toContainText("Publicado");
   expect(visibility).toBe("published");
   expect(version).toBe(2);
   expect(reasons).toHaveLength(2);
