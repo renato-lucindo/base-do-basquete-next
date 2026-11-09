@@ -29,7 +29,7 @@
     "test:pdf-runtime": "wrangler deploy --dry-run --config tests/fixtures/pdf-worker.wrangler.jsonc --outdir ../../.preview-artifacts/pdf-worker && node --test tests/pdf-runtime.test.mjs",
     "design:build": "node docs/design/build.cjs",
     "design:verify": "node docs/design/verify.cjs",
-    "test:ci": "node scripts/format-dump.mjs && node --test tests/ci-plan.test.mjs",
+    "test:ci": "node --test tests/ci-plan.test.mjs",
     "gate:ui": "npm run lint && npm run format:check && npm run typecheck && npm run build && npm run build:foundation && node scripts/check-client-boundary.mjs && node scripts/check-secrets.mjs --source-only"
   },
   "dependencies": {
