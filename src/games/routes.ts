@@ -77,10 +77,14 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
       return jsonResponse(result.value);
     }
     if (request.method === "POST") {
-      const command = await readMutationJson(request, saveGameVisibilitySchema, {
-        origin: env.APP_ORIGIN,
-        maxBytes: 8192,
-      });
+      const command = await readMutationJson(
+        request,
+        saveGameVisibilitySchema,
+        {
+          origin: env.APP_ORIGIN,
+          maxBytes: 8192,
+        },
+      );
       if (command.gameId.toLowerCase() !== id.data.toLowerCase())
         throw badInput();
       const result = await session.saveGameVisibility(command);
