@@ -273,7 +273,8 @@ it("legacy published standings keep remaining group results when a published sem
       expectedGameVersion: visibility.gameVersion,
       expectedPublicationVersion: visibility.publicationVersion,
       visibility: "draft",
-      reason: "Semifinal antecipada, sem divulgação até concluir a fase anterior",
+      reason:
+        "Semifinal antecipada, sem divulgação até concluir a fase anterior",
     };
     await query("public.save_game_visibility($1)", [change]);
     await anon();
