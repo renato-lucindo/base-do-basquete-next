@@ -5,8 +5,8 @@ import {
   gameVisibilityResultSchema,
 } from "./visibility-contract";
 
-const gameId = "62d99b70-21c9-495f-b0d7-44c0f53b4380";
-const disputeId = "b5433b13-a8f9-4baa-b4d9-08066ebf3e96";
+const gameId = "f7900000-0000-4000-8000-000000000001";
+const disputeId = "f7900000-0000-4000-8000-000000000002";
 const commandId = "2c2f447e-27ef-4a52-a959-67edfe7c2a78";
 
 describe("game draft visibility", () => {
@@ -47,12 +47,31 @@ describe("game draft visibility", () => {
       reason: "Before classification is finished",
     };
     expect(saveGameVisibilitySchema.safeParse(payload).success).toBe(true);
-    expect(saveGameVisibilitySchema.safeParse({ ...payload, reason: "  " }).success).toBe(false);
-    expect(saveGameVisibilitySchema.safeParse({ ...payload, expectedGameVersion: 0 }).success).toBe(false);
-    expect(saveGameVisibilitySchema.safeParse({ ...payload, visibility: "cancelled" }).success).toBe(false);
-    expect(saveGameVisibilitySchema.safeParse({ ...payload, actorId: commandId }).success).toBe(false);
-    expect(gameVisibilityResultSchema.safeParse({
-      commandId, gameId, version: 1, visibility: "draft", savedAt: "2026-11-09T14:00:00Z",
-    }).success).toBe(true);
+    expect(
+      saveGameVisibilitySchema.safeParse({ ...payload, reason: "  " }).success,
+    ).toBe(false);
+    expect(
+      saveGameVisibilitySchema.safeParse({ ...payload, expectedGameVersion: 0 })
+        .success,
+    ).toBe(false);
+    expect(
+      saveGameVisibilitySchema.safeParse({
+        ...payload,
+        visibility: "cancelled",
+      }).success,
+    ).toBe(false);
+    expect(
+      saveGameVisibilitySchema.safeParse({ ...payload, actorId: commandId })
+        .success,
+    ).toBe(false);
+    expect(
+      gameVisibilityResultSchema.safeParse({
+        commandId,
+        gameId,
+        version: 1,
+        visibility: "draft",
+        savedAt: "2026-11-09T14:00:00Z",
+      }).success,
+    ).toBe(true);
   });
 });
