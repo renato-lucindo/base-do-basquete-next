@@ -201,9 +201,17 @@ export class SupabaseGames {
       if (response.status === 404)
         throw new HttpError(404, "game_not_found", "Jogo não encontrado.");
       if (response.status === 409)
-        throw new HttpError(409, "visibility_conflict", "O jogo ou o resultado mudou. Recarregue antes de continuar.");
+        throw new HttpError(
+          409,
+          "visibility_conflict",
+          "O jogo ou o resultado mudou. Recarregue antes de continuar.",
+        );
       if (response.status === 400)
-        throw new HttpError(400, "invalid_visibility", "Confira o estado de publicação e o motivo da alteração.");
+        throw new HttpError(
+          400,
+          "invalid_visibility",
+          "Confira o estado de publicação e o motivo da alteração.",
+        );
       throw unavailable();
     }
     const parsed = schema.safeParse(await providerJson(response, 1048576));
