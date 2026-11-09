@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
-import {
-  competitionSetupFixture,
-} from "./fixtures/competition-setup";
+import { competitionSetupFixture } from "./fixtures/competition-setup";
 import { selectGameRegistration } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
 import { saveGameVisibilitySchema } from "../src/games/visibility-contract";
@@ -52,7 +50,9 @@ test("published semifinal becomes a private draft and can be republished without
     });
   });
   page.on("dialog", (dialog) => void dialog.accept());
-  await page.goto(`http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`);
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+  );
   await page.getByRole("button", { name: "Novo jogo", exact: true }).click();
   await selectGameRegistration(page, "mandante", "Lobos");
   await selectGameRegistration(page, "visitante", "Lobos B");
