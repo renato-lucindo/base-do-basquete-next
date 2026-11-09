@@ -1,4 +1,5 @@
 import { GameFormatAssignment } from "./format-assignment";
+import { GameVisibilityPanel } from "./visibility-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
 import type { GameOrder } from "./contract";
 import { useEffect, useId, useRef, useState } from "react";
@@ -1057,6 +1058,18 @@ export function GamesWorkspace(props: Props) {
                 onSessionLost={props.onSessionLost}
               />
             )}
+            {flexible && savedGame && (
+              <GameVisibilityPanel
+                key={savedGame.id}
+                game={savedGame}
+                enabled={props.enabled && !busy && !dirty && !uncertain && !conflict}
+                onSessionLost={props.onSessionLost}
+                onSaved={() => {
+                  setEpoch((v) => v + 1);
+                  props.onSaved();
+                }}
+              />
+            )}
             <p className="game-publication-note">
               {flexible
                 ? "Finalize a súmula ou conclua a importação para atualizar o resultado automaticamente."
@@ -1174,7 +1187,7 @@ export function GamesWorkspace(props: Props) {
                     <td>{g.venue ?? "A definir"}</td>
                     <td className="nowrap">
                       {g.state === "finished"
-                        ? "Resultado publicado"
+                        ? flexible ? "Resultado registrado" : "Resultado publicado"
                         : "Sem resultado"}
                     </td>
                   </tr>
