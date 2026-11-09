@@ -64,7 +64,7 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
       throw new HttpError(result.status, result.code, result.message);
     return jsonResponse(result.value);
   }
-  const visibility = /^\\/api\\/games\\/([^/]+)\\/visibility$/u.exec(url.pathname);
+  const visibility = /^\/api\/games\/([^/]+)\/visibility$/u.exec(url.pathname);
   if (visibility) {
     if (env.FLEXIBLE_COMPETITION !== "true")
       throw new HttpError(404, "not_found", "Página não encontrada.");
