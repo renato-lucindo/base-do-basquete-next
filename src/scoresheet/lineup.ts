@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import {
   validateSheet,
   type RosterSlot,
@@ -5,10 +6,7 @@ import {
 } from "../domain/scoresheet";
 
 export function orderedRoster(roster: readonly RosterSlot[]): RosterSlot[] {
-  return [...roster].sort(
-    (a, b) =>
-      Number(a.jersey) - Number(b.jersey) || a.jersey.length - b.jersey.length,
-  );
+  return [...roster].sort((a, b) => compareJerseys(a.jersey, b.jersey));
 }
 export function setStarter(sheet: Sheet, id: number, starter: boolean): Sheet {
   if (!sheet.roster.some((slot) => slot.rosterEntryId === id))

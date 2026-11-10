@@ -50,13 +50,13 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
     };
   });
   console.log(`SÚMULA ${info.project.name}: ${JSON.stringify(frame)}`);
-  // The accepted always-visible global search adds one mobile row; the scoresheet body retains its previous density.
+  // The accepted always-visible global search adds one mobile row; the accepted equal-height rosters preserve five readable mobile rows.
   expect(
     (frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0)) /
       (info.project.name === "desktop" ? 1.5 : 1),
   ).toBeLessThan(info.project.name === "desktop" ? 400 : 460);
   expect(frame.visible).toBeGreaterThanOrEqual(
-    Math.min(info.project.name === "desktop" ? 3 : 8, frame.total),
+    Math.min(info.project.name === "desktop" ? 3 : 5, frame.total),
   );
   expect(frame.viewportOverflow).toBe(false);
   expect(frame.sticky).toBe("sticky");
@@ -65,9 +65,7 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
     fullPage: false,
   });
 
-  const detail = page
-    .getByRole("button", { name: /faltas, detalhes de/ })
-    .first();
+  const detail = page.getByRole("button", { name: /Detalhar faltas/ }).first();
   await detail.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog", { name: /Faltas/ })).toBeVisible();

@@ -899,6 +899,7 @@ export type Database = {
         Returns: Json;
       };
       get_public_game: { Args: { p_id: string }; Returns: Json };
+      get_public_game_detail: { Args: { p_id: string }; Returns: Json };
       get_public_player_profile: {
         Args: { p_person_id: string };
         Returns: Json;

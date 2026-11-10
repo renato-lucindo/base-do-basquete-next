@@ -67,6 +67,20 @@ Atualização de 04/11/2026: o perfil de jogador passa a uma **página contínua
 
 ## Integração das páginas públicas
 
+### Partida — aceite de 10/11/2026
+
+O protótipo desta conversa foi aceito para implementação com as decisões abaixo, que substituem orientações anteriores da súmula quando conflitantes:
+
+- Parciais mostram somente pontos; retirar faltas coletivas dessas células.
+- Elencos preservam titulares pelo nome em negrito e asterisco; quem não entrou conserva texto/fundo normais, inclusive em PTS, com — nas estatísticas. Completar cada corpo até12linhas com preenchimentos cinza vazios, sem identidade, ações ou participação nos cálculos. Colunas, linhas correspondentes e rodapés equivalentes; nomes extensos continuam legíveis.
+- Destacar máximos positivos de PTS/2P/3P/LL por equipe e recorte, com todos os empates. Não aplicar peso à linha inteira, zeros, ausências ou totais.
+- Jogo todo/quartos/prorrogações sincronizam dados, totais, máximos e faltas; o placar final permanece visível. A consulta optativa lê somente a versão imutável publicada. PDF/legado sem cobertura não recebe períodos individuais inventados.
+- O responsável confirmou manter — quando a participação no quarto não é conhecida. Titular comprova o primeiro quarto; evento individual comprova presença no período. Ausência de evento nunca comprova que o atleta não entrou. Exclusões/desqualificações respeitam a cronologia.
+- Retirar 5F/GD do nome. Cinco faltas usam número vermelho/negrito em F; desqualificação usa GD junto do número, inclusive5GD, com identificação por foco, mouse e toque e detalhes na célula.
+- Legenda usa definições curtas compartilhadas, com **2P e3P separados**. Não incluir Negrito/Maior valor da equipe no recorte, Parciais/Pontos acima… ou0/Zero confirmado. Cabeçalhos explicam somente o significado da sigla.
+
+Regra global de camisas em [PADROES.md](PADROES.md):00 ao final dos números.
+
 Cabeçalho compartilhado com busca sempre visível, tabelas dimensionadas pelo conteúdo e largura excedente após as colunas. Textos e seus cabeçalhos à esquerda; métricas à direita. No celular, equipe pode acompanhar a identificação do atleta para manter J/PTS acessíveis. A seleção explícita de colunas prevalece sobre a adaptação automática.
 
 Jogos confirmados e agenda publicada usam a mesma tabela compacta por data, pesquisa de equipe/local e páginas de20. Apenas resultado publicado oferece súmula; campos desconhecidos mantêm “a definir” e placar ausente permanece —. Parciais e elencos da súmula vigente não foram redesenhados.

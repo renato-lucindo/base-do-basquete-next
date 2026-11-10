@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { z } from "zod";
 import {
   confirmedPlayerFactSchema,
@@ -388,7 +389,7 @@ export function aggregateConfirmedStatistics(
         nicknames: unique(related.map((r) => r.person.nickname)),
         registrationNames: unique(related.map((r) => r.registration.name)),
         teamNames: unique(related.map((r) => r.registration.team.name)),
-        jerseys: unique(related.map((r) => r.jersey)),
+        jerseys: unique(related.map((r) => r.jersey)).sort(compareJerseys),
 
         ...observedMetrics(related, config),
       };

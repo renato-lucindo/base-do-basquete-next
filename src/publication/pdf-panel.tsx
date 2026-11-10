@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
@@ -596,11 +597,7 @@ export function PdfPublicationPanel(p: Props) {
               team = p.review.source.parsed.teams[sourceSide],
               mappings = p.review.document.mappings
                 .filter((m) => m.sourceSide === sourceSide)
-                .sort(
-                  (a, b) =>
-                    Number(a.jersey) - Number(b.jersey) ||
-                    a.jersey.length - b.jersey.length,
-                );
+                .sort((a, b) => compareJerseys(a.jersey, b.jersey));
             return (
               <fieldset key={side} disabled={disabled}>
                 <legend>

@@ -3,50 +3,137 @@ import {
   publicPlayerName,
 } from "../public-ui/player-name";
 import { publicDetailLink } from "../public-ui/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { api } from "../competition/api";
 import { publicResultSchema, type PublicResult } from "./pdf-contract";
-
-type Side = "home" | "away";
-type Player = PublicResult["facts"]["players"][number];
+import { STATISTICS_METRICS } from "../statistics/metrics";
+import { parseFoul } from "../domain/scoresheet";
+import { GameHint } from "./game-hint";
+import {
+  gameRows,
+  gameTotals,
+  gameLeaders,
+  scoringKeys,
+  periodName,
+  periodShort,
+  disciplineName,
+  type GamePlayer,
+  type Period,
+  type Side,
+} from "./game-view";
 const sides: Side[] = ["home", "away"];
-const periodName = (i: number) => (i < 4 ? `Q${i + 1}` : `PR${i - 3}`);
+const metrics = [
+  { key: "points", label: "PTS", name: STATISTICS_METRICS.points.name },
+  { key: "two", label: "2P", name: STATISTICS_METRICS.twoMade.name },
+  { key: "three", label: "3P", name: STATISTICS_METRICS.threeMade.name },
+  { key: "free", label: "LL", name: STATISTICS_METRICS.freeMade.name },
+  { key: "fouls", label: "F", name: STATISTICS_METRICS.foulsCommitted.name },
+] as const;
 const prettyNumber = (s: string | null) =>
   s ? s.replace(/^0+(?=\d)/u, "") || "0" : null;
 const date = (s: string | null) => s?.split("-").reverse().join("/") ?? null;
-const stat = (v: number | null) => (v === null ? "—" : v);
-function playerFouls(p: Player): number | null {
-  if (!p.played) return null;
-  if ("fouls" in p) return p.fouls;
-  return p.advanced?.foulsCommitted ?? null;
-}
-function playerStatus(p: Player) {
-  if ("status" in p && p.status !== "eligible")
-    return p.status === "excluded" ? "5F" : p.status;
-  return null;
-}
+const stat = (n: number | null) => (n === null ? "—" : n);
+const percentage = (made: number, attempted: number | null) =>
+  attempted
+    ? `${((made / attempted) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`
+    : "—";
 
 export function PublicGameView({ result: r }: { result: PublicResult }) {
-  const [selected, setSelected] = useState<Player | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const closeButton = useRef<HTMLButtonElement>(null);
-  const opener = useRef<HTMLButtonElement | null>(null);
+  const [period, setPeriod] = useState<Period>("all");
+  const [selected, setSelected] = useState<GamePlayer | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null),
+    closeButton = useRef<HTMLButtonElement>(null),
+    opener = useRef<HTMLButtonElement | null>(null);
   const periods = r.facts.teams.home.periods;
+  const article = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const align = () => {
+      const rows = [
+        ...(article.current?.querySelectorAll<HTMLTableRowElement>(
+          ".roster-table tbody tr",
+        ) ?? []),
+      ];
+      rows.forEach((row) => (row.style.height = ""));
+      const tables = [
+        ...(article.current?.querySelectorAll<HTMLTableElement>(
+          ".roster-table",
+        ) ?? []),
+      ];
+      const heights = Array.from({ length: 12 }, (_, index) =>
+        Math.max(
+          0,
+          ...tables.map(
+            (t) =>
+              t.tBodies[0].rows[index]?.getBoundingClientRect().height ?? 0,
+          ),
+        ),
+      );
+      tables.forEach((t) =>
+        [...t.tBodies[0].rows].forEach(
+          (row, index) => (row.style.height = `${heights[index]}px`),
+        ),
+      );
+      tables.forEach((t) => {
+        const scroll = t.parentElement!,
+          cells = t.tHead!.rows[0].cells;
+        const fixed =
+          cells[0].getBoundingClientRect().width +
+          cells[1].getBoundingClientRect().width +
+          cells[6].getBoundingClientRect().width;
+        scroll.classList.toggle(
+          "allow-full-scroll",
+          fixed > scroll.clientWidth + 1,
+        );
+      });
+    };
+    align();
+    window.addEventListener("resize", align);
+    const widths = new WeakMap<Element, number>();
+    let frame = 0;
+    const observer = new ResizeObserver((entries) => {
+      if (entries.some((e) => widths.get(e.target) !== e.contentRect.width)) {
+        entries.forEach((e) => widths.set(e.target, e.contentRect.width));
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(align);
+      }
+    });
+    article.current
+      ?.querySelectorAll(".roster-table")
+      .forEach((t) => observer.observe(t));
+    return () => {
+      window.removeEventListener("resize", align);
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [r, period]);
   useEffect(() => {
-    if (!selected) return;
+    if (!selected) {
+      opener.current?.focus({ preventScroll: true });
+      return;
+    }
     dialog.current?.showModal();
     closeButton.current?.focus();
-    return () => opener.current?.focus({ preventScroll: true });
   }, [selected]);
+  const choose = (value: Period) => {
+    setSelected(null);
+    setPeriod(value);
+  };
+  const foulEvents = selected
+    ? r.details?.fouls.filter(
+        (e) =>
+          e.side === selected.side &&
+          e.jersey === selected.jersey &&
+          (period === "all" || e.period === period),
+      )
+    : undefined;
   return (
-    <article className="public-site scoresheet-public public-game">
-      <section
-        className="game-context"
-        aria-label="Dados da partida"
-        title={`${r.context.name} · ${r.context.year} · ${r.context.category}${r.context.division ? ` · ${r.context.division}` : ""}`}
-      >
+    <article
+      ref={article}
+      className="public-site scoresheet-public public-game"
+    >
+      <section className="game-context" aria-label="Dados da partida">
         <strong>
           {prettyNumber(r.game.number)
             ? `Jogo ${prettyNumber(r.game.number)}`
@@ -71,14 +158,34 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                 <tr>
                   <th scope="col">Equipe</th>
                   {periods.map((_, i) => (
-                    <th key={i} scope="col">
-                      <span className="period-heading">
-                        {i < 4 ? `${i + 1}º Q` : `${i - 3}ª PR`}
-                      </span>
+                    <th
+                      key={i}
+                      scope="col"
+                      className={
+                        period === i + 1 ? "selected-period" : undefined
+                      }
+                    >
+                      <button
+                        type="button"
+                        className="period-link"
+                        aria-pressed={period === i + 1}
+                        aria-label={`${periodShort(i + 1)}: ${periodName(i + 1)}`}
+                        disabled={!r.details}
+                        onClick={() => choose(i + 1)}
+                      >
+                        {periodShort(i + 1)}
+                      </button>
                     </th>
                   ))}
                   <th scope="col" className="period-total">
-                    Total
+                    <button
+                      type="button"
+                      className="period-link"
+                      aria-pressed={period === "all"}
+                      onClick={() => choose("all")}
+                    >
+                      Total
+                    </button>
                   </th>
                 </tr>
               </thead>
@@ -87,17 +194,13 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                   <tr key={side}>
                     <th scope="row">{r.game[side].name}</th>
                     {r.facts.teams[side].periods?.map((n, i) => (
-                      <td key={i}>
+                      <td
+                        key={i}
+                        className={
+                          period === i + 1 ? "selected-period" : undefined
+                        }
+                      >
                         <span className="period-points">{n}</span>
-                        {"foulsByPeriod" in r.facts.teams[side] && (
-                          <span
-                            className="period-fouls"
-                            aria-label={`${r.facts.teams[side].foulsByPeriod[i]} faltas coletivas no ${periodName(i)}`}
-                            title={`Faltas coletivas: ${r.facts.teams[side].foulsByPeriod[i]}`}
-                          >
-                            F{r.facts.teams[side].foulsByPeriod[i]}
-                          </span>
-                        )}
                       </td>
                     ))}
                     <td className="period-total">
@@ -121,70 +224,41 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
         )}
       </section>
       <div className="teams-heading">
+        <p
+          className="period-status"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {periodName(period)}
+        </p>
         <div
           className="period-filter"
           role="group"
           aria-label="Recorte das estatísticas individuais"
         >
-          <button type="button" aria-pressed="true">
-            Jogo todo
-          </button>
-          {periods?.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              disabled
-              title="Estatísticas individuais por período não disponíveis na publicação"
-            >
-              {i < 4 ? `${i + 1}º Q` : `${i - 3}ª PR`}
-            </button>
-          ))}
+          {(["all", ...(periods?.map((_, i) => i + 1) ?? [])] as Period[]).map(
+            (value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={period === value}
+                aria-label={`${periodShort(value)}: ${periodName(value)}`}
+                disabled={value !== "all" && !r.details}
+                onClick={() => choose(value)}
+              >
+                {periodShort(value)}
+              </button>
+            ),
+          )}
         </div>
       </div>
       <div className="teams-grid public-rosters">
         {sides.map((side) => {
-          const rows = r.facts.players
-            .filter((p) => p.side === side)
-            .sort(
-              (a, b) =>
-                Number(a.jersey) - Number(b.jersey) ||
-                a.jersey.length - b.jersey.length,
-            );
-          const coach = r.staff[side];
-          const total = (key: "points" | "two" | "three" | "free") =>
-            rows.reduce((n, p) => n + (p.played ? p[key] : 0), 0);
-          const sumFouls = rows.every(
-            (p) => !p.played || playerFouls(p) !== null,
-          )
-            ? rows.reduce((n, p) => n + (playerFouls(p) ?? 0), 0)
-            : null;
-          const teamFacts = r.facts.teams[side];
-          const freeMade =
-            "freeMade" in teamFacts ? teamFacts.freeMade : total("free");
-          // Makes and attempts may only be paired when their published origins agree.
-          const manualPdfScore =
-            "origins" in r.facts &&
-            r.facts.origins.scorePoints.kind === "sheet";
-          const freeTaken = manualPdfScore
-            ? null
-            : "freeTaken" in teamFacts
-              ? teamFacts.freeTaken
-              : rows.every(
-                    (p) =>
-                      !p.played || ("advanced" in p && p.advanced !== null),
-                  )
-                ? rows.reduce(
-                    (n, p) =>
-                      n +
-                      ("advanced" in p
-                        ? (p.advanced?.freeThrows.attempted ?? 0)
-                        : 0),
-                    0,
-                  )
-                : null;
-          const percent = freeTaken
-            ? `${((100 * freeMade) / freeTaken).toFixed(1).replace(".", ",")}%`
-            : "—";
+          const rows = gameRows(r, side, period),
+            totals = gameTotals(r, side, period),
+            leaders = gameLeaders(rows),
+            coach = r.staff[side];
           return (
             <section
               key={side}
@@ -203,14 +277,10 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                   </a>
                 </h2>
               </div>
-              <p className="scroll-hint">
-                <span>Deslize para ver todas as estatísticas</span>
-                <span>2P · 3P · LL · F</span>
-              </p>
               <div
                 className="table-scroll public-athletes"
                 role="region"
-                aria-label={`Participações de ${r.game[side].name}`}
+                aria-label={`Participações de ${r.game[side].name}: ${periodName(period)}`}
                 tabIndex={0}
               >
                 <table
@@ -218,15 +288,16 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                   aria-label="Participações e estatísticas publicadas"
                 >
                   <caption className="sr-only">
-                    {r.game[side].name}. Titulares em negrito e asterisco; CAP
-                    identifica o capitão.
+                    {r.game[side].name}: {periodName(period)}. Titulares com
+                    asterisco; CAP identifica o capitão.
                   </caption>
                   <colgroup>
                     <col className="jersey-col" />
-                    <col />
-                    {[0, 1, 2, 3, 4].map((n) => (
-                      <col key={n} className="stat-col" />
+                    <col className="name-col" />
+                    {scoringKeys.map((key) => (
+                      <col key={key} className="stat-col" />
                     ))}
+                    <col className="foul-col" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -236,40 +307,42 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                       <th scope="col" className="athlete-cell">
                         Atleta
                       </th>
-                      {(["PTS", "2P", "3P", "LL", "F"] as const).map((k) => (
+                      {metrics.map((m) => (
                         <th
+                          key={m.key}
                           scope="col"
-                          key={k}
-                          className={k === "PTS" ? "points-cell" : undefined}
+                          className={
+                            m.key === "points" ? "points-cell" : undefined
+                          }
                         >
-                          <abbr
-                            title={
-                              k === "PTS"
-                                ? "Pontos totais"
-                                : k === "LL"
-                                  ? "Lances livres convertidos"
-                                  : k === "F"
-                                    ? "Faltas cometidas"
-                                    : `Cestas de ${k[0]} pontos convertidas`
-                            }
+                          <GameHint
+                            className="game-header-tip"
+                            text={m.name}
+                            aria-label={`${m.label}: ${m.name}`}
                           >
-                            {k}
-                          </abbr>
+                            {m.label}
+                          </GameHint>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((p) => {
-                      const fouls = playerFouls(p),
-                        status = playerStatus(p);
+                      const status = disciplineName(p),
+                        gd = p.status === "GD" || p.status === "D";
+                      const foulLabel = `${stat(p.fouls)}${gd ? " GD" : ""}`;
+                      const unknown =
+                        p.played === null
+                          ? "Participação no período não informada"
+                          : p.played === false
+                            ? "Não participou"
+                            : "Dado não informado";
                       return (
                         <tr
                           key={p.person.id}
-                          className={[
-                            p.starter ? "starter" : "",
-                            !p.played ? "did-not-play" : "",
-                          ].join(" ")}
+                          data-jersey={p.jersey}
+                          data-played={String(p.played)}
+                          className={p.starter ? "starter" : undefined}
                         >
                           <td className="jersey-cell">{p.jersey}</td>
                           <th scope="row" className="athlete-cell">
@@ -293,69 +366,114 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                                   )}
                                 </a>
                                 {p.starter && (
-                                  <span className="starter-symbol"> *</span>
-                                )}
-                                {status && (
-                                  <span className="discipline-label">
+                                  <span
+                                    className="starter-symbol"
+                                    role="img"
+                                    aria-label="Titular do jogo"
+                                  >
                                     {" "}
-                                    {status}
+                                    *
                                   </span>
                                 )}
                               </span>
                               {p.captain && (
-                                <span className="captain" title="Capitão">
+                                <span
+                                  className="captain"
+                                  role="img"
+                                  aria-label="Capitão"
+                                >
                                   CAP
                                 </span>
                               )}
                             </div>
                           </th>
-                          <td className="points-cell">
-                            {p.played ? p.points : "—"}
-                          </td>
-                          <td>{p.played ? p.two : "—"}</td>
-                          <td>{p.played ? p.three : "—"}</td>
-                          <td>{p.played ? p.free : "—"}</td>
+                          {scoringKeys.map((key) => (
+                            <td
+                              key={key}
+                              data-stat={key}
+                              className={
+                                key === "points" ? "points-cell" : undefined
+                              }
+                            >
+                              {p[key] === null ? (
+                                <span role="img" aria-label={unknown}>
+                                  —
+                                </span>
+                              ) : p[key] > 0 && p[key] === leaders[key] ? (
+                                <strong className="stat-leader">
+                                  {p[key]}
+                                </strong>
+                              ) : (
+                                p[key]
+                              )}
+                            </td>
+                          ))}
                           <td className="foul-cell">
-                            {fouls === null ? (
-                              "—"
+                            {p.played === false ? (
+                              <span role="img" aria-label="Não participou">
+                                —
+                              </span>
                             ) : (
-                              <button
+                              <GameHint
                                 className={`foul-button${status ? " discipline" : ""}`}
-                                title={`Ver cobertura de faltas de ${p.person.name}`}
-                                aria-label={`${fouls} faltas, detalhes de ${p.person.name}`}
+                                text={status ?? "Faltas cometidas"}
+                                aria-label={`${foulLabel}: ${p.person.name}. ${status ?? "Detalhar faltas"}. ${periodName(period)}`}
+                                aria-haspopup="dialog"
                                 onClick={(e) => {
                                   opener.current = e.currentTarget;
                                   setSelected(p);
                                 }}
                               >
-                                {fouls}
-                              </button>
+                                {foulLabel}
+                              </GameHint>
                             )}
                           </td>
                         </tr>
                       );
                     })}
+                    {Array.from(
+                      { length: Math.max(0, 12 - rows.length) },
+                      (_, i) => (
+                        <tr
+                          key={`empty-${i}`}
+                          className="filler"
+                          aria-hidden="true"
+                        >
+                          <td className="jersey-cell" />
+                          <td className="athlete-cell" />
+                          <td />
+                          <td />
+                          <td />
+                          <td />
+                          <td />
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                   <tfoot>
                     <tr>
                       <th colSpan={2} scope="row" className="total-label">
                         Total da equipe
                       </th>
-                      <td className="points-cell">{total("points")}</td>
-                      <td>{total("two")}</td>
-                      <td>{total("three")}</td>
+                      <td className="points-cell">{stat(totals.points)}</td>
+                      <td>{totals.two}</td>
+                      <td>{totals.three}</td>
                       <td className="total-free">
                         <span className="sr-only">LL da equipe: </span>
                         <span>
-                          {freeMade}/{freeTaken === null ? "—" : freeTaken}
+                          {totals.free}/{stat(totals.attempts)}
                         </span>
                         <small>
-                          {freeTaken === null
-                            ? "tentativas não informadas"
-                            : percent}
+                          {totals.attempts === null ? (
+                            <span className="sr-only">
+                              tentativas não informadas
+                            </span>
+                          ) : (
+                            percentage(totals.free, totals.attempts)
+                          )}
                         </small>
                       </td>
-                      <td>{stat(sumFouls)}</td>
+                      <td>{stat(totals.fouls)}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -377,34 +495,29 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           );
         })}
       </div>
-      <section className="legend" aria-labelledby="legend-title">
+      <section className="legend table-legend" aria-labelledby="legend-title">
         <h2 id="legend-title">Legenda</h2>
         <dl>
           {[
-            ["* Titular", "Nome em negrito e asterisco"],
-            ["CAP", "Capitão da equipe"],
-            ["PTS", "Pontos totais"],
-            ["2P / 3P", "Cestas de dois / três pontos"],
-            ["LL", "Lances livres convertidos"],
-            ["F", "Faltas cometidas"],
-          ].map(([code, label]) => (
+            ["*", "Titular do jogo"],
+            ["CAP", "Capitão"],
+            ...metrics.map((m) => [m.label, m.name]),
+            ["5", "Excluído por cinco faltas"],
+            ["GD", "Desqualificado"],
+            ["—", "Não participou ou dado não informado"],
+          ].map(([code, name]) => (
             <div key={code}>
-              <dt>{code}</dt>
-              <dd>{label}</dd>
+              <dt
+                className={
+                  code === "5" || code === "GD" ? "discipline-label" : undefined
+                }
+              >
+                {code}
+              </dt>
+              <dd>{name}</dd>
             </div>
           ))}
         </dl>
-        <div className="legend-notes">
-          <p>
-            <strong>5F:</strong> exclusão por cinco faltas.{" "}
-            <strong>GD/D:</strong> desqualificação. <strong>—:</strong> não
-            participou ou dado sem cobertura.
-          </p>
-          <p>
-            Estatísticas individuais por quarto e faltas detalhadas por período,
-            horário e penalidade não constam na projeção publicada.
-          </p>
-        </div>
       </section>
       {selected && (
         <dialog
@@ -413,14 +526,31 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           aria-describedby="foul-player"
           onCancel={() => setSelected(null)}
           onClose={() => setSelected(null)}
+          onKeyDown={(e) => {
+            if (e.key !== "Tab") return;
+            const buttons = [
+                ...e.currentTarget.querySelectorAll<HTMLButtonElement>(
+                  "button:not([disabled])",
+                ),
+              ],
+              first = buttons[0],
+              last = buttons.at(-1);
+            if (e.shiftKey && document.activeElement === first) {
+              e.preventDefault();
+              last?.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+              e.preventDefault();
+              first?.focus();
+            }
+          }}
           onClick={(e) => {
             if (e.target !== e.currentTarget) return;
-            const box = e.currentTarget.getBoundingClientRect();
+            const b = e.currentTarget.getBoundingClientRect();
             if (
-              e.clientX < box.left ||
-              e.clientX > box.right ||
-              e.clientY < box.top ||
-              e.clientY > box.bottom
+              e.clientX < b.left ||
+              e.clientX > b.right ||
+              e.clientY < b.top ||
+              e.clientY > b.bottom
             )
               setSelected(null);
           }}
@@ -428,8 +558,9 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           <div className="dialog-header">
             <h2 id="public-foul-title">Faltas do atleta</h2>
             <button
-              className="close-dialog"
+              type="button"
               ref={closeButton}
+              className="close-dialog"
               onClick={() => setSelected(null)}
             >
               Fechar
@@ -438,7 +569,6 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
           <p
             id="foul-player"
             className="dialog-athlete"
-            title={selected.person.name}
             aria-label={publicPlayerAccessibleName(
               selected.person.name,
               selected.person.nickname,
@@ -447,36 +577,118 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
             {publicPlayerName(selected.person.name, selected.person.nickname)}
           </p>
           <p className="dialog-team">
-            {r.game[selected.side].name} · Camisa {selected.jersey}
-            {selected.captain ? " · Capitão" : ""}
+            {r.game[selected.side].name} · Camisa {selected.jersey} —{" "}
+            {periodName(period)}
           </p>
           <div className="foul-summary">
-            <span>Faltas</span>
-            <strong>{playerFouls(selected)}</strong>
+            <span>Faltas{period !== "all" ? " no período" : ""}</span>
+            <strong>{stat(selected.fouls)}</strong>
           </div>
-          {"technical" in selected && (
-            <dl className="foul-breakdown">
-              <div>
-                <dt>Técnicas (T)</dt>
-                <dd>{selected.technical}</dd>
+          {selected.fouls === null ? (
+            <p className="missing-note">
+              {selected.played === null
+                ? "Participação no período não informada."
+                : "Faltas não informadas."}
+            </p>
+          ) : foulEvents ? (
+            foulEvents.length ? (
+              <div className="foul-halves">
+                {[
+                  {
+                    name: "1º tempo",
+                    events: foulEvents.filter((e) => e.period <= 2),
+                  },
+                  {
+                    name: "2º tempo",
+                    events: foulEvents.filter(
+                      (e) => e.period > 2 && e.period <= 4,
+                    ),
+                  },
+                  {
+                    name: "Prorrogação",
+                    events: foulEvents.filter((e) => e.period > 4),
+                  },
+                ]
+                  .filter((g) => g.events.length)
+                  .map((g) => (
+                    <section
+                      key={g.name}
+                      className="foul-half"
+                      aria-label={g.name}
+                    >
+                      <h3>{g.name}</h3>
+                      <ol className="foul-codes">
+                        {g.events.map((e, i) => {
+                          const foul = parseFoul(e.code, e.jersey)!;
+                          const name = {
+                            P: "Falta pessoal",
+                            T: "Falta técnica",
+                            U: "Falta antidesportiva",
+                            D: "Falta desqualificante",
+                            B: "Falta de banco",
+                            C: "Falta do técnico",
+                          }[foul.kind];
+                          const penalty = foul.compensated
+                            ? "Penalidade compensada"
+                            : foul.freeThrows
+                              ? `${foul.freeThrows} ${foul.freeThrows === 1 ? "lance livre" : "lances livres"} de penalidade`
+                              : "Sem lances livres";
+                          return (
+                            <li
+                              key={i}
+                              className={
+                                e.period <= 4 && e.period % 2
+                                  ? "quarter-red"
+                                  : "quarter-blue"
+                              }
+                            >
+                              <GameHint
+                                className="event-tip"
+                                text={`${name} · ${penalty}`}
+                                aria-label={`${e.code} ${periodShort(e.period)}: ${name}. ${penalty}`}
+                              >
+                                {foul.kind}
+                                {foul.compensated ? (
+                                  <sub>C</sub>
+                                ) : foul.freeThrows ? (
+                                  <sub>{foul.freeThrows}</sub>
+                                ) : null}{" "}
+                                <small>{periodShort(e.period)}</small>
+                              </GameHint>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </section>
+                  ))}
               </div>
-              <div>
-                <dt>Antidesportivas (U)</dt>
-                <dd>{selected.unsportsmanlike}</dd>
-              </div>
-            </dl>
+            ) : (
+              <p className="missing-note">Nenhuma falta registrada.</p>
+            )
+          ) : (
+            <>
+              {selected.technical !== null && (
+                <dl className="foul-breakdown">
+                  <div>
+                    <dt>Técnicas (T)</dt>
+                    <dd>{selected.technical}</dd>
+                  </div>
+                  <div>
+                    <dt>Antidesportivas (U)</dt>
+                    <dd>{selected.unsportsmanlike}</dd>
+                  </div>
+                </dl>
+              )}
+              <p className="missing-note">
+                Detalhes por período não informados nesta publicação.
+              </p>
+            </>
           )}
-          {playerStatus(selected) && (
+          {disciplineName(selected) && (
             <p className="discipline-status alert">
-              {playerStatus(selected) === "5F"
-                ? "Excluído por cinco faltas"
-                : `Desqualificado (${playerStatus(selected)})`}
+              {disciplineName(selected)}
             </p>
           )}
-          <p className="missing-note">
-            Os eventos por período, os horários e os lances livres de penalidade
-            não estão disponíveis nesta publicação.
-          </p>
         </dialog>
       )}
     </article>

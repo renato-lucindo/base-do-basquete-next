@@ -79,8 +79,8 @@ it("selects at most twelve across the complete roster by numeric shirt, preservi
   c.sides.home.roster.reverse();
   const r = suggestPreparation(c).participants.filter((p) => p.side === "home");
   expect(r).toHaveLength(12);
-  expect(r.slice(0, 3).map((p) => p.jersey)).toEqual(["0", "00", "2"]);
-  expect(r.at(-1)?.jersey).toBe("11");
+  expect(r.slice(0, 3).map((p) => p.jersey)).toEqual(["0", "2", "3"]);
+  expect(r.at(-1)?.jersey).toBe("12");
 });
 it("reuses eligible identities, most recent jerseys and roles, not bench participation", () => {
   const c = context(13),

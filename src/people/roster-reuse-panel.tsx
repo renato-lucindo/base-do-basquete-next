@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import type { RegistrationSnapshot } from "../teams/contract";
@@ -372,7 +373,8 @@ export function RosterReusePanel(p: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {preview.rows
+                    {[...preview.rows]
+                      .sort((a, b) => compareJerseys(a.jersey, b.jersey))
                       .slice(page * SIZE, (page + 1) * SIZE)
                       .map((r) => (
                         <tr key={r.sourceEntryId}>

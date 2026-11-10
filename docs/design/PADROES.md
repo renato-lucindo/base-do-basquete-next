@@ -21,6 +21,8 @@ Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar alt
 
 ## Tabelas e ações
 
+- **Camisas — decisão de 10/11/2026:** ao ordenar camisas ou exibir múltiplas camisas de uma pessoa, usar **0, 1…99, 00**, com camisas não informadas depois. `00` é distinto de `0` e fica depois dos demais números; nunca normalizá-lo para zero. Reutilizar `src/domain/jersey.ts` no público/admin, incluindo elencos, preparação, súmula, associação de PDF, estatísticas e perfis. A paginação de elencos aplica a mesma regra antes do corte. Ordem cronológica de eventos e linhas importadas conservam a sequência de origem.
+
 - Identificação e nomes são prioritários; alinhamento, cabeçalhos, ordenação e filtros previsíveis. A rolagem horizontal, se necessária, deve ser interna à tabela; a página não pode transbordar.
 - Filtros, busca, colunas e ações ficam próximos dos dados. Quando houver muitas opções, usar combobox/autocomplete com pesquisa, estado vazio, seleção clara e teclado. Não exibir catálogo inteiro ao abrir por padrão.
 - Campos essenciais visíveis; recolher apenas os secundários quando houver benefício concreto. Rótulos persistentes e erros associados ao campo.

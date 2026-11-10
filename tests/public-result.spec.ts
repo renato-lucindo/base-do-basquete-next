@@ -111,11 +111,7 @@ test("Site projection keeps unavailable periods distinct from real zero stats", 
   await expect(
     page.getByText("Parciais indisponíveis na publicação."),
   ).toBeVisible();
-  await expect(
-    page.getByText(
-      /Estatísticas individuais por quarto e faltas detalhadas por período/u,
-    ),
-  ).toBeVisible();
+  await expect(page.locator(".period-filter button")).toHaveCount(1);
   await expect(
     page.getByRole("columnheader", { name: "MIN", exact: true }),
   ).toHaveCount(0);
