@@ -1,5 +1,7 @@
 import { expect, it } from "vitest";
 import { publishedSheet } from "../../tests/fixtures/published-game";
+import { publicationSheet, pubId } from "../../tests/fixtures/publication";
+import { withGameDetails } from "../../tests/fixtures/public-game-detail";
 import { gameRows, gameLeaders, gameTotals } from "./game-view";
 it("não transforma participação desconhecida em zero e não antecipa desqualificação", () => {
   const r = publishedSheet();
@@ -44,4 +46,20 @@ it("destaca todos os máximos positivos independentemente da titularidade e excl
   expect(gameLeaders(rows)).toMatchObject({ points: 6, three: 0, free: 0 });
   expect(gameTotals(r, "home", "all").points).toBe(2);
   expect(rows.at(-1)?.jersey).toBe("00");
+});
+it("preserva LL do legado sem exibir tentativas impossíveis no recorte", () => {
+  const sheet = publicationSheet();
+  sheet.events = [
+    { id: pubId(39001), side: "away", target: "0", period: 1, code: "P1" },
+    { id: pubId(39002), side: "home", target: "0", period: 4, code: "1" },
+  ];
+  const result = withGameDetails(sheet);
+  expect(gameTotals(result, "home", "all")).toMatchObject({
+    free: 1,
+    attempts: 1,
+  });
+  expect(gameTotals(result, "home", 4)).toMatchObject({
+    free: 1,
+    attempts: null,
+  });
 });

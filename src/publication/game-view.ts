@@ -85,7 +85,11 @@ export function gameTotals(result: PublicResult, side: Side, period: Period) {
     "origins" in result.facts &&
     result.facts.origins.scorePoints.kind === "sheet";
   const attempts = cut
-    ? cut.teams[side].freeTaken
+    ? // Legacy sheets validate LL awards at game level. A period with more
+      // made throws than recorded attempts cannot establish that denominator.
+      cut.teams[side].freeMade > cut.teams[side].freeTaken
+      ? null
+      : cut.teams[side].freeTaken
     : manualPdf
       ? null
       : "freeTaken" in team
