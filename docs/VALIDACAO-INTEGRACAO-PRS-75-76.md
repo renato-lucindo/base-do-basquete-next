@@ -4,7 +4,7 @@
 
 Integração sequencial autorizada pelo responsável: PR75 por merge commit, atualização explícita da PR76 com main, reconciliação da migration emergencial, gate e browsers completos antes do segundo merge. Sem deploy de Worker, DDL/DML remoto, seeds, publicação da semifinal, Auth, Access, segredos ou configurações de produção.
 
-PR75 revisada em `a47c58f7cfb0e4a05510630dc9917416c4003063`, base `903dc9c`: rotas/flag, comandos administrativos, concorrência/idempotência, projeções anônimas e regressões de privacidade. Sem bloqueio encontrado nos pontos revisados; revisão técnica deste agente, sem parecer independente adicional. CI [42840209632](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840209632) 7/7 SUCCESS. Integrada em `6445091e8b5d8f1c16f2b1567c02bfbc721722e4`; [CI da main](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42853798575) em execução ao compor este registro.
+PR75 revisada em `a47c58f7cfb0e4a05510630dc9917416c4003063`, base `903dc9c`: rotas/flag, comandos administrativos, concorrência/idempotência, projeções anônimas e regressões de privacidade. Sem bloqueio encontrado nos pontos revisados; revisão técnica deste agente, sem parecer independente adicional. CI [42840209632](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840209632) 7/7 SUCCESS. Integrada em `6445091e8b5d8f1c16f2b1567c02bfbc721722e4`; [CI da main](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42853798575) **7/7 SUCCESS**, conferida no SHA integrado.
 
 PR76 de origem `8e4868c3dcad8c1275186fa7e39175518a556b31`, com [CI anterior](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840273781) 7/7 SUCCESS. Esse PASS não valida a composição nova.
 
@@ -49,4 +49,12 @@ Checkout principal sync/trabalho-casa e suas alterações humanas em CONTRIBUTIN
 
 ## Gate e resultado
 
-Gate completo local e CI da composição pendentes. Chromium desktop/mobile completo, WebKit/macOS e design serão conferidos no HEAD combinado; nenhum merge da PR76 antes de todos os checks obrigatórios aprovarem. CI do SHA integrado também será conferida. Sem nova aceitação visual humana declarada nesta integração.
+Composição material **08afa92cc6e31437021082c0c62734a760865736**:
+
+- `npm run gate` local: **exit0**, 799 unitários/170 arquivos, 11 transporte, 15 banco isolado, 35 Worker/HTTP, um teste dos quatro PDFs no workerd; lint/formato/tipos/builds/fronteira/segredos PASS. Log local ignorado `.integration-gate.log`. Wrangler somente em dry-run, sem deploy.
+- [CI42854770370](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42854770370), workflow_dispatch no SHA exato: **7/7 SUCCESS**, todos os jobs incluindo validate.
+- Chromium: dois shards disjuntos de451testes, **451 +333 =784 PASS**, **118 SKIP**; união igual à coleção integral de902cenários em64arquivos. Nenhum skip ou timeout alterado nesta integração.
+- WebKit/macOS: **42 PASS** em5arquivos. Design PASS. CI também executou arquitetura, 141 regressões da skill e scanner de segredos.
+- Threads existentes das PRs conferidas: nenhuma aberta; achado anterior de permissão anônima resolvido e com regressão preservada. Revisão técnica deste agente, sem nova aceitação visual humana ou parecer independente declarado.
+
+O checkpoint posterior à composição é exclusivamente documental. Provas locais de código inalterado são reutilizadas; a CI obrigatória deve aprovar no HEAD documental antes do merge. A PR76 e seu merge commit registram o SHA resultante e a conferência da CI da main, sem criar um ciclo de commits apenas para inserir o próprio SHA no documento. Nenhum Worker, dado humano, migration remota ou configuração de produção alterado.

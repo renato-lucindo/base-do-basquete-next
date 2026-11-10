@@ -2,19 +2,22 @@
 
 Atualizado em 10/11/2026. Unidade: integração sequencial das PRs #75 e #76, autorizada expressamente pelo responsável, sem publicar nova versão do site.
 
-## Integração
+## Entrega e rastreabilidade
 
-- PR #75 integrada por merge commit `6445091e8b5d8f1c16f2b1567c02bfbc721722e4`, HEAD revisado `a47c58f7cfb0e4a05510630dc9917416c4003063`. [CI da PR](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840209632): 7/7 SUCCESS. CI do merge em conferência.
-- PR #76 em composição com essa main por merge explícito; origem `8e4868c3dcad8c1275186fa7e39175518a556b31`. Branch local `codex/integracao-pr75-pr76` acompanha a PR existente `codex/partida-publica`, sem nova PR. SHA material será registrado após o merge local.
-- Três conflitos tratados: checkpoint arquivado por origem, regras públicas preservando classificação e partida, painel PDF preservando ordenação de camisas e finalização flexível. Provider, tipos SQL e fixture Worker serão conferidos mesmo nos merges automáticos.
-- SQL original de `20261110133504_public_game_detail_draft_guard` recuperado de `supabase_migrations.schema_migrations` do DEV e incorporado sem reaplicação. Dependências: visibilidade da PR75 → detalhe `130218` → guard `133504` → filtro aninhado `145957` → compatibilidade `150011`.
+- [PR75](https://github.com/renato-lucindo/base-do-basquete-next/pull/75): merge commit **6445091e8b5d8f1c16f2b1567c02bfbc721722e4**, HEAD revisado a47c58f. [CI da PR42840209632](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840209632) e [CI da main42853798575](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42853798575): **7/7 SUCCESS** em ambas.
+- [PR76](https://github.com/renato-lucindo/base-do-basquete-next/pull/76): composição material **08afa92cc6e31437021082c0c62734a760865736**, originada de 8e4868c e atualizada por merge explícito da main da PR75. [CI completa42854770370](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42854770370): **7/7 SUCCESS**, incluindo gate, Chromium integral, WebKit e design. Sem bloqueios de código identificados na revisão técnica desta integração; sem parecer independente adicional.
+- Branch da PR existente: codex/partida-publica. Branch local de integração: codex/integracao-pr75-pr76, em worktree gerenciado isolado. Este checkpoint altera somente documentação sobre a composição já validada; gate local inalterado reutilizado. A CI obrigatória do HEAD documental e a CI do merge permanecem critérios de integração. O estado final e o SHA resultante são registrados na PR76 e no seu merge commit, consultáveis pelo link acima.
 
-## Provas e limites
+## Validação e migrations
 
-Gate completo e browsers da composição ainda pendentes; não integrar PR76 até aprovação integral. Evidências detalhadas serão consolidadas em [VALIDACAO-INTEGRACAO-PRS-75-76.md](VALIDACAO-INTEGRACAO-PRS-75-76.md).
+Gate local em 08afa92: **exit0**, 799 unitários/170 arquivos, 11 transporte, 15 banco isolado, 35 Worker/HTTP e um teste com os quatro PDFs no workerd; lint, formato, tipos, builds, fronteira cliente e segredos aprovados. CI da composição: **784 Chromium PASS +118 SKIP**, **42 WebKit PASS**, design e validate aprovados. Detalhes, comandos, limites e conflitos em [VALIDACAO-INTEGRACAO-PRS-75-76.md](VALIDACAO-INTEGRACAO-PRS-75-76.md).
 
-Leitura do DEV confirmou semifinal IVV/Cetaf × Saldanha da Gama em **draft v1**, jogo finished v4 e publicação histórica v1; `get_public_game` e `get_public_game_detail` anônimos retornam null; fonte pública contém 26 jogos/resultados sem ID privado. Nenhum DDL, DML, seed ou deploy executado nesta unidade. Auth, Access, segredos e configurações de produção preservados. Estado publicado não foi auditado; versões previamente registradas continuam apenas como evidência histórica.
+SQL original de **20261110133504_public_game_detail_draft_guard** recuperado de supabase_migrations.schema_migrations do DEV e incorporado sem reaplicação. Git e DEV têm as mesmas **73 versões**, sem duplicatas. Ordem: visibilidade da PR75 → detalhe130218 → guard133504 → filtro aninhado145957 → compatibilidade150011. SQL aplicado preservado; sequência reproduzida integralmente no PGlite.
 
-Checkout principal `sync/trabalho-casa` preservado, incluindo alteração humana em CONTRIBUTING.md, `.agents/skills/web-design-guidelines/` e `skills-lock.json`. Outros worktrees/branches não alterados. Históricos anteriores: [PR75](../historico/progresso/2026-11-10-antes-integracao-pr75.md) e [PR76](../historico/progresso/2026-11-10-antes-integracao-pr76.md).
+## Serviço e preservação
 
-Próximo passo: validar composição, publicar na mesma branch da PR76 sem force push, conferir CI do HEAD e do SHA integrado; nenhum deploy autorizado.
+DEV consultado somente para leitura: semifinal IVV/Cetaf × Saldanha da Gama permanece **draft v1**, jogo finished v4 e publicação histórica v1. As duas RPCs públicas negam a partida; fonte pública mantém26jogos/resultados sem ID privado. Hashes de súmula/snapshot registrados na validação. Nenhum DDL, DML, seed, repair ou deploy nesta unidade. Auth, Access, segredos e configurações de produção preservados. Versão publicada não auditada; o merge não publica o site e a flag flexível principal permanece false.
+
+Checkout principal sync/trabalho-casa preservado, incluindo alteração humana em CONTRIBUTING.md, .agents/skills/web-design-guidelines/ e skills-lock.json. Outros worktrees/branches não alterados. Históricos anteriores: [PR75](../historico/progresso/2026-11-10-antes-integracao-pr75.md) e [PR76](../historico/progresso/2026-11-10-antes-integracao-pr76.md).
+
+Nenhuma publicação de serviço ou de dados está autorizada por esta integração. Próxima liberação do site depende de solicitação própria do responsável; não republicar a semifinal.
