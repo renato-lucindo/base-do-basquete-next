@@ -299,18 +299,17 @@ it("legacy published standings keep remaining group results when a published sem
       ),
     ).toEqual([1, 1]);
     expect(JSON.stringify(filtered)).not.toContain(id(8));
-    const publicLegacy = (await query(
-      "public.get_live_competition_source($1)",
-      [id(3)],
-    )) as {
+    const publicLegacy = (await query("public.get_live_competition_source($1)", [
+      id(3),
+    ])) as {
       legacyDefinition: {
         groupPhases: { groups: { gameIds: string[] }[] }[];
         series: { games: { gameId: string }[] }[];
       };
     };
-    expect(publicLegacy.legacyDefinition.groupPhases[0].groups[0].gameIds).toEqual([
-      id(9),
-    ]);
+    expect(
+      publicLegacy.legacyDefinition.groupPhases[0].groups[0].gameIds,
+    ).toEqual([id(9)]);
     expect(publicLegacy.legacyDefinition.series[0].games).toEqual([]);
     expect(JSON.stringify(publicLegacy)).not.toContain(id(8));
     await auth();
@@ -333,10 +332,9 @@ it("legacy published standings keep remaining group results when a published sem
       },
     ]);
     await anon();
-    const customPublic = (await query(
-      "public.get_live_competition_source($1)",
-      [id(3)],
-    )) as {
+    const customPublic = (await query("public.get_live_competition_source($1)", [
+      id(3),
+    ])) as {
       configuration: {
         customDefinition: {
           groupPhases: { groups: { gameIds: string[] }[] }[];
@@ -352,14 +350,16 @@ it("legacy published standings keep remaining group results when a published sem
       [],
     );
     expect(JSON.stringify(customPublic)).not.toContain(id(8));
-    expect((await buildLivePublicStandings(customPublic)).games.map((g) => g.id)).toEqual([
-      id(9),
-    ]);
+    expect(
+      (await buildLivePublicStandings(customPublic)).games.map((g) => g.id),
+    ).toEqual([id(9)]);
     await auth();
     const administrative = await query<{
       document: { customDefinition: unknown };
     }>("public.get_competition_setup($1)", [id(3)]);
-    expect(JSON.stringify(administrative.document.customDefinition)).toContain(id(8));
+    expect(JSON.stringify(administrative.document.customDefinition)).toContain(
+      id(8),
+    );
     await query("public.save_game_visibility($1)", [
       {
         ...change,
