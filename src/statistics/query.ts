@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { publicPlayerHistoryName } from "../public-ui/player-name";
 import { rankSortedRows } from "./ranking";
 import {
@@ -48,7 +49,7 @@ function predominantJerseys(facts: ConfirmedPlayerFact[]) {
         [...jerseys]
           .filter(([, count]) => count === maximum)
           .map(([jersey]) => jersey)
-          .sort(),
+          .sort(compareJerseys),
       ];
     }),
   );

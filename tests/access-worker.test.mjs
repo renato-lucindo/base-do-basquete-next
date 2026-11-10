@@ -999,7 +999,7 @@ async function fixture(options = {}) {
                 : null,
             );
         }
-        if (url.pathname === "/rest/v1/rpc/get_public_game") {
+        if (url.pathname === "/rest/v1/rpc/get_public_game_detail") {
           assert.equal(request.headers.get("authorization"), null);
           assert.equal(request.headers.get("apikey"), "fixture-publishable");
           return Response.json(options.publicResult ?? null);
@@ -1698,7 +1698,7 @@ test("public result transport uses only the projection RPC without session cooki
     });
     assert.equal(r.status, 404);
     assert.equal(r.headers.get("set-cookie"), null);
-    assert.deepEqual(f.calls, ["/rest/v1/rpc/get_public_game"]);
+    assert.deepEqual(f.calls, ["/rest/v1/rpc/get_public_game_detail"]);
     assert.equal(
       (await f.mf.dispatchFetch(origin + path, { method: "POST", body: "{}" }))
         .status,

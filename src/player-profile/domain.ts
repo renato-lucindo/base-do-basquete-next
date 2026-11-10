@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { playerCareerSourceSchema } from "./career-source";
 import { profileQuerySchema } from "./query-contract";
 import {
@@ -146,7 +147,7 @@ export function buildPlayerProfile(
         names: distinct(rows.map((p) => p.fact.person.name)),
         teamNames: distinct(rows.map((p) => p.fact.registration.team.name)),
         registrationNames: distinct(rows.map((p) => p.fact.registration.name)),
-        jerseys: distinct(rows.map((p) => p.fact.jersey)),
+        jerseys: distinct(rows.map((p) => p.fact.jersey)).sort(compareJerseys),
         relatedGames: rows.length,
         playedGames: rows.filter((p) => p.fact.played).length,
         firstGameDate: dates[0] ?? null,

@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { periodColor, periodLabel } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
@@ -138,11 +139,7 @@ export function SheetLiveTables({
                 <tbody>
                   {p.players
                     .filter((r) => r.side === side)
-                    .sort(
-                      (a, b) =>
-                        Number(a.jersey) - Number(b.jersey) ||
-                        a.jersey.length - b.jersey.length,
-                    )
+                    .sort((a, b) => compareJerseys(a.jersey, b.jersey))
                     .map((r) => {
                       const identity = d.participants[r.rosterEntryId - 1],
                         playerName = name(identity.rosterEntryId),

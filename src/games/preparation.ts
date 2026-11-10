@@ -1,17 +1,10 @@
+import { compareJerseys } from "../domain/jersey";
 import { emptyPersistedSheet, type PersistedSheet } from "./sheet-contract";
 import type { PreparationContext } from "./preparation-contract";
 export const shirtOrder = (
   a: { jersey: string | null },
   b: { jersey: string | null },
-) =>
-  a.jersey === null
-    ? b.jersey === null
-      ? 0
-      : 1
-    : b.jersey === null
-      ? -1
-      : Number(a.jersey) - Number(b.jersey) ||
-        a.jersey.length - b.jersey.length;
+) => compareJerseys(a.jersey, b.jersey);
 /** Suggestion only. Never apply to an existing saved sheet. Missing/conflicting shirts stay visible for correction. */
 export function suggestPreparation(
   context: PreparationContext,

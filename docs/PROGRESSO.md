@@ -1,35 +1,23 @@
 # Progresso atual
 
-## Auditoria de rascunhos e compatibilidade — 10/11/2026
+Atualizado em 10/11/2026. Unidade: integração sequencial das PRs #75 e #76, autorizada expressamente pelo responsável, sem publicar nova versão do site.
 
-Na PR #75, o leitor público agora remove referências de jogos privados de `configuration.assignments`, `configuration.customDefinition` e `legacyDefinition`, incluindo `groupPhases[].groups[].gameIds` e `series[].games`. A configuração administrativa e os registros de partidas não são alterados. Teste de regressão em `src/games/visibility-database.test.ts` cobre fonte anônima legada/customizada, manutenção do cálculo público e histórico privado.
+## Entrega e rastreabilidade
 
-Migration imutável `20261110145957_public_nested_definition_visibility.sql` aplicada em `base-do-basquete-next-dev`. Consulta anônima após a aplicação: 26 jogos e resultados públicos, ID da semifinal ausente e detalhe privado bloqueado, inclusive após a migration independente `20261110150011_public_detail_visibility_compat` da PR #76. Advisors sem novas categorias. O jogo IVV/Cetaf × Saldanha continua `draft`, sem alteração de placar, súmula ou versões. A CI do código teve o gate completo aprovado antes de alinhar o nome da migration; conferir CI do HEAD atual antes do merge.
+- [PR75](https://github.com/renato-lucindo/base-do-basquete-next/pull/75): merge commit **6445091e8b5d8f1c16f2b1567c02bfbc721722e4**, HEAD revisado a47c58f. [CI da PR42840209632](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42840209632) e [CI da main42853798575](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42853798575): **7/7 SUCCESS** em ambas.
+- [PR76](https://github.com/renato-lucindo/base-do-basquete-next/pull/76): composição material **08afa92cc6e31437021082c0c62734a760865736**, originada de 8e4868c e atualizada por merge explícito da main da PR75. [CI completa42854770370](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42854770370): **7/7 SUCCESS**, incluindo gate, Chromium integral, WebKit e design. Sem bloqueios de código identificados na revisão técnica desta integração; sem parecer independente adicional.
+- Branch da PR existente: codex/partida-publica. Branch local de integração: codex/integracao-pr75-pr76, em worktree gerenciado isolado. Este checkpoint altera somente documentação sobre a composição já validada; gate local inalterado reutilizado. A CI obrigatória do HEAD documental e a CI do merge permanecem critérios de integração. O estado final e o SHA resultante são registrados na PR76 e no seu merge commit, consultáveis pelo link acima.
 
-A PR #76 continua independente e contém a correção complementar no leitor de detalhes. Não fazer merge de nenhuma PR sem aprovação específica; nenhum Worker principal/preview foi publicado nesta etapa.
+## Validação e migrations
 
----
+Gate local em 08afa92: **exit0**, 799 unitários/170 arquivos, 11 transporte, 15 banco isolado, 35 Worker/HTTP e um teste com os quatro PDFs no workerd; lint, formato, tipos, builds, fronteira cliente e segredos aprovados. CI da composição: **784 Chromium PASS +118 SKIP**, **42 WebKit PASS**, design e validate aprovados. Detalhes, comandos, limites e conflitos em [VALIDACAO-INTEGRACAO-PRS-75-76.md](VALIDACAO-INTEGRACAO-PRS-75-76.md).
 
-## PR75 — rascunhos privados e classificação pública — 10/11/2026
+SQL original de **20261110133504_public_game_detail_draft_guard** recuperado de supabase_migrations.schema_migrations do DEV e incorporado sem reaplicação. Git e DEV têm as mesmas **73 versões**, sem duplicatas. Ordem: visibilidade da PR75 → detalhe130218 → guard133504 → filtro aninhado145957 → compatibilidade150011. SQL aplicado preservado; sequência reproduzida integralmente no PGlite.
 
-Unidade `codex/campeonato-flexivel`, [PR #75](https://github.com/renato-lucindo/base-do-basquete-next/pull/75), **draft/sem merge**. A função de visibilidade `draft/published` tem auditoria e mantém súmulas/publicações históricas. Testes de código anteriores passaram em [CI #42673679723](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42673679723) (7/7, SHA `4a53e1f`); não inferir que PASS antigo valida commits posteriores.
+## Serviço e preservação
 
-### Incidente resolvido no leitor de classificação flexível
+DEV consultado somente para leitura: semifinal IVV/Cetaf × Saldanha da Gama permanece **draft v1**, jogo finished v4 e publicação histórica v1. As duas RPCs públicas negam a partida; fonte pública mantém26jogos/resultados sem ID privado. Hashes de súmula/snapshot registrados na validação. Nenhum DDL, DML, seed, repair ou deploy nesta unidade. Auth, Access, segredos e configurações de produção preservados. Versão publicada não auditada; o merge não publica o site e a flag flexível principal permanece false.
 
-Depois da conversão autorizada da semifinal em rascunho (09/11), a página pública da Copa ES Sub-15 passou a mostrar erro de classificação. Causa comprovada: `private.competition_setups.document.assignments` ainda referenciava o jogo privado como `unassigned`, enquanto `get_live_competition_source` enviava apenas jogos públicos. A validação de `buildCompetitionDefinition` rejeitava essa associação ausente, provocando erro na API.
+Checkout principal sync/trabalho-casa preservado, incluindo alteração humana em CONTRIBUTING.md, .agents/skills/web-design-guidelines/ e skills-lock.json. Outros worktrees/branches não alterados. Históricos anteriores: [PR75](../historico/progresso/2026-11-10-antes-integracao-pr75.md) e [PR76](../historico/progresso/2026-11-10-antes-integracao-pr76.md).
 
-Correção na mesma PR:
-
-- `src/regulation/setup-provider.ts`: a projeção pública descarta associações sem ID no catálogo público, sem modificar a configuração administrativa.
-- Migration de leitura **`20261110115128_public_competition_draft_assignments.sql`**: `public.get_live_competition_source` remove previamente de `configuration.assignments` qualquer referência a jogo fora dos `games` públicos, sem exibir o ID privado no payload. Nenhuma DML; privilégios e RLS preservados.
-- `src/regulation/setup-database.test.ts`: teste PGlite publica dois jogos, coloca um em draft, valida tabela e placar do outro jogo, ausência de ID privado na fonte pública e preservação da configuração no admin. Também testa compatibilidade do cliente com resposta antiga contendo associação privada.
-
-O job **checks** da [CI #42810041580](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42810041580) (SHA `45d7a0ad`) concluiu **SUCCESS** com gate completo e o teste de banco; design e WebKit também passaram, Chromium ainda estava executando na última consulta. A renomeação do arquivo da migration e este checkpoint geram novos SHAs; conferir CI do HEAD atual antes de integrar. Não há mudança de bundle publicada desde a versão descrita abaixo.
-
-### Serviço, dados e verificações
-
-- Supabase DEV: `base-do-basquete-next-dev` / `nizmasjddyrhmevvfviz`. Migrations aplicadas: `20261109163216_game_draft_visibility`, `20261109181057_legacy_standings_visibility` e agora `20261110115128_public_competition_draft_assignments` (**SUCCESS**, nome do SQL alinhado ao histórico remoto). Verificação anônima depois da última migration: **26 jogos/26 resultados**, `configuration.assignments=[]`, ID da semifinal ausente do payload, `get_public_game` retorna `null`. Segurança: advisors sem novas categorias.
-- Semifinal real Copa ES Sub-15 masculino: disputa `b5433b13-a8f9-4baa-b4d9-08066ebf3e96`, game `62d99b70-21c9-495f-b0d7-44c0f53b4380`, IVV/Cetaf **88×35** Saldanha. Alteração administrativa autorizada em 09/11 20:28:47 UTC, command `df6c522a-e59f-40c7-9057-7664b857e2b9`. Permanece **draft v1**, jogo `finished` v4, publicação histórica v1, placar e súmula preservados. A configuração admin ainda contém `unassigned` deste game: não foi sobrescrita.
-- Cloudflare: preview isolado `base-do-basquete-next-pr75` protegido por Access, deploy existente `c194c9db-3b70-4b37-be2b-1a6e78470727` (fonte `f8598a9`). O SQL corrigido é lido imediatamente pelo preview sem rebuild; contudo **nenhum smoke de interface autenticado foi realizado** após esta migration. Workers principal e UIUX não foram publicados.
-
-**Próximo passo:** confirmar CI do novo HEAD, testar visualmente a página pública da classificação no preview com Access e registrar evidência. Não republicar a semifinal, não fazer merge/deploy de Workers/produção sem autorização separada.
+Nenhuma publicação de serviço ou de dados está autorizada por esta integração. Próxima liberação do site depende de solicitação própria do responsável; não republicar a semifinal.

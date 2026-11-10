@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { z } from "zod";
 import { teamRows, validatedTeamSource } from "./domain";
 import { teamDetailQuerySchema } from "./detail-query";
@@ -113,7 +114,9 @@ export function buildTeamDetail(
         personId,
         names: distinct(appearances.map((f) => f.person.name)),
         nicknames: distinct(appearances.map((f) => f.person.nickname)),
-        jerseys: distinct(appearances.map((f) => f.jersey)),
+        jerseys: distinct(appearances.map((f) => f.jersey)).sort(
+          compareJerseys,
+        ),
         relatedGames: appearances.length,
         playedGames: appearances.filter((f) => f.played).length,
         statistics:
@@ -125,9 +128,7 @@ export function buildTeamDetail(
     })
     .sort(
       (a, b) =>
-        Math.min(...a.jerseys.map(Number)) -
-          Math.min(...b.jerseys.map(Number)) ||
-        a.jerseys.join("/").length - b.jerseys.join("/").length ||
+        compareJerseys(a.jerseys[0] ?? null, b.jerseys[0] ?? null) ||
         a.names.join("/").localeCompare(b.names.join("/"), "pt-BR") ||
         a.personId.localeCompare(b.personId),
     );

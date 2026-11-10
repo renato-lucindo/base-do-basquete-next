@@ -1,3 +1,4 @@
+import { compareJerseys } from "../domain/jersey";
 import { publicPlayerName } from "../public-ui/player-name";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
@@ -595,11 +596,24 @@ export function PlayerPublicPage() {
     filtered.map((g) => [g.key, careerStatistics(g.games, id!, view.mode)]),
   );
   const ordered = [...filtered].sort((a, b) => {
+    if (view.sort === "jersey") {
+      const left = a.history.jerseys[0] ?? null,
+        right = b.history.jerseys[0] ?? null;
+      if (left === "00" || right === "00")
+        return left === right
+          ? a.key.localeCompare(b.key)
+          : left === "00"
+            ? 1
+            : -1;
+      return (
+        (view.direction === "asc" ? 1 : -1) * compareJerseys(left, right) ||
+        a.key.localeCompare(b.key)
+      );
+    }
     const value = (g: typeof a): string | number | null => {
       if (view.sort === "competition")
         return `${g.history.context.name} ${g.history.context.year} ${g.history.context.category}`;
       if (view.sort === "team") return g.history.registration.name;
-      if (view.sort === "jersey") return g.history.jerseys.join(" / ");
       if (view.sort === "games")
         return g.games.filter((p) => p.fact.played).length;
       if (view.sort === "year") return g.history.context.year;

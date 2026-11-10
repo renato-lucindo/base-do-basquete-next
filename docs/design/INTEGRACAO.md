@@ -11,11 +11,11 @@ Use os componentes, navegação e tokens existentes na aplicação ao implementa
 ## Súmula
 
 - Contexto compacto: fase quando existir, senão número normalizado do jogo, data/hora e local. O fixture usa 024 e a UI mostra 24.
-- Equipes nas linhas, períodos nas colunas, incluindo prorrogações e Total. Pontos são principais; marcadores de faltas coletivas têm menor hierarquia. A contagem coletiva é própria, não soma indiscriminada de tipos disciplinares.
+- Equipes nas linhas, períodos nas colunas, incluindo prorrogações e Total. Pela decisão de10/11/2026, mostrar somente pontos nas parciais.
 - Elencos por camisa, preservando 0/00. Cinco titulares com nome em negrito e asterisco; capitão independente, inclusive reserva. Participação define números versus travessões; quem participou e zerou mantém 0.
 - Colunas Nº, Atleta, PTS, 2P, 3P, LL e F. 2P/3P/LL são convertidos. PTS = 2×2P + 3×3P + LL. Total de LL da equipe inclui convertidos/tentados e percentual; zero tentativas tem percentual —.
 - Recorte de jogo todo, quartos e prorrogação sincroniza os dois elencos. Não altera o placar final. Atleta sem participação no recorte mantém —; ausência de cobertura não vira zero.
-- F mostra somente o total clicável, com toda a célula como alvo. No detalhe, eventos explícitos têm tipo P/T/U/D, período, LL da penalidade e compensação quando conhecida. Não inventar cronologia.
+- F mostra o total clicável e GD junto ao número quando houver desqualificação, com toda a célula como alvo. No detalhe, eventos explícitos têm tipo P/T/U/D, período, LL da penalidade e compensação quando conhecida. Não inventar cronologia.
 - Vermelho nos períodos ímpares, azul nos pares/prorrogação, com código textual do período. Contornos separam primeiro tempo, segundo tempo e prorrogação. Cor não é a única identificação.
 - Exclusão por cinco faltas e desqualificação têm fonte vermelha e negrita; CAP sem balão, à direita. Ausência de exclusão não ganha mensagem.
 - Comissão técnica abaixo de cada equipe; equipes lado a lado quando couberem, empilhadas no celular.

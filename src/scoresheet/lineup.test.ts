@@ -10,8 +10,8 @@ it("ordena camisas numericamente e distingue 0 de 00 sem alterar o documento", (
     .map((slot, index) => ({ ...slot, jersey: ["12", "00", "0"][index] }));
   expect(orderedRoster(roster).map((slot) => slot.jersey)).toEqual([
     "0",
-    "00",
     "12",
+    "00",
   ]);
   expect(roster.map((slot) => slot.jersey)).toEqual(["12", "00", "0"]);
 });

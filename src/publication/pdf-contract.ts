@@ -1,3 +1,4 @@
+import { gameDetailMatches } from "./game-detail-contract";
 import { z } from "zod";
 import { pdfSupplementSchema } from "./pdf-selection";
 import { pdfAuthoritySchema } from "./pdf-authority";
@@ -173,6 +174,7 @@ export const publicPdfGameSchema = z
         g.facts.players.length
     )
       fail();
+    if (!gameDetailMatches(g)) fail();
     for (const v of Object.values(o))
       if (v?.kind === "pdf" && v.version !== g.source.version) fail();
     for (const k of [

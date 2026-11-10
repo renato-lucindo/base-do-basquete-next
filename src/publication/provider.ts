@@ -41,7 +41,7 @@ type Functions = Database["public"]["Functions"];
 type Rpc =
   | "get_game_publication_state"
   | "get_game_publication_version"
-  | "get_public_game"
+  | "get_public_game_detail"
   | "get_pdf_publication_preparation"
   | "save_pdf_publication_preparation"
   | "finalize_sheet_game"
@@ -192,9 +192,13 @@ export class SupabasePublications {
 
   async getPublic(gameId: string) {
     if (!z.uuid().safeParse(gameId).success) throw badInput();
-    const r = await this.rpc(publicResultSchema.nullable(), "get_public_game", {
-      p_id: gameId,
-    });
+    const r = await this.rpc(
+      publicResultSchema.nullable(),
+      "get_public_game_detail",
+      {
+        p_id: gameId,
+      },
+    );
     if (r && r.id !== gameId) throw unavailable();
     return r;
   }
@@ -291,7 +295,7 @@ export class SupabasePublications {
       const body = await providerJson(response, 1048576);
       if (
         body === null &&
-        name !== "get_public_game" &&
+        name !== "get_public_game_detail" &&
         name !== "get_pdf_publication_preparation"
       )
         throw new HttpError(
@@ -318,7 +322,7 @@ export class SupabasePublications {
       throw new HttpError(409, "version_conflict", messages.version_conflict);
     }
     await response.body?.cancel().catch(() => undefined);
-    if (name === "get_public_game") throw unavailable();
+    if (name === "get_public_game_detail") throw unavailable();
     if (response.status === 401) throw invalidSession();
     if (response.status === 403) throw forbidden();
     throw unavailable();

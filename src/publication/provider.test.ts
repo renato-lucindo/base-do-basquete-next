@@ -113,7 +113,7 @@ it("fixes administrative RPCs and sends no user token for the public-only reader
   expect(headers.apikey).toBe(config.key);
   expect(headers).not.toHaveProperty("Authorization");
   expect(send.mock.calls.at(-1)![0]).toBe(
-    config.url + "/rest/v1/rpc/get_public_game",
+    config.url + "/rest/v1/rpc/get_public_game_detail",
   );
   await expect(db.getVersion("fixture-jwt", gameId, 1)).rejects.toMatchObject({
     status: 404,

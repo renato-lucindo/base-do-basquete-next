@@ -1,3 +1,4 @@
+import { gameDetailSchema, gameDetailMatches } from "./game-detail-contract";
 import { z } from "zod";
 import { persistedSheetSchema } from "../games/sheet-contract";
 const reviewedCount = z.number().int().min(0).max(2147483647).nullable();
@@ -117,6 +118,7 @@ const staff = z
   .strict();
 export const publicGameSchema = z
   .object({
+    details: gameDetailSchema.nullable().optional(),
     id: z.uuid(),
     disputeId: z.uuid(),
     version,
@@ -178,6 +180,7 @@ export const publicGameSchema = z
         g.facts.players.length
     )
       fail();
+    if (!gameDetailMatches(g)) fail();
     for (const side of ["home", "away"] as const) {
       const rows = g.facts.players.filter((p) => p.side === side),
         t = g.facts.teams[side],
