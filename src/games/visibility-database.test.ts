@@ -4,6 +4,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { platform } from "../../tests/fixtures/database-platform";
 import { publicStandingsSourceSchema } from "../regulation/public-contract";
 import { buildPublicStandings } from "../regulation/public";
+import { buildLivePublicStandings } from "../regulation/setup-provider";
 import {
   gameVisibilityResultSchema,
   gameVisibilityStateSchema,
