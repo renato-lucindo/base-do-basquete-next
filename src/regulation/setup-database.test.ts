@@ -277,3 +277,102 @@ it("a legacy group assignment cannot prevent manual scheduling in the flexible w
     );
   }
 });
+
+it("keeps public flexible standings when a private game remains assigned in the admin setup", async () => {
+  const db = await database();
+  try {
+    const before = competitionSetupStateSchema.parse(
+      await json(db, "public.get_competition_setup($1)", [id(3)]),
+    );
+    const document = {
+      ...defaultCompetitionSetup(),
+      knockoutSize: 0 as const,
+      directPerGroup: 0,
+      assignments: [{ gameId: id(8), kind: "unassigned" as const }],
+    };
+    await json(db, "public.save_competition_setup($1)", [
+      {
+        commandId: id(9900),
+        disputeId: id(3),
+        expectedVersion: 0,
+        expectedContextFingerprint: before.contextFingerprint,
+        document,
+      },
+    ]);
+    const command = (await json(db, "pg_temp.pu_command()")) as Record<
+      string,
+      unknown
+    >;
+    await json(db, "public.finalize_sheet_game($1)", [command]);
+    await json(db, "public.finalize_sheet_game($1)", [
+      { ...command, requestId: id(9901), gameId: id(9) },
+    ]);
+    const visibility = (await json(
+      db,
+      "public.get_game_visibility($1)",
+      [id(8)],
+    )) as {
+      version: number;
+      gameVersion: number;
+      publicationVersion: number;
+    };
+    await json(db, "public.save_game_visibility($1)", [
+      {
+        commandId: id(9902),
+        gameId: id(8),
+        expectedVersion: visibility.version,
+        expectedGameVersion: visibility.gameVersion,
+        expectedPublicationVersion: visibility.publicationVersion,
+        visibility: "draft",
+        reason: "Semifinal antecipada; manter privada até confirmação dos classificados",
+      },
+    ]);
+    await db.exec("set local role anon");
+    const source = (await json(
+      db,
+      "public.get_live_competition_source($1)",
+      [id(3)],
+    )) as {
+      configuration: { assignments: { gameId: string; kind: string }[] };
+      games: { id: string }[];
+      publishedGames: { gameId: string }[];
+    };
+    expect(source.configuration.assignments).toEqual([]);
+    expect(source.games.map((game) => game.id)).toEqual([id(9)]);
+    expect(source.publishedGames.map((game) => game.gameId)).toEqual([id(9)]);
+    const standings = await buildLivePublicStandings(source);
+    expect(standings.games).toHaveLength(1);
+    expect(standings.games[0]).toMatchObject({
+      id: id(9),
+      state: "played",
+      score: { homePoints: 2, awayPoints: 0 },
+    });
+    expect(
+      standings.projection.groupPhases[0].groups[0].standings.rows.map(
+        (row) => row.games,
+      ),
+    ).toEqual([1, 1]);
+    expect(JSON.stringify(standings)).not.toContain(id(8));
+    // Defensive client behavior with older RPCs that still expose an assignment.
+    expect(
+      (await buildLivePublicStandings({
+        ...source,
+        configuration: {
+          ...source.configuration,
+          assignments: document.assignments,
+        },
+      })).games,
+    ).toEqual(standings.games);
+    await db.exec(
+      `set local role authenticated;set local request.jwt.claim.sub='${id(98)}'`,
+    );
+    const admin = competitionSetupStateSchema.parse(
+      await json(db, "public.get_competition_setup($1)", [id(3)]),
+    );
+    expect(admin.document?.assignments).toEqual(document.assignments);
+  } finally {
+    await db.exec(
+      "rollback to savepoint setup_case;release savepoint setup_case",
+    );
+  }
+}, 20000);
