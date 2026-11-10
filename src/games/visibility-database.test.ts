@@ -299,9 +299,10 @@ it("legacy published standings keep remaining group results when a published sem
       ),
     ).toEqual([1, 1]);
     expect(JSON.stringify(filtered)).not.toContain(id(8));
-    const publicLegacy = (await query("public.get_live_competition_source($1)", [
-      id(3),
-    ])) as {
+    const publicLegacy = (await query(
+      "public.get_live_competition_source($1)",
+      [id(3)],
+    )) as {
       legacyDefinition: {
         groupPhases: { groups: { gameIds: string[] }[] }[];
         series: { games: { gameId: string }[] }[];
@@ -332,9 +333,10 @@ it("legacy published standings keep remaining group results when a published sem
       },
     ]);
     await anon();
-    const customPublic = (await query("public.get_live_competition_source($1)", [
-      id(3),
-    ])) as {
+    const customPublic = (await query(
+      "public.get_live_competition_source($1)",
+      [id(3)],
+    )) as {
       configuration: {
         customDefinition: {
           groupPhases: { groups: { gameIds: string[] }[] }[];
