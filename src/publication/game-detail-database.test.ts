@@ -167,8 +167,76 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
     expect(JSON.stringify(result.details)).not.toMatch(
       /rosterEntryId|published_by|reason|actorId|document/u,
     );
-    // The detail RPC must work on main without draft controls, then fail
-    // closed when the independent PR75 visibility schema becomes available.
+    // Exercise the real PR75 controls after all migrations, including the
+    // recovered emergency guard, have been replayed in chronological order.
+    await db.exec(
+      "set local role authenticated;set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098'",
+    );
+    const visibility = (
+      await db.query<{
+        value: {
+          version: number;
+          gameVersion: number;
+          publicationVersion: number;
+        };
+      }>("select public.get_game_visibility($1) value", [row.id])
+    ).rows[0].value;
+    const change = {
+      commandId: pubId(39500),
+      gameId: row.id,
+      expectedVersion: visibility.version,
+      expectedGameVersion: visibility.gameVersion,
+      expectedPublicationVersion: visibility.publicationVersion,
+      visibility: "draft",
+      reason: "Integração: preservar o detalhe privado",
+    };
+    await db.query("select public.save_game_visibility($1)", [change]);
+    await db.exec("set local role anon");
+    expect(await read()).toBeNull();
+    expect(
+      (
+        await db.query<{ value: unknown }>(
+          "select public.get_public_game($1) value",
+          [row.id],
+        )
+      ).rows[0].value,
+    ).toBeNull();
+    await db.exec("reset role");
+    expect(
+      JSON.stringify(
+        (
+          await db.query<{ value: unknown }>(
+            "select private.get_public_game_detail($1) value",
+            [row.id],
+          )
+        ).rows[0].value,
+      ),
+    ).toBe(before);
+    await db.exec(
+      "set local role authenticated;set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098'",
+    );
+    await db.query("select public.save_game_visibility($1)", [
+      {
+        ...change,
+        commandId: pubId(39501),
+        expectedVersion: visibility.version + 1,
+        visibility: "published",
+        reason: "Integração: conferir restauração no banco isolado",
+      },
+    ]);
+    await db.exec("set local role anon");
+    expect(publicGameSchema.parse(await read())).toEqual(result);
+
+    // Model installations without PR75 and a partially installed visibility
+    // feature only inside this disposable database. Preserve the original
+    // objects and their ACLs under temporary names; the transaction rolls back.
+    await db.exec("reset role");
+    await db.exec(`
+      alter table private.game_visibility_heads rename to integration_visibility_heads;
+      alter function private.game_is_public(uuid) rename to integration_game_is_public;
+    `);
+    await db.exec("set local role anon");
+    expect(publicGameSchema.parse(await read())).toEqual(result);
     await db.exec("reset role");
     await db.exec(`
       create table private.game_visibility_heads (

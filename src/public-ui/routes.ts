@@ -51,6 +51,7 @@ export async function publicCatalogRoute(request: Request, env: Env, url: URL) {
   const provider = new PublicCatalog({
     url: env.SUPABASE_URL,
     key: env.SUPABASE_PUBLISHABLE_KEY,
+    flexible: env.FLEXIBLE_COMPETITION === "true",
   });
   if (search) {
     const q = url.searchParams.get("q")?.trim() ?? "";

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
+import { finalizeSheetSchema, finalizePdfSchema } from "./finalization";
 import { publishSheetSchema } from "./contract";
 import { reviseTeamStatisticsSchema } from "./team-statistics-contract";
 import { confirmGameStagesSchema } from "./stages-contract";
@@ -90,6 +91,31 @@ export async function publicationRoute(request: Request, env: Env, url: URL) {
     );
     if (command.gameId !== id.data) throw badInput();
     const r = await session.reviseTeamStatistics(command);
+    if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+    return jsonResponse(r.value);
+  }
+  if (
+    (tail === "/finalize-sheet" || tail === "/finalize-pdf") &&
+    request.method === "POST"
+  ) {
+    if (env.FLEXIBLE_COMPETITION !== "true")
+      throw new HttpError(404, "not_found", "Página não encontrada.");
+    if (tail === "/finalize-sheet") {
+      const command = await readMutationJson(request, finalizeSheetSchema, {
+        origin: env.APP_ORIGIN,
+        maxBytes: 524288,
+      });
+      if (command.gameId !== id.data) throw badInput();
+      const r = await session.finalizeSheet(command);
+      if (!r.ok) throw new HttpError(r.status, r.code, r.message);
+      return jsonResponse(r.value);
+    }
+    const command = await readMutationJson(request, finalizePdfSchema, {
+      origin: env.APP_ORIGIN,
+      maxBytes: 65536,
+    });
+    if (command.gameId !== id.data) throw badInput();
+    const r = await session.finalizePdf(command);
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }

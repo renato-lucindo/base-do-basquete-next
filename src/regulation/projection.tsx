@@ -19,10 +19,6 @@ export function RegulationProjection({
   return (
     <section className="reg-projection">
       <h3>{title}</h3>
-      <p>
-        Classificação provisória. Empates e pendências não confirmam
-        classificados ou colocações.
-      </p>
       {value.groupPhases.map((p) => (
         <section key={p.phaseId}>
           <h4>

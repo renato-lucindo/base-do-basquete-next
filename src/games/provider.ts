@@ -21,6 +21,11 @@ import {
   validatePersistedSheet,
   type SaveSheet,
 } from "./sheet-contract";
+import {
+  gameVisibilityStateSchema,
+  gameVisibilityResultSchema,
+  type SaveGameVisibility,
+} from "./visibility-contract";
 type Functions = Database["public"]["Functions"];
 export class SupabaseGames {
   constructor(
@@ -125,7 +130,7 @@ export class SupabaseGames {
     }
     return r;
   }
-  async saveSheet(token: string, input: SaveSheet) {
+  async saveSheet(token: string, input: SaveSheet, automatic = false) {
     const parsed = saveSheetSchema.safeParse(input);
     if (!parsed.success)
       throw new HttpError(400, "invalid_input", "Dados inválidos da súmula.");
@@ -141,7 +146,7 @@ export class SupabaseGames {
     }
     const r = await this.checked(
       sheetSaveResultSchema,
-      "save_game_sheet",
+      automatic ? "save_flexible_game_sheet" : "save_game_sheet",
       { p_command: command },
       token,
     );
@@ -152,6 +157,68 @@ export class SupabaseGames {
       throw unavailable();
     return r;
   }
+  getVisibility(token: string, gameId: string) {
+    return this.visibilityRpc(
+      "get_game_visibility",
+      { p_game_id: gameId },
+      gameVisibilityStateSchema,
+      token,
+    );
+  }
+  saveVisibility(token: string, command: SaveGameVisibility) {
+    return this.visibilityRpc(
+      "save_game_visibility",
+      { p_command: command },
+      gameVisibilityResultSchema,
+      token,
+    );
+  }
+  private async visibilityRpc<T>(
+    name: "get_game_visibility" | "save_game_visibility",
+    args: object,
+    schema: z.ZodType<T>,
+    token: string,
+  ): Promise<T> {
+    let response: Response;
+    try {
+      response = await this.send(`${this.config.url}/rest/v1/rpc/${name}`, {
+        method: "POST",
+        headers: {
+          apikey: this.config.key,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(args),
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch {
+      throw unavailable();
+    }
+    if (!response.ok) {
+      await response.body?.cancel().catch(() => undefined);
+      if (response.status === 401) throw invalidSession();
+      if (response.status === 403) throw forbidden();
+      if (response.status === 404)
+        throw new HttpError(404, "game_not_found", "Jogo não encontrado.");
+      if (response.status === 409)
+        throw new HttpError(
+          409,
+          "visibility_conflict",
+          "O jogo ou o resultado mudou. Recarregue antes de continuar.",
+        );
+      if (response.status === 400)
+        throw new HttpError(
+          400,
+          "invalid_visibility",
+          "Confira o estado de publicação e o motivo da alteração.",
+        );
+      throw unavailable();
+    }
+    const parsed = schema.safeParse(await providerJson(response, 1048576));
+    if (!parsed.success) throw unavailable();
+    return parsed.data;
+  }
+
   private async checked<T, N extends keyof Functions>(
     schema: z.ZodType<T>,
     name: N,

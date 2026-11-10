@@ -1043,6 +1043,20 @@ export type Database = {
       };
       prepare_pdf_source: { Args: { p_command: Json }; Returns: Json };
       prepare_text_target: { Args: { p_command: Json }; Returns: Json };
+      get_competition_setup: { Args: { p_dispute_id: string }; Returns: Json };
+      save_competition_setup: { Args: { p_command: Json }; Returns: Json };
+      get_live_competition_source: {
+        Args: { p_dispute_id: string };
+        Returns: Json;
+      };
+      list_live_competition_disputes: {
+        Args: { p_dispute_id?: string };
+        Returns: Json;
+      };
+      finalize_sheet_game: { Args: { p_command: Json }; Returns: Json };
+      finalize_pdf_game: { Args: { p_command: Json }; Returns: Json };
+      save_flexible_game_editor: { Args: { p_command: Json }; Returns: Json };
+      save_flexible_game_sheet: { Args: { p_command: Json }; Returns: Json };
       publish_pdf_game: { Args: { p_command: Json }; Returns: Json };
       publish_sheet_game: { Args: { p_command: Json }; Returns: Json };
       revise_sheet_team_statistics: {

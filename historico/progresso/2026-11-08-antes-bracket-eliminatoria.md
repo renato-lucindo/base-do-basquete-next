@@ -1,0 +1,23 @@
+# Progresso atual
+
+## Classificação simplificada — preview atualizado em08/11/2026
+
+Unidade **codex/campeonato-flexivel**, base903dc9cb2ab17db8fd892bf9eea3593e906ab34a, worktree `C:/Users/12405304716/.codex/worktrees/classificacao-ultimos-cinco/Base do Basquete-v1`. [PR75](https://github.com/renato-lucindo/base-do-basquete-next/pull/75) **aberta/draft, aguardando validação humana**; não mesclar/fechar antes do aceite. Produto51ec8ee, fonte publicada **b3908fbef221032de5b7c804056d0fbc82c7d17d**. [CI42515060673](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42515060673) SUCCESS em todos os jobs, incluindo validate em08/11 às19:38:46UTC. Sem revisões/comentários na consulta anterior ao release. Alterações posteriores deste checkpoint são exclusivamente documentais; não mudar a proveniência do pacote nem atribuir CI antiga a outro SHA.
+
+**[Classificação para validar](https://base-do-basquete-next-pr75.renato-lucindo-jr.workers.dev/publico.html#b5433b13-a8f9-4baa-b4d9-08066ebf3e96?secao=classificacao)**. Worker exclusivo `base-do-basquete-next-pr75`, versão ativa **b6161cb7-a16f-4f6c-978e-4d3f3d608f06**,100% do tráfego, deployment8d28edc0-7c7f-4f9b-a11d-c4e4497bea8c. Builds e pacote novos após CI, versions upload e deploy explícitos. [Provas da apresentação e release](evidencias/2026-11-08-classificacao-apresentacao.md#preview-atualizado), [plano](PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026).
+
+Implementado: sem avisos genéricos fixos, cabeçalhos completos sem tooltip/ajuda, abreviações com significado curto, legenda no padrão existente, **Últimos jogos** centralizado e tooltip `LUSB 56 x 66 IVV/Cetaf - 20/09`, sigla ou nome publicado. Ausência/zero e descrição acessível completa separados. FIBA/grupos/vagas extras/séries e finalização automática já entregues nesta mesma unidade. Sem alteração em cálculos, contratos ou banco nesta etapa de apresentação. Documentação consolidada antes de alterar a tela; conferência obrigatória de UI em docs/design e regra de checagem de CI em CONTRIBUTING.
+
+**Provas:** gate local exit0 (775testes/163arquivos,15contratos SQL,35Worker,11transportes, runtime PDF e checks),28browsers desktop/mobile PASS, capturas1366/1920/390/320CSSpx,1366desktop/390mobile inspecionadas e axe dos cenários sem violações. Smoke remoto08/11 às19:48:21UTC:35assets200/hash/fonte b3908fb, metadado true,26jogos públicos sem motivos privados e4endpoints privados401. Token/política temporários revogados em sequência; consulta final zero tokens temporários, só owner-only; anônimo/admin302 ao Access. Revisão do autor, sem parecer independente; não declarar aceite humano ou escrita autenticada remota realizados.
+
+## Proteções e próximo passo
+
+Configurações/deployments de principal e UIUX comparados com baseline: iguais. Bindings do preview preservados: SESSIONS3552464a1346403ab7132137b7b39e6d, rate limit751107202611, origem exata/featuretrue e os dois segredos existentes, sem gerar/rotacionar. Access app e0700da3-fde2-4f2f-b833-81e3c9abcf1b, política owner-only7de2233d-9114-46f0-bcf6-58ed641fec30, sessão8h; URLs alternativas desabilitadas. Nenhum deploy no principal/UIUX.
+
+Banco dev **compartilhado** nizmasjddyrhmevvfviz; escritas humanas no preview persistem. Migration20261107213937 aplicada/imutável: **não reaplicar/editar SQL**. Sem DML remoto de teste, seed Auth/admin ou publicação de dados reais para teste. Próximo passo de produto: responsável validar no preview; manter a mesma PR para eventuais ajustes. Após aceite, conferir autorização e CI reais antes de integrar; esta entrega não autoriza merge.
+
+Automação `retomar-regulamento-fiba`, “Checar CI e preview PR75”, acompanha somente a CI do checkpoint documental após o push, sem outro deploy/rebuild. Conferir HEAD real, silenciar se pendente/inalterado; se SUCCESS, **pausar e não emitir outro aviso**, pois o preview já foi entregue. Em falha documental, corrigir sem tocar no produto e manter a checagem. Não executar novamente o roteiro antigo de release. Ao restar somente aceite humano, manter pausada. Cota na retomada21%usado5h/85%semanal, sem créditos/resets.
+
+## Preservação
+
+Worktree limpo antes do release; nenhum trabalho alheio alterado. Checkout principal, CONTRIBUTING humano, skills/skills-lock e branches anteriores preservados. [Checkpoint pré-release](../historico/progresso/2026-11-08-antes-deploy-apresentacao.md), [etapa documental](../historico/progresso/2026-11-08-antes-apresentacao-classificacao.md), [provas do primeiro preview](evidencias/2026-11-07-preview-isolado-pr75.md). Estado histórico não substitui verificação real.

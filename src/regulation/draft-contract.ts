@@ -30,6 +30,7 @@ const draftRef = z.discriminatedUnion("kind", [
   entrantReferenceSchema.options[1].extend({ phaseId: refId, groupId: refId }),
   entrantReferenceSchema.options[2].extend({ seriesId: refId }),
   entrantReferenceSchema.options[3].extend({ seriesId: refId }),
+  entrantReferenceSchema.options[4].extend({ poolId: refId }),
 ]);
 const shape = regulationDefinitionSchema.shape;
 // Deliberately omit cross-reference/completeness refinements, retaining a closed,
