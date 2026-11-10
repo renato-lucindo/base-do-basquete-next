@@ -86,6 +86,7 @@ O protótipo desta conversa foi aceito para implementação com as decisões aba
 
 - Parciais mostram somente pontos; retirar faltas coletivas dessas células.
 - Elencos preservam titulares pelo nome em negrito e asterisco; quem não entrou conserva texto/fundo normais, inclusive em PTS, com — nas estatísticas. Completar cada corpo até12linhas com preenchimentos cinza vazios, sem identidade, ações ou participação nos cálculos. Colunas, linhas correspondentes e rodapés equivalentes; nomes extensos continuam legíveis.
+- Refinamento posterior: as linhas de jogadores usam a mesma altura compacta de Estatísticas, na escala compartilhada. Remover o espaço vertical fixo excessivo no desktop/celular; nomes longos podem ampliar a linha necessária, sem corte ou sobreposição. Preservar foco e interação dos detalhes de faltas.
 - Destacar máximos positivos de PTS/2P/3P/LL por equipe e recorte, com todos os empates. Não aplicar peso à linha inteira, zeros, ausências ou totais.
 - Jogo todo/quartos/prorrogações sincronizam dados, totais, máximos e faltas; o placar final permanece visível. A consulta optativa lê somente a versão imutável publicada. PDF/legado sem cobertura não recebe períodos individuais inventados.
 - O responsável confirmou manter — quando a participação no quarto não é conhecida. Titular comprova o primeiro quarto; evento individual comprova presença no período. Ausência de evento nunca comprova que o atleta não entrou. Exclusões/desqualificações respeitam a cronologia.

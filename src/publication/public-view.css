@@ -1635,3 +1635,18 @@
     min-height: 2.75rem;
   }
 }
+
+/* Mesma densidade das linhas de Estatísticas, com espaço para nomes completos. */
+.public-site.scoresheet-public .roster-table tbody th,
+.public-site.scoresheet-public .roster-table tbody td {
+  height: calc(0.875rem * 1.45 + 0.625rem + 1px);
+}
+.public-site.scoresheet-public .roster-table tbody .foul-button {
+  min-height: 1.75rem;
+}
+@media (min-width: 601px) {
+  .public-site.scoresheet-public .roster-table tbody th,
+  .public-site.scoresheet-public .roster-table tbody td {
+    height: calc(0.875rem * 1.5 + 0.625rem + 1px);
+  }
+}
