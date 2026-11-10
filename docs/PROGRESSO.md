@@ -9,6 +9,7 @@ Unidade `codex/campeonato-flexivel`, [PR #75](https://github.com/renato-lucindo/
 Depois da conversão autorizada da semifinal em rascunho (09/11), a página pública da Copa ES Sub-15 passou a mostrar erro de classificação. Causa comprovada: `private.competition_setups.document.assignments` ainda referenciava o jogo privado como `unassigned`, enquanto `get_live_competition_source` enviava apenas jogos públicos. A validação de `buildCompetitionDefinition` rejeitava essa associação ausente, provocando erro na API.
 
 Correção na mesma PR:
+
 - `src/regulation/setup-provider.ts`: a projeção pública descarta associações sem ID no catálogo público, sem modificar a configuração administrativa.
 - Migration de leitura **`20261110115128_public_competition_draft_assignments.sql`**: `public.get_live_competition_source` remove previamente de `configuration.assignments` qualquer referência a jogo fora dos `games` públicos, sem exibir o ID privado no payload. Nenhuma DML; privilégios e RLS preservados.
 - `src/regulation/setup-database.test.ts`: teste PGlite publica dois jogos, coloca um em draft, valida tabela e placar do outro jogo, ausência de ID privado na fonte pública e preservação da configuração no admin. Também testa compatibilidade do cliente com resposta antiga contendo associação privada.
