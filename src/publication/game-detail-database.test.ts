@@ -167,6 +167,44 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
     expect(JSON.stringify(result.details)).not.toMatch(
       /rosterEntryId|published_by|reason|actorId|document/u,
     );
+    // The detail RPC must work on main without draft controls, then fail
+    // closed when the independent PR75 visibility schema becomes available.
+    await db.exec("reset role");
+    await db.exec(`
+      create table private.game_visibility_heads (
+        game_id uuid primary key,
+        visibility text not null check(visibility in ('published','draft'))
+      );
+      insert into private.game_visibility_heads(game_id,visibility)
+      values ('${row.id}'::uuid,'draft');
+      alter table private.game_visibility_heads enable row level security;
+      revoke all on private.game_visibility_heads from public,anon,authenticated,service_role;
+    `);
+    await db.exec("set local role anon");
+    // If the visibility table exists but its helper is missing, deny reads.
+    expect(await read()).toBeNull();
+    await db.exec("reset role");
+    await db.exec(`
+      create function private.game_is_public(gid uuid)
+      returns boolean language sql stable security definer set search_path='' as $
+        select not exists (
+          select 1 from private.game_visibility_heads
+          where game_id=gid and visibility='draft'
+        )
+      $;
+      revoke all on function private.game_is_public(uuid)
+        from public,anon,authenticated,service_role;
+    `);
+    await db.exec("set local role anon");
+    expect(await read()).toBeNull();
+    await db.exec("reset role");
+    await db.exec(
+      "update private.game_visibility_heads set visibility='published' where game_id=$1",
+      [row.id],
+    );
+    await db.exec("set local role anon");
+    expect(publicGameSchema.parse(await read())).toEqual(result);
+    await db.exec("reset role");
     await db.exec("rollback");
   } finally {
     await db.close();
