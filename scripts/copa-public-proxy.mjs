@@ -128,7 +128,12 @@ export async function publicPreview(request, env) {
         },
       ),
     );
-    if (response.status >= 300 && response.status < 400) return failure(502);
+    if (
+      response.status >= 300 &&
+      response.status < 400 &&
+      response.status !== 304
+    )
+      return failure(502);
     const result = headers();
     for (const name of responseHeaders) {
       const value = response.headers.get(name);

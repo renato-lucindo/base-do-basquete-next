@@ -209,11 +209,13 @@ test("Pages limita catálogo, APIs e perfis à disputa configurada", async () =>
 test("HTML dedicado recebe contexto e título; assets locais preservam o backend", async () => {
   const { env, calls } = fixture();
   env.ASSETS = {
-    fetch: async () =>
-      new Response(
+    fetch: async (request) => {
+      assert.equal(new URL(request.url).pathname, "/publico");
+      return new Response(
         "<html><head><title>Competições</title></head><body></body></html>",
         { headers: { "content-type": "text/html" } },
-      ),
+      );
+    },
   };
   const r = await publicPreview(new Request(site + "/publico.html"), env);
   assert.match(
@@ -224,6 +226,22 @@ test("HTML dedicado recebe contexto e título; assets locais preservam o backend
   );
   assert.equal(calls.length, 0);
   assert.equal(r.headers.get("cache-control"), "no-store");
+});
+test("assets revalidados preservam 304 sem tratar cache como redirecionamento", async () => {
+  const { env } = fixture();
+  env.ASSETS = {
+    fetch: async () =>
+      new Response(null, { status: 304, headers: { etag: '"public"' } }),
+  };
+  const response = await publicPreview(
+    new Request(site + "/assets/public-cached.js", {
+      headers: { "if-none-match": '"public"' },
+    }),
+    env,
+  );
+  assert.equal(response.status, 304);
+  assert.equal(response.headers.get("etag"), '"public"');
+  assert.equal(await response.text(), "");
 });
 test("HEAD preserva status sem corpo; erros e redirects não revelam o servidor", async () => {
   const { env } = fixture();
