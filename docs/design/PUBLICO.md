@@ -51,7 +51,7 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 - Fase e posição da série vêm dos dados explícitos. Jogo único mostra somente a fase; série mostra, por exemplo, “Semifinal · Jogo 2”. Número oficial é independente do slot.
 - W.O. aparece em texto normal junto da fase: “Quartas de final - W.O.”. Só uma decisão confirmada de W.O. autoriza essa identificação; placares 20 × 0 e decisões administrativas genéricas não a implicam. As etiquetas de revisão, aguardando resultado, decisão administrativa e desconsiderado não aparecem na lista pública.
 - Na implementação real, o placar abre o detalhe publicado do jogo; os nomes abrem o perfil da equipe com a inscrição correta. Usar o catálogo público para confirmar os destinos, inclusive perfis disponíveis em partidas futuras. Sem publicação, não inventar uma página. O retorno conserva a disputa e a busca da lista. Esta decisão posterior substitui a ausência de links do protótipo.
-- Nomes e placares clicáveis ficam sem sublinhado, inclusive no hover, por pedido posterior do responsável. Preservar os destinos reais, a cor de link compartilhada e o foco visível por teclado.
+- Nomes e placares clicáveis ficam sem sublinhado, inclusive no hover. Refinamento aceito posteriormente: placar confirmado em azul #1557A4, equipes em tom escuro; número/data/horário/fase/local e placar ausente em cinza neutro. Preservar os destinos reais, o foco visível por teclado e o retorno visual de interação. O destaque usa também peso/tamanho, sem depender somente da cor.
 - Implementação e validação desta unidade estão em [VALIDACAO-JOGOS-PUBLICOS.md](../VALIDACAO-JOGOS-PUBLICOS.md). Aceite visual e abertura de PR não autorizam merge, deploy ou publicação de dados.
 
 ## Estatísticas e publicação

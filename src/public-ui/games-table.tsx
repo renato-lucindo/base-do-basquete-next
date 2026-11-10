@@ -132,7 +132,9 @@ export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
                       game.home
                     )}
                   </span>
-                  <span className="public-game-score">
+                  <span
+                    className={`public-game-score${game.score ? " has-score" : ""}`}
+                  >
                     {game.published && game.score ? (
                       <a
                         href={publicDetailLink(
