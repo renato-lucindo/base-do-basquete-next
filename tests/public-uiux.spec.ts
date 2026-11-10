@@ -101,7 +101,7 @@ for (const width of [1366, 1920])
     });
   });
 
-test("agenda pública pagina, filtra e conserva ausência de placar", async ({
+test("agenda pública lista todos os jogos e filtra sem fabricar placares", async ({
   page,
 }, info) => {
   await publicNavigationFixture(page);
@@ -122,30 +122,27 @@ test("agenda pública pagina, filtra e conserva ausência de placar", async ({
     route.fulfill({ json: buildPublicStandings(source) }),
   );
   await page.goto(
-    `http://127.0.0.1:5174/publico.html#${source.disputeId}?secao=jogos`,
+    `http://127.0.0.1:5174/publico.html#${source.disputeId}?secao=jogos&paginaJogos=2`,
   );
-  const table = page.getByRole("table", {
-    name: "Jogos por data",
-    exact: true,
-  });
-  await expect(table.getByRole("row")).toHaveCount(21);
-  await expect(table.getByRole("link")).toHaveCount(0);
-  await expect(table.getByLabel("Sem placar publicado")).toHaveCount(20);
-  await page
-    .getByRole("button", { name: "Próximos jogos", exact: true })
-    .click();
-  await expect(table.getByRole("row")).toHaveCount(6);
-  await page.reload();
-  await expect(table.getByRole("row")).toHaveCount(6);
+  const list = page.getByRole("list", { name: "Jogos por data", exact: true });
+  await expect(list.getByRole("listitem")).toHaveCount(25);
+  await expect(list.getByRole("link")).toHaveCount(0);
+  await expect(list.getByLabel("Sem placar publicado")).toHaveCount(25);
+  await expect(
+    page.getByRole("button", { name: "Próximos jogos", exact: true }),
+  ).toHaveCount(0);
+  await expect(page).not.toHaveURL(/paginaJogos=/);
   const search = page.getByRole("searchbox", {
     name: "Buscar jogo",
     exact: true,
   });
   await search.fill("Sem correspondência");
-  await expect(table).toContainText("Nenhum jogo neste recorte.");
-  await search.fill("");
-  await expect(table.getByRole("row")).toHaveCount(21);
-  await expect(page).not.toHaveURL(/paginaJogos=/);
+  await expect(
+    page.getByText("Nenhum jogo encontrado.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Limpar busca", exact: true }).click();
+  await expect(search).toBeFocused();
+  await expect(list.getByRole("listitem")).toHaveCount(25);
   const scan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();

@@ -160,8 +160,10 @@ function PublicHome() {
                               time: g.game.time,
                               venue: g.game.venue,
                               score: g.score,
-                              status: "Encerrado",
-                              published: true,
+                              number: g.game.number,
+                              phase: null,
+                              seriesGame: null,
+                              walkover: false,
                             }))}
                           />
                         ) : (

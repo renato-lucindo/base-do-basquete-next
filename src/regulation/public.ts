@@ -51,6 +51,9 @@ export function buildPublicStandings(input: unknown): PublicStandings {
       return {
         ...g,
         state: decision.state,
+        walkover:
+          decision.outcome?.kind === "awarded" &&
+          decision.outcome.award.kind === "wo",
         needs: decision.needs,
         score: outcome ? outcomeScore(outcome) : null,
         winnerRegistrationId: outcome ? outcomeWinner(outcome) : null,

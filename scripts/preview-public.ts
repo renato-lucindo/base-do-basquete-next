@@ -20,6 +20,7 @@ import { catalogGameSchema } from "../src/public-ui/catalog-contract";
 import { pubId } from "../tests/fixtures/publication";
 import { publicStandingsSourceSchema } from "../src/regulation/public-contract";
 import { buildPublicStandings } from "../src/regulation/public";
+import { publicGamesFixture } from "../tests/fixtures/public-games";
 import { competitiveFactFromPublication } from "../src/regulation/standings";
 
 const previewPort = Number(process.env.PUBLIC_PREVIEW_PORT ?? 5177);
@@ -183,6 +184,7 @@ upcoming.definition.groupPhases[0].groups[0].gameIds = upcoming.games.map(
   (g) => g.id,
 );
 standings.push(publicStandingsSourceSchema.parse(upcoming));
+standings.push(publicStandingsSourceSchema.parse(publicGamesFixture()));
 // Validate every scenario at startup instead of serving a plausible but invalid mock.
 standings.forEach(buildPublicStandings);
 

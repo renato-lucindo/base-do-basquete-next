@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { PublicGamesTable } from "../public-ui/games-table";
+import { publicScheduleRows } from "../public-ui/games-model";
 import { api } from "../competition/api";
 import { publicStandingsSchema, type PublicStandings } from "./public-contract";
 import { teamDetailLink } from "../team-statistics/navigation";
@@ -416,30 +417,5 @@ export function PublicStandingsTables({
 }
 
 export function PublicSchedule({ value }: { value: PublicStandings }) {
-  const names = new Map(value.registrations.map((r) => [r.id, r.name]));
-  return (
-    <PublicGamesTable
-      games={value.games.map((g) => ({
-        id: g.id,
-        disputeId: value.disputeId,
-        home: names.get(g.homeRegistrationId) ?? "Equipe confirmada",
-        away: names.get(g.awayRegistrationId) ?? "Equipe confirmada",
-        date: g.date,
-        time: g.time,
-        venue: g.venue,
-        score: g.score
-          ? { home: g.score.homePoints, away: g.score.awayPoints }
-          : null,
-        published: g.state === "played",
-        status:
-          g.state === "awarded"
-            ? "Decisão administrativa"
-            : g.state === "excluded"
-              ? "Desconsiderado"
-              : g.state === "conflict"
-                ? "Em revisão"
-                : "Aguardando resultado",
-      }))}
-    />
-  );
+  return <PublicGamesTable games={publicScheduleRows(value)} />;
 }

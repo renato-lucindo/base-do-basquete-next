@@ -1,165 +1,163 @@
-import { useEffect, useState } from "react";
-import { publicDetailLink } from "./navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import { selectPublicGames, type PublicGameRow } from "./games-model";
+import "./games-list.css";
 
-export type PublicGameRow = {
-  id: string;
-  disputeId: string;
-  home: string;
-  away: string;
-  date: string | null;
-  time: string | null;
-  venue: string | null;
-  score: { home: number; away: number } | null;
-  status: string;
-  published: boolean;
-};
+export type { PublicGameRow } from "./games-model";
 const formatDate = new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" });
-const read = () => {
-  const p = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
-  const n = Number(p.get("paginaJogos"));
-  return {
-    search: (p.get("buscaJogos") ?? "").slice(0, 120),
-    page: Number.isSafeInteger(n) && n > 0 ? n : 1,
-  };
-};
-const normalize = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase("pt-BR");
+const read = () =>
+  new URLSearchParams(window.location.hash.split("?")[1] ?? "")
+    .get("buscaJogos")
+    ?.slice(0, 120) ?? "";
 
 export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
-  const [query, setQuery] = useState(read);
+  const [search, setSearch] = useState(read);
+  const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const onHash = () => setQuery(read());
+    const onHash = () => {
+      const [id, query = ""] = window.location.hash.slice(1).split("?", 2);
+      const params = new URLSearchParams(query);
+      if (params.has("paginaJogos")) {
+        params.delete("paginaJogos");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `#${id}?${params}`,
+        );
+      }
+      setSearch(read());
+    };
+    onHash();
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  function update(next: typeof query) {
-    const [id, search = ""] = window.location.hash.slice(1).split("?", 2);
-    const p = new URLSearchParams(search);
-    if (next.search) p.set("buscaJogos", next.search);
-    else p.delete("buscaJogos");
-    if (next.page > 1) p.set("paginaJogos", String(next.page));
-    else p.delete("paginaJogos");
-    window.history.replaceState(window.history.state, "", `#${id}?${p}`);
-    setQuery(next);
+  function update(value: string) {
+    const [id, query = ""] = window.location.hash.slice(1).split("?", 2);
+    const params = new URLSearchParams(query);
+    if (value) params.set("buscaJogos", value);
+    else params.delete("buscaJogos");
+    params.delete("paginaJogos");
+    window.history.replaceState(window.history.state, "", `#${id}?${params}`);
+    setSearch(value);
   }
-  const rows = [...games]
-    .sort(
-      (a, b) =>
-        (a.date ?? "9999").localeCompare(b.date ?? "9999") ||
-        (a.time ?? "99").localeCompare(b.time ?? "99") ||
-        a.id.localeCompare(b.id),
-    )
-    .filter((g) =>
-      normalize(`${g.home} ${g.away} ${g.venue ?? ""}`).includes(
-        normalize(query.search.trim()),
-      ),
-    );
-  const pages = Math.max(1, Math.ceil(rows.length / 20)),
-    page = Math.min(query.page, pages);
+  function clear() {
+    update("");
+    inputRef.current?.focus();
+  }
+  const rows = selectPublicGames(games, search);
   return (
     <section className="public-games-block" aria-label="Jogos da disputa">
-      <div className="public-games-tools">
-        <label>
-          Buscar jogo
-          <input
-            name="buscaJogos"
-            type="search"
-            value={query.search}
-            autoComplete="off"
-            placeholder="Equipe ou local"
-            onChange={(e) => update({ search: e.target.value, page: 1 })}
-          />
-        </label>
-        <p role="status">
-          {rows.length} {rows.length === 1 ? "jogo" : "jogos"}
+      <div className="public-games-tools public-games-search">
+        <div className="public-game-search-field">
+          <label htmlFor={inputId}>Buscar jogo</label>
+          <div className="public-game-search-controls">
+            <input
+              id={inputId}
+              ref={inputRef}
+              name="buscaJogos"
+              type="search"
+              value={search}
+              maxLength={120}
+              autoComplete="off"
+              placeholder="Equipe ou local"
+              onChange={(e) => update(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && search) {
+                  e.preventDefault();
+                  clear();
+                }
+              }}
+            />
+            {search && (
+              <button type="button" onClick={clear}>
+                Limpar
+              </button>
+            )}
+          </div>
+        </div>
+        <p role="status" aria-live="polite" aria-atomic="true">
+          {rows.length}{" "}
+          {rows.length === 1 ? "jogo encontrado" : "jogos encontrados"}
         </p>
       </div>
-      <div
-        className="public-games public-table-scroll"
-        role="region"
-        aria-label="Tabela de jogos"
-        tabIndex={0}
-      >
-        <table>
-          <caption className="public-visually-hidden">Jogos por data</caption>
-          <thead>
-            <tr>
-              <th scope="col">Confronto</th>
-              <th scope="col" className="public-numeric">
-                Placar
-              </th>
-              <th scope="col">Local</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.slice((page - 1) * 20, page * 20).map((g) => (
-              <tr key={g.id}>
-                <th scope="row">
-                  {g.published ? (
-                    <a
-                      href={publicDetailLink(
-                        `/resultado.html#${g.id}`,
-                        g.disputeId,
-                      )}
-                    >
-                      {g.home} × {g.away}
-                    </a>
-                  ) : (
-                    <span>
-                      {g.home} × {g.away}
-                    </span>
-                  )}
-                  <small>
-                    <time dateTime={g.date ?? undefined}>
-                      {g.date
-                        ? formatDate.format(new Date(`${g.date}T12:00:00Z`))
-                        : "Data a definir"}{" "}
-                      · {g.time ?? "Horário a definir"}
-                    </time>
-                  </small>
-                  {!g.published && <small>{g.status}</small>}
-                </th>
-                <td className="public-numeric">
-                  {g.score ? (
-                    `${g.score.home} × ${g.score.away}`
-                  ) : (
-                    <span aria-label="Sem placar publicado">—</span>
-                  )}
-                </td>
-                <td>{g.venue ?? "Local a definir"}</td>
-              </tr>
-            ))}
-            {!rows.length && (
-              <tr>
-                <td colSpan={3}>Nenhum jogo neste recorte.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      {rows.length > 20 && (
-        <nav className="public-games-pager" aria-label="Paginação dos jogos">
-          <button
-            type="button"
-            disabled={page === 1}
-            onClick={() => update({ ...query, page: page - 1 })}
-          >
-            Jogos anteriores
-          </button>
-          <span>
-            Página {page} de {pages}
-          </span>
-          <button
-            type="button"
-            disabled={page === pages}
-            onClick={() => update({ ...query, page: page + 1 })}
-          >
-            Próximos jogos
-          </button>
-        </nav>
+      {!!rows.length && (
+        <ol className="public-games-list" aria-label="Jogos por data">
+          {rows.map((game) => {
+            const phase = game.phase
+              ? game.phase +
+                (game.seriesGame === null ? "" : ` · Jogo ${game.seriesGame}`)
+              : "";
+            const context = [phase, game.walkover ? "W.O." : ""]
+              .filter(Boolean)
+              .join(" - ");
+            return (
+              <li
+                key={game.id}
+                className="public-game-row"
+                data-game-id={game.id}
+              >
+                <div className="public-game-meta">
+                  <span>Nº do jogo: {game.number?.trim() || "a definir"}</span>
+                  <span>
+                    {game.date ? (
+                      <time dateTime={game.date}>
+                        {formatDate.format(new Date(`${game.date}T12:00:00Z`))}
+                      </time>
+                    ) : (
+                      "Data a definir"
+                    )}
+                    {" · "}
+                    {game.time ? (
+                      <time dateTime={game.time}>{game.time}</time>
+                    ) : (
+                      "Horário a definir"
+                    )}
+                  </span>
+                </div>
+                <div className="public-game-matchup">
+                  <span className="public-game-home">{game.home}</span>
+                  <span className="public-game-score">
+                    {game.score ? (
+                      <>
+                        <span>{game.score.home}</span>
+                        <span
+                          className="public-game-separator"
+                          aria-hidden="true"
+                        >
+                          ×
+                        </span>
+                        <span className="public-visually-hidden"> a </span>
+                        <span>{game.score.away}</span>
+                      </>
+                    ) : (
+                      <span role="img" aria-label="Sem placar publicado">
+                        —
+                      </span>
+                    )}
+                  </span>
+                  <span className="public-game-away">{game.away}</span>
+                </div>
+                {context && <div className="public-game-phase">{context}</div>}
+                <div className="public-game-venue">
+                  {game.venue?.trim() || "Local a definir"}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      {!rows.length && (
+        <div className="public-game-empty">
+          <p>Nenhum jogo encontrado.</p>
+          {search && (
+            <>
+              <p>Tente outra equipe ou local.</p>
+              <button type="button" onClick={clear}>
+                Limpar busca
+              </button>
+            </>
+          )}
+        </div>
       )}
     </section>
   );

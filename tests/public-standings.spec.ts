@@ -152,7 +152,8 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await nav.getByRole("link", { name: "Jogos", exact: true }).click();
   await expect(
     page.getByText("Aguardando resultado", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByLabel("Sem placar publicado")).toHaveCount(1);
   await expect(
     page.getByText("Horário a definir", { exact: false }),
   ).toBeVisible();
@@ -300,7 +301,9 @@ test("resultados sem associação continuam acessíveis na agenda pública", asy
     page.getByRole("status").filter({ hasText: "aguardam associação" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Jogos", exact: true }).click();
-  await expect(
-    page.getByRole("link", { name: "Lobos × Águias", exact: true }),
-  ).toBeVisible();
+  const games = page.getByRole("list", { name: "Jogos por data", exact: true });
+  await expect(games.getByRole("listitem")).toHaveCount(1);
+  await expect(games.locator(".public-game-home")).toHaveText("Lobos");
+  await expect(games.locator(".public-game-away")).toHaveText("Águias");
+  await expect(games.getByRole("link")).toHaveCount(0);
 });
