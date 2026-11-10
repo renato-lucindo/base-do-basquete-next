@@ -76,6 +76,27 @@ export async function publicPreview(request, env) {
     )
       return failure(503);
     const target = new URL(path + incoming.search, origin);
+    const disputeId = env.PUBLIC_DISPUTE_ID;
+    if (!new RegExp(`^${uuid}$`, "u").test(disputeId)) return failure(503);
+    if (data) {
+      const parts = path.split("/");
+      const kind = parts[3];
+      const explicit = target.searchParams.getAll("disputeId");
+      if (explicit.some((id) => id !== disputeId)) return failure(404);
+      if (["discovery", "search"].includes(kind)) return failure(404);
+      if (kind === "catalog" || kind === "players")
+        target.searchParams.set("disputeId", disputeId);
+      else if (
+        ["standings", "statistics", "teams", "achievements"].includes(kind)
+      ) {
+        if (parts[4] !== disputeId) return failure(404);
+      } else if (
+        kind !== "games" ||
+        !new RegExp(`^${uuid}$`, "u").test(parts[4] ?? "") ||
+        parts.length !== 5
+      )
+        return failure(404);
+    }
     const h = new Headers(request.headers);
     for (const name of [
       "cookie",
@@ -88,23 +109,68 @@ export async function publicPreview(request, env) {
       h.delete(name);
     h.delete("origin");
     if (query) h.set("origin", origin.origin);
-    const response = await env.SOURCE.fetch(
-      new Request(target, {
-        method: request.method === "HEAD" ? "GET" : request.method,
-        headers: h,
-        body: query ? request.body : undefined,
-        duplex: "half",
-        redirect: "manual",
-      }),
+    // Dedicated public assets are built from the same PR, without changing SOURCE.
+    const local = !data && (pages.has(path) || asset.test(path)) && env.ASSETS;
+    const response = await (local ? env.ASSETS : env.SOURCE).fetch(
+      new Request(
+        local
+          ? new URL(
+              path.replace(/\.html$/u, "") + incoming.search,
+              incoming.origin,
+            )
+          : target,
+        {
+          method: request.method === "HEAD" ? "GET" : request.method,
+          headers: h,
+          body: query ? request.body : undefined,
+          duplex: "half",
+          redirect: "manual",
+        },
+      ),
     );
-    if (response.status >= 300 && response.status < 400) return failure(502);
+    if (
+      response.status >= 300 &&
+      response.status < 400 &&
+      response.status !== 304
+    )
+      return failure(502);
     const result = headers();
     for (const name of responseHeaders) {
       const value = response.headers.get(name);
       if (value !== null) result.set(name, value);
     }
     if (data) result.set("cache-control", "no-store");
-    return new Response(request.method === "HEAD" ? null : response.body, {
+    let body = response.body;
+    if (data && response.ok && /\/api\/public\/(games|players)\//u.test(path)) {
+      const value = await response.json();
+      if (
+        path.startsWith("/api/public/games/") &&
+        value.disputeId !== disputeId
+      )
+        return failure(404);
+      if (path.startsWith("/api/public/players/")) {
+        value.contexts = value.contexts.filter(
+          (c) => c.disputeId === disputeId,
+        );
+        if (!value.contexts.length) return failure(404);
+      }
+      body = JSON.stringify(value);
+    } else if (
+      pages.has(path) &&
+      response.ok &&
+      result.get("content-type")?.includes("text/html")
+    ) {
+      const html = await response.text();
+      body = html
+        .replace(
+          "<head>",
+          `<head><meta name="bdb-dispute" content="${disputeId}">`,
+        )
+        .replace(/<title>[^<]*<\/title>/u, "<title>Copa ES U15</title>");
+      result.delete("etag");
+      result.set("cache-control", "no-store");
+    }
+    return new Response(request.method === "HEAD" ? null : body, {
       status: response.status,
       headers: result,
     });

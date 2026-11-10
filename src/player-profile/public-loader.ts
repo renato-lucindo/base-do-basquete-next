@@ -5,6 +5,7 @@ import {
 } from "./page-contract";
 import { parseProfileQuery, serializeProfileQuery } from "./query-contract";
 import { validatePublicCareer } from "./public-model";
+import { siteDisputeId } from "../public-ui/site";
 
 const unavailable = () =>
   new ApiFailure(
@@ -26,6 +27,7 @@ const signature = (p: PlayerProfilePage) =>
 /** Uses the existing public paginated contract; no private or direct database access. */
 export async function loadPublicCareer(id: string, signal: AbortSignal) {
   const base = parseProfileQuery(new URLSearchParams());
+  if (siteDisputeId) base.disputeId = siteDisputeId;
   async function read(page: number, historyPage: number) {
     const query = { ...base, page, historyPage };
     const data = await api(

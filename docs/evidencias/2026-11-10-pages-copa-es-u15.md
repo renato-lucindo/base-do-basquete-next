@@ -19,3 +19,9 @@ O Pages depende da disponibilidade e manutenção do Worker da PR77, que deve pe
 ## Reproduzir a publicação
 
 Usar Wrangler4.152.0 local. Em diretório ignorado de release, copiar o proxy como `site/_worker.js`, criar404.html sem dados e configurar `pages_build_output_dir=./site`, Service Binding SOURCE para o Worker da PR77 e as variáveis de servidor PUBLIC_BACKEND_ORIGIN e PUBLIC_DISPUTE_ID. Publicar somente o projeto copa-es-u15, branch Pages main, registrando o SHA validado com `--commit-hash`. A configuração de servidor não vai no diretório público. Nenhum arquivo com segredo ou source map é publicado. Conferir no remoto a navegação e a ausência do identificador nos arquivos, headers e requests públicos antes de entregar.
+
+## Restrição exclusiva da Copa — 10/11/2026
+
+Pedido posterior do responsável: este Pages deve mostrar somente Copa ES U15, sem troca de disputa, encaminhamento para campeonatos nem administrativo. Substitui a navegação global descrita acima exclusivamente nesse endereço. A aplicação principal preserva seu comportamento.
+
+O Pages passa a servir assets públicos próprios pelo ASSETS e a injetar a configuração pública de disputa no HTML. O shell renderiza somente o cabeçalho da Copa; as quatro abas e detalhes continuam disponíveis. O servidor restringe catálogo/APIs/perfis à disputa, sem DDL/DML ou nova publicação de dados. Para reproduzir: build foundation, copiar somente os seis HTML públicos e dependências para site, copiar proxy para site/_worker.js e manter SOURCE/variáveis existentes. Não copiar foundation.html nem arquivos internos/configuração para assets. Testes e estado final no checkpoint e PR da unidade codex/copa-es-u15.
