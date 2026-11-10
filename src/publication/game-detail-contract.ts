@@ -142,7 +142,6 @@ export function gameDetailMatches(g: {
         rows.reduce((n, p) => n + p.points, 0) !== t.points ||
         t.points !== g.facts.teams[side].periods?.[i] ||
         rows.reduce((n, p) => n + p.free, 0) !== t.freeMade ||
-        t.freeMade > t.freeTaken ||
         rows.reduce((n, p) => n + p.fouls, 0) !== t.fouls
       )
         return false;

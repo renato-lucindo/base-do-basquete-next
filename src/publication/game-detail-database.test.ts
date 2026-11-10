@@ -87,6 +87,20 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
       )
     ).rows[0].value;
     expect(publicGameSchema.parse(projected)).toEqual(expected);
+    // Legacy publication validates LL at game level, not by penalty's period.
+    const legacy = publicationSheet();
+    legacy.events = [
+      { id: pubId(39001), side: "away", target: "0", period: 1, code: "P1" },
+      { id: pubId(39002), side: "home", target: "0", period: 4, code: "1" },
+    ];
+    const legacySnapshot = publishedSheet(legacy);
+    const legacyDetail = (
+      await db.query<{ value: unknown }>(
+        "select private.public_game_period_detail($1::jsonb,$2::jsonb) value",
+        [JSON.stringify(legacySnapshot), JSON.stringify(legacy)],
+      )
+    ).rows[0].value;
+    expect(publicGameSchema.safeParse(legacyDetail).success).toBe(true);
     expect(
       expected.details.periods[2].players.find(
         (p) => p.side === "away" && p.jersey === "2",

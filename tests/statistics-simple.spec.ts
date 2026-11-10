@@ -144,9 +144,12 @@ test("resultado de súmula mantém faltas e DNP sem inventar coluna de disciplin
     }),
   });
   await expect(
-    table.getByRole("columnheader", { name: "F", exact: true }),
+    table.getByRole("columnheader", {
+      name: "F: Faltas cometidas",
+      exact: true,
+    }),
   ).toBeVisible();
-  // A súmula aprovada exibe o status disciplinar junto ao atleta, quando publicado.
+  // O estado disciplinar usa a célula F, sem coluna GD separada.
   await expect(
     table.getByRole("columnheader", { name: "GD", exact: true }),
   ).toHaveCount(0);

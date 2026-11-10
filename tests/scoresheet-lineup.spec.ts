@@ -12,7 +12,7 @@ test("opções no final, camisas ordenadas e cinco titulares obrigatórios por e
     await region
       .getByRole("textbox")
       .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("value"))),
-  ).toEqual(["0", "00", "7", "8", "9", "10"]);
+  ).toEqual(["0", "7", "8", "9", "10", "00"]);
   const later = page.getByRole("region", {
     name: "Outras opções da súmula",
     exact: true,
