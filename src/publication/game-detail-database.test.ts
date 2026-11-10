@@ -198,7 +198,7 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
     await db.exec("set local role anon");
     expect(await read()).toBeNull();
     await db.exec("reset role");
-    await db.exec(
+    await db.query(
       "update private.game_visibility_heads set visibility='published' where game_id=$1",
       [row.id],
     );
