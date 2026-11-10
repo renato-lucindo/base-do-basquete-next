@@ -186,12 +186,11 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
     await db.exec("reset role");
     await db.exec(`
       create function private.game_is_public(gid uuid)
-      returns boolean language sql stable security definer set search_path='' as $
-        select not exists (
-          select 1 from private.game_visibility_heads
-          where game_id=gid and visibility='draft'
-        )
-      $;
+      returns boolean language sql stable security definer set search_path=''
+      as 'select not exists (
+        select 1 from private.game_visibility_heads
+        where game_id=gid and visibility=''draft''
+      )';
       revoke all on function private.game_is_public(uuid)
         from public,anon,authenticated,service_role;
     `);
