@@ -2,6 +2,16 @@
 
 ## Partida pública aceita - 10/11/2026
 
+### Worker da PR76 publicado - 10/11/2026
+
+Por solicitação expressa do responsável, publicado Worker isolado `base-do-basquete-next-pr76`, fonte `c5a99a5ef6227c3d3ed1aa64904d08316f2532d0`, versão `cf5a1d67-196b-4509-9593-9732c2469597`. [Abrir partida real](https://base-do-basquete-next-pr76.renato-lucindo-jr.workers.dev/resultado.html#4dd44428-f4d9-41a1-8aa1-aa6d7d019cdf). Access `dbbe35c3-9b65-4cd9-82ec-9fd434175879`, somente conta do responsável; navegador aberto na autenticação Access, ainda sem smoke de interface autenticado. Worker público principal, PR75, rotas e dados existentes preservados; PR76 segue sem merge.
+
+Migration de leitura `public_game_detail` aplicada exclusivamente ao Supabase DEV `nizmasjddyrhmevvfviz`, após conferir histórico e ausência da função. Primeiro acesso como anon devolveu a partida real acima com cinco períodos. Sem seeds/DML. Advisors consultados antes/depois; não declarar ausência de novas categorias sem comparar os relatórios. Configuração isolada, secrets e logs em `.preview-artifacts/pr76-worker/` e `.pr76-worker-*.log`, ignorados pelo Git; não copiar valores para documentos.
+
+CI da fonte publicada: [42817205805](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42817205805), todos os jobs incluindo validate SUCCESS; 764 unitários, 746 Chromium (116 skips preexistentes), 42 WebKit. Dry-run e deploy Wrangler concluídos. Aguardando login do responsável no Access para conferir a interface real. Limite excepcional de cota nesta solicitação: parar em 3% restante, substituindo 15% somente nesta execução.
+
+O registro abaixo descreve a implementação anterior ao deploy; o estado de serviço vigente é o desta seção.
+
 Unidade `codex/partida-publica`, [PR76 para main](https://github.com/renato-lucindo/base-do-basquete-next/pull/76), base `origin/main 903dc9c`, worktree isolado `C:/Users/12405304716/.codex/worktrees/partida-publica-aceita/Base do Basquete-v1`. Escopo em [PLAN-PARTIDA-PUBLICA.md](PLAN-PARTIDA-PUBLICA.md); decisões em [PUBLICO.md](design/PUBLICO.md).
 
 Código `5c7e067b8e49bd4a753444ed3dea3eae5b5fe7ee`: 12 linhas por elenco, DNP com apresentação normal, máximos positivos independentes, parciais sem faltas, legenda compartilhada com 2P/3P separados e cronologia de cinco faltas/GD. Comparador de camisas compartilhado (0, 1...99, 00, ausentes), aplicado no público/admin e na paginação de elencos. Participação desconhecida no quarto permanece —, conforme resposta expressa do responsável.
