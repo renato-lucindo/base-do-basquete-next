@@ -1,0 +1,23 @@
+# Progresso atual
+
+Atualizado em10/11/2026. Unidade ativa: concluir a PR77 e entregar a consulta pública completa da Copa ES U15. O responsável autorizou o azul no placar, merge após CI, atualização do Worker PR77 e publicação em Pages para evitar identificador pessoal na URL. O pedido de Pages substitui a atualização do Worker antigo copa-es-sub15. Sem deploy no serviço principal, escrita de banco ou nova publicação de dados.
+
+## Unidade e evidências
+
+- Branch `codex/jogos-publicos-lista`, base **91f11fb**, worktree gerenciado isolado. Fonte material atual **80ff1ec95d8b1e249c9599d2ef15be3fbb2d76af**: placar azul #1557A4, equipes escuras, metadados/ausência neutros e proxy público Pages. Inclui os refinamentos anteriores83e8e13 e navegação5133f3a. Este checkpoint posterior é documental.
+- Formato centralizado em todas as larguras; número/data/horário no topo, confronto, fase/série e local. W.O. em texto junto à fase. Lista completa, busca, contagem, vazio e ausência versus zero preservados. Placar agora abre jogo publicado e nomes abrem os perfis disponíveis, com IDs de equipe/inscrição explícitos e retorno preservando a busca. Catálogo público da mesma disputa confirma destinos; jogos sem publicação não recebem link de detalhe.
+- Gate consolidado **PASS/exit0** na correção:805unitários/171arquivos,11política de CI,11transporte,15banco isolado,35Worker/HTTP e teste dos quatro PDFs; lint, formato, tipos, builds, fronteira cliente e segredos aprovados.52cenários de browser mais12de layout com links PASS. Desktop/mobile, teclado, cliques nos dois nomes, retorno/reload/busca, nomes longos e reflow200% verificados. [Detalhes e limites](VALIDACAO-JOGOS-PUBLICOS.md).
+- Refinamentos somente CSS: nomes/placares sem sublinhado normal/hover/foco, links e foco preservados;14cenários da lista PASS e gate UI PASS. Linhas do detalhe do jogo iguais à densidade de Estatísticas:47,5px desktop e31,296875px celular, com expansão para nomes longos;14cenários de partida PASS, buildfoundation/formato/fronteira/segredos aprovados. Domínio e APIs inalterados; o gate805testes acima corresponde à fonte5133f3a.
+- Proxy Pages:5testes de transporte PASS;28cenários da lista/súmula PASS. Gate completo em execução para a infraestrutura nova. A [CI42877392387](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42877392387),7/7SUCCESS, validou5c22054; o run42885719771 valida80ff1ec e ainda está em execução neste registro. Conferir o HEAD real e o check validate antes do merge. Provas finais e fontes publicadas ficam na mesma PR, sem gerar novo commit somente para transcrever resultado de CI.
+
+## Execução e preservação
+
+Projeto local de fixtures em http://127.0.0.1:5186/publico.html#f2200000-0000-4000-8000-000000000090?secao=jogos; Vite real em5174 para verificações automatizadas, sem banco. Worker exclusivo **base-do-basquete-next-pr77** atualizado por autorização vigente, sem Access, fonte **83e8e13**, versão **066ab789-7424-4542-a303-2a4ee314c03c**,100%. [Aba Jogos](https://base-do-basquete-next-pr77.renato-lucindo-jr.workers.dev/publico.html#b5433b13-a8f9-4baa-b4d9-08066ebf3e96?secao=jogos). Smoke atual36assets/hash/source PASS; provas de26detalhes/6perfis e privados401 reutilizadas do backend inalterado5133f3a. Sessões, limitador e segredos preservados; banco dev compartilhado, sem DDL/DML ou publicação de dados. [Evidências](evidencias/2026-11-10-worker-pr77.md).
+
+`npm ci` foi interrompido por falta de espaço. Instalação parcial desta unidade preservada em `.preview-artifacts/npm-incomplete` após rejeição da exclusão pela política automática; dependências diretas compatíveis conferidas e reutilizadas por junction. Artefatos de execução e dependências não entram no commit.
+
+Checkout principal `sync/trabalho-casa` preservado: alteração humana em CONTRIBUTING.md, `.agents/skills/web-design-guidelines/` e `skills-lock.json`. Nenhum outro worktree/branch alterado. Contexto único da integração anterior das PRs75/76 preservado no [histórico](../historico/progresso/2026-11-10-antes-jogos-publicos.md).
+
+## Próximo passo
+
+Concluir gate/CI atuais, atualizar o Worker PR77 e publicar o projeto Pages **copa-es-u15** (já criado, ainda sem deploy neste registro), conferir funções públicas, origem POST e ausência do identificador em HTML/JS/headers/requests. Serviço vinculado SOURCE mantém o backend na PR77: preservar esse Worker após o merge. Integrar por merge commit somente com CI aprovada; conferir CI do SHA integrado. Usar a mesma checagem oficial desta conversa se houver espera; pausar ao concluir. Não repetir deploy por checkpoint documental nem alterar o preview principal/banco. [Plano, testes e reprodução do Pages](evidencias/2026-11-10-pages-copa-es-u15.md).
