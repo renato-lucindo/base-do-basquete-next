@@ -45,10 +45,23 @@ export async function buildLivePublicStandings(input: unknown) {
             customDefinition: source.legacyDefinition,
           }
         : defaultCompetitionSetup());
-  const built = await buildCompetitionDefinition(source.disputeId, document, {
-    registrationIds: source.registrations.map((r) => r.id),
-    games: source.games,
-  });
+  // The public game list excludes private drafts. Remove stale private game
+  // assignments from this read-only projection, not from the admin document.
+  const publicGameIds = new Set(source.games.map((game) => game.id));
+  const publicDocument = {
+    ...document,
+    assignments: document.assignments.filter(({ gameId }) =>
+      publicGameIds.has(gameId),
+    ),
+  };
+  const built = await buildCompetitionDefinition(
+    source.disputeId,
+    publicDocument,
+    {
+      registrationIds: source.registrations.map((r) => r.id),
+      games: source.games,
+    },
+  );
   const definition = { ...built.definition };
   delete definition.tieNotes;
   delete definition.customReason;
