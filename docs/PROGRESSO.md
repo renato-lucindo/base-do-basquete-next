@@ -1,5 +1,15 @@
 # Progresso atual
 
+## Segurança do detalhe público e histórico remoto — 10/11/2026
+
+PR #76 (`codex/partida-publica`): a RPC `public.get_public_game_detail` agora respeita a visibilidade quando existe a funcionalidade de rascunhos da PR #75. Se a tabela de visibilidade existir sem o predicado protetor, o leitor falha fechado; sem a funcionalidade de rascunhos, mantém o comportamento público já existente. Teste PGlite em `src/publication/game-detail-database.test.ts` cobre os três estados, inclusive restauração da visibilidade, sem alterar dados reais.
+
+As migrations `20261110130218_public_game_detail.sql` (mesmo SQL aplicado originalmente em DEV) e `20261110150011_public_detail_visibility_compat.sql` estão alinhadas aos números do histórico do Supabase DEV `nizmasjddyrhmevvfviz`. Existe também uma **intervenção histórica emergencial** aplicada no DEV sob `20261110133504_public_game_detail_draft_guard`, anterior à correção portável: ela **não integra a sequência distribuível da PR #76** porque depende da PR #75 e não executaria num banco limpo sem essa funcionalidade. Não editar a migration já aplicada nem assumi-la como dependência oculta; o guard portável é a fonte da entrega. A gestão desse registro excepcional deverá ser reconciliada com o histórico antes de operações automatizadas de migração.
+
+A verificação anônima em DEV após o guard portável confirmou a semifinal privada inacessível em `get_public_game_detail` e `get_public_game`, enquanto 26 partidas públicas continuam disponíveis. Nenhum merge ou novo deploy ocorreu nesta revisão; o Worker PR76 anterior permanece isolado. O gate completo do novo código passou antes do alinhamento dos nomes de migrations; conferir a CI do último HEAD.
+
+---
+
 ## Partida pública aceita - 10/11/2026
 
 ### Worker da PR76 publicado - 10/11/2026
