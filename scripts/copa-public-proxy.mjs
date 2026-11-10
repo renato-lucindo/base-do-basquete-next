@@ -113,7 +113,12 @@ export async function publicPreview(request, env) {
     const local = !data && (pages.has(path) || asset.test(path)) && env.ASSETS;
     const response = await (local ? env.ASSETS : env.SOURCE).fetch(
       new Request(
-        local ? new URL(path + incoming.search, incoming.origin) : target,
+        local
+          ? new URL(
+              path.replace(/\.html$/u, "") + incoming.search,
+              incoming.origin,
+            )
+          : target,
         {
           method: request.method === "HEAD" ? "GET" : request.method,
           headers: h,
