@@ -10,6 +10,38 @@ import {
 } from "./public-contract";
 import { buildPublicStandings } from "./public";
 describe("fonte e classificação públicas mínimas", () => {
+  it("não confunde zero confirmado nem decisão administrativa com W.O.", () => {
+    const s = fixture();
+    s.publishedGames[0].homePoints = 20;
+    s.publishedGames[0].awayPoints = 0;
+    expect(buildPublicStandings(s).games[0].walkover).toBe(false);
+    s.occurrences.push({
+      id: id(200),
+      version: 1,
+      gameId: id(100),
+      gameVersion: 2,
+      publicationVersion: 1,
+      effect: {
+        kind: "administrative",
+        decision: {
+          kind: "award",
+          winnerRegistrationId: id(1),
+          homeLeaguePoints: 2,
+          awayLeaguePoints: 0,
+          score: { homePoints: 20, awayPoints: 0 },
+        },
+      },
+    });
+    const result = buildPublicStandings(s);
+    expect(result.games[0]).toMatchObject({
+      state: "awarded",
+      walkover: false,
+      score: { homePoints: 20, awayPoints: 0 },
+    });
+    result.games[0].state = "played";
+    result.games[0].walkover = true;
+    expect(publicStandingsSchema.safeParse(result).success).toBe(false);
+  });
   it("recusa campos privados mesmo quando as listas de notas estão vazias", () => {
     for (const extra of [{ tieNotes: [] }, { customReason: "" }]) {
       const s = fixture();
@@ -243,6 +275,7 @@ describe("fonte e classificação públicas mínimas", () => {
     const v = buildPublicStandings(s);
     expect(v.games[0]).toMatchObject({
       state: "awarded",
+      walkover: true,
       score: null,
       winnerRegistrationId: id(1),
       sourceKind: "administrative",

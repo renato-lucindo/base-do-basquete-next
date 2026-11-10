@@ -106,7 +106,14 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     .click();
   expect(page.url()).toBe(source);
   await page.goto(origin + disputeLink(f.source.disputeId, "jogos"));
-  await page.locator(".public-games a").first().click();
+  await expect(
+    page.getByRole("list", { name: "Jogos por data" }),
+  ).toBeVisible();
+  await page.getByRole("searchbox", { name: "Buscar jogo" }).fill("Lobos");
+  const gamesSource = page.url();
+  const row = page.locator(`[data-game-id="${f.source.games[0].snapshot.id}"]`);
+  await row.locator(".public-game-score a").focus();
+  await page.keyboard.press("Enter");
   await expect(
     page
       .getByRole("table", { name: "Participações e estatísticas publicadas" })
@@ -123,6 +130,20 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   await expect(
     page.getByRole("heading", { name: "Jogos publicados", exact: true }),
   ).toBeVisible();
+  expect(page.url()).toBe(gamesSource);
+  await expect(
+    page.getByRole("searchbox", { name: "Buscar jogo" }),
+  ).toHaveValue("Lobos");
+  for (const side of ["home", "away"]) {
+    await row.locator(`.public-game-${side} a`).click();
+    await expect(
+      page.getByRole("navigation", { name: "Seções da equipe" }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Voltar à origem", exact: true })
+      .click();
+    expect(page.url()).toBe(gamesSource);
+  }
 });
 
 test("busca pública repete o mesmo termo após falha transitória", async ({

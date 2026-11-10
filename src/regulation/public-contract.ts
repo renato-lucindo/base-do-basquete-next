@@ -160,6 +160,7 @@ const competitiveGame = publicGame
     winnerRegistrationId: uuid.nullable(),
     publicationVersion: revision,
     sourceKind: z.enum(["sheet", "pdf", "administrative"]).nullable(),
+    walkover: z.boolean().default(false),
   })
   .superRefine((g, c) => {
     const counted = g.state === "played" || g.state === "awarded";
@@ -180,6 +181,7 @@ const competitiveGame = publicGame
           g.publicationVersion === 0 ||
           g.sourceKind === "administrative")) ||
       (g.state === "awarded" && g.sourceKind !== "administrative") ||
+      (g.walkover && g.state !== "awarded") ||
       (g.score &&
         (g.score.homePoints === g.score.awayPoints ||
           (g.winnerRegistrationId === g.homeRegistrationId) !==

@@ -95,7 +95,10 @@ function PublicHome() {
             )}
             {standings.data ? (
               route.section === "jogos" ? (
-                <PublicSchedule value={standings.data} />
+                <PublicSchedule
+                  value={standings.data}
+                  publishedGames={catalog.games}
+                />
               ) : (
                 <PublicStandingsTables
                   key={route.id}
@@ -156,12 +159,23 @@ function PublicHome() {
                               disputeId: g.disputeId,
                               home: g.game.home.name,
                               away: g.game.away.name,
+                              homeProfile: {
+                                teamId: g.game.home.team.id,
+                                registrationId: g.game.home.registrationId,
+                              },
+                              awayProfile: {
+                                teamId: g.game.away.team.id,
+                                registrationId: g.game.away.registrationId,
+                              },
+                              published: true,
                               date: g.game.date,
                               time: g.game.time,
                               venue: g.game.venue,
                               score: g.score,
-                              status: "Encerrado",
-                              published: true,
+                              number: g.game.number,
+                              phase: null,
+                              seriesGame: null,
+                              walkover: false,
                             }))}
                           />
                         ) : (

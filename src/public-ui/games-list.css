@@ -1,0 +1,135 @@
+.public-games-block .public-games-search {
+  gap: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+.public-game-search-field {
+  width: min(26rem, 100%);
+}
+.public-games-search label {
+  display: block;
+  width: auto;
+  margin-bottom: 0.25rem;
+}
+.public-game-search-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+.public-game-search-controls input {
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+  border-color: #7b8796;
+}
+.public-game-search-controls button {
+  flex: none;
+  min-height: 2.75rem;
+  white-space: nowrap;
+}
+.public-games-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--public-line);
+}
+.public-game-row {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid var(--public-line);
+  text-align: center;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.public-game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.125rem 0.625rem;
+  margin-bottom: 0.875rem;
+}
+.public-game-meta,
+.public-game-phase,
+.public-game-venue {
+  color: #667085;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.public-game-matchup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+.public-game-home,
+.public-game-away {
+  min-width: 0;
+  font-weight: 600;
+}
+.public-game-score {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.375rem;
+  font-size: 1rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #667085;
+}
+.public-game-score.has-score {
+  color: #1557a4;
+}
+.public-game-separator {
+  color: #667085;
+  font-weight: 400;
+}
+.public-game-matchup a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  color: inherit;
+  border-radius: 0.125rem;
+}
+.public-home .public-game-matchup a,
+.public-home .public-game-matchup a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+.public-game-score a {
+  gap: 0.375rem;
+  min-width: 2.75rem;
+}
+.public-home .public-game-matchup a:hover {
+  background: #f1f6fd;
+}
+.public-game-matchup a:focus-visible {
+  outline: 2px solid var(--public-blue);
+  outline-offset: 3px;
+}
+.public-game-phase {
+  margin-top: 0.625rem;
+}
+.public-game-venue {
+  margin-top: 0.625rem;
+}
+.public-game-empty {
+  padding: 1.5rem 0.75rem;
+  border-block: 1px solid var(--public-line);
+  text-align: center;
+}
+.public-game-empty p {
+  margin: 0 0 0.5rem;
+}
+@media (max-width: 800px) {
+  .public-game-row {
+    padding-inline: 0;
+  }
+  .public-game-matchup {
+    grid-template-columns: minmax(0, 1fr) 4.75rem minmax(0, 1fr);
+    gap: 0.375rem;
+  }
+  .public-game-search-field {
+    width: 100%;
+  }
+  .public-game-search-controls input {
+    font-size: 1rem;
+  }
+}

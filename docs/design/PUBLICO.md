@@ -39,9 +39,20 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 | Página        | Regra de experiência                                                                                                                                           |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Classificação | Uma tabela por vez, seletor de grupo quando houver vários e navegação por fase. Se indisponível/não publicada, explicar e manter as demais páginas acessíveis. |
-| Jogos         | Lista **única e compacta, ordenada por data**; rodadas não são obrigatórias. Acesso ao detalhe com contexto preservado.                                        |
+| Jogos         | Lista única centralizada em todas as larguras, com busca e ordenação decrescente por data; placar abre o jogo publicado e nomes abrem os perfis disponíveis.   |
 | Equipes       | Listagem/tabela de desempenho e entrada no perfil da equipe.                                                                                                   |
 | Jogadores     | Tabela pesquisável de estatísticas individuais e acesso ao perfil do atleta.                                                                                   |
+
+## Jogos — aceite visual de 10/11/2026
+
+- Usar o mesmo formato no celular e no desktop expandido: número oficial e data/horário no topo; equipes e placar centralizados; fase/série abaixo; local ao final. Nomes completos quebram linha.
+- Agenda e resultados ficam juntos, com rolagem da página. Datas e horários são decrescentes; datas desconhecidas ficam ao final, horários desconhecidos depois dos conhecidos e empates preservam a ordem de entrada.
+- Buscar equipe ou local sem distinguir acentos ou maiúsculas; atualizar contagem e oferecer recuperação no vazio. Zero confirmado não equivale a placar ausente, exibido como “—”. Campos desconhecidos usam “a definir”.
+- Fase e posição da série vêm dos dados explícitos. Jogo único mostra somente a fase; série mostra, por exemplo, “Semifinal · Jogo 2”. Número oficial é independente do slot.
+- W.O. aparece em texto normal junto da fase: “Quartas de final - W.O.”. Só uma decisão confirmada de W.O. autoriza essa identificação; placares 20 × 0 e decisões administrativas genéricas não a implicam. As etiquetas de revisão, aguardando resultado, decisão administrativa e desconsiderado não aparecem na lista pública.
+- Na implementação real, o placar abre o detalhe publicado do jogo; os nomes abrem o perfil da equipe com a inscrição correta. Usar o catálogo público para confirmar os destinos, inclusive perfis disponíveis em partidas futuras. Sem publicação, não inventar uma página. O retorno conserva a disputa e a busca da lista. Esta decisão posterior substitui a ausência de links do protótipo.
+- Nomes e placares clicáveis ficam sem sublinhado, inclusive no hover. Refinamento aceito posteriormente: placar confirmado em azul #1557A4, equipes em tom escuro; número/data/horário/fase/local e placar ausente em cinza neutro. Preservar os destinos reais, o foco visível por teclado e o retorno visual de interação. O destaque usa também peso/tamanho, sem depender somente da cor.
+- Implementação e validação desta unidade estão em [VALIDACAO-JOGOS-PUBLICOS.md](../VALIDACAO-JOGOS-PUBLICOS.md). Aceite visual e abertura de PR não autorizam merge, deploy ou publicação de dados.
 
 ## Estatísticas e publicação
 
@@ -75,6 +86,7 @@ O protótipo desta conversa foi aceito para implementação com as decisões aba
 
 - Parciais mostram somente pontos; retirar faltas coletivas dessas células.
 - Elencos preservam titulares pelo nome em negrito e asterisco; quem não entrou conserva texto/fundo normais, inclusive em PTS, com — nas estatísticas. Completar cada corpo até12linhas com preenchimentos cinza vazios, sem identidade, ações ou participação nos cálculos. Colunas, linhas correspondentes e rodapés equivalentes; nomes extensos continuam legíveis.
+- Refinamento posterior: as linhas de jogadores usam a mesma altura compacta de Estatísticas, na escala compartilhada. Remover o espaço vertical fixo excessivo no desktop/celular; nomes longos podem ampliar a linha necessária, sem corte ou sobreposição. Preservar foco e interação dos detalhes de faltas.
 - Destacar máximos positivos de PTS/2P/3P/LL por equipe e recorte, com todos os empates. Não aplicar peso à linha inteira, zeros, ausências ou totais.
 - Jogo todo/quartos/prorrogações sincronizam dados, totais, máximos e faltas; o placar final permanece visível. A consulta optativa lê somente a versão imutável publicada. PDF/legado sem cobertura não recebe períodos individuais inventados.
 - O responsável confirmou manter — quando a participação no quarto não é conhecida. Titular comprova o primeiro quarto; evento individual comprova presença no período. Ausência de evento nunca comprova que o atleta não entrou. Exclusões/desqualificações respeitam a cronologia.
