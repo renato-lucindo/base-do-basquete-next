@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import { RegulationWorkspace } from "../regulation/workspace";
+import { CompetitionSetupWorkspace } from "../regulation/setup-workspace";
+import { flexibleCompetitionEnabled } from "./features";
 import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
@@ -580,7 +582,9 @@ export function CompetitionWorkspace({
                 setRoute(editor.draft.id, selected, "regulation");
               }}
             >
-              Regulamento
+              {flexibleCompetitionEnabled()
+                ? "Formato e classificação"
+                : "Regulamento"}
             </button>
             {context && editor.savedIds.has(context.id) && (
               <a
@@ -605,14 +609,25 @@ export function CompetitionWorkspace({
           </nav>
           {context && editor.savedIds.has(context.id) && (
             <div hidden={tab !== "regulation"}>
-              <RegulationWorkspace
-                key={context.id}
-                disputeId={context.id}
-                enabled={enabled && tab === "regulation"}
-                guard={regulationGuard}
-                onSessionLost={onSessionLost}
-                onSaved={() => setRefresh((n) => n + 1)}
-              />
+              {flexibleCompetitionEnabled() ? (
+                <CompetitionSetupWorkspace
+                  key={context.id}
+                  disputeId={context.id}
+                  enabled={enabled && tab === "regulation"}
+                  guard={regulationGuard}
+                  onSessionLost={onSessionLost}
+                  onSaved={() => setRefresh((n) => n + 1)}
+                />
+              ) : (
+                <RegulationWorkspace
+                  key={context.id}
+                  disputeId={context.id}
+                  enabled={enabled && tab === "regulation"}
+                  guard={regulationGuard}
+                  onSessionLost={onSessionLost}
+                  onSaved={() => setRefresh((n) => n + 1)}
+                />
+              )}
             </div>
           )}
           <div className="competition-info" hidden={tab !== "info"}>

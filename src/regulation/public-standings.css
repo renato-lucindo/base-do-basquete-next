@@ -86,6 +86,13 @@
 }
 .public-standings.public-site.statistics-public
   .standings-explorer
+  .statistics-table
+  .standings-recent {
+  text-align: center;
+  white-space: nowrap;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
   .standings-header-help {
   min-height: 2rem;
   font: inherit;
@@ -172,7 +179,9 @@
     width: max-content;
     max-width: 100%;
   }
-  .public-standings .standings-explorer .scrollable-table-top {
+  .public-standings
+    .standings-explorer
+    :is(.scrollable-table-top, .table-legend) {
     contain: inline-size;
   }
 }

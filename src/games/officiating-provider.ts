@@ -13,7 +13,10 @@ import {
 
 type Functions = Pick<
   Database["public"]["Functions"],
-  "list_game_officials" | "save_game_editor" | "get_game_editor"
+  | "list_game_officials"
+  | "save_flexible_game_editor"
+  | "save_game_editor"
+  | "get_game_editor"
 >;
 type Rpc = keyof Functions;
 export class SupabaseOfficiating {
@@ -52,7 +55,7 @@ export class SupabaseOfficiating {
       token,
     );
   }
-  async save(token: string, command: SaveGameEditor) {
+  async save(token: string, command: SaveGameEditor, flexible = false) {
     const parsed = saveGameEditorSchema.safeParse(command);
     if (!parsed.success)
       throw new HttpError(
@@ -62,7 +65,7 @@ export class SupabaseOfficiating {
       );
     const result = await this.call(
       saveResultSchema,
-      "save_game_editor",
+      flexible ? "save_flexible_game_editor" : "save_game_editor",
       { p_command: parsed.data },
       token,
     );

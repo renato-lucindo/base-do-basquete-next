@@ -27,7 +27,7 @@ import {
   type PublicationState,
 } from "./data-contract";
 type Ack = z.infer<typeof publicationSheetResultSchema>;
-type Props = {
+export type SheetPublicationProps = {
   game: GameSnapshot;
   document: PersistedSheet;
   sourceVersion: number;
@@ -42,7 +42,7 @@ type Props = {
   onSessionLost: () => void;
   onPublished: (r: Ack, explicitReload: boolean) => Promise<void>;
 };
-export function SheetPublicationPanel(p: Props) {
+export function SheetPublicationPanel(p: SheetPublicationProps) {
   const [teamReview, setTeamReview] = useState(() =>
     initialGDReview(deriveSheetTeamStatistics(p.document)),
   );

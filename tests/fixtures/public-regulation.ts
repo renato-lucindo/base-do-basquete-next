@@ -141,3 +141,95 @@ export function publicKnockoutFixture() {
   }
   return s;
 }
+
+/** Browser-only bracket: no database or publication writes. */
+export function publicQuarterfinalsFixture() {
+  const s = publicRegulationFixture(),
+    template = s.registrations[0],
+    gameTemplate = s.games[0],
+    factTemplate = s.publishedGames[0];
+  const names = [
+    "Aurora",
+    "Vale Verde",
+    "Vila Nova",
+    "Serra Azul",
+    "Atlântico",
+    "Horizonte",
+    "Estrela",
+    "Costa Norte",
+  ];
+  s.registrations = names.map((name, i) => ({
+    ...template,
+    id: id(i + 1),
+    name,
+    team: { ...template.team, id: id(700 + i), name, abbreviation: null },
+  }));
+  s.definition.registrationIds = s.registrations.map((r) => r.id);
+  s.definition.groupPhases = [];
+  s.definition.knockoutPhases = [
+    { id: id(30), name: "Quartas de final" },
+    { id: id(31), name: "Semifinais" },
+    { id: id(32), name: "Final" },
+  ];
+  s.definition.series = [];
+  s.games = [];
+  s.publishedGames = [];
+  s.occurrences = [];
+  s.withdrawals = [];
+  for (let i = 0; i < 7; i++) {
+    const home =
+      i < 4
+        ? { kind: "registration" as const, registrationId: id(i * 2 + 1) }
+        : {
+            kind: "series_winner" as const,
+            seriesId: id(20 + (i === 6 ? 4 : (i - 4) * 2)),
+          };
+    const away =
+      i < 4
+        ? { kind: "registration" as const, registrationId: id(i * 2 + 2) }
+        : {
+            kind: "series_winner" as const,
+            seriesId: id(20 + (i === 6 ? 5 : (i - 4) * 2 + 1)),
+          };
+    const node = {
+      id: id(20 + i),
+      phaseId: id(i < 4 ? 30 : i < 6 ? 31 : 32),
+      name:
+        i < 4
+          ? `Quarta de final ${i + 1}`
+          : i < 6
+            ? `Semifinal ${i - 3}`
+            : "Final",
+      format: "best_of_3" as const,
+      home,
+      away,
+      games: [] as { slot: number; gameId: string }[],
+    };
+    const homeId = id(i < 4 ? i * 2 + 1 : i === 4 ? 1 : 5),
+      awayId = id(i < 4 ? i * 2 + 2 : i === 4 ? 3 : 7);
+    if (i < 6)
+      for (let slot = 1; slot <= 2; slot++) {
+        const gameId = id(150 + i * 3 + slot),
+          forward = slot === 1;
+        node.games.push({ slot, gameId });
+        const game = {
+          ...gameTemplate,
+          id: gameId,
+          homeRegistrationId: forward ? homeId : awayId,
+          awayRegistrationId: forward ? awayId : homeId,
+        };
+        s.games.push(game);
+        const win = i !== 5 || slot === 1;
+        s.publishedGames.push({
+          ...factTemplate,
+          gameId,
+          homeRegistrationId: game.homeRegistrationId,
+          awayRegistrationId: game.awayRegistrationId,
+          homePoints: forward ? (win ? 76 : 62) : win ? 65 : 71,
+          awayPoints: forward ? (win ? 62 : 76) : win ? 71 : 65,
+        });
+      }
+    s.definition.series.push(node);
+  }
+  return s;
+}

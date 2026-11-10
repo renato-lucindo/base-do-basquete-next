@@ -91,6 +91,13 @@ export function previewEntrantGraph<R extends Result>(
   catalogSeries: GraphSeries[],
   groupPhases: GraphGroupPhase[],
   resolve: (id: string, home: string, away: string) => R,
+  resolveQualification?: (
+    poolId: string,
+    position: number,
+  ) => {
+    registrationId: string | null;
+    needs: "group_tie" | "group_results" | null;
+  },
 ) {
   const catalog = new Map(catalogSeries.map((n) => [n.id, n])),
     order = seriesDependencyOrder(catalogSeries);
@@ -110,6 +117,12 @@ export function previewEntrantGraph<R extends Result>(
         needs,
       });
     if (ref.kind === "registration") return ready(ref.registrationId);
+    if (ref.kind === "qualification_rank") {
+      const qualification = resolveQualification?.(ref.poolId, ref.position);
+      return qualification?.registrationId
+        ? ready(qualification.registrationId)
+        : pending(qualification?.needs ?? "group_results");
+    }
     if (ref.kind === "group_rank") {
       const group = phases
         .get(ref.phaseId)

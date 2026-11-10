@@ -43,6 +43,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
     context: publicGameSchema.shape.context,
     definition: publicDefinition,
     registrations: z.array(registration).max(1000),
+    organizationPendingGameIds: z.array(uuid).max(10000).optional(),
   };
 
 const source = z
@@ -105,10 +106,11 @@ export const publicStandingsSourceSchema = source.superRefine((s, c) => {
     ) &&
     sameIds(
       s.games.map((g) => g.id),
-      assignedIds(d),
+      [...assignedIds(d), ...(s.organizationPendingGameIds ?? [])],
     ) &&
     organizedInputSchema.safeParse({
       context: publicCompetitiveContext(s),
+      qualificationPools: d.qualificationPools,
       groupPhases: d.groupPhases.map((p) => ({
         phaseId: p.phaseId,
         rules: p.rules,
@@ -202,11 +204,18 @@ export const publicStandingsSchema = z
     const d = s.definition,
       p = s.projection,
       regs = new Set(d.registrationIds),
-      games = new Set(assignedIds(d)),
+      games = new Set([
+        ...assignedIds(d),
+        ...(s.organizationPendingGameIds ?? []),
+      ]),
       gameCatalog = new Map(s.games.map((g) => [g.id, g])),
       phaseCatalog = new Map(d.groupPhases.map((p) => [p.phaseId, p])),
       seriesCatalog = new Map(d.series.map((n) => [n.id, n]));
     let valid =
+      sameIds(
+        [...games],
+        [...assignedIds(d), ...(s.organizationPendingGameIds ?? [])],
+      ) &&
       p.disputeId === s.disputeId &&
       p.regulationVersion === s.regulationVersion &&
       sameIds(

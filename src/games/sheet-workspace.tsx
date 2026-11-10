@@ -1,3 +1,5 @@
+import { FinalizeSheetPanel } from "../publication/finalize-sheet-panel";
+import { flexibleCompetitionEnabled } from "../competition/features";
 import { SheetPublicationPanel } from "../publication/sheet-panel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
@@ -49,6 +51,8 @@ type History = {
 const sides = ["home", "away"] as const;
 const sideName = (s: Side) => (s === "home" ? "A" : "B");
 export function GameSheetWorkspace(props: Props) {
+  const flexible = flexibleCompetitionEnabled(),
+    PublicationPanel = flexible ? FinalizeSheetPanel : SheetPublicationPanel;
   const [history, setHistory] = useState<History | null>(null),
     [baseline, setBaseline] = useState(""),
     [version, setVersion] = useState(0),
@@ -477,7 +481,12 @@ export function GameSheetWorkspace(props: Props) {
       setError("Conclua ou cancele a alteração da ação antes de salvar.");
       return;
     }
-    if (snapshot?.confirmed && !pending.current && reason.trim().length < 10) {
+    if (
+      !flexible &&
+      snapshot?.confirmed &&
+      !pending.current &&
+      reason.trim().length < 10
+    ) {
       setError("Informe o motivo da revisão da súmula (10 a 500 caracteres).");
       return;
     }
@@ -1057,9 +1066,11 @@ export function GameSheetWorkspace(props: Props) {
               </div>
             </AdminDialog>
           </div>
-          {snapshot?.confirmed && (
+          {(snapshot?.confirmed || flexible) && (
             <label>
-              Motivo da revisão da súmula
+              {flexible
+                ? "Comentário (opcional)"
+                : "Motivo da revisão da súmula"}
               <textarea
                 maxLength={500}
                 value={reason}
@@ -1086,7 +1097,7 @@ export function GameSheetWorkspace(props: Props) {
               Recarregar súmula
             </button>
           </div>
-          <SheetPublicationPanel
+          <PublicationPanel
             key={`${props.game.id}:${gameVersion}:${version}`}
             game={props.game}
             document={d}

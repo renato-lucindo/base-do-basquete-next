@@ -5,6 +5,7 @@ import { groupPhaseInputSchema } from "./groups";
 import { occurrencesInputSchema, occurrenceRulesSchema } from "./occurrences";
 import { organizedInputSchema, previewOrganizedCompetition } from "./organized";
 import { tieDecisionSchema, tieNoteSchema } from "./tie-decisions";
+import { qualificationPoolSchema } from "./qualifications";
 const uuid = z.uuid().transform((v) => v.toLowerCase()),
   version = z.number().int().min(1).max(2147483647),
   fingerprint = z.string().regex(/^[a-f0-9]{64}$/u),
@@ -22,6 +23,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase()),
 const definitionShape = z
   .object({
     registrationIds: z.array(uuid).max(1000),
+    qualificationPools: z.array(qualificationPoolSchema).max(64).optional(),
     transfers: z.enum(["allowed", "forbidden"]).nullable().optional(),
     customized: z.boolean().optional(),
     customReason: z.string().trim().max(2000).optional(),
@@ -51,6 +53,7 @@ const definitionShape = z
   })
   .strict();
 const structure = (d: z.infer<typeof definitionShape>) => ({
+  ...(d.qualificationPools ? { qualificationPools: d.qualificationPools } : {}),
   ...(d.tieDecisions ? { tieDecisions: d.tieDecisions } : {}),
   groupPhases: d.groupPhases.map((p) => ({
     phaseId: p.phaseId,
@@ -94,6 +97,7 @@ export const regulationDefinitionSchema = definitionShape.superRefine(
       disputeId: "00000000-0000-4000-8000-000000000001",
       regulationVersion: 1,
       registrationIds: d.registrationIds,
+      qualificationPools: d.qualificationPools,
       groupPhases: parts.groupPhases.map((p) => ({
         ...p,
         disputeId: "00000000-0000-4000-8000-000000000001",

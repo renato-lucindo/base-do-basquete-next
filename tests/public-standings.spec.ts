@@ -43,7 +43,7 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     "PP",
     "PC",
     "SLD",
-    "Últimos 5",
+    "Últimos jogos",
   ]);
   await page.screenshot({
     path: `.preview-artifacts/standings-columns-after-${info.project.name}.png`,
@@ -126,7 +126,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     "PP",
     "PC",
     "SLD",
-    "Últimos 5",
+    "Últimos jogos",
   ]);
   await expect(
     table.getByRole("row").nth(1).getByRole("cell").nth(4),
@@ -216,16 +216,16 @@ test("correção publicada altera a tabela e fases mantêm confrontos em revisã
       .getByRole("cell")
       .nth(5),
   ).toHaveText("95");
-  await page.getByRole("link", { name: "Finais", exact: true }).click();
+  await page.getByRole("link", { name: "Eliminatória", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Final", exact: true }),
+    page.getByRole("article", { name: "Final", exact: true }),
   ).toBeVisible();
   const semi = s.publishedGames.find((g) => g.gameId.endsWith("000000000103"))!;
   semi.publicationVersion++;
   semi.homePoints = 50;
   semi.awayPoints = 60;
   await page.reload();
-  await page.getByRole("link", { name: "Finais", exact: true }).click();
+  await page.getByRole("link", { name: "Eliminatória", exact: true }).click();
   await expect(
     page
       .getByText("Confronto em revisão após alteração dos resultados.")
@@ -276,4 +276,31 @@ test("falha do leitor permite repetir consulta; nomes longos não transbordam em
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test("resultados sem associação continuam acessíveis na agenda pública", async ({
+  page,
+}) => {
+  await publicNavigationFixture(page);
+  const source = publicRegulationFixture();
+  source.definition.groupPhases = [];
+  source.definition.knockoutPhases = [];
+  source.definition.series = [];
+  const value = buildPublicStandings({
+    ...source,
+    organizationPendingGameIds: source.games.map((g) => g.id),
+  });
+  await page.route("**/api/public/standings/**", (r) =>
+    r.fulfill({ json: value }),
+  );
+  await page.goto(
+    `${origin}/publico.html#${source.disputeId}?secao=classificacao`,
+  );
+  await expect(
+    page.getByRole("status").filter({ hasText: "aguardam associação" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Jogos", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Lobos × Águias", exact: true }),
+  ).toBeVisible();
 });

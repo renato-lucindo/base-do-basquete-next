@@ -34,6 +34,9 @@ export function buildPublicStandings(input: unknown): PublicStandings {
     context: s.context,
     definition: s.definition,
     registrations: s.registrations,
+    ...(s.organizationPendingGameIds
+      ? { organizationPendingGameIds: s.organizationPendingGameIds }
+      : {}),
     games: s.games.map((g) => {
       const decision = decisions.get(g.id)!,
         outcome = decision.outcome

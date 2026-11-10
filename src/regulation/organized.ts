@@ -8,6 +8,10 @@ import { previewEntrantGraph } from "./crossing-graph";
 import { seriesFormatSchema } from "./series";
 import type { OutcomeGame } from "./outcome";
 import {
+  qualificationPoolSchema,
+  resolveQualifications,
+} from "./qualifications";
+import {
   tieDecisionSchema,
   tieDecisionContext,
   applyTieDecisions,
@@ -16,6 +20,7 @@ const uuid = z.uuid().transform((v) => v.toLowerCase());
 export const organizedInputSchema = z
   .object({
     context: occurrencesInputSchema,
+    qualificationPools: z.array(qualificationPoolSchema).max(64).optional(),
     tieDecisions: z.array(tieDecisionSchema).max(1000).optional(),
     groupPhases: z
       .array(
@@ -68,6 +73,7 @@ export const organizedInputSchema = z
       disputeId: ctx.disputeId,
       regulationVersion: ctx.regulationVersion,
       registrationIds: ctx.registrationIds,
+      qualificationPools: s.qualificationPools,
       groupPhases: s.groupPhases.map((p) => ({
         ...p,
         disputeId: ctx.disputeId,
@@ -112,6 +118,28 @@ export const organizedInputSchema = z
     if (assigned.size > 10000) issue();
   });
 export type OrganizedInput = z.infer<typeof organizedInputSchema>;
+function completeCalendar(
+  ids: string[],
+  outcomes: OutcomeGame[],
+  turns: number,
+) {
+  if (
+    ids.length < 2 ||
+    ((ids.length * (ids.length - 1)) / 2) * turns > outcomes.length
+  )
+    return false;
+  const pairs = new Map<string, number>();
+  const key = (a: string, b: string) => (a < b ? `${a}:${b}` : `${b}:${a}`);
+  for (const g of outcomes) {
+    const k = key(g.homeRegistrationId, g.awayRegistrationId);
+    pairs.set(k, (pairs.get(k) ?? 0) + 1);
+  }
+  return ids.every((home, i) =>
+    ids
+      .slice(i + 1)
+      .every((away) => (pairs.get(key(home, away)) ?? 0) >= turns),
+  );
+}
 /** Administrative/private preview. No persistence or public confirmation is implied. */
 export function previewOrganizedCompetition(input: unknown) {
   const s = organizedInputSchema.parse(input),
@@ -160,6 +188,15 @@ export function previewOrganizedCompetition(input: unknown) {
           );
           return {
             groupId: g.id,
+            ...(s.qualificationPools?.length
+              ? {
+                  qualificationReady: completeCalendar(
+                    g.registrationIds,
+                    outcomes,
+                    phase.rules.turns ?? 1,
+                  ),
+                }
+              : {}),
             pendingGameIds: g.gameIds
               .filter((id) =>
                 ["pending", "conflict"].includes(games.get(id)!.state),
@@ -174,6 +211,16 @@ export function previewOrganizedCompetition(input: unknown) {
         }),
     }))
     .sort((a, b) => a.phaseId.localeCompare(b.phaseId));
+  const qualifications = new Map(
+    (s.qualificationPools ?? []).map((pool) => [
+      pool.id,
+      resolveQualifications(
+        pool,
+        groupPhases.find((p) => p.phaseId === pool.phaseId)?.groups ?? [],
+        s.context.registrationIds,
+      ),
+    ]),
+  );
   const series = previewEntrantGraph(
     s.series.map((n) => ({
       ...n,
@@ -203,6 +250,14 @@ export function previewOrganizedCompetition(input: unknown) {
           return game ? [{ slot, game }] : [];
         }),
       });
+    },
+    (poolId, position) => {
+      const result = qualifications.get(poolId);
+      if (!result) return { registrationId: null, needs: "group_results" };
+      return {
+        registrationId: result.registrationIds[position - 1] ?? null,
+        needs: result.needs,
+      };
     },
   );
   return {

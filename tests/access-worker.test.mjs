@@ -601,6 +601,7 @@ async function fixture(options = {}) {
       compatibilityFlags: ["nodejs_compat"],
       bindings: {
         APP_ORIGIN: origin,
+        FLEXIBLE_COMPETITION: options.flexibleCompetition ? "true" : "false",
         SUPABASE_URL: "https://auth.example.test",
         SUPABASE_PUBLISHABLE_KEY: "fixture-publishable",
         SESSION_ENCRYPTION_KEY: btoa("\0".repeat(32)),
@@ -3447,5 +3448,45 @@ test("regulation drafts enforce session, CSRF, closed bodies and receipt replay 
     assert.ok(!JSON.stringify(draft).includes("fixture-access"));
   } finally {
     await f.mf.dispose();
+  }
+});
+
+test("flexible preview metadata and private setup/finalization routes stay isolated", async () => {
+  const f = await fixture({ flexibleCompetition: true });
+  try {
+    const html = await f.mf.dispatchFetch(origin + "/admin");
+    assert.equal(html.status, 200);
+    assert.match(
+      await html.text(),
+      /<meta name="bb-flexible-competition" content="true">/,
+    );
+    for (const path of [
+      `/api/competition-setups/${id}`,
+      `/api/games/${id}/publication/finalize-sheet`,
+      `/api/games/${id}/publication/finalize-pdf`,
+    ]) {
+      const r = await f.mf.dispatchFetch(origin + path, {
+        method: path.includes("finalize") ? "POST" : "GET",
+      });
+      assert.equal(r.status, 401);
+    }
+    assert.equal(
+      f.calls.filter(
+        (c) => c.includes("competition_setup") || c.includes("finalize_"),
+      ).length,
+      0,
+    );
+  } finally {
+    await f.mf.dispose();
+  }
+  const legacy = await fixture({});
+  try {
+    assert.equal(
+      (await legacy.mf.dispatchFetch(origin + `/api/competition-setups/${id}`))
+        .status,
+      404,
+    );
+  } finally {
+    await legacy.mf.dispose();
   }
 });

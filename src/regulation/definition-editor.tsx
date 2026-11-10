@@ -28,6 +28,7 @@ const maximums = {
 };
 type Props = {
   definition: RegulationDefinition;
+  optionalComment?: boolean;
   registrations: RegistrationSnapshot[];
   games: GameSnapshot[];
   change: (f: (d: RegulationDefinition) => void) => void;
@@ -57,6 +58,12 @@ function ReferenceEditor({
           onChange={(e) => {
             const kind = e.target.value;
             if (kind === "registration") onChange({ kind, registrationId: "" });
+            else if (kind === "qualification_rank")
+              onChange({
+                kind,
+                poolId: definition.qualificationPools?.[0]?.id ?? "",
+                position: 1,
+              });
             else if (kind === "group_rank")
               onChange({ kind, phaseId: "", groupId: "", position: 1 });
             else
@@ -70,6 +77,11 @@ function ReferenceEditor({
           <option value="group_rank">Posição em grupo</option>
           <option value="series_winner">Vencedor de confronto</option>
           <option value="series_loser">Perdedor de confronto</option>
+          {!!definition.qualificationPools?.length && (
+            <option value="qualification_rank">
+              Classificado entre grupos
+            </option>
+          )}
         </select>
       </label>
       {value.kind === "registration" ? (
@@ -93,6 +105,34 @@ function ReferenceEditor({
               ))}
           </select>
         </label>
+      ) : value.kind === "qualification_rank" ? (
+        <>
+          <label>
+            Classificação de origem
+            <select
+              value={value.poolId}
+              onChange={(e) => onChange({ ...value, poolId: e.target.value })}
+            >
+              {definition.qualificationPools?.map((p) => (
+                <option key={p.id} value={p.id}>
+                  Classificados da fase
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Posição entre classificados
+            <input
+              type="number"
+              min={1}
+              max={1000}
+              value={value.position}
+              onChange={(e) =>
+                onChange({ ...value, position: Number(e.target.value) })
+              }
+            />
+          </label>
+        </>
       ) : value.kind === "group_rank" ? (
         <>
           <label>
@@ -150,6 +190,7 @@ function ReferenceEditor({
 }
 export function DefinitionEditor({
   definition: d,
+  optionalComment = false,
   registrations,
   games,
   change,
@@ -253,9 +294,11 @@ export function DefinitionEditor({
         </div>
         {d.customized && (
           <label>
-            Justificativa das regras personalizadas
+            {optionalComment
+              ? "Comentário sobre as regras (opcional)"
+              : "Justificativa das regras personalizadas"}
             <textarea
-              required
+              required={!optionalComment}
               maxLength={2000}
               value={d.customReason ?? ""}
               onChange={(e) =>

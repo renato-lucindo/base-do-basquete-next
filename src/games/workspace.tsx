@@ -1,3 +1,6 @@
+import { GameFormatAssignment } from "./format-assignment";
+import { GameVisibilityPanel } from "./visibility-panel";
+import { flexibleCompetitionEnabled } from "../competition/features";
 import type { GameOrder } from "./contract";
 import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
@@ -67,6 +70,9 @@ const document = (s: GameSnapshot) =>
     knockoutStage: s.knockoutStage ?? null,
   });
 export function GamesWorkspace(props: Props) {
+  const flexible = flexibleCompetitionEnabled(),
+    formatAction = useRef<() => Promise<string>>(async () => "");
+  const [formatDirty, setFormatDirty] = useState(false);
   const listPosition = useRef({ y: 0, id: "" }),
     stageId = useId(),
     workspace = useRef<HTMLElement>(null);
@@ -127,7 +133,7 @@ export function GamesWorkspace(props: Props) {
       sheetGuard.current() &&
       auxGuard.current() &&
       occurrenceGuard.current() &&
-      (!(dirty || uncertain) ||
+      (!(dirty || uncertain || formatDirty) ||
         window.confirm(
           "Há alterações não salvas ou um envio não confirmado. Deseja sair deste jogo?",
         ))
@@ -343,12 +349,14 @@ export function GamesWorkspace(props: Props) {
         gameEditorSnapshotSchema,
       );
       const intent = saveAction.current;
+      const organizationWarning = flexible ? await formatAction.current() : "";
       accept(snapshot);
       if (intent === "next") beginNew(snapshot.game);
       setStatus(
-        intent === "next"
-          ? "Jogo salvo. Preencha o próximo confronto."
-          : "Jogo salvo",
+        organizationWarning ||
+          (intent === "next"
+            ? "Jogo salvo. Preencha o próximo confronto."
+            : "Jogo salvo"),
       );
       setEpoch((v) => v + 1);
       props.onSaved();
@@ -1039,12 +1047,39 @@ export function GamesWorkspace(props: Props) {
                 }}
               />
             </details>
+            {flexible && (
+              <GameFormatAssignment
+                key={`format-${editor.game.id}`}
+                disputeId={props.disputeId}
+                gameId={editor.game.id}
+                disabled={busy || uncertain || conflict || !props.enabled}
+                action={formatAction}
+                onDirty={setFormatDirty}
+                onSessionLost={props.onSessionLost}
+              />
+            )}
+            {flexible && savedGame && (
+              <GameVisibilityPanel
+                key={`visibility-${savedGame.id}`}
+                game={savedGame}
+                enabled={
+                  props.enabled && !busy && !dirty && !uncertain && !conflict
+                }
+                onSessionLost={props.onSessionLost}
+                onSaved={() => {
+                  setEpoch((v) => v + 1);
+                  props.onSaved();
+                }}
+              />
+            )}
             <p className="game-publication-note">
-              Salvar o jogo não publica o resultado.
+              {flexible
+                ? "Finalize a súmula ou conclua a importação para atualizar o resultado automaticamente."
+                : "Salvar o jogo não publica o resultado."}
             </p>
             {savedGame && (
               <GameOccurrencePanel
-                key={savedGame.id}
+                key={`occurrence-${savedGame.id}`}
                 game={savedGame}
                 enabled={
                   props.enabled && !busy && !dirty && !uncertain && !conflict
@@ -1154,7 +1189,9 @@ export function GamesWorkspace(props: Props) {
                     <td>{g.venue ?? "A definir"}</td>
                     <td className="nowrap">
                       {g.state === "finished"
-                        ? "Resultado publicado"
+                        ? flexible
+                          ? "Resultado registrado"
+                          : "Resultado publicado"
                         : "Sem resultado"}
                     </td>
                   </tr>

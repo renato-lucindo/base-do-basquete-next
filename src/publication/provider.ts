@@ -32,6 +32,11 @@ import {
   publicationSheetResultSchema,
   publicationPdfResultSchema,
 } from "./data-contract";
+import {
+  finalizeSheetSchema,
+  finalizePdfSchema,
+  prepareFinalSheet,
+} from "./finalization";
 type Functions = Database["public"]["Functions"];
 type Rpc =
   | "get_game_publication_state"
@@ -39,6 +44,8 @@ type Rpc =
   | "get_public_game"
   | "get_pdf_publication_preparation"
   | "save_pdf_publication_preparation"
+  | "finalize_sheet_game"
+  | "finalize_pdf_game"
   | "publish_sheet_game"
   | "revise_sheet_team_statistics"
   | "publish_pdf_game"
@@ -191,18 +198,21 @@ export class SupabasePublications {
     if (r && r.id !== gameId) throw unavailable();
     return r;
   }
-  async publishSheet(token: string, input: PublishSheet) {
-    const parsed = publishSheetSchema.safeParse(input);
+  async publishSheet(token: string, input: PublishSheet, automatic = false) {
+    const parsed = (
+      automatic ? finalizeSheetSchema : publishSheetSchema
+    ).safeParse(input);
     if (!parsed.success) throw badInput();
-    const c = parsed.data;
+    let c = parsed.data;
     try {
-      prepareManualPublication(c);
+      if (automatic) c = prepareFinalSheet(c);
+      else prepareManualPublication(c);
     } catch {
       throw badInput();
     }
     const r = await this.rpc(
       publicationSheetResultSchema,
-      "publish_sheet_game",
+      automatic ? "finalize_sheet_game" : "publish_sheet_game",
       { p_command: c },
       token,
     );
@@ -233,13 +243,15 @@ export class SupabasePublications {
       throw unavailable();
     return r;
   }
-  async publishPdf(token: string, input: PublishPdf) {
-    const parsed = publishPdfSchema.safeParse(input);
+  async publishPdf(token: string, input: PublishPdf, automatic = false) {
+    const parsed = (automatic ? finalizePdfSchema : publishPdfSchema).safeParse(
+      input,
+    );
     if (!parsed.success) throw badInput();
     const c = parsed.data;
     const r = await this.rpc(
       publicationPdfResultSchema,
-      "publish_pdf_game",
+      automatic ? "finalize_pdf_game" : "publish_pdf_game",
       { p_command: c },
       token,
     );

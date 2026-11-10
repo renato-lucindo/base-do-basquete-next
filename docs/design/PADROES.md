@@ -16,8 +16,14 @@ Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar alt
 
 ## Textos de apresentação
 
-- Legendas e tooltips explicam o significado dos indicadores para o público. Fórmulas, origem dos dados e instruções de implementação ficam na documentação técnica, salvo necessidade explicitamente solicitada pelo responsável. Por exemplo, exibir **FR — Faltas recebidas**; a equivalência com FC da adversária permanece na especificação técnica.
-- Reutilizar uma definição aprovada por indicador, compartilhada entre tabela, seletor de colunas, legenda e tooltip. Evitar complementos locais que alterem o nome apresentado em apenas um desses lugares.
+Decisão de08/11/2026, válida para páginas novas ou alteradas nas áreas pública e administrativa. A conferência obrigatória fica no [fluxo de revisão](README.md#conferência-obrigatória-de-textos-e-tabelas).
+
+- Textos auxiliares comunicam uma ação necessária, erro, ausência ou estado concreto, somente quando aplicável. Não acrescentar avisos permanentes que expliquem o funcionamento normal da página, repitam informações visíveis ou antecipem situações inexistentes. Por exemplo, não inserir um bloco fixo “Classificação provisória” acompanhado de uma explicação genérica sobre atualização dos resultados.
+- Fórmulas, critérios técnicos, origem dos dados e instruções de implementação ficam na documentação técnica, salvo necessidade explicitamente solicitada pelo responsável. Concisão não autoriza ocultar erros, estados vazios ou pendências concretas necessários à compreensão dos dados.
+- Tooltips de **cabeçalho** contêm somente o significado da sigla ou abreviação, sem fórmulas, instruções, justificativas ou explicações adicionais: `V` → `Vitórias`, `FR` → `Faltas recebidas`. Cabeçalhos com nomes completos, como **Equipe** e **Últimos jogos**, não recebem tooltip nem botão exclusivamente de ajuda. Ações reais, como ordenação, conservam seus controles e nomes acessíveis.
+- Reutilizar uma definição curta aprovada por indicador, compartilhada entre tabela, seletor de colunas, legenda e tooltip. Não acrescentar complementos locais. A equivalência de FR com FC da adversária, por exemplo, permanece na especificação técnica.
+- Legendas reutilizam a apresentação existente de Jogadores e Equipes: título **Legenda**, pares de sigla/abreviação e significado, com a mesma estrutura visual e comportamento responsivo. Incluir apenas abreviações das colunas visíveis; nomes completos não precisam ser repetidos. Não criar parágrafos explicativos, fórmulas, instruções técnicas ou um formato próprio para cada página.
+- A restrição dos cabeçalhos não elimina tooltips informativos de registros ou ícones. Eles seguem o conteúdo mínimo aprovado para sua finalidade; o formato compacto dos jogos está em [Público — Classificação](PUBLICO.md#classificação--decisão-de-06112026). Preservar teclado, toque e informações acessíveis necessárias, separadas de explicações visuais dispensáveis.
 
 ## Tabelas e ações
 

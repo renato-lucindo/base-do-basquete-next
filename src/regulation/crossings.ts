@@ -3,6 +3,7 @@ import { calculateGroupPhase, groupPhaseInputSchema } from "./groups";
 import { resolveSeries, seriesFormatSchema, seriesInputSchema } from "./series";
 import type { CompetitiveFact } from "./contract";
 import { previewEntrantGraph } from "./crossing-graph";
+import { qualificationPoolSchema } from "./qualifications";
 const uuid = z.uuid().transform((v) => v.toLowerCase());
 export const entrantReferenceSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("registration"), registrationId: uuid }).strict(),
@@ -16,6 +17,13 @@ export const entrantReferenceSchema = z.discriminatedUnion("kind", [
     .strict(),
   z.object({ kind: z.literal("series_winner"), seriesId: uuid }).strict(),
   z.object({ kind: z.literal("series_loser"), seriesId: uuid }).strict(),
+  z
+    .object({
+      kind: z.literal("qualification_rank"),
+      poolId: uuid,
+      position: z.number().int().min(1).max(1000),
+    })
+    .strict(),
 ]);
 const seriesNodeSchema = z
   .object({
@@ -32,6 +40,7 @@ export const crossingsInputSchema = z
     disputeId: uuid,
     regulationVersion: z.number().int().min(1).max(2147483647),
     registrationIds: z.array(uuid).max(1000),
+    qualificationPools: z.array(qualificationPoolSchema).max(64).optional(),
     groupPhases: z.array(groupPhaseInputSchema).max(64),
     series: z.array(seriesNodeSchema).max(256),
   })
@@ -87,6 +96,8 @@ export const crossingsInputSchema = z
       for (const ref of [n.home, n.away]) {
         if (ref.kind === "registration") {
           if (!registrations.has(ref.registrationId)) issue();
+        } else if (ref.kind === "qualification_rank") {
+          if (!s.qualificationPools?.some((p) => p.id === ref.poolId)) issue();
         } else if (ref.kind === "group_rank") {
           const group = phases
             .get(ref.phaseId)

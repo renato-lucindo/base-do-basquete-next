@@ -1,3 +1,5 @@
+import { flexibleCompetitionEnabled } from "../competition/features";
+import { finalizePdfSchema, auditFinalizationReason } from "./finalization";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
@@ -55,6 +57,7 @@ type Props = {
 const sides = ["home", "away"] as const;
 const rowKey = (side: number, index: number) => `${side}:${index}`;
 export function PdfPublicationPanel(p: Props) {
+  const automatic = flexibleCompetitionEnabled();
   const [loaded, setLoaded] = useState<Loaded | null>(null),
     [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
@@ -366,6 +369,9 @@ export function PdfPublicationPanel(p: Props) {
     };
     const manualNeeded =
       authority.scorePoints === "sheet" || authority.periodScores === "sheet";
+    const validationReason = automatic
+      ? auditFinalizationReason(reason)
+      : reason;
     preparePdfFacts(
       p.review,
       supplement,
@@ -373,19 +379,19 @@ export function PdfPublicationPanel(p: Props) {
       loaded.sheet
         ? { document: loaded.sheet.document, version: loaded.sheet.version }
         : undefined,
-      reason,
+      validationReason,
       accepted,
     );
     if (
       p.review.source.parsed.gameNumber &&
       loaded.game.number &&
       p.review.source.parsed.gameNumber !== loaded.game.number &&
-      (!accepted || reason.trim().length < 10)
+      (!accepted || validationReason.trim().length < 10)
     )
       throw Error(
         "O número do PDF difere do jogo. Aceite a divergência com motivo para continuar.",
       );
-    return publishPdfSchema.parse({
+    return (automatic ? finalizePdfSchema : publishPdfSchema).parse({
       requestId: crypto.randomUUID(),
       gameId: loaded.game.id,
       gameVersion: loaded.game.version,
@@ -468,19 +474,26 @@ export function PdfPublicationPanel(p: Props) {
     pendingPublish.current = null;
     setUncertain(false);
     setPublished(true);
-    setStatus("Resultado publicado");
+    setStatus(automatic ? "Resultado atualizado" : "Resultado publicado");
     p.onPublished();
   }
   async function publish() {
-    if (!ready || edited || p.disabled || busy || conflict) return;
-    const c = pendingPublish.current ?? ready;
+    if ((!automatic && (!ready || edited)) || p.disabled || busy || conflict)
+      return;
+    let c: PublishPdf;
+    try {
+      c = pendingPublish.current ?? (automatic ? command() : ready!);
+    } catch (e) {
+      report(e);
+      return;
+    }
     pendingPublish.current = c;
     setBusy(true);
     setError("");
     try {
       if (!ack.current) {
         const a = await api(
-          `/api/games/${c.gameId}/publication/pdf`,
+          `/api/games/${c.gameId}/publication/${automatic ? "finalize-pdf" : "pdf"}`,
           publicationPdfResultSchema,
           c,
         );
@@ -559,7 +572,9 @@ export function PdfPublicationPanel(p: Props) {
     >
       {!loaded && (
         <button disabled={p.disabled || busy} onClick={() => void load()}>
-          Preparar publicação do PDF
+          {automatic
+            ? "Completar importação do PDF"
+            : "Preparar publicação do PDF"}
         </button>
       )}
       {error && (
@@ -571,7 +586,9 @@ export function PdfPublicationPanel(p: Props) {
       {loaded && (
         <>
           <h4 ref={heading} tabIndex={-1}>
-            Conferir publicação do PDF
+            {automatic
+              ? "Completar dados do PDF"
+              : "Conferir publicação do PDF"}
           </h4>
           <p>
             Escolha a participação, cinco titulares e um capitão por equipe. As
@@ -851,7 +868,9 @@ export function PdfPublicationPanel(p: Props) {
               Aceitar divergências entre as fontes ou número do jogo
             </label>
             <label>
-              Motivo da publicação do PDF
+              {automatic
+                ? "Comentário (opcional)"
+                : "Motivo da publicação do PDF"}
               <textarea
                 maxLength={500}
                 value={reason}
@@ -859,26 +878,29 @@ export function PdfPublicationPanel(p: Props) {
               />
             </label>
             <p>
-              Correções, combinação com súmula ou divergências exigem motivo de
-              10 a 500 caracteres. Salvar a preparação não publica.
+              {automatic
+                ? "Concluir atualiza o resultado e a classificação. O comentário é opcional."
+                : "Correções, combinação com súmula ou divergências exigem motivo de 10 a 500 caracteres. Salvar a preparação não publica."}
             </p>
           </fieldset>
           <div className="competition-actions">
-            <button
-              disabled={
-                p.disabled ||
-                busy ||
-                conflict ||
-                !!pendingPublish.current ||
-                !!ack.current
-              }
-              onClick={() => void save()}
-            >
-              {pendingSave.current
-                ? "Repetir salvamento da preparação"
-                : "Salvar preparação"}
-            </button>
-            {ready && !edited && !published && (
+            {!automatic && (
+              <button
+                disabled={
+                  p.disabled ||
+                  busy ||
+                  conflict ||
+                  !!pendingPublish.current ||
+                  !!ack.current
+                }
+                onClick={() => void save()}
+              >
+                {pendingSave.current
+                  ? "Repetir salvamento da preparação"
+                  : "Salvar preparação"}
+              </button>
+            )}
+            {(automatic || (ready && !edited)) && !published && (
               <button
                 disabled={
                   p.disabled || busy || conflict || !!pendingSave.current
@@ -888,8 +910,12 @@ export function PdfPublicationPanel(p: Props) {
                 {ack.current
                   ? "Recuperar resultado publicado"
                   : pendingPublish.current
-                    ? "Repetir publicação do PDF"
-                    : "Publicar preparação salva"}
+                    ? automatic
+                      ? "Repetir finalização do PDF"
+                      : "Repetir publicação do PDF"
+                    : automatic
+                      ? "Concluir importação e atualizar resultado"
+                      : "Publicar preparação salva"}
               </button>
             )}
             <button

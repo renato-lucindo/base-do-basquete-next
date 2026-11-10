@@ -16,6 +16,7 @@ import {
 } from "../achievements/routes";
 import { regulationRoute, publicStandingsRoute } from "../regulation/routes";
 import { decisionRoute } from "../regulation/decision-routes";
+import { competitionSetupRoute } from "../regulation/setup-routes";
 import { z } from "zod";
 import { HttpError, jsonResponse, readMutationJson } from "./http";
 import { saveCompetitionSchema } from "../competition/contract";
@@ -104,6 +105,8 @@ export default {
         url.pathname.startsWith("/api/regulations/")
       )
         response = await regulationRoute(request, env, url);
+      else if (url.pathname.startsWith("/api/competition-setups/"))
+        response = await competitionSetupRoute(request, env, url);
       else if (
         url.pathname === "/api/pdf-sources" ||
         url.pathname.startsWith("/api/pdf-sources/")
@@ -152,6 +155,22 @@ export default {
         else if (["/admin", "/admin/"].includes(url.pathname))
           url.pathname = "/foundation.html";
         response = await env.ASSETS.fetch(new Request(url, request));
+        if (
+          env.FLEXIBLE_COMPETITION === "true" &&
+          url.pathname === "/foundation.html" &&
+          response.ok &&
+          response.headers.get("Content-Type")?.includes("text/html")
+        )
+          response = new HTMLRewriter()
+            .on("head", {
+              element(element) {
+                element.append(
+                  '<meta name="bb-flexible-competition" content="true">',
+                  { html: true },
+                );
+              },
+            })
+            .transform(response);
       } else
         response = jsonResponse(
           { error: { code: "not_found", message: "Página não encontrada." } },

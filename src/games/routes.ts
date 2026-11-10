@@ -4,6 +4,7 @@ import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveGameSchema, gameOrderSchema } from "./contract";
 import { saveSheetSchema } from "./sheet-contract";
 import { saveGameEditorSchema } from "./officiating-contract";
+import { saveGameVisibilitySchema } from "./visibility-contract";
 export async function gamesRoute(request: Request, env: Env, url: URL) {
   const name = await sessionName(request, env.SESSION_ENCRYPTION_KEY);
   if (!name)
@@ -62,6 +63,36 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     if (!result.ok)
       throw new HttpError(result.status, result.code, result.message);
     return jsonResponse(result.value);
+  }
+  const visibility = /^\/api\/games\/([^/]+)\/visibility$/u.exec(url.pathname);
+  if (visibility) {
+    if (env.FLEXIBLE_COMPETITION !== "true")
+      throw new HttpError(404, "not_found", "Página não encontrada.");
+    const id = z.uuid().safeParse(visibility[1]);
+    if (!id.success || url.search) throw badInput();
+    if (request.method === "GET") {
+      const result = await session.getGameVisibility(id.data);
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    if (request.method === "POST") {
+      const command = await readMutationJson(
+        request,
+        saveGameVisibilitySchema,
+        {
+          origin: env.APP_ORIGIN,
+          maxBytes: 8192,
+        },
+      );
+      if (command.gameId.toLowerCase() !== id.data.toLowerCase())
+        throw badInput();
+      const result = await session.saveGameVisibility(command);
+      if (!result.ok)
+        throw new HttpError(result.status, result.code, result.message);
+      return jsonResponse(result.value);
+    }
+    throw new HttpError(405, "invalid_method", "Método não permitido.");
   }
   const editor = /^\/api\/games\/([^/]+)\/editor$/u.exec(url.pathname);
   if (editor) {
