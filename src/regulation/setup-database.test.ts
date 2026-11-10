@@ -307,11 +307,9 @@ it("keeps public flexible standings when a private game remains assigned in the 
     await json(db, "public.finalize_sheet_game($1)", [
       { ...command, requestId: id(9901), gameId: id(9) },
     ]);
-    const visibility = (await json(
-      db,
-      "public.get_game_visibility($1)",
-      [id(8)],
-    )) as {
+    const visibility = (await json(db, "public.get_game_visibility($1)", [
+      id(8),
+    ])) as {
       version: number;
       gameVersion: number;
       publicationVersion: number;
@@ -324,15 +322,14 @@ it("keeps public flexible standings when a private game remains assigned in the 
         expectedGameVersion: visibility.gameVersion,
         expectedPublicationVersion: visibility.publicationVersion,
         visibility: "draft",
-        reason: "Semifinal antecipada; manter privada até confirmação dos classificados",
+        reason:
+          "Semifinal antecipada; manter privada até confirmação dos classificados",
       },
     ]);
     await db.exec("set local role anon");
-    const source = (await json(
-      db,
-      "public.get_live_competition_source($1)",
-      [id(3)],
-    )) as {
+    const source = (await json(db, "public.get_live_competition_source($1)", [
+      id(3),
+    ])) as {
       configuration: { assignments: { gameId: string; kind: string }[] };
       games: { id: string }[];
       publishedGames: { gameId: string }[];
@@ -355,13 +352,15 @@ it("keeps public flexible standings when a private game remains assigned in the 
     expect(JSON.stringify(standings)).not.toContain(id(8));
     // Defensive client behavior with older RPCs that still expose an assignment.
     expect(
-      (await buildLivePublicStandings({
-        ...source,
-        configuration: {
-          ...source.configuration,
-          assignments: document.assignments,
-        },
-      })).games,
+      (
+        await buildLivePublicStandings({
+          ...source,
+          configuration: {
+            ...source.configuration,
+            assignments: document.assignments,
+          },
+        })
+      ).games,
     ).toEqual(standings.games);
     await db.exec(
       `set local role authenticated;set local request.jwt.claim.sub='${id(98)}'`,
