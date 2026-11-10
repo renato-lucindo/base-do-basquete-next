@@ -5,10 +5,17 @@ const site = "https://copa-es-u15.pages.dev";
 const backend = "https://internal.example";
 const id = "b5433b13-a8f9-4baa-b4d9-08066ebf3e96";
 function fixture(
-  reply = () =>
-    new Response("public", {
-      headers: { "content-type": "text/html", "x-bdb-source": "verified" },
-    }),
+  reply = (r) =>
+    new Response(
+      r.url.includes("/api/public/games/")
+        ? JSON.stringify({ disputeId: id })
+        : r.url.includes("/api/public/players/")
+          ? JSON.stringify({ contexts: [{ disputeId: id }] })
+          : "public",
+      {
+        headers: { "content-type": "text/html", "x-bdb-source": "verified" },
+      },
+    ),
 ) {
   const calls = [];
   const env = {
@@ -40,7 +47,6 @@ test("Pages abre a Copa sem expor o backend nem bloquear a navegação pública"
     "/assets/public-abc.js",
     "/assets/public-abc.css",
     `/api/public/catalog?disputeId=${id}`,
-    `/api/public/discovery?q=Copa`,
     `/api/public/standings/${id}`,
     `/api/public/games/${id}`,
     `/api/public/statistics/${id}`,
@@ -51,8 +57,9 @@ test("Pages abre a Copa sem expor o backend nem bloquear a navegação pública"
     const response = await publicPreview(new Request(site + path), env);
     assert.equal(response.status, 200, path);
     assert.equal(response.headers.get("x-bdb-source"), "verified");
-    assert.equal(await response.text(), "public");
-    assert.equal(calls.at(-1).url, backend + path);
+    assert.ok(await response.text());
+    const target = new URL(calls.at(-1).url);
+    assert.equal(target.pathname, new URL(backend + path).pathname);
   }
 });
 test("rotas privadas e fontes do Pages não chegam ao serviço vinculado", async () => {
@@ -121,7 +128,7 @@ test("consulta POST de equipes conserva filtros e valida origem antes do encamin
 test("o proxy é anônimo, mantém MIME e não devolve cookies ou URLs internas", async () => {
   const { env, calls } = fixture(
     () =>
-      new Response("{}", {
+      new Response(JSON.stringify({ contexts: [{ disputeId: id }] }), {
         headers: {
           "content-type": "application/json",
           "set-cookie": "session=private",
@@ -153,6 +160,70 @@ test("o proxy é anônimo, mantém MIME e não devolve cookies ou URLs internas"
     assert.equal(response.headers.get(name), null);
   assert.equal(response.headers.get("content-type"), "application/json");
   assert.equal(response.headers.get("cache-control"), "no-store");
+});
+test("Pages limita catálogo, APIs e perfis à disputa configurada", async () => {
+  const other = "f2200000-0000-4000-8000-000000000090";
+  const { env, calls } = fixture();
+  assert.equal(
+    (await publicPreview(new Request(site + "/api/public/catalog"), env))
+      .status,
+    200,
+  );
+  assert.equal(new URL(calls[0].url).searchParams.get("disputeId"), id);
+  for (const path of [
+    `/api/public/catalog?disputeId=${other}`,
+    `/api/public/catalog?disputeId=${id}&disputeId=${other}`,
+    `/api/public/standings/${other}`,
+    `/api/public/statistics/${other}`,
+    `/api/public/teams/${other}`,
+    `/api/public/achievements/${other}`,
+    "/api/public/discovery?q=Copa",
+    "/api/public/search?q=atleta",
+  ])
+    assert.equal(
+      (await publicPreview(new Request(site + path), env)).status,
+      404,
+      path,
+    );
+  assert.equal(calls.length, 1);
+  const foreignGame = fixture(() => Response.json({ disputeId: other }));
+  assert.equal(
+    (
+      await publicPreview(
+        new Request(site + `/api/public/games/${other}`),
+        foreignGame.env,
+      )
+    ).status,
+    404,
+  );
+  const player = fixture(() =>
+    Response.json({ contexts: [{ disputeId: id }, { disputeId: other }] }),
+  );
+  const r = await publicPreview(
+    new Request(site + `/api/public/players/${other}`),
+    player.env,
+  );
+  assert.deepEqual((await r.json()).contexts, [{ disputeId: id }]);
+  assert.equal(new URL(player.calls[0].url).searchParams.get("disputeId"), id);
+});
+test("HTML dedicado recebe contexto e título; assets locais preservam o backend", async () => {
+  const { env, calls } = fixture();
+  env.ASSETS = {
+    fetch: async () =>
+      new Response(
+        "<html><head><title>Competições</title></head><body></body></html>",
+        { headers: { "content-type": "text/html" } },
+      ),
+  };
+  const r = await publicPreview(new Request(site + "/publico.html"), env);
+  assert.match(
+    await r.text(),
+    new RegExp(
+      `<meta name="bdb-dispute" content="${id}"><title>Copa ES U15</title>`,
+    ),
+  );
+  assert.equal(calls.length, 0);
+  assert.equal(r.headers.get("cache-control"), "no-store");
 });
 test("HEAD preserva status sem corpo; erros e redirects não revelam o servidor", async () => {
   const { env } = fixture();

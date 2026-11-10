@@ -10,6 +10,7 @@ import { CompetitionTree, usePublicCatalog } from "./catalog";
 import { safePublicReturn, sectionReturn } from "./navigation";
 import { PublicSearchForm } from "./search-form";
 import "./navigation.css";
+import { siteDisputeId, siteHome, siteTitle } from "./site";
 
 export function PublicHeader({
   disputeId,
@@ -25,19 +26,23 @@ export function PublicHeader({
   return (
     <header className="site-header public-header">
       <div className="wrap header-inner">
-        <a href="/publico.html" className="brand">
+        <a href={siteHome} className="brand">
           <span className="brand-mark" aria-hidden="true">
             b.
           </span>
-          <span>Base do Basquete</span>
+          <span>{siteTitle}</span>
         </a>
-        <PublicSearchForm />
-        <a href="/publico.html" className="public-catalog-link">
-          Campeonatos
-        </a>
-        <a href="/foundation.html" className="public-admin">
-          Administração
-        </a>
+        {!siteDisputeId && <PublicSearchForm />}
+        {!siteDisputeId && (
+          <>
+            <a href="/publico.html" className="public-catalog-link">
+              Campeonatos
+            </a>
+            <a href="/foundation.html" className="public-admin">
+              Administração
+            </a>
+          </>
+        )}
       </div>
       {disputeId && section && (
         <DisputeNavigation
@@ -92,13 +97,15 @@ function DisputeNavigation({
               ? "Carregando disputa…"
               : "Disputa sem contexto público disponível"}
         </p>
-        <details
-          className="public-quick-selector"
-          onToggle={(e) => setSelecting(e.currentTarget.open)}
-        >
-          <summary>Trocar disputa</summary>
-          {selecting && <QuickSelector />}
-        </details>
+        {!siteDisputeId && (
+          <details
+            className="public-quick-selector"
+            onToggle={(e) => setSelecting(e.currentTarget.open)}
+          >
+            <summary>Trocar disputa</summary>
+            {selecting && <QuickSelector />}
+          </details>
+        )}
       </div>
       <nav className="dispute-navigation" aria-label="Seções da disputa">
         {publicSections.map((s) => (
@@ -113,7 +120,7 @@ function DisputeNavigation({
       </nav>
       {detail && (
         <nav className="public-return" aria-label="Localização">
-          <a href="/publico.html">Competições</a>
+          <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
           <span aria-hidden="true"> / </span>
           <a href={sectionReturn(disputeId, section)}>Voltar à origem</a>
           <span aria-hidden="true"> / </span>
@@ -166,7 +173,7 @@ export function PublicBreadcrumb({
 }) {
   return (
     <nav className="breadcrumb" aria-label="Localização">
-      <a href="/publico.html">Competições</a>
+      <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
       <span aria-hidden="true">/</span>
       {context && (
         <>
@@ -181,7 +188,7 @@ export function PublicBreadcrumb({
 export function PublicFooter() {
   return (
     <footer className="wrap footer public-footer">
-      <span>Base do Basquete</span>
+      <span>{siteTitle}</span>
       <span>Resultados publicados</span>
     </footer>
   );
