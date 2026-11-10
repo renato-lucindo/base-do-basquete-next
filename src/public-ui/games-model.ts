@@ -1,4 +1,7 @@
 import type { PublicStandings } from "../regulation/public-contract";
+import type { CatalogGame } from "./catalog-contract";
+
+type PublicTeamProfile = { teamId: string; registrationId: string };
 
 export type PublicGameRow = {
   id: string;
@@ -6,6 +9,9 @@ export type PublicGameRow = {
   number: string | null;
   home: string;
   away: string;
+  homeProfile: PublicTeamProfile | null;
+  awayProfile: PublicTeamProfile | null;
+  published: boolean;
   date: string | null;
   time: string | null;
   venue: string | null;
@@ -15,7 +21,25 @@ export type PublicGameRow = {
   walkover: boolean;
 };
 
-export function publicScheduleRows(value: PublicStandings): PublicGameRow[] {
+export function publicScheduleRows(
+  value: PublicStandings,
+  publishedGames: CatalogGame[] = [],
+): PublicGameRow[] {
+  const eligible = publishedGames.filter(
+    (g) => g.disputeId === value.disputeId,
+  );
+  const publishedIds = new Set(eligible.map((g) => g.id));
+  const profiles = new Map(
+    eligible.flatMap((g) =>
+      [g.game.home, g.game.away].map(
+        (team) =>
+          [
+            team.registrationId,
+            { teamId: team.team.id, registrationId: team.registrationId },
+          ] as const,
+      ),
+    ),
+  );
   const names = new Map(value.registrations.map((r) => [r.id, r.name]));
   const phases = new Map(
     value.definition.knockoutPhases.map((p) => [p.id, p.name]),
@@ -40,6 +64,9 @@ export function publicScheduleRows(value: PublicStandings): PublicGameRow[] {
     number: game.number,
     home: names.get(game.homeRegistrationId) ?? "Equipe a definir",
     away: names.get(game.awayRegistrationId) ?? "Equipe a definir",
+    homeProfile: profiles.get(game.homeRegistrationId) ?? null,
+    awayProfile: profiles.get(game.awayRegistrationId) ?? null,
+    published: publishedIds.has(game.id),
     date: game.date,
     time: game.time,
     venue: game.venue,

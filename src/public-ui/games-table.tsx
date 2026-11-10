@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { selectPublicGames, type PublicGameRow } from "./games-model";
+import { publicDetailLink } from "./navigation";
+import { teamDetailLink } from "../team-statistics/navigation";
 import "./games-list.css";
 
 export type { PublicGameRow } from "./games-model";
@@ -115,9 +117,40 @@ export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
                   </span>
                 </div>
                 <div className="public-game-matchup">
-                  <span className="public-game-home">{game.home}</span>
+                  <span className="public-game-home">
+                    {game.homeProfile ? (
+                      <a
+                        href={teamDetailLink(
+                          game.disputeId,
+                          game.homeProfile.teamId,
+                          game.homeProfile.registrationId,
+                        )}
+                      >
+                        {game.home}
+                      </a>
+                    ) : (
+                      game.home
+                    )}
+                  </span>
                   <span className="public-game-score">
-                    {game.score ? (
+                    {game.published && game.score ? (
+                      <a
+                        href={publicDetailLink(
+                          `/resultado.html#${game.id}`,
+                          game.disputeId,
+                        )}
+                        aria-label={`Ver jogo: ${game.home} ${game.score.home} a ${game.score.away} ${game.away}`}
+                      >
+                        <span>{game.score.home}</span>
+                        <span
+                          className="public-game-separator"
+                          aria-hidden="true"
+                        >
+                          ×
+                        </span>
+                        <span>{game.score.away}</span>
+                      </a>
+                    ) : game.score ? (
                       <>
                         <span>{game.score.home}</span>
                         <span
@@ -135,7 +168,21 @@ export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
                       </span>
                     )}
                   </span>
-                  <span className="public-game-away">{game.away}</span>
+                  <span className="public-game-away">
+                    {game.awayProfile ? (
+                      <a
+                        href={teamDetailLink(
+                          game.disputeId,
+                          game.awayProfile.teamId,
+                          game.awayProfile.registrationId,
+                        )}
+                      >
+                        {game.away}
+                      </a>
+                    ) : (
+                      game.away
+                    )}
+                  </span>
                 </div>
                 {context && <div className="public-game-phase">{context}</div>}
                 <div className="public-game-venue">

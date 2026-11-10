@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PublicGamesTable } from "../public-ui/games-table";
 import { publicScheduleRows } from "../public-ui/games-model";
+import type { CatalogGame } from "../public-ui/catalog-contract";
 import { api } from "../competition/api";
 import { publicStandingsSchema, type PublicStandings } from "./public-contract";
 import { teamDetailLink } from "../team-statistics/navigation";
@@ -416,6 +417,12 @@ export function PublicStandingsTables({
   );
 }
 
-export function PublicSchedule({ value }: { value: PublicStandings }) {
-  return <PublicGamesTable games={publicScheduleRows(value)} />;
+export function PublicSchedule({
+  value,
+  publishedGames,
+}: {
+  value: PublicStandings;
+  publishedGames: CatalogGame[];
+}) {
+  return <PublicGamesTable games={publicScheduleRows(value, publishedGames)} />;
 }

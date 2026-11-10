@@ -4,8 +4,48 @@ import { buildPublicStandings } from "../regulation/public";
 import { regulationId as id } from "../../tests/fixtures/regulation";
 import { publicGamesFixture } from "../../tests/fixtures/public-games";
 import { publicScheduleRows, selectPublicGames } from "./games-model";
+import { catalogGameSchema } from "./catalog-contract";
 
 describe("lista pública de jogos", () => {
+  it("liga somente destinos publicados da mesma disputa com IDs de equipe e inscrição", () => {
+    const value = buildPublicStandings(publicGamesFixture());
+    const game = value.games[0];
+    const team = (id: string) => {
+      const r = value.registrations.find((r) => r.id === id)!;
+      return { registrationId: r.id, name: r.name, team: r.team };
+    };
+    const published = catalogGameSchema.parse({
+      id: game.id,
+      disputeId: value.disputeId,
+      context: value.context,
+      game: {
+        home: team(game.homeRegistrationId),
+        away: team(game.awayRegistrationId),
+        date: game.date,
+        time: game.time,
+        timeZone: game.timeZone,
+        venue: game.venue,
+        number: game.number,
+      },
+      score: { home: 20, away: 0 },
+    });
+    const rows = publicScheduleRows(value, [published]);
+    expect(rows[0]).toMatchObject({
+      published: true,
+      homeProfile: {
+        teamId: published.game.home.team.id,
+        registrationId: game.homeRegistrationId,
+      },
+      awayProfile: {
+        teamId: published.game.away.team.id,
+        registrationId: game.awayRegistrationId,
+      },
+    });
+    expect(rows.slice(1).every((g) => !g.published)).toBe(true);
+    expect(
+      publicScheduleRows(value, [{ ...published, disputeId: id(999) }])[0],
+    ).toMatchObject({ published: false, homeProfile: null, awayProfile: null });
+  });
   it("valida a mesma amostra de 41 jogos usada no navegador e no preview", () => {
     const value = buildPublicStandings(publicGamesFixture());
     expect(value.games).toHaveLength(41);

@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { publicNavigationFixture } from "./fixtures/public-navigation";
 import { disputeLink } from "../src/public-ui/catalog-contract";
-import { publicDetailLink } from "../src/public-ui/navigation";
 const origin = "http://127.0.0.1:5174";
 
 test("descoberta hierárquica, teclado e quatro seções preservam a disputa", async ({
@@ -110,14 +109,11 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   await expect(
     page.getByRole("list", { name: "Jogos por data" }),
   ).toBeVisible();
-  await expect(page.locator(".public-games-list a")).toHaveCount(0);
-  await page.goto(
-    origin +
-      publicDetailLink(
-        `/resultado.html#${f.source.games[0].snapshot.id}`,
-        f.source.disputeId,
-      ),
-  );
+  await page.getByRole("searchbox", { name: "Buscar jogo" }).fill("Lobos");
+  const gamesSource = page.url();
+  const row = page.locator(`[data-game-id="${f.source.games[0].snapshot.id}"]`);
+  await row.locator(".public-game-score a").focus();
+  await page.keyboard.press("Enter");
   await expect(
     page
       .getByRole("table", { name: "Participações e estatísticas publicadas" })
@@ -134,6 +130,20 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   await expect(
     page.getByRole("heading", { name: "Jogos publicados", exact: true }),
   ).toBeVisible();
+  expect(page.url()).toBe(gamesSource);
+  await expect(
+    page.getByRole("searchbox", { name: "Buscar jogo" }),
+  ).toHaveValue("Lobos");
+  for (const side of ["home", "away"]) {
+    await row.locator(`.public-game-${side} a`).click();
+    await expect(
+      page.getByRole("navigation", { name: "Seções da equipe" }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Voltar à origem", exact: true })
+      .click();
+    expect(page.url()).toBe(gamesSource);
+  }
 });
 
 test("busca pública repete o mesmo termo após falha transitória", async ({
