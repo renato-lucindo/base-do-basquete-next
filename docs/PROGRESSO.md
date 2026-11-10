@@ -1,5 +1,15 @@
 # Progresso atual
 
+## Auditoria de rascunhos e compatibilidade — 10/11/2026
+
+Na PR #75, o leitor público agora remove referências de jogos privados de `configuration.assignments`, `configuration.customDefinition` e `legacyDefinition`, incluindo `groupPhases[].groups[].gameIds` e `series[].games`. A configuração administrativa e os registros de partidas não são alterados. Teste de regressão em `src/games/visibility-database.test.ts` cobre fonte anônima legada/customizada, manutenção do cálculo público e histórico privado.
+
+Migration imutável `20261110145957_public_nested_definition_visibility.sql` aplicada em `base-do-basquete-next-dev`. Consulta anônima após a aplicação: 26 jogos e resultados públicos, ID da semifinal ausente e detalhe privado bloqueado, inclusive após a migration independente `20261110150011_public_detail_visibility_compat` da PR #76. Advisors sem novas categorias. O jogo IVV/Cetaf × Saldanha continua `draft`, sem alteração de placar, súmula ou versões. A CI do código teve o gate completo aprovado antes de alinhar o nome da migration; conferir CI do HEAD atual antes do merge.
+
+A PR #76 continua independente e contém a correção complementar no leitor de detalhes. Não fazer merge de nenhuma PR sem aprovação específica; nenhum Worker principal/preview foi publicado nesta etapa.
+
+---
+
 ## PR75 — rascunhos privados e classificação pública — 10/11/2026
 
 Unidade `codex/campeonato-flexivel`, [PR #75](https://github.com/renato-lucindo/base-do-basquete-next/pull/75), **draft/sem merge**. A função de visibilidade `draft/published` tem auditoria e mantém súmulas/publicações históricas. Testes de código anteriores passaram em [CI #42673679723](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42673679723) (7/7, SHA `4a53e1f`); não inferir que PASS antigo valida commits posteriores.
