@@ -36,7 +36,28 @@ it("consulta somente a versão publicada, com recortes estritos e sem dados priv
           [row.id],
         )
       ).rows[0].value;
+    // First invocation must be anonymous: an owner-cached SQL plan can mask
+    // a SECURITY INVOKER wrapper's missing USAGE on the private schema.
+    await db.exec("set local role anon");
+    expect(
+      (
+        await db.query<{ allowed: boolean }>(
+          "select has_schema_privilege('anon','private','usage') allowed",
+        )
+      ).rows[0].allowed,
+    ).toBe(false);
     const result = publicGameSchema.parse(await read());
+    await db.exec("reset role");
+    for (const role of ["anon", "authenticated", "service_role"]) {
+      expect(
+        (
+          await db.query<{ allowed: boolean }>(
+            "select has_function_privilege($1,'private.get_public_game_detail(uuid)','execute') allowed",
+            [role],
+          )
+        ).rows[0].allowed,
+      ).toBe(false);
+    }
     expect(result.details?.periods).toHaveLength(4);
     expect(
       result.details?.periods[0].players.every(

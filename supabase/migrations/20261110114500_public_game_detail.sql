@@ -60,9 +60,9 @@ begin
  return private.public_game_period_detail(payload,d);
 end$$;
 create function public.get_public_game_detail(p_id uuid) returns jsonb
-language sql stable security invoker set search_path='' as $$select private.get_public_game_detail(p_id)$$;
+language sql stable security definer set search_path='' as $$select private.get_public_game_detail(p_id)$$;
 revoke all on function private.get_public_game_detail(uuid),public.get_public_game_detail(uuid) from public,anon,authenticated,service_role;
-grant execute on function private.get_public_game_detail(uuid),public.get_public_game_detail(uuid) to anon,authenticated;
+grant execute on function public.get_public_game_detail(uuid) to anon,authenticated;
 
 -- The same numeric rule must apply BEFORE pagination of administrative rosters.
 create or replace function public.list_roster(p_registration_id uuid,p_active_only boolean default true,p_offset integer default 0) returns jsonb
