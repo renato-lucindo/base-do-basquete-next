@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { playerPublicFixture } from "./fixtures/player-public-browser";
+import { confirmedManualFixture } from "./fixtures/statistics-publications";
 const summary = (p: Page) =>
   p.getByRole("table", { name: "Resumo de temporada e carreira", exact: true });
 const stats = (p: Page) =>
@@ -43,6 +44,14 @@ test("carreira completa não herda origem; filtros e nenhuma equipe não alteram
   const f = await playerPublicFixture(page);
   await page.goto(
     f.url + `?disputeId=${f.source.participations[0].fact.disputeId}`,
+  );
+  const result = confirmedManualFixture();
+  await expect(
+    page.locator(
+      `.player-recent tr[data-game="${result.id}"] .player-match-score`,
+    ),
+  ).toHaveText(
+    `${result.facts.teams.home.points} × ${result.facts.teams.away.points}`,
   );
   const before = await summary(page).innerText();
   const recent = await page
