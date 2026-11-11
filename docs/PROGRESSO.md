@@ -1,19 +1,18 @@
 # Progresso atual
 
-Atualizado em10/11/2026. Unidade: restringir https://copa-es-u15.pages.dev à Copa ES U15, por solicitação direta do responsável. Publicação autorizada exclusivamente nesse Pages; sem alterar o Worker principal, banco ou dados publicados.
+Atualizado em 11/11/2026. Unidade: implementar o perfil do atleta aceito na revisão 4, com ajustes finais de resumo, recordes e links. Responsável autorizou implementação, procedimentos de publicação e abertura de PR; determinou manter a PR aberta. Nenhum merge nesta unidade.
 
-## Unidade e evidências
+## Unidade ativa
 
-- Branch `codex/copa-es-u15`, base `ab4820b` (merge da PR77), worktree isolado `C:/Users/12405304716/.codex/worktrees/copa-es-u15`. Fonte material **658c879** (UI a58fd1a; correções do Pages b05d86d/658c879). A PR77 foi integrada durante esta execução pelo agente anterior; esta unidade começa da main integrada, sem empilhamento.
-- Cabeçalho exclusivo Copa ES U15, entrada direta em Classificação, quatro seções preservadas. Sem troca de disputa, busca global, catálogo de campeonatos ou entrada administrativa. URLs sem disputa ou com outra disputa são reconduzidas à Copa. Perfis consultam somente a disputa configurada.
-- Proxy limita catálogo e APIs à disputa, bloqueia descoberta/busca global e jogos de outras disputas. Perfis filtram estatísticas, jogos, histórico, conquistas e contextos pelo contrato existente. Assets públicos próprios no Pages, API pelo SOURCE existente, sem novo deploy no backend.
-- Transporte Node **8/8 PASS**; navegação Playwright **2/2 PASS** (1366×768 e390×844), incluindo quatro seções, URL adulterada, jogo/retorno e atleta. Typecheck, build foundation, lint focal, formato e diff PASS. Revisão `web-design-guidelines` sobre o cabeçalho: links semânticos e foco preservados; sem avisos, tooltips ou tabelas novos.
-- Gate local inicial travou em forks; com threads passaram805unitários/171arquivos,18transporte e15banco. Runtime:33/35PASS e2falhas, uma com SQLite disk I/O e disco local cheio; PDF não executado nessa sequência. CI42889008688 no HEAD anterior b7f65fc aprovou gate completo, design e WebKit; isso não aprova as correções posteriores do proxy. CI completa do HEAD atual da PR78 e do SHA integrado ainda obrigatória.
+- Branch `codex/perfil-atleta-aprovado`, base `a55dd7c7ef3b85991238c6e5bd379f5aa60e1b05` de `origin/main`. Worktree isolado em `C:/Users/12405304716/Documents/Codex/2026-11-10/perfil-jogador-prototipos/work/perfil-atleta-produto`.
+- Perfil integrado aos dados públicos existentes: identificação/resumo e conquistas, trajetória de equipes, cinco recentes, jogos dedicados, filtros recolhidos e recordes com top 5. Marcas azuis e linhas expandidas com preenchimento sutil. Links reais de equipe/jogo e retorno seguro, sem sublinhado.
+- Provas: 9 testes focais de modelo/apresentação; 34 cenários de regressão e 14 de aceite/geométrica desktop/mobile PASS. Lint, formato, tipos e typecheck PASS. Quatro estados axe sem violações. Detalhes e limites em [VALIDACAO-PERFIL-APROVADO.md](VALIDACAO-PERFIL-APROVADO.md).
+- Gate local incompleto: forks sem progresso; tentativa alternativa interrompida por disco cheio. CI remota completa e publicação do Worker ainda pendentes. Não confundir provas focais com gate consolidado.
 
-## Serviço e continuidade
+## Preservação e continuidade
 
-Pages observado inicialmente: deployment `69c41d4e-9eaf-4b59-95c0-f714a82ef586`, fonte `720d85b`. SOURCE `base-do-basquete-next-pr77`, disputa `b5433b13-a8f9-4baa-b4d9-08066ebf3e96`. O backend e as proteções existentes são preservados. Publicado em https://copa-es-u15.pages.dev, deployment curto2d093e45 (https://2d093e45.copa-es-u15.pages.dev), fonte658c879. Smoke remoto24percursosPASS em1366/1920/390/320px, quatro abas, atleta e jogo/retorno;7rotas externas/privadas bloqueadas, catálogo somenteU15, requests somentePages, sem errosJS ou transbordamento. Primeira tentativa identificou redirecionamento HTML do ASSETS e revalidação304; ambos corrigidos e cobertos por teste. Captura390px e JSON detalhado preservados nos artefatos locais.
+Checkout principal `sync/trabalho-casa` não alterado; preservadas mudanças humanas em CONTRIBUTING.md, skills locais e skills-lock.json. Outras branches, Workers e Pages preservados. Nenhum SQL, dado publicado, Auth ou Access alterado. Histórico único anterior preservado em [checkpoint anterior](../historico/progresso/2026-11-11-antes-perfil-atleta-aprovado.md).
 
-Checkout principal `sync/trabalho-casa` e mudanças humanas em CONTRIBUTING.md, skills locais e skills-lock.json preservados. Worktree/branch da PR77 não alterados. Histórico único anterior em [checkpoint da PR77](../historico/progresso/2026-11-10-antes-copa-es-u15-exclusiva.md).
+Última consulta oficial: 54% restante na janela 5h e 58% semanal. Intermediários próprios foram compactados sem alterar bytes para reduzir o uso de disco; dependências existentes reutilizadas sem upgrade.
 
-Próximo passo: conferir CI do HEAD real da PR78, revisar e integrar por merge commit após checks aprovados, depois acompanhar CI integrada. Pages já publicado e validado; não repetir deploy por atualização documental. Checagem oficial concluir-copa-es-u15-exclusiva ACTIVE, a cada10min. Responsável autorizou continuar até3%restante5h neste chat; depois checkpoint e retomada pelo reset real+2min. Sem avisos repetidos enquanto CI pendente.
+Próximo passo: publicar a branch e abrir a PR desta unidade para `main`, conferir CI completa do HEAD e preparar Worker próprio com configuração existente e smoke remoto. Deixar a PR aberta, sem auto-merge.

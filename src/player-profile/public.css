@@ -403,6 +403,307 @@
 .player-recent-date {
   display: none;
 }
+
+/* Approved profile: shared geometry for headers, best marks and rankings. */
+.player-page a,
+.player-page a:hover {
+  text-decoration: none;
+}
+.player-page a:hover {
+  background-color: var(--bb-blue-soft);
+}
+.player-page a:focus-visible {
+  outline: 2px solid var(--bb-blue);
+  outline-offset: 2px;
+}
+.player-primary {
+  min-width: 0;
+}
+.player-full-name {
+  margin-bottom: 20px !important;
+}
+.player-current-team {
+  margin: 0 0 6px !important;
+  font-size: 1rem;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.player-current-team a {
+  color: inherit;
+}
+.player-current-context {
+  color: var(--bb-muted);
+  margin: 0 0 12px !important;
+}
+.player-summary {
+  margin-top: 24px;
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.player-summary table {
+  width: 100%;
+}
+.player-summary tbody tr,
+.player-summary tbody th,
+.player-summary tbody td {
+  background: #fff;
+}
+.player-overview {
+  border-bottom: 1px solid var(--bb-line);
+}
+.player-team-history {
+  margin-top: 18px;
+}
+.player-team-history > summary {
+  color: var(--bb-blue);
+  min-height: 44px;
+  padding-block: 10px;
+}
+.player-trajectory {
+  list-style: none;
+  padding: 0 0 0 14px;
+  margin: 10px 0 0 7px;
+  border-left: 2px solid var(--bb-line);
+}
+.player-trajectory li {
+  position: relative;
+  padding: 0 0 20px 8px;
+  display: grid;
+  gap: 4px;
+}
+.player-trajectory li::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bb-blue);
+}
+.player-trajectory li > span {
+  color: var(--bb-muted);
+  font-size: 12px;
+}
+.player-award-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.player-award-columns > section {
+  min-width: 0;
+}
+.player-award-columns h3 {
+  margin: 0 0 12px;
+  font-weight: 500;
+  color: var(--bb-muted);
+}
+.player-honors details {
+  min-width: 0;
+  margin: 0 0 8px;
+}
+.player-honors summary {
+  display: inline-block;
+  max-width: 100%;
+  list-style: none;
+  padding-block: 10px;
+  min-height: 44px;
+  color: var(--bb-blue);
+  overflow-wrap: anywhere;
+}
+.player-honors summary::-webkit-details-marker {
+  display: none;
+}
+.player-honors summary::marker {
+  content: "";
+}
+.player-honors details[open] > summary {
+  font-weight: 600;
+}
+.player-honors details ul {
+  padding-bottom: 12px;
+}
+.player-honors details li {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.player-award-competition {
+  display: block;
+  font-size: 12px;
+}
+.player-medal-group {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.player-medal {
+  padding-top: 10px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+.player-adjust {
+  margin-left: auto;
+  background: transparent !important;
+  color: var(--bb-blue) !important;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  font-size: 12px !important;
+}
+.player-filters[hidden] {
+  display: none;
+}
+.player-records {
+  border-top: 1px solid var(--bb-line);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+.player-records h2 {
+  text-align: center;
+  margin: 0 0 16px;
+}
+.player-records table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.player-records th,
+.player-records td {
+  text-align: center;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--bb-line);
+  overflow-wrap: anywhere;
+}
+.player-records thead {
+  background: #f1f5fa;
+  font-size: 12px;
+  color: var(--bb-muted);
+}
+.player-records tbody th {
+  font-weight: 500;
+}
+.player-record-metric-col {
+  width: 64px;
+}
+.player-record-value-col {
+  width: 72px;
+}
+.player-record-date-col {
+  width: 128px;
+}
+.player-record-action-col {
+  width: 112px;
+}
+.player-records .player-record-value,
+.player-page .player-game-score {
+  color: #1557a4;
+  font-weight: 650;
+}
+.player-records .player-record-value a {
+  color: inherit;
+}
+.player-records .player-record-ranking {
+  background: #f5f8fc;
+}
+.player-records .player-record-ranking td {
+  padding-block: 14px;
+}
+.player-record-match {
+  padding-inline: 14px !important;
+}
+.player-record-match a {
+  color: var(--bb-text);
+  font-weight: 500;
+}
+.player-record-match small {
+  display: block;
+  color: var(--bb-muted);
+  margin-top: 4px;
+  font-size: 12px;
+}
+.player-records button {
+  background: transparent !important;
+  color: var(--bb-blue) !important;
+  border: 0;
+  min-width: 84px;
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.player-records abbr {
+  text-decoration: none;
+}
+.player-record-mobile-date {
+  display: none;
+}
+.player-back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.player-games-page .bb-primary-cell {
+  max-width: none !important;
+}
+@media (min-width: 960px) {
+  .player-with-honors {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .player-full-name {
+    margin-bottom: 16px !important;
+  }
+  .player-award-columns {
+    gap: 12px;
+  }
+  .player-medal-group {
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 2px;
+  }
+  .player-honors h3 {
+    font-size: 12px;
+  }
+  .player-honors summary {
+    font-size: 12px;
+  }
+  .player-record-date {
+    display: none;
+  }
+  .player-record-mobile-date {
+    display: inline;
+  }
+  .player-record-metric-col {
+    width: 34px;
+  }
+  .player-record-value-col {
+    width: 40px;
+  }
+  .player-record-action-col {
+    width: 80px;
+  }
+  .player-records th,
+  .player-records td {
+    padding: 9px 4px;
+    font-size: 12px;
+  }
+  .player-record-match {
+    padding-inline: 8px !important;
+  }
+  .player-record-match small {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .player-records button {
+    min-width: 72px;
+    padding-inline: 3px;
+    font-size: 11px;
+  }
+}
 @media (max-width: 600px) {
   .player-recent .bb-table tr > :first-child {
     display: none;

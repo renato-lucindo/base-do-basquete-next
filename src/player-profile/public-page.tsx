@@ -18,15 +18,17 @@ import {
   type PublicCareer,
 } from "./public-model";
 import { STATISTICS_METRICS } from "../statistics/metrics";
+import {
+  MatchTeams,
+  CareerHonors,
+  CareerRecords,
+  TeamTrajectory,
+} from "./approved-components";
+import { profileDate as date } from "./presentation";
 import type { ConfirmedPlayerGame } from "./participation-contract";
 
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const date = (value: string | null) =>
-  value
-    ? new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(
-        new Date(`${value}T12:00:00Z`),
-      )
-    : "Data não informada";
+
 const sections = [
   ["resumo", "Resumo"],
   ["conquistas", "Conquistas e honrarias"],
@@ -34,8 +36,9 @@ const sections = [
   ["jogos", "Jogos"],
   ["historico", "Histórico"],
   ["evolucao", "Evolução"],
+  ["recordes", "Recordes"],
 ] as const;
-const extras = ["jogos", "historico", "evolucao"];
+const extras = ["evolucao"];
 type View = {
   year: string;
   championship: string;
@@ -161,9 +164,9 @@ function Metadata({ career }: { career: PublicCareer }) {
   const m = career.page.identity.metadata;
   const values: [string, ReactNode][] = m
     ? [
-        ["Posição", m.position],
         ["Ano de nascimento", m.publicBirthYear],
         ["Altura", m.heightCm === null ? null : `${m.heightCm} cm`],
+        ["Posição", m.position],
         [
           "Peso",
           m.weightKg === null ? null : `${number.format(m.weightKg)} kg`,
@@ -193,62 +196,6 @@ function Metadata({ career }: { career: PublicCareer }) {
       </dl>
       {m?.biography && <p className="player-biography">{m.biography}</p>}
     </>
-  );
-}
-function Honors({ career }: { career: PublicCareer }) {
-  const d = career.page;
-  return (
-    <aside className="player-honors" aria-labelledby="conquistas">
-      <h2 id="conquistas" tabIndex={-1}>
-        Conquistas e honrarias
-      </h2>
-      {!d.honors.length && !d.teamPlacements.length ? (
-        <p>Nenhuma conquista publicada.</p>
-      ) : (
-        <>
-          {!!d.honors.length && (
-            <>
-              <h3>Honrarias individuais</h3>
-              <ul>
-                {d.honors.map((h) => (
-                  <li key={`${h.disputeId}/${h.honor.id}`}>
-                    <strong>{h.honor.title}</strong>
-                    <small>
-                      {h.context.name} · {h.context.year} · {h.context.gender} ·{" "}
-                      {h.context.category}
-                      {h.context.division ? ` · ${h.context.division}` : ""}
-                    </small>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {!!d.teamPlacements.length && (
-            <>
-              <h3>Colocações das equipes</h3>
-              <ul>
-                {d.teamPlacements.map((h) => (
-                  <li key={`${h.disputeId}/${h.registration.registrationId}`}>
-                    <strong>
-                      {h.position}º lugar · {h.registration.name}
-                    </strong>
-                    <small>
-                      {h.context.name} · {h.context.year} · {h.context.gender} ·{" "}
-                      {h.context.category}
-                      {h.context.division ? ` · ${h.context.division}` : ""}
-                    </small>
-                  </li>
-                ))}
-              </ul>
-              <p className="player-note">
-                Colocação coletiva; não representa premiação individual do
-                atleta.
-              </p>
-            </>
-          )}
-        </>
-      )}
-    </aside>
   );
 }
 function Table({ label, children }: { label: string; children: ReactNode }) {
@@ -319,14 +266,7 @@ function Games({
       primary: true,
       render: (g) => (
         <>
-          <a
-            href={publicDetailLink(
-              `/resultado.html#${g.fact.gameId}`,
-              g.fact.disputeId,
-            )}
-          >
-            {g.game.home.name} × {g.game.away.name}
-          </a>
+          <MatchTeams game={g} />
           <small>
             {recent && (
               <span className="player-recent-date">{date(g.game.date)} · </span>
@@ -342,7 +282,12 @@ function Games({
       label: "Placar",
       numeric: true,
       render: (g) => (
-        <span
+        <a
+          className="player-game-score"
+          href={publicDetailLink(
+            `/resultado.html#${g.fact.gameId}`,
+            g.fact.disputeId,
+          )}
           title={
             scores[g.fact.gameId]
               ? "Placar final"
@@ -350,7 +295,7 @@ function Games({
           }
         >
           {scores[g.fact.gameId] ?? "—"}
-        </span>
+        </a>
       ),
     },
     {
@@ -381,7 +326,7 @@ function Games({
     });
   return (
     <DataTable
-      label={recent ? "Três últimos jogos" : "Jogos confirmados"}
+      label={recent ? "Cinco últimos jogos" : "Jogos confirmados"}
       columns={columns}
       rows={games}
       rowId={(g) => g.fact.gameId}
@@ -449,6 +394,7 @@ function CheckOptions({
   );
 }
 export function PlayerPublicPage() {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [route, setRoute] = useState(readLocation),
     [career, setCareer] = useState<PublicCareer | null>(null),
     [error, setError] = useState(""),
@@ -643,7 +589,7 @@ export function PlayerPublicPage() {
   const latest = years[0];
   const summaryRows = [
     {
-      label: latest ? String(latest) : "Temporada mais recente",
+      label: latest ? String(latest) : "Temporada",
       games: ready?.games.filter((g) => g.fact.context.year === latest) ?? [],
     },
     { label: "Carreira", games: ready?.games ?? [] },
@@ -709,10 +655,6 @@ export function PlayerPublicPage() {
       ),
     })),
   ];
-  const page = Math.min(
-    view.page,
-    Math.max(1, Math.ceil(filteredGames.length / 20)),
-  );
   const displayName = ready
     ? publicPlayerName(ready.page.identity.name, ready.page.identity.nickname)
     : "Perfil do atleta";
@@ -753,58 +695,141 @@ export function PlayerPublicPage() {
             <h1>Perfil do atleta</h1>
             <p role="status">Consultando perfil e participações publicadas…</p>
           </>
+        ) : view.section === "jogos" ? (
+          <section className="player-games-page" aria-labelledby="jogos">
+            <a
+              className="player-back"
+              href={`#${id}?${query({ ...view, section: "resumo" }, origin)}`}
+            >
+              Voltar ao perfil
+            </a>
+            <h1 id="jogos" tabIndex={-1}>
+              Jogos de {displayName}
+            </h1>
+            <p className="player-note">
+              Todas as participações publicadas, da mais recente para a mais
+              antiga.
+            </p>
+            <Games
+              games={chronologicalGames(ready.games).slice(
+                (Math.min(
+                  view.page,
+                  Math.max(1, Math.ceil(ready.games.length / 20)),
+                ) -
+                  1) *
+                  20,
+                Math.min(
+                  view.page,
+                  Math.max(1, Math.ceil(ready.games.length / 20)),
+                ) * 20,
+              )}
+            />
+            {ready.games.length > 20 && (
+              <nav className="player-pager" aria-label="Paginação de jogos">
+                <button
+                  disabled={view.page <= 1}
+                  onClick={() => update({ page: view.page - 1 })}
+                >
+                  Anterior
+                </button>
+                <span>
+                  Página{" "}
+                  {Math.min(view.page, Math.ceil(ready.games.length / 20))} de{" "}
+                  {Math.ceil(ready.games.length / 20)} · {ready.games.length}{" "}
+                  jogos
+                </span>
+                <button
+                  disabled={view.page * 20 >= ready.games.length}
+                  onClick={() => update({ page: view.page + 1 })}
+                >
+                  Próxima
+                </button>
+              </nav>
+            )}
+          </section>
         ) : (
           <>
             <div
               className={`player-overview ${ready.page.honors.length || ready.page.teamPlacements.length ? "player-with-honors" : ""}`}
             >
-              <header className="player-identity">
-                <h1>{displayName}</h1>
-                {displayName !== ready.page.identity.name && (
-                  <p className="player-full-name">{ready.page.identity.name}</p>
-                )}
-                <Metadata career={ready} />
-              </header>
-              <Honors career={ready} />
+              <div className="player-primary">
+                <header className="player-identity">
+                  <h1>{displayName}</h1>
+                  {displayName !== ready.page.identity.name && (
+                    <p className="player-full-name">
+                      {ready.page.identity.name}
+                    </p>
+                  )}
+                  {chronologicalGames(ready.games)[0] &&
+                    (() => {
+                      const latestGame = chronologicalGames(ready.games)[0];
+                      return (
+                        <>
+                          <p className="player-current-team">
+                            <a
+                              href={publicDetailLink(
+                                `/equipe.html#${latestGame.fact.registration.team.id}?registrationId=${latestGame.fact.registration.registrationId}`,
+                                latestGame.fact.disputeId,
+                              )}
+                            >
+                              {latestGame.fact.registration.name}
+                            </a>
+                            <span> · #{latestGame.fact.jersey}</span>
+                          </p>
+                          <p className="player-current-context">
+                            {latestGame.fact.context.name}{" "}
+                            {latestGame.fact.context.year} ·{" "}
+                            {latestGame.fact.context.category}
+                          </p>
+                        </>
+                      );
+                    })()}
+                  <Metadata career={ready} />
+                  <TeamTrajectory career={ready} />
+                </header>
+                <section className="player-summary" aria-labelledby="resumo">
+                  <h2 id="resumo" tabIndex={-1}>
+                    Resumo <small>Médias por jogo</small>
+                  </h2>
+                  <Table label="Resumo de temporada e carreira">
+                    <thead>
+                      <tr>
+                        <th scope="col">Resumo</th>
+                        <th scope="col" className="player-numeric">
+                          <abbr title="Jogos com participação confirmada">
+                            J
+                          </abbr>
+                        </th>
+                        {PROFILE_METRICS.map((m) => (
+                          <th key={m} scope="col" className="player-numeric">
+                            <abbr title={STATISTICS_METRICS[m].name}>
+                              {metricLabel(m)}
+                            </abbr>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {summaryRows.map((row) => (
+                        <tr key={row.label}>
+                          <th scope="row">{row.label}</th>
+                          <td className="player-numeric">
+                            {row.games.filter((g) => g.fact.played).length}
+                          </td>
+                          <Metrics
+                            games={row.games}
+                            id={id!}
+                            mode="per-game"
+                            columns={[...PROFILE_METRICS]}
+                          />
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </section>
+              </div>
+              <CareerHonors career={ready} />
             </div>
-            <section className="player-summary" aria-labelledby="resumo">
-              <h2 id="resumo" tabIndex={-1}>
-                Resumo <small>Médias por jogo</small>
-              </h2>
-              <Table label="Resumo de temporada e carreira">
-                <thead>
-                  <tr>
-                    <th scope="col">Resumo</th>
-                    <th scope="col" className="player-numeric">
-                      <abbr title="Jogos com participação confirmada">J</abbr>
-                    </th>
-                    {PROFILE_METRICS.map((m) => (
-                      <th key={m} scope="col" className="player-numeric">
-                        <abbr title={STATISTICS_METRICS[m].name}>
-                          {metricLabel(m)}
-                        </abbr>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {summaryRows.map((row) => (
-                    <tr key={row.label}>
-                      <th scope="row">{row.label}</th>
-                      <td className="player-numeric">
-                        {row.games.filter((g) => g.fact.played).length}
-                      </td>
-                      <Metrics
-                        games={row.games}
-                        id={id!}
-                        mode="per-game"
-                        columns={[...PROFILE_METRICS]}
-                      />
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </section>
             <nav className="player-navigation" aria-label="Seções do perfil">
               {sections.map(([key, label]) => (
                 <a
@@ -837,7 +862,7 @@ export function PlayerPublicPage() {
             </nav>
             <section className="player-recent" aria-labelledby="recentes">
               <div className="player-section-title">
-                <h2 id="recentes">Três últimos jogos</h2>
+                <h2 id="recentes">Cinco últimos jogos</h2>
                 <a
                   href={`#${id}?${query({ ...view, section: "jogos", panels: [...new Set([...view.panels, "jogos"])] }, origin)}`}
                   onClick={(e) => {
@@ -867,17 +892,32 @@ export function PlayerPublicPage() {
                 recent
                 games={chronologicalGames(
                   ready.games.filter((g) => g.fact.played),
-                ).slice(0, 3)}
+                ).slice(0, 5)}
               />
             </section>
             <section
               className="player-championships"
               aria-labelledby="estatisticas"
             >
-              <h2 id="estatisticas" tabIndex={-1}>
-                Estatísticas por campeonato
-              </h2>
-              <div className="player-filters">
+              <div className="player-section-title">
+                <h2 id="estatisticas" tabIndex={-1}>
+                  Estatísticas por campeonato
+                </h2>
+                <button
+                  className="player-adjust"
+                  type="button"
+                  aria-expanded={filtersOpen}
+                  aria-controls="profile-filters"
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                >
+                  Filtrar e ajustar
+                </button>
+              </div>
+              <div
+                id="profile-filters"
+                className="player-filters"
+                hidden={!filtersOpen}
+              >
                 <label>
                   Ano
                   <select
@@ -1031,6 +1071,7 @@ export function PlayerPublicPage() {
                 </p>
               </details>
             </section>
+            <CareerRecords career={ready} />
             <div className="player-extras">
               {extras.map((key) => (
                 <details
@@ -1056,134 +1097,68 @@ export function PlayerPublicPage() {
                       });
                     }}
                   >
-                    {key === "jogos"
-                      ? "Jogos completos"
-                      : key === "historico"
-                        ? "Histórico"
-                        : "Evolução"}
+                    Evolução
                   </summary>
                   {view.panels.includes(key) && (
                     <div className="player-extra-content">
-                      {key === "jogos" ? (
-                        <>
-                          <Games
-                            games={filteredGames.slice(
-                              (page - 1) * 20,
-                              page * 20,
-                            )}
-                          />
-                          <nav
-                            className="player-pager"
-                            aria-label="Paginação de jogos"
-                          >
-                            <button
-                              disabled={page === 1}
-                              onClick={() => update({ page: page - 1 })}
-                            >
-                              Anterior
-                            </button>
-                            <span>
-                              Página {page} de{" "}
-                              {Math.max(
-                                1,
-                                Math.ceil(filteredGames.length / 20),
-                              )}{" "}
-                              · {filteredGames.length} jogos
-                            </span>
-                            <button
-                              disabled={page * 20 >= filteredGames.length}
-                              onClick={() => update({ page: page + 1 })}
-                            >
-                              Próxima
-                            </button>
-                          </nav>
-                        </>
-                      ) : key === "historico" ? (
-                        <>
-                          <p className="player-note">
-                            Inscrições comprovadas por participações publicadas;
-                            não indicam vínculo atual.
-                          </p>
-                          <ul className="player-history">
-                            {filtered.map((g) => (
-                              <li key={g.key}>
-                                <strong>
-                                  {g.history.context.year} ·{" "}
-                                  {g.history.context.name}
-                                </strong>
-                                <span>
-                                  {g.history.registration.name} ·{" "}
-                                  {g.history.context.gender} ·{" "}
-                                  {g.history.context.category} · Camisa{" "}
-                                  {g.history.jerseys.join(" / ")}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                          {!filtered.length && (
-                            <p>Nenhuma inscrição neste recorte.</p>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <p className="player-note">
-                            Médias por jogo nas temporadas selecionadas. Sem
-                            interpolar dados ausentes.
-                          </p>
-                          <Table label="Evolução por temporada">
-                            <thead>
-                              <tr>
-                                <th scope="col">Temporada</th>
-                                <th scope="col" className="player-numeric">
-                                  J
+                      <>
+                        <p className="player-note">
+                          Médias por jogo nas temporadas selecionadas. Sem
+                          interpolar dados ausentes.
+                        </p>
+                        <Table label="Evolução por temporada">
+                          <thead>
+                            <tr>
+                              <th scope="col">Temporada</th>
+                              <th scope="col" className="player-numeric">
+                                J
+                              </th>
+                              {PROFILE_METRICS.map((m) => (
+                                <th
+                                  key={m}
+                                  scope="col"
+                                  className="player-numeric"
+                                >
+                                  {metricLabel(m)}
                                 </th>
-                                {PROFILE_METRICS.map((m) => (
-                                  <th
-                                    key={m}
-                                    scope="col"
-                                    className="player-numeric"
-                                  >
-                                    {metricLabel(m)}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {years
-                                .filter((y) =>
-                                  filteredGames.some(
-                                    (g) => g.fact.context.year === y,
-                                  ),
-                                )
-                                .map((year) => {
-                                  const games = filteredGames.filter(
-                                    (g) => g.fact.context.year === year,
-                                  );
-                                  return (
-                                    <tr key={year}>
-                                      <th scope="row">{year}</th>
-                                      <td className="player-numeric">
-                                        {
-                                          games.filter((g) => g.fact.played)
-                                            .length
-                                        }
-                                      </td>
-                                      <Metrics
-                                        games={games}
-                                        id={id!}
-                                        mode="per-game"
-                                        columns={[...PROFILE_METRICS]}
-                                      />
-                                    </tr>
-                                  );
-                                })}
-                            </tbody>
-                          </Table>
-                          {!filteredGames.length && (
-                            <p>Sem jogos neste recorte.</p>
-                          )}
-                        </>
-                      )}
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {years
+                              .filter((y) =>
+                                filteredGames.some(
+                                  (g) => g.fact.context.year === y,
+                                ),
+                              )
+                              .map((year) => {
+                                const games = filteredGames.filter(
+                                  (g) => g.fact.context.year === year,
+                                );
+                                return (
+                                  <tr key={year}>
+                                    <th scope="row">{year}</th>
+                                    <td className="player-numeric">
+                                      {
+                                        games.filter((g) => g.fact.played)
+                                          .length
+                                      }
+                                    </td>
+                                    <Metrics
+                                      games={games}
+                                      id={id!}
+                                      mode="per-game"
+                                      columns={[...PROFILE_METRICS]}
+                                    />
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
+                        </Table>
+                        {!filteredGames.length && (
+                          <p>Sem jogos neste recorte.</p>
+                        )}
+                      </>
                     </div>
                   )}
                 </details>

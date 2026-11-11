@@ -25,14 +25,13 @@ test("perfil contínuo público: dados disponíveis, ordem dos blocos e atalhos 
   await expect(summary(page).getByRole("row")).toHaveCount(3);
   await expect(
     page
-      .getByRole("table", { name: "Três últimos jogos", exact: true })
+      .getByRole("table", { name: "Cinco últimos jogos", exact: true })
       .getByRole("row"),
   ).toHaveCount(3);
   await expect(page.locator(".player-provenance")).toHaveCount(0);
   for (const [name, target] of [
     ["Estatísticas", "#estatisticas"],
     ["Conquistas e honrarias", "#conquistas"],
-    ["Jogos", "#jogos"],
     ["Histórico", "#historico"],
     ["Evolução", "#evolucao"],
     ["Resumo", "#resumo"],
@@ -44,15 +43,6 @@ test("perfil contínuo público: dados disponíveis, ordem dos blocos e atalhos 
     await page.keyboard.press("Enter");
     await expect(page.locator(target)).toBeFocused();
   }
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
-  await page.reload();
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
   expect(f.state.sessionReads).toBe(0);
   await expect(page.getByText(/confirmação v|Resultado v|Fontes/i)).toHaveCount(
     0,
@@ -69,10 +59,13 @@ test("carreira completa não herda campeonato de origem; filtros e checkboxes n�
   await expect(stats(page).getByRole("row")).toHaveCount(3);
   const before = await summary(page).innerText();
   const recent = page.getByRole("table", {
-    name: "Três últimos jogos",
+    name: "Cinco últimos jogos",
     exact: true,
   });
   await expect(recent.getByRole("row")).toHaveCount(3);
+  await page
+    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
+    .click();
   await page
     .getByRole("combobox", { name: "Ano", exact: true })
     .selectOption("2027");
@@ -117,14 +110,15 @@ test("histórico completo não fica limitado à primeira página e paginação d
   await expect(
     page.getByText("Página 2 de 2 · 25 jogos", { exact: true }),
   ).toBeVisible();
-  await expect(stats(page).getByRole("row")).toHaveCount(21);
-  await expect(
-    summary(page).getByRole("row").last().getByRole("cell").first(),
-  ).toHaveText("25");
+  await expect(summary(page)).toHaveCount(0);
   expect(f.state.queries.map((p) => p.get("page"))).toEqual([null, "2"]);
   await page.getByRole("button", { name: "Anterior", exact: true }).click();
   await expect(games.getByRole("row")).toHaveCount(21);
   expect(f.state.queries).toHaveLength(2);
+  await page
+    .getByRole("link", { name: "Voltar ao perfil", exact: true })
+    .click();
+  await expect(stats(page).getByRole("row")).toHaveCount(21);
   await page
     .getByRole("button", { name: "Próximos campeonatos", exact: true })
     .click();
@@ -147,6 +141,9 @@ test("ordenação e colunas persistem sem refazer as consultas da carreira", asy
   await expect(stats(page).locator("tbody tr").first()).toContainText("2026");
   await stats(page).getByRole("button", { name: /PTS/ }).click();
   await expect(stats(page).locator("tbody tr").first()).toContainText("2027");
+  await page
+    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
+    .click();
   await page
     .locator(".player-options > summary")
     .filter({ hasText: "Colunas" })
@@ -238,9 +235,6 @@ test("relacionado sem jogar preserva camisa e não recebe zero estatístico nem 
       discipline: null,
     });
   await page.goto(f.url + "?secao=jogos");
-  await expect(
-    page.getByRole("table", { name: "Três últimos jogos", exact: true }),
-  ).toContainText("Ainda não há jogos confirmados");
   const games = page.getByRole("table", {
     name: "Jogos confirmados",
     exact: true,
@@ -254,7 +248,7 @@ test("relacionado sem jogar preserva camisa e não recebe zero estatístico nem 
   );
 });
 
-test("três recentes usam data do jogo e participação explícita, não publicação de correção", async ({
+test("cinco recentes usam data do jogo e participação explícita, não publicação de correção", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page, { long: true });
@@ -275,14 +269,20 @@ test("três recentes usam data do jogo e participação explícita, não publica
   f.source.participations[0].fact.publishedAt = "2028-01-01T00:00:00Z";
   await page.goto(f.url);
   const recent = page.getByRole("table", {
-    name: "Três últimos jogos",
+    name: "Cinco últimos jogos",
     exact: true,
   });
-  await expect(recent.getByRole("row")).toHaveCount(4);
+  await expect(recent.getByRole("row")).toHaveCount(6);
   const dates = await recent
     .locator("tbody tr td:first-child")
     .allTextContents();
-  expect(dates).toEqual(["24/01/2026", "23/01/2026", "22/01/2026"]);
+  expect(dates).toEqual([
+    "24/01/2026",
+    "23/01/2026",
+    "22/01/2026",
+    "21/01/2026",
+    "20/01/2026",
+  ]);
 });
 
 test("retorno da súmula de outra disputa preserva filtros, painel e rolagem", async ({
@@ -294,13 +294,13 @@ test("retorno da súmula de outra disputa preserva filtros, painel e rolagem", a
   );
   await expect(summary(page)).toBeVisible();
   await page
+    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
+    .click();
+  await page
     .getByRole("combobox", { name: "Ano", exact: true })
     .selectOption("2027");
-  await page
-    .getByRole("link", { name: "Ver todos os jogos", exact: true })
-    .click();
   const link = page
-    .getByRole("table", { name: "Três últimos jogos", exact: true })
+    .getByRole("table", { name: "Cinco últimos jogos", exact: true })
     .locator(`a[href*="${f.source.participations[0].fact.gameId}"]`);
   await link.scrollIntoViewIfNeeded();
   const before = await page.evaluate(() => scrollY);
@@ -311,13 +311,12 @@ test("retorno da súmula de outra disputa preserva filtros, painel e rolagem", a
   await page
     .getByRole("link", { name: "Voltar à origem", exact: true })
     .click();
+  await page
+    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
+    .click();
   await expect(
     page.getByRole("combobox", { name: "Ano", exact: true }),
   ).toHaveValue("2027");
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
   await expect
     .poll(() => page.evaluate(() => scrollY))
     .toBeGreaterThanOrEqual(Math.max(0, before - 3));
