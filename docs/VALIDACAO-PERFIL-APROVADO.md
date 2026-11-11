@@ -17,15 +17,15 @@ Nomes abrem o perfil da equipe com a inscrição correta; placar e marca abrem o
 ## Fonte, revisão e CI
 
 - [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), branch `codex/perfil-atleta-aprovado`, base `a55dd7c7ef3b85991238c6e5bd379f5aa60e1b05`. Manter aberta, sem merge ou auto-merge.
-- Fonte de código publicada: **697c7af67bf21624a814656616179c05ce5f8f89**. Implementação em `acbc5f2`; o commit seguinte apenas adapta o teste de acessibilidade ao percurso dedicado. Commits de registro posteriores não alteram os artefatos executáveis.
+- Fonte de código publicada: **fc276b3f50d913bd43014938206d90d0bf205406**. Implementação em `acbc5f2`; o commit seguinte apenas adapta o teste de acessibilidade ao percurso dedicado. Commits de registro posteriores não alteram os artefatos executáveis.
 - [CI completa 42958772570](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42958772570): **SUCCESS**, sete jobs incluindo `validate`. Gate: **810 unitários / 172 arquivos**, 19 transportes, 15 testes de banco isolado, 35 de Worker/HTTP e 1 de PDF, além de política, lint, formato, tipos, builds, fronteira do cliente e segredos.
 - Browsers completos: **814 PASS / 118 SKIP** nos dois shards (466 e 348 PASS). Skips preexistentes, sem novos skips ou timeouts ampliados nesta unidade. Design e WebKit também SUCCESS. A CI do registro documental segue o classificador proporcional; consultar os checks do HEAD real da PR.
-- Local: cinco casos novos RED→GREEN e quatro existentes de modelo; execução inicial de 34 cenários, depois 14 de aceite/geométrica e dois de acessibilidade focal PASS. Os testes de perfil e de aceite somam 42 cenários distintos nas duas configurações. Axe: quatro estados geométricos e 12 estados do percurso/filtros sem violações automáticas nas regras A/AA selecionadas.
+- Local: cinco casos novos RED→GREEN e quatro existentes de modelo; execução inicial de 34 cenários, depois 14 de aceite/geométrica e dois de acessibilidade focal PASS. Os testes de perfil e de aceite somam 44 cenários distintos nas duas configurações. Axe: quatro estados geométricos e 12 estados do percurso/filtros sem violações automáticas nas regras A/AA selecionadas.
 - O primeiro run, 42957135715, aprovou gate/design/WebKit e falhou somente nos dois cenários do teste de acessibilidade que ainda esperavam Jogos como painel. O consumidor foi adaptado para a página dedicada e confirmado localmente antes da CI final. Fixtures de nomes longos e seleção de botões dinâmicos também foram corrigidas no verificador, sem reduzir asserções.
 
 O gate local completo não é declarado aprovado: forks ficaram sem progresso e tentativas posteriores encontraram disco cheio. A evidência consolidada é a CI remota do SHA acima. Artefatos temporários próprios foram preservados em armazenamento de trabalho na rede, permitindo concluir os verificadores focais. Nenhuma limpeza de dados humanos ou mudança de configuração do sistema foi feita.
 
-Revisão do autor, sem subagente revisor disponível. Aplicadas `ui-ux-pro-max`, `web-design-guidelines` e a [fonte atualizada de diretrizes](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md). Cobertura/zero, empates, agrupamento, retorno, semântica e limites das células revisados; sem achados impeditivos. Não se declara auditoria WCAG integral, leitor de tela ou teste em aparelho físico.
+Revisão do autor complementada pelo review automatizado Codex. O apontamento P2 de paginação no commit 20522a7 foi reproduzido e corrigido: com `page=500`, uma única ação Anterior usa a página efetiva e volta à página precedente. Teste RED→GREEN desktop/mobile e conjunto focal final de 44 cenários PASS. Aplicadas `ui-ux-pro-max`, `web-design-guidelines` e a [fonte atualizada de diretrizes](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md). Cobertura/zero, empates, agrupamento, retorno, semântica e limites das células revisados; sem achados impeditivos. Não se declara auditoria WCAG integral, leitor de tela ou teste em aparelho físico.
 
 ## Worker e verificação remota
 
@@ -34,9 +34,9 @@ Revisão do autor, sem subagente revisor disponível. Aplicadas `ui-ux-pro-max`,
 | Worker                | `base-do-basquete-next-pr79`                                                                                      |
 | URL                   | https://base-do-basquete-next-pr79.renato-lucindo-jr.workers.dev                                                  |
 | Perfil de exemplo     | https://base-do-basquete-next-pr79.renato-lucindo-jr.workers.dev/atleta.html#ab277378-2b23-4e71-8234-b6d2b3915f9f |
-| Deployment ativo      | `9036757c-24d8-4eb2-bf3d-ab2244bebc42`                                                                            |
-| Versão, 100%          | `84dd73ef-70b5-426b-be97-da1114761c0c`                                                                            |
-| Fonte em X-Bdb-Source | `697c7af67bf21624a814656616179c05ce5f8f89`                                                                        |
+| Deployment ativo      | `d56c620d-c918-4d32-b91b-316beb91f879`                                                                            |
+| Versão, 100%          | `4efd167c-7778-429e-82a2-04bfd7aaaf48`                                                                            |
+| Fonte em X-Bdb-Source | `fc276b3f50d913bd43014938206d90d0bf205406`                                                                        |
 | SESSIONS próprio      | `f12d689440054666976f78289a51eb55`                                                                                |
 | Rate limit próprio    | `791111202611`, 10 requisições / 60 s                                                                             |
 
@@ -53,3 +53,7 @@ Capturas versionadas: [desktop](design/evidencias/perfil-aprovado/recordes-1366.
 ## Continuidade
 
 Checkout principal `sync/trabalho-casa`, suas três alterações preexistentes, demais branches e protótipos preservados. Histórico anterior em `historico/progresso/2026-11-11-antes-perfil-atleta-aprovado.md`. Sem SQL, alteração de Auth/Access, publicação de dados ou merge nesta unidade. Próximo passo do responsável: revisar a PR aberta e o Worker entregue.
+
+## Correção da revisão final
+
+A fonte atual inclui a correção P2 da paginação em fc276b3. A CI 42958772570 acima registra a composição anterior 697c7af; não é declarada como prova desta correção. O conjunto focal completo passou 44/44 após reproduzir a falha. A CI completa do HEAD atual e seu resultado são conferidos na [PR79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79) e na entrega local. Este registro posterior é exclusivamente documental; os novos artefatos do Worker identificam a fonte fc276b3 em X-Bdb-Source.
