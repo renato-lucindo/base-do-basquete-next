@@ -586,6 +586,9 @@ export function PlayerPublicPage() {
     view.statsPage,
     Math.max(1, Math.ceil(ordered.length / 20)),
   );
+  const allGames = chronologicalGames(ready?.games ?? []);
+  const gamesPages = Math.max(1, Math.ceil(allGames.length / 20));
+  const gamesPage = Math.min(view.page, gamesPages);
   const latest = years[0];
   const summaryRows = [
     {
@@ -711,36 +714,22 @@ export function PlayerPublicPage() {
               antiga.
             </p>
             <Games
-              games={chronologicalGames(ready.games).slice(
-                (Math.min(
-                  view.page,
-                  Math.max(1, Math.ceil(ready.games.length / 20)),
-                ) -
-                  1) *
-                  20,
-                Math.min(
-                  view.page,
-                  Math.max(1, Math.ceil(ready.games.length / 20)),
-                ) * 20,
-              )}
+              games={allGames.slice((gamesPage - 1) * 20, gamesPage * 20)}
             />
-            {ready.games.length > 20 && (
+            {gamesPages > 1 && (
               <nav className="player-pager" aria-label="Paginação de jogos">
                 <button
-                  disabled={view.page <= 1}
-                  onClick={() => update({ page: view.page - 1 })}
+                  disabled={gamesPage <= 1}
+                  onClick={() => update({ page: gamesPage - 1 })}
                 >
                   Anterior
                 </button>
                 <span>
-                  Página{" "}
-                  {Math.min(view.page, Math.ceil(ready.games.length / 20))} de{" "}
-                  {Math.ceil(ready.games.length / 20)} · {ready.games.length}{" "}
-                  jogos
+                  Página {gamesPage} de {gamesPages} · {allGames.length} jogos
                 </span>
                 <button
-                  disabled={view.page * 20 >= ready.games.length}
-                  onClick={() => update({ page: view.page + 1 })}
+                  disabled={gamesPage >= gamesPages}
+                  onClick={() => update({ page: gamesPage + 1 })}
                 >
                   Próxima
                 </button>

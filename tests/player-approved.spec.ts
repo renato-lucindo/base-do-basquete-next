@@ -3,6 +3,34 @@ import { playerPublicFixture } from "./fixtures/player-public-browser";
 import { teamPublicFixture } from "./fixtures/team-public-browser";
 import AxeBuilder from "@axe-core/playwright";
 
+test("página de jogos normaliza URL acima do limite antes de voltar uma página", async ({
+  page,
+}) => {
+  const f = await playerPublicFixture(page, { long: true });
+  await page.goto(f.url + "?secao=jogos&page=500");
+  const games = page.getByRole("table", {
+    name: "Jogos confirmados",
+    exact: true,
+  });
+  await expect(
+    page.getByText("Página 2 de 2 · 25 jogos", { exact: true }),
+  ).toBeVisible();
+  await expect(games.locator("tbody tr")).toHaveCount(5);
+  await page.getByRole("button", { name: "Anterior", exact: true }).click();
+  await expect(games.locator("tbody tr")).toHaveCount(20);
+  await expect(
+    page.getByText("Página 1 de 2 · 25 jogos", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Anterior", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Próxima", exact: true }).click();
+  await expect(games.locator("tbody tr")).toHaveCount(5);
+  await expect(
+    page.getByRole("button", { name: "Próxima", exact: true }),
+  ).toBeDisabled();
+});
+
 test("perfil aprovado: cinco recentes, recordes alinhados e expansão independente sem repetir o melhor", async ({
   page,
 }) => {
