@@ -118,4 +118,4 @@ export const profileDate = (value: string | null) =>
     ? new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(
         new Date(`${value}T12:00:00Z`),
       )
-    : "Data não informada";
+    : "—";

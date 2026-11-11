@@ -1,21 +1,25 @@
 # Progresso atual
 
-Atualizado em 11/11/2026. Unidade única: perfil do atleta, branch codex/perfil-atleta-aprovado, [PR79 aberta](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), sem merge ou auto-merge. O responsável reprovou o resultado visual e solicitou novo protótipo HTML mobile, com revisão documental antes da criação. Não implementar a nova composição no produto sem novo aceite.
+Atualizado em 11/11/2026. Unidade única: perfil do atleta, branch codex/perfil-atleta-aprovado, [PR79 aberta](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), sem merge ou auto-merge. O responsável aprovou o HTML v9 e autorizou implementá-lo na mesma PR, melhorando o Histórico de equipes para que a linha não ultrapasse os pontos.
 
-## Revisão documental e estudo atual
+## Implementação v9
 
-- Regras de textos curtos já existiam, mas o perfil criou definições locais/notas técnicas e a revisão não comparou o conteúdo com o catálogo. PUBLICO.md mantinha trechos ambíguos sobre cobertura e Evolução. Causas, referências do código e correções em [REVISAO-TEXTUAL-PERFIL.md](design/REVISAO-TEXTUAL-PERFIL.md).
-- PADROES.md e o checklist exigem uma única Legenda ao final de todo o conteúdo ativo, antes do rodapé; siglas/tooltip/seletor usam o mesmo nome curto de Jogadores/Equipes. J significa somente Jogos. Sem complementos sobre participação, cobertura, zero, filtros ou fases. Evolução fora do escopo.
-- Protótipo local separado em outputs/perfil-jogador-mobile-v5 do chat perfil-jogador-prototipos, com abas Visão geral/Estatísticas/Carreira, cinco recentes, página de jogos e navegação local para equipes/partidas. Dados fictícios preservados das fixtures; nenhuma consulta ao banco. Relatório, capturas e verificações do estudo ficam nessa entrega local, sem declaração de aceite visual.
-- A documentação foi corrigida antes da criação do novo HTML. A organização anterior permanece apenas como implementação histórica; o novo estudo não foi publicado em Worker.
+- Quatro abas: Visão geral, Estatísticas, Carreira e Ver jogos. Resumo branco e quatro marcas na primeira aba; conquistas à direita da identificação no desktop; recordes completos e trajetória em Carreira. Colunas superiores e inferiores alinhadas com divisória fina.
+- Confrontos como um único link real para a partida, incluindo data/contexto/PTS na lista. Equipes fora de confrontos continuam levando à equipe. Nomes completos no desktop, siglas cadastradas no mobile e nomes completos nas estatísticas em todas as larguras. Data DD/MM/YYYY, campeonato sem repetir ano e placar em grafite; marca em azul.
+- Ver jogos com 12 atuações por página e filtros Ano/Campeonato/Equipe/adversário no mesmo modal das estatísticas. Preparação, Aplicar, Cancelar e Limpar; filtros independentes, retorno e paginação preservados na URL. Estatísticas com Ano/Idade/Campeonato/J e Total/Por jogo. Idade usa somente o ano de nascimento já publicado; coluna integralmente ausente sem esse dado.
+- Trajetória agrupada por equipe, com anos separados e segmentos entre os centros dos pontos; primeiro sem linha acima, último sem linha abaixo e item único sem linha. Legenda única final e tooltips curtas do catálogo; Evolução permanece fora do escopo.
+- Arquitetura e escopo em [PLAN-PERFIL-V9.md](PLAN-PERFIL-V9.md); regras vigentes em [PUBLICO.md](design/PUBLICO.md). Sem alteração de API, banco, dados, Auth/Access ou dependências.
 
-## Fonte e serviço anteriores
+## Verificação em curso
 
-- Fonte executável fc276b3f50d913bd43014938206d90d0bf205406, registro 00a76e00e28f0b41f8104aab0bed2f61d10e1d5b, base a55dd7c. [CI42961762268](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/42961762268) SUCCESS: 810 unitários, 816 browsers/118 skips preexistentes, 42 WebKit e sete jobs aprovados. Valida a implementação anterior, não o novo HTML nem seu aceite. O check do registro documental atual é consultado no HEAD real da PR.
-- Worker anterior: https://base-do-basquete-next-pr79.renato-lucindo-jr.workers.dev, versão 4efd167c-7778-429e-82a2-04bfd7aaaf48, deployment d56c620d-c918-4d32-b91b-316beb91f879. Continua sendo a composição reprovada visualmente; não houve novo deploy nesta revisão. [Provas técnicas anteriores](VALIDACAO-PERFIL-APROVADO.md).
+Vitest focal: 13 testes em três arquivos PASS; lint focal e build público PASS. Rodada final de browsers: 54 cenários desktop/mobile PASS, com 320/390/1366/1920, alinhamento, extremos da trajetória, dados ausentes, nascimento público, filtros, teclado e retorno. Toque emulado confirmou alvo de expansão mínimo de 44 × 44 px após ajuste da coluna; voltar/avançar e rejeição de placar de outra publicação também PASS. Typecheck focal de todos os arquivos TS/TSX alterados PASS. CI do código v9 ainda pendente: provas da versão anterior não validam esta revisão.
 
-## Preservação e próximo passo
+O gate local foi tentado e interrompido no teste de CLI Git em pasta temporária UNC: dez casos PASS e um erro de ambiente “not in a git directory”. Typecheck local também encontrou falta de memória do sistema, sem resultado conclusivo. Não foram alterados testes, timeouts ou sistema para contornar esses limites. Gate e browsers completos continuam obrigatórios na CI.
 
-Worktree da unidade em work/perfil-atleta-produto do chat; checkout humano sync/trabalho-casa e suas três mudanças preexistentes preservados. Protótipos e capturas anteriores mantidos. Intermediários próprios preservados por movimento individual/hash em //es-rdc01/recover/Codex-Worktrees/perfil-atleta-pr79-intermediarios; sem remoção recursiva ou alteração do sistema.
+## Serviço, preservação e próximo passo
 
-Próximo passo: avaliação humana do novo protótipo mobile. A PR79 permanece aberta. Sem alterações no código React, API, banco, dados, Auth/Access ou Workers nesta revisão. Histórico único anterior em [checkpoint anterior](../historico/progresso/2026-11-11-antes-revisao-mobile-perfil.md). A automação concluir-perfil-do-atleta-e-worker-pr79 estava pausada no fechamento anterior; eventual espera por CI segue CONTRIBUTING.md e a mesma automação.
+Worker anterior preservado: https://base-do-basquete-next-pr79.renato-lucindo-jr.workers.dev, fonte fc276b3f50d913bd43014938206d90d0bf205406, versão 4efd167c-7778-429e-82a2-04bfd7aaaf48. Ainda não recebeu a v9. Autorização anterior permite atualizar somente este preview, preservando proteção e demais Workers.
+
+Worktree da unidade em work/perfil-atleta-produto do chat perfil-jogador-prototipos; checkout humano sync/trabalho-casa e suas três mudanças preexistentes preservados. HTML v9 e capturas anteriores preservados, ZIP de referência SHA256 8c45e056220fc37ca6a4b460dd080dfa894e92b2b66cec9fc6ad982eec99a962. Intermediários em //es-rdc01/recover/Codex-Worktrees/perfil-atleta-pr79-intermediarios; sem limpeza recursiva ou alteração do sistema.
+
+Próximo passo: concluir verificações e revisão, publicar a atualização na mesma PR, observar CI do HEAD real, atualizar o mesmo Worker protegido e produzir novas capturas/relatório. Deixar PR aberta. A espera por CI usa a mesma automação concluir-perfil-do-atleta-e-worker-pr79 conforme CONTRIBUTING.md. [Resumo anterior preservado](../historico/progresso/2026-11-11-antes-perfil-v9-produto.md).
