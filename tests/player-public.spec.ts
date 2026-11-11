@@ -109,13 +109,13 @@ test("ordenação, modo, nenhuma coluna e recarga preservam valores sem novas le
   await page.goto(f.url + "?secao=estatisticas");
   await expect(stats(page).locator("tbody tr")).toHaveCount(2);
   await stats(page)
-    .getByRole("button", { name: "Ordenar por Pontos", exact: true })
+    .getByRole("button", { name: "Ordenar por PTS (Pontos)", exact: true })
     .click();
   await expect(
     stats(page).locator("thead th[aria-sort=descending]"),
   ).toHaveCount(1);
   await stats(page)
-    .getByRole("button", { name: "Ordenar por Pontos", exact: true })
+    .getByRole("button", { name: "Ordenar por PTS (Pontos)", exact: true })
     .click();
   await expect(
     stats(page).locator("thead th[aria-sort=ascending]"),
@@ -131,7 +131,7 @@ test("ordenação, modo, nenhuma coluna e recarga preservam valores sem novas le
   await page.reload();
   await expect(
     stats(page).getByRole("button", {
-      name: "Ordenar por Pontos",
+      name: "Ordenar por PTS (Pontos)",
       exact: true,
     }),
   ).toHaveCount(0);

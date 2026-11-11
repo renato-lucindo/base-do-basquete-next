@@ -84,7 +84,7 @@ export function MetricTerm({
       }}
       aria-label={
         onClick
-          ? `Ordenar por ${name}`
+          ? `Ordenar por ${metric === "games" ? "J" : metricLabel(metric)} (${name})`
           : `${metric === "games" ? "J" : metricLabel(metric)}: ${name}`
       }
     >
@@ -157,11 +157,7 @@ export function ProfileGames({
           <tr key={g.fact.gameId} data-game={g.fact.gameId}>
             <td>{profileDate(g.game.date)}</td>
             <td>
-              <a
-                className="player-game-link"
-                href={gameHref(g)}
-                aria-label={`${g.game.home.name} ${scores[scoreKey(g)] ?? "×"} ${g.game.away.name}, ${profileDate(g.game.date)}, ${g.fact.context.name}, ${g.fact.context.category}`}
-              >
+              <a className="player-game-link" href={gameHref(g)}>
                 <MatchTeams game={g} score={scores[scoreKey(g)]} />
                 <GameContext game={g} />
                 {!g.fact.played && <small>Não participou</small>}

@@ -317,7 +317,7 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
     .first()
     .click();
   await expect(
-    page.getByRole("navigation", { name: "Seções do perfil" }),
+    page.getByRole("tablist", { name: "Seções do perfil" }),
   ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Seções da disputa" }),

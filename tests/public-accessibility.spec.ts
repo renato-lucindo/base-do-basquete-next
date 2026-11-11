@@ -38,46 +38,53 @@ test("axe: estatísticas e escolha de colunas", async ({ page }, info) => {
   ).toBeVisible();
   await scan(page, info, "statistics-columns");
 });
-test("axe: perfil contínuo, painéis e seleção por checkboxes", async ({
-  page,
-}, info) => {
-  const f = await playerPublicFixture(page);
-  await page.goto(f.url);
-  await expect(
-    page.getByRole("heading", { name: "AP", exact: true }),
-  ).toBeVisible();
-  await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
-  await scan(page, info, "player-continuous");
-  for (const [name, target] of [
-    ["Jogos", "#jogos"],
-    ["Histórico", "#historico"],
-    ["Evolução", "#evolucao"],
-  ]) {
-    await page
-      .getByRole("navigation", { name: "Seções do perfil" })
-      .getByRole("link", { name, exact: true })
-      .focus();
+for (const name of ["Visão geral", "Estatísticas", "Carreira", "Ver jogos"])
+  test(`axe: perfil ${name}, filtros e seleção por checkboxes`, async ({
+    page,
+  }, info) => {
+    const f = await playerPublicFixture(page);
+    await page.goto(f.url);
+    await expect(
+      page.getByRole("heading", { name: "AP", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
+    const tab = page.getByRole("tab", { name, exact: true });
+    await tab.focus();
     await page.keyboard.press("Enter");
-    await expect(page.locator(target)).toBeFocused();
-    if (name === "Histórico") await page.keyboard.press("Enter");
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+    await expect(
+      page.getByRole("tabpanel", { name, exact: true }),
+    ).toBeVisible();
     await scan(page, info, `player-${name}`);
-    if (name === "Jogos")
+    if (name === "Estatísticas") {
+      const trigger = page.getByRole("button", {
+        name: "Filtrar e ajustar",
+        exact: true,
+      });
+      await trigger.click();
+      for (const group of ["Equipes", "Colunas"])
+        await expect(
+          page.getByRole("group", { name: group, exact: true }),
+        ).toBeVisible();
+      await scan(page, info, "player-filters");
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    }
+    if (name === "Carreira") {
       await page
-        .getByRole("link", { name: "Voltar ao perfil", exact: true })
+        .getByRole("button", { name: "Ver top 5 de PTS", exact: true })
         .click();
-  }
-  await page
-    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
-    .click();
-  for (const name of ["Equipes", "Colunas"]) {
-    await page
-      .locator(".player-options > summary")
-      .filter({ hasText: name })
-      .click();
-    await scan(page, info, `player-options-${name}`);
-    await page.keyboard.press("Escape");
-  }
-});
+      const trajectory = page.locator(".player-team-history > summary");
+      await trajectory.focus();
+      await page.keyboard.press("Enter");
+      await expect(page.locator(".player-team-history")).toHaveAttribute(
+        "open",
+        "",
+      );
+      await scan(page, info, "player-career-expanded");
+    }
+  });
 
 test("axe: lista de equipes longa e escolha explícita da inscrição", async ({
   page,
