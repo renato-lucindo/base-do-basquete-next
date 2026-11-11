@@ -59,8 +59,16 @@ test("axe: perfil contínuo, painéis e seleção por checkboxes", async ({
       .focus();
     await page.keyboard.press("Enter");
     await expect(page.locator(target)).toBeFocused();
+    if (name === "Histórico") await page.keyboard.press("Enter");
     await scan(page, info, `player-${name}`);
+    if (name === "Jogos")
+      await page
+        .getByRole("link", { name: "Voltar ao perfil", exact: true })
+        .click();
   }
+  await page
+    .getByRole("button", { name: "Filtrar e ajustar", exact: true })
+    .click();
   for (const name of ["Equipes", "Colunas"]) {
     await page
       .locator(".player-options > summary")
