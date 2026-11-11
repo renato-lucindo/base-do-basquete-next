@@ -10,7 +10,7 @@ React/TypeScript sobre loadPublicCareer e contratos públicos existentes. Separa
 2. [x] Composição v9: resumo branco e quatro marcas na Visão geral; recordes em Carreira; Ver jogos com 12 por página e painel de filtros; estatísticas Ano/Idade/Campeonato, modo segmentado, legenda final curta. Reutilizar tooltip/catálogo e controles do produto.
 3. [x] Confronto único clicável, placar validado compartilhado, nomes completos desktop/siglas mobile, nome completo em estatísticas. Conquistas no topo à direita desktop e em Carreira mobile.
 4. [x] Trajetória de equipes mais recente primeiro, ponto e segmentos por item: primeiro sem segmento acima, último sem segmento abaixo; linha termina no centro dos pontos. Um único item não recebe linha. Nomes completos, anos separados e links reais.
-5. [ ] Adaptar testes de comportamento antigo para abas sem retirar provas de privacidade, carregamento, erro/retry, ordenação, ausências e retorno. Verificar 320/390/1366/1920, teclado/toque, zoom real quando suportado e fonte/targets efetivos.
+5. [x] Adaptar testes de comportamento antigo para abas sem retirar provas de privacidade, carregamento, erro/retry, ordenação, ausências e retorno. Verificar 320/390/1366/1920, teclado/toque, zoom real quando suportado e fonte/targets efetivos. Smoke remoto e 26 capturas em outputs/implementacao-perfil-v9; relatório detalhado em VALIDACAO-PERFIL-V9.md.
 6. [ ] Atualizar documentação vigente/checkpoint, gate proporcional real (perfil ainda exige completo), revisão e CI do SHA publicado. Atualizar mesma PR e Worker protegido; smoke e capturas; manter PR aberta.
 
 ## Evidência e continuidade
