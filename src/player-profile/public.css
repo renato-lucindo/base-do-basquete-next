@@ -616,6 +616,7 @@
   color: #9e5f00;
 }
 .player-mobile-honors {
+  container-type: inline-size;
   border-top: 1px solid var(--bb-line);
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -781,6 +782,9 @@
   }
 }
 @container (max-width: 12rem) {
+  .player-mobile-honors .player-award-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .player-tabs-shell .bb-tabs {
     display: flex;
     overflow-x: auto;
