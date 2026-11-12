@@ -1,6 +1,6 @@
 # Refinamento público — evidências de 12/11/2026
 
-Unidade existente `codex/perfil-atleta-aprovado`, [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), base `a55dd7c`, início `a465e9c`. Pedido: refinar perfil e componentes públicos, sem reconstrução, banco, API, permissões, merge ou deploy. Fonte e CI ficam no checkpoint, nos checks e no corpo da PR. A composição de produto `4cbbe68e44ac5070711e5d36930c7f1d5de33cc1` teve **CI completa SUCCESS**, incluindo `validate`, no [run43230100404](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43230100404), e a PR foi retirada de Draft. O commit posterior atualiza apenas documentação; sua CI é acompanhada pela mesma automação e registrada no corpo da PR, sem repetir suítes locais inalteradas.
+Unidade existente `codex/perfil-atleta-aprovado`, [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), base `a55dd7c`, início `a465e9c`. Pedido inicial: refinar perfil e componentes públicos, sem reconstrução, banco, API, permissões, merge ou deploy. A autorização posterior para preview separado consta ao final. Fonte e CI ficam no checkpoint, nos checks e no corpo da PR. A composição de produto `4cbbe68e44ac5070711e5d36930c7f1d5de33cc1` teve **CI completa SUCCESS**, incluindo `validate`, no [run43230100404](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43230100404), e a PR foi retirada de Draft. O commit posterior atualiza apenas documentação; sua CI é acompanhada pela mesma automação e registrada no corpo da PR, sem repetir suítes locais inalteradas.
 
 ## Resultado por solicitação
 
@@ -58,4 +58,29 @@ Falhas relevantes preservadas nos logs locais: testes antigos ainda esperavam hi
 
 Revisão feita pelo implementador, com [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultadas nesta execução. Foram conferidos diff, semântica, origem dos dados, foco, estados selecionados, quebra de nomes, ausência/zero e limites da reserva de altura. Não há novo parecer independente declarado. Axe e capturas não comprovam conformidade WCAG integral nem substituem aceite visual do responsável.
 
-Nenhuma alteração de dependências, API, banco, registros, Auth/Access, produção ou Worker remoto. O checkout humano `sync/trabalho-casa`, `CONTRIBUTING.md`, `skills-lock.json` e a skill local preexistentes foram preservados.
+Até a conclusão do refinamento local, nenhuma alteração de dependências, API, banco, registros, Auth/Access, produção ou Worker remoto. O checkout humano `sync/trabalho-casa`, `CONTRIBUTING.md`, `skills-lock.json` e a skill local preexistentes foram preservados.
+
+## Preview separado — autorização de12/11/2026
+
+O responsável pediu **outro Worker para preview, preservando o da PR79**, e especificou **sem Access**. Publicado somente o destino separado, sem alterar Access ou serviços existentes.
+
+| Item             | Resultado real                                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Worker           | `base-do-basquete-next-uiux-preview`                                                                                                      |
+| URL              | [Abrir preview](https://base-do-basquete-next-uiux-preview.renato-lucindo-jr.workers.dev/)                                                |
+| Perfil conferido | [Pedro Amorim](https://base-do-basquete-next-uiux-preview.renato-lucindo-jr.workers.dev/atleta.html#d8b5a99a-5280-4ad4-bee3-c2f6e50ab0f0) |
+| Fonte / CI       | `4643a29acd1d9e4ece9401c7e9cbd6fe97bbb3cb`; run43232981577 SUCCESS completo                                                               |
+| Versão,100%      | `acef31bf-ab42-4754-b4b8-bed4cf45f7bd`                                                                                                    |
+| Deployment       | `1f2beccf-5132-41c1-9bb9-e258b419aa18`,12/11/2026 às11:43:59 BRT                                                                          |
+| Sessão própria   | `d9757391d85040fc925f46d5bc421560`                                                                                                        |
+| Limite próprio   | `791212202611`,10 requisições/60s                                                                                                         |
+
+Build foundation, tipos da configuração isolada e dry-run do Wrangler4.152.0 PASS. Deploy usou configuração própria sem rotas/domínios compartilhados, mesma data de compatibilidade, `FLEXIBLE_COMPETITION=true` e integração existente de desenvolvimento. Chave publicável existente e chave de sessão nova configuradas a partir do Windows Credential Manager; arquivo temporário de upload removido ao terminar, sem valores em logs/commits. A publicação usa o [fluxo documentado de segredos junto ao código](https://developers.cloudflare.com/workers/configuration/secrets/#upload-secrets-alongside-code).
+
+Smoke remoto com User-Agent de navegador: **36 arquivos HTTP200**, sendo29 JS/CSS com SHA256 idêntico ao build e7 HTMLs conferidos, incluindo a meta de competição flexível que o Worker injeta em foundation. Raiz, health, catálogo, busca e perfil público200, sem redirecionamento ao Access; sessão e consulta administrativa401 anônimas. Nenhum login, escrita em dados humanos, migration de banco ou publicação de resultados foi executado. O provisionamento de sessão é exclusivo do novo Worker.
+
+Inspeção no navegador real: quatro abas em **390 e1366 CSS px**, legenda única, FC no padrão, campeonato/categoria inline e histórico permanente; nenhuma largura externa transbordou. Capturas reais de Visão geral desktop e Carreira mobile foram exibidas e examinadas. Após emular outro dispositivo, a ferramenta recarrega a página; a inspeção final aguardou o perfil carregar antes de trocar abas. Provas HTTP, geometria e preservação ficam em `.worker-artifacts/uiux-release/{smoke-http,browser-desktop,browser-mobile,preservacao-antes,preservacao-depois}.json`.
+
+**Worker PR79 preservado:** versão `80e95d3b-9a4f-45c7-a418-d8c6d4ac367e`, deployment `abab63fd-a7e9-4687-ab2e-a702764da3ce`, fonte `8f7b38d148d4fa6ddeb2ea711acc0d6737fd4938`; mesmos bindings, ETag e data de modificação. Os nove Workers preexistentes e a lista das sete aplicações Access permanecem iguais. Não houve edição de Access para tornar público o novo hostname, nem alteração do domínio principal. O preview novo foi aberto em uma aba separada.
+
+A atualização documental posterior não muda o código publicado. Seu HEAD/CI são acompanhados nos checks e corpo da mesma PR79, sem outro commit apenas para registrar o resultado novamente. Permanecem pendentes o aceite visual e eventual autorização de integração; nenhum merge ou auto-merge executado.
