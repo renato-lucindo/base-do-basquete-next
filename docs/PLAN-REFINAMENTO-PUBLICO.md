@@ -9,6 +9,7 @@ Pedido do responsável de 12/11/2026: refinar o perfil e componentes públicos c
 - [x] Usar `fact.played` confirmado para listas de atuações, contadores, paginação e opções de filtros. Zero ponto continua sendo participação. Preservar os registros e validação da fonte completa. Recordes sem marca positiva recebem estado vazio na apresentação; cálculo e ordenação permanecem intactos.
 - [x] Corrigir deslocamento causado por `scrollIntoView` ao alternar abas. Reservar apenas o espaço disponível da janela no desktop; conteúdo pode crescer, sem corte ou scroll interno. Mobile usa altura natural.
 - [x] Reutilizar escala, legenda e tokens públicos; superfícies claras, contexto azul e divisórias discretas. Refinar busca e placares com dados públicos existentes.
-- [ ] Verificar casos vazios, zero/ausência, nomes longos, teclado/foco, filtros/retorno, 320/390/640/1366/1920 e zoom 200%; inspecionar capturas depois; executar testes focais e gate, atualizar mesma PR e conferir CI do novo SHA.
+- [x] Verificar casos vazios, zero/ausência, nomes longos, teclado/foco, filtros/retorno, 320/390/640/1366/1920 e zoom 200%; inspecionar capturas depois; executar testes focais e gate, atualizar a mesma PR. Resultado local final:168 PASS/8 SKIP e gate:ui PASS.
+- [ ] Conferir CI do SHA final e retirar Draft; manter sem merge/deploy.
 
 Sem novas bibliotecas, alterações de API/banco/segurança, merge ou deploy. A escolha de execução é local e sequencial. Evidências e limites em `docs/VALIDACAO-REFINAMENTO-PUBLICO.md`; checkpoint vigente em `docs/PROGRESSO.md`.
