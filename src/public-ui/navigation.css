@@ -1,5 +1,10 @@
 :root {
-  --public-blue: #075fca;
+  --public-blue: #2563a6;
+  --public-blue-soft: #eaf2fc;
+  --public-text: #142d4e;
+  --public-muted: #526176;
+  --public-background: #f3f6fa;
+  --public-surface: #fff;
   --public-line: #dce4ee;
 }
 .public-header,
@@ -113,7 +118,7 @@
 }
 .public-header a:focus-visible,
 .public-home :focus-visible {
-  outline: 0.1875rem solid #075fca;
+  outline: 0.1875rem solid var(--public-blue);
   outline-offset: 0.1875rem;
 }
 .public-header a:hover,
@@ -541,7 +546,7 @@
   border: 0;
   padding: 0.375rem;
   background: transparent;
-  color: #075fca;
+  color: var(--public-blue);
   font: inherit;
   cursor: pointer;
 }
@@ -549,7 +554,7 @@
   text-decoration: underline;
 }
 .public-header.site-header .public-header-search:focus-within {
-  border-color: #075fca;
+  border-color: var(--public-blue);
 }
 .public-header.site-header .public-catalog-link {
   justify-self: end;
@@ -755,4 +760,31 @@
   .public-header.site-header .public-catalog-link {
     margin-left: auto;
   }
+}
+
+/* Public surfaces are shared by discovery, standings, games and profiles. */
+body:has(.public-header) {
+  background: var(--public-background);
+}
+.public-header .public-context {
+  background: var(--public-blue-soft);
+}
+.public-header.site-header .header-inner > .public-admin {
+  color: var(--public-muted);
+  border: 1px solid var(--public-line);
+  border-radius: 0.3125rem;
+  padding-inline: 0.625rem;
+  font-size: 0.75rem;
+}
+.public-header .public-return.wrap {
+  width: calc(100% - 2rem);
+  margin-inline: auto;
+  padding-block: 0.375rem;
+}
+.public-home .public-main {
+  background: var(--public-surface);
+}
+.public-table-scroll thead th {
+  background: var(--public-blue-soft);
+  color: var(--public-text);
 }

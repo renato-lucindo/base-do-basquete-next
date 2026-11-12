@@ -226,10 +226,13 @@ test("relacionado sem atuar não recebe zero nem entra nos recentes", async ({
     name: "Jogos do atleta",
     exact: true,
   });
-  await expect(games.getByText("Não participou", { exact: true })).toHaveCount(
-    2,
+  await expect(games).toHaveCount(0);
+  await expect(page.locator(".player-games-count")).toHaveText(
+    "0 jogos encontrados",
   );
-  await expect(games.locator(".player-game-points")).toHaveText(["—", "—"]);
+  await expect(
+    page.getByText("Nenhum jogo encontrado.", { exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".player-current-team")).toContainText("77");
   await tab(page, "Visão geral");
   await expect(page.locator(".player-recent table")).toHaveCount(0);
@@ -289,9 +292,7 @@ test("retorno de outra disputa mantém aba, filtros e origem", async ({
   await expect(
     page.getByRole("region", { name: "Parciais e placar final", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await expect(
     page.getByRole("tab", { name: "Ver jogos", exact: true }),
   ).toHaveAttribute("aria-selected", "true");

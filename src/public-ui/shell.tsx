@@ -10,6 +10,7 @@ import { CompetitionTree, usePublicCatalog } from "./catalog";
 import { safePublicReturn, sectionReturn } from "./navigation";
 import { PublicSearchForm } from "./search-form";
 import "./navigation.css";
+import "./legend.css";
 import { siteDisputeId, siteHome, siteTitle } from "./site";
 
 export function PublicHeader({
@@ -122,7 +123,10 @@ function DisputeNavigation({
         <nav className="public-return" aria-label="Localização">
           <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
           <span aria-hidden="true"> / </span>
-          <a href={sectionReturn(disputeId, section)}>Voltar à origem</a>
+          <a href={sectionReturn(disputeId, section)}>
+            <span className="public-visually-hidden">Voltar à origem: </span>
+            {publicSections.find((s) => s.id === section)?.label}
+          </a>
           <span aria-hidden="true"> / </span>
           <span aria-current="page">{detail}</span>
         </nav>

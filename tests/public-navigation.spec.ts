@@ -91,9 +91,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   ).toBeVisible();
   await expect(page).toHaveURL(/returnTo=/);
   await page.reload();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await expect(table).toBeVisible();
   const source = page.url();
   await table.locator('a[href^="/equipe.html"]').first().click();
@@ -101,9 +99,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     page.getByRole("navigation", { name: "Seções da equipe" }),
   ).toBeVisible();
   await page.reload();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   expect(page.url()).toBe(source);
   await page.goto(origin + disputeLink(f.source.disputeId, "jogos"));
   await expect(
@@ -124,9 +120,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     fullPage: false,
   });
   await page.reload();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await expect(
     page.getByRole("heading", { name: "Jogos publicados", exact: true }),
   ).toBeVisible();
@@ -139,9 +133,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     await expect(
       page.getByRole("navigation", { name: "Seções da equipe" }),
     ).toBeVisible();
-    await page
-      .getByRole("link", { name: "Voltar à origem", exact: true })
-      .click();
+    await page.getByRole("link", { name: /^Voltar à origem/ }).click();
     expect(page.url()).toBe(gamesSource);
   }
 });
@@ -323,9 +315,7 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
     page.getByRole("navigation", { name: "Seções da disputa" }),
   ).toHaveCount(0);
   await page.reload();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await expect(
     page.getByRole("combobox", { name: /Buscar competições/ }),
   ).toHaveValue(name);

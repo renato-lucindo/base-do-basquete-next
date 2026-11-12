@@ -137,62 +137,53 @@ export function ProfileGames({
   if (!games.length)
     return <p className="player-empty">Nenhum jogo encontrado.</p>;
   return (
-    <table className="player-games-table" aria-label={label}>
-      <colgroup>
-        <col className="player-game-date-col" />
-        <col />
-        <col className="player-game-points-col" />
-      </colgroup>
-      <thead>
-        <tr>
-          <th scope="col">Data</th>
-          <th scope="col">Confronto</th>
-          <th scope="col">
-            <MetricTerm metric="points" />
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {games.map((g) => (
-          <tr key={g.fact.gameId} data-game={g.fact.gameId}>
-            <td>{profileDate(g.game.date)}</td>
-            <td>
-              <a className="player-game-link" href={gameHref(g)}>
-                <MatchTeams game={g} score={scores[scoreKey(g)]} />
-                <GameContext game={g} />
-                {!g.fact.played && <small>Não participou</small>}
-              </a>
-            </td>
-            <td className="player-game-points">
-              {g.fact.played ? (g.fact.scoring?.points ?? "—") : "—"}
-            </td>
+    <div
+      className="player-games-scroll"
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+    >
+      <table className="player-games-table" aria-label={label}>
+        <colgroup>
+          <col className="player-game-date-col" />
+          <col />
+          <col className="player-game-points-col" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Data</th>
+            <th scope="col">Confronto</th>
+            <th scope="col">
+              <MetricTerm metric="points" />
+            </th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {games.map((g) => (
+            <tr key={g.fact.gameId} data-game={g.fact.gameId}>
+              <td>{profileDate(g.game.date)}</td>
+              <td>
+                <a className="player-game-link" href={gameHref(g)}>
+                  <MatchTeams game={g} score={scores[scoreKey(g)]} />
+                  <GameContext game={g} />
+                  {!g.fact.played && <small>Não participou</small>}
+                </a>
+              </td>
+              <td className="player-game-points">
+                {g.fact.played ? (g.fact.scoring?.points ?? "—") : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
-export function TeamTrajectory({
-  career,
-  open,
-  onChange,
-}: {
-  career: PublicCareer;
-  open: boolean;
-  onChange: (open: boolean) => void;
-}) {
+export function TeamTrajectory({ career }: { career: PublicCareer }) {
   const passages = teamTrajectory(career.history).reverse();
   return (
-    <details
-      className="player-team-history"
-      open={open}
-      onToggle={(e) => {
-        if (e.currentTarget.open !== open) onChange(e.currentTarget.open);
-      }}
-    >
-      <summary id="historico">
-        Histórico de equipes <span>{open ? "Recolher" : "Ver histórico"}</span>
-      </summary>
+    <section className="player-team-history" aria-labelledby="historico">
+      <h2 id="historico">Histórico de equipes</h2>
       {passages.length ? (
         <ol className="player-trajectory">
           {passages.map((p, i) => (
@@ -216,7 +207,7 @@ export function TeamTrajectory({
       ) : (
         <p className="player-empty">Nenhuma equipe registrada.</p>
       )}
-    </details>
+    </section>
   );
 }
 function AwardIcon({ position }: { position: number }) {
@@ -353,7 +344,7 @@ export function CareerRecords({
   onChange: (expanded: RecordMetric[]) => void;
 }) {
   return (
-    <section className="player-records" aria-labelledby="recordes">
+    <section className="player-records" aria-labelledby="recordes" tabIndex={0}>
       <h2 id="recordes">Recordes da carreira</h2>
       <table aria-label="Recordes da carreira">
         <colgroup>
@@ -376,7 +367,8 @@ export function CareerRecords({
           </tr>
         </thead>
         {RECORD_METRICS.map((metric) => {
-          const ranking = rankCareerGames(career.games, metric),
+          const covered = rankCareerGames(career.games, metric),
+            ranking = covered.filter((game) => game.fact.scoring![metric] > 0),
             open = expanded.includes(metric),
             label = metricLabel(metric);
           return (
@@ -386,7 +378,11 @@ export function CareerRecords({
                   <th scope="row">{label}</th>
                   <td>—</td>
                   <td>—</td>
-                  <td>Nenhuma marca registrada.</td>
+                  <td className="player-record-empty">
+                    {covered.length
+                      ? "Nenhuma marca positiva."
+                      : "Nenhuma marca registrada."}
+                  </td>
                   <td />
                 </tr>
               ) : (

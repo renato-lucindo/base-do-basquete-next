@@ -166,7 +166,7 @@ export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
                       </>
                     ) : (
                       <span role="img" aria-label="Sem placar publicado">
-                        —
+                        Sem placar
                       </span>
                     )}
                   </span>

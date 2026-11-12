@@ -104,14 +104,14 @@ test("v9: recordes independentes, somente 2º–5º e restauração de expansão
     name: "Recordes da carreira",
     exact: true,
   });
-  await expect(table.locator(".player-record-main")).toHaveCount(4);
+  await expect(table.locator(".player-record-main")).toHaveCount(2);
   expect(
     await table
       .locator(".player-record-value")
       .first()
       .evaluate((e) => getComputedStyle(e).color),
-  ).toBe("rgb(21, 87, 164)");
-  for (const label of ["PTS", "LL"])
+  ).toBe("rgb(37, 99, 166)");
+  for (const label of ["PTS", "2P"])
     await table
       .getByRole("button", { name: `Ver top 5 de ${label}`, exact: true })
       .click();
@@ -135,11 +135,11 @@ test("v9: recordes independentes, somente 2º–5º e restauração de expansão
     .getByRole("button", { name: "Recolher top 5 de PTS", exact: true })
     .click();
   await expect(
-    table.locator('[data-metric="freeMade"] [data-game]'),
+    table.locator('[data-metric="twoMade"] [data-game]'),
   ).toHaveCount(5);
   await page.reload();
   await expect(
-    table.locator('[data-metric="freeMade"] [data-game]'),
+    table.locator('[data-metric="twoMade"] [data-game]'),
   ).toHaveCount(5);
   await expect(table.locator('[data-metric="points"] [data-game]')).toHaveCount(
     1,
@@ -234,17 +234,13 @@ test("v9: confronto inteiro abre a partida; equipe fora dele abre a equipe", asy
         exact: true,
       }),
     ).toBeVisible();
-    await page
-      .getByRole("link", { name: "Voltar à origem", exact: true })
-      .click();
+    await page.getByRole("link", { name: /^Voltar à origem/ }).click();
     await expect(row).toBeVisible();
     expect(page.url()).toContain("anoPerfil=2026");
   }
   await page.locator(".player-current-team a").click();
   await expect(page.locator(".team-public-page").first()).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await page.getByRole("tab", { name: "Carreira", exact: true }).click();
   const knownId = f.source.participations[0].fact.gameId;
   if (
@@ -348,7 +344,7 @@ for (const width of [320, 390, 1366, 1920])
     );
     await page.getByRole("tab", { name: "Carreira", exact: true }).click();
     const table = page.locator(".player-records table");
-    for (const label of ["PTS", "2P", "3P", "LL"])
+    for (const label of ["PTS", "2P"])
       await page
         .getByRole("button", { name: `Ver top 5 de ${label}`, exact: true })
         .click();

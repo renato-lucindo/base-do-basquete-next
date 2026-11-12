@@ -27,7 +27,7 @@ export function searchHitDescription(hit: SearchHit) {
   }
   return hit.kind === "players"
     ? hit.nickname
-      ? `Apelido: ${hit.nickname}`
+      ? hit.nickname
       : ""
     : hit.kind === "teams"
       ? `${hit.participations.length} participações públicas`

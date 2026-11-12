@@ -71,18 +71,14 @@ test("agenda real abre placar e perfis, sem inventar detalhe para jogo futuro", 
       .getByRole("table", { name: "Participações e estatísticas publicadas" })
       .first(),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   expect(page.url()).toBe(from);
   for (const side of ["home", "away"]) {
     await row.locator(`.public-game-${side} a`).click();
     await expect(
       page.getByRole("navigation", { name: "Seções da equipe" }),
     ).toBeVisible();
-    await page
-      .getByRole("link", { name: "Voltar à origem", exact: true })
-      .click();
+    await page.getByRole("link", { name: /^Voltar à origem/ }).click();
     expect(page.url()).toBe(from);
     await expect(search).toHaveValue("Lobos");
   }

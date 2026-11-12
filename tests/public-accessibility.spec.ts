@@ -75,13 +75,10 @@ for (const name of ["Visão geral", "Estatísticas", "Carreira", "Ver jogos"])
       await page
         .getByRole("button", { name: "Ver top 5 de PTS", exact: true })
         .click();
-      const trajectory = page.locator(".player-team-history > summary");
-      await trajectory.focus();
-      await page.keyboard.press("Enter");
-      await expect(page.locator(".player-team-history")).toHaveAttribute(
-        "open",
-        "",
-      );
+      await expect(page.locator(".player-trajectory")).toBeVisible();
+      const team = page.locator(".player-trajectory a").first();
+      await team.focus();
+      await expect(team).toBeFocused();
       await scan(page, info, "player-career-expanded");
     }
   });

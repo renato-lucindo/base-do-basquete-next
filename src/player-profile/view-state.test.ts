@@ -31,6 +31,7 @@ describe("contexto do perfil v9", () => {
       "twoMade",
       "threeMade",
       "freeMade",
+      "foulsCommitted",
     ]);
   });
   it("rejeita identidade inválida e normaliza páginas sem fabricar estado", () => {

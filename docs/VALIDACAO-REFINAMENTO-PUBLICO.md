@@ -1,0 +1,44 @@
+# Refinamento público — evidências de 12/11/2026
+
+Unidade existente `codex/perfil-atleta-aprovado`, [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), base `a55dd7c`, início `a465e9c`. Pedido: refinar perfil e componentes públicos, sem reconstrução, banco, API, permissões, merge ou deploy. Fonte e resultado final da CI ficam no checkpoint e nos checks da PR.
+
+## Resultado por solicitação
+
+| Item | Implementação e conferência |
+| --- | --- |
+| 1.1 Campeonato/categoria | Mesmo trecho inline, com quebra natural de nomes longos. Adulto omitido nessa célula; equipe/camisas preservadas abaixo. Padding vertical reduzido. Testes de Adulto e Sub-15/nome extenso/320px. |
+| 1.2 FC | Padrão e Limpar incluem FC com as quatro métricas anteriores. Seleção explícita, inclusive vazia, prevalece. Coluna, checkbox, URL, recarga e legenda conferidos. |
+| 1.3 Histórico | Seção permanente, sem details/summary/botão/estado na URL. Círculos, anos, conexões e links completos mantidos. Teste existente confere os extremos e a ausência de linha no item único. |
+| 1.4 Cabeçalhos | Removidos somente Por campeonato/Jogos do conteúdo do atleta. As quatro abas permanecem. Outros títulos de seção foram examinados: o cabeçalho repetido de Equipes já é apenas semântico (`sr-only`). |
+| 1.5 Legenda/tipografia | Um CSS compartilhado por perfil/Jogadores/Equipes. Títulos, corpo, peso, espaçamento e cores usam a escala pública; igualdade tipográfica medida em 390/1366. Legenda única por perfil com siglas das informações da aba. Tipografia dos confrontos desktop aumentada para evitar os antigos textos de 0,625/0,65rem. |
+| 1.6 Participação | Lista, paginação, contagem e opções de filtros usam exclusivamente `fact.played` publicado. Não deriva participação de pontos. Zero continua visível; inscrito sem atuar não entra. Recentes/recordes e J já usavam esse contrato, preservado. Carreira completa continua validada antes do recorte visual. |
+| 1.7 Busca | Apelido permanece abaixo do nome completo, sem prefixo. Agrupamento por entidade, teclado, foco, autocomplete e URLs preservados. |
+| 1.8 Altura | Causas: renderização apenas da aba ativa e `scrollIntoView` em toda troca. Removida a rolagem forçada. Altura mínima desktop acompanha o maior conjunto conteúdo/legenda visitado, com margem inicial igual ao espaçamento vertical existente do painel e limite na área de leitura da janela. Mede filhos naturais, não a própria reserva; atualiza antes da pintura nas trocas e agenda ResizeObserver em frame próprio. Mobile não aplica mínimo. Conteúdo longo cresce e não recebe rolagem interna. |
+
+Superfícies: fundo cinza-azulado, identificação e conteúdo em branco, contexto/cabeçalhos/seleção com azul suave e separadores discretos. Sem card por estatística. Recordes sem marca positiva mostram estado vazio; o ranking/cálculo original continua intacto e os jogos com zero permanecem acessíveis na lista. Retorno da disputa explicita a seção de origem, com nome acessível; Administração ganha diferenciação discreta. Placares ausentes exibem Sem placar e valores conhecidos continuam distintos de zero/ausência, sem estados administrativos.
+
+## Capturas e inspeção
+
+[Comparação antes/depois](design/evidencias/refinamento-publico/COMPARACAO.md). Todas são capturas do navegador com fixtures locais; não são mockups. Antes: build local da implementação v9 (`8f7b38d`), materialmente igual a `a465e9c` em `src` (diff vazio). Depois: código desta unidade.
+
+Capturadas as quatro abas em 320/390/640/1366/1920, além de Jogadores/Equipes/busca em 390/1366. Inspeção visual do perfil: agrupamento branco sobre fundo suave, números destacados, abas legíveis, nomes completos na tabela, trajetória aberta e recordes sem zeros destacados. A rolagem da tabela permanece interna. Jogadores/Equipes/busca tiveram suas capturas abertas e examinadas; a comparação automática das legendas confirmou a mesma escala. A comparação selecionada é versionada; matriz completa e logs ficam em `.preview-artifacts/refinement/` neste worktree.
+
+Contraste calculado para os tokens usados: azul/link sobre branco **6,15:1**; texto secundário sobre azul suave **5,59:1**; título sobre branco **13,86:1**. Os percursos incluem Axe, teclado, foco, toque, nomes longos, ausência de nascimento, sem resultados, zero/ausência e filtros/retorno. Texto200% e viewport de 683×384 com DPR2 verificam o reflow equivalente a 1366×768 em zoom200%; não representam uma inspeção manual de zoom nativo em todos os navegadores.
+
+## Execuções e revisão
+
+Comandos locais principais, Node24, fixtures Playwright e bancos isolados:
+
+```powershell
+npm run gate
+npx playwright test tests/public-refinement.spec.ts tests/player-approved.spec.ts tests/player-public.spec.ts tests/public-search.spec.ts tests/public-games.spec.ts tests/public-navigation.spec.ts tests/public-accessibility.spec.ts tests/public-uiux.spec.ts tests/copa-public-site.spec.ts tests/team-refinement.spec.ts tests/player-statistics-boundaries.spec.ts --workers=2 --reporter=line
+npx playwright test tests/public-refinement.spec.ts --workers=1 --reporter=line
+```
+
+Resultados finais consolidados no checkpoint. Os skips do arquivo novo evitam repetir matrizes explícitas de largura/zoom no projeto mobile; não omitem comportamento funcional. O gate inclui somente builds/dry-runs de Worker e PDF, sem publicação.
+
+Falhas relevantes preservadas nos logs locais: testes antigos ainda esperavam histórico recolhível/lista de relacionados/rankings de zero; servidor estático antigo foi substituído pelo servidor de desenvolvimento da própria unidade. O fundo novo revelou contraste4,4:1 em metadados dos jogos, corrigido pelo token de texto secundário. A primeira medição das abas revelou loop do observador e uma diferença natural de uma linha; houve correção do agendamento e reserva inicial proporcional ao padding existente. Um teste novo reutilizou indevidamente inscrição entre disputas; sua fixture foi corrigida, sem alterar validação de domínio. Uma execução concorrente sobrescreveu arquivos temporários de traces; as execuções finais usaram uma única suíte de browser por vez. Nenhum timeout ou teste foi relaxado para encobrir defeito.
+
+Revisão feita pelo implementador, com [Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultadas nesta execução. Foram conferidos diff, semântica, origem dos dados, foco, estados selecionados, quebra de nomes, ausência/zero e limites da reserva de altura. Não há novo parecer independente declarado. Axe e capturas não comprovam conformidade WCAG integral nem substituem aceite visual do responsável.
+
+Nenhuma alteração de dependências, API, banco, registros, Auth/Access, produção ou Worker remoto. O checkout humano `sync/trabalho-casa`, `CONTRIBUTING.md`, `skills-lock.json` e a skill local preexistentes foram preservados.

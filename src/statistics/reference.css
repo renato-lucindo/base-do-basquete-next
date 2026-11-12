@@ -2,7 +2,7 @@
 .public-site.statistics-public {
   min-height: 100vh;
   min-width: 0;
-  background: #fff;
+  background: var(--public-background, #f3f6fa);
 }
 .public-site.statistics-public button {
   min-height: 0;
@@ -19,9 +19,9 @@
 .public-site.statistics-public {
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   color: #172033;
-  background: #fff;
+  background: var(--public-background, #f3f6fa);
   font-synthesis: none;
-  --blue: #075fca;
+  --blue: var(--public-blue);
   --muted: #526176;
   --line: #dce4ee;
   --surface: #f6f8fb;
@@ -397,36 +397,7 @@
 .public-site.statistics-public .scroll-hint {
   display: none;
 }
-.public-site.statistics-public .table-legend {
-  padding: 1.25rem 0 0.25rem;
-}
-.public-site.statistics-public .table-legend h2 {
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.625rem;
-}
-.public-site.statistics-public .table-legend dl {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.5rem 1.125rem;
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.6875rem;
-}
-.public-site.statistics-public .table-legend dl > div {
-  display: flex;
-  gap: 0.4375rem;
-  align-items: baseline;
-}
-.public-site.statistics-public .table-legend dt {
-  font-weight: 600;
-  color: #3e4e64;
-  flex: none;
-}
-.public-site.statistics-public .table-legend dd {
-  margin: 0;
-  line-height: 1.6;
-}
+
 .public-site.statistics-public .legend-notes {
   margin-top: 0.875rem;
   padding-top: 0.75rem;
@@ -593,9 +564,6 @@
     z-index: 3;
     background: var(--surface);
   }
-  .public-site.statistics-public .table-legend dl {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 @media (max-width: 600px) {
   .public-site.statistics-public .wrap {
@@ -733,17 +701,7 @@
   .public-site.statistics-public .team-name {
     font-size: 0.6875rem;
   }
-  .public-site.statistics-public .table-legend {
-    padding-top: 1.125rem;
-  }
-  .public-site.statistics-public .table-legend dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5625rem 0.8125rem;
-    font-size: 0.625rem;
-  }
-  .public-site.statistics-public .table-legend h2 {
-    font-size: 0.6875rem;
-  }
+
   .public-site.statistics-public .legend-notes {
     font-size: 0.625rem;
     line-height: 1.8;
@@ -1681,15 +1639,6 @@
   max-width: 100%;
 }
 
-/* Preserve column sizing with larger fallback fonts; descriptions may wrap. */
-.public-site.statistics-public .table-legend dl > div,
-.public-site.statistics-public .table-legend dd {
-  min-width: 0;
-}
-.public-site.statistics-public .table-legend dd {
-  overflow-wrap: anywhere;
-}
-
 /* Approved compact pilot, integrated into public statistics. Extra width stays after columns. */
 .public-site.statistics-public .reference-explorer .statistics-table {
   width: max-content;
@@ -1944,4 +1893,11 @@
     dl {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   }
+}
+
+.public-site.statistics-public main {
+  background: var(--public-surface);
+}
+.public-site.statistics-public .statistics-table thead th {
+  background: var(--public-blue-soft);
 }

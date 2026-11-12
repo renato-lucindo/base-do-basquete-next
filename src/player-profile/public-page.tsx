@@ -33,6 +33,7 @@ import {
   type ProfileView,
 } from "./view-state";
 import { ProfileFilters } from "./profile-filters";
+import { useProfilePanelSpace } from "./panel-space";
 
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const readLocation = () => readProfileLocation(window.location.hash);
@@ -95,6 +96,7 @@ export function PlayerPublicPage() {
     return () => c.abort();
   }, [id, retry]);
   const ready = career?.page.personId === id ? career : null;
+  useProfilePanelSpace(!!ready, `${view.section}/${view.columns.join(",")}`);
   useEffect(() => {
     if (error) alert.current?.focus();
   }, [error]);
@@ -146,9 +148,6 @@ export function PlayerPublicPage() {
         document
           .getElementById(`player-tabs-${next.section}`)
           ?.focus({ preventScroll: true });
-        document
-          .getElementById(`player-tabs-panel-${next.section}`)
-          ?.scrollIntoView({ block: "start" });
       });
   }
   const groups = ready ? careerGroups(ready) : [];
@@ -240,8 +239,10 @@ export function PlayerPublicPage() {
     statsPage = Math.min(view.statsPage, statsPages);
   const allGames = chronologicalGames(ready?.games ?? []),
     recent = allGames.filter((g) => g.fact.played).slice(0, 5);
+  const appearances = allGames.filter((g) => g.fact.played);
   const games = allGames.filter(
     (g) =>
+      g.fact.played &&
       (!view.gameYear || String(g.fact.context.year) === view.gameYear) &&
       (!view.gameChampionship ||
         g.fact.context.championshipId === view.gameChampionship) &&
@@ -365,7 +366,9 @@ export function PlayerPublicPage() {
             }}
           >
             <strong>
-              {rankCareerGames(ready.games, m)[0]?.fact.scoring?.[m] ?? "—"}
+              {(rankCareerGames(ready.games, m)[0]?.fact.scoring?.[m] ||
+                null) ??
+                "—"}
             </strong>
             <span>{metricLabel(m)}</span>
           </a>
@@ -499,7 +502,11 @@ export function PlayerPublicPage() {
               >
                 {view.section !== tab.key ? null : tab.key === "resumo" ? (
                   <div className="player-overview">
-                    <section className="player-summary">
+                    <section
+                      className="player-summary"
+                      aria-label="Resumo de temporada e carreira"
+                      tabIndex={0}
+                    >
                       <table aria-label="Resumo de temporada e carreira">
                         <thead>
                           <tr>
@@ -566,7 +573,6 @@ export function PlayerPublicPage() {
                 ) : tab.key === "estatisticas" ? (
                   <section className="player-championships">
                     <div className="player-section-title">
-                      <h2>Por campeonato</h2>
                       <button
                         className="player-adjust"
                         aria-expanded={filters === "stats"}
@@ -677,13 +683,17 @@ export function PlayerPublicPage() {
                                   </td>
                                 )}
                                 <th scope="row" className="player-champ">
-                                  {g.history.context.name}
-                                  <small>
-                                    {g.history.context.category}
+                                  <span className="player-competition-name">
+                                    {g.history.context.name}
+                                    {g.history.context.category
+                                      .trim()
+                                      .toLocaleLowerCase("pt-BR") !== "adulto"
+                                      ? ` · ${g.history.context.category}`
+                                      : ""}
                                     {g.history.context.division
                                       ? ` · ${g.history.context.division}`
                                       : ""}
-                                  </small>
+                                  </span>
                                   <small>
                                     <a
                                       href={publicDetailLink(
@@ -729,16 +739,11 @@ export function PlayerPublicPage() {
                     <div className="player-mobile-honors">
                       <CareerHonors career={ready} />
                     </div>
-                    <TeamTrajectory
-                      career={ready}
-                      open={view.trajectory}
-                      onChange={(trajectory) => update({ trajectory })}
-                    />
+                    <TeamTrajectory career={ready} />
                   </div>
                 ) : (
                   <section className="player-games-page">
                     <div className="player-section-title">
-                      <h2>Jogos</h2>
                       <button
                         className="player-adjust"
                         aria-expanded={filters === "games"}
@@ -814,9 +819,31 @@ export function PlayerPublicPage() {
               <ProfileFilters
                 kind={filters}
                 view={view}
-                years={years}
-                championships={championships}
-                teams={teams}
+                years={
+                  filters === "games"
+                    ? years.filter((year) =>
+                        appearances.some((g) => g.fact.context.year === year),
+                      )
+                    : years
+                }
+                championships={
+                  filters === "games"
+                    ? championships.filter((c) =>
+                        appearances.some(
+                          (g) => g.fact.context.championshipId === c.id,
+                        ),
+                      )
+                    : championships
+                }
+                teams={
+                  filters === "games"
+                    ? teams.filter((t) =>
+                        appearances.some(
+                          (g) => g.fact.registration.team.id === t.id,
+                        ),
+                      )
+                    : teams
+                }
                 onClose={() => setFilters(null)}
                 onApply={(patch) => {
                   setFilters(null);

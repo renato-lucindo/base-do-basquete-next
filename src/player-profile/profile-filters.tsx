@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Modal } from "../ui-system/components";
 import { PROFILE_METRICS, metricLabel } from "./public-model";
-import { RECORD_METRICS } from "./presentation";
 import { STATISTICS_METRICS } from "../statistics/metrics";
 import type { ProfileView } from "./view-state";
 
@@ -70,7 +69,7 @@ export function ProfileFilters({
                       championship: "",
                       teams: null,
                       scope: "all",
-                      columns: [...RECORD_METRICS],
+                      columns: [...PROFILE_METRICS],
                     }),
               })
             }

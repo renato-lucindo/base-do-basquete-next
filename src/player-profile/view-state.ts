@@ -25,7 +25,6 @@ export type ProfileView = {
   gameTeam: string;
   opponent: string;
   expanded: RecordMetric[];
-  trajectory: boolean;
 };
 const pageNumber = (raw: string | null) =>
   Math.max(1, Math.min(500, Math.floor(Number(raw)) || 1));
@@ -56,7 +55,7 @@ export function readProfileLocation(hash: string) {
         ? PROFILE_METRICS.filter((m) =>
             p.get("colunasPerfil")!.split(",").includes(m),
           )
-        : [...RECORD_METRICS],
+        : [...PROFILE_METRICS],
       sort: [
         "competition",
         "team",
@@ -76,7 +75,6 @@ export function readProfileLocation(hash: string) {
       expanded: RECORD_METRICS.filter((m) =>
         (p.get("recordesPerfil") ?? "").split(",").includes(m),
       ),
-      trajectory: p.get("historicoEquipes") === "1",
     } as ProfileView,
   };
 }
@@ -97,7 +95,6 @@ export function profileQuery(view: ProfileView, origin: string | null) {
   if (view.gameTeam) p.set("equipeJogos", view.gameTeam);
   if (view.opponent) p.set("adversario", view.opponent);
   if (view.expanded.length) p.set("recordesPerfil", view.expanded.join(","));
-  if (view.trajectory) p.set("historicoEquipes", "1");
   return p.toString();
 }
 export function seasonAge(
