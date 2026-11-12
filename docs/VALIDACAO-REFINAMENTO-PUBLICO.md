@@ -1,6 +1,6 @@
 # Refinamento público — evidências de 12/11/2026
 
-Unidade existente `codex/perfil-atleta-aprovado`, [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), base `a55dd7c`, início `a465e9c`. Pedido: refinar perfil e componentes públicos, sem reconstrução, banco, API, permissões, merge ou deploy. Fonte e resultado final da CI ficam no checkpoint e nos checks da PR.
+Unidade existente `codex/perfil-atleta-aprovado`, [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), base `a55dd7c`, início `a465e9c`. Pedido: refinar perfil e componentes públicos, sem reconstrução, banco, API, permissões, merge ou deploy. Fonte e CI ficam no checkpoint, nos checks e no corpo da PR. A composição de produto `4cbbe68e44ac5070711e5d36930c7f1d5de33cc1` teve **CI completa SUCCESS**, incluindo `validate`, no [run43230100404](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43230100404), e a PR foi retirada de Draft. O commit posterior atualiza apenas documentação; sua CI é acompanhada pela mesma automação e registrada no corpo da PR, sem repetir suítes locais inalteradas.
 
 ## Resultado por solicitação
 

@@ -1,6 +1,6 @@
 # Progresso atual
 
-Atualizado em12/11/2026. Unidade única: **refinamento público do atleta e componentes compartilhados**, mesma [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), sem merge/auto-merge ou deploy. Implementação e revisão local concluídas; entrega condicionada aos checks do HEAD atual. O estado autoritativo da CI fica nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/79/checks), que devem ser conferidos antes de integrar.
+Atualizado em12/11/2026. Unidade única: **refinamento público do atleta e componentes compartilhados**, mesma [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), sem merge/auto-merge ou deploy. Implementação e revisão local concluídas; PR **pronta para revisão**, retirada de Draft após CI completa do produto. O estado autoritativo da CI fica nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/79/checks), que devem ser conferidos antes de integrar.
 
 ## Branch e resultado
 
@@ -14,8 +14,8 @@ Atualizado em12/11/2026. Unidade única: **refinamento público do atleta e comp
 
 - Suíte consolidada local: **168 PASS/8 SKIP**, 176 combinações, em `.preview-artifacts/refinement-final.log`. Quatro abas em320/390/640/1366/1920, vazios/zero/ausência, filtros/URL/retorno, teclado/toque/Axe, nomes longos e texto200%/viewport equivalente a zoom200%. Skips apenas evitam duplicar matrizes explícitas no projeto mobile.
 - Gate local: **814 unitários/173 arquivos, CI-plan11, transporte19, banco isolado15, Worker35 e PDF1 PASS**, builds/formato/boundary/segredos. Após o ajuste final de entrada direta `d77b7e4`, `npm run gate:ui` PASS (lint, formato, TypeScript, builds, boundary e segredos); prova em `.preview-artifacts/refinement-final-gate-ui.log`. Formato/diff PASS. Não repetir domínio inalterado por documentação. Logs em `.preview-artifacts/refinement-*`.
-- CI: `04c42bc`/run43226804372 foi CANCELLED ao ser substituída, com gate/design/WebKit previamente aprovados. Na composição `6c3e4f3`, [run43228055854](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43228055854), gate completo, design, WebKit e browsers2 SUCCESS; browsers1 ainda em execução nesta atualização. A composição com `d77b7e4` exige seus próprios checks antes de retirar Draft; acompanhar os checks da PR, sem reaproveitar uma execução anterior como aprovação do novo SHA.
-- Inspeção concluída das comparações principais, componentes compartilhados e reflow extremo. Revisão pelo implementador segundo `web-design-guidelines`; sem novo parecer independente declarado. O próximo estado Ready depende dos checks atuais. Testes/capturas não comprovam WCAG integral nem substituem aceite visual do responsável.
+- **CI completa SUCCESS** na composição **`4cbbe68e44ac5070711e5d36930c7f1d5de33cc1`**, [run43230100404](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43230100404): scope, gate completo, browsers1/2, design, WebKit e `validate` aprovados. A atualização posterior altera somente este checkpoint/plano/relatório; seus próprios checks continuam obrigatórios antes de integrar. O resultado autoritativo da composição documental é registrado nos checks e no corpo da PR, sem gerar outra cadeia de commits de checkpoint.
+- Inspeção concluída das comparações principais, componentes compartilhados e reflow extremo. Revisão pelo implementador segundo `web-design-guidelines`; sem novo parecer independente declarado. Ready confirmado pela ferramenta GitHub após o resultado acima; eventual novo parecer automático deve ser conferido, sem atribuir ao refinamento a revisão antiga de `a465e9c`. Testes/capturas não comprovam WCAG integral nem substituem aceite visual do responsável.
 
 ## Serviços, preservação e próximo passo
 
@@ -23,6 +23,6 @@ Nenhum Worker remoto foi alterado. Último serviço registrado: PR79, fonte `8f7
 
 Checkout humano `sync/trabalho-casa` e suas alterações preservados: `CONTRIBUTING.md`, `skills-lock.json` e `.agents/skills/web-design-guidelines/`; outros worktrees preservados. As imagens selecionadas são fixtures locais, não dados de produção. A matriz completa continua em `.preview-artifacts/refinement/`.
 
-A retomada manual revogou a pausa por cota. Automação **`retomar-refinamento-p-blico-da-pr79` PAUSED**, confirmada pela ferramenta oficial; sem agendamento duplicado. Se for necessário aguardar CI fora da execução, atualizar essa mesma automação conforme CONTRIBUTING.md e pausar após concluir.
+A retomada manual revogou a pausa por cota. Nesta atualização, a mesma automação **`retomar-refinamento-p-blico-da-pr79` ACTIVE**, confirmada pela ferramenta oficial, confere CI/pareceres a cada10min no mesmo chat; permanece silenciosa enquanto não houver mudança acionável. Deve registrar o resultado final no corpo da PR e pausar quando restar só aceite humano. Sem agendamento duplicado.
 
-**Próximo passo autorizado:** conferir `gh pr view 79 --json headRefOid,isDraft,statusCheckRollup` e os pareceres do SHA atual. Com todos os checks aprovados e revisão concluída, retirar Draft e entregar a comparação ao responsável. Permanecer sem merge/deploy; a integração requer autorização específica.
+**Próximo passo autorizado:** conferir HEAD/CI e eventuais pareceres da composição documental, corrigir somente falhas reais desta unidade e registrar o encerramento no corpo da PR; pausar o heartbeat pela ferramenta oficial. Produto pronto para aceite visual do responsável. Permanecer sem merge/deploy; a integração requer autorização específica.
