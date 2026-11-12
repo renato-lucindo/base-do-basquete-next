@@ -498,9 +498,11 @@ export function PlayerPublicPage() {
                 aria-labelledby={`player-tabs-${tab.key}`}
                 key={tab.key}
                 hidden={view.section !== tab.key}
-                className="player-tab-panel"
+                inert={view.section !== tab.key}
+                className={`player-tab-panel${tab.key === "resumo" ? " player-overview-panel" : ""}`}
               >
-                {view.section !== tab.key ? null : tab.key === "resumo" ? (
+                {view.section !== tab.key &&
+                tab.key !== "resumo" ? null : tab.key === "resumo" ? (
                   <div className="player-overview">
                     <section
                       className="player-summary"

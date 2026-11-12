@@ -90,9 +90,9 @@ test("refinamento: somente atuações confirmadas, incluindo zero, e trajetória
     `${played.length} jogos encontrados`,
   );
   await expect(
-    page.locator(
-      `tr[data-game="${played[0].fact.gameId}"] .player-game-points`,
-    ),
+    page
+      .getByRole("tabpanel")
+      .locator(`tr[data-game="${played[0].fact.gameId}"] .player-game-points`),
   ).toHaveText("0");
   await page
     .getByRole("button", { name: "Filtrar e ajustar", exact: true })
@@ -198,6 +198,43 @@ for (const width of [390, 640, 1366, 1920]) {
     }
   });
 }
+
+test("refinamento: entrada direta em Estatísticas mantém rodapé ao abrir Visão geral", async ({
+  page,
+}, info) => {
+  test.skip(
+    info.project.name !== "desktop",
+    "Verificação desktop de entrada direta",
+  );
+  const f = await playerPublicFixture(page);
+  await page.setViewportSize({ width: 1366, height: 1080 });
+  await page.goto(f.url + "?secao=estatisticas");
+  await expect(page.locator(".player-stats-table")).toBeVisible();
+  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+  await expect(
+    page.getByRole("table", {
+      name: "Resumo de temporada e carreira",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(page.locator(".player-overview-panel")).toHaveAttribute(
+    "inert",
+    "",
+  );
+  const footerTop = () =>
+    page
+      .locator(".public-footer")
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  const before = await footerTop();
+  await page.getByRole("tab", { name: "Visão geral", exact: true }).click();
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  expect(Math.abs((await footerTop()) - before)).toBeLessThan(2);
+});
 
 test("refinamento: FC padrão, seleção explícita, categoria inline e títulos sem redundância", async ({
   page,

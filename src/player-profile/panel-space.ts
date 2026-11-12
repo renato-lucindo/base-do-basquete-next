@@ -37,8 +37,13 @@ export function useProfilePanelSpace(ready: boolean, contentKey: string) {
       const panel = panels.find((el) => !el.hidden)!;
       const panelStyle = getComputedStyle(panel);
       const legendHeight = outerHeight(elements[1]);
+      const overviewHeight =
+        panels[0].firstElementChild!.getBoundingClientRect().height;
       const naturalHeight =
-        panel.firstElementChild!.getBoundingClientRect().height +
+        Math.max(
+          panel.firstElementChild!.getBoundingClientRect().height,
+          overviewHeight,
+        ) +
         parseFloat(panelStyle.paddingTop) +
         parseFloat(panelStyle.paddingBottom);
       // Reuse the panel's vertical spacing as a small initial allowance. This

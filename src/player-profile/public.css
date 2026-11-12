@@ -1,4 +1,5 @@
 .player-page.bb-ui {
+  position: relative;
   --bb-blue: var(--public-blue);
   --bb-blue-soft: var(--public-blue-soft);
   --bb-line: var(--public-line);
@@ -828,6 +829,16 @@ body:has(.player-page) #metric-tooltip[hidden] {
   }
 }
 @media (min-width: 640px) {
+  /* Keep one natural layout reference for direct entry into a shorter tab.
+     The inactive overview is inert and invisible, outside normal flow. */
+  .player-overview-panel[hidden] {
+    display: block;
+    position: absolute;
+    inset: 0 0 auto;
+    visibility: hidden;
+    min-height: 0;
+    pointer-events: none;
+  }
   .player-tabs-shell .bb-tabs button {
     font-size: 0.875rem;
   }

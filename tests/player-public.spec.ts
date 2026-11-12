@@ -231,7 +231,9 @@ test("relacionado sem atuar não recebe zero nem entra nos recentes", async ({
     "0 jogos encontrados",
   );
   await expect(
-    page.getByText("Nenhum jogo encontrado.", { exact: true }),
+    page
+      .getByRole("tabpanel")
+      .getByText("Nenhum jogo encontrado.", { exact: true }),
   ).toBeVisible();
   await expect(page.locator(".player-current-team")).toContainText("77");
   await tab(page, "Visão geral");
@@ -288,7 +290,7 @@ test("retorno de outra disputa mantém aba, filtros e origem", async ({
   );
   await expect(page.locator(".player-games-page tbody tr")).toHaveCount(1);
   const expected = page.url();
-  await page.locator(".player-game-link").click();
+  await page.getByRole("tabpanel").locator(".player-game-link").click();
   await expect(
     page.getByRole("region", { name: "Parciais e placar final", exact: true }),
   ).toBeVisible();
