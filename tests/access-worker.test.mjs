@@ -438,6 +438,12 @@ test("public player career route derives a page without app session, JWT or cook
     assert.equal(page.personId, source.personId);
     assert.equal(page.statistics.summary.gamesPlayed, 2);
     assert.equal("participations" in page, false);
+    assert.equal("currentAge" in page.identity, false);
+    const withAge = await f.mf.dispatchFetch(origin + path + "?age=1");
+    assert.equal(withAge.status, 200);
+    const withAgePage = await withAge.json();
+    assert.equal(withAgePage.identity.currentAge, null);
+    assert.equal(JSON.stringify(withAgePage).includes("birthDate"), false);
     assert.equal(
       f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
       false,

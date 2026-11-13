@@ -19,7 +19,7 @@ update public.persons set name='Nome privado posterior',biography='Biografia pri
 set local role anon;
 select public.get_player_career_source(pg_temp.pu_id(930)) as profile_without_games;
 select pg_temp.pu_assert(public.get_player_career_source(pg_temp.pu_id(931)) is null,'private cadastre alone is not a public source');
-select pg_temp.pu_assert(public.get_player_career_source(pg_temp.pu_id(930))->'profile'->'person'->'publicBirthYear'='null'::jsonb,'birth year remains independently confirmed');
+select pg_temp.pu_assert(public.get_player_career_source(pg_temp.pu_id(930))#>>'{profile,person,publicBirthYear}'='1997','birth year is captured on independent profile confirmation');
 reset role;
 set local role authenticated;
 select public.save_achievement_draft(jsonb_set(pg_temp.ad_command(101,24),'{draft}',jsonb_build_object('disputeId',pg_temp.pu_id(3),'placements','[]'::jsonb,'honors','[]'::jsonb)));

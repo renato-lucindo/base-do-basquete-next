@@ -1,6 +1,7 @@
 import { expect, it } from "vitest";
 import { readFile, readdir } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
+import { playerCareerSourceSchema } from "./career-source";
 import { platform } from "../../tests/fixtures/database-platform";
 import {
   publicPlayerProfileSchema,
@@ -48,7 +49,12 @@ it.each(["zero", "upgrade"] as const)(
       );
       expect(profile.version).toBe(2);
       expect(profile.person.name).toBe("Ana depois da publicação");
-      expect(profile.person.publicBirthYear).toBeNull();
+      expect(profile.person.publicBirthYear).toBe(2000);
+      const career = playerCareerSourceSchema.parse(
+        get("public_player_career"),
+      );
+      expect(career.currentAge).toEqual(expect.any(Number));
+      expect(career.profile).toEqual(profile);
       playerProfileProposalSchema.parse(get("profile_proposal"));
       playerProfileStateSchema.parse(get("empty_profile_state"));
       playerProfileStateSchema.parse(get("profile_state"));

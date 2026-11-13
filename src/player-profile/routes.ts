@@ -24,7 +24,7 @@ export async function publicPlayerProfileRoute(
   const page = await new SupabasePlayerProfiles({
     url: env.SUPABASE_URL,
     key: env.SUPABASE_PUBLISHABLE_KEY,
-  }).getPage(id.data, url.searchParams);
+  }).getPage(id.data, url.searchParams, url.searchParams.get("age") === "1");
   if (page === null)
     throw new HttpError(
       404,

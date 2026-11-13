@@ -891,6 +891,10 @@ export type Database = {
         Args: { p_person_id: string };
         Returns: Json;
       };
+      get_player_career_with_age: {
+        Args: { p_person_id: string };
+        Returns: Json;
+      };
       get_player_profile_proposal: {
         Args: { p_person_id: string };
         Returns: Json;

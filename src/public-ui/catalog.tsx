@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../competition/api";
 import {
   catalogPageSchema,
-  contextLabel,
+  type PublicSection,
   disputeLink,
   type CatalogGame,
 } from "./catalog-contract";
@@ -83,120 +83,106 @@ export const publicDisputes = (
 ) => [
   ...new Map([...games, ...disputes].map((g) => [g.disputeId, g])).values(),
 ];
-const matches = (text: string, query: string) =>
-  text
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLocaleLowerCase("pt-BR")
-    .includes(
-      query
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "")
-        .toLocaleLowerCase("pt-BR"),
-    );
+type CatalogDispute = Pick<PublicDispute, "disputeId" | "context">;
+const compareLabels = (a: string, b: string) =>
+  a.localeCompare(b, "pt-BR", { numeric: true });
 
-export function CompetitionTree({
-  games,
-  query = "",
-  confirmed = [],
+export function DisputeLinks({
+  disputes,
+  headingLevel,
+  section = "classificacao",
+  currentId,
   onSelect,
 }: {
-  games: CatalogGame[];
-  query?: string;
-  confirmed?: PublicDispute[];
+  disputes: CatalogDispute[];
+  headingLevel: "h3" | "h4";
+  section?: PublicSection;
+  currentId?: string;
   onSelect?: React.MouseEventHandler<HTMLAnchorElement>;
 }) {
-  const disputes = publicDisputes(games, confirmed).filter((g) =>
-    matches(contextLabel(g.context), query),
-  );
-  const competitions = [
-    ...new Map(
-      disputes.map((g) => [g.context.championshipId, g.context.name]),
-    ).entries(),
-  ].sort((a, b) => a[1].localeCompare(b[1], "pt-BR"));
-  if (!competitions.length) return <p>Nenhuma competição encontrada.</p>;
+  const Heading = headingLevel;
   return (
-    <div className="competition-tree">
-      {competitions.map(([id, name]) => (
-        <details key={id} open={query ? true : undefined}>
-          <summary>{name}</summary>
-          {[
-            ...new Set(
-              disputes
-                .filter((g) => g.context.championshipId === id)
-                .map((g) => g.context.year),
-            ),
-          ]
-            .sort((a, b) => b - a)
-            .map((year) => {
-              const season = disputes.filter(
-                (g) =>
-                  g.context.championshipId === id && g.context.year === year,
-              );
-              return (
-                <details key={year} open>
-                  <summary>{year}</summary>
-                  <div className="gender-columns">
-                    {(["masculino", "feminino"] as const).map((gender) => {
-                      const items = season.filter(
-                        (g) => g.context.gender === gender,
-                      );
-                      return (
-                        items.length > 0 && (
-                          <section
-                            key={gender}
-                            aria-label={`${name} ${year} ${gender}`}
-                          >
-                            <h3>
-                              {gender === "masculino"
-                                ? "Masculino"
-                                : "Feminino"}
-                            </h3>
-                            {[...new Set(items.map((g) => g.context.category))]
-                              .sort((a, b) =>
-                                a.localeCompare(b, "pt-BR", { numeric: true }),
-                              )
-                              .map((category) => {
-                                const rows = items.filter(
-                                  (g) => g.context.category === category,
-                                );
-                                return rows.length === 1 &&
-                                  !rows[0].context.division ? (
-                                  <a
-                                    key={category}
-                                    href={disputeLink(rows[0].disputeId)}
-                                    onClick={onSelect}
-                                  >
-                                    {category}
-                                  </a>
-                                ) : (
-                                  <details
-                                    key={category}
-                                    open={query ? true : undefined}
-                                  >
-                                    <summary>{category}</summary>
-                                    {rows.map((g) => (
-                                      <a
-                                        key={g.disputeId}
-                                        href={disputeLink(g.disputeId)}
-                                        onClick={onSelect}
-                                      >
-                                        {g.context.division || category}
-                                      </a>
-                                    ))}
-                                  </details>
-                                );
-                              })}
-                          </section>
-                        )
-                      );
-                    })}
-                  </div>
-                </details>
-              );
-            })}
-        </details>
-      ))}
+    <div className="gender-columns">
+      {(["masculino", "feminino"] as const).map((gender) => {
+        const items = disputes
+          .filter((d) => d.context.gender === gender)
+          .sort(
+            (a, b) =>
+              compareLabels(a.context.category, b.context.category) ||
+              compareLabels(
+                a.context.division ?? "",
+                b.context.division ?? "",
+              ) ||
+              a.disputeId.localeCompare(b.disputeId),
+          );
+        if (!items.length) return null;
+        const label = gender === "masculino" ? "Masculino" : "Feminino";
+        return (
+          <section key={gender} aria-label={label}>
+            <Heading>{label}</Heading>
+            <ul>
+              {items.map(({ disputeId, context }) => (
+                <li key={disputeId}>
+                  <a
+                    href={disputeLink(disputeId, section)}
+                    aria-current={disputeId === currentId ? "true" : undefined}
+                    onClick={onSelect}
+                  >
+                    {context.category}
+                    {context.division && ` · ${context.division}`}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function CompetitionCatalog({
+  games,
+  confirmed,
+}: {
+  games: CatalogGame[];
+  confirmed: PublicDispute[];
+}) {
+  const disputes = publicDisputes(games, confirmed);
+  const years = new Map<number, Map<string, CatalogDispute[]>>();
+  for (const dispute of disputes) {
+    const { year, championshipId } = dispute.context;
+    const championships =
+      years.get(year) ?? new Map<string, CatalogDispute[]>();
+    const edition = championships.get(championshipId) ?? [];
+    edition.push(dispute);
+    championships.set(championshipId, edition);
+    years.set(year, championships);
+  }
+  if (!years.size) return <p>Nenhuma competição encontrada.</p>;
+  return (
+    <div className="competition-catalog">
+      {[...years]
+        .sort(([a], [b]) => b - a)
+        .map(([year, championships]) => (
+          <section key={year}>
+            <h2>{year}</h2>
+            {[...championships]
+              .sort(
+                ([a, gamesA], [b, gamesB]) =>
+                  compareLabels(
+                    gamesA[0].context.name,
+                    gamesB[0].context.name,
+                  ) || a.localeCompare(b),
+              )
+              .map(([id, edition]) => (
+                <section key={id}>
+                  <h3>{edition[0].context.name}</h3>
+                  <DisputeLinks disputes={edition} headingLevel="h4" />
+                </section>
+              ))}
+          </section>
+        ))}
     </div>
   );
 }
@@ -215,7 +201,7 @@ export function PublicDiscovery({
       catalogAvailable={catalogAvailable}
       fallback={
         catalogAvailable ? (
-          <CompetitionTree games={games} confirmed={confirmed} />
+          <CompetitionCatalog games={games} confirmed={confirmed} />
         ) : null
       }
     />

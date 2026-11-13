@@ -52,6 +52,7 @@ export const playerProfilePageSchema = z
           })
           .strict(),
         metadata: publicPlayerProfileSchema.shape.person.nullable(),
+        currentAge: z.number().int().min(0).max(120).nullable().optional(),
       })
       .strict(),
     contexts: z

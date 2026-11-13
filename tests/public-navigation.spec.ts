@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { publicNavigationFixture } from "./fixtures/public-navigation";
-import { disputeLink } from "../src/public-ui/catalog-contract";
+import { disputeLink, publicSections } from "../src/public-ui/catalog-contract";
 const origin = "http://127.0.0.1:5174";
 
 test("descoberta hierárquica, teclado e quatro seções preservam a disputa", async ({
@@ -13,16 +13,31 @@ test("descoberta hierárquica, teclado e quatro seções preservam a disputa", a
   await expect(
     page.getByRole("heading", { name: "Competições", exact: true }),
   ).toBeVisible();
-  const summary = page.locator(".competition-tree > details > summary").first();
-  await summary.focus();
-  await page.keyboard.press("Enter");
+  const catalog = page.locator(".competition-catalog");
+  await expect(catalog.locator("h2")).toHaveText([
+    String(c.year),
+    String(c.year - 1),
+  ]);
+  const currentYear = catalog.locator(":scope > section").first();
+  const noGames = catalog.getByRole("link", { name: "Sub-12", exact: true });
+  await expect(noGames).toBeVisible();
+  await expect(noGames).toHaveAttribute(
+    "href",
+    disputeLink(f.confirmed[0].disputeId),
+  );
   await expect(
-    page.getByRole("heading", { name: "Masculino", exact: true }),
+    catalog.getByRole("link", { name: "Adulto · Prata" }),
+  ).toBeVisible();
+  await expect(catalog.locator("details")).toHaveCount(0);
+  await expect(
+    currentYear.getByRole("heading", { name: "Masculino", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Feminino", exact: true }),
+    currentYear.getByRole("heading", { name: "Feminino", exact: true }),
   ).toBeVisible();
   const genders = await page
+    .locator(".competition-catalog > section")
+    .first()
     .locator(".gender-columns section")
     .evaluateAll((nodes) =>
       nodes.slice(0, 2).map((n) => ({
@@ -207,67 +222,63 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   ).toHaveCount(0);
 });
 
-test("troca rápida pesquisável abre classificação e respeita naipe único sem divisão", async ({
+test("painel da edição atual preserva cada aba e o histórico", async ({
   page,
 }, info) => {
   const f = await publicNavigationFixture(page);
-  await page.goto(origin + disputeLink(f.source.disputeId));
   const toggle = page.locator(".public-competition-trigger");
-  await expect(toggle).toBeVisible();
-  await expect(toggle).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(page.locator(".public-context")).toHaveCSS(
-    "background-color",
-    "rgba(0, 0, 0, 0)",
-  );
-  await expect(page.getByText("Trocar disputa", { exact: true })).toHaveCount(
-    0,
-  );
-  await toggle.focus();
-  await page.keyboard.press("Enter");
-  await expect(
-    page.getByRole("dialog", { name: "Escolher disputa" }),
-  ).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(toggle).toBeFocused();
-  await page.keyboard.press("Enter");
-  await page
-    .getByRole("searchbox", { name: "Buscar competição ou disputa" })
-    .fill("Sub-14");
-  await expect(
-    page.locator(".public-selector-panel .gender-columns section"),
-  ).toHaveCount(1);
-  await expect(
-    page
-      .locator(".public-selector-panel")
-      .getByRole("link", { name: "Sem divisão" }),
-  ).toHaveCount(0);
-  await page.screenshot({
-    path: `.preview-artifacts/public-navigation-selector-after-${info.project.name}.png`,
-    fullPage: false,
-  });
-  const link = page
-    .locator(".public-selector-panel")
-    .getByRole("link", { name: "Sub-14", exact: true });
-  const href = await link.getAttribute("href");
-  const newPage = await page.context().newPage();
-  await publicNavigationFixture(newPage);
-  await newPage.goto(origin + href);
-  await expect(
-    newPage.getByRole("heading", {
-      name: "Classificação ainda não disponível",
-    }),
-  ).toBeVisible();
-  await newPage.close();
-  await link.focus();
-  await page.keyboard.press("Enter");
-  expect(page.url()).toBe(origin + href);
-  await expect(
-    page.getByRole("dialog", { name: "Escolher disputa" }),
-  ).toHaveCount(0);
-  await page.reload();
-  await expect(
-    page.getByRole("heading", { name: "Classificação ainda não disponível" }),
-  ).toBeVisible();
+  const panel = page.getByRole("navigation", { name: "Disputas da edição" });
+  const nav = page.getByRole("navigation", { name: "Seções da disputa" });
+  const alternative = f.games.find((g) => g.context.category === "Sub-14")!;
+  for (const section of publicSections) {
+    const start = disputeLink(f.source.disputeId, section.id);
+    const destination = disputeLink(alternative.disputeId, section.id);
+    await page.goto(origin + start);
+    await expect(toggle).toBeVisible();
+    const before = await nav.boundingBox();
+    await toggle.focus();
+    await page.keyboard.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(panel.locator('[aria-current="true"]')).toHaveAttribute(
+      "href",
+      start,
+    );
+    await expect(
+      panel.getByRole("link", { name: "Sub-12", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      panel.getByRole("link", { name: "Sub-11", exact: true }),
+    ).toBeVisible();
+    await expect(
+      panel.getByRole("link", { name: "Ver todos os campeonatos" }),
+    ).toHaveAttribute("href", "/publico.html");
+    expect((await nav.boundingBox())!.y).toBeGreaterThan(before!.y);
+    const link = panel.getByRole("link", { name: "Sub-14", exact: true });
+    await link.focus();
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect(toggle).toBeFocused();
+    await page.keyboard.press("Enter");
+    if (section.id === "classificacao")
+      await page.screenshot({
+        path: `.preview-artifacts/public-navigation-selector-after-${info.project.name}.png`,
+        fullPage: false,
+      });
+    await expect(link).toHaveAttribute("href", destination);
+    await link.press("Enter");
+    await expect(page).toHaveURL(origin + destination);
+    await expect(
+      nav.getByRole("link", { name: section.label, exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+    await expect(panel).toHaveCount(0);
+    await page.goBack();
+    await expect(page).toHaveURL(
+      (url) => url.pathname + url.hash.split("?")[0] === start.split("?")[0],
+    );
+    await expect(
+      nav.getByRole("link", { name: section.label, exact: true }),
+    ).toHaveAttribute("aria-current", "page");
+  }
 });
 
 test("vazio, erro e contexto inválido oferecem recuperação sem bloquear outras seções", async ({
@@ -292,7 +303,7 @@ test("vazio, erro e contexto inválido oferecem recuperação sem bloquear outra
     .getByRole("button", { name: "Buscar na base", exact: true })
     .click();
   await page.getByRole("button", { name: "Tentar novamente" }).click();
-  await expect(page.locator(".competition-tree")).toBeVisible();
+  await expect(page.locator(".competition-catalog")).toBeVisible();
   f.state.missing = true;
   await page.goto(origin + disputeLink(f.source.disputeId));
   await expect(
@@ -346,27 +357,23 @@ test("axe, foco visível, reflow 320px e zoom 200%", async ({ page }, info) => {
     game.context.category = "Categoria".repeat(8);
   }
   await page.goto(origin + "/publico.html");
-  await page.locator(".competition-tree > details > summary").first().click();
+  await expect(page.locator(".competition-catalog")).toBeVisible();
   const scan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(scan.violations).toEqual([]);
   await page.goto(origin + disputeLink(f.source.disputeId));
   await page.locator(".public-competition-trigger").click();
-  await expect(
-    page.getByRole("searchbox", { name: "Buscar competição ou disputa" }),
-  ).toBeVisible();
-  await page
-    .getByRole("searchbox", { name: "Buscar competição ou disputa" })
-    .focus();
-  await expect(
-    page.getByRole("searchbox", { name: "Buscar competição ou disputa" }),
-  ).toBeFocused();
+  const catalogLink = page.getByRole("link", {
+    name: "Ver todos os campeonatos",
+  });
+  await catalogLink.focus();
+  await expect(catalogLink).toBeFocused();
   const openScan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(openScan.violations).toEqual([]);
-  for (const width of [320, 720]) {
+  for (const width of [320, 390, 1366, 720]) {
     await page.setViewportSize({ width, height: 844 });
     if (width === 720)
       await page.evaluate(() => {

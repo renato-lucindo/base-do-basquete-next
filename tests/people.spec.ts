@@ -867,6 +867,20 @@ for (const width of [1366, 1920])
     ])
       await expect(dialog.getByLabel(label, { exact: true })).toBeVisible();
     await expect(dialog.locator("details")).toHaveCount(0);
+    const date = dialog.getByLabel("Data completa de nascimento", {
+      exact: true,
+    });
+    const year = dialog.getByRole("spinbutton", {
+      name: "Ano público de nascimento",
+    });
+    await year.fill("2004");
+    await date.fill("2003-02-12");
+    await expect(year).toHaveValue("2003");
+    await expect(year).not.toBeEditable();
+    await date.fill("");
+    await expect(year).toBeEditable();
+    await expect(year).toHaveValue("");
+    await year.fill("2004");
     const height = await dialog
       .getByLabel("Altura (cm)", { exact: true })
       .boundingBox();

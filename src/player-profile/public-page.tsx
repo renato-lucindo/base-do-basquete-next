@@ -292,6 +292,19 @@ export function PlayerPublicPage() {
     birthYear = ready?.page.identity.metadata?.publicBirthYear ?? null,
     hasAge = birthYear !== null;
   const metadata = ready?.page.identity.metadata;
+  const age = ready?.page.identity.currentAge;
+  const currentAge =
+    age === undefined
+      ? seasonAge(
+          birthYear,
+          Number(
+            new Intl.DateTimeFormat("pt-BR", {
+              year: "numeric",
+              timeZone: "America/Sao_Paulo",
+            }).format(),
+          ),
+        )
+      : age;
   const summaryRows = [
     {
       label: latestYear ? String(latestYear) : "Temporada",
@@ -453,25 +466,22 @@ export function PlayerPublicPage() {
                     </p>
                   </>
                 )}
-                <div className="player-bio">
-                  {seasonAge(birthYear, new Date().getFullYear()) !== null && (
-                    <span>
-                      {seasonAge(birthYear, new Date().getFullYear())} anos
-                    </span>
-                  )}
-                  {metadata?.heightCm != null && (
-                    <span>
-                      {new Intl.NumberFormat("pt-BR", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(metadata.heightCm / 100)}{" "}
-                      m
-                    </span>
-                  )}
-                  {metadata?.position && <span>{metadata.position}</span>}
-                </div>
-                {metadata?.biography && (
-                  <p className="player-biography">{metadata.biography}</p>
+                {(currentAge != null ||
+                  metadata?.heightCm != null ||
+                  metadata?.position) && (
+                  <div className="player-bio">
+                    {currentAge != null && <span>{currentAge} anos</span>}
+                    {metadata?.heightCm != null && (
+                      <span>
+                        {new Intl.NumberFormat("pt-BR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(metadata.heightCm / 100)}{" "}
+                        m
+                      </span>
+                    )}
+                    {metadata?.position && <span>{metadata.position}</span>}
+                  </div>
                 )}
               </header>
               {hasHonors && (

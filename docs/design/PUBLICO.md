@@ -9,23 +9,22 @@ Decisão de07/11/2026: no novo percurso de [campeonato flexível](../decisoes/02
 ## Encontrar e abrir uma disputa
 
 1. A página inicial lista as **competições**, com busca no topo. A busca global cobre competições, disputas, equipes e jogadores; **não** busca jogos no MVP.
-2. O percurso é **Competição → Ano → Naipe → Categoria → Divisão**, com ordem fixa para todas as edições e naipes. A decisão de 02/11/2026 substitui a previsão de configuração por edição; não adicionar campo ou controle de ordenação. Divisão ausente não cria nível vazio; não inventar níveis ausentes no domínio.
-3. No desktop, árvores de navegação **Masculino** e **Feminino** ficam **lado a lado** quando existirem ambos. Com apenas um naipe, não criar coluna vazia. No celular, a árvore se adapta verticalmente.
-4. A seleção rápida combina **árvore expansível** e **busca pesquisável**; sem obrigar uma série de páginas intermediárias.
-5. Abrir uma disputa leva diretamente à **Classificação**. O menu contextual contém **Classificação, Jogos, Equipes, Jogadores**, com indicação da disputa e retorno previsível à seleção.
+2. O catálogo **Campeonatos** agrupa por **Ano → Campeonato → Naipe**. Anos aparecem do mais recente ao mais antigo e categorias/divisões ficam visíveis como links diretos. Inclui disputas confirmadas sem jogos. Divisão ausente não cria rótulo adicional.
+3. No desktop, os grupos **Masculino** e **Feminino** ficam lado a lado quando existirem ambos. Com apenas um naipe, não criar coluna vazia. No celular, os grupos ficam um abaixo do outro.
+4. O painel junto ao nome do campeonato mostra as disputas da edição atual sem níveis recolhidos.
+5. Abrir uma disputa pelo catálogo leva à **Classificação**. Trocar pelo painel mantém a aba atual. O menu contextual contém **Classificação, Jogos, Equipes, Jogadores**, com indicação da disputa e retorno previsível à seleção.
 
 ```text
 [ Buscar competições, equipes ou jogadores... ]
 
-▼ Copa ES
-  ▼ 2026
+2026
+  Copa ES
     MASCULINO           FEMININO
     Sub-14              Sub-14
     Sub-16              Sub-17
-    Adulto              Sub-19
-      Série Ouro
-      Série Prata
-      Série Bronze
+    Adulto · Série Ouro Sub-19
+    Adulto · Série Prata
+    Adulto · Série Bronze
 ```
 
 Exemplo ilustrativo; respeitar dados reais de cada edição.
@@ -84,7 +83,7 @@ Confrontos dos jogos e recordes são links únicos para a partida, com mandante,
 
 Ver jogos integra o perfil, ordena datas decrescentes com ausentes ao final e pagina 12 atuações por vez. Lista, contagem, paginação e opções dos filtros consideram somente `fact.played` confirmado; zero ponto não exclui uma atuação. Ano, Campeonato, Equipe e Buscar adversário ficam em Filtrar e ajustar, inicialmente fechado. Estatísticas preserva seus próprios filtros, métricas e cálculos, com Total/Por jogo em botões no padrão público de Jogadores. Ambos os painéis têm rascunho: Cancelar/Fechar/Escape não aplicam alterações; Limpar prepara campos; Aplicar confirma e reinicia a paginação correspondente. Aba, filtros, página e expansões dos recordes permanecem no retorno/URL. A trajetória fica permanentemente visível, sem estado de recolhimento. Resumo, conquistas, recordes e últimos jogos não mudam com filtros estatísticos.
 
-Estatísticas usa Ano | Idade | Campeonato | J | métricas, também no celular com rolagem interna. Conforme refinamento solicitado em 12/11/2026, categoria aparece junto ao campeonato, separada por ponto médio; omitir Adulto e manter equipe completa abaixo, sem ano repetido. FC integra o padrão, preservando seleções explícitas, inclusive vazias. Não repetir os títulos internos Por campeonato/Jogos sob as abas. Idade = ano da temporada menos publicBirthYear já publicado; sem esse dado, remover integralmente cabeçalho, células e largura da coluna. Não consultar nem expor nascimento privado. Trajetória agrupa somente passagens por equipe, mais recente primeiro, sem campeonatos. A linha conecta os centros dos pontos e é coberta pelos próprios pontos; não ultrapassa primeiro/último e inexiste com um único item. Anos e nomes completos ficam separados, com links reais para as equipes.
+Estatísticas usa Ano | Idade | Campeonato | J | métricas, também no celular com rolagem interna. Conforme refinamento solicitado em 12/11/2026, categoria aparece junto ao campeonato, separada por ponto médio; omitir Adulto e manter equipe completa abaixo, sem ano repetido. FC integra o padrão, preservando seleções explícitas, inclusive vazias. Não repetir os títulos internos Por campeonato/Jogos sob as abas. Idade = ano da temporada menos publicBirthYear já publicado; sem esse dado, remover integralmente cabeçalho, células e largura da coluna. No cabeçalho, mostrar idade atual em Brasília, altura e posição quando publicados. O servidor calcula a idade em anos completos a partir da data privada confirmada ou, se houver apenas o ano, pela diferença de anos. O perfil não mostra biografia nem data completa. Trajetória agrupa somente passagens por equipe, mais recente primeiro, sem campeonatos. A linha conecta os centros dos pontos e é coberta pelos próprios pontos; não ultrapassa primeiro/último e inexiste com um único item. Anos e nomes completos ficam separados, com links reais para as equipes.
 
 O refinamento de 12/11/2026 usa fundo cinza-azulado, superfícies principais brancas e azul suave em contexto/cabeçalhos/seleção, com os tokens públicos compartilhados. Legendas de perfil/Jogadores/Equipes usam uma mesma escala. Recordes sem marca positiva recebem estado vazio, preservando ordenação, cálculo e acesso aos jogos. Busca mantém apelido sem o prefixo Apelido:. No desktop (640px ou mais), considerar a altura natural da Visão geral desde a entrada por qualquer aba e reservar o espaço do maior conteúdo visitado, limitado à área de leitura da janela; conteúdo extenso cresce normalmente. Não deslocar a rolagem ao trocar de aba. No celular, altura natural, sem reserva para igualar abas. [Plano e provas](../PLAN-REFINAMENTO-PUBLICO.md).
 
@@ -117,7 +116,7 @@ Versões e datas técnicas saem das linhas públicas; cobertura, siglas e distin
 
 ## Refinamento de Jogadores — decisão de05/11/2026
 
-Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Jogadores usa30linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
+Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. Jogadores usa30linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
 
 Em F/T/U/5F/GD, o negrito identifica o maior valor positivo da consulta filtrada inteira, incluindo empates; zeros e ausências não recebem destaque. Não representa desempenho melhor: a comparação continua considerando menos faltas como melhor valor.
 
@@ -175,6 +174,6 @@ Preservar separadamente, na identificação acessível dos ícones, vitória/der
 
 A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo e modo de Equipes ficam juntos; se a largura exigir quebra, os grupos partem do mesmo alinhamento. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
 
-O nome do campeonato abre o seletor de disputa, sem o botão separado de troca. A busca interna, os links diretos e a seleção pelo teclado permanecem disponíveis. Sites de disputa única continuam sem seletor.
+O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
 
 A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useId, useRef, useState, type ReactNode } from "react";
 import {
   contextLabel,
   disputeLink,
@@ -6,10 +6,10 @@ import {
   type PublicContext,
   type PublicSection,
 } from "./catalog-contract";
-import { CompetitionTree, usePublicCatalog } from "./catalog";
+import { DisputeLinks, publicDisputes, usePublicCatalog } from "./catalog";
 import { safePublicReturn, sectionReturn } from "./navigation";
 import { PublicSearchForm } from "./search-form";
-import { Modal } from "../ui-system/components";
+
 import "../ui-system/theme.css";
 import "./navigation.css";
 import "./legend.css";
@@ -88,19 +88,32 @@ function DisputeNavigation({
 }) {
   const catalog = usePublicCatalog(disputeId);
   const [selecting, setSelecting] = useState(false);
+  const panelId = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
   const c =
     context ?? catalog.disputes[0]?.context ?? catalog.games[0]?.context;
   return (
-    <div className="public-context wrap">
+    <div
+      className="public-context wrap"
+      data-choosing-dispute={selecting || undefined}
+      onKeyDown={(e) => {
+        if (selecting && e.key === "Escape") {
+          e.preventDefault();
+          setSelecting(false);
+          trigger.current?.focus();
+        }
+      }}
+    >
       <div className="public-context-line">
         {c && !siteDisputeId ? (
           <p>
             <button
               type="button"
               className="public-competition-trigger"
-              aria-haspopup="dialog"
+              ref={trigger}
+              aria-controls={selecting ? panelId : undefined}
               aria-expanded={selecting}
-              onClick={() => setSelecting(true)}
+              onClick={() => setSelecting(!selecting)}
             >
               {c.name}
               <span aria-hidden="true"> ⌄</span>
@@ -116,12 +129,17 @@ function DisputeNavigation({
                 : "Disputa sem contexto público disponível"}
           </p>
         )}
-        {selecting && (
-          <div className="public-dispute-dialog bb-ui">
-            <Modal title="Escolher disputa" onClose={() => setSelecting(false)}>
-              <QuickSelector onSelect={() => setSelecting(false)} />
-            </Modal>
-          </div>
+        {selecting && c && (
+          <EditionDisputes
+            id={panelId}
+            context={c}
+            section={section}
+            currentId={disputeId}
+            onClose={() => {
+              setSelecting(false);
+              trigger.current?.focus();
+            }}
+          />
         )}
       </div>
       <nav className="dispute-navigation" aria-label="Seções da disputa">
@@ -150,44 +168,58 @@ function DisputeNavigation({
     </div>
   );
 }
-function QuickSelector({ onSelect }: { onSelect: () => void }) {
+function EditionDisputes({
+  id,
+  context,
+  section,
+  currentId,
+  onClose,
+}: {
+  id: string;
+  context: PublicContext;
+  section: PublicSection;
+  currentId: string;
+  onClose: () => void;
+}) {
   const catalog = usePublicCatalog();
-  const [query, setQuery] = useState("");
+  const disputes = publicDisputes(catalog.games, catalog.disputes).filter(
+    (d) =>
+      d.context.championshipId === context.championshipId &&
+      d.context.year === context.year,
+  );
   return (
-    <div className="public-selector-panel">
-      <label>
-        Buscar competição ou disputa
-        <input
-          type="search"
-          name="q"
-          autoComplete="off"
-          maxLength={120}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </label>
+    <nav
+      id={id}
+      className="public-selector-panel"
+      aria-label="Disputas da edição"
+    >
       {catalog.loading && <p role="status">Carregando disputas…</p>}
       {catalog.error && (
         <p role="alert">
           {catalog.error}{" "}
-          <button onClick={catalog.retry}>Tentar novamente</button>
+          <button type="button" onClick={catalog.retry}>
+            Tentar novamente
+          </button>
         </p>
       )}
       {!catalog.loading && !catalog.error && (
-        <CompetitionTree
-          games={catalog.games}
-          confirmed={catalog.disputes}
-          query={query}
+        <DisputeLinks
+          disputes={
+            disputes.length ? disputes : [{ disputeId: currentId, context }]
+          }
+          headingLevel="h3"
+          section={section}
+          currentId={currentId}
           onSelect={(e) => {
-            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey)
-              onSelect();
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) onClose();
           }}
         />
       )}
-      <a href="/publico.html">Todas as competições e busca pública</a>
-    </div>
+      <a href="/publico.html">Ver todos os campeonatos</a>
+    </nav>
   );
 }
+
 export function PublicBreadcrumb({
   context,
   page,

@@ -78,11 +78,6 @@
   flex-wrap: wrap;
   margin-top: 1rem;
 }
-.player-biography {
-  margin-top: 0.75rem !important;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 .player-desktop-honors {
   display: none;
   min-width: 0;
