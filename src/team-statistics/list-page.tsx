@@ -248,16 +248,27 @@ export function TeamsListPublicPage() {
                   })
                 }
               />
-              <Segments
-                label="Escopo"
-                value={q.scope}
-                options={[
-                  ["all", "Todos"],
-                  ["regular", "Fase regular"],
-                  ["playoffs", "Eliminatórias"],
-                ]}
-                onChange={(scope) => change({ scope })}
-              />
+              <div className="team-list-segments">
+                <Segments
+                  label="Escopo"
+                  value={q.scope}
+                  options={[
+                    ["all", "Todos"],
+                    ["regular", "Fase regular"],
+                    ["playoffs", "Eliminatórias"],
+                  ]}
+                  onChange={(scope) => change({ scope })}
+                />
+                <Segments
+                  label="Modo"
+                  value={q.mode}
+                  options={[
+                    ["total", "Totais"],
+                    ["per-game", "Por jogo"],
+                  ]}
+                  onChange={(mode) => change({ mode })}
+                />
+              </div>
               {data?.hasBoxscore && (
                 <label>
                   Dados
@@ -400,24 +411,15 @@ export function TeamsListPublicPage() {
               className="statistics-results-block team-list-results"
               data-sheet-only={data?.scoresheet || undefined}
             >
-              <div className="table-toolbar">
-                <span className="sr-only" role="status">
-                  {loading
-                    ? "Consultando…"
-                    : data
-                      ? `${data.total} inscrições`
-                      : ""}
-                </span>
-                <Segments
-                  label="Modo"
-                  value={q.mode}
-                  options={[
-                    ["total", "Totais"],
-                    ["per-game", "Por jogo"],
-                  ]}
-                  onChange={(mode) => change({ mode })}
-                />
-                {data?.hasBoxscore && (
+              <span className="sr-only" role="status">
+                {loading
+                  ? "Consultando…"
+                  : data
+                    ? `${data.total} inscrições`
+                    : ""}
+              </span>
+              {data?.hasBoxscore && (
+                <div className="table-toolbar">
                   <ColumnPicker
                     options={LIST_METRIC_KEYS.map((key) => ({
                       key,
@@ -432,8 +434,8 @@ export function TeamsListPublicPage() {
                       })
                     }
                   />
-                )}
-              </div>
+                </div>
+              )}
               {data && (
                 <div aria-busy={loading}>
                   <TeamsListTable

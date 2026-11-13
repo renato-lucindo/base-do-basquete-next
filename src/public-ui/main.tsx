@@ -52,7 +52,14 @@ function PublicHome() {
         section={route.section}
         context={standings.data?.context}
       />
-      <main id="public-content" className="public-main" tabIndex={-1}>
+      <main
+        id="public-content"
+        className="public-main"
+        data-standings={
+          (!!route.id && route.section === "classificacao") || undefined
+        }
+        tabIndex={-1}
+      >
         {!route.id && <PublicBreadcrumb page="Consulta pública" />}
         <h1 className={route.id ? "sr-only" : undefined}>
           {route.id

@@ -1,5 +1,11 @@
 .public-standings.public-site.statistics-public {
   min-height: 0;
+  background: transparent;
+}
+.public-standings.public-site.statistics-public .public-phase-navigation {
+  width: fit-content;
+  margin-block: 0.75rem;
+  margin-inline-start: 0;
 }
 .public-standings .statistics-table-wrap {
   scroll-padding-top: 3rem;

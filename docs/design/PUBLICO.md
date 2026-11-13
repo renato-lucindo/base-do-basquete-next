@@ -147,7 +147,7 @@ A listagem de súmula herda o bloco intrínseco centralizado acima1050px, sem so
 
 ## Eliminatória — protótipo aceito em 08/11/2026
 
-Na Classificação, navegação raiz somente **Classificatória** e **Eliminatória**. Esta última fica disponível a partir do primeiro confronto com as duas inscrições resolvidas, sem exigir jogo ou resultado. Classificatória conserva tabela e grupos, com opções agrupadas por fase quando necessário. Campeonatos apenas eliminatórios abrem o quadro disponível; links antigos por fase conservam o destino correspondente.
+Na Classificação, as opções **Fase Regular** e **Eliminatórias** usam o padrão segmentado de Total/Por jogo. Eliminatórias fica disponível a partir do primeiro confronto com as duas inscrições resolvidas, sem exigir jogo ou resultado. Fase Regular só aparece no seletor quando Eliminatórias também está disponível. A tabela e os grupos continuam acessíveis sem esse seletor, com opções agrupadas por fase quando necessário. Campeonatos apenas eliminatórios abrem o quadro disponível; links antigos por fase conservam o destino correspondente.
 
 Eliminatória mostra todas as etapas num bracket com conexões reais de vencedor/perdedor. Cada confronto tem duas linhas de equipes e colunas **Jogo1…N** (com espaço entre palavra e número na tela), com cabeçalhos dentro da borda do cartão. Fonte dos placares compacta, sem ampliar a altura do cartão para acomodar o cabeçalho; separar claramente confrontos e etapas. MD3 sempre mostra três posições, inclusive terceiro jogo dispensado como `—`; aplicar o equivalente a jogo único, ida-volta, MD5 e MD7. Ida-volta acrescenta Total somente da projeção oficial. Vitória em cada jogo em negrito; nome da classificada recebe destaque discreto apenas com decisão confirmada. Não repetir uma lista de jogos abaixo nem exigir clique para consultar placares.
 
@@ -170,3 +170,11 @@ Vitória: círculo verde e ✓ branco; derrota: círculo vermelho e × branco. A
 O texto visual do tooltip contém **somente confronto, placar e data DD/MM**, neste formato: **`LUSB 56 x 66 IVV/Cetaf - 20/09`**. Usar a sigla cadastrada de cada equipe; na ausência, o nome publicado da inscrição, sem inventar abreviações ou concatenar identificações. Preservar a ordem das equipes do jogo e os respectivos placares. Não acrescentar horário, ano, vitória/derrota, “resultado administrativo” ou “mais recente” ao tooltip visual. Sem data, omitir o sufixo: `LUSB 56 x 66 IVV/Cetaf`. Sem placar, usar `—` nos valores ausentes: `LUSB — x — IVV/Cetaf - 20/09`, nunca presumir zero.
 
 Preservar separadamente, na identificação acessível dos ícones, vitória/derrota e os estados necessários, incluindo resultado administrativo e resultado mais recente quando aplicáveis, sem motivos privados. Esses detalhes ficam na identificação acessível, sem entrar no tooltip visual. Evidências e limites na PR da unidade.
+
+## Ajustes de 13/11/2026
+
+A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo e modo de Equipes ficam juntos; se a largura exigir quebra, os grupos partem do mesmo alinhamento. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
+
+O nome do campeonato abre o seletor de disputa, sem o botão separado de troca. A busca interna, os links diretos e a seleção pelo teclado permanecem disponíveis. Sites de disputa única continuam sem seletor.
+
+A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.

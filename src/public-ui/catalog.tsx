@@ -99,10 +99,12 @@ export function CompetitionTree({
   games,
   query = "",
   confirmed = [],
+  onSelect,
 }: {
   games: CatalogGame[];
   query?: string;
   confirmed?: PublicDispute[];
+  onSelect?: React.MouseEventHandler<HTMLAnchorElement>;
 }) {
   const disputes = publicDisputes(games, confirmed).filter((g) =>
     matches(contextLabel(g.context), query),
@@ -163,6 +165,7 @@ export function CompetitionTree({
                                   <a
                                     key={category}
                                     href={disputeLink(rows[0].disputeId)}
+                                    onClick={onSelect}
                                   >
                                     {category}
                                   </a>
@@ -176,6 +179,7 @@ export function CompetitionTree({
                                       <a
                                         key={g.disputeId}
                                         href={disputeLink(g.disputeId)}
+                                        onClick={onSelect}
                                       >
                                         {g.context.division || category}
                                       </a>

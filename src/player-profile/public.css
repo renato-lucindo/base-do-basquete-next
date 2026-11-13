@@ -91,7 +91,7 @@
   container-type: inline-size;
   position: sticky;
   top: 0;
-  background: var(--bb-blue-soft);
+  background: var(--public-background);
   border-bottom: 1px solid var(--bb-line);
   z-index: 5;
 }
@@ -118,7 +118,7 @@
   background: transparent;
 }
 .player-tabs-shell .bb-tabs button[aria-selected="true"] {
-  background: var(--bb-surface);
+  background: var(--bb-blue-soft);
   color: var(--bb-blue);
   border-bottom-color: var(--bb-blue);
   font-weight: 600;

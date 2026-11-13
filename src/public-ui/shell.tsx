@@ -9,6 +9,8 @@ import {
 import { CompetitionTree, usePublicCatalog } from "./catalog";
 import { safePublicReturn, sectionReturn } from "./navigation";
 import { PublicSearchForm } from "./search-form";
+import { Modal } from "../ui-system/components";
+import "../ui-system/theme.css";
 import "./navigation.css";
 import "./legend.css";
 import { siteDisputeId, siteHome, siteTitle } from "./site";
@@ -91,21 +93,35 @@ function DisputeNavigation({
   return (
     <div className="public-context wrap">
       <div className="public-context-line">
-        <p>
-          {c
-            ? contextLabel(c)
-            : catalog.loading
-              ? "Carregando disputa…"
-              : "Disputa sem contexto público disponível"}
-        </p>
-        {!siteDisputeId && (
-          <details
-            className="public-quick-selector"
-            onToggle={(e) => setSelecting(e.currentTarget.open)}
-          >
-            <summary>Trocar disputa</summary>
-            {selecting && <QuickSelector />}
-          </details>
+        {c && !siteDisputeId ? (
+          <p>
+            <button
+              type="button"
+              className="public-competition-trigger"
+              aria-haspopup="dialog"
+              aria-expanded={selecting}
+              onClick={() => setSelecting(true)}
+            >
+              {c.name}
+              <span aria-hidden="true"> ⌄</span>
+            </button>
+            <span>{contextLabel(c).slice(c.name.length)}</span>
+          </p>
+        ) : (
+          <p>
+            {c
+              ? contextLabel(c)
+              : catalog.loading
+                ? "Carregando disputa…"
+                : "Disputa sem contexto público disponível"}
+          </p>
+        )}
+        {selecting && (
+          <div className="public-dispute-dialog bb-ui">
+            <Modal title="Escolher disputa" onClose={() => setSelecting(false)}>
+              <QuickSelector onSelect={() => setSelecting(false)} />
+            </Modal>
+          </div>
         )}
       </div>
       <nav className="dispute-navigation" aria-label="Seções da disputa">
@@ -134,7 +150,7 @@ function DisputeNavigation({
     </div>
   );
 }
-function QuickSelector() {
+function QuickSelector({ onSelect }: { onSelect: () => void }) {
   const catalog = usePublicCatalog();
   const [query, setQuery] = useState("");
   return (
@@ -143,6 +159,8 @@ function QuickSelector() {
         Buscar competição ou disputa
         <input
           type="search"
+          name="q"
+          autoComplete="off"
           maxLength={120}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -160,6 +178,10 @@ function QuickSelector() {
           games={catalog.games}
           confirmed={catalog.disputes}
           query={query}
+          onSelect={(e) => {
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey)
+              onSelect();
+          }}
         />
       )}
       <a href="/publico.html">Todas as competições e busca pública</a>

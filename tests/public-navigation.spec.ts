@@ -212,8 +212,23 @@ test("troca rápida pesquisável abre classificação e respeita naipe único se
 }, info) => {
   const f = await publicNavigationFixture(page);
   await page.goto(origin + disputeLink(f.source.disputeId));
-  const toggle = page.locator(".public-quick-selector > summary");
+  const toggle = page.locator(".public-competition-trigger");
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(page.locator(".public-context")).toHaveCSS(
+    "background-color",
+    "rgba(0, 0, 0, 0)",
+  );
+  await expect(page.getByText("Trocar disputa", { exact: true })).toHaveCount(
+    0,
+  );
   await toggle.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("dialog", { name: "Escolher disputa" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(toggle).toBeFocused();
   await page.keyboard.press("Enter");
   await page
     .getByRole("searchbox", { name: "Buscar competição ou disputa" })
@@ -246,6 +261,9 @@ test("troca rápida pesquisável abre classificação e respeita naipe único se
   await link.focus();
   await page.keyboard.press("Enter");
   expect(page.url()).toBe(origin + href);
+  await expect(
+    page.getByRole("dialog", { name: "Escolher disputa" }),
+  ).toHaveCount(0);
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Classificação ainda não disponível" }),
@@ -334,7 +352,7 @@ test("axe, foco visível, reflow 320px e zoom 200%", async ({ page }, info) => {
     .analyze();
   expect(scan.violations).toEqual([]);
   await page.goto(origin + disputeLink(f.source.disputeId));
-  await page.locator(".public-quick-selector > summary").click();
+  await page.locator(".public-competition-trigger").click();
   await expect(
     page.getByRole("searchbox", { name: "Buscar competição ou disputa" }),
   ).toBeVisible();

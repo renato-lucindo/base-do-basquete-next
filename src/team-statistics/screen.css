@@ -12,7 +12,7 @@
   padding: 0.625rem 0.875rem;
   border: 1px solid #74839b;
   border-radius: 0.25rem;
-  background: #fff;
+  background: transparent;
   color: #075fca;
 }
 .team-navigation a[aria-current="page"] {
@@ -301,6 +301,27 @@
   gap: 0.75rem;
   margin-block: 0.75rem;
 }
+.team-list-page .public-site.statistics-public {
+  background: transparent;
+}
+.team-list-page .team-list-segments {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.team-list-page .team-list-segments .segmented button {
+  min-height: 2.75rem;
+  white-space: normal;
+}
+.team-list-page .team-list-segments .mode-control {
+  width: auto;
+}
+.team-list-page .team-list-segments .segmented {
+  margin-inline-start: 0;
+}
 .team-list-page .team-list-filters label {
   font-size: 0.8125rem;
 }
@@ -454,8 +475,11 @@
     max-width: 100%;
     width: 100%;
   }
-  .team-list-page .team-list-filters .mode-control {
+  .team-list-page .team-list-filters .team-list-segments {
     flex: 1 1 100%;
+  }
+  .team-list-page .team-list-segments .segmented button {
+    padding-inline: 0.4rem;
   }
 }
 .team-list-page

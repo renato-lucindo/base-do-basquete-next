@@ -3,8 +3,10 @@ import type { CatalogGame } from "../../src/public-ui/catalog-contract";
 import type { PublicDispute } from "../../src/regulation/publication-contract";
 import {
   discoveryPageSchema,
+  discoveryPageSize,
   foldSearch,
   type SearchHit,
+  type SearchType,
 } from "../../src/public-ui/search-contract";
 // Browser-only responses. Normalization/ranking/visibility have independent real SQL tests.
 export function searchFixtureHits(
@@ -72,7 +74,8 @@ export function fixtureSearchPage(hits: SearchHit[], p: URLSearchParams) {
     type = p.get("type") ?? "all",
     entityId = p.get("entityId"),
     needle = foldSearch(q),
-    size = type === "all" ? 5 : 20;
+    view = p.get("view") === "results" ? "results" : undefined,
+    size = discoveryPageSize(type as SearchType, view);
   const aliases = (hit: SearchHit) =>
     [
       hit.name,
@@ -122,6 +125,7 @@ export function fixtureSearchPage(hits: SearchHit[], p: URLSearchParams) {
     query: q,
     type,
     entityId,
+    view,
     page,
     totalPages,
     counts,
@@ -130,6 +134,8 @@ export function fixtureSearchPage(hits: SearchHit[], p: URLSearchParams) {
         .filter((h) => h.kind === k)
         .slice((page - 1) * size, page * size)
         .map((h) => {
+          if (h.kind === "players" && view === "results")
+            return { ...h, latestTeam: h.latestTeam ?? null };
           if (h.kind !== "competitions" || foldSearch(h.name).includes(needle))
             return h;
           const scopes = h.disputes.filter((d) =>

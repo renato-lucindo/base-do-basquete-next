@@ -61,6 +61,10 @@ test("agenda real abre placar e perfis, sem inventar detalhe para jogo futuro", 
   await expect(future.locator(".public-game-home a")).toHaveCount(1);
   const row = page.locator(`[data-game-id="${game.id}"]`);
   const score = row.getByRole("link", { name: /^Ver jogo:/ });
+  await expect(row.locator(".public-game-score")).toHaveCSS(
+    "background-color",
+    "rgba(0, 0, 0, 0)",
+  );
   await score.focus();
   expect(await score.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe(
     "solid",

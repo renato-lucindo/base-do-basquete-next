@@ -110,11 +110,46 @@ test("busca global mantém nome completo em destaque e apelido como complemento"
   if (!player || player.kind !== "players")
     throw Error("Atleta de teste ausente.");
   player.nickname = "Alvinho";
+  player.latestTeam = "Álvares Cabral";
   await page.goto(base + "/publico.html#?q=alvares&type=players");
   const results = page.getByRole("region", { name: "Resultados da busca" });
   const first = results.locator(".public-search-entity-list > li").first();
   await expect(first.locator("strong")).toHaveText("Álvares");
-  await expect(first.locator("small")).toHaveText("Alvinho");
+  await expect(first.locator("small")).toHaveText([
+    "Alvinho",
+    "Álvares Cabral",
+  ]);
+});
+test("ver todos os resultados mostra vinte jogadores sem mudar o autocomplete", async ({
+  page,
+}) => {
+  const f = await setup(page);
+  const player = f.hits.find(
+    (hit) => hit.kind === "players" && hit.name === "Álvares",
+  );
+  if (player?.kind !== "players") throw Error("Atleta de teste ausente.");
+  player.latestTeam = "Álvares Cabral";
+  await page.goto(base + "/publico.html");
+  await page
+    .getByRole("combobox", { name: /Buscar competições/ })
+    .fill("alvares");
+  const suggestions = page
+    .getByRole("listbox")
+    .getByRole("group", { name: "Jogadores", exact: true });
+  await expect(suggestions.getByRole("option")).toHaveCount(5);
+  await page.getByRole("link", { name: "Ver todos os resultados" }).click();
+  const players = page.getByRole("region", { name: "Jogadores", exact: true });
+  await expect(players.locator(".public-search-entity-list > li")).toHaveCount(
+    20,
+  );
+  await expect(players.locator("li").first().locator("small")).toHaveText(
+    "Álvares Cabral",
+  );
+  await page.getByRole("link", { name: "Próxima", exact: true }).click();
+  await expect(players.locator(".public-search-entity-list > li")).toHaveCount(
+    7,
+  );
+  await expect(page).toHaveURL(/page=2/);
 });
 
 test("debounce/cancelamento descarta resposta atrasada e retry mantém foco e termo", async ({

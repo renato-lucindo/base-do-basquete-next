@@ -154,9 +154,9 @@ export function PublicStandingsTables({
             disponíveis em Jogos.
           </p>
         )}
-        {(!!phases.length || knockoutAvailable) && (
+        {knockoutAvailable && (
           <nav
-            className="public-phase-navigation"
+            className="public-phase-navigation segmented"
             aria-label="Etapas da classificação"
           >
             {!!phases.length && (
@@ -164,17 +164,15 @@ export function PublicStandingsTables({
                 href={selectionLink(phase?.phaseId, group?.id)}
                 aria-current={stage === "classificatoria" ? "page" : undefined}
               >
-                Classificatória
+                Fase Regular
               </a>
             )}
-            {knockoutAvailable && (
-              <a
-                href={selectionLink()}
-                aria-current={stage === "eliminatoria" ? "page" : undefined}
-              >
-                Eliminatória
-              </a>
-            )}
+            <a
+              href={selectionLink()}
+              aria-current={stage === "eliminatoria" ? "page" : undefined}
+            >
+              Eliminatórias
+            </a>
           </nav>
         )}
         {stage === "eliminatoria" && <PublicBracket value={value} />}
