@@ -118,7 +118,7 @@ export function DisputeLinks({
         if (!items.length) return null;
         const label = gender === "masculino" ? "Masculino" : "Feminino";
         return (
-          <section key={gender} aria-label={label}>
+          <section key={gender}>
             <Heading>{label}</Heading>
             <ul>
               {items.map(({ disputeId, context }) => (
