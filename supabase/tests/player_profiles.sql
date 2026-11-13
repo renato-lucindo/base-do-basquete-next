@@ -58,6 +58,8 @@ select pg_temp.pp_assert(
  'the private date is absent from the anonymous response'
 );
 select pg_temp.pp_error('select birth_date from private.player_profile_versions','42501');
+select pg_temp.pp_assert(public.get_confirmed_player_age(pg_temp.pp_id(1),1) is null,'historical birthdays cannot be queried');
+select pg_temp.pp_assert(public.get_confirmed_player_age(pg_temp.pp_id(4),1) is null,'unpublished age cannot be queried');
 select pg_temp.pp_assert(public.get_player_career_with_age(pg_temp.pp_id(4)) is null,'no implicit public profile');
 select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(999)) is null,'unknown identity has no public profile');
 select pg_temp.pp_error('select public.get_player_profile_proposal(pg_temp.pp_id(1))','42501');

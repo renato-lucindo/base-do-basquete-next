@@ -142,28 +142,31 @@ returns integer language sql immutable security invoker set search_path='' as $$
 $$;
 revoke all on function private.confirmed_player_age(date,integer,date) from public,anon,authenticated,service_role;
 
--- The public career lookup supplies the eligible identity and confirmed version.
--- No input controls the reference date or selects a historical version.
+-- The public helper checks the current published version before reading its private date.
+-- Its parameters cannot request an earlier version or a different reference date.
+create function public.get_confirmed_player_age(p_person_id uuid,p_version integer)
+returns integer language sql stable security definer set search_path='' as $$
+ select private.confirmed_player_age(
+  v.birth_date,
+  (h.snapshot#>>'{person,publicBirthYear}')::integer,
+  (statement_timestamp() at time zone 'America/Sao_Paulo')::date
+ )
+ from public.published_player_profiles h
+ join private.player_profile_versions v on v.person_id=h.person_id and v.version=h.version
+ where h.person_id=p_person_id and h.version=p_version
+$$;
+revoke all on function public.get_confirmed_player_age(uuid,integer) from public,anon,authenticated,service_role;
+grant execute on function public.get_confirmed_player_age(uuid,integer) to anon,authenticated;
+
+-- Run the career lookup as the caller so its game and honor visibility policies apply.
 create function public.get_player_career_with_age(p_person_id uuid)
-returns jsonb language plpgsql stable security definer set search_path='' as $$
-declare
- career jsonb;
- published_version integer;
- birth_date date;
- current_age integer;
+returns jsonb language plpgsql stable security invoker set search_path='' as $$
+declare career jsonb; current_age integer;
 begin
  career:=public.get_player_career_source(p_person_id);
  if career is null then return null;end if;
- published_version:=(career#>>'{profile,version}')::integer;
- if published_version is not null then
-  select v.birth_date into birth_date
-  from private.player_profile_versions v
-  where v.person_id=p_person_id and v.version=published_version;
-  current_age:=private.confirmed_player_age(
-   birth_date,
-   (career#>>'{profile,person,publicBirthYear}')::integer,
-   (statement_timestamp() at time zone 'America/Sao_Paulo')::date
-  );
+ if career->'profile'<>'null'::jsonb then
+  current_age:=public.get_confirmed_player_age(p_person_id,(career#>>'{profile,version}')::integer);
  end if;
  career:=career||jsonb_build_object('currentAge',current_age);
  if octet_length(career::text)>4194304 then raise sqlstate 'PT413' using message='player_career_source_too_large';end if;

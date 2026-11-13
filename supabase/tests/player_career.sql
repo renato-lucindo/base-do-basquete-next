@@ -7,6 +7,17 @@ select public.save_achievement_draft(jsonb_set(pg_temp.ad_command(100,23),'{draf
 select public.confirm_achievements(jsonb_build_object('commandId',pg_temp.pu_id(99001),'disputeId',pg_temp.pu_id(3),'expectedDraftVersion',24,'expectedPublicationVersion',0,'expectedContextFingerprint',public.get_achievement_context(pg_temp.pu_id(3))->'contextFingerprint','reason','','acknowledgeImpact',true));
 set local role anon;
 select public.get_player_career_source(pg_temp.pu_id(201)) as player_career;
+reset role;
+create policy test_hide_player_games on public.published_player_games as restrictive for select to anon using(false);
+set local role anon;
+select pg_temp.pu_assert(
+ public.get_player_career_with_age(pg_temp.pu_id(201))-'currentAge'=public.get_player_career_source(pg_temp.pu_id(201))
+ and jsonb_array_length(public.get_player_career_with_age(pg_temp.pu_id(201))->'participations')=0,
+ 'age wrapper respects the caller game visibility'
+);
+reset role;
+drop policy test_hide_player_games on public.published_player_games;
+set local role anon;
 select public.get_player_career_source(pg_temp.pu_id(910)) as recipient_without_games;
 select pg_temp.pu_assert(public.get_player_career_source(pg_temp.pu_id(999)) is null,'unknown identity is not a public profile');
 reset role;
