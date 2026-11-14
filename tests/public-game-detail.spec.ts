@@ -118,11 +118,20 @@ for (const width of [1366, 1920, 320, 390])
           },
         );
       });
+      const centeredFoulDash = tables.every((t) => {
+        const cell = t.querySelector('tr[data-played="false"] .foul-cell')!;
+        const dash = cell.querySelector("span")!.getBoundingClientRect();
+        const bounds = cell.getBoundingClientRect();
+        return (
+          Math.abs(dash.x + dash.width / 2 - bounds.x - bounds.width / 2) < 1
+        );
+      });
       return {
         overflow: document.documentElement.scrollWidth > innerWidth,
         heights,
         widths,
         dnp,
+        centeredFoulDash,
         filler: [...tables[0].querySelectorAll(".filler")].every(
           (r) => !r.textContent && !r.querySelector("a,button"),
         ),
@@ -131,7 +140,9 @@ for (const width of [1366, 1920, 320, 390])
     expect(dimensions.overflow).toBe(false);
     expect(dimensions.heights[0]).toEqual(dimensions.heights[1]);
     expect(dimensions.widths[0]).toEqual(dimensions.widths[1]);
-    expect(dimensions.dnp && dimensions.filler).toBe(true);
+    expect(
+      dimensions.dnp && dimensions.filler && dimensions.centeredFoulDash,
+    ).toBe(true);
     const scroll = page.locator('[data-team="away"] .table-scroll');
     await scroll.evaluate((e) => (e.scrollLeft = 9999));
     const gd = page.locator(

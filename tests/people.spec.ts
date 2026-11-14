@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { draftProfile } from "../src/player-profile/profile-card";
 import {
   emptyPerson,
   type PersonSnapshot,
@@ -97,11 +98,103 @@ async function fixture(page: Page) {
   await page.route("**/api/registrations**", (route) =>
     route.fulfill({ json: { items: registrations, hasMore: false } }),
   );
+  const profileAttempts: unknown[] = [];
+  const published = new Map<
+    string,
+    {
+      version: number;
+      confirmedPersonVersion: number;
+      person: ReturnType<typeof draftProfile>["metadata"];
+    }
+  >();
+  let profileFailure = 0;
+  let priorProfileAck: object | null = null;
+  await page.route(/\/api\/people\/[^/]+\/profile$/, (route) => {
+    const request = route.request();
+    const personId = new URL(request.url()).pathname.split("/")[3];
+    const person = persons.get(personId);
+    if (!person) return route.fulfill({ status: 404, json: {} });
+    const card = draftProfile(person).metadata;
+    const old = published.get(personId);
+    if (request.method() === "GET")
+      return route.fulfill({
+        json: {
+          proposal: { personId, personVersion: person.version, person: card },
+          state: {
+            personId,
+            personVersion: person.version,
+            version: old?.version ?? 0,
+            confirmedPersonVersion: old?.confirmedPersonVersion ?? null,
+            sourceChanged:
+              !!old && old.confirmedPersonVersion !== person.version,
+            published: old
+              ? {
+                  kind: "confirmed-player-profile-v1",
+                  personId,
+                  version: old.version,
+                  confirmedAt: timestamp,
+                  person: old.person,
+                }
+              : null,
+            history: [],
+            hasMore: false,
+          },
+        },
+      });
+    const command = request.postDataJSON();
+    profileAttempts.push(command);
+    if (profileFailure === 409) {
+      profileFailure = 0;
+      return route.fulfill({
+        status: 409,
+        json: { error: { message: "Cadastro mudou." } },
+      });
+    }
+    if (
+      priorProfileAck &&
+      "commandId" in priorProfileAck &&
+      priorProfileAck.commandId === command.commandId
+    )
+      return route.fulfill({ json: priorProfileAck });
+    if (
+      command.expectedPersonVersion !== person.version ||
+      command.expectedPublicationVersion !== (old?.version ?? 0)
+    )
+      return route.fulfill({
+        status: 409,
+        json: { error: { message: "Versão mudou." } },
+      });
+    expect([...roster.values()].some((row) => row.personId === personId)).toBe(
+      true,
+    );
+    const version = (old?.version ?? 0) + 1;
+    published.set(personId, {
+      version,
+      confirmedPersonVersion: person.version,
+      person: card,
+    });
+    priorProfileAck = {
+      commandId: command.commandId,
+      personId,
+      version,
+      personVersion: person.version,
+      confirmedAt: timestamp,
+    };
+    if (profileFailure === 503) {
+      profileFailure = 0;
+      return route.fulfill({
+        status: 503,
+        json: { error: { message: "Resposta perdida." } },
+      });
+    }
+    return route.fulfill({ json: priorProfileAck });
+  });
   await page.route(/\/api\/(people|roster|staff)(\/|\?|$)/, async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
       resource = url.pathname.split("/")[2],
       itemId = url.pathname.split("/")[3];
+    if (url.pathname.endsWith("/profile")) return route.fallback();
     const error = (status: number, code: string, message: string) =>
       route.fulfill({ status, json: { error: { code, message } } });
     if (expireOnWrite && request.method() === "POST") {
@@ -281,6 +374,11 @@ async function fixture(page: Page) {
   });
   return {
     persons,
+    published,
+    profileAttempts,
+    failProfile: (status: number) => {
+      profileFailure = status;
+    },
     roster,
     staff,
     attempts,
@@ -304,6 +402,12 @@ async function open(page: Page) {
     page.getByRole("heading", { name: "Elenco de Lobos", exact: true }),
   ).toBeVisible();
 }
+async function savePersonOnly(page: Page) {
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Só salvar", exact: true }).click();
+}
 async function newAthlete(page: Page, name: string, jersey: string) {
   await page
     .getByRole("button", { name: "Adicionar atleta", exact: true })
@@ -316,9 +420,7 @@ async function newAthlete(page: Page, name: string, jersey: string) {
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill(name);
   await page.getByLabel("Camisa", { exact: true }).fill(jersey);
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByText("Vínculo salvo.", { exact: true })).toBeVisible();
 }
 
@@ -584,9 +686,7 @@ test("ACK de pessoa seguido de GET falho retoma apenas leitura e não cadastra n
     .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Nova");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(
     page.getByText("Envio não confirmado", { exact: true }),
   ).toBeVisible();
@@ -798,9 +898,7 @@ test("homônimos exigem nova identidade explícita sem renomear", async ({
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Silva");
   await page.getByLabel("Camisa", { exact: true }).fill("2");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByRole("alert")).toContainText(
     "Confirme outra identidade",
   );
@@ -867,6 +965,20 @@ for (const width of [1366, 1920])
     ])
       await expect(dialog.getByLabel(label, { exact: true })).toBeVisible();
     await expect(dialog.locator("details")).toHaveCount(0);
+    const date = dialog.getByLabel("Data completa de nascimento", {
+      exact: true,
+    });
+    const year = dialog.getByRole("spinbutton", {
+      name: "Ano público de nascimento",
+    });
+    await year.fill("2004");
+    await date.fill("2003-02-12");
+    await expect(year).toHaveValue("2003");
+    await expect(year).not.toBeEditable();
+    await date.fill("");
+    await expect(year).toBeEditable();
+    await expect(year).toHaveValue("");
+    await year.fill("2004");
     const height = await dialog
       .getByLabel("Altura (cm)", { exact: true })
       .boundingBox();
@@ -902,9 +1014,7 @@ for (const width of [1366, 1920])
         await new Promise((resolve) => setTimeout(resolve, 250));
       return route.fallback();
     });
-    await dialog
-      .getByRole("button", { name: "Salvar pessoa", exact: true })
-      .click();
+    await savePersonOnly(page);
     await expect(
       page.getByText("Pessoa salva.", { exact: true }),
     ).toBeVisible();
@@ -972,9 +1082,7 @@ test("pessoa e camisa retomam falha parcial sem repetir POSTs já confirmados", 
     }
     return route.fallback();
   });
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByRole("alert")).toContainText(
     "dados globais da pessoa já foram salvos",
   );
@@ -1011,9 +1119,7 @@ test("camisa duplicada preserva pessoa salva e recarrega para corrigir sem recad
     .click();
   await page.getByLabel("Altura (cm)", { exact: true }).fill("183");
   await page.getByLabel("Camisa", { exact: true }).fill("1");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByRole("alert")).toContainText(
     "dados globais da pessoa já foram salvos",
   );
@@ -1065,9 +1171,7 @@ test("reautenticação entre pessoa e camisa preserva a etapa pendente", async (
     }
     return r.fallback();
   });
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(
     page.getByRole("heading", { name: "Acesso administrativo", exact: true }),
   ).toBeVisible();
@@ -1131,9 +1235,7 @@ test("envio incerto e conflito mantêm edição e comandos corretos", async ({
     .getByLabel("Nome da pessoa", { exact: true })
     .fill("Minha correção");
   f.setMode("conflict");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByLabel("Nome da pessoa", { exact: true })).toHaveValue(
     "Minha correção",
   );
@@ -1186,9 +1288,7 @@ test("guardas e reautenticação preservam cadastro contextual", async ({
     "Trabalho pendente",
   );
   f.expire();
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByLabel("Senha", { exact: true })).toBeVisible();
   await page.getByLabel("E-mail", { exact: true }).fill("admin@example.test");
   await page.getByLabel("Senha", { exact: true }).fill("fixture-password");
@@ -1257,9 +1357,7 @@ test("cadastro único permite camisa vazia e recupera falha do vínculo sem repe
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Bia Vínculo");
   await page.getByLabel("Camisa", { exact: true }).fill("00");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByRole("alert")).toContainText(
     "dados globais da pessoa já foram salvos",
   );
@@ -1296,9 +1394,7 @@ test("camisa repetida no novo cadastro permite recarregar e corrigir sem duplica
     .click();
   await page.getByLabel("Nome da pessoa", { exact: true }).fill("Bia Nova");
   await page.getByLabel("Camisa", { exact: true }).fill("1");
-  await page
-    .getByRole("button", { name: "Salvar pessoa", exact: true })
-    .click();
+  await savePersonOnly(page);
   await expect(page.getByRole("alert")).toContainText("camisa repetida");
   const person = [...f.persons.values()].find((p) => p.name === "Bia Nova")!;
   page.once("dialog", (d) => d.accept());
@@ -1369,9 +1465,7 @@ for (const [committed, expireDuringReload, failReadDuringReload] of [
       .getByLabel("Nome da pessoa", { exact: true })
       .fill("Ana ACK perdido");
     await page.getByLabel("Camisa", { exact: true }).fill("00");
-    await page
-      .getByRole("button", { name: "Salvar pessoa", exact: true })
-      .click();
+    await savePersonOnly(page);
     await expect(page.getByRole("alert")).toContainText(
       "dados globais da pessoa já foram salvos",
     );
@@ -1452,3 +1546,157 @@ for (const [committed, expireDuringReload, failReadDuringReload] of [
     expect(f.roster.get(original.entry.id)!.version).toBe(1);
   });
 }
+
+test("ficha manual só publica após o vínculo e retoma o mesmo recibo", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  await open(page);
+  await page
+    .getByRole("button", { name: "Adicionar atleta", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Cadastrar novo atleta", exact: true })
+    .click();
+  await page.getByLabel("Nome da pessoa", { exact: true }).fill("Ana Ficha");
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("188");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  const review = page.getByRole("dialog", {
+    name: "Publicar os dados do perfil?",
+  });
+  await expect(review.getByRole("button", { name: "Só salvar" })).toBeFocused();
+  await expect(review).toContainText("188cm");
+  await review.getByRole("button", { name: "Voltar à edição" }).click();
+  expect(f.persons.size).toBe(0);
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  f.failProfile(503);
+  await review.getByRole("button", { name: "Salvar e publicar" }).click();
+  await expect(
+    page.getByText("Cadastro salvo. Publicação pendente", { exact: true }),
+  ).toBeVisible();
+  expect(f.persons.size).toBe(1);
+  expect(f.roster.size).toBe(1);
+  expect(f.published.size).toBe(1);
+  await page
+    .getByRole("button", { name: "Retomar publicação", exact: true })
+    .click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Perfil publicado." }),
+  ).toBeVisible();
+  expect(f.profileAttempts).toHaveLength(2);
+  expect(f.profileAttempts[0]).toEqual(f.profileAttempts[1]);
+
+  await page
+    .getByRole("button", { name: "Editar pessoa Ana Ficha", exact: true })
+    .click();
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("190");
+  await savePersonOnly(page);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect([...f.published.values()][0].person.heightCm).toBe(188);
+  expect([...f.persons.values()][0].heightCm).toBe(190);
+
+  await page
+    .getByRole("button", { name: "Editar pessoa Ana Ficha", exact: true })
+    .click();
+  await page.getByLabel("Altura (cm)", { exact: true }).fill("191");
+  await page
+    .getByRole("button", { name: "Salvar pessoa", exact: true })
+    .click();
+  const publish = review.getByRole("button", { name: "Salvar e publicar" });
+  await expect(publish).toBeDisabled();
+  await review.getByLabel("Motivo da revisão").fill("Altura conferida");
+  f.failProfile(409);
+  await publish.click();
+  await expect(
+    page.getByText("Cadastro salvo. Publicação pendente", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Conferir dados novamente" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Publicação do perfil" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Dados públicos do perfil" }),
+  ).toContainText("191");
+  expect([...f.published.values()][0].person.heightCm).toBe(188);
+});
+
+test("lote retoma o mesmo recibo e separa cadastro que mudou", async ({
+  page,
+}) => {
+  await fixture(page);
+  const people = [91, 92, 93].map((n) => ({
+    personId: id(n),
+    personVersion: 3,
+    person: draftProfile({
+      ...emptyPerson(id(n)),
+      name: "Ficha " + n,
+      heightCm: 170 + (n % 10),
+    }).metadata,
+  }));
+  await page.route("**/api/people/profile-batch", (route) =>
+    route.fulfill({ json: { items: people, next: null } }),
+  );
+  const commands: {
+    commandId: string;
+    personId: string;
+    initialBatch: boolean;
+  }[] = [];
+  await page.route("**/api/people/*/profile", (route) => {
+    const command = route.request().postDataJSON();
+    commands.push(command);
+    expect(command.initialBatch).toBe(true);
+    if (commands.length === 2)
+      return route.fulfill({
+        status: 503,
+        json: { error: { message: "Falha transitória" } },
+      });
+    if (command.personId === id(93))
+      return route.fulfill({
+        status: 409,
+        json: { error: { message: "Cadastro mudou" } },
+      });
+    return route.fulfill({
+      json: {
+        commandId: command.commandId,
+        personId: command.personId,
+        personVersion: 3,
+        version: 1,
+        confirmedAt: timestamp,
+      },
+    });
+  });
+  await open(page);
+  await page
+    .getByRole("button", { name: "Publicar fichas de jogadores", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Publicar fichas de jogadores",
+  });
+  await dialog
+    .getByRole("button", { name: "Carregar fichas para conferência" })
+    .click();
+  await expect(dialog.locator("li")).toHaveCount(3);
+  expect(commands).toHaveLength(0);
+  await dialog.getByRole("button", { name: "Publicar 3 fichas" }).click();
+  await expect(dialog.getByRole("alert")).toHaveText("Falha transitória");
+  await expect(dialog.getByRole("status")).toContainText(
+    "1 publicadas · 2 pendentes",
+  );
+  await dialog
+    .getByRole("button", { name: "Retomar fichas pendentes" })
+    .click();
+  await expect(dialog.getByRole("status")).toContainText(
+    "2 publicadas · 0 pendentes · 1 para nova conferência",
+  );
+  expect(commands.map((command) => command.personId)).toEqual([
+    id(91),
+    id(92),
+    id(92),
+    id(93),
+  ]);
+  expect(commands[1].commandId).toBe(commands[2].commandId);
+});

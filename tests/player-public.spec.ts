@@ -1,172 +1,172 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { playerPublicFixture } from "./fixtures/player-public-browser";
+import { confirmedManualFixture } from "./fixtures/statistics-publications";
+const summary = (p: Page) =>
+  p.getByRole("table", { name: "Resumo de temporada e carreira", exact: true });
+const stats = (p: Page) =>
+  p.getByRole("table", { name: "Estatísticas por campeonato", exact: true });
+const tab = (p: Page, name: string) =>
+  p.getByRole("tab", { name, exact: true }).click();
+const filters = (p: Page) =>
+  p.getByRole("button", { name: "Filtrar e ajustar", exact: true }).click();
+const apply = (p: Page) =>
+  p.getByRole("button", { name: "Aplicar", exact: true }).click();
 
-const summary = (page: import("@playwright/test").Page) =>
-  page.getByRole("table", {
-    name: "Resumo de temporada e carreira",
-    exact: true,
-  });
-const stats = (page: import("@playwright/test").Page) =>
-  page.getByRole("table", { name: "Estatísticas por campeonato", exact: true });
-
-test("perfil contínuo público: dados disponíveis, ordem dos blocos e atalhos por teclado", async ({
+test("perfil público mantém identidade, metadados publicados e navegação de teclado", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
+  Object.assign(f.source, { currentAge: 17 });
+  Object.assign(f.source.profile!.person, {
+    publicBirthYear: 2008,
+    heightCm: 188,
+    weightKg: 90,
+    position: "Ala-Pivô / Pivô",
+    originCity: "São Mateus",
+    originState: "ES",
+  });
   await page.goto(f.url);
   await expect(
     page.getByRole("heading", { name: "AP", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
-  await expect(page.getByText("180 cm", { exact: true })).toBeVisible();
+  await expect(page.locator(".player-bio li")).toHaveText([
+    "17 anos (2008)",
+    "188cm, 90kg",
+    "Ala-Pivô / Pivô",
+    "São Mateus - ES",
+  ]);
   await expect(
-    page.getByText("Ano de nascimento:", { exact: true }),
+    page.getByText("Trajetória confirmada.", { exact: true }),
   ).toHaveCount(0);
-  await expect(summary(page).getByRole("row")).toHaveCount(3);
+  await expect(summary(page).locator("tbody tr")).toHaveCount(2);
+  await expect(page.locator(".player-legend")).toBeVisible();
+  await page.getByRole("button", { name: "J: Jogos", exact: true }).focus();
+  await expect(page.getByRole("tooltip")).toHaveText("Jogos");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tooltip")).not.toBeVisible();
+  await page.getByRole("tab", { name: "Visão geral", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
   await expect(
-    page
-      .getByRole("table", { name: "Três últimos jogos", exact: true })
-      .getByRole("row"),
-  ).toHaveCount(3);
-  await expect(page.locator(".player-provenance")).toHaveCount(0);
-  for (const [name, target] of [
-    ["Estatísticas", "#estatisticas"],
-    ["Conquistas e honrarias", "#conquistas"],
-    ["Jogos", "#jogos"],
-    ["Histórico", "#historico"],
-    ["Evolução", "#evolucao"],
-    ["Resumo", "#resumo"],
-  ]) {
-    await page
-      .getByRole("navigation", { name: "Seções do perfil" })
-      .getByRole("link", { name, exact: true })
-      .focus();
-    await page.keyboard.press("Enter");
-    await expect(page.locator(target)).toBeFocused();
-  }
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
-  await page.reload();
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
+    page.getByRole("tab", { name: "Estatísticas", exact: true }),
+  ).toBeFocused();
   expect(f.state.sessionReads).toBe(0);
   await expect(page.getByText(/confirmação v|Resultado v|Fontes/i)).toHaveCount(
     0,
   );
 });
-
-test("carreira completa não herda campeonato de origem; filtros e checkboxes não alteram resumo/recentes", async ({
+test("carreira completa não herda origem; filtros e nenhuma equipe não alteram resumo ou recentes", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
   await page.goto(
     f.url + `?disputeId=${f.source.participations[0].fact.disputeId}`,
   );
-  await expect(stats(page).getByRole("row")).toHaveCount(3);
+  const result = confirmedManualFixture();
+  await expect(
+    page.locator(
+      `.player-recent tr[data-game="${result.id}"] .player-match-score`,
+    ),
+  ).toHaveText(
+    `${result.facts.teams.home.points} × ${result.facts.teams.away.points}`,
+  );
   const before = await summary(page).innerText();
-  const recent = page.getByRole("table", {
-    name: "Três últimos jogos",
-    exact: true,
-  });
-  await expect(recent.getByRole("row")).toHaveCount(3);
+  const recent = await page
+    .getByRole("table", { name: "Últimos jogos", exact: true })
+    .innerText();
+  await tab(page, "Estatísticas");
+  await expect(stats(page).locator("tbody tr")).toHaveCount(2);
+  await filters(page);
   await page
     .getByRole("combobox", { name: "Ano", exact: true })
     .selectOption("2027");
-  await expect(stats(page).getByRole("row")).toHaveCount(2);
+  await apply(page);
+  await expect(stats(page).locator("tbody tr")).toHaveCount(1);
+  await filters(page);
   await page
-    .locator(".player-options > summary")
-    .filter({ hasText: "Equipes" })
+    .getByRole("group", { name: "Equipes", exact: true })
+    .getByRole("button", { name: "Nenhuma", exact: true })
     .click();
-  const teams = page.getByRole("group", { name: "Equipes", exact: true });
-  await teams.getByRole("button", { name: "Nenhuma", exact: true }).click();
-  await expect(stats(page)).toContainText(
-    "Nenhuma participação neste recorte.",
-  );
-  await expect(summary(page)).toHaveText(before, { useInnerText: true });
-  await expect(recent.getByRole("row")).toHaveCount(3);
-  await expect(page.getByText("MVP da edição", { exact: true })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await apply(page);
   await expect(
-    page.locator(".player-options > summary").filter({ hasText: "Equipes" }),
-  ).toBeFocused();
+    page.getByText("Nenhuma participação neste recorte.", { exact: true }),
+  ).toBeVisible();
   await page.reload();
-  await expect(stats(page)).toContainText(
-    "Nenhuma participação neste recorte.",
-  );
+  await expect(stats(page).locator("tbody tr")).toHaveCount(0);
+  await tab(page, "Visão geral");
+  await expect(summary(page)).toHaveText(before, { useInnerText: true });
+  await expect(
+    page.getByRole("table", { name: "Últimos jogos", exact: true }),
+  ).toHaveText(recent, { useInnerText: true });
   expect(
     f.state.queries.every(
       (p) => !p.get("disputeId") && !p.get("championshipId"),
     ),
   ).toBe(true);
 });
-
-test("histórico completo não fica limitado à primeira página e paginação dos jogos é local", async ({
+test("histórico e jogos carregam todas as páginas antes da paginação local", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page, { long: true });
   await page.goto(f.url + "?secao=jogos&page=2&mode=total");
   const games = page.getByRole("table", {
-    name: "Jogos confirmados",
+    name: "Jogos do atleta",
     exact: true,
   });
-  await expect(games.getByRole("row")).toHaveCount(6);
-  await expect(
-    page.getByText("Página 2 de 2 · 25 jogos", { exact: true }),
-  ).toBeVisible();
-  await expect(stats(page).getByRole("row")).toHaveCount(21);
-  await expect(
-    summary(page).getByRole("row").last().getByRole("cell").first(),
-  ).toHaveText("25");
+  await expect(games.locator("tbody tr")).toHaveCount(12);
+  await expect(page.getByText("Página 2 de 3", { exact: true })).toBeVisible();
   expect(f.state.queries.map((p) => p.get("page"))).toEqual([null, "2"]);
-  await page.getByRole("button", { name: "Anterior", exact: true }).click();
-  await expect(games.getByRole("row")).toHaveCount(21);
+  await page.getByRole("button", { name: "Próxima", exact: true }).click();
+  await expect(games.locator("tbody tr")).toHaveCount(1);
   expect(f.state.queries).toHaveLength(2);
-  await page
-    .getByRole("button", { name: "Próximos campeonatos", exact: true })
-    .click();
-  await expect(stats(page).getByRole("row")).toHaveCount(6);
+  await tab(page, "Estatísticas");
+  await expect(stats(page).locator("tbody tr")).toHaveCount(20);
+  await page.getByRole("button", { name: "Próxima", exact: true }).click();
+  await expect(stats(page).locator("tbody tr")).toHaveCount(5);
+  await tab(page, "Visão geral");
   await expect(
-    summary(page).getByRole("row").last().getByRole("cell").first(),
+    summary(page).locator("tbody tr").last().locator("td").first(),
   ).toHaveText("25");
 });
-
-test("ordenação e colunas persistem sem refazer as consultas da carreira", async ({
+test("ordenação, modo, nenhuma coluna e recarga preservam valores sem novas leituras de carreira", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
-  await page.goto(f.url);
-  await expect(stats(page).getByRole("row")).toHaveCount(3);
-  await stats(page).getByRole("button", { name: "PTS", exact: true }).click();
-  await expect(
-    stats(page).locator("thead th").filter({ hasText: "PTS" }),
-  ).toHaveAttribute("aria-sort", "ascending");
-  await expect(stats(page).locator("tbody tr").first()).toContainText("2026");
-  await stats(page).getByRole("button", { name: /PTS/ }).click();
-  await expect(stats(page).locator("tbody tr").first()).toContainText("2027");
-  await page
-    .locator(".player-options > summary")
-    .filter({ hasText: "Colunas" })
+  await page.goto(f.url + "?secao=estatisticas");
+  await expect(stats(page).locator("tbody tr")).toHaveCount(2);
+  await stats(page)
+    .getByRole("button", { name: "Ordenar por PTS (Pontos)", exact: true })
     .click();
-  const choices = page.getByRole("group", { name: "Colunas", exact: true });
-  await choices
-    .getByRole("checkbox", { name: "LL · Lances livres", exact: true })
-    .check();
-  await page.keyboard.press("Escape");
+  await expect(
+    stats(page).locator("thead th[aria-sort=descending]"),
+  ).toHaveCount(1);
+  await stats(page)
+    .getByRole("button", { name: "Ordenar por PTS (Pontos)", exact: true })
+    .click();
+  await expect(
+    stats(page).locator("thead th[aria-sort=ascending]"),
+  ).toHaveCount(1);
+  await page.getByRole("button", { name: "Total", exact: true }).click();
+  expect(f.state.queries).toHaveLength(1);
+  await filters(page);
+  await page
+    .getByRole("group", { name: "Colunas", exact: true })
+    .getByRole("button", { name: "Nenhuma", exact: true })
+    .click();
+  await apply(page);
   await page.reload();
   await expect(
-    stats(page).locator("thead th").filter({ hasText: "PTS" }),
-  ).toHaveAttribute("aria-sort", "descending");
+    stats(page).getByRole("button", {
+      name: "Ordenar por PTS (Pontos)",
+      exact: true,
+    }),
+  ).toHaveCount(0);
   await expect(
-    stats(page).getByRole("button", { name: "LL", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Total", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   expect(f.state.queries).toHaveLength(2);
 });
-
-test("leitura incompleta e alteração entre páginas exigem retry e não exibem carreira parcial", async ({
+test("leitura incompleta ou alterada não exibe carreira parcial; retry recupera", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page, { long: true });
@@ -181,31 +181,34 @@ test("leitura incompleta e alteração entre páginas exigem retry e não exibem
   await expect(summary(page)).toHaveCount(0);
   f.state.changedPage = 0;
   await page.getByRole("button", { name: "Tentar novamente" }).click();
-  await expect(stats(page).getByRole("row")).toHaveCount(21);
+  await expect(summary(page)).toBeVisible();
+  await tab(page, "Estatísticas");
+  await expect(stats(page).locator("tbody tr")).toHaveCount(20);
 });
-
-test("perfil sem jogos tem resumo indisponível e somente metadados publicados", async ({
+test("perfil sem jogos mantém apenas metadados públicos e zero de J", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page, { profileOnly: true });
   await page.goto(f.url);
+  await expect(page.getByText("180cm", { exact: true })).toBeVisible();
   await expect(
     page.getByText("Trajetória confirmada.", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(summary(page).locator("tbody tr").last()).toContainText("—");
   await expect(
-    page.getByText("Nenhuma conquista publicada.", { exact: true }),
-  ).toBeVisible();
-  await expect(summary(page).getByRole("row").last()).toContainText("—");
-  await expect(
-    summary(page).getByRole("row").last().getByRole("cell").first(),
+    summary(page).locator("tbody tr").last().locator("td").first(),
   ).toHaveText("0");
-  await expect(stats(page)).toContainText(
-    "Nenhuma participação neste recorte.",
-  );
   await expect(page.locator(".player-with-honors")).toHaveCount(0);
+  await tab(page, "Estatísticas");
+  await expect(
+    page.getByText("Nenhuma participação neste recorte.", { exact: true }),
+  ).toBeVisible();
+  await tab(page, "Carreira");
+  await expect(page.locator(".player-records")).toContainText(
+    "Nenhuma marca registrada.",
+  );
 });
-
-test("erros e resposta contaminada não exibem dados; retry recupera", async ({
+test("erros e resposta contaminada não exibem dados privados; retry recupera", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
@@ -221,8 +224,7 @@ test("erros e resposta contaminada não exibem dados; retry recupera", async ({
   await page.getByRole("button", { name: "Tentar novamente" }).click();
   await expect(summary(page)).toBeVisible();
 });
-
-test("relacionado sem jogar preserva camisa e não recebe zero estatístico nem jogo recente", async ({
+test("relacionado sem atuar não recebe zero nem entra nos recentes", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
@@ -238,31 +240,31 @@ test("relacionado sem jogar preserva camisa e não recebe zero estatístico nem 
       discipline: null,
     });
   await page.goto(f.url + "?secao=jogos");
-  await expect(
-    page.getByRole("table", { name: "Três últimos jogos", exact: true }),
-  ).toContainText("Ainda não há jogos confirmados");
   const games = page.getByRole("table", {
-    name: "Jogos confirmados",
+    name: "Jogos do atleta",
     exact: true,
   });
-  await expect(games.getByRole("cell", { name: /Não participou/ })).toHaveCount(
-    2,
+  await expect(games).toHaveCount(0);
+  await expect(page.locator(".player-games-count")).toHaveText(
+    "0 jogos encontrados",
   );
-  await expect(games).toContainText("Camisa 77");
-  await expect(games.getByRole("cell", { name: "0", exact: true })).toHaveCount(
-    0,
-  );
+  await expect(
+    page
+      .getByRole("tabpanel")
+      .getByText("Nenhum jogo encontrado.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".player-current-team")).toContainText("77");
+  await tab(page, "Visão geral");
+  await expect(page.locator(".player-recent table")).toHaveCount(0);
 });
-
-test("três recentes usam data do jogo e participação explícita, não publicação de correção", async ({
+test("recentes usam data e participação, sem reordenar por publicação de correção", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page, { long: true });
   f.source.participations.forEach((g, i) => {
     g.game.date = `2026-01-${String(i + 1).padStart(2, "0")}`;
   });
-  const newest = f.source.participations.at(-1)!;
-  Object.assign(newest.fact, {
+  Object.assign(f.source.participations.at(-1)!.fact, {
     played: false,
     starter: false,
     captain: false,
@@ -274,95 +276,71 @@ test("três recentes usam data do jogo e participação explícita, não publica
   });
   f.source.participations[0].fact.publishedAt = "2028-01-01T00:00:00Z";
   await page.goto(f.url);
-  const recent = page.getByRole("table", {
-    name: "Três últimos jogos",
-    exact: true,
-  });
-  await expect(recent.getByRole("row")).toHaveCount(4);
-  const dates = await recent
-    .locator("tbody tr td:first-child")
-    .allTextContents();
-  expect(dates).toEqual(["24/01/2026", "23/01/2026", "22/01/2026"]);
+  await expect(page.locator(".player-recent tbody tr")).toHaveCount(5);
+  await expect(page.locator(".player-recent tbody td:first-child")).toHaveText([
+    "24/01/2026",
+    "23/01/2026",
+    "22/01/2026",
+    "21/01/2026",
+    "20/01/2026",
+  ]);
 });
-
-test("retorno da súmula de outra disputa preserva filtros, painel e rolagem", async ({
+test("ano de nascimento público controla presença integral da coluna Idade", async ({
+  page,
+}) => {
+  const f = await playerPublicFixture(page);
+  await page.goto(f.url + "?secao=estatisticas");
+  await expect(page.locator(".player-age")).toHaveCount(0);
+  f.source.profile!.person.publicBirthYear = 2009;
+  await page.reload();
+  await expect(page.locator(".player-age")).toHaveText(["Idade", "18", "17"]);
+  await expect(page.locator(".player-champ a").first()).toHaveText(
+    "Outra inscrição",
+  );
+});
+test("retorno de outra disputa mantém aba, filtros e origem", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
   await page.goto(
-    f.url + `?disputeId=${f.source.participations[1].fact.disputeId}`,
+    f.url +
+      `?secao=jogos&anoJogos=2026&disputeId=${f.source.participations[1].fact.disputeId}`,
   );
-  await expect(summary(page)).toBeVisible();
-  await page
-    .getByRole("combobox", { name: "Ano", exact: true })
-    .selectOption("2027");
-  await page
-    .getByRole("link", { name: "Ver todos os jogos", exact: true })
-    .click();
-  const link = page
-    .getByRole("table", { name: "Três últimos jogos", exact: true })
-    .locator(`a[href*="${f.source.participations[0].fact.gameId}"]`);
-  await link.scrollIntoViewIfNeeded();
-  const before = await page.evaluate(() => scrollY);
-  await link.click();
+  await expect(page.locator(".player-games-page tbody tr")).toHaveCount(1);
+  const expected = page.url();
+  await page.getByRole("tabpanel").locator(".player-game-link").click();
   await expect(
     page.getByRole("region", { name: "Parciais e placar final", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar à origem", exact: true })
-    .click();
+  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await expect(
-    page.getByRole("combobox", { name: "Ano", exact: true }),
-  ).toHaveValue("2027");
-  await expect(page.locator("#jogos").locator("..")).toHaveAttribute(
-    "open",
-    "",
-  );
-  await expect
-    .poll(() => page.evaluate(() => scrollY))
-    .toBeGreaterThanOrEqual(Math.max(0, before - 3));
+    page.getByRole("tab", { name: "Ver jogos", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  expect(page.url()).toBe(expected);
 });
-
 for (const width of [320, 390, 1366, 1920])
-  test(`perfil real: geometria compacta e ordem em ${width}px`, async ({
+  test(`geometria das quatro abas e nomes longos em ${width}px`, async ({
     page,
-  }, info) => {
+  }) => {
     const f = await playerPublicFixture(page);
     f.source.profile!.person.name = "Ana de Albuquerque e Vasconcelos da Silva";
-    await page.setViewportSize({ width, height: width > 1000 ? 900 : 844 });
+    await page.setViewportSize({ width, height: width > 1000 ? 1080 : 844 });
     await page.goto(f.url);
     await expect(summary(page)).toBeVisible();
-    const identity = await page.locator(".player-identity").boundingBox(),
-      honors = await page.locator(".player-honors").boundingBox();
-    if (width >= 960)
-      expect(honors!.x).toBeGreaterThan(identity!.x + identity!.width);
-    else
-      expect(honors!.y).toBeGreaterThanOrEqual(identity!.y + identity!.height);
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
-    await page.screenshot({
-      path: `.preview-artifacts/player-continuous-after-${width}-${info.project.name}.png`,
-      fullPage: true,
-    });
-    if (width === 1920)
-      expect(
-        await stats(page).evaluate((el) => el.getBoundingClientRect().width),
-      ).toBeLessThan(1300);
-    if (width === 320) {
-      await page.addStyleTag({
-        content: "html { font-size: 200% !important; }",
-      });
+    for (const name of [
+      "Visão geral",
+      "Estatísticas",
+      "Carreira",
+      "Ver jogos",
+    ]) {
+      await tab(page, name);
       expect(
         await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth,
         ),
       ).toBe(true);
-      await page.screenshot({
-        path: `.preview-artifacts/player-continuous-after-320-text200-${info.project.name}.png`,
-        fullPage: true,
-      });
+      await expect(page.locator(".player-legend")).toHaveCount(1);
     }
   });

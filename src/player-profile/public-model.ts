@@ -98,7 +98,7 @@ export function validatePublicCareer(career: PublicCareer) {
 
 export const metricLabel = (metric: StatisticsMetric) =>
   metric === "foulsCommitted"
-    ? "F"
+    ? "FC"
     : (
         {
           points: "PTS",

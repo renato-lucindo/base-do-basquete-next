@@ -12,7 +12,7 @@ Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar alt
 - Tema claro, azul como destaque, linguagem visual sóbria, tabelas, listas, divisores e alinhamento consistente. Consulte tokens e componentes reais; sugestões externas não substituem identidade aprovada.
 - Aproveite a largura desktop para reduzir rolagem e espaços vazios. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.
 - Compactar nunca autoriza texto ilegível, alvos pequenos, omissão de contexto necessário ou etapas escondidas. Prefira hierarquia por proximidade, tamanho, peso e contraste.
-- Rótulos em português brasileiro natural; siglas recebem explicação acessível também por teclado e toque.
+- Rótulos em português brasileiro natural; siglas recebem somente o significado curto aprovado, acessível também por teclado e toque.
 
 ## Textos de apresentação
 
@@ -23,6 +23,9 @@ Decisão de08/11/2026, válida para páginas novas ou alteradas nas áreas públ
 - Tooltips de **cabeçalho** contêm somente o significado da sigla ou abreviação, sem fórmulas, instruções, justificativas ou explicações adicionais: `V` → `Vitórias`, `FR` → `Faltas recebidas`. Cabeçalhos com nomes completos, como **Equipe** e **Últimos jogos**, não recebem tooltip nem botão exclusivamente de ajuda. Ações reais, como ordenação, conservam seus controles e nomes acessíveis.
 - Reutilizar uma definição curta aprovada por indicador, compartilhada entre tabela, seletor de colunas, legenda e tooltip. Não acrescentar complementos locais. A equivalência de FR com FC da adversária, por exemplo, permanece na especificação técnica.
 - Legendas reutilizam a apresentação existente de Jogadores e Equipes: título **Legenda**, pares de sigla/abreviação e significado, com a mesma estrutura visual e comportamento responsivo. Incluir apenas abreviações das colunas visíveis; nomes completos não precisam ser repetidos. Não criar parágrafos explicativos, fórmulas, instruções técnicas ou um formato próprio para cada página.
+- **Posição da legenda — decisão de 11/11/2026:** uma única legenda estatística no final do conteúdo da página, depois de todas as tabelas, rankings, seções e paginação, antes do rodapé global. Em páginas com abas, fica depois de todo o conteúdo da aba ativa. Não repetir junto de tabelas, inserir entre seções ou criar painéis como “Siglas e cobertura”. Esta regra não se refere ao elemento `legend` que identifica grupos de campos de um formulário.
+- **Vocabulário único:** tooltip de cabeçalho, seletor e legenda usam exatamente o mesmo nome curto do catálogo compartilhado da página de Jogadores. Exemplos: `J` → `Jogos`, `PTS` → `Pontos`, `2P` → `Cestas de dois`, `3P` → `Cestas de três`, `LL` → `Lances livres`, `FC` → `Faltas cometidas`. Não anexar “média por jogo”, “total”, regras de participação, condições de cobertura ou explicações de zero/ausência. O modo do recorte pertence ao controle ou título correspondente, não à definição da sigla.
+- Regras de cobertura, elegibilidade e cálculo continuam obrigatórias no domínio e na documentação técnica. Não autorizam parágrafos preventivos na interface, tooltips mais extensos ou itens de legenda para `0` e `—`. Um erro ou estado vazio concreto continua sendo comunicado de forma breve quando ocorrer.
 - A restrição dos cabeçalhos não elimina tooltips informativos de registros ou ícones. Eles seguem o conteúdo mínimo aprovado para sua finalidade; o formato compacto dos jogos está em [Público — Classificação](PUBLICO.md#classificação--decisão-de-06112026). Preservar teclado, toque e informações acessíveis necessárias, separadas de explicações visuais dispensáveis.
 
 ## Tabelas e ações

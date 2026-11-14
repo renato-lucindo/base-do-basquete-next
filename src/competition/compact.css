@@ -506,7 +506,7 @@
     margin: 0.5rem 0;
     font-size: 0.8125rem;
   }
-  .compact-pilot .profile-publication .profile-public-fields > div:last-child {
+  .compact-pilot .profile-publication .profile-history-biography {
     grid-column: 1/-1;
   }
   .compact-pilot .profile-publication dd {

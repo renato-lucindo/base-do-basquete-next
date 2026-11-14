@@ -438,6 +438,12 @@ test("public player career route derives a page without app session, JWT or cook
     assert.equal(page.personId, source.personId);
     assert.equal(page.statistics.summary.gamesPlayed, 2);
     assert.equal("participations" in page, false);
+    assert.equal("currentAge" in page.identity, false);
+    const withAge = await f.mf.dispatchFetch(origin + path + "?age=1");
+    assert.equal(withAge.status, 200);
+    const withAgePage = await withAge.json();
+    assert.equal(withAgePage.identity.currentAge, null);
+    assert.equal(JSON.stringify(withAgePage).includes("birthDate"), false);
     assert.equal(
       f.calls.some((p) => p.includes("/auth/") || p.includes("admin_access")),
       false,
@@ -473,6 +479,8 @@ test("private player profile routes authorize before body and preserve confirmat
     path = `/api/people/${source.personId}/profile`;
   try {
     assert.equal((await f.mf.dispatchFetch(origin + path)).status, 401);
+    const batch = origin + "/api/people/profile-batch";
+    assert.equal((await f.mf.dispatchFetch(batch)).status, 401);
     const cookie = (await f.login()).headers.get("set-cookie").split(";", 1)[0];
     const send = (tail = "", method = "GET", body, extra = {}) =>
       f.mf.dispatchFetch(origin + path + tail, {
@@ -488,6 +496,17 @@ test("private player profile routes authorize before body and preserve confirmat
           : {}),
       });
     assert.equal((await send()).status, 200);
+    const list = await f.mf.dispatchFetch(batch, { headers: { cookie } });
+    assert.equal(list.status, 200);
+    const inventory = await list.json();
+    assert.equal(inventory.items[0].person.heightCm, 188);
+    assert.equal("biography" in inventory.items[0].person, false);
+    assert.equal("dominantHand" in inventory.items[0].person, false);
+    assert.equal(
+      (await f.mf.dispatchFetch(batch + "?after=x", { headers: { cookie } }))
+        .status,
+      400,
+    );
     const c = {
       commandId: "f9400000-0000-4000-8000-000000009900",
       personId: source.personId,

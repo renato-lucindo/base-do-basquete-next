@@ -74,7 +74,7 @@
   color: #667085;
 }
 .public-game-score.has-score {
-  color: #1557a4;
+  color: var(--public-text);
 }
 .public-game-separator {
   color: #667085;
@@ -132,4 +132,18 @@
   .public-game-search-controls input {
     font-size: 1rem;
   }
+}
+
+.public-game-row {
+  background: var(--public-surface);
+}
+.public-game-meta {
+  background: var(--public-blue-soft);
+  color: var(--public-muted);
+  padding: 0.375rem 0.5rem;
+}
+.public-game-score:not(.has-score) {
+  font-size: 0.75rem;
+  font-weight: 400;
+  white-space: normal;
 }

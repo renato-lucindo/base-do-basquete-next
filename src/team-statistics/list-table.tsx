@@ -135,7 +135,10 @@ export function TeamsListTable({
           Nenhuma inscrição neste recorte.
         </p>
       )}
-      <section className="table-legend" aria-labelledby="team-legend">
+      <section
+        className="table-legend reference-legend"
+        aria-labelledby="team-legend"
+      >
         <h2 id="team-legend">Legenda</h2>
         <dl>
           {d.query.columns.map((key) => (

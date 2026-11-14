@@ -71,7 +71,7 @@ test("histórico privado longo abre snapshot da ocasião sem mudar a proposta", 
   ).toBeFocused();
   await expect(
     page.getByRole("region", { name: "Dados públicos do perfil", exact: true }),
-  ).toContainText("Biografia confirmada 25");
+  ).not.toContainText("Biografia confirmada 25");
   expect(f.attempts).toHaveLength(0);
 });
 test("confirma somente metadados salvos, sem expor campos privados na conferência", async ({

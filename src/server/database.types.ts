@@ -787,6 +787,15 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      search_public_entities_full: {
+        Args: {
+          p_query: string;
+          p_type?: string;
+          p_page?: number;
+          p_entity_id?: string | null;
+        };
+        Returns: Json;
+      };
       search_public_entities: {
         Args: {
           p_query: string;
@@ -878,7 +887,12 @@ export type Database = {
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
+      list_initial_player_cards: { Args: { p_after?: string }; Returns: Json };
       get_player_career_source: {
+        Args: { p_person_id: string };
+        Returns: Json;
+      };
+      get_player_career_with_age: {
         Args: { p_person_id: string };
         Returns: Json;
       };

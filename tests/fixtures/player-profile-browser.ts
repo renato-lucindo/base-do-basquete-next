@@ -3,13 +3,17 @@ import { transferBrowserFixture } from "./transfer-browser";
 import { emptyPerson } from "../../src/people/contract";
 import type { PublicPlayerProfile } from "../../src/player-profile/contract";
 import { tid } from "./text-import";
-export async function profileBrowserFixture(page: Page) {
+export async function profileBrowserFixture(
+  page: Page,
+  birthYear: number | null = null,
+) {
   const f = await transferBrowserFixture(page),
     pid = f.context.personId;
   const { athlete, coach, ...person } = emptyPerson(pid);
   void athlete;
   void coach;
   person.name = "Ana Silva";
+  person.publicBirthYear = birthYear;
   let personVersion = 1,
     version = 0,
     published: PublicPlayerProfile | null = null,

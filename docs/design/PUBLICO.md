@@ -9,23 +9,22 @@ Decisão de07/11/2026: no novo percurso de [campeonato flexível](../decisoes/02
 ## Encontrar e abrir uma disputa
 
 1. A página inicial lista as **competições**, com busca no topo. A busca global cobre competições, disputas, equipes e jogadores; **não** busca jogos no MVP.
-2. O percurso é **Competição → Ano → Naipe → Categoria → Divisão**, com ordem fixa para todas as edições e naipes. A decisão de 02/11/2026 substitui a previsão de configuração por edição; não adicionar campo ou controle de ordenação. Divisão ausente não cria nível vazio; não inventar níveis ausentes no domínio.
-3. No desktop, árvores de navegação **Masculino** e **Feminino** ficam **lado a lado** quando existirem ambos. Com apenas um naipe, não criar coluna vazia. No celular, a árvore se adapta verticalmente.
-4. A seleção rápida combina **árvore expansível** e **busca pesquisável**; sem obrigar uma série de páginas intermediárias.
-5. Abrir uma disputa leva diretamente à **Classificação**. O menu contextual contém **Classificação, Jogos, Equipes, Jogadores**, com indicação da disputa e retorno previsível à seleção.
+2. O catálogo **Campeonatos** agrupa por **Ano → Campeonato → Naipe**. Anos aparecem do mais recente ao mais antigo e categorias/divisões ficam visíveis como links diretos. Inclui disputas confirmadas sem jogos. Divisão ausente não cria rótulo adicional.
+3. No desktop, os grupos **Masculino** e **Feminino** ficam lado a lado quando existirem ambos. Com apenas um naipe, não criar coluna vazia. No celular, os grupos ficam um abaixo do outro.
+4. O painel junto ao nome do campeonato mostra as disputas da edição atual sem níveis recolhidos.
+5. Abrir uma disputa pelo catálogo leva à **Classificação**. Trocar pelo painel mantém a aba atual. O menu contextual contém **Classificação, Jogos, Equipes, Jogadores**, com indicação da disputa e retorno previsível à seleção.
 
 ```text
 [ Buscar competições, equipes ou jogadores... ]
 
-▼ Copa ES
-  ▼ 2026
+2026
+  Copa ES
     MASCULINO           FEMININO
     Sub-14              Sub-14
     Sub-16              Sub-17
-    Adulto              Sub-19
-      Série Ouro
-      Série Prata
-      Série Bronze
+    Adulto · Série Ouro Sub-19
+    Adulto · Série Prata
+    Adulto · Série Bronze
 ```
 
 Exemplo ilustrativo; respeitar dados reais de cada edição.
@@ -58,12 +57,12 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 
 Pedido de 03/11/2026: a classificação usa exatamente **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD**, nessa ordem. Aprov. é V/J × 100 e permanece indefinido antes do primeiro jogo; não é pontuação do campeonato nem critério novo de desempate. O perfil recebe a inscrição explícita. Preservar grupos, fases, decisões e empates do domínio.
 
-Equipes reutiliza métricas, siglas, precisão, controles e tabelas de Jogadores quando a fonte coletiva for suficiente. LL% é adicional na súmula e usa soma de `freeMade`/soma de `freeTaken`; o boxscore conserva uma única coluna de LL%. Tentativas zero e cobertura incompleta são ausência, não 0%. Uma linha por inscrição, com ordenação, busca, fases publicadas, totais/médias, escolha de colunas e estado na URL. Não completar coletivos a partir de somas parciais de atletas, nem somar MIN, +/− ou participação individual em pontos como medida coletiva. Fonte e cobertura devem explicar valores indisponíveis.
+Equipes reutiliza métricas, siglas, precisão, controles e tabelas de Jogadores quando a fonte coletiva for suficiente. LL% é adicional na súmula e usa soma de `freeMade`/soma de `freeTaken`; o boxscore conserva uma única coluna de LL%. Tentativas zero e cobertura incompleta são ausência, não 0%. Uma linha por inscrição, com ordenação, busca, fases publicadas, totais/médias, escolha de colunas e estado na URL. Não completar coletivos a partir de somas parciais de atletas, nem somar MIN, +/− ou participação individual em pontos como medida coletiva. Cobertura e fonte permanecem nos contratos técnicos; a apresentação de ausência segue os padrões comuns, sem parágrafos preventivos na interface.
 
 Refinamento de 03/11 para disputas de súmula: **Pos, Equipe, J, PTS, 2P, 3P, FC, FR, LLT, LLC, LL%, T, U, GD**, nessa ordem essencial. Por jogo divide PTS/2P/3P/FC/FR/LLT/LLC/T/U/GD por J; J e o percentual ponderado permanecem. Pos é ranking estatístico da métrica ordenada, com empates compartilhados; não é classificação oficial, e nome/ausência não recebem posição estatística. Colunas manuais persistem na sessão; seleção explícita na URL prevalece. T cobre atletas e comissão/banco, excluindo a penalidade B2; GD requer total completo conferido na publicação. Pela decisão de05/11/2026, FR coletiva de súmula é FC adversária por partida; FR própria do boxscore e métricas individuais são preservadas. Publicações históricas sem cobertura conservam —. Contrato e limites em [ADR 018](../decisoes/018-equipes-de-resultados-confirmados.md#estat%C3%ADsticas-coletivas-de-s%C3%BAmula--pedido-de-03112026).
 
 - **Jogo de súmula:** indicadores existentes no Next; **jogo de boxscore:** indicadores elegíveis do `renato-lucindo/base-do-basquete` anterior, adaptados à arquitetura Next. Nunca juntar métricas incompatíveis nem exibir zero para dado ausente.
-- Expor cobertura, unidade e fonte dos indicadores quando necessário. Atletas podem ter vínculos com equipes diferentes; nomes sozinhos não identificam pessoa ou participação.
+- Preservar cobertura, unidade e fonte nos cálculos e contratos técnicos. Na interface, os rótulos e estados concretos seguem os padrões de apresentação; esta regra não autoriza explicações permanentes de funcionamento, cobertura ou participação. Atletas podem ter vínculos com equipes diferentes; nomes sozinhos não identificam pessoa ou participação.
 - Reaproveitar a navegação pública bem resolvida do projeto anterior de modo seletivo, sem importar regras de publicação, contratos ou dependências antigas.
 - Para as referências de súmula e estatísticas, seguir [INTEGRACAO.md](INTEGRACAO.md) e [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
 - A publicação respeita confirmação explícita e fontes públicas do Next. **Não** expor automaticamente inscrições, classificação ou agenda futura por mera existência de rascunho ou regulamento. A política aprovada está na [decisão 013](../decisoes/013-classificacao-publica-confirmada.md): confirmar uma versão completa do regulamento pode publicar seus participantes e jogos futuros sem resultado, após prévia nominal do conjunto. Mudança nas fontes exige nova prévia; alterações privadas posteriores exigem nova confirmação.
@@ -76,7 +75,21 @@ O responsável definiu público primeiro no celular, tema claro e azul, tabela d
 
 Retirar da apresentação pública versões, datas técnicas, “Fonte do nome” e instruções internas; preservar rastreabilidade administrativa e avisos indispensáveis para interpretar cobertura/ausência. Isso substitui recomendações anteriores de exibir proveniência técnica nas linhas. Não muda elegibilidade, cálculos ou publicação.
 
-Atualização de 04/11/2026: o perfil de jogador passa a uma **página contínua**: identificação/dados pessoais, conquistas na lateral desktop/abaixo no celular, resumo da temporada mais recente e carreira, três últimos jogos e estatísticas por campeonato. Jogos completos, Histórico e Evolução ficam recolhidos ao final, com atalhos internos em vez das cinco abas. A entrada permanece pela carreira completa; filtros da tabela não alteram resumo, conquistas ou recentes, e o retorno conserva filtros/painéis/rolagem. Perfil de equipe mantém Estatísticas, Elenco e Jogos quando disponíveis. O jogo do piloto deve reproduzir a composição da súmula atual, sem o placar adicional reprovado. Contrato e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md); integração do perfil real e preservação da súmula autorizadas pelo responsável em 04/11, na PR #51, já integrada. Após aceitar o piloto, o responsável autorizou executar em sequência o público real, busca no servidor, administração e preparação da liberação. A execução vigente fica em PROGRESSO.md; deploy e banco real exigem autorização própria.
+Em 11/11/2026, o responsável aceitou a revisão HTML v9 e autorizou sua implementação na mesma PR #79, com refinamento do Histórico de equipes. A validação/Worker da revisão 4 permanecem históricos e não validam o novo código. Plano e critérios em [PLAN-PERFIL-V9.md](../PLAN-PERFIL-V9.md); execução observada em PROGRESSO.md. Evolução está **fora do escopo**.
+
+A composição aprovada usa quatro abas: **Visão geral, Estatísticas, Carreira e Ver jogos**. Identificação: apelido, nome completo, equipe/camisa, campeonato/categoria e metadados públicos. Visão geral contém Resumo na primeira célula, linhas de ano/Carreira brancas, até cinco Últimos jogos e síntese das quatro marcas. Recordes completos ficam em Carreira. No desktop, identificação/conquistas e resumo/últimos jogos compartilham duas colunas iguais e uma divisória fina central; conquistas ocupam a direita da identificação. No celular, conquistas ficam em Carreira, com Coletivas/Individuais lado a lado inclusive em 320 px. Primeiro lugar usa troféu e os seguintes medalha, somente quando publicados; expansão pelo nome do campeonato. Ícones preservam os formatos da referência FIBA ([licença Remix Icon](https://raw.githubusercontent.com/Remix-Design/RemixIcon/master/License)).
+
+Confrontos dos jogos e recordes são links únicos para a partida, com mandante, placar neutro e visitante; nomes completos a partir de 1050 CSS px e siglas cadastradas no mobile. Na ausência de sigla, usar nome publicado, sem gerar código. Data DD/MM/YYYY e contexto campeonato/categoria sem ano repetido; PTS ocupa coluna própria nos jogos. Toda a linha dos jogos, incluindo data/contexto/PTS, abre a partida. Nos recordes, marca azul e área do confronto abrem a mesma partida; Ver top 5/Recolher é independente, expande somente 2º–5º, sem repetir a principal e com fundo sutil. Equipes fora de confrontos continuam abrindo a equipe, sem sublinhado.
+
+Ver jogos integra o perfil, ordena datas decrescentes com ausentes ao final e pagina 12 atuações por vez. Lista, contagem, paginação e opções dos filtros consideram somente `fact.played` confirmado; zero ponto não exclui uma atuação. Ano, Campeonato, Equipe e Buscar adversário ficam em Filtrar e ajustar, inicialmente fechado. Estatísticas preserva seus próprios filtros, métricas e cálculos, com Total/Por jogo em botões no padrão público de Jogadores. Ambos os painéis têm rascunho: Cancelar/Fechar/Escape não aplicam alterações; Limpar prepara campos; Aplicar confirma e reinicia a paginação correspondente. Aba, filtros, página e expansões dos recordes permanecem no retorno/URL. A trajetória fica permanentemente visível, sem estado de recolhimento. Resumo, conquistas, recordes e últimos jogos não mudam com filtros estatísticos.
+
+Estatísticas usa Ano | Idade | Campeonato | J | métricas, também no celular com rolagem interna. Conforme refinamento solicitado em 12/11/2026, categoria aparece junto ao campeonato, separada por ponto médio; omitir Adulto e manter equipe completa abaixo, sem ano repetido. FC integra o padrão, preservando seleções explícitas, inclusive vazias. Não repetir os títulos internos Por campeonato/Jogos sob as abas. Idade = ano da temporada menos publicBirthYear já publicado; sem esse dado, remover integralmente cabeçalho, células e largura da coluna. No cabeçalho, mostrar idade atual em Brasília, altura e posição quando publicados. O servidor calcula a idade em anos completos a partir da data privada confirmada ou, se houver apenas o ano, pela diferença de anos. O perfil não mostra biografia nem data completa. Trajetória agrupa somente passagens por equipe, mais recente primeiro, sem campeonatos. A linha conecta os centros dos pontos e é coberta pelos próprios pontos; não ultrapassa primeiro/último e inexiste com um único item. Anos e nomes completos ficam separados, com links reais para as equipes.
+
+O refinamento de 12/11/2026 usa fundo cinza-azulado, superfícies principais brancas e azul suave em contexto/cabeçalhos/seleção, com os tokens públicos compartilhados. Legendas de perfil/Jogadores/Equipes usam uma mesma escala. Recordes sem marca positiva recebem estado vazio, preservando ordenação, cálculo e acesso aos jogos. Busca mantém apelido sem o prefixo Apelido:. No desktop (640px ou mais), considerar a altura natural da Visão geral desde a entrada por qualquer aba e reservar o espaço do maior conteúdo visitado, limitado à área de leitura da janela; conteúdo extenso cresce normalmente. Não deslocar a rolagem ao trocar de aba. No celular, altura natural, sem reserva para igualar abas. [Plano e provas](../PLAN-REFINAMENTO-PUBLICO.md).
+
+**Legenda e tooltips no perfil:** aplicar os [padrões comuns](PADROES.md#textos-de-apresentação), com uma única Legenda ao final do conteúdo ativo e os mesmos nomes curtos de Jogadores/Equipes. `J` significa somente `Jogos`. Remover notas permanentes sobre participação, cobertura, fases, zero/ausência e alcance dos filtros. A regra vale também para tooltips, seletores e detalhes recolhidos; esconder o parágrafo em uma expansão não o torna adequado. Cálculos e elegibilidade permanecem inalterados. Causas e conferência da correção documental em [revisão textual do perfil](REVISAO-TEXTUAL-PERFIL.md).
+
+Perfil de equipe mantém Estatísticas, Elenco e Jogos quando disponíveis. O jogo do piloto deve reproduzir a composição da súmula atual, sem o placar adicional reprovado. Contrato e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md); integração do perfil real e preservação da súmula autorizadas pelo responsável em 04/11, na PR #51, já integrada. Após aceitar o piloto, o responsável autorizou executar em sequência o público real, busca no servidor, administração e preparação da liberação. A execução vigente fica em PROGRESSO.md; deploy e banco real exigem autorização própria.
 
 ## Integração das páginas públicas
 
@@ -103,7 +116,7 @@ Versões e datas técnicas saem das linhas públicas; cobertura, siglas e distin
 
 ## Refinamento de Jogadores — decisão de05/11/2026
 
-Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Jogadores usa30linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
+Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. Jogadores usa30linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
 
 Em F/T/U/5F/GD, o negrito identifica o maior valor positivo da consulta filtrada inteira, incluindo empates; zeros e ausências não recebem destaque. Não representa desempenho melhor: a comparação continua considerando menos faltas como melhor valor.
 
@@ -133,7 +146,7 @@ A listagem de súmula herda o bloco intrínseco centralizado acima1050px, sem so
 
 ## Eliminatória — protótipo aceito em 08/11/2026
 
-Na Classificação, navegação raiz somente **Classificatória** e **Eliminatória**. Esta última fica disponível a partir do primeiro confronto com as duas inscrições resolvidas, sem exigir jogo ou resultado. Classificatória conserva tabela e grupos, com opções agrupadas por fase quando necessário. Campeonatos apenas eliminatórios abrem o quadro disponível; links antigos por fase conservam o destino correspondente.
+Na Classificação, as opções **Fase Regular** e **Eliminatórias** usam o padrão segmentado de Total/Por jogo. Eliminatórias fica disponível a partir do primeiro confronto com as duas inscrições resolvidas, sem exigir jogo ou resultado. Fase Regular só aparece no seletor quando Eliminatórias também está disponível. A tabela e os grupos continuam acessíveis sem esse seletor, com opções agrupadas por fase quando necessário. Campeonatos apenas eliminatórios abrem o quadro disponível; links antigos por fase conservam o destino correspondente.
 
 Eliminatória mostra todas as etapas num bracket com conexões reais de vencedor/perdedor. Cada confronto tem duas linhas de equipes e colunas **Jogo1…N** (com espaço entre palavra e número na tela), com cabeçalhos dentro da borda do cartão. Fonte dos placares compacta, sem ampliar a altura do cartão para acomodar o cabeçalho; separar claramente confrontos e etapas. MD3 sempre mostra três posições, inclusive terceiro jogo dispensado como `—`; aplicar o equivalente a jogo único, ida-volta, MD5 e MD7. Ida-volta acrescenta Total somente da projeção oficial. Vitória em cada jogo em negrito; nome da classificada recebe destaque discreto apenas com decisão confirmada. Não repetir uma lista de jogos abaixo nem exigir clique para consultar placares.
 
@@ -156,3 +169,15 @@ Vitória: círculo verde e ✓ branco; derrota: círculo vermelho e × branco. A
 O texto visual do tooltip contém **somente confronto, placar e data DD/MM**, neste formato: **`LUSB 56 x 66 IVV/Cetaf - 20/09`**. Usar a sigla cadastrada de cada equipe; na ausência, o nome publicado da inscrição, sem inventar abreviações ou concatenar identificações. Preservar a ordem das equipes do jogo e os respectivos placares. Não acrescentar horário, ano, vitória/derrota, “resultado administrativo” ou “mais recente” ao tooltip visual. Sem data, omitir o sufixo: `LUSB 56 x 66 IVV/Cetaf`. Sem placar, usar `—` nos valores ausentes: `LUSB — x — IVV/Cetaf - 20/09`, nunca presumir zero.
 
 Preservar separadamente, na identificação acessível dos ícones, vitória/derrota e os estados necessários, incluindo resultado administrativo e resultado mais recente quando aplicáveis, sem motivos privados. Esses detalhes ficam na identificação acessível, sem entrar no tooltip visual. Evidências e limites na PR da unidade.
+
+## Ajustes de 13/11/2026
+
+A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo e modo de Equipes ficam juntos; se a largura exigir quebra, os grupos partem do mesmo alinhamento. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
+
+O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
+
+A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.
+
+### Ficha do atleta
+
+Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre parênteses, altura em cm e peso em kg, posição, cidade e UF. Exemplo: **17 anos (2009)**, **188cm, 90kg**, **Ala-Pivô / Pivô**, **São Mateus - ES**. Renderizar os valores confirmados disponíveis e ocultar linhas vazias. Data completa, mão dominante, biografia e registro federativo ficam no cadastro privado.

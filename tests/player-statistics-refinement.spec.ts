@@ -233,12 +233,18 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   });
   await search.fill("joao");
   await expect(table.locator("tbody tr")).toHaveCount(3);
-  await page
-    .getByRole("spinbutton", { name: "Mínimo de jogos", exact: true })
-    .fill("2");
+  const minimum = page.getByRole("spinbutton", {
+    name: "Mínimo de jogos",
+    exact: true,
+  });
+  await expect(minimum).toHaveValue("");
+  await expect(minimum).not.toHaveAttribute("placeholder", "Sem restrição");
+  await minimum.fill("2");
   await expect(
     page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
   ).toBeVisible();
+  await minimum.fill("");
+  await expect(table.locator("tbody tr")).toHaveCount(3);
   await page
     .getByRole("button", { name: "Limpar filtros", exact: true })
     .first()

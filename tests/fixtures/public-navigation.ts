@@ -45,6 +45,22 @@ export async function publicNavigationFixture(page: Page) {
       context: { ...first.context, category: "Adulto", division: "Prata" },
     },
   );
+  const confirmed = [
+    {
+      disputeId: pubId(90005),
+      context: {
+        ...first.context,
+        year: first.context.year - 1,
+        category: "Sub-12",
+      },
+      registrations: [],
+    },
+    {
+      disputeId: pubId(90006),
+      context: { ...first.context, category: "Sub-11" },
+      registrations: [],
+    },
+  ];
   games.sort((a, b) => a.id.localeCompare(b.id));
   const state = {
     missing: false,
@@ -67,6 +83,9 @@ export async function publicNavigationFixture(page: Page) {
           ? []
           : games.filter((g) => !id || g.disputeId === id),
         next: null,
+        disputes: state.missing
+          ? []
+          : confirmed.filter((d) => !id || d.disputeId === id),
       },
     });
   });
@@ -164,5 +183,5 @@ export async function publicNavigationFixture(page: Page) {
       ],
     ),
   );
-  return { ...f, games, state, discovery };
+  return { ...f, games, confirmed, state, discovery };
 }

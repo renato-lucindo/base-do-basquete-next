@@ -105,7 +105,7 @@ for (const width of [1366, 1920]) {
   }, info) => {
     test.skip(info.project.name !== "desktop", "Recorte desktop");
     await page.setViewportSize({ width, height: width === 1366 ? 768 : 1080 });
-    await profileBrowserFixture(page);
+    await profileBrowserFixture(page, 2009);
     await openProfilePublication(page);
     const fields = page
       .getByRole("region", { name: "Dados públicos do perfil", exact: true })
@@ -115,8 +115,9 @@ for (const width of [1366, 1920]) {
       path: `.preview-artifacts/admin-expansion-${phase}-profile-${width}.png`,
       fullPage: true,
     });
-    const name = await fields.nth(0).boundingBox(),
-      year = await fields.nth(2).boundingBox();
+    await expect(fields).toHaveCount(2);
+    const name = await fields.filter({ hasText: "Ana Silva" }).boundingBox(),
+      year = await fields.filter({ hasText: "2009" }).boundingBox();
     expect(Math.abs(name!.y - year!.y)).toBeLessThan(3);
     await expect(
       page.getByRole("button", { name: "Conferir publicação", exact: true }),

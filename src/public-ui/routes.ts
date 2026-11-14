@@ -12,7 +12,7 @@ export async function publicSearchRoute(request: Request, env: Env, url: URL) {
     url.search.length > 1600 ||
     [...p.keys()].some(
       (k) =>
-        !["q", "type", "page", "entityId"].includes(k) ||
+        !["q", "type", "page", "entityId", "view"].includes(k) ||
         p.getAll(k).length !== 1,
     )
   )
@@ -22,6 +22,7 @@ export async function publicSearchRoute(request: Request, env: Env, url: URL) {
     type: p.get("type") ?? "all",
     page: p.has("page") ? Number(p.get("page")) : 1,
     entityId: p.get("entityId"),
+    view: p.get("view") ?? undefined,
   });
   if (!q.success || (p.has("page") && !/^[1-9][0-9]*$/u.test(p.get("page")!)))
     throw new HttpError(
