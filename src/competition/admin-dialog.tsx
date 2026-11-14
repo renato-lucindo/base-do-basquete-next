@@ -10,6 +10,7 @@ export function AdminDialog({
   className = "",
   closeLabel,
   footer,
+  initialFocus,
   closeOnBackdrop = false,
 }: {
   title: string;
@@ -20,6 +21,7 @@ export function AdminDialog({
   className?: string;
   closeLabel?: string;
   footer?: ReactNode;
+  initialFocus?: React.RefObject<HTMLElement | null>;
   closeOnBackdrop?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null),
@@ -35,18 +37,20 @@ export function AdminDialog({
         ? document.activeElement
         : null;
     if (!node.open) node.showModal();
+    initialFocus?.current?.focus();
     return () => {
       node.close();
       queueMicrotask(() => {
         if (
           origin?.isConnected &&
           !origin.closest("[hidden], [inert]") &&
-          !document.querySelector("dialog[open]")
+          (!document.querySelector("dialog[open]") ||
+            origin.closest("dialog[open]"))
         )
           origin.focus({ preventScroll: true });
       });
     };
-  }, [open]);
+  }, [open, initialFocus]);
   return (
     <dialog
       ref={dialog}

@@ -12,6 +12,7 @@ export function playerProfileOutbound(options, actorId) {
     const name = new URL(request.url).pathname.split("/").at(-1);
     if (
       ![
+        "list_initial_player_cards",
         "get_player_career_source",
         "get_player_career_with_age",
         "get_player_profile_proposal",
@@ -54,6 +55,19 @@ export function playerProfileOutbound(options, actorId) {
       originState: null,
       biography: null,
     };
+    if (name === "list_initial_player_cards") {
+      assert.deepEqual(args, {});
+      return Response.json({
+        items: [
+          {
+            personId: person.id,
+            personVersion: 1,
+            person: { ...person, heightCm: 188 },
+          },
+        ],
+        next: null,
+      });
+    }
     const header = {
       version,
       personVersion: 1,

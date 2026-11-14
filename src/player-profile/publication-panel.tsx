@@ -8,6 +8,7 @@ import {
   type ConfirmPlayerProfile,
   type PlayerProfileAck,
   type PlayerProfileWorkspace,
+  type PlayerProfileMetadata,
 } from "./contract";
 import type { z } from "zod";
 type Props = {
@@ -32,26 +33,28 @@ const labels = {
 } as const;
 const stamp = (s: string) =>
   new Date(s).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-function ProfileFields({
+export function ProfileFields({
   person,
 }: {
-  person: PlayerProfileWorkspace["proposal"]["person"];
+  person: PlayerProfileMetadata & {
+    dominantHand?: string | null;
+    biography?: string | null;
+  };
 }) {
   return (
     <dl className="profile-public-fields">
       {Object.entries(labels).map(([field, label]) => {
         const value = person[field as keyof typeof labels];
+        if (value == null) return null;
         return (
           <div key={field}>
             <dt>{label}</dt>
             <dd>
-              {value === null
-                ? "Não informado"
-                : field === "dominantHand"
-                  ? { left: "Esquerda", right: "Direita", both: "Ambidestra" }[
-                      value as "left" | "right" | "both"
-                    ]
-                  : String(value)}
+              {field === "dominantHand"
+                ? { left: "Esquerda", right: "Direita", both: "Ambidestra" }[
+                    value as "left" | "right" | "both"
+                  ]
+                : String(value)}
             </dd>
           </div>
         );

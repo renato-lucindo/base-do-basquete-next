@@ -166,8 +166,8 @@ describe("metadados do perfil exigem confirmação própria", () => {
           biography: "  História 🏀\nLinha seguinte  ",
           publicBirthYear: 1997,
         },
-      }).person.biography,
-    ).toBe("História 🏀\nLinha seguinte");
+      }).person,
+    ).not.toHaveProperty("biography");
   });
   it("estado privado distingue fonte alterada, primeira publicação e histórico paginado", () => {
     const header = {

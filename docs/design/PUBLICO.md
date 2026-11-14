@@ -177,3 +177,7 @@ A navegação pública mantém o fundo da superfície e preenche somente a opç�
 O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
 
 A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.
+
+### Ficha do atleta
+
+Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre parênteses, altura em cm e peso em kg, posição, cidade e UF. Exemplo: **17 anos (2009)**, **188cm, 90kg**, **Ala-Pivô / Pivô**, **São Mateus - ES**. Renderizar os valores confirmados disponíveis e ocultar linhas vazias. Data completa, mão dominante, biografia e registro federativo ficam no cadastro privado.

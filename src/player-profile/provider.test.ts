@@ -146,7 +146,14 @@ it("workspace privado correlaciona pessoa/versões e usa somente RPCs próprias"
       url.endsWith("get_player_profile_state") ? f.state : f.proposal,
     );
   });
-  expect(await db.getWorkspace("fixture-session", pubId(1), 20)).toEqual(f);
+  const view = await db.getWorkspace("fixture-session", pubId(1), 20);
+  expect(view.state).toEqual(f.state);
+  expect(view.proposal.person).not.toHaveProperty("dominantHand");
+  expect(view.proposal.person).not.toHaveProperty("biography");
+  expect(view.proposal.person).toMatchObject({
+    id: f.proposal.personId,
+    name: "Ana Silva",
+  });
   expect(calls).toHaveLength(2);
   expect(
     calls.every(

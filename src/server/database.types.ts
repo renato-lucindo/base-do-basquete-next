@@ -887,6 +887,7 @@ export type Database = {
       get_pdf_review: { Args: { p_source_id: string }; Returns: Json };
       get_pdf_source: { Args: { p_id: string }; Returns: Json };
       get_person: { Args: { p_id: string }; Returns: Json };
+      list_initial_player_cards: { Args: { p_after?: string }; Returns: Json };
       get_player_career_source: {
         Args: { p_person_id: string };
         Returns: Json;

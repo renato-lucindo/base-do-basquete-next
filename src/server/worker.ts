@@ -129,7 +129,10 @@ export default {
         url.pathname.startsWith("/api/roster/reuse/")
       )
         response = await rosterReuseRoute(request, env, url);
-      else if (/^\/api\/people\/[^/]+\/profile(?:\/|$)/u.test(url.pathname))
+      else if (
+        url.pathname === "/api/people/profile-batch" ||
+        /^\/api\/people\/[^/]+\/profile(?:\/|$)/u.test(url.pathname)
+      )
         response = await privatePlayerProfileRoute(request, env, url);
       else if (
         ["/api/people", "/api/roster", "/api/staff"].some(

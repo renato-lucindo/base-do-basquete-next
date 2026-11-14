@@ -47,6 +47,14 @@ select pg_temp.pp_assert(public.get_player_profile_version(pg_temp.pp_id(1),1)->
 select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(4)) is null,'homonym not implicitly published');
 set local role anon;
 select public.get_public_player_profile(pg_temp.pp_id(1)) as public_player_profile;
+select pg_temp.pp_assert(not (
+ (select snapshot->'person' from public.published_player_profiles where person_id=pg_temp.pp_id(1))
+ ?| array['dominantHand','biography','birthDate']
+),'public storage contains only the public card');
+select pg_temp.pp_assert(
+ public.get_public_player_profile(pg_temp.pp_id(1))#>'{person,biography}'='null'::jsonb,
+ 'legacy response keeps an empty compatibility field'
+);
 select public.get_player_career_with_age(pg_temp.pp_id(1)) as public_player_career;
 select pg_temp.pp_assert(
  public.get_player_career_with_age(pg_temp.pp_id(1))->>'currentAge'=

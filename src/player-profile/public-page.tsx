@@ -1,3 +1,4 @@
+import { profileCardLines } from "./profile-card";
 import { useEffect, useRef, useState } from "react";
 import { ApiFailure } from "../competition/api";
 import { compareJerseys } from "../domain/jersey";
@@ -305,6 +306,7 @@ export function PlayerPublicPage() {
           ),
         )
       : age;
+  const cardLines = metadata ? profileCardLines(metadata, currentAge) : [];
   const summaryRows = [
     {
       label: latestYear ? String(latestYear) : "Temporada",
@@ -466,22 +468,12 @@ export function PlayerPublicPage() {
                     </p>
                   </>
                 )}
-                {(currentAge != null ||
-                  metadata?.heightCm != null ||
-                  metadata?.position) && (
-                  <div className="player-bio">
-                    {currentAge != null && <span>{currentAge} anos</span>}
-                    {metadata?.heightCm != null && (
-                      <span>
-                        {new Intl.NumberFormat("pt-BR", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(metadata.heightCm / 100)}{" "}
-                        m
-                      </span>
-                    )}
-                    {metadata?.position && <span>{metadata.position}</span>}
-                  </div>
+                {!!cardLines.length && (
+                  <ul className="player-bio">
+                    {cardLines.map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 )}
               </header>
               {hasHonors && (

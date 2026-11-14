@@ -19,16 +19,23 @@ test("perfil público mantém identidade, metadados publicados e navegação de 
   Object.assign(f.source, { currentAge: 17 });
   Object.assign(f.source.profile!.person, {
     publicBirthYear: 2008,
-    position: "Armadora",
+    heightCm: 188,
+    weightKg: 90,
+    position: "Ala-Pivô / Pivô",
+    originCity: "São Mateus",
+    originState: "ES",
   });
   await page.goto(f.url);
   await expect(
     page.getByRole("heading", { name: "AP", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".player-full-name")).toHaveText("Ana Pública");
-  await expect(page.getByText("1,80 m", { exact: true })).toBeVisible();
-  await expect(page.getByText("17 anos", { exact: true })).toBeVisible();
-  await expect(page.getByText("Armadora", { exact: true })).toBeVisible();
+  await expect(page.locator(".player-bio li")).toHaveText([
+    "17 anos (2008)",
+    "188cm, 90kg",
+    "Ala-Pivô / Pivô",
+    "São Mateus - ES",
+  ]);
   await expect(
     page.getByText("Trajetória confirmada.", { exact: true }),
   ).toHaveCount(0);
@@ -183,7 +190,7 @@ test("perfil sem jogos mantém apenas metadados públicos e zero de J", async ({
 }) => {
   const f = await playerPublicFixture(page, { profileOnly: true });
   await page.goto(f.url);
-  await expect(page.getByText("1,80 m", { exact: true })).toBeVisible();
+  await expect(page.getByText("180cm", { exact: true })).toBeVisible();
   await expect(
     page.getByText("Trajetória confirmada.", { exact: true }),
   ).toHaveCount(0);

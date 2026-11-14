@@ -12,7 +12,7 @@ import {
   confirmPlayerProfileSchema,
 } from "./contract";
 
-it.each(["zero", "upgrade"] as const)(
+it.each(["zero", "upgrade", "published-upgrade"] as const)(
   "confirma metadados sem expor cadastro privado no %s",
   async (mode) => {
     const db = await PGlite.create();
@@ -25,7 +25,17 @@ it.each(["zero", "upgrade"] as const)(
         n.endsWith("_player_profile_publications.sql"),
       );
       const index = split < 0 ? names.length : split;
-      for (const n of names.slice(0, mode === "zero" ? names.length : index))
+      const cardMigration = names.findIndex((n) =>
+        n.endsWith("_player_profile_public_card.sql"),
+      );
+      for (const n of names.slice(
+        0,
+        mode === "zero"
+          ? names.length
+          : mode === "published-upgrade"
+            ? cardMigration
+            : index,
+      ))
         await db.exec(await readFile(`supabase/migrations/${n}`, "utf8"));
       const [seed, proof] = (
         await readFile("supabase/tests/player_profiles.sql", "utf8")
@@ -40,6 +50,31 @@ it.each(["zero", "upgrade"] as const)(
       expect(
         (await db.query("select * from public.persons order by id")).rows,
       ).toEqual(before);
+      if (mode === "published-upgrade") {
+        await db.exec(`
+          update public.persons set biography='Histórico privado',dominant_hand='left'
+          where id=pg_temp.pp_id(1);
+          set local role authenticated;
+          select public.confirm_player_profile(pg_temp.pp_command());
+          reset role;
+        `);
+        const query =
+          "select snapshot,version,birth_date from private.player_profile_versions";
+        const history = (await db.query(query)).rows;
+        await db.exec(
+          await readFile("supabase/migrations/" + names[cardMigration], "utf8"),
+        );
+        expect((await db.query(query)).rows).toEqual(history);
+        const projected = (
+          await db.query<{ person: Record<string, unknown> }>(
+            "select snapshot->'person' as person from public.published_player_profiles",
+          )
+        ).rows[0].person;
+        expect(projected).not.toHaveProperty("biography");
+        expect(projected).not.toHaveProperty("dominantHand");
+        expect(projected.publicBirthYear).toBe(1997);
+        return;
+      }
       const rows = (
         await db.exec(proof.replace(/\nrollback;\s*$/u, "\n"))
       ).flatMap((r) => r.rows);
@@ -139,7 +174,12 @@ it.each(["zero", "upgrade"] as const)(
         { dominantHand: "unknown" },
         { birthDate: "1997-01-01" },
       ]) {
-        const p = { ...profile.person, ...extra };
+        const p = {
+          ...profile.person,
+          dominantHand: null,
+          biography: null,
+          ...extra,
+        };
         const actual = (
           await db.query<{ ok: boolean }>(
             "select private.valid_profile_metadata($1::jsonb) ok",

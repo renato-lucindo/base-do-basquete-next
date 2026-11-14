@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { publicPlayerProfileSchema } from "./contract";
+import { playerProfileMetadataSchema } from "./contract";
 import { confirmedPlayerGameSchema } from "./participation-contract";
 import { playerHonorSchema, playerTeamPlacementSchema } from "./career-source";
 import { profileQuerySchema } from "./query-contract";
@@ -51,7 +51,7 @@ export const playerProfilePageSchema = z
             publishedAt: z.iso.datetime({ offset: true }),
           })
           .strict(),
-        metadata: publicPlayerProfileSchema.shape.person.nullable(),
+        metadata: playerProfileMetadataSchema.nullable(),
         currentAge: z.number().int().min(0).max(120).nullable().optional(),
       })
       .strict(),

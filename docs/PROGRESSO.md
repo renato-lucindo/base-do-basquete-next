@@ -1,11 +1,10 @@
 # Progresso atual
 
-Atualizado em 13/11/2026. Perfil dos jogadores e navegação por disputas na mesma [PR79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), branch `codex/perfil-atleta-aprovado`, base `a55dd7c`. O SHA a publicar e seu `validate` são os do [HEAD desta rodada](https://github.com/renato-lucindo/base-do-basquete-next/pull/79/checks). A CI 43421897883 é da revisão anterior.
+Ficha pública na [PR79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), branch `codex/perfil-atleta-aprovado`, base `a55dd7c`. O SHA desta rodada e seu `validate` estão nos [checks da PR](https://github.com/renato-lucindo/base-do-basquete-next/pull/79/checks).
 
-- Campeonatos agrupa ano, campeonato e naipe, com disputas abertas. O nome do campeonato expande só a edição atual e mantém a aba ao trocar. O mínimo de jogos fica vazio quando inativo.
-- Identificação sem biografia. A data completa bloqueia o ano no cadastro, prevalece no servidor e fica congelada em coluna privada da versão do perfil. O público recebe a idade em anos completos e o ano confirmado. A consulta anterior continua disponível.
-- Validação local registrada nos logs ignorados `followup-age-gate-final.log` e `followup-age-browser-final.log` em `.preview-artifacts/`. A CI exige o gate completo incluindo browsers e `validate`.
-- Migration de esquema e de publicação versionada `20261113201054_player_profile_confirmed_age`. Aplicação remota, perfil do Fernando e smoke do Worker são etapas distintas. Os resultados operacionais desta rodada ficam no corpo da PR para evitar novo commit apenas de acompanhamento de CI.
-- Baseline do [preview separado](https://base-do-basquete-next-uiux-preview.renato-lucindo-jr.workers.dev), sem Access: fonte `f1c9924`, versão `17355c61-98d5-42aa-886c-6c83c81ceba7`, deployment `521f54cd-eb01-447d-855d-0caf6d67fb88`. Worker da PR79: fonte `8f7b38d`, versão `80e95d3b-9a4f-45c7-a418-d8c6d4ac367e`, deployment `abab63fd-a7e9-4687-ab2e-a702764da3ce`.
+- A ficha usa até quatro linhas e mostra dados confirmados. A confirmação manual usa prévia, decisão explícita e motivo de revisão. O lote administrativo reaproveita as confirmações individuais, com conferência de elegibilidade e versões.
+- Migration `20261114002816_player_profile_public_card.sql` saneia a projeção corrente, preserva o histórico privado e habilita o inventário autenticado para primeiras publicações. Aplicação no DEV e lote real aguardam autorização específica. Inventário preliminar: 225 atletas públicos, um perfil confirmado, 64 fichas elegíveis e 160 sem dados da ficha.
+- Provas locais em `.preview-artifacts/ficha-browsers-final.log` e `.preview-artifacts/ficha-gate.log`. Verificação remota e estado do rollout no corpo da PR.
+- [Preview separado](https://base-do-basquete-next-uiux-preview.renato-lucindo-jr.workers.dev/publico.html) ainda no SHA `de58931`, versão `bcdf7709-17ac-4a1f-aeae-2f8e967dc905`, deployment `223d6aef-c69d-49b0-b442-8aa2320770af`. Worker PR79 em `8f7b38d`, deployment `abab63fd-a7e9-4687-ab2e-a702764da3ce`. Checkout humano e demais worktrees preservados.
 
-Worktree da unidade: `C:/Users/12405304716/Documents/Codex/2026-11-10/perfil-jogador-prototipos/work/perfil-atleta-produto`. Checkout humano e demais worktrees preservados. [Rodada anterior](../historico/progresso/2026-11-13-ajustes-publicos-e-preview.md).
+[Rodada anterior](../historico/progresso/2026-11-13-perfil-e-navegacao-por-ano.md). O próximo passo é conferir `validate` e obter a autorização do DEV.

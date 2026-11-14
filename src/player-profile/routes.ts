@@ -45,6 +45,22 @@ export async function privatePlayerProfileRoute(
       "invalid_session",
       "Entre para acessar a área administrativa.",
     );
+  const session = env.SESSIONS.getByName(name);
+  if (url.pathname === "/api/people/profile-batch") {
+    if (request.method !== "GET")
+      throw new HttpError(405, "invalid_method", "Método não permitido.");
+    const after = url.searchParams.get("after");
+    if (
+      [...url.searchParams.keys()].some((key) => key !== "after") ||
+      url.searchParams.getAll("after").length > 1 ||
+      (after !== null && !z.uuid().safeParse(after).success)
+    )
+      throw bad();
+    const result = await session.listInitialPlayerCards(after);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
   const match =
       /^\/api\/people\/([^/]+)\/profile(?:\/versions\/([1-9][0-9]*))?$/u.exec(
         url.pathname,
@@ -54,7 +70,6 @@ export async function privatePlayerProfileRoute(
       .transform((v) => v.toLowerCase())
       .safeParse(match?.[1]);
   if (!match || !id.success) throw bad();
-  const session = env.SESSIONS.getByName(name);
   if (request.method === "GET") {
     const offset = Number(url.searchParams.get("offset") ?? 0);
     if (
