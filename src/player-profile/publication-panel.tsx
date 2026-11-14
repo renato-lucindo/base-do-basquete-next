@@ -47,7 +47,12 @@ export function ProfileFields({
         const value = person[field as keyof typeof labels];
         if (value == null) return null;
         return (
-          <div key={field}>
+          <div
+            key={field}
+            className={
+              field === "biography" ? "profile-history-biography" : undefined
+            }
+          >
             <dt>{label}</dt>
             <dd>
               {field === "dominantHand"
