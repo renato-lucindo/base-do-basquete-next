@@ -2,6 +2,8 @@ import { z } from "zod";
 import { publicContextSchema } from "./catalog-contract";
 export const searchTypes = ["all", "players", "teams", "competitions"] as const;
 export type SearchType = (typeof searchTypes)[number];
+export const discoveryPageSize = (type: SearchType, view?: "results") =>
+  type === "all" && view !== "results" ? 5 : 20;
 export const foldSearch = (text: string) =>
   text
     .normalize("NFD")
@@ -20,6 +22,7 @@ const player = z
     name: z.string().min(1).max(120),
     nickname: z.string().max(120).nullable(),
     disputeId: uuid.nullable(),
+    latestTeam: z.string().min(1).max(120).nullable().optional(),
   })
   .strict();
 const team = z
@@ -73,6 +76,7 @@ export const discoveryQuerySchema = z
     type: z.enum(searchTypes).default("all"),
     page: z.number().int().min(1).max(2147483647).default(1),
     entityId: uuid.nullable().default(null),
+    view: z.literal("results").optional(),
   })
   .strict()
   .refine((q) => q.entityId === null || q.type !== "all");
@@ -82,6 +86,7 @@ export const discoveryPageSchema = z
     query: z.string().min(2).max(120),
     type: z.enum(searchTypes),
     entityId: uuid.nullable(),
+    view: z.literal("results").optional(),
     page: z.number().int().positive(),
     totalPages: z.number().int().positive(),
     counts: z
@@ -91,11 +96,11 @@ export const discoveryPageSchema = z
         competitions: z.number().int().nonnegative(),
       })
       .strict(),
-    results: z.array(searchHitSchema).max(20),
+    results: z.array(searchHitSchema).max(60),
   })
   .strict()
   .superRefine((r, ctx) => {
-    const size = r.type === "all" ? 5 : 20,
+    const size = discoveryPageSize(r.type, r.view),
       seen = new Set<string>();
     const bad = () =>
       ctx.addIssue({ code: "custom", message: "Busca pública inconsistente." });
@@ -125,6 +130,12 @@ export const discoveryPageSchema = z
       const key = `${item.kind}/${item.id}`;
       if (seen.has(key) || (r.entityId && item.id !== r.entityId)) bad();
       seen.add(key);
+      if (
+        r.view === "results" &&
+        item.kind === "players" &&
+        item.latestTeam === undefined
+      )
+        bad();
       if (
         item.kind === "competitions" &&
         item.directDisputeId &&

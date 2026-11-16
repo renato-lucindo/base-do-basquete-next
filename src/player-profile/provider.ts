@@ -5,6 +5,7 @@ import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import {
   confirmPlayerProfileSchema,
+  initialProfileCandidatesSchema,
   playerProfileAckSchema,
   playerProfileProposalSchema,
   playerProfileStateSchema,
@@ -16,7 +17,9 @@ import { buildPlayerProfile } from "./domain";
 
 type Functions = Database["public"]["Functions"];
 type Rpc =
+  | "list_initial_player_cards"
   | "get_player_career_source"
+  | "get_player_career_with_age"
   | "get_player_profile_proposal"
   | "get_player_profile_state"
   | "get_player_profile_version"
@@ -41,7 +44,7 @@ export class SupabasePlayerProfiles {
     private readonly config: { url: string; key: string },
     private readonly send: Send = (url, init) => fetch(url, init),
   ) {}
-  async getPage(id: string, params: URLSearchParams) {
+  async getPage(id: string, params: URLSearchParams, includeAge = false) {
     id = uuid(id);
     let query;
     try {
@@ -49,9 +52,10 @@ export class SupabasePlayerProfiles {
     } catch {
       throw bad();
     }
-    const body = await this.request("get_player_career_source", {
-      p_person_id: id,
-    });
+    const body = await this.request(
+      includeAge ? "get_player_career_with_age" : "get_player_career_source",
+      { p_person_id: id },
+    );
     if (body === null) return null;
     try {
       const page = buildPlayerProfile(body, query);
@@ -80,6 +84,25 @@ export class SupabasePlayerProfiles {
     const r = playerProfileWorkspaceSchema.safeParse({ state, proposal });
     if (!r.success || r.data.state.personId !== id) throw unavailable();
     return r.data;
+  }
+  async listInitialCards(token: string, after: string | null) {
+    const page = await this.checked(
+      initialProfileCandidatesSchema,
+      "list_initial_player_cards",
+      after ? { p_after: uuid(after) } : {},
+      token,
+    );
+    let previous = after ?? "";
+    for (const item of page.items) {
+      if (item.personId <= previous) throw unavailable();
+      previous = item.personId;
+    }
+    if (
+      page.next !== null &&
+      (page.items.length !== 50 || page.next !== previous)
+    )
+      throw unavailable();
+    return page;
   }
   async getVersion(token: string, id: string, version: number) {
     id = uuid(id);
@@ -135,7 +158,9 @@ export class SupabasePlayerProfiles {
     args: Functions[N]["Args"],
     token?: string,
   ): Promise<unknown> {
-    const publicRead = name === "get_player_career_source";
+    const publicRead =
+      name === "get_player_career_source" ||
+      name === "get_player_career_with_age";
     if (!publicRead && !token) throw invalidSession();
     let response: Response;
     try {
@@ -161,6 +186,7 @@ export class SupabasePlayerProfiles {
             "idempotency_conflict",
             "version_conflict",
             "profile_version_limit",
+            "profile_not_eligible",
           ]),
         })
         .safeParse(await providerJson(response));
@@ -170,7 +196,9 @@ export class SupabasePlayerProfiles {
         code,
         code === "idempotency_conflict"
           ? "Este envio já foi usado com outros dados. Confira o estado salvo."
-          : "O cadastro ou a publicação mudou. Atualize e confira antes de confirmar.",
+          : code === "profile_not_eligible"
+            ? "O atleta não está mais elegível para a primeira publicação em lote."
+            : "O cadastro ou a publicação mudou. Atualize e confira antes de confirmar.",
       );
     }
     await response.body?.cancel().catch(() => undefined);

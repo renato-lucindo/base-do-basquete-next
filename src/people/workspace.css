@@ -228,3 +228,16 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.profile-review-lines {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+.profile-review-reason {
+  display: grid;
+  gap: 0.25rem;
+}

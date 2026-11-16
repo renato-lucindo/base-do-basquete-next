@@ -295,6 +295,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
+  listInitialPlayerCards(after: string | null) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.playerProfiles.listInitialCards(accessToken, after),
+      ),
+    );
+  }
   getPlayerProfileWorkspace(id: string, offset: number) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>

@@ -23,7 +23,9 @@ test("global public discovery uses one bounded anonymous RPC and rejects unsafe 
       serviceBindings: { ASSETS: async () => new Response("asset") },
       outboundService: async (request) => {
         const u = new URL(request.url);
-        assert.equal(u.pathname, "/rest/v1/rpc/search_public_entities");
+        const full = u.pathname === "/rest/v1/rpc/search_public_entities_full";
+        if (!full)
+          assert.equal(u.pathname, "/rest/v1/rpc/search_public_entities");
         assert.equal(request.method, "POST");
         assert.equal(request.headers.get("Authorization"), null);
         assert.equal(request.headers.get("cookie"), null);
@@ -50,6 +52,10 @@ test("global public discovery uses one bounded anonymous RPC and rejects unsafe 
           ],
         };
         if (bad) body.results[0].birthDate = "1997-01-01";
+        if (full) {
+          body.view = "results";
+          body.results[0].latestTeam = "Equipe publicada";
+        }
         return Response.json(body);
       },
     }),
@@ -64,6 +70,7 @@ test("global public discovery uses one bounded anonymous RPC and rejects unsafe 
       "?q=ab&page=1.0",
       "?q=ab&entityId=bad",
       "?q=ab&offset=1",
+      "?q=ab&view=private",
       "?q=%00ab",
     ]) {
       assert.equal(
@@ -98,6 +105,11 @@ test("global public discovery uses one bounded anonymous RPC and rejects unsafe 
     assert.deepEqual(calls, [
       { p_query: "João", p_type: "players", p_page: 1, p_entity_id: null },
     ]);
+    const full = await mf.dispatchFetch(
+      origin + "/api/public/discovery?q=Jo%C3%A3o&view=results",
+    );
+    assert.equal(full.status, 200);
+    assert.equal((await full.json()).results[0].latestTeam, "Equipe publicada");
     bad = true;
     assert.equal(
       (

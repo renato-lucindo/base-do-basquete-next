@@ -44,8 +44,8 @@
   .public-header-search
   .public-search-types
   button[aria-pressed="true"] {
-  color: #075fca;
-  border-color: #075fca;
+  color: var(--public-blue);
+  border-color: var(--public-blue);
   background: #eef5ff;
   font-weight: 600;
 }
@@ -180,7 +180,7 @@
 }
 .public-autocomplete a:focus-visible,
 .public-search-results :is(a, button, summary):focus-visible {
-  outline: 0.125rem solid #075fca;
+  outline: 0.125rem solid var(--public-blue);
   outline-offset: 0.125rem;
 }
 @media (max-width: 600px) {
@@ -227,4 +227,28 @@
   header.public-header.site-header .public-header-search {
     grid-row: 3;
   }
+}
+
+.public-suggestion-heading {
+  background: var(--public-blue-soft);
+  border-left: 3px solid var(--public-blue);
+  color: var(--public-text);
+  margin-top: 0.375rem;
+  text-transform: none;
+}
+.public-suggestion-list strong {
+  display: block;
+  color: var(--public-text);
+  line-height: 1.4;
+}
+.public-search-results h2 {
+  background: var(--public-blue-soft);
+  border-left: 3px solid var(--public-blue);
+  padding: 0.375rem 0.625rem;
+  font-size: 1.0625rem;
+  color: var(--public-text);
+}
+.public-search-entity-list > li > a {
+  overflow-wrap: anywhere;
+  min-height: 2.75rem;
 }

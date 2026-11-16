@@ -2,7 +2,11 @@ import { type ReactNode } from "react";
 import { usePublicPosition } from "./position";
 import { contextLabel, disputeLink } from "./catalog-contract";
 import { publicDetailLink } from "./navigation";
-import { type SearchHit, searchTypes } from "./search-contract";
+import {
+  discoveryPageSize,
+  type SearchHit,
+  searchTypes,
+} from "./search-contract";
 import {
   searchHref,
   searchLabels,
@@ -27,7 +31,7 @@ export function searchHitDescription(hit: SearchHit) {
   }
   return hit.kind === "players"
     ? hit.nickname
-      ? `Apelido: ${hit.nickname}`
+      ? hit.nickname
       : ""
     : hit.kind === "teams"
       ? `${hit.participations.length} participações públicas`
@@ -39,6 +43,7 @@ function SearchEntity({ hit }: { hit: SearchHit }) {
       <a href={searchHitHref(hit, "")}>
         <strong>{hit.name}</strong>
         {hit.nickname && <small>{hit.nickname}</small>}
+        {hit.latestTeam && <small>{hit.latestTeam}</small>}
       </a>
     );
   if (hit.kind === "teams")
@@ -189,11 +194,14 @@ export function PublicSearchResults({
                     </li>
                   ))}
                 </ul>
-                {query.type === "all" && state.data!.counts[type] > 5 && (
-                  <a href={searchHref(query.q, type)}>
-                    Ver todos os {searchLabels[type].toLocaleLowerCase("pt-BR")}
-                  </a>
-                )}
+                {query.type === "all" &&
+                  state.data!.counts[type] >
+                    discoveryPageSize(query.type, query.view) && (
+                    <a href={searchHref(query.q, type)}>
+                      Ver todos os{" "}
+                      {searchLabels[type].toLocaleLowerCase("pt-BR")}
+                    </a>
+                  )}
               </section>
             ) : null;
           })}

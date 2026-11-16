@@ -20,6 +20,7 @@ export function PersonFields({
   contextFields?: ReactNode;
 }) {
   const patch = (value: Partial<Person>) => change({ ...person, ...value });
+  const birthDate = person.athlete?.birthDate;
   return (
     <div className="person-fields-grid">
       <label className="person-name-field">
@@ -121,6 +122,7 @@ export function PersonFields({
                 onChange={(e) => {
                   if (person.athlete)
                     patch({
+                      publicBirthYear: null,
                       athlete: {
                         ...person.athlete,
                         birthDate: e.target.value || null,
@@ -190,7 +192,12 @@ export function PersonFields({
               min={min}
               max={max}
               step={key === "publicBirthYear" ? 1 : "any"}
-              value={person[key] ?? ""}
+              readOnly={key === "publicBirthYear" && !!birthDate}
+              value={
+                key === "publicBirthYear" && birthDate
+                  ? Number(birthDate.slice(0, 4))
+                  : (person[key] ?? "")
+              }
               onChange={(e) =>
                 patch({ [key]: e.target.value ? Number(e.target.value) : null })
               }

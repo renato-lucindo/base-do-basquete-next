@@ -390,7 +390,6 @@ export function StatisticsPageView() {
                       max={9999}
                       step={1}
                       inputMode="numeric"
-                      placeholder="Sem restrição"
                       value={minimumGames || ""}
                       onChange={(e) => {
                         const n = Number(e.currentTarget.value);

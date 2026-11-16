@@ -37,12 +37,15 @@ export const playerCareerSourceSchema = z
     kind: z.literal("confirmed-player-career-v1"),
     personId: uuid,
     profile: publicPlayerProfileSchema.nullable(),
+    currentAge: z.number().int().min(0).max(120).nullable().optional(),
     participations: z.array(confirmedPlayerGameSchema).max(10000),
     honors: z.array(playerHonorSchema).max(10000),
     teamPlacements: z.array(playerTeamPlacementSchema).max(10000),
   })
   .strict()
   .refine((s) => {
+    if (s.currentAge != null && s.profile?.person.publicBirthYear == null)
+      return false;
     if (s.profile?.personId !== undefined && s.profile.personId !== s.personId)
       return false;
     if (!s.profile && !s.participations.length && !s.honors.length)

@@ -63,6 +63,7 @@ export function usePublicSearch(
         page: String(q.page),
       });
       if (q.entityId) p.set("entityId", q.entityId);
+      if (q.view) p.set("view", q.view);
       void api(
         `/api/public/discovery?${p}`,
         discoveryPageSchema,
@@ -74,6 +75,7 @@ export function usePublicSearch(
             data.query !== q.q ||
             data.type !== q.type ||
             data.entityId !== q.entityId ||
+            data.view !== q.view ||
             data.page !== Math.min(q.page, data.totalPages)
           )
             throw Error("Uncorrelated search");
@@ -115,7 +117,7 @@ export function useSearchRoute() {
       window.removeEventListener(PUBLIC_SEARCH_EVENT, submit);
     };
   }, []);
-  const parsed = discoveryQuerySchema.safeParse(raw);
+  const parsed = discoveryQuerySchema.safeParse({ ...raw, view: "results" });
   return {
     raw,
     query: parsed.success ? parsed.data : null,

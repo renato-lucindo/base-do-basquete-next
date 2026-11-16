@@ -26,7 +26,9 @@ A ordem dos IDs não representa prioridade. O identificador original é preserva
 
 ### FUT-002 — Recordes da Carreira no perfil do jogador
 
-**Status:** Ideia. **Origem:** pedido do responsável em 29/10/2026; autorizado somente o registro no roadmap.
+**Status:** implementação parcial na [PR #79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), mantida aberta. **Origem:** pedido de 29/10/2026; em 11/11/2026 o responsável aceitou o protótipo e autorizou implementar e publicar o Worker da unidade.
+
+**Recorte aprovado e implementado:** PTS, 2P, 3P e LL, somente em atuações públicas com cobertura confirmada. A primeira marca permanece na linha principal; “Ver top 5” acrescenta 2º–5º sem repetição. Marca abre o jogo publicado, nomes abrem as equipes; data e campeonato acompanham o confronto. Isso substitui a indefinição anterior do elemento clicável e da composição para essas quatro métricas. Idade na data do jogo e outras métricas, como assistências/rebotes, permanecem futuras e exigem fonte elegível; não foram inventadas nesta entrega. [Evidências e serviço](VALIDACAO-PERFIL-APROVADO.md).
 
 **Objetivo e benefício:** mostrar as cinco maiores atuações individuais de cada estatística válida da carreira, como o career high da NBA, permitindo consultar o confronto de origem.
 

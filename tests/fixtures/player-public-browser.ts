@@ -23,7 +23,7 @@ export async function playerPublicFixture(
       name: "Ana Pública",
       nickname: "AP",
       heightCm: 180,
-      biography: "Trajetória confirmada.",
+      weightKg: null,
     },
   };
   const f = source.participations[0].fact;

@@ -32,22 +32,44 @@ function workspace() {
   };
 }
 it("leitura pública só envia identidade à RPC, sem JWT/cookie ou fonte bruta no retorno", async () => {
-  const source = playerCareerFixture(),
-    send = vi.fn(async () => Response.json(source)),
+  const source = playerCareerFixture();
+  source.profile = {
+    kind: "confirmed-player-profile-v1",
+    personId: source.personId,
+    version: 1,
+    confirmedAt: "2026-10-25T12:00:00Z",
+    person: workspace().proposal.person,
+  };
+  source.profile.person.publicBirthYear = 2008;
+  const send = vi.fn(async () => Response.json({ ...source, currentAge: 17 })),
     db = new SupabasePlayerProfiles(config, send);
   const page = await db.getPage(
     source.personId.toUpperCase(),
     new URLSearchParams("mode=total"),
+    true,
   );
   expect(page?.statistics.summary?.gamesPlayed).toBe(2);
+  expect(page?.identity.currentAge).toBe(17);
+  expect(page?.identity.metadata?.publicBirthYear).toBe(2008);
+  expect(page?.identity.metadata).not.toHaveProperty("birthDate");
   expect(page).not.toHaveProperty("participations");
   const [url, init] = send.mock.calls[0] as unknown as [string, RequestInit];
-  expect(url).toBe(config.url + "/rest/v1/rpc/get_player_career_source");
+  expect(url).toBe(config.url + "/rest/v1/rpc/get_player_career_with_age");
   expect(JSON.parse(init.body as string)).toEqual({
     p_person_id: source.personId,
   });
   expect(new Headers(init.headers).has("authorization")).toBe(false);
   expect(new Headers(init.headers).has("cookie")).toBe(false);
+  const legacySend = vi.fn(async () => Response.json(source));
+  const legacyPage = await new SupabasePlayerProfiles(
+    config,
+    legacySend,
+  ).getPage(source.personId, new URLSearchParams());
+  expect(legacyPage?.identity).not.toHaveProperty("currentAge");
+  expect(legacySend).toHaveBeenCalledWith(
+    config.url + "/rest/v1/rpc/get_player_career_source",
+    expect.any(Object),
+  );
 });
 it("dados públicos incorretos e erros técnicos não viram perfil vazio ou mensagem privada", async () => {
   const source = playerCareerFixture();
@@ -124,7 +146,14 @@ it("workspace privado correlaciona pessoa/versões e usa somente RPCs próprias"
       url.endsWith("get_player_profile_state") ? f.state : f.proposal,
     );
   });
-  expect(await db.getWorkspace("fixture-session", pubId(1), 20)).toEqual(f);
+  const view = await db.getWorkspace("fixture-session", pubId(1), 20);
+  expect(view.state).toEqual(f.state);
+  expect(view.proposal.person).not.toHaveProperty("dominantHand");
+  expect(view.proposal.person).not.toHaveProperty("biography");
+  expect(view.proposal.person).toMatchObject({
+    id: f.proposal.personId,
+    name: "Ana Silva",
+  });
   expect(calls).toHaveLength(2);
   expect(
     calls.every(

@@ -25,10 +25,19 @@ import {
   type SaveStaff,
   type StaffSnapshot,
 } from "./staff-contract";
+import { ProfileSaveReview } from "./profile-save-review";
+import { draftProfile } from "../player-profile/profile-card";
+import {
+  confirmPlayerProfileSchema,
+  playerProfileAckSchema,
+  playerProfileWorkspaceSchema,
+  type ConfirmPlayerProfile,
+} from "../player-profile/contract";
 import { PersonFields } from "./person-fields";
 import { PersonPicker } from "./person-picker";
 import { AdminDialog } from "../competition/admin-dialog";
 import { AdminToast } from "../competition/admin-toast";
+import { InitialProfileBatch } from "../player-profile/initial-batch";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
 import { RosterReusePanel } from "./roster-reuse-panel";
@@ -45,6 +54,7 @@ type Editor =
       originalAthlete: boolean;
       originalCoach: boolean;
       needsPersonSave: boolean;
+      originalProfile: ReturnType<typeof draftProfile> | null;
       roster?: { command: SaveRoster; initialJersey: string | null };
     }
   | { kind: "roster"; command: SaveRoster; person: Summary; wasActive: boolean }
@@ -78,6 +88,8 @@ export function MembersWorkspace({
   const reuseGuard = useRef<() => boolean>(() => true);
   const [profiling, setProfiling] = useState<string | null>(null);
   const profileGuard = useRef<() => boolean>(() => true);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const batchGuard = useRef<() => boolean>(() => true);
   const [transferring, setTransferring] = useState<RosterSnapshot | null>(null);
   const transferGuard = useRef<() => boolean>(() => true);
   const importGuard = useRef<() => boolean>(() => true);
@@ -125,6 +137,23 @@ export function MembersWorkspace({
     !!editor &&
     (JSON.stringify(editor.command) !== baseline || !!jerseyChanged);
   const [partialSaved, setPartialSaved] = useState(false);
+  const [profileReview, setProfileReview] = useState<{
+    draft: ReturnType<typeof draftProfile>;
+    publicationVersion: number | null;
+  } | null>(null);
+  const profileChoice = useRef<{
+    source: string;
+    publication: { version: number; reason: string } | null;
+  } | null>(null);
+  const [pendingProfile, setPendingProfile] = useState<{
+    command: ConfirmPlayerProfile;
+    conflict: boolean;
+    verify: boolean;
+  } | null>(null);
+  const deferredProfile = useRef<ConfirmPlayerProfile | null>(null);
+  const reviewedProfile = useRef<
+    ReturnType<typeof draftProfile>["metadata"] | null
+  >(null);
   const acknowledged = useRef(
     new Map<string, { id: string; version: number }>(),
   );
@@ -138,7 +167,8 @@ export function MembersWorkspace({
       reuseGuard.current() &&
       transferGuard.current() &&
       profileGuard.current() &&
-      (!(busy || dirty || uncertain) ||
+      batchGuard.current() &&
+      (!(busy || dirty || uncertain || pendingProfile) ||
         (!busy &&
           window.confirm(
             "Há alterações não salvas ou um envio não confirmado. Deseja sair desta edição?",
@@ -152,14 +182,14 @@ export function MembersWorkspace({
     };
   });
   useEffect(() => {
-    if (!dirty && !uncertain) return;
+    if (!dirty && !uncertain && !pendingProfile) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty, uncertain]);
+  }, [dirty, uncertain, pendingProfile]);
   useEffect(() => {
     if (!enabled) return;
     if (editor)
@@ -261,6 +291,8 @@ export function MembersWorkspace({
     };
   }, [enabled, target, query, searchOffset, refresh]);
   function begin(value: Editor) {
+    profileChoice.current = null;
+    deferredProfile.current = null;
     acknowledged.current.clear();
     unconfirmed.current.clear();
     setPartialSaved(false);
@@ -275,6 +307,9 @@ export function MembersWorkspace({
   }
   function cancel() {
     if (!mayLeave()) return;
+    setProfileReview(null);
+    profileChoice.current = null;
+    deferredProfile.current = null;
     setEditor(null);
     setTarget(null);
     setError("");
@@ -320,6 +355,7 @@ export function MembersWorkspace({
       kind: "person",
       target: wanted,
       originalAthlete: !!p?.athlete,
+      originalProfile: p?.athlete ? draftProfile(p) : null,
       originalCoach: p?.coach ?? false,
       needsPersonSave:
         !p ||
@@ -491,6 +527,98 @@ export function MembersWorkspace({
       throw failure;
     }
   }
+  async function publishProfile(command: ConfirmPlayerProfile, verify = false) {
+    setPendingProfile({ command, conflict: false, verify });
+    try {
+      const path = `/api/people/${command.personId}/profile`;
+      if (verify) {
+        const { proposal, state } = await api(
+          path,
+          playerProfileWorkspaceSchema,
+        );
+        if (
+          proposal.personId !== command.personId ||
+          proposal.personVersion !== command.expectedPersonVersion ||
+          state.version !== command.expectedPublicationVersion ||
+          JSON.stringify(draftProfile(proposal.person).metadata) !==
+            JSON.stringify(reviewedProfile.current)
+        )
+          throw new ApiFailure(
+            409,
+            "Os dados salvos diferem da prévia. Confira antes de publicar.",
+          );
+      }
+      verify = false;
+      const ack = await api(path, playerProfileAckSchema, command);
+      if (
+        ack.commandId !== command.commandId ||
+        ack.personId !== command.personId ||
+        ack.personVersion !== command.expectedPersonVersion ||
+        ack.version !== command.expectedPublicationVersion + 1
+      )
+        throw new ApiFailure(
+          503,
+          "Não foi possível conferir a confirmação do envio.",
+        );
+      setPendingProfile(null);
+      setStatus("Perfil publicado.");
+    } catch (failure) {
+      setPendingProfile({
+        command,
+        verify,
+        conflict:
+          failure instanceof ApiFailure &&
+          [400, 404, 409, 413].includes(failure.status),
+      });
+      setStatus("Cadastro salvo. Publicação pendente");
+      report(failure);
+    }
+  }
+  async function openProfileReview(
+    person: SavePerson["person"],
+    version: number,
+  ) {
+    const draft = draftProfile(person);
+    setProfileReview({
+      draft,
+      publicationVersion:
+        version === 0 || (editor?.kind === "person" && !editor.originalAthlete)
+          ? 0
+          : null,
+    });
+    if (!version || (editor?.kind === "person" && !editor.originalAthlete))
+      return;
+    setBusy(true);
+    setError("");
+    try {
+      const { state, proposal } = await api(
+        `/api/people/${person.id}/profile`,
+        playerProfileWorkspaceSchema,
+      );
+      if (state.personId !== person.id || state.personVersion !== version)
+        throw new ApiFailure(
+          409,
+          "O cadastro mudou. Recarregue antes de publicar.",
+        );
+      if (
+        draft.metadata.publicBirthYear === null &&
+        editor?.kind === "person" &&
+        editor.command.person.publicBirthYear === null &&
+        editor.originalProfile?.metadata.publicBirthYear === null &&
+        editor.originalProfile?.date === null
+      )
+        draft.metadata.publicBirthYear = proposal.person.publicBirthYear;
+      setProfileReview({ draft, publicationVersion: state.version });
+    } catch (failure) {
+      if (failure instanceof ApiFailure && failure.status === 409) {
+        setProfileReview(null);
+        setConflict(true);
+      }
+      report(failure);
+    } finally {
+      setBusy(false);
+    }
+  }
   async function save(event?: FormEvent) {
     event?.preventDefault();
     if (!editor || busy || conflict) return;
@@ -512,6 +640,19 @@ export function MembersWorkspace({
           : "Informe camisa válida: 0, 00 ou 1–99.",
       );
       return;
+    }
+    if (editor.kind === "person" && editor.command.person.athlete) {
+      const person = personSchema.parse(editor.command.person);
+      const source = JSON.stringify(draftProfile(person));
+      if (
+        source !== JSON.stringify(editor.originalProfile) &&
+        profileChoice.current?.source !== source &&
+        !uncertain &&
+        !partialSaved
+      ) {
+        await openProfileReview(person, editor.command.expectedVersion);
+        return;
+      }
     }
     setBusy(true);
     setError("");
@@ -543,6 +684,23 @@ export function MembersWorkspace({
               "Não foi possível confirmar a camisa desta inscrição.",
             );
         }
+        const publication =
+          profileChoice.current?.source ===
+          JSON.stringify(
+            draftProfile(personSchema.parse(editor.command.person)),
+          )
+            ? profileChoice.current.publication
+            : null;
+        const profileCommand =
+          publication &&
+          confirmPlayerProfileSchema.parse({
+            commandId: crypto.randomUUID(),
+            personId: p.id,
+            expectedPersonVersion: result.version,
+            expectedPublicationVersion: publication.version,
+            reason: publication.reason,
+            acknowledgeImpact: true,
+          });
         if (editor.target === "none" || editor.roster) {
           setEditor(null);
           setStatus(
@@ -551,7 +709,11 @@ export function MembersWorkspace({
           setPartialSaved(false);
           setUncertain(false);
           setConflict(false);
-        } else membership(p, editor.target);
+          if (profileCommand) await publishProfile(profileCommand, true);
+        } else {
+          membership(p, editor.target);
+          deferredProfile.current = profileCommand || null;
+        }
       } else {
         const path = editor.kind === "roster" ? "/api/roster" : "/api/staff";
         const result = await persist(path, editor.command);
@@ -570,6 +732,9 @@ export function MembersWorkspace({
         setUncertain(false);
         setConflict(false);
         setStatus("Vínculo salvo.");
+        const command = deferredProfile.current;
+        deferredProfile.current = null;
+        if (command) await publishProfile(command, true);
       }
       setRefresh((v) => v + 1);
       onSaved();
@@ -643,14 +808,18 @@ export function MembersWorkspace({
             rosterEntry.registrationId !== registration.id)
         )
           throw new Error("O vínculo não corresponde a esta inscrição.");
-        personEditor(
-          await api(
-            `/api/people/${editor.command.person.id}`,
-            personSnapshotSchema,
-          ),
-          editor.target,
-          rosterEntry,
+        const saved = await api(
+          `/api/people/${editor.command.person.id}`,
+          personSnapshotSchema,
         );
+        const choice = profileChoice.current;
+        personEditor(saved, editor.target, rosterEntry);
+        if (
+          choice?.publication &&
+          saved.version === editor.command.expectedVersion + 1 &&
+          choice.source === JSON.stringify(draftProfile(saved))
+        )
+          profileChoice.current = choice;
       } else if (editor.kind === "roster") {
         const r = await api(
           `/api/roster/${editor.command.entry.id}`,
@@ -700,7 +869,7 @@ export function MembersWorkspace({
       setBusy(false);
     }
   }
-  const disabled = busy || !canEdit;
+  const disabled = busy || !canEdit || !!pendingProfile;
   const feedback = (
     <>
       {error && (
@@ -840,8 +1009,50 @@ export function MembersWorkspace({
         >
           Reaproveitar atletas
         </button>
+        <button
+          className="secondary"
+          type="button"
+          disabled={disabled}
+          onClick={() => {
+            if (mayLeave()) setBatchOpen(true);
+          }}
+        >
+          Publicar fichas de jogadores
+        </button>
       </div>
       {!target && !editor && feedback}
+      {batchOpen && (
+        <InitialProfileBatch
+          enabled={enabled && canEdit}
+          guard={batchGuard}
+          onClose={() => setBatchOpen(false)}
+          onSessionLost={onSessionLost}
+        />
+      )}
+      {pendingProfile && !editor && (
+        <button
+          type="button"
+          disabled={busy || !canEdit}
+          onClick={() => {
+            if (pendingProfile.conflict) {
+              setProfiling(pendingProfile.command.personId);
+              setPendingProfile(null);
+              setError("");
+              return;
+            }
+            setBusy(true);
+            setError("");
+            void publishProfile(
+              pendingProfile.command,
+              pendingProfile.verify,
+            ).finally(() => setBusy(false));
+          }}
+        >
+          {pendingProfile.conflict
+            ? "Conferir dados novamente"
+            : "Retomar publicação"}
+        </button>
+      )}
       {(target || editor) && (
         <AdminDialog
           title={`${target === "athlete" || editor?.kind === "roster" || (editor?.kind === "person" && editor.target === "athlete") ? "Adicionar atleta" : target === "head" ? "Adicionar técnico" : target === "assistant" ? "Adicionar assistente" : "Cadastro de pessoa"} · ${registration.name}`}
@@ -1111,6 +1322,33 @@ export function MembersWorkspace({
             </form>
           )}
         </AdminDialog>
+      )}
+      {profileReview && editor?.kind === "person" && enabled && (
+        <ProfileSaveReview
+          draft={profileReview.draft}
+          publicationVersion={profileReview.publicationVersion}
+          busy={busy}
+          onClose={() => setProfileReview(null)}
+          onSave={(reason) => {
+            if (reason !== null && profileReview.publicationVersion === null)
+              return;
+            reviewedProfile.current = profileReview.draft.metadata;
+            profileChoice.current = {
+              source: JSON.stringify(
+                draftProfile(personSchema.parse(editor.command.person)),
+              ),
+              publication:
+                reason === null
+                  ? null
+                  : {
+                      version: profileReview.publicationVersion!,
+                      reason,
+                    },
+            };
+            setProfileReview(null);
+            void save();
+          }}
+        />
       )}
       <label className="member-checkbox">
         <input

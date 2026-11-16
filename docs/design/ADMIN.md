@@ -28,3 +28,7 @@ No desktop, conferir **1366×768** e **1920×1080** com nomes longos, listas rep
 Registrar SHA, ambiente, comando, resultado e limites. Revisão do autor, axe ou fixtures não substituem revisão independente, aceite humano ou prova autenticada remota. Nenhuma sugestão estética amplia o MVP. Evidências anteriores ficam no [índice histórico](../../historico/documentacao/README.md) e são consultadas somente quando pertinentes.
 
 A escala compartilhada de 06/11/2026 também vale para acesso, formulários, menus e diálogos administrativos: 150% a partir de 640 CSS px, tamanho anterior até 639 px. Títulos que repetem a aba ficam somente semânticos, com foco em uma área visível. No contexto da disputa, listas e seletores mostram a inscrição; a distinção de nome global permanece nos formulários em que é necessária.
+
+No cadastro de atleta, a data completa de nascimento preenche e bloqueia o campo de ano. Ao remover a data, o ano volta a aceitar edição manual. Em **Elenco → Perfil público**, a proposta mostra o ano que será publicado. A data completa fica privada.
+
+Ao salvar novo atleta ou alterar dados da ficha, **Publicar os dados do perfil?** mostra a prévia e oferece **Só salvar**, **Salvar e publicar** e **Voltar à edição**, com foco inicial em **Só salvar**. Só salvar conserva a versão publicada. Salvar e publicar confirma a ficha depois do cadastro e vínculo. A revisão de ficha publicada exige motivo. Camisa, dados privados e importação seguem seus fluxos de cadastro.

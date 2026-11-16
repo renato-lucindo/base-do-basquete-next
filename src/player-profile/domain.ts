@@ -178,7 +178,10 @@ export function buildPlayerProfile(
     kind: "confirmed-player-profile-page-v1",
     personId: source.personId,
     query: { ...q, page, historyPage },
-    identity,
+    identity:
+      source.currentAge === undefined
+        ? identity
+        : { ...identity, currentAge: source.currentAge },
     contexts,
     statistics: {
       status,

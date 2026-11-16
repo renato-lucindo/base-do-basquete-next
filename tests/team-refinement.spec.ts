@@ -1,6 +1,45 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { teamPublicFixture } from "./fixtures/team-public-browser";
+test("Equipes alinha Totais/Por jogo à direita em qualquer largura", async ({
+  page,
+}, info) => {
+  const f = await teamPublicFixture(page);
+  for (const width of [320, 390, 1366]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(f.listUrl);
+    await expect(
+      page.getByRole("table", { name: "Estatísticas das equipes" }),
+    ).toBeVisible();
+    const group = page.locator(".team-list-segments");
+    const bar = (await group.boundingBox())!;
+    const scope = (await group
+      .getByRole("group", { name: "Escopo" })
+      .boundingBox())!;
+    const mode = (await group
+      .getByRole("group", { name: "Modo" })
+      .boundingBox())!;
+    expect(Math.abs(scope.x - bar.x)).toBeLessThan(1);
+    expect(Math.abs(mode.x + mode.width - bar.x - bar.width)).toBeLessThan(1);
+    if (width >= 390) {
+      expect(
+        Math.abs(scope.y + scope.height / 2 - mode.y - mode.height / 2),
+      ).toBeLessThan(1);
+      expect(mode.x - scope.x - scope.width).toBeGreaterThan(0);
+    } else if (mode.y > scope.y + 1) {
+      expect(mode.y).toBeGreaterThanOrEqual(scope.y + scope.height);
+    }
+    await expect(group).toBeVisible();
+    await expect(page.locator(".team-list-page .statistics-public")).toHaveCSS(
+      "background-color",
+      "rgba(0, 0, 0, 0)",
+    );
+    if (width === 390)
+      await page.screenshot({
+        path: `.preview-artifacts/followup-equipes-390-${info.project.name}.png`,
+      });
+  }
+});
 test("Equipes abre completa, filtra sem tirar foco e mantém opções e retorno", async ({
   page,
 }) => {

@@ -510,7 +510,14 @@
 }
 .simple-statistics-table thead th {
   white-space: nowrap;
+  border-block-start: 1px solid var(--public-line);
   background: #f2f6fb;
+}
+.simple-statistics-table thead th:first-child {
+  border-inline-start: 1px solid var(--public-line);
+}
+.simple-statistics-table thead th:last-child {
+  border-inline-end: 1px solid var(--public-line);
 }
 .simple-statistics-table th:first-child,
 .simple-statistics-table td:first-child {

@@ -1,0 +1,40 @@
+/* One public legend scale for players, teams and the athlete profile. */
+.reference-legend {
+  padding: 1.25rem 0 0.25rem;
+  color: var(--public-muted);
+}
+:is(.public-site.statistics-public, .player-page) .reference-legend h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 0.625rem;
+  color: var(--public-text);
+}
+.reference-legend dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.5rem 1.125rem;
+  margin: 0;
+  font-size: 0.6875rem;
+}
+.reference-legend dl > div {
+  display: flex;
+  gap: 0.4375rem;
+  align-items: baseline;
+  min-width: 0;
+}
+.reference-legend dt {
+  font-weight: 600;
+  color: var(--public-text);
+  flex: none;
+}
+.reference-legend dd {
+  margin: 0;
+  line-height: 1.6;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 639px) {
+  .reference-legend dl {
+    font-size: 0.75rem;
+  }
+}

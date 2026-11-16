@@ -408,7 +408,10 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                               )}
                             </td>
                           ))}
-                          <td className="foul-cell">
+                          <td
+                            className="foul-cell"
+                            data-not-played={p.played === false || undefined}
+                          >
                             {p.played === false ? (
                               <span role="img" aria-label="Não participou">
                                 —

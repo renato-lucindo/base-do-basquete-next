@@ -15,7 +15,10 @@ const unavailable = () =>
 const signature = (p: PlayerProfilePage) =>
   JSON.stringify([
     p.personId,
-    p.identity,
+    p.identity.name,
+    p.identity.nickname,
+    p.identity.origin,
+    p.identity.metadata,
     p.contexts,
     p.statistics,
     p.honors,
@@ -31,7 +34,7 @@ export async function loadPublicCareer(id: string, signal: AbortSignal) {
   async function read(page: number, historyPage: number) {
     const query = { ...base, page, historyPage };
     const data = await api(
-      `/api/public/players/${id}?${serializeProfileQuery(query)}`,
+      `/api/public/players/${id}?${serializeProfileQuery(query)}&age=1`,
       playerProfilePageSchema,
       undefined,
       signal,

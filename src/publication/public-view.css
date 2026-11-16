@@ -1118,6 +1118,9 @@
 .public-site.scoresheet-public .roster-table .foul-cell {
   padding: 0;
 }
+.public-site.scoresheet-public .roster-table .foul-cell[data-not-played] {
+  text-align: center;
+}
 .public-site.scoresheet-public .roster-table .foul-button {
   width: 100%;
   min-height: 2.6875rem;

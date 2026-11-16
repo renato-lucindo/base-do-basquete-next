@@ -31,7 +31,7 @@ test("approved quarterfinal bracket, MD3 in every round and no preliminary stage
     "Final",
   ]);
   await expect(
-    page.getByRole("link", { name: "Classificatória", exact: true }),
+    page.getByRole("link", { name: "Fase Regular", exact: true }),
   ).toHaveCount(0);
   await expect(board.locator("tbody td")).toHaveCount(42);
   const finale = board.getByRole("article", { name: "Final", exact: true });
@@ -174,10 +174,12 @@ test("two stages, all knockout phases and internal game headers without clicking
     name: "Etapas da classificação",
   });
   await expect(stages.getByRole("link")).toHaveText([
-    "Classificatória",
-    "Eliminatória",
+    "Fase Regular",
+    "Eliminatórias",
   ]);
-  await stages.getByRole("link", { name: "Eliminatória", exact: true }).click();
+  await stages
+    .getByRole("link", { name: "Eliminatórias", exact: true })
+    .click();
   const board = page.getByRole("region", {
     name: "Confrontos da eliminatória",
   });
@@ -216,9 +218,7 @@ test("two stages, all knockout phases and internal game headers without clicking
     path: `.preview-artifacts/bracket-${info.project.name}.png`,
     fullPage: true,
   });
-  await stages
-    .getByRole("link", { name: "Classificatória", exact: true })
-    .click();
+  await stages.getByRole("link", { name: "Fase Regular", exact: true }).click();
   await expect(
     page.getByRole("table", {
       name: "Classificação por resultados confirmados",
@@ -260,7 +260,10 @@ test("knockout appears when opponents are defined before games or results, and l
   value = buildPublicStandings(source);
   await page.reload();
   await expect(
-    page.getByRole("link", { name: "Eliminatória", exact: true }),
+    page.getByRole("link", { name: "Eliminatórias", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Fase Regular", exact: true }),
   ).toHaveCount(0);
   await expect(
     page.getByRole("table", {

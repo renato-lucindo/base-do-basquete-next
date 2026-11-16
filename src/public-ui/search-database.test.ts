@@ -26,6 +26,15 @@ it("pesquisa todo escopo publicado antes do limite; normaliza Unicode, deduplica
           )
         ).rows[0].result,
       );
+    const fullSearch = async (q: string, type = "all", page = 1) =>
+      discoveryPageSchema.parse(
+        (
+          await db.query<{ result: unknown }>(
+            "select public.search_public_entities_full($1,$2,$3) as result",
+            [q, type, page],
+          )
+        ).rows[0].result,
+      );
     await db.exec("set role anon");
     expect((await search("joao")).results).toEqual([]);
     await expect(
@@ -60,6 +69,36 @@ it("pesquisa todo escopo publicado antes do limite; normaliza Unicode, deduplica
     expect(first.counts.players).toBe(66);
     expect(first.results).toHaveLength(5);
     expect(first.results[0].name).toBe("Álvaro");
+    const full = await fullSearch("alvaro");
+    expect(full.view).toBe("results");
+    expect(full.totalPages).toBe(4);
+    expect(full.results).toHaveLength(20);
+    expect((await fullSearch("alvaro", "all", 4)).results).toHaveLength(6);
+    expect(full.results[0]).toMatchObject({ name: "Álvaro", latestTeam: null });
+    // The older game has the newer correction. Only the two public game
+    // projections are changed here, inside the isolated fixture transaction.
+    await db.exec(`reset role;
+      update public.published_player_games
+      set snapshot=jsonb_set(jsonb_set(jsonb_set(snapshot,
+        '{game,date}',to_jsonb(case when game_id=pg_temp.pu_id(9) then '2026-11-01' else '2026-10-01' end)),
+        '{fact,registration,name}',to_jsonb(case when game_id=pg_temp.pu_id(9) then 'Última equipe publicada' else 'Equipe antiga' end)),
+        '{fact,publishedAt}',to_jsonb(case when game_id=pg_temp.pu_id(9) then '2026-11-02T12:00:00Z' else '2027-01-01T12:00:00Z' end))
+      where person_id=pg_temp.pu_id(201) and game_id in(pg_temp.pu_id(8),pg_temp.pu_id(9));
+      set local role anon;`);
+    expect((await fullSearch("Player 1", "players")).results).toContainEqual(
+      expect.objectContaining({
+        id: "f9200000-0000-4000-8000-000000000201",
+        latestTeam: "Última equipe publicada",
+      }),
+    );
+    expect(
+      (await fullSearch("Perfil sem jogos", "players")).results[0],
+    ).toMatchObject({ latestTeam: null });
+    expect(
+      await db.query(
+        "select has_function_privilege('service_role','public.search_public_entities_full(text,text,integer,uuid)','execute') as allowed",
+      ),
+    ).toMatchObject({ rows: [{ allowed: false }] });
     const folded = await search("A\u0301LVARO");
     expect(folded.results).toEqual(first.results);
     expect(folded.counts).toEqual(first.counts);
@@ -72,6 +111,9 @@ it("pesquisa todo escopo publicado antes do limite; normaliza Unicode, deduplica
     expect(nick.results.map((x) => x.name)).toContain("João Independente");
     expect((await search("Nome privado posterior")).results).toEqual([]);
     expect((await search("Cadastro alterado e privado")).results).toEqual([]);
+    expect((await fullSearch("Cadastro alterado e privado")).results).toEqual(
+      [],
+    );
     expect((await search("Cadastro privado sem publicação")).results).toEqual(
       [],
     );

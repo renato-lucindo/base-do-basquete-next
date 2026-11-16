@@ -24,18 +24,38 @@ const textLimits: Record<string, number> = {
   originState: 80,
   biography: 4000,
 };
-const metadata = publicPersonSchema
-  .extend({ id: uuid })
-  .refine(
-    (p) =>
-      Object.entries(p).every(
-        ([key, v]) =>
-          typeof v !== "string" ||
-          (!/[\u0000\uD800-\uDFFF]/u.test(v) &&
-            (textLimits[key] === undefined || v.length <= textLimits[key])),
-      ),
-    "Confira os caracteres dos metadados públicos.",
+const validMetadataText = (person: Record<string, unknown>) =>
+  Object.entries(person).every(
+    ([key, value]) =>
+      typeof value !== "string" ||
+      (!/[\u0000\uD800-\uDFFF]/u.test(value) &&
+        (textLimits[key] === undefined || value.length <= textLimits[key])),
   );
+const historicalMetadata = publicPersonSchema
+  .extend({ id: uuid })
+  .refine(validMetadataText, "Confira os caracteres dos metadados.");
+const cardFields = publicPersonSchema
+  .omit({ dominantHand: true, biography: true })
+  .extend({ id: uuid });
+export const playerProfileMetadataSchema = cardFields.refine(
+  validMetadataText,
+  "Confira os caracteres dos metadados públicos.",
+);
+export type PlayerProfileMetadata = z.infer<typeof playerProfileMetadataSchema>;
+
+// Accept snapshots from the older database during rollout and discard fields
+// outside the public contract before serializing the Worker response.
+const metadata = cardFields
+  .extend({
+    dominantHand: publicPersonSchema.shape.dominantHand.optional(),
+    biography: publicPersonSchema.shape.biography.optional(),
+  })
+  .refine(validMetadataText)
+  .transform(({ dominantHand, biography, ...person }) => {
+    void dominantHand;
+    void biography;
+    return person;
+  });
 
 export const confirmPlayerProfileSchema = z
   .object({
@@ -45,11 +65,15 @@ export const confirmPlayerProfileSchema = z
     expectedPublicationVersion: expectedVersion,
     reason,
     acknowledgeImpact: z.literal(true),
+    initialBatch: z.literal(true).optional(),
   })
   .strict()
   .refine(
     (c) =>
-      c.expectedPublicationVersion === 0 || Array.from(c.reason).length >= 3,
+      c.initialBatch
+        ? c.expectedPublicationVersion === 0
+        : c.expectedPublicationVersion === 0 ||
+          Array.from(c.reason).length >= 3,
     "Revisão exige motivo.",
   );
 
@@ -58,7 +82,7 @@ export const playerProfileProposalSchema = z
   .strict()
   .refine((p) => p.person.id === p.personId);
 
-export const publicPlayerProfileSchema = z
+const publicPlayerProfileBase = z
   .object({
     kind: z.literal("confirmed-player-profile-v1"),
     personId: uuid,
@@ -66,7 +90,15 @@ export const publicPlayerProfileSchema = z
     confirmedAt: stamp,
     person: metadata,
   })
-  .strict()
+  .strict();
+
+export const publicPlayerProfileSchema = publicPlayerProfileBase.refine(
+  (p) => p.person.id === p.personId,
+);
+const historicalPlayerProfileSchema = publicPlayerProfileBase
+  .extend({
+    person: z.union([historicalMetadata, playerProfileMetadataSchema]),
+  })
   .refine((p) => p.person.id === p.personId);
 
 const header = z
@@ -79,7 +111,7 @@ const header = z
   })
   .strict();
 export const playerProfileVersionSchema = header
-  .extend({ personId: uuid, snapshot: publicPlayerProfileSchema })
+  .extend({ personId: uuid, snapshot: historicalPlayerProfileSchema })
   .strict()
   .refine(
     (v) =>
@@ -156,6 +188,13 @@ export const playerProfileWorkspaceSchema = z
       w.proposal.personId === w.state.personId &&
       w.proposal.personVersion === w.state.personVersion,
   );
+export const initialProfileCandidatesSchema = z
+  .object({
+    items: z.array(playerProfileProposalSchema).max(50),
+    next: uuid.nullable(),
+  })
+  .strict();
+
 export type PlayerProfileWorkspace = z.infer<
   typeof playerProfileWorkspaceSchema
 >;

@@ -22,17 +22,23 @@ select pg_temp.pp_assert(public.confirm_player_profile(pg_temp.pp_command())=pub
 select pg_temp.pp_error($q$select public.confirm_player_profile(jsonb_set(pg_temp.pp_command(),'{reason}','"different"'))$q$,'PT409');
 select pg_temp.pp_error($q$select public.confirm_player_profile(pg_temp.pp_command(3))$q$,'PT409');
 select pg_temp.pp_error($q$select public.confirm_player_profile(jsonb_set(pg_temp.pp_command(6),'{personId}',to_jsonb(pg_temp.pp_id(5))))$q$,'PT404');
-select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(1))->'person'->'publicBirthYear'='null'::jsonb,'no private birth year inferred');
+select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(1))#>>'{person,publicBirthYear}'='1997','explicit confirmation takes the year from the complete date');
 select pg_temp.pp_assert(not (public.get_public_player_profile(pg_temp.pp_id(1))->'person' ?| array['sex','birthDate','federationRegistration','athlete','coach']),'no private fields in snapshot');
 select pg_temp.pp_error('select * from private.player_profile_versions','42501');
 select pg_temp.pp_error($q$update public.published_player_profiles set version=99$q$,'42501');
 reset role;
-update public.persons set name='Ana depois da publicação',biography='Texto opcional 🏀',version=version+1 where id=pg_temp.pp_id(1);
+update private.athletes set birth_date='2000-02-29' where person_id=pg_temp.pp_id(1);
+update public.persons set name='Ana depois da publicação',biography='Texto opcional 🏀',public_birth_year=2009,version=version+1 where id=pg_temp.pp_id(1);
 set local role authenticated;
 select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(1))->'person'->>'name'='Ana Silva','cadastre edit preserves published identity');
 select pg_temp.pp_assert((public.get_player_profile_state(pg_temp.pp_id(1))->>'sourceChanged')::boolean,'source change reported privately');
 select pg_temp.pp_error($q$select public.confirm_player_profile(pg_temp.pp_command(7,1,1,'Revisão conferida'))$q$,'PT409');
 select pg_temp.pp_error($q$select public.confirm_player_profile(pg_temp.pp_command(8,2,1,''))$q$,'PT400');
+select pg_temp.pp_assert(
+ public.get_player_career_with_age(pg_temp.pp_id(1))->>'currentAge'=
+ extract(year from age((statement_timestamp() at time zone 'America/Sao_Paulo')::date::timestamp,'1997-01-01'::timestamp))::int::text,
+ 'edit does not affect a confirmed birthday'
+);
 select public.confirm_player_profile(pg_temp.pp_command(9,2,1,'Revisão conferida')) as revised_profile_ack;
 select pg_temp.pp_assert((public.confirm_player_profile(pg_temp.pp_command())->>'version')::int=1,'known replay stays original after newer confirmation');
 select public.get_player_profile_state(pg_temp.pp_id(1)) as profile_state;
@@ -41,6 +47,28 @@ select pg_temp.pp_assert(public.get_player_profile_version(pg_temp.pp_id(1),1)->
 select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(4)) is null,'homonym not implicitly published');
 set local role anon;
 select public.get_public_player_profile(pg_temp.pp_id(1)) as public_player_profile;
+select pg_temp.pp_assert(not (
+ (select snapshot->'person' from public.published_player_profiles where person_id=pg_temp.pp_id(1))
+ ?| array['dominantHand','biography','birthDate']
+),'public storage contains only the public card');
+select pg_temp.pp_assert(
+ public.get_public_player_profile(pg_temp.pp_id(1))#>'{person,biography}'='null'::jsonb,
+ 'legacy response keeps an empty compatibility field'
+);
+select public.get_player_career_with_age(pg_temp.pp_id(1)) as public_player_career;
+select pg_temp.pp_assert(
+ public.get_player_career_with_age(pg_temp.pp_id(1))->>'currentAge'=
+ extract(year from age((statement_timestamp() at time zone 'America/Sao_Paulo')::date::timestamp,'2000-02-29'::timestamp))::int::text,
+ 'reconfirmation updates the birthday and returns age to anon'
+);
+select pg_temp.pp_assert(
+ position('2000-02-29' in public.get_player_career_with_age(pg_temp.pp_id(1))::text)=0,
+ 'the private date is absent from the anonymous response'
+);
+select pg_temp.pp_error('select birth_date from private.player_profile_versions','42501');
+select pg_temp.pp_assert(public.get_confirmed_player_age(pg_temp.pp_id(1),1) is null,'historical birthdays cannot be queried');
+select pg_temp.pp_assert(public.get_confirmed_player_age(pg_temp.pp_id(4),1) is null,'unpublished age cannot be queried');
+select pg_temp.pp_assert(public.get_player_career_with_age(pg_temp.pp_id(4)) is null,'no implicit public profile');
 select pg_temp.pp_assert(public.get_public_player_profile(pg_temp.pp_id(999)) is null,'unknown identity has no public profile');
 select pg_temp.pp_error('select public.get_player_profile_proposal(pg_temp.pp_id(1))','42501');
 select pg_temp.pp_error('select public.confirm_player_profile(pg_temp.pp_command())','42501');
@@ -69,6 +97,26 @@ select public.get_player_profile_state(pg_temp.pp_id(1),20) as profile_last_page
 select pg_temp.pp_assert(jsonb_array_length(public.get_player_profile_state(pg_temp.pp_id(1))->'history')=20 and (public.get_player_profile_state(pg_temp.pp_id(1))->>'hasMore')::boolean,'first page is bounded and reports more');
 select pg_temp.pp_assert(jsonb_array_length(public.get_player_profile_state(pg_temp.pp_id(1),20)->'history')=3 and not (public.get_player_profile_state(pg_temp.pp_id(1),20)->>'hasMore')::boolean,'remaining history not omitted');
 select pg_temp.pp_error('select public.get_player_profile_state(pg_temp.pp_id(1),-1)','PT400');
+reset role;
+select pg_temp.pp_assert(private.confirmed_player_age('2000-07-06',1997,'2026-07-05')=25,'before birthday');
+select pg_temp.pp_assert(private.confirmed_player_age('2000-07-06',1997,'2026-07-06')=26,'on birthday');
+select pg_temp.pp_assert(private.confirmed_player_age('2000-07-06',1997,'2026-07-07')=26,'after birthday');
+select pg_temp.pp_assert(private.confirmed_player_age('2000-02-29',null,'2026-02-28')=25,'leap birthday before March');
+select pg_temp.pp_assert(private.confirmed_player_age('2000-02-29',null,'2026-03-01')=26,'leap birthday in March');
+select pg_temp.pp_assert(private.confirmed_player_age(null,2010,'2026-01-01')=16,'year only');
+select pg_temp.pp_assert(private.confirmed_player_age(null,null,'2026-01-01') is null,'unknown birthday');
+select pg_temp.pp_assert(private.confirmed_player_age('2026-01-02',null,'2026-01-01') is null,'future date');
+select pg_temp.pp_assert(
+ (select birth_date from private.player_profile_versions where person_id=pg_temp.pp_id(1) and version=1)='1997-01-01',
+ 'old confirmed date remains frozen'
+);
+set local role authenticated;
+select public.save_person(
+ jsonb_build_object('commandId',pg_temp.pp_id(500),'expectedVersion',2,'disputeId',null,'confirmHomonym',false,
+ 'person',jsonb_set(public.get_person(pg_temp.pp_id(1))-'version'-'savedAt','{publicBirthYear}','2008'))
+);
+select pg_temp.pp_assert(public.get_person(pg_temp.pp_id(1))->'publicBirthYear'='null'::jsonb,'full date overrides year in save');
+select pg_temp.pp_assert(public.get_player_profile_proposal(pg_temp.pp_id(1))#>>'{person,publicBirthYear}'='2000','full date supplies proposal year');
 reset role;
 update public.admin_access set enabled=false;
 set local role authenticated;

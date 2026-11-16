@@ -15,27 +15,28 @@ export class PublicSearch {
   ) {}
   async search(input: DiscoveryQuery, signal?: AbortSignal) {
     const q = discoveryQuerySchema.parse(input);
+    const rpc =
+      q.view === "results"
+        ? "search_public_entities_full"
+        : "search_public_entities";
     let response: Response;
     try {
-      response = await this.send(
-        `${this.config.url}/rest/v1/rpc/search_public_entities`,
-        {
-          method: "POST",
-          headers: {
-            apikey: this.config.key,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            p_query: q.q,
-            p_type: q.type,
-            p_page: q.page,
-            p_entity_id: q.entityId,
-          }),
-          signal: signal
-            ? AbortSignal.any([signal, AbortSignal.timeout(8000)])
-            : AbortSignal.timeout(8000),
+      response = await this.send(`${this.config.url}/rest/v1/rpc/${rpc}`, {
+        method: "POST",
+        headers: {
+          apikey: this.config.key,
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          p_query: q.q,
+          p_type: q.type,
+          p_page: q.page,
+          p_entity_id: q.entityId,
+        }),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(8000)])
+          : AbortSignal.timeout(8000),
+      });
     } catch {
       throw unavailable();
     }
@@ -51,6 +52,7 @@ export class PublicSearch {
       r.data.query !== q.q ||
       r.data.type !== q.type ||
       r.data.entityId !== q.entityId ||
+      r.data.view !== q.view ||
       r.data.page !== Math.min(q.page, r.data.totalPages)
     )
       throw unavailable();
