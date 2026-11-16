@@ -1,3 +1,5 @@
+@import "./ui-system/tokens.css";
+
 @layer base, components, responsive;
 @layer base {
   :root {
@@ -13,11 +15,11 @@
     background: #fff;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
-    --blue: #075fca;
+    --blue: var(--bb-blue);
     --ink: #172033;
     --muted: #526176;
     --line: #d9e2ee;
-    --surface: #f6f8fb;
+    --surface: var(--bb-background);
     --accent: #eef6ff;
   }
   * {
@@ -65,7 +67,7 @@
   button,
   .button {
     min-height: 2.75rem;
-    border: 1px solid #7b8796;
+    border: 1px solid var(--bb-control-line);
     background: #fff;
     color: var(--ink);
     padding: 0.5625rem 0.9375rem;
@@ -98,7 +100,7 @@
     min-height: 2.75rem;
     background: white;
     color: var(--ink);
-    border: 1px solid #7b8796;
+    border: 1px solid var(--bb-control-line);
     padding: 0.5625rem 0.75rem;
     font-size: 1rem;
   }

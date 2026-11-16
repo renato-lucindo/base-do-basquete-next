@@ -2,6 +2,7 @@
 
 ## Leitura por tarefa
 
+- [Design system](DESIGN-SYSTEM.md) — catálogo interativo, tokens e componentes reutilizáveis.
 - [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
 - [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
 - [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.

@@ -1,5 +1,14 @@
 # Progresso atual
 
+## Design system
+
+- Unidade `codex/design-system`, baseada em `a7f8aee`. [CI da base integrada](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43897953923) com sucesso. [Commits da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/design-system) e [execuções de CI](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fdesign-system) identificam o SHA e resultado de cada rodada.
+- [Guia e catálogo](design/DESIGN-SYSTEM.md) com tokens consumidos pelo tema público e pela base administrativa. O catálogo gera HTML offline com fixtures. O contorno dos campos do tema compartilhado passa a usar o tom administrativo.
+- A unidade usa worktree próprio. A edição de `CONTRIBUTING.md`, a instalação de `web-design-guidelines` e o `skills-lock.json` do checkout de origem permanecem lá.
+- A integração segue a revisão e o check `validate` da PR. A unidade gera um catálogo local e no artefato de CI. A situação do preview aparece abaixo.
+
+## Última unidade integrada
+
 Ficha pública e refinamento visual na [PR79](https://github.com/renato-lucindo/base-do-basquete-next/pull/79), branch `codex/perfil-atleta-aprovado`. O SHA validado e o deployment em serviço ficam nos [checks](https://github.com/renato-lucindo/base-do-basquete-next/pull/79/checks) e na descrição da PR.
 
 - A ficha mostra até quatro linhas de dados confirmados. A publicação manual usa prévia, decisão explícita e motivo de revisão. O lote reutiliza as confirmações versionadas.

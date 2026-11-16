@@ -4,6 +4,7 @@ for (const file of [
   "prototipos/sumula/build.cjs",
   "prototipos/estatisticas/react-prototype/build.cjs",
   "prototipos/reforma-uiux/build.cjs",
+  "catalogo/build.cjs",
 ]) {
   execFileSync(process.execPath, [path.join(__dirname, file)], {
     stdio: "inherit",
