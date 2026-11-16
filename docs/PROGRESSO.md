@@ -3,9 +3,9 @@
 ## Design system
 
 - Unidade `codex/design-system`, baseada em `a7f8aee`. [CI da base integrada](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43897953923) com sucesso. [Commits da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/design-system) e [execuções de CI](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fdesign-system) identificam o SHA e resultado de cada rodada.
-- [Guia e catálogo](design/DESIGN-SYSTEM.md) com tokens consumidos pelo tema público e pela base administrativa. O catálogo gera HTML offline com fixtures. O contorno dos campos do tema compartilhado passa a usar o tom administrativo.
+- [Guia e catálogo](design/DESIGN-SYSTEM.md) com tokens consumidos pelo tema público e pela base administrativa. O catálogo offline inclui autocomplete, filtros, seletor de colunas, tooltip, legenda, formulários, estados de consulta e feedback. O guia identifica os componentes reaproveitáveis e seus consumidores. O contorno dos campos do tema compartilhado passa a usar o tom administrativo.
 - A unidade usa worktree próprio. A edição de `CONTRIBUTING.md`, a instalação de `web-design-guidelines` e o `skills-lock.json` do checkout de origem permanecem lá.
-- A [PR #80](https://github.com/renato-lucindo/base-do-basquete-next/pull/80) inclui consulta ao design system antes de editar UI e revisão da tela renderizada antes da entrega. O código em `2f17cb4` passou no [gate completo](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43907063372). A revisão seguinte ajusta as instruções dos agentes. Próximo passo de integração nos checks da PR.
+- A [PR #80](https://github.com/renato-lucindo/base-do-basquete-next/pull/80) inclui consulta ao design system antes de editar UI e revisão da tela renderizada antes da entrega. A [CI do commit anterior](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43944645508) passou em `6353ada`. A rodada de catálogo corrigiu fechamento prematuro de filtro de equipe e seletor de colunas no WebKit. Evidências e próximo passo nos checks da PR.
 
 ## Última unidade integrada
 

@@ -19,7 +19,15 @@ import { Badge, Field } from "../../../src/ui";
 import "../../../src/ui-system/readability.css";
 import "../../../src/styles.css";
 import "../../../src/ui-system/theme.css";
+import "../../../src/statistics/reference.css";
+import "../../../src/public-ui/legend.css";
 import "./catalogo.css";
+import {
+  AdminControls,
+  FeedbackExamples,
+  PublicSearchExample,
+} from "./examples";
+import { StatisticsExample } from "./statistics-example";
 
 const palette = [
   ["--bb-blue", "Ação e foco"],
@@ -154,6 +162,7 @@ function PublicExample() {
   return (
     <section className="catalog-section" aria-labelledby="publico">
       <h2 id="publico">Interface pública</h2>
+      <PublicSearchExample />
       <div className="catalog-card">
         <h3>Liga do Litoral · Sub-17</h3>
         <div className="bb-ui catalog-public">
@@ -224,6 +233,7 @@ function PublicExample() {
           </div>
         </div>
       </div>
+      <StatisticsExample />
     </section>
   );
 }
@@ -238,6 +248,7 @@ function AdminExample() {
   return (
     <section className="catalog-section" aria-labelledby="administracao">
       <h2 id="administracao">Administração</h2>
+      <AdminControls />
       <div className="catalog-card catalog-admin">
         <div className="catalog-admin-summary">
           <div>
@@ -342,6 +353,7 @@ function Catalog() {
             <a href="#fundamentos">Fundamentos</a>
             <a href="#publico">Público</a>
             <a href="#administracao">Administração</a>
+            <a href="#estados">Estados</a>
           </nav>
         </div>
       </header>
@@ -356,6 +368,7 @@ function Catalog() {
         <Foundations />
         <PublicExample />
         <AdminExample />
+        <FeedbackExamples />
       </main>
     </>
   );

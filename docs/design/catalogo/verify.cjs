@@ -20,12 +20,110 @@ async function checkAccessibility(page) {
   );
 }
 
+async function checkExamples(page) {
+  const search = page.getByRole("combobox", {
+    name: "Buscar jogadores, equipes ou campeonatos",
+  });
+  await search.fill("nautico");
+  await expect(
+    page.getByRole("option", { name: /Clube Náutico/ }),
+  ).toBeVisible();
+  await search.press("ArrowDown");
+  await search.press("Enter");
+  await expect(
+    page.getByRole("status").filter({ hasText: "Selecionado:" }),
+  ).toHaveText("Selecionado: Clube Náutico da Enseada");
+
+  const stats = page.getByRole("table", { name: "Estatísticas por atleta" });
+  await expect(stats.getByRole("rowheader").first()).toHaveCSS(
+    "text-align",
+    "left",
+  );
+  await expect(stats.getByRole("cell").first()).toHaveCSS(
+    "text-align",
+    "right",
+  );
+  const games = stats.getByRole("button", { name: "Ordenar por J (Jogos)" });
+  await games.focus();
+  await expect(page.getByRole("tooltip")).toHaveText("Jogos");
+  await games.press("Enter");
+  await expect(
+    stats.getByRole("columnheader", { name: "Jogos" }),
+  ).toHaveAttribute("aria-sort", "ascending");
+  await expect(stats.getByRole("rowheader").first()).toHaveText(
+    "Isabela Martins",
+  );
+  await games.press("Escape");
+  await expect(page.getByRole("tooltip")).toBeHidden();
+
+  const filter = page.getByRole("button", { name: /Equipe.*Todas as equipes/ });
+  await filter.press("Enter");
+  const team = page.getByRole("checkbox", { name: "Clube Náutico da Enseada" });
+  await team.uncheck();
+  await expect(stats.getByRole("rowheader")).toHaveCount(2);
+  await team.press("Escape");
+  await expect(
+    page.getByRole("button", { name: /Equipe.*Equipes/ }),
+  ).toBeFocused();
+
+  const picker = page.getByRole("button", { name: /Colunas · 2 de 2/ });
+  await picker.press("Enter");
+  const gamesChoice = page.getByRole("checkbox", { name: "J · Jogos" });
+  await gamesChoice.uncheck();
+  await expect(stats.getByRole("columnheader", { name: "Jogos" })).toHaveCount(
+    0,
+  );
+  const legend = page.getByRole("region", { name: "Legenda" });
+  await expect(legend).toHaveCount(1);
+  await expect(legend.getByText("Jogos", { exact: true })).toHaveCount(0);
+  await expect(legend.getByText("Pontos", { exact: true })).toBeVisible();
+  await checkAccessibility(page);
+  await gamesChoice.press("Escape");
+  await expect(
+    page.getByRole("button", { name: /Colunas · 1 de 2/ }),
+  ).toBeFocused();
+
+  const number = page.getByRole("spinbutton", { name: "Nº do jogo" });
+  await number.fill("15");
+  await page.getByRole("radio", { name: "Encerrado" }).check();
+  await page.getByRole("button", { name: "Salvar jogo" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Jogo de exemplo salvo." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Restaurar exemplo" }).click();
+  await expect(number).toHaveValue("12");
+  await expect(page.getByRole("radio", { name: "Agendado" })).toBeChecked();
+
+  const states = page.getByRole("group", { name: "Estado da consulta" });
+  await expect(
+    page.getByRole("heading", { name: "Nenhum jogo encontrado" }),
+  ).toBeVisible();
+  await states.getByRole("button", { name: "Carregando" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Carregando jogos…" }),
+  ).toBeVisible();
+  await states.getByRole("button", { name: "Erro" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Não foi possível carregar os jogos",
+  );
+  await page.getByRole("button", { name: "Tentar novamente" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Agenda atualizada." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Mostrar notificação" }).click();
+  const toast = page.getByRole("region", { name: "Notificação" });
+  await expect(toast).toContainText("Local de jogo salvo");
+  await toast.getByRole("button", { name: "Dispensar notificação" }).click();
+  await expect(toast).toBeHidden();
+}
+
 async function main() {
   const engine = process.argv.includes("--webkit") ? webkit : chromium;
   const browser = await engine.launch();
   const prefix = engine === webkit ? "catalogo-webkit" : "catalogo";
   try {
     const context = await browser.newContext({ reducedMotion: "reduce" });
+    context.setDefaultTimeout(8000);
     const page = await context.newPage();
     for (const width of [320, 390, 639, 640, 1366, 1920]) {
       await page.setViewportSize({ width, height: width < 640 ? 844 : 768 });
@@ -104,6 +202,8 @@ async function main() {
     ).toBeVisible();
 
     await page.setViewportSize({ width: 320, height: 844 });
+    await checkExamples(page);
+
     const trigger = page.getByRole("button", { name: "Editar local" });
     await trigger.click();
     const dialog = page.getByRole("dialog", { name: "Editar local de jogo" });
@@ -122,12 +222,12 @@ async function main() {
     await trigger.click();
     await field.fill("Quadra da Enseada");
     await dialog.getByRole("button", { name: "Salvar local" }).click();
-    await expect(page.getByRole("status")).toHaveText(
-      "Local salvo como Quadra da Enseada.",
-    );
+    await expect(
+      page.getByRole("status").filter({ hasText: "Local salvo" }),
+    ).toHaveText("Local salvo como Quadra da Enseada.");
     await expect(trigger).toBeFocused();
     console.log(
-      "Catálogo validado em 6 larguras, com ordenação, busca, paginação, teclado, diálogo, erro, feedback e axe.",
+      "Catálogo validado em 6 larguras, com navegação, buscas, filtros, legendas, formulário, diálogo, estados, toast e axe.",
     );
   } finally {
     await browser.close();

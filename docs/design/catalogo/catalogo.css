@@ -257,3 +257,134 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.catalog-section > .catalog-card + .catalog-card {
+  margin-block-start: 0.75rem;
+}
+
+.catalog-statistics.public-site.statistics-public {
+  --public-blue: var(--bb-blue);
+  --public-muted: var(--bb-muted);
+  --public-text: var(--bb-text);
+  min-height: 0;
+  background: var(--bb-surface);
+  margin-block-start: 0.75rem;
+}
+
+.catalog-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.625rem;
+  margin-block-end: 0.75rem;
+}
+
+.catalog-filter-bar .team-filter {
+  max-width: 100%;
+  flex: 0 1 15rem;
+}
+
+.catalog-statistics .catalog-metrics {
+  font-variant-numeric: tabular-nums;
+}
+
+.catalog-statistics.public-site.statistics-public
+  .catalog-metrics
+  th:first-child {
+  text-align: left;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.catalog-statistics.public-site.statistics-public
+  .catalog-metrics
+  :is(th:not(:first-child), td:not([colspan])) {
+  text-align: right;
+}
+
+.catalog-statistics.public-site.statistics-public .catalog-metrics td[colspan] {
+  text-align: left;
+}
+
+.catalog-statistics.public-site.statistics-public .catalog-metrics button {
+  padding-inline: 0.25rem;
+  min-height: 2.75rem;
+}
+
+.catalog-metrics button:hover {
+  color: var(--bb-blue);
+  text-decoration: underline;
+}
+
+.catalog-statistics .statistics-table-wrap:focus-visible {
+  outline-offset: -0.125rem;
+}
+
+.catalog-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-start: 0.75rem;
+}
+
+.catalog-field-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.65fr) repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+.catalog-choice-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.catalog-choice-group legend {
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.catalog-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.catalog-choice-group label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  gap: 0.4375rem;
+  cursor: pointer;
+}
+
+.catalog-choice-group input[type="radio"] {
+  width: 1.25rem;
+  min-height: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--bb-blue);
+}
+
+.catalog-badges {
+  list-style: none;
+  padding: 0;
+}
+
+.catalog-badges li {
+  margin: 0;
+}
+
+.catalog-resource:has(.notice.success) {
+  display: flow-root;
+}
+
+@media (max-width: 639px) {
+  .catalog-field-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
