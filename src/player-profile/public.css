@@ -88,13 +88,15 @@
   container-type: inline-size;
   position: sticky;
   top: 0;
-  background: var(--public-background);
-  border-bottom: 1px solid var(--bb-line);
+  padding: 0.375rem;
+  border: 1px solid var(--bb-line);
+  border-radius: var(--bb-radius);
+  background: var(--bb-surface);
   z-index: 5;
 }
 .player-tabs-shell .bb-tabs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
   gap: 0.25rem;
   max-width: 34rem;
   margin-inline: auto;
@@ -783,6 +785,8 @@
   .player-mobile-honors .player-award-columns {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+@container (max-width: 17rem) {
   .player-tabs-shell .bb-tabs {
     display: flex;
     overflow-x: auto;

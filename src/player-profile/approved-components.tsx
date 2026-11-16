@@ -129,10 +129,12 @@ export function ProfileGames({
   games,
   scores,
   label,
+  matchupHeading = "Confronto",
 }: {
   games: ConfirmedPlayerGame[];
   scores: Record<string, string>;
   label: string;
+  matchupHeading?: string;
 }) {
   if (!games.length)
     return <p className="player-empty">Nenhum jogo encontrado.</p>;
@@ -152,7 +154,7 @@ export function ProfileGames({
         <thead>
           <tr>
             <th scope="col">Data</th>
-            <th scope="col">Confronto</th>
+            <th scope="col">{matchupHeading}</th>
             <th scope="col">
               <MetricTerm metric="points" />
             </th>

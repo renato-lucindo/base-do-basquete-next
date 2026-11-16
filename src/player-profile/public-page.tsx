@@ -547,11 +547,11 @@ export function PlayerPublicPage() {
                       </table>
                     </section>
                     <section className="player-recent">
-                      <h2>Últimos jogos</h2>
                       <ProfileGames
                         games={recent}
                         scores={scores}
                         label="Últimos jogos"
+                        matchupHeading="Últimos jogos"
                       />
                       <div className="player-link-footer">
                         <a
