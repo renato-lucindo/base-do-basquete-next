@@ -56,7 +56,9 @@ export function TeamFilter({
       onBlur={(e) => {
         if (
           e.relatedTarget &&
-          !e.currentTarget.contains(e.relatedTarget as Node)
+          !e.currentTarget.contains(e.relatedTarget) &&
+          // WebKit may focus the enclosing main on clicks inside the panel.
+          !e.relatedTarget.contains(e.currentTarget)
         )
           setOpen(false);
       }}

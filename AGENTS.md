@@ -16,6 +16,10 @@ Leia `CONTRIBUTING.md` e o resumo atual de `docs/PROGRESSO.md` antes de editar. 
 
 Padrão atual e comandos estão em `CONTRIBUTING.md`. A limpeza histórica dePRs está documentada em `historico/documentacao/analises/CONSOLIDACAO-PRS.md`.
 
-Nas tarefas de UI/UX, seguir [docs/design/README.md](docs/design/README.md), `docs/design/PADROES.md` e `PUBLICO.md` ou `ADMIN.md` conforme a área; para componentes e fluxos CRUD do admin, consultar também `docs/design/PADROES-ADMIN.md`. O índice descreve o uso das skills e a precedência das decisões; histórico arquivado não tem autoridade sobre as regras vigentes.
+## Trabalho de interface
+
+Antes de editar uma interface ou protótipo, consulte o [design system](docs/design/DESIGN-SYSTEM.md), os [padrões comuns](docs/design/PADROES.md) e o padrão da área [pública](docs/design/PUBLICO.md) ou [administrativa](docs/design/ADMIN.md). Para componentes e fluxos CRUD no admin, consulte também os [padrões administrativos](docs/design/PADROES-ADMIN.md).
+
+Confira a tela atual e use os tokens, componentes e textos aprovados que atendam ao pedido. Preserve as decisões vigentes ao adaptar uma tela ou um protótipo. Antes de entregar, verifique a tela alterada e registre na PR o que foi reaproveitado ou por que foi necessária uma variação e o resultado das conferências aplicáveis. Siga o [fluxo de revisão de UI/UX](docs/design/README.md#fluxo-de-trabalho-dos-agentes).
 
 Para identificar quais documentos ler em cada tipo de tarefa, consulte [`docs/INDICE.md`](docs/INDICE.md). Leitura seletiva e obrigatória — não leia toda a documentação em todas as tarefas.

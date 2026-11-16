@@ -1,0 +1,26 @@
+:root {
+  --bb-blue: #075fca;
+  --bb-blue-hover: #064da3;
+  --bb-blue-soft: #eef5ff;
+  --bb-text: #172b45;
+  --bb-muted: #53657a;
+  --bb-line: #dbe3ed;
+  --bb-background: #f6f8fb;
+  --bb-surface: #fff;
+  --bb-danger: #b42318;
+  --bb-success: #21603e;
+  --bb-control-line: #7b8796;
+  --bb-radius: 0.3125rem;
+  --bb-font-family:
+    Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bb-font-body: 0.875rem;
+  --bb-font-heading: 1.3125rem;
+  --bb-font-section: 1.0625rem;
+  --bb-font-detail: 0.75rem;
+}
+
+@media (max-width: 639px) {
+  :root {
+    --bb-font-heading: 1.25rem;
+  }
+}
