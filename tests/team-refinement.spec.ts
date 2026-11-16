@@ -1,30 +1,33 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { teamPublicFixture } from "./fixtures/team-public-browser";
-test("Equipes mantém os dois grupos de botões juntos e alinhados", async ({
+test("Equipes alinha Totais/Por jogo à direita em qualquer largura", async ({
   page,
 }, info) => {
   const f = await teamPublicFixture(page);
-  for (const width of [390, 1366]) {
+  for (const width of [320, 390, 1366]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(f.listUrl);
     await expect(
       page.getByRole("table", { name: "Estatísticas das equipes" }),
     ).toBeVisible();
     const group = page.locator(".team-list-segments");
-    const [scope, mode] = await group
-      .locator(".segmented")
-      .evaluateAll((elements) =>
-        elements.map((el) => {
-          const { x, y, right, bottom } = el.getBoundingClientRect();
-          return { x, y, right, bottom };
-        }),
-      );
-    if (Math.abs(scope.y - mode.y) < 1)
-      expect(mode.x - scope.right).toBeLessThan(16);
-    else {
-      expect(Math.abs(scope.x - mode.x)).toBeLessThan(1);
-      expect(mode.y - scope.bottom).toBeLessThan(16);
+    const bar = (await group.boundingBox())!;
+    const scope = (await group
+      .getByRole("group", { name: "Escopo" })
+      .boundingBox())!;
+    const mode = (await group
+      .getByRole("group", { name: "Modo" })
+      .boundingBox())!;
+    expect(Math.abs(scope.x - bar.x)).toBeLessThan(1);
+    expect(Math.abs(mode.x + mode.width - bar.x - bar.width)).toBeLessThan(1);
+    if (width >= 390) {
+      expect(
+        Math.abs(scope.y + scope.height / 2 - mode.y - mode.height / 2),
+      ).toBeLessThan(1);
+      expect(mode.x - scope.x - scope.width).toBeGreaterThan(0);
+    } else if (mode.y > scope.y + 1) {
+      expect(mode.y).toBeGreaterThanOrEqual(scope.y + scope.height);
     }
     await expect(group).toBeVisible();
     await expect(page.locator(".team-list-page .statistics-public")).toHaveCSS(
