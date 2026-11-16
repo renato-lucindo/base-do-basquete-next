@@ -773,18 +773,3 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
   background: var(--public-blue-soft);
   color: var(--public-text);
 }
-:is(.public-table-scroll, .public-standings-table, .simple-statistics-table)
-  thead
-  th {
-  border-block: 1px solid var(--public-line);
-}
-:is(.public-table-scroll, .public-standings-table, .simple-statistics-table)
-  thead
-  th:first-child {
-  border-inline-start: 1px solid var(--public-line);
-}
-:is(.public-table-scroll, .public-standings-table, .simple-statistics-table)
-  thead
-  th:last-child {
-  border-inline-end: 1px solid var(--public-line);
-}
