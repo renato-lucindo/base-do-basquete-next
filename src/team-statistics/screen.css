@@ -306,6 +306,7 @@
 }
 .team-list-page .team-list-segments {
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
@@ -318,6 +319,9 @@
 }
 .team-list-page .team-list-segments .mode-control {
   width: auto;
+}
+.team-list-page .team-list-segments .mode-control:last-child {
+  margin-inline-start: auto;
 }
 .team-list-page .team-list-segments .segmented {
   margin-inline-start: 0;

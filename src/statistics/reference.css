@@ -1909,5 +1909,12 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   background: var(--public-surface);
 }
 .public-site.statistics-public .statistics-table thead th {
+  border-block-start: 1px solid var(--public-line);
   background: var(--public-blue-soft);
+}
+.public-site.statistics-public .statistics-table thead th:first-child {
+  border-inline-start: 1px solid var(--public-line);
+}
+.public-site.statistics-public .statistics-table thead th:last-child {
+  border-inline-end: 1px solid var(--public-line);
 }

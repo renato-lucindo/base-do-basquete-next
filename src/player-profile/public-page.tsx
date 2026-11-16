@@ -576,16 +576,7 @@ export function PlayerPublicPage() {
                   </div>
                 ) : tab.key === "estatisticas" ? (
                   <section className="player-championships">
-                    <div className="player-section-title">
-                      <button
-                        className="player-adjust"
-                        aria-expanded={filters === "stats"}
-                        onClick={() => setFilters("stats")}
-                      >
-                        Filtrar e ajustar
-                      </button>
-                    </div>
-                    <div className="player-stat-controls">
+                    <div className="player-toolbar">
                       <div
                         className="player-segmented"
                         role="group"
@@ -601,26 +592,33 @@ export function PlayerPublicPage() {
                           </button>
                         ))}
                       </div>
-                      {(view.year ||
-                        view.championship ||
-                        view.teams !== null ||
-                        view.scope !== "all") && (
-                        <button
-                          className="player-clear"
-                          onClick={() =>
-                            update({
-                              year: "",
-                              championship: "",
-                              teams: null,
-                              scope: "all",
-                              statsPage: 1,
-                            })
-                          }
-                        >
-                          Limpar filtros
-                        </button>
-                      )}
+                      <button
+                        className="player-adjust"
+                        aria-expanded={filters === "stats"}
+                        onClick={() => setFilters("stats")}
+                      >
+                        Filtrar e ajustar
+                      </button>
                     </div>
+                    {(view.year ||
+                      view.championship ||
+                      view.teams !== null ||
+                      view.scope !== "all") && (
+                      <button
+                        className="player-clear"
+                        onClick={() =>
+                          update({
+                            year: "",
+                            championship: "",
+                            teams: null,
+                            scope: "all",
+                            statsPage: 1,
+                          })
+                        }
+                      >
+                        Limpar filtros
+                      </button>
+                    )}
                     <div
                       className="player-scroll"
                       role="region"
@@ -747,7 +745,13 @@ export function PlayerPublicPage() {
                   </div>
                 ) : (
                   <section className="player-games-page">
-                    <div className="player-section-title">
+                    <div className="player-toolbar">
+                      <p className="player-games-count" role="status">
+                        {games.length}{" "}
+                        {games.length === 1
+                          ? "jogo encontrado"
+                          : "jogos encontrados"}
+                      </p>
                       <button
                         className="player-adjust"
                         aria-expanded={filters === "games"}
@@ -787,12 +791,6 @@ export function PlayerPublicPage() {
                         </button>
                       </div>
                     )}
-                    <p className="player-games-count" role="status">
-                      {games.length}{" "}
-                      {games.length === 1
-                        ? "jogo encontrado"
-                        : "jogos encontrados"}
-                    </p>
                     <ProfileGames
                       games={pageGames}
                       scores={scores}

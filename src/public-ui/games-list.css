@@ -136,6 +136,7 @@
   background: var(--public-surface);
 }
 .public-game-meta {
+  border: 1px solid var(--public-line);
   background: var(--public-blue-soft);
   color: var(--public-muted);
   padding: 0.375rem 0.5rem;
