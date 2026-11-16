@@ -249,7 +249,9 @@ function AdminExample() {
         <button
           type="button"
           className="primary"
-          onClick={() => {
+          onClick={(event) => {
+            // WebKit can open the dialog on click without focusing its trigger.
+            event.currentTarget.focus({ preventScroll: true });
             setError(false);
             setOpen(true);
           }}

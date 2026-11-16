@@ -38,4 +38,4 @@ Ao alterar um token ou componente compartilhado, confira os consumidores afetado
 
 ## Verificação
 
-`npm run design:verify` inclui o catálogo. O verificador confere interação, contraste automatizado com axe, ausência de transbordamento da página e escala nas larguras de 320, 390, 639, 640, 1366 e 1920 CSS px. O verificador também simula ampliação de 200% por CSS. A execução grava capturas desktop e mobile junto do HTML. As provas do catálogo cobrem suas amostras e fixtures.
+`npm run design:verify` inclui o catálogo. O verificador confere interação, contraste automatizado com axe, ausência de transbordamento da página e escala nas larguras de 320, 390, 639, 640, 1366 e 1920 CSS px. O verificador também simula ampliação de 200% por CSS. A execução grava capturas desktop e mobile junto do HTML. As provas do catálogo cobrem suas amostras e fixtures. Com WebKit do Playwright instalado, rode `node docs/design/catalogo/verify.cjs --webkit` para repetir a verificação no segundo motor.

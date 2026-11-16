@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
-const { chromium, expect } = require("@playwright/test");
+const { chromium, webkit, expect } = require("@playwright/test");
 const { AxeBuilder } = require("@axe-core/playwright");
 
 const directory = path.join(__dirname, "../.preview-artifacts/catalogo");
@@ -21,7 +21,9 @@ async function checkAccessibility(page) {
 }
 
 async function main() {
-  const browser = await chromium.launch();
+  const engine = process.argv.includes("--webkit") ? webkit : chromium;
+  const browser = await engine.launch();
+  const prefix = engine === webkit ? "catalogo-webkit" : "catalogo";
   try {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();
@@ -47,7 +49,7 @@ async function main() {
       if (width === 390 || width === 1366) {
         await checkAccessibility(page);
         await page.screenshot({
-          path: path.join(directory, `catalogo-${width}.png`),
+          path: path.join(directory, `${prefix}-${width}.png`),
           fullPage: true,
         });
       }
@@ -113,7 +115,7 @@ async function main() {
     await expect(field).toHaveAccessibleDescription("Informe o nome do local.");
     await checkAccessibility(page);
     await page.screenshot({
-      path: path.join(directory, "catalogo-dialogo.png"),
+      path: path.join(directory, `${prefix}-dialogo.png`),
     });
     await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
