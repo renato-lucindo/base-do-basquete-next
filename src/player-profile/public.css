@@ -44,7 +44,7 @@
 }
 .player-intro {
   padding: 1.25rem;
-  margin-block: 1rem;
+  margin-block: 1rem 0.5rem;
   border: 1px solid var(--bb-line);
   border-top: 3px solid var(--bb-blue);
   border-radius: var(--bb-radius);
@@ -85,13 +85,12 @@
   min-width: 0;
 }
 .player-tabs-shell {
-  margin-bottom: 0.5rem;
   container-type: inline-size;
   position: sticky;
   top: 0;
   padding: 0.375rem;
   border: 1px solid var(--bb-line);
-  border-radius: var(--bb-radius);
+  border-radius: var(--bb-radius) var(--bb-radius) 0 0;
   background: var(--bb-surface);
   z-index: 5;
 }
@@ -126,8 +125,7 @@
 .player-tab-panel {
   padding: 1rem;
   border: 1px solid var(--bb-line);
-  border-bottom: 0;
-  border-radius: var(--bb-radius) var(--bb-radius) 0 0;
+  border-block-width: 0;
   background: var(--bb-surface);
   scroll-margin-top: 4rem;
 }
