@@ -28,11 +28,9 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  border-top: 1px solid var(--public-line);
 }
 .public-game-row {
-  padding: 1rem 0.75rem;
-  border-bottom: 1px solid var(--public-line);
+  padding-inline: 0.75rem;
   text-align: center;
   font-size: 0.875rem;
   overflow-wrap: anywhere;
