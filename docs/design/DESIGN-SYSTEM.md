@@ -2,6 +2,12 @@
 
 A base visual do MVP reúne superfícies claras, azul para ações e seleção, tipografia de leitura rápida e tabelas compactas. A consulta pública prioriza o celular. A operação administrativa prioriza o desktop, com reflow para telas menores. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) definem o comportamento dos fluxos.
 
+## Uso pelos agentes
+
+Use este guia antes de propor ou editar UI. Comece pela tela atual e pela decisão vigente da área. Localize o consumidor real do token ou componente para conferir se ele cobre o caso solicitado. Ao revisar a entrega, compare a tela renderizada com essa referência e aplique a [conferência de textos e tabelas](README.md#conferência-obrigatória-de-textos-e-tabelas) quando pertinente. Registre a escolha e o resultado observado na seção de verificação da PR.
+
+Por exemplo, ao ajustar uma tabela de estatísticas, confira no [catálogo de métricas](../../src/statistics/metrics.ts) que `J` aparece como **Jogos** no tooltip, no seletor e na legenda. Abra a aba afetada e confirme que a legenda aparece uma vez, depois da paginação, quando houver, e antes do rodapé. Para um diálogo, confira foco inicial, Escape e retorno ao acionador no percurso alterado.
+
 ## Catálogo interativo
 
 Com as dependências do projeto instaladas, gere o HTML com `node docs/design/catalogo/build.cjs` e abra `docs/design/.preview-artifacts/catalogo/index.html` no navegador. O catálogo funciona offline. Os exemplos usam dados fictícios e podem ser reiniciados ao recarregar a página.

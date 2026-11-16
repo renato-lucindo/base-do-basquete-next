@@ -2,7 +2,7 @@
 
 ## Leitura por tarefa
 
-- [Design system](DESIGN-SYSTEM.md) — catálogo interativo, tokens e componentes reutilizáveis.
+- [Design system](DESIGN-SYSTEM.md) — referência de trabalho dos agentes para escolher tokens e componentes antes de editar a interface.
 - [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
 - [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
 - [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
@@ -18,11 +18,11 @@ Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da 
 
 ## Fluxo de trabalho dos agentes
 
-1. **Entender:** identificar a tarefa e o primeiro dado útil, ler o padrão da área, consultar o estado real no Next e limitar o escopo ao MVP.
-2. **Projetar:** usar `ui-ux-pro-max` para pesquisar recomendações específicas de fluxo, componentes e hierarquia; preservar identidade, decisões e componentes já existentes.
+1. **Entender.** Identificar a tarefa e o primeiro dado útil, consultar a tela atual, o design system e o padrão vigente da área. Limitar a alteração ao escopo da tarefa no MVP.
+2. **Projetar.** Localizar no código o token ou componente que atende ao caso e reutilizá-lo. Se a tarefa exigir uma variação, registrar o motivo na PR. Usar `ui-ux-pro-max` para pesquisas específicas de fluxo, componentes e hierarquia, de acordo com as decisões vigentes.
 3. **Implementar:** cuidar desde o início de teclado, leitor de tela, foco, erro, carregamento, vazio, densidade e zoom.
 4. **Revisar:** usar `web-design-guidelines` sobre arquivos de UI alterados, buscar diretrizes atualizadas da fonte indicada pela skill antes da revisão e registrar achados por arquivo/linha. Executar também a conferência obrigatória abaixo; repetir um padrão antigo na implementação não dispensa compará-lo com a regra vigente.
-5. **Verificar:** revisão **proporcional** à mudança (texto, componente ou fluxo), com tamanhos de tela/estados afetados, testes pertinentes, capturas quando necessário e evidência de SHA/resultado/limites. Axe não substitui inspeção manual nem comprova WCAG integral.
+5. **Verificar.** Comparar a interface renderizada com o pedido e os padrões vigentes. Conferir textos, controles, estados e tamanhos atingidos pela mudança. Registrar na PR um resultado observável da conferência e as provas proporcionais, com SHA e limites. Usar axe como apoio à inspeção manual.
 
 **Skills e instalação híbrida:** consulte [SKILLS.md](SKILLS.md) para origem, licença, versão, hashes e execução. `ui-ux-pro-max` está versionada com catálogos e scripts; `web-design-guidelines` continua por instalação local ou consulta à fonte, pois não foi comprovada licença de redistribuição da coleção. Preservar instalações pessoais e `skills-lock.json` de outros checkouts, sem alegar revisão não executada.
 
