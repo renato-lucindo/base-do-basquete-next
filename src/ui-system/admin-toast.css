@@ -1,5 +1,6 @@
 .admin-toast-announcer {
   position: fixed;
+  z-index: 80;
 }
 .admin-toast {
   --toast-accent: var(--bb-success);
@@ -8,7 +9,6 @@
   position: fixed;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
-  z-index: 80;
   pointer-events: none;
   display: flex;
   gap: 0.625rem;

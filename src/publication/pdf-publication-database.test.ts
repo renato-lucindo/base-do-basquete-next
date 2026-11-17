@@ -83,6 +83,7 @@ it("publishes each supplied PDF with actual capabilities and preserves only auth
     insert into auth.users(id) values('${pubId(9001)}');insert into public.admin_access(user_id) values('${pubId(9001)}');
     insert into public.championships(id,name) values('${pubId(9003)}','Fixture');insert into public.seasons(id,championship_id,year) values('${pubId(9004)}','${pubId(9003)}',2026);
     insert into public.disputes(id,season_id,gender,category) values('${pubId(2)}','${pubId(9004)}','masculino','Adulto');
+    update private.dispute_administration set visibility='legacy',was_public=true where dispute_id='${pubId(2)}';
     insert into public.teams(id,name) values('${pubId(9002)}','Global');insert into public.registrations(id,dispute_id,team_id,name) values('${pubId(9005)}','${pubId(2)}','${pubId(9002)}','Home'),('${pubId(9006)}','${pubId(2)}','${pubId(9002)}','Away');
     insert into public.games(id,dispute_id,home_registration_id,away_registration_id) values('${pubId(3)}','${pubId(2)}','${pubId(9005)}','${pubId(9006)}');
     insert into public.persons(id,name) values ${people};insert into private.athletes(person_id,sex) values ${athletes};insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey) values ${roster};

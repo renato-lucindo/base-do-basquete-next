@@ -15,6 +15,13 @@ insert into public.admin_access(user_id) values(pg_temp.pp_id(98));
 insert into public.championships(id,name) values(pg_temp.pp_id(1),'PDF publication fixture');
 insert into public.seasons(id,championship_id,year) values(pg_temp.pp_id(2),pg_temp.pp_id(1),2026);
 insert into public.disputes(id,season_id,gender,category) values(pg_temp.pp_id(3),pg_temp.pp_id(2),'masculino','Adulto');
+-- This fixture exercises public publication readers.
+do $$ begin
+ if to_regclass('private.dispute_administration') is not null then
+  update private.dispute_administration set visibility='legacy',was_public=true
+  where dispute_id=pg_temp.pp_id(3);
+ end if;
+end $$;
 insert into public.teams(id,name) values(pg_temp.pp_id(4),'Global team');
 insert into public.registrations(id,dispute_id,team_id,name) values(pg_temp.pp_id(5),pg_temp.pp_id(3),pg_temp.pp_id(4),'Home'),(pg_temp.pp_id(6),pg_temp.pp_id(3),pg_temp.pp_id(4),'Away');
 insert into public.games(id,dispute_id,home_registration_id,away_registration_id) values(pg_temp.pp_id(8),pg_temp.pp_id(3),pg_temp.pp_id(5),pg_temp.pp_id(6)),(pg_temp.pp_id(9),pg_temp.pp_id(3),pg_temp.pp_id(5),pg_temp.pp_id(6));

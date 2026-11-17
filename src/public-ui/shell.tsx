@@ -1,4 +1,10 @@
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { api } from "../competition/api";
+import {
+  disputeStatusLabels,
+  disputeStatusSchema,
+} from "../competition/administration-contract";
+import { previewDisputeId } from "./preview";
 import {
   contextLabel,
   disputeLink,
@@ -28,6 +34,12 @@ export function PublicHeader({
 } = {}) {
   return (
     <header className="site-header public-header">
+      {previewDisputeId() && (
+        <div className="wrap" role="status">
+          Prévia de disputa de teste ·{" "}
+          <a href="/publico.html?sairPrevia=1">Sair da prévia</a>
+        </div>
+      )}
       <div className="wrap header-inner">
         <a href={siteHome} className="brand">
           <span className="brand-mark" aria-hidden="true">
@@ -87,6 +99,27 @@ function DisputeNavigation({
   detail?: string;
 }) {
   const catalog = usePublicCatalog(disputeId);
+  const [publicState, setPublicState] = useState<{
+    disputeId: string;
+    status: keyof typeof disputeStatusLabels | null;
+  } | null>(null);
+  const status =
+    publicState?.disputeId === disputeId ? publicState.status : null;
+  useEffect(() => {
+    const controller = new AbortController();
+    void api(
+      "/api/public/dispute-status/" + disputeId,
+      disputeStatusSchema.nullable(),
+      undefined,
+      controller.signal,
+    )
+      .then((value) => {
+        if (!controller.signal.aborted)
+          setPublicState({ disputeId, status: value });
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [disputeId]);
   const [selecting, setSelecting] = useState(false);
   const panelId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -129,6 +162,7 @@ function DisputeNavigation({
                 : "Disputa sem contexto público disponível"}
           </p>
         )}
+        {status && <span>{disputeStatusLabels[status]}</span>}
         {selecting && c && (
           <EditionDisputes
             id={panelId}

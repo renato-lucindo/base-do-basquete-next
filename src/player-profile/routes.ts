@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { sessionName } from "../access/cookie";
 import { confirmPlayerProfileSchema } from "./contract";
@@ -21,10 +22,13 @@ export async function publicPlayerProfileRoute(
   const m = /^\/api\/public\/players\/([^/]+)$/u.exec(url.pathname),
     id = z.uuid().safeParse(m?.[1]);
   if (!id.success) throw bad();
-  const page = await new SupabasePlayerProfiles({
-    url: env.SUPABASE_URL,
-    key: env.SUPABASE_PUBLISHABLE_KEY,
-  }).getPage(id.data, url.searchParams, url.searchParams.get("age") === "1");
+  const page = await new SupabasePlayerProfiles(
+    {
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    },
+    await publicReadTransport(request, env),
+  ).getPage(id.data, url.searchParams, url.searchParams.get("age") === "1");
   if (page === null)
     throw new HttpError(
       404,

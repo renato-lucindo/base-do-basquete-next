@@ -43,7 +43,7 @@ select pg_temp.r_assert(not ((public.get_roster_entry(pg_temp.r_id(12))->'person
 reset role;
 -- Global edits must not invalidate an existing active context.
 select pg_temp.r_error($q$update private.athletes set sex='male' where person_id=pg_temp.r_id(50)$q$,'PT400');
-select pg_temp.r_error($q$update public.disputes set gender='masculino' where id=pg_temp.r_id(92)$q$,'PT400');
+select pg_temp.r_error($q$update public.disputes set gender='masculino' where id=pg_temp.r_id(92)$q$,case when to_regclass('private.dispute_administration') is null then 'PT400' else 'PT409' end);
 select pg_temp.r_assert((select sex='female' from private.athletes where person_id=pg_temp.r_id(50)),'global sex mismatch rolled back');
 update public.roster_entries set ended_at=clock_timestamp() where person_id=pg_temp.r_id(50) and ended_at is null;
 update private.athletes set sex='male' where person_id=pg_temp.r_id(50);

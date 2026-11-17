@@ -1,0 +1,10 @@
+# 023 — Administração de disputas
+
+Decisão de 17/11/2026. Aplica-se ao cadastro de campeonatos, aos fluxos esportivos do admin e às leituras públicas.
+
+- Naipe, categoria e divisão são editáveis até a primeira inscrição, jogo, fonte ou revisão de importação, regulamento, configuração ou conquista. O bloqueio é permanente. O ano trava junto à primeira disputa em uso da temporada. IDs e vínculos entre campeonato, temporada e disputa são estáveis. Renomear o campeonato fica auditado e exige motivo quando alguma disputa já foi pública. As páginas atuais exibem o nome atual e os documentos históricos conservam a versão original.
+- Disputas nascem Planejadas. A confirmação do primeiro resultado por súmula, PDF, W.O. ou decisão que atribua o resultado inicia a disputa. Concluir exige resolução de todos os jogos. Cancelar exige motivo e recolhe partidas pendentes da agenda pública. Concluir e cancelar travam a operação esportiva. Reabrir com motivo restaura a situação anterior. Visibilidade pode ser administrada em qualquer situação.
+- Pública dá acesso à identificação mesmo sem partidas. A publicação de agenda, equipes, jogos e conquistas segue seus próprios contratos. Privada restringe toda a disputa, incluindo links diretos, buscas e participação nos agregados. Perfis publicados de forma independente e dados de outras disputas seguem disponíveis. A exposição herdada continua condicionada aos leitores que já exibiam o conteúdo.
+- Teste é definido na criação e sempre privado. A prévia autenticada reaproveita as consultas e telas públicas com o escopo de uma única disputa, incluindo catálogo, descoberta e perfis. Cadastros de pessoas e equipes podem ser consultados e vinculados. É possível gravar inscrições, elencos e resultados da própria disputa de teste.
+
+Comandos de estado registram ator, versão, motivo quando aplicável e recibo idempotente. O banco coordena alterações de identificação e primeiras dependências com o lock do campeonato, inclusive pelos comandos antigos. A visibilidade compõe as políticas de linha, leitores privilegiados e guardas de jogos individuais. O histórico privado permanece íntegro quando a exposição muda.

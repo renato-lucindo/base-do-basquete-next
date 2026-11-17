@@ -853,6 +853,19 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_dispute_administration: {
+        Args: { p_competition_id: string };
+        Returns: Json;
+      };
+      save_dispute_administration: { Args: { p_command: Json }; Returns: Json };
+      save_competition_administration: {
+        Args: { p_command: Json };
+        Returns: Json;
+      };
+      read_test_dispute: {
+        Args: { p_id: string; p_operation: string; p_args: Json };
+        Returns: Json;
+      };
       get_competition: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_editor: { Args: { p_id: string }; Returns: Json };

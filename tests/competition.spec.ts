@@ -10,6 +10,7 @@ async function fixture(page: Page) {
   const commands = new Map<string, { id: string; version: number }>();
   let attempts: string[] = [];
   let authenticated = true;
+  let lockIdentification = false;
   await page.route("**/api/session", (route) => {
     if (route.request().method() === "POST") authenticated = true;
     if (route.request().method() === "DELETE") {
@@ -104,12 +105,45 @@ async function fixture(page: Page) {
       },
     });
   });
+  await page.route("**/api/competition-administration/**", async (route) => {
+    const request = route.request();
+    if (!saved) return route.fulfill({ json: [] });
+    if (request.method() === "GET")
+      return route.fulfill({
+        json: saved.seasons.flatMap((s) =>
+          s.disputes.map((d) => ({
+            disputeId: d.id,
+            version: 1,
+            status: "planned",
+            visibility: "private",
+            lockReason: lockIdentification ? "registration" : null,
+            isTest: false,
+            wasPublic: false,
+          })),
+        ),
+      });
+    const command = request.postDataJSON();
+    return route.fulfill({
+      json: {
+        disputeId: command.disputeId,
+        version: 2,
+        status: "planned",
+        visibility: command.visibility,
+        wasPublic: command.visibility === "public",
+        isTest: false,
+        lockReason: null,
+      },
+    });
+  });
   return {
     setMode: (next: typeof mode) => {
       mode = next;
       attempts = [];
     },
     attempts: () => attempts,
+    lockIdentification: () => {
+      lockIdentification = true;
+    },
     expire: () => {
       authenticated = false;
     },
@@ -129,6 +163,64 @@ async function create(page: Page) {
     .getByLabel("Categoria da disputa 1.1", { exact: true })
     .selectOption("adult");
 }
+
+test("protege os campos de identificação e confirma a alteração de visibilidade", async ({
+  page,
+}) => {
+  const state = await fixture(page);
+  state.lockIdentification();
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  await page
+    .getByRole("button", { name: "Salvar campeonato", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Ano da temporada 1", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByLabel("Naipe da disputa 1.1", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByLabel("Categoria da disputa 1.1", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByLabel("Divisão da disputa 1.1", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("A disputa já tem histórico de inscrições."),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Tornar pública", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog", { name: "Tornar pública" });
+  await expect(dialog).toBeVisible();
+  await dialog
+    .getByRole("button", { name: "Tornar pública", exact: true })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByText("Planejada · Pública")).toBeVisible();
+});
+
+test("mantém a prévia de teste ao navegar e restaura o catálogo normal ao sair", async ({
+  page,
+}) => {
+  const disputeId = "7d780000-0000-4000-8000-000000000222";
+  const scopes: (string | undefined)[] = [];
+  await page.route("**/api/public/catalog**", (route) => {
+    scopes.push(route.request().headers()["x-dispute-preview"]);
+    return route.fulfill({ json: { games: [], disputes: [], next: null } });
+  });
+  await page.goto("http://127.0.0.1:5174/publico.html?previa=" + disputeId);
+  await expect(page.getByText("Prévia de disputa de teste")).toBeVisible();
+  await expect.poll(() => scopes.at(-1)).toBe(disputeId);
+  const beforeNavigation = scopes.length;
+  await page.getByRole("link", { name: "Campeonatos", exact: true }).click();
+  await expect.poll(() => scopes.length).toBeGreaterThan(beforeNavigation);
+  expect(scopes.at(-1)).toBe(disputeId);
+  await page.getByRole("link", { name: "Sair da prévia" }).click();
+  await expect(page.getByText("Prévia de disputa de teste")).toHaveCount(0);
+  await expect.poll(() => scopes.at(-1)).toBeUndefined();
+});
 
 for (const width of [1366, 1920])
   test(`campeonato compacto desktop ${width} mantém campos e salvamento acessíveis`, async ({

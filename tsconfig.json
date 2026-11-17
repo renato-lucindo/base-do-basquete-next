@@ -27,6 +27,8 @@
     "src/player-profile/routes.ts",
     "src/statistics/routes.ts",
     "src/server/worker.ts",
+    "src/server/public-read.ts",
+    "src/competition/administration-route.ts",
     "src/achievements/routes.ts",
     "src/access/durable.ts",
     "src/teams/routes.ts",

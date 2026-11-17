@@ -33,14 +33,31 @@ export class PublicCatalog {
     return providerJson(response, 1024 * 1024);
   }
   async page(disputeId: string | null, after: string | null) {
-    const p = new URLSearchParams({
-      select:
-        "id:game_id,disputeId:dispute_id,context:snapshot->context,game:snapshot->game,home:snapshot->facts->teams->home->points,away:snapshot->facts->teams->away->points",
-      order: "game_id.asc",
-      limit: "100",
-    });
-    if (disputeId) p.set("dispute_id", `eq.${uuid.parse(disputeId)}`);
-    if (after) p.set("game_id", `gt.${uuid.parse(after)}`);
+    const args = {
+      p_dispute_id: disputeId && uuid.parse(disputeId),
+      p_after: after && uuid.parse(after),
+    };
+    let response: Response;
+    try {
+      response = await this.send(
+        this.config.url + "/rest/v1/rpc/list_public_catalog_games",
+        {
+          method: "POST",
+          headers: {
+            apikey: this.config.key,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(args),
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+    } catch {
+      throw unavailable();
+    }
+    if (!response.ok) {
+      await response.body?.cancel().catch(() => undefined);
+      throw unavailable();
+    }
     const raw = z
       .array(
         catalogGameSchema
@@ -52,7 +69,7 @@ export class PublicCatalog {
           .strict(),
       )
       .max(100)
-      .safeParse(await this.read("published_games", p));
+      .safeParse(await providerJson(response, 1024 * 1024));
     if (!raw.success) throw unavailable();
     let previous = after;
     for (const row of raw.data) {

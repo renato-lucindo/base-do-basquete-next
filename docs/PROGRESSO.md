@@ -1,5 +1,12 @@
 # Progresso atual
 
+## Administração de disputas
+
+- Unidade `codex/administracao-disputas`, baseada em `54ffd93`, em worktree próprio. Regras na [ADR 023](decisoes/023-administracao-disputas.md). O checkout original conserva as alterações locais de contribuição e skills.
+- Gate local aprovado, com 820 testes Vitest. Navegador da unidade com 16 aprovados e 2 skips de desktop no mobile. PostgreSQL 17.11 isolado com duas conexões confirmou os conflitos entre edição e primeira inscrição, e entre cancelamento e nova inscrição.
+- DEV com as migrations da unidade registradas como `20261117163812` e `20261117163815`. Resultado do inventário: 3 disputas em andamento e 1 planejada com exposição herdada, 7 planejadas e privadas. Leitor anônimo manteve jogos públicos de 3 disputas e não tem execução para prévia ou administração. RLS ativa nas três tabelas privadas. Avisos de advisors revisados na PR. A migration de categorias etárias já consta no DEV como `20261117132108`.
+- Próximo passo: conferir CI de integração e disponibilização do Worker no ambiente de destino. Nenhum deployment do Worker nesta unidade até este checkpoint.
+
 ## Categorias etárias e notificações administrativas
 
 - Unidade `codex/categorias-etarias`, baseada em `4891dc6`. Cadastro de Adulto, Base e Master nas disputas e aviso após inscrições fora da faixa ou acima das duas vagas ativas do Sub-22. O design system inclui os três toasts e o catálogo atualizado.

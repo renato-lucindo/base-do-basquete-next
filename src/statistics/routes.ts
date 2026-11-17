@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { HttpError, jsonResponse } from "../server/http";
 import { SupabaseStatistics } from "./provider";
 export async function publicStatisticsRoute(
@@ -18,10 +19,13 @@ export async function publicStatisticsRoute(
     id = z.uuid().safeParse(match?.[1]);
   if (!id.success)
     throw new HttpError(400, "invalid_input", "Disputa inválida.");
-  const page = await new SupabaseStatistics({
-    url: env.SUPABASE_URL,
-    key: env.SUPABASE_PUBLISHABLE_KEY,
-  }).getPage(id.data, url.searchParams);
+  const page = await new SupabaseStatistics(
+    {
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    },
+    await publicReadTransport(request, env),
+  ).getPage(id.data, url.searchParams);
   if (page === null)
     throw new HttpError(
       404,
