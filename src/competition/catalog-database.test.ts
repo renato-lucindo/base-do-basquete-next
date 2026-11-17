@@ -42,7 +42,7 @@ async function list(query: object = {}) {
   return disputeListPageSchema.parse(
     (
       await db.query<{ result: unknown }>(
-        "select public.list_admin_disputes($1) result",
+        "select public.list_admin_dispute_catalog($1) result",
         [disputeListQuerySchema.parse(query)],
       )
     ).rows[0].result,
@@ -61,6 +61,36 @@ it("pages disputes independently of championships and filters the full set befor
   expect(found.total).toBe(1);
   expect(found.items[0].administration.visibility).toBe("private");
   expect((await list({ status: "completed" })).items).toEqual([]);
+});
+it("sorts youth, adult and masters by age and filters multiple championships", async () => {
+  const categories = ["55+", "Adulto", "Sub-23", "30+", "Sub-15", "Sub-12"];
+  for (const n of [4, 6]) {
+    await db.query("insert into public.championships(id,name) values ($1,$2)", [
+      id(n),
+      "Liga " + n,
+    ]);
+    await db.query(
+      "insert into public.seasons(id,championship_id,year) values ($1,$2,2027)",
+      [id(n + 1), id(n)],
+    );
+  }
+  for (const [index, category] of categories.entries()) {
+    await db.query(
+      "insert into public.disputes(id,season_id,gender,category) values ($1,$2,'feminino',$3)",
+      [id(200 + index), id(index % 2 ? 5 : 7), category],
+    );
+  }
+  const filters = { championshipIds: [id(4), id(6)], sort: "category" };
+  const asc = await list({ ...filters, direction: "asc" });
+  const expected = ["Sub-12", "Sub-15", "Sub-23", "Adulto", "30+", "55+"];
+  expect(asc.items.map((row) => row.category)).toEqual(expected);
+  expect(asc.championships.map((row) => row.id)).toEqual([id(2), id(4), id(6)]);
+  expect(
+    (await list({ ...filters, direction: "desc" })).items.map(
+      (row) => row.category,
+    ),
+  ).toEqual(expected.toReversed());
+  expect((await list({ ...filters, championshipIds: [id(6)] })).total).toBe(3);
 });
 it("rejects anonymous and revoked administrative reads", async () => {
   await db.exec("set role anon");

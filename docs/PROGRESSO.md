@@ -2,8 +2,9 @@
 
 ## Lista de disputas
 
-- Unidade `codex/lista-disputas` baseada em `71b8901`. Uma disputa por linha, filtros/ordenação na consulta paginada, botão Adicionar e cadastros em diálogo. Procedimento e evidências esperadas no [plano da unidade](PLAN-LISTA-DISPUTAS.md).
-- Validação local do catálogo: 8 linhas inteiras em 1366×768 com zoom a 100%. Migration de leitura `20261117204021_admin_dispute_listing` testada com PGlite. A confirmação da integração, do DEV e da publicação fica registrada na PR e no checkpoint de execução.
+- Revisão visual em `codex/ajustes-lista-disputas`, a partir de `745e964`. Depois da primeira versão no Worker, o responsável pediu filtros com checkboxes, ordenação por faixa da categoria, cadastro único, cores sem azul para situação e acesso direto à disputa de trabalho.
+- A [PR #84](https://github.com/renato-lucindo/base-do-basquete-next/pull/84) foi integrada antes do aceite visual. A CI da PR passou. A primeira tentativa da [CI integrada](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44178393435) teve cancelamento do job WebKit e foi retomada. A consulta original está no DEV como `20261117210244`. A versão apresentada no Worker foi `8a15f4e5-6021-424e-87ef-c7ccb14938d2`.
+- A revisão usa a nova consulta `20261117214457_admin_dispute_catalog_preferences` e o mesmo [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin). Após publicar a revisão, aguardar aprovação visual antes de integrar. O trabalho nas demais telas do painel começa depois desse aceite. A automação de retomada da PR #84 permanece pausada.
 
 ## Administração de disputas
 

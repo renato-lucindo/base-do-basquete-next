@@ -1293,13 +1293,6 @@ test("guardas e reautenticação preservam cadastro contextual", async ({
 }) => {
   const f = await fixture(page);
   await open(page);
-  await page.getByRole("button", { name: "Informações", exact: true }).click();
-  await page
-    .getByLabel("Naipe da disputa 1.1", { exact: true })
-    .selectOption("masculino");
-  await page
-    .getByRole("button", { name: "Equipes e elencos", exact: true })
-    .click();
   await page
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();

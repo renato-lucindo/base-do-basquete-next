@@ -6,7 +6,15 @@ test("password form supports keyboard, errors, restore and logout without browse
   let signedIn = false;
   let reject = true;
   await page.route("**/api/competition-administration/listing", (route) =>
-    route.fulfill({ json: { items: [], total: 0, years: [], hasMore: false } }),
+    route.fulfill({
+      json: {
+        items: [],
+        total: 0,
+        years: [],
+        championships: [],
+        hasMore: false,
+      },
+    }),
   );
   await page.route("**/api/session", async (route) => {
     const method = route.request().method();

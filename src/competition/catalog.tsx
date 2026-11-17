@@ -4,10 +4,10 @@ import { AdminToast } from "../ui-system/admin-toast";
 import { Icon } from "../ui-system/components";
 import { AdminDialog } from "./admin-dialog";
 import { DisputeControls } from "./dispute-controls";
-import { ChampionshipPicker } from "./championship-picker";
-import { CreateCompetitionDialog, type CreateTarget } from "./create-dialog";
+import { DisputeFormDialog, type DisputeFormTarget } from "./create-dialog";
 import { disputeStatusLabels } from "./administration-contract";
 import {
+  type ChampionshipOption,
   disputeListPageSchema,
   disputeListQuerySchema,
   type DisputeListRow,
@@ -15,15 +15,7 @@ import {
 } from "./catalog-contract";
 import "./catalog.css";
 
-function Actions({
-  label,
-  primary = false,
-  children,
-}: {
-  label: string;
-  primary?: boolean;
-  children: ReactNode;
-}) {
+function Actions({ label, children }: { label: string; children: ReactNode }) {
   const id = useId();
   const button = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -61,17 +53,9 @@ function Actions({
         type="button"
         popoverTarget={id}
         aria-label={label}
-        className={primary ? "primary" : "secondary"}
+        className="secondary"
       >
-        {primary ? (
-          <>
-            <Icon name="plus" />
-            {label}
-            <span aria-hidden="true">⌄</span>
-          </>
-        ) : (
-          <span aria-hidden="true">⋯</span>
-        )}
+        <span aria-hidden="true">⋯</span>
       </button>
       <div
         ref={panel}
@@ -114,21 +98,18 @@ export function DisputeCatalog({
   const [query, setQuery] = useState<DisputeListQuery>(() =>
     disputeListQuerySchema.parse({}),
   );
-  const [championship, setChampionship] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
   const [page, setPage] = useState({
     items: [] as DisputeListRow[],
     total: 0,
     hasMore: false,
     years: [] as number[],
+    championships: [] as ChampionshipOption[],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [reload, setReload] = useState(0);
-  const [create, setCreate] = useState<CreateTarget | null>(null);
+  const [create, setCreate] = useState<DisputeFormTarget | null>(null);
   const [managing, setManaging] = useState<DisputeListRow | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const scroll = useRef(0);
@@ -193,10 +174,9 @@ export function DisputeCatalog({
     });
   }
   function reset() {
-    setChampionship(null);
     setQuery(disputeListQuerySchema.parse({}));
   }
-  function add(target: CreateTarget) {
+  function add(target: DisputeFormTarget) {
     setCreate(target);
     setError("");
     setNotice("");
@@ -216,7 +196,7 @@ export function DisputeCatalog({
     query.gender ||
     query.status ||
     query.visibility ||
-    query.championshipId ||
+    query.championshipIds.length ||
     query.recent
   );
   return (
@@ -225,17 +205,14 @@ export function DisputeCatalog({
         <h2 ref={heading} tabIndex={-1}>
           Disputas
         </h2>
-        <Actions label="Adicionar" primary>
-          <button type="button" onClick={() => add({ kind: "championship" })}>
-            Novo campeonato
-          </button>
-          <button type="button" onClick={() => add({ kind: "season" })}>
-            Nova temporada
-          </button>
-          <button type="button" onClick={() => add({ kind: "dispute" })}>
-            Nova disputa
-          </button>
-        </Actions>
+        <button
+          type="button"
+          className="primary dispute-add"
+          disabled={!!error || (loading && !page.championships.length)}
+          onClick={() => add({ mode: "add" })}
+        >
+          <Icon name="plus" /> Adicionar
+        </button>
       </div>
       <div className="dispute-list-filters">
         <label className="dispute-search">
@@ -243,20 +220,58 @@ export function DisputeCatalog({
           <input
             name="dispute-search"
             autoComplete="off"
-            placeholder="Campeonato, categoria ou divisão…"
+            placeholder="Nome ou categoria…"
             maxLength={120}
             value={query.q}
             onChange={(e) => filter({ q: e.target.value })}
           />
         </label>
-        <ChampionshipPicker
-          value={championship}
-          onSessionLost={onSessionLost}
-          onChange={(value) => {
-            setChampionship(value);
-            filter({ championshipId: value?.id ?? null });
-          }}
-        />
+        <div className="dispute-championship-filter">
+          <span>Campeonatos</span>
+          <details
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget))
+                event.currentTarget.open = false;
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && event.currentTarget.open) {
+                event.preventDefault();
+                event.currentTarget.open = false;
+                event.currentTarget.querySelector("summary")?.focus();
+              }
+            }}
+          >
+            <summary aria-label="Filtrar campeonatos">
+              {query.championshipIds.length
+                ? query.championshipIds.length + " selecionados"
+                : "Todos"}
+            </summary>
+            <fieldset className="dispute-championship-options">
+              <legend className="admin-visually-hidden">Campeonatos</legend>
+              {page.championships.map((item) => (
+                <label key={item.id}>
+                  <input
+                    type="checkbox"
+                    checked={query.championshipIds.includes(item.id)}
+                    onChange={(event) =>
+                      filter({
+                        championshipIds: event.target.checked
+                          ? [...query.championshipIds, item.id]
+                          : query.championshipIds.filter(
+                              (id) => id !== item.id,
+                            ),
+                      })
+                    }
+                  />
+                  <span>{item.name}</span>
+                </label>
+              ))}
+              {!page.championships.length && (
+                <p>Nenhum campeonato cadastrado.</p>
+              )}
+            </fieldset>
+          </details>
+        </div>
         <label>
           Ano
           <select
@@ -466,15 +481,15 @@ export function DisputeCatalog({
                         </button>
                         <button
                           type="button"
-                          onClick={() => add({ kind: "dispute", row })}
+                          onClick={() => add({ mode: "add", row })}
                         >
-                          Nova disputa nesta temporada
+                          Adicionar neste campeonato
                         </button>
                         <button
                           type="button"
-                          onClick={() => add({ kind: "season", row })}
+                          onClick={() => add({ mode: "edit", row })}
                         >
-                          Nova temporada neste campeonato
+                          Editar dados da disputa
                         </button>
                         <button type="button" onClick={() => setManaging(row)}>
                           Situação e visibilidade
@@ -533,9 +548,10 @@ export function DisputeCatalog({
       </div>
       <AdminToast key={reload} message={notice} />
       {create && (
-        <CreateCompetitionDialog
+        <DisputeFormDialog
           enabled={enabled}
           target={create}
+          championships={page.championships}
           onSessionLost={onSessionLost}
           guard={guard}
           onClose={() => {
@@ -545,7 +561,9 @@ export function DisputeCatalog({
           onSaved={() => {
             setCreate(null);
             guard.current = () => true;
-            setNotice("Cadastro salvo");
+            setNotice(
+              create.mode === "edit" ? "Alterações salvas" : "Cadastro salvo",
+            );
             setReload((n) => n + 1);
           }}
         />

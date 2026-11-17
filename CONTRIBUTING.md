@@ -38,6 +38,8 @@ Enquanto o resultado estiver pendente ou inalterado, manter a checagem sem aviso
 
 ## Revisar e integrar
 
+Quando a entrega puder ser avaliada em um Worker, publique o SHA da PR no Worker de avaliação autorizado e envie o link da tela ao responsável. Mantenha a PR aberta até o responsável validar visualmente o Worker e aprovar de forma explícita. Registre a versão apresentada e confira se a aprovação ainda se aplica se a interface mudar depois.
+
 Toda PR de trabalho destina-se à `main`. O template pede problema/resultado, evidências, migrations/deploy e pendências. Draft sinaliza WIP, não um estacionamento indefinido de funcionalidades já concluídas.
 
 Antes do merge, conferir o diff, CI do SHA atual, pareceres/conversas aplicáveis, autorização de integração e dependências. A proteção da `main` exige CI atualizada e PR; bloqueia force-push e exclusão. No repositório de mantenedor único, não exigimos aprovação fictícia de um segundo usuário: a revisão realizada e seus limites devem ser explícitos. Parecer independente, quando disponível, não deve ser declarado sem ter ocorrido.

@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
 import { scanAccessibility } from "./fixtures/accessibility";
-for (const area of ["jogos", "equipes", "informacoes"])
+for (const area of ["jogos", "equipes"])
   test(`reflow e geometria ${area}`, async ({ page }, info) => {
     const f = await gamesFixture(page),
       home = f.registrations.get(tid(5))!,
@@ -38,7 +38,7 @@ for (const area of ["jogos", "equipes", "informacoes"])
       await page.goto("about:blank");
       await page.setViewportSize({ width, height: width > 1000 ? 900 : 844 });
       await page.goto(
-        `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}${area === "informacoes" ? "" : "/" + area}`,
+        `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/${area}`,
       );
       if (area === "jogos")
         await expect(
@@ -50,13 +50,6 @@ for (const area of ["jogos", "equipes", "informacoes"])
         await page
           .getByRole("button", { name: "Expandir " + home.name, exact: true })
           .click();
-      else
-        await expect(
-          page.getByRole("combobox", {
-            name: "Categoria da disputa 1.1",
-            exact: true,
-          }),
-        ).toBeVisible();
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,

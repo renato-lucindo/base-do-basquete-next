@@ -43,7 +43,7 @@ export class SupabaseCompetitions {
   async listDisputes(token: string, query: DisputeListQuery) {
     return checked(
       disputeListPageSchema,
-      await this.rpc("list_admin_disputes", { p_query: query }, token),
+      await this.rpc("list_admin_dispute_catalog", { p_query: query }, token),
     );
   }
   async get(token: string, id: string) {
