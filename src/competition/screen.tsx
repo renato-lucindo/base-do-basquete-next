@@ -17,15 +17,14 @@ import {
   type SaveCompetitionAdministration,
 } from "./administration-contract";
 import { DisputeControls } from "./dispute-controls";
+import { DisputeCatalog } from "./catalog";
 import {
   competitionSchema,
-  listingSchema,
   snapshotSchema,
   saveCompetitionSchema,
   saveResultSchema,
   type Competition,
   type CompetitionSnapshot,
-  type CompetitionListing,
   type SaveCompetition,
 } from "./contract";
 import "./screen.css";
@@ -47,11 +46,6 @@ type Props = {
 type Pending = {
   fingerprint: string;
   command: SaveCompetition | SaveCompetitionAdministration;
-};
-const emptyList: CompetitionListing = {
-  items: [],
-  recents: [],
-  hasMore: false,
 };
 const allIds = (draft: Competition) =>
   new Set([
@@ -78,10 +72,6 @@ export function CompetitionWorkspace({
   onSessionLost,
   onCompactChange,
 }: Props) {
-  const [list, setList] = useState(emptyList);
-  const [query, setQuery] = useState("");
-  const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [administration, setAdministration] = useState<DisputeAdministration[]>(
@@ -112,7 +102,7 @@ export function CompetitionWorkspace({
   const [conflict, setConflict] = useState(false);
   const pending = useRef<Pending | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const catalogGuard = useRef<() => boolean>(() => true);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const restored = useRef(false);
   const dirty =
@@ -169,6 +159,7 @@ export function CompetitionWorkspace({
 
   function mayLeave() {
     return (
+      catalogGuard.current() &&
       teamsGuard.current() &&
       gamesGuard.current() &&
       pdfGuard.current() &&
@@ -195,49 +186,12 @@ export function CompetitionWorkspace({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, uncertain]);
   useEffect(() => {
-    if (enabled) {
-      if (editor) nameRef.current?.focus();
-      else headingRef.current?.focus();
-    }
+    if (enabled && editor) nameRef.current?.focus();
   }, [editor?.draft.id]);
   useEffect(() => {
     if (error && enabled) errorRef.current?.focus();
   }, [error, enabled]);
 
-  useEffect(() => {
-    if (!enabled) return;
-    let active = true;
-    const controller = new AbortController();
-    setLoading(true);
-    const timer = setTimeout(() => {
-      void api(
-        `/api/competitions?q=${encodeURIComponent(query)}&offset=${offset}`,
-        listingSchema,
-        undefined,
-        controller.signal,
-      )
-        .then((value) => {
-          if (active) setList(value);
-        })
-        .catch((failure) => {
-          if (active) {
-            if (isSessionFailure(failure)) onSessionLost();
-            else
-              setError(
-                "Não foi possível carregar os campeonatos. Tente novamente.",
-              );
-          }
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-    }, 200);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [enabled, query, offset, refresh]);
   useEffect(() => {
     if (!enabled || restored.current) return;
     restored.current = true;
@@ -323,38 +277,6 @@ export function CompetitionWorkspace({
     } finally {
       setOpening(false);
     }
-  }
-  function start() {
-    if (!mayLeave()) return;
-    setPendingRemoval(null);
-    setTestIds([]);
-    setRenameReason("");
-    setAdministration([]);
-    const dispute = newDispute();
-    const draft: Competition = {
-      id: crypto.randomUUID(),
-      name: "",
-      seasons: [
-        { id: crypto.randomUUID(), year: currentYear(), disputes: [dispute] },
-      ],
-    };
-    setEditor({
-      draft,
-      version: 0,
-      baseline: JSON.stringify(draft),
-      savedIds: new Set(),
-    });
-    setSelected(dispute.id);
-    setTab("info");
-    setError("");
-    setUncertain(false);
-    setConflict(false);
-    pending.current = null;
-    history.replaceState(
-      null,
-      "",
-      `${location.pathname}${location.search}#novo-campeonato`,
-    );
   }
   function back() {
     if (!mayLeave()) return;
@@ -481,92 +403,17 @@ export function CompetitionWorkspace({
         </p>
       )}
       {opening && <p role="status">Abrindo campeonato…</p>}
-      {!editor ? (
-        <>
-          <div className="competition-title competition-list-toolbar">
-            <h2 ref={headingRef} tabIndex={-1}>
-              Campeonatos
-            </h2>
-            <button onClick={start} disabled={opening}>
-              Novo campeonato
-            </button>
-            <label className="competition-search">
-              Buscar campeonato, ano ou disputa
-              <input
-                value={query}
-                name="competition-search"
-                autoComplete="off"
-                maxLength={120}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setOffset(0);
-                }}
-              />
-            </label>
-          </div>
-          {loading ? (
-            <p role="status">Carregando campeonatos…</p>
-          ) : (
-            <>
-              {list.recents.length > 0 && (
-                <section aria-labelledby="recentes">
-                  <h3 id="recentes">Recentes</h3>
-                  <CompetitionRows
-                    items={list.recents}
-                    open={(id) => void openCompetition(id)}
-                    disabled={opening}
-                  />
-                </section>
-              )}
-              <section aria-labelledby="todos-campeonatos">
-                <h3 id="todos-campeonatos">Todos os campeonatos</h3>
-                {list.items.length ? (
-                  <CompetitionRows
-                    items={list.items}
-                    open={(id) => void openCompetition(id)}
-                    disabled={opening}
-                  />
-                ) : (
-                  <p>
-                    {query
-                      ? "Nenhum campeonato encontrado."
-                      : "Ainda não há campeonatos cadastrados."}
-                  </p>
-                )}
-                <div className="competition-actions">
-                  {offset > 0 && (
-                    <button
-                      className="secondary"
-                      onClick={() => setOffset((n) => Math.max(0, n - 20))}
-                    >
-                      Página anterior
-                    </button>
-                  )}
-                  {list.hasMore && (
-                    <button
-                      className="secondary"
-                      onClick={() => setOffset((n) => n + 20)}
-                    >
-                      Próxima página
-                    </button>
-                  )}
-                </div>
-              </section>
-            </>
-          )}
-          {error && (
-            <button
-              className="secondary"
-              onClick={() => {
-                setError("");
-                setRefresh((n) => n + 1);
-              }}
-            >
-              Tentar novamente
-            </button>
-          )}
-        </>
-      ) : (
+      <div hidden={!!editor}>
+        <DisputeCatalog
+          enabled={enabled && !editor}
+          refresh={refresh}
+          opening={opening}
+          open={(id, dispute) => void openCompetition(id, dispute)}
+          guard={catalogGuard}
+          onSessionLost={onSessionLost}
+        />
+      </div>
+      {editor && (
         <>
           <div className="competition-context-header">
             <div className="competition-title">
@@ -1159,59 +1006,6 @@ export function CompetitionWorkspace({
   );
 }
 
-function CompetitionRows({
-  items,
-  open,
-  disabled,
-}: {
-  items: CompetitionListing["items"];
-  open: (id: string) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div
-      className="admin-table-scroll"
-      tabIndex={0}
-      role="region"
-      aria-label="Lista de campeonatos"
-    >
-      <table className="admin-data-table" aria-label="Campeonatos">
-        <thead>
-          <tr>
-            <th scope="col">Campeonato</th>
-            <th scope="col">Temporadas e disputas</th>
-            <th scope="col">Último trabalho salvo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td>
-                <button
-                  className="competition-open"
-                  aria-label={`Abrir ${item.name}`}
-                  disabled={disabled}
-                  onClick={() => open(item.id)}
-                >
-                  {item.name}
-                </button>
-              </td>
-              <td>
-                {item.contexts
-                  .map(
-                    (c) =>
-                      `${c.year} · ${c.gender === "feminino" ? "Feminino" : "Masculino"} · ${c.category}${c.division ? ` · ${c.division}` : ""}`,
-                  )
-                  .join(" / ")}
-              </td>
-              <td className="nowrap">{formatDate(item.savedAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",

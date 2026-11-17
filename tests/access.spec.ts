@@ -5,8 +5,8 @@ test("password form supports keyboard, errors, restore and logout without browse
 }) => {
   let signedIn = false;
   let reject = true;
-  await page.route("**/api/competitions**", (route) =>
-    route.fulfill({ json: { items: [], recents: [], hasMore: false } }),
+  await page.route("**/api/competition-administration/listing", (route) =>
+    route.fulfill({ json: { items: [], total: 0, years: [], hasMore: false } }),
   );
   await page.route("**/api/session", async (route) => {
     const method = route.request().method();
@@ -47,7 +47,7 @@ test("password form supports keyboard, errors, restore and logout without browse
   ).toBeFocused();
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "Campeonatos", exact: true }),
+    page.getByRole("heading", { name: "Disputas", exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() => ({

@@ -1,12 +1,16 @@
 # Progresso atual
 
+## Lista de disputas
+
+- Unidade `codex/lista-disputas` baseada em `71b8901`. Uma disputa por linha, filtros/ordenação na consulta paginada, botão Adicionar e cadastros em diálogo. Procedimento e evidências esperadas no [plano da unidade](PLAN-LISTA-DISPUTAS.md).
+- Validação local do catálogo: 8 linhas inteiras em 1366×768 com zoom a 100%. Migration de leitura `20261117204021_admin_dispute_listing` testada com PGlite. A confirmação da integração, do DEV e da publicação fica registrada na PR e no checkpoint de execução.
+
 ## Administração de disputas
 
-- Unidade `codex/administracao-disputas`, baseada em `54ffd93`, em worktree próprio. Regras na [ADR 023](decisoes/023-administracao-disputas.md). O checkout original conserva as alterações locais de contribuição e skills.
-- Gate local aprovado, com 820 testes Vitest. Navegador da unidade com 16 aprovados e 2 skips de desktop no mobile. PostgreSQL 17.11 isolado com duas conexões confirmou os conflitos entre edição e primeira inscrição, e entre cancelamento e nova inscrição.
-- DEV com as migrations da unidade registradas como `20261117163812` e `20261117163815`. Resultado do inventário: 3 disputas em andamento e 1 planejada com exposição herdada, 7 planejadas e privadas. Leitor anônimo manteve jogos públicos de 3 disputas e não tem execução para prévia ou administração. RLS ativa nas três tabelas privadas. Avisos de advisors revisados na PR. A migration de categorias etárias já consta no DEV como `20261117132108`.
-- Pausa em 17/11/2026 a pedido do responsável. Cota de 5h consultada no app: 89% usados, 11% restantes, reset às 16h02 de Brasília. Retomada única confirmada para 16h04 na automação `retomar-administra-o-de-disputas`.
-- PR #83 em atualização após revisão. A [CI 44128439481](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44128439481) passou no SHA inicial `2a33732`. O [apontamento sobre ocorrências pendentes](https://github.com/renato-lucindo/base-do-basquete-next/pull/83#discussion_r4602750481) foi confirmado com regressão RED → GREEN. A conclusão respeita adiamento, interrupção e versões obsoletas do jogo ou da publicação. Testes focais 20/20. Migration corretiva `20261117165418_dispute_completion_pending_occurrences` aplicada e verificada no DEV como `20261117165533`. Próximo passo: aguardar o `validate` do novo HEAD, integrar a PR e confirmar a CI do SHA integrado. Worker com deploy pendente.
+- [PR #83](https://github.com/renato-lucindo/base-do-basquete-next/pull/83) integrada à main no SHA `71b8901628aefc9180c54934ebf31aa2b9364404`. [CI do SHA integrado](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44134240291) concluída com todos os checks aprovados. Regras na [ADR 023](decisoes/023-administracao-disputas.md). Worktree da unidade preservado em `codex/administracao-disputas`. Alterações de contribuição e skills do checkout original preservadas.
+- PostgreSQL 17.11 com conexões separadas confirmou o bloqueio concorrente de edição e cancelamento. A regressão da revisão cobre jogos adiados, interrompidos e decisões com versões obsoletas. DEV com as três migrations registradas como `20261117163812`, `20261117163815` e `20261117165533`. Exposição anônima anterior preservada e prévia/admin inacessíveis ao papel anônimo.
+- Worker dedicado [`base-do-basquete-admin`](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) publicado em 17/11/2026 com fonte `71b8901`, versão `cebc6b0f-8cea-4402-a8bf-ed8a0db3f86e` e deployment `da506319-6a5d-4943-a370-1fd537909498`. Sem Cloudflare Access por decisão do responsável, com login interno, Durable Object e segredo de sessão próprios. Banco Supabase DEV compartilhado e nenhuma rota de domínio principal. Smoke GET confirmou painel/health 200, APIs privadas 401 sem sessão e catálogo DEV 200. A validação com login real fica pendente. O preview público manteve a versão `0fffde67-41a6-42e9-bf5c-3369a0d7ffe3`.
+- Próximas mudanças de administração usam este Worker. Configuração de implantação em `wrangler.admin.jsonc`, conforme o [procedimento do admin](PLAN-LISTA-DISPUTAS.md#atualização-do-worker-administrativo). O primeiro deploy criou apenas o SQLite do Durable Object deste Worker.
 
 ## Categorias etárias e notificações administrativas
 

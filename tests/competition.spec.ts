@@ -1,11 +1,18 @@
 import { test, expect, type Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import type {
+  DisputeListQuery,
+  DisputeListRow,
+} from "../src/competition/catalog-contract";
 import type {
   CompetitionSnapshot,
   SaveCompetition,
 } from "../src/competition/contract";
 
-async function fixture(page: Page) {
-  let saved: CompetitionSnapshot | undefined;
+async function fixture(page: Page, initial?: CompetitionSnapshot) {
+  let saved = initial;
+  const testIds = new Set<string>();
+  const queries: DisputeListQuery[] = [];
   let mode: "normal" | "uncertain" | "conflict" = "normal";
   const commands = new Map<string, { id: string; version: number }>();
   let attempts: string[] = [];
@@ -22,7 +29,7 @@ async function fixture(page: Page) {
       json: { authenticated },
     });
   });
-  await page.route("**/api/competitions**", async (route) => {
+  const competitions = async (route: import("@playwright/test").Route) => {
     if (!authenticated)
       return route.fulfill({
         status: 401,
@@ -31,7 +38,10 @@ async function fixture(page: Page) {
     const request = route.request();
     const url = new URL(request.url());
     if (request.method() === "POST") {
-      const body = request.postDataJSON() as SaveCompetition;
+      const body = request.postDataJSON() as SaveCompetition & {
+        testDisputeIds?: string[];
+      };
+      for (const id of body.testDisputeIds ?? []) testIds.add(id);
       attempts.push(body.commandId);
       if (mode === "conflict") {
         if (saved)
@@ -104,9 +114,72 @@ async function fixture(page: Page) {
         hasMore: false,
       },
     });
-  });
+  };
+  await page.route("**/api/competitions**", competitions);
   await page.route("**/api/competition-administration/**", async (route) => {
     const request = route.request();
+    const path = new URL(request.url()).pathname;
+    if (path.endsWith("/competition")) return competitions(route);
+    if (path.endsWith("/listing")) {
+      const query = request.postDataJSON() as DisputeListQuery;
+      queries.push(query);
+      const snapshot = saved;
+      const rows: DisputeListRow[] =
+        snapshot?.seasons.flatMap((s) =>
+          s.disputes.map((d) => ({
+            competitionId: snapshot.id,
+            seasonId: s.id,
+            name: snapshot.name,
+            year: s.year,
+            gender: d.gender,
+            category: d.category,
+            division: d.division,
+            administration: {
+              disputeId: d.id,
+              version: 1,
+              status: "planned",
+              visibility: "private",
+              lockReason: null,
+              isTest: testIds.has(d.id),
+              wasPublic: false,
+            },
+          })),
+        ) ?? [];
+      const items = rows.filter(
+        (row) =>
+          (!query.q ||
+            [row.name, row.year, row.category, row.division]
+              .join(" ")
+              .toLowerCase()
+              .includes(query.q.toLowerCase())) &&
+          (!query.year || row.year === query.year) &&
+          (!query.championshipId ||
+            row.competitionId === query.championshipId) &&
+          (!query.gender || row.gender === query.gender) &&
+          (!query.status || row.administration.status === query.status) &&
+          (!query.visibility ||
+            (row.administration.isTest
+              ? "test"
+              : row.administration.visibility) === query.visibility),
+      );
+      const column = query.sort === "championship" ? "name" : query.sort;
+      if (column !== "visibility" && column !== "status")
+        items.sort(
+          (a, b) =>
+            String(a[column] ?? "").localeCompare(String(b[column] ?? "")) *
+            (query.direction === "asc" ? 1 : -1),
+        );
+      return route.fulfill({
+        json: {
+          items: items.slice(query.offset, query.offset + 25),
+          years: [...new Set(rows.map((row) => row.year))].sort(
+            (a, b) => b - a,
+          ),
+          total: items.length,
+          hasMore: items.length > query.offset + 25,
+        },
+      });
+    }
     if (!saved) return route.fulfill({ json: [] });
     if (request.method() === "GET")
       return route.fulfill({
@@ -141,6 +214,8 @@ async function fixture(page: Page) {
       attempts = [];
     },
     attempts: () => attempts,
+    queries,
+    saved: () => saved,
     lockIdentification: () => {
       lockIdentification = true;
     },
@@ -150,18 +225,29 @@ async function fixture(page: Page) {
   };
 }
 
-async function create(page: Page) {
+async function draft(page: Page) {
+  await page.getByRole("button", { name: "Adicionar", exact: true }).click();
   await page
     .getByRole("button", { name: "Novo campeonato", exact: true })
     .click();
-  await page.getByLabel("Nome do campeonato").fill("Liga Regional");
-  await page.getByLabel("Ano da temporada 1", { exact: true }).fill("2026");
+  const dialog = page.getByRole("dialog", { name: "Novo campeonato" });
+  await dialog.getByLabel("Nome do campeonato").fill("Liga Regional");
+  await dialog.getByLabel("Temporada", { exact: true }).fill("2026");
+  await dialog.getByLabel("Naipe", { exact: true }).selectOption("feminino");
+  return dialog;
+}
+
+async function create(page: Page) {
+  const dialog = await draft(page);
+  await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+}
+
+async function openFirstDispute(page: Page) {
   await page
-    .getByLabel("Naipe da disputa 1.1", { exact: true })
-    .selectOption("feminino");
-  await page
-    .getByLabel("Categoria da disputa 1.1", { exact: true })
-    .selectOption("adult");
+    .getByRole("button", { name: /^Abrir Liga Regional ·/ })
+    .first()
+    .click();
 }
 
 test("protege os campos de identificação e confirma a alteração de visibilidade", async ({
@@ -171,9 +257,7 @@ test("protege os campos de identificação e confirma a alteração de visibilid
   state.lockIdentification();
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
-  await page
-    .getByRole("button", { name: "Salvar campeonato", exact: true })
-    .click();
+  await openFirstDispute(page);
   await expect(
     page.getByLabel("Ano da temporada 1", { exact: true }),
   ).toBeDisabled();
@@ -222,74 +306,68 @@ test("mantém a prévia de teste ao navegar e restaura o catálogo normal ao sai
   await expect.poll(() => scopes.at(-1)).toBeUndefined();
 });
 
-for (const width of [1366, 1920])
-  test(`campeonato compacto desktop ${width} mantém campos e salvamento acessíveis`, async ({
-    page,
-  }, info) => {
+for (const width of [1366, 1920]) {
+  test(`lista de disputas compacta em ${width}px`, async ({ page }, info) => {
     test.skip(info.project.name !== "desktop", "Recorte desktop");
-    await page.setViewportSize({ width, height: width === 1366 ? 768 : 1080 });
-    await fixture(page);
+    const height = width === 1366 ? 768 : 1080;
+    await page.setViewportSize({ width, height });
+    const f = await fixture(page, {
+      id: randomUUID(),
+      name: "Liga Regional de Basquete",
+      version: 1,
+      savedAt: "2026-10-23T11:00:00Z",
+      seasons: [2026, 2025, 2024].map((year) => ({
+        id: randomUUID(),
+        year,
+        disputes: Array.from({ length: 10 }, (_, i) => ({
+          id: randomUUID(),
+          gender: i % 2 ? "feminino" : "masculino",
+          category: "Adulto",
+          division: String(i + 1),
+        })),
+      })),
+    });
     await page.goto("http://127.0.0.1:5174/foundation.html");
-    await create(page);
-    await page
-      .getByRole("button", {
-        name: "Adicionar disputa à temporada 1",
-        exact: true,
-      })
-      .click();
-    await page
-      .getByLabel("Categoria da disputa 1.2", { exact: true })
-      .selectOption("base");
-    await page
-      .getByLabel("Idade máxima da categoria 1.2", { exact: true })
-      .selectOption("18");
-    await page.evaluate(() => scrollTo(0, 0));
-    const phase = process.env.ADMIN_CAPTURE_BASELINE ? "before" : "after";
-    await page.screenshot({
-      path: `.preview-artifacts/admin-expansion-${phase}-competition-${width}.png`,
-      fullPage: true,
-    });
-    const year = await page
-      .getByLabel("Ano da temporada 1", { exact: true })
-      .boundingBox();
-    const name = await page
-      .getByLabel("Nome do campeonato", { exact: true })
-      .boundingBox();
-    const save = page.getByRole("button", {
-      name: "Salvar campeonato",
-      exact: true,
-    });
-    const box = await save.boundingBox();
-    expect(year!.width).toBeLessThanOrEqual(150 * 1.5);
-    expect(name!.width).toBeGreaterThan(year!.width * 3);
-    expect(box!.y + box!.height).toBeLessThan(width === 1366 ? 768 : 1080);
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth > innerWidth,
-      ),
-    ).toBe(false);
-    await save.focus();
-    await page.keyboard.press("Enter");
-    await expect(page.getByTestId("competition-save-state")).toContainText(
-      "Salvo",
+    const list = page.getByRole("table", { name: "Disputas", exact: true });
+    await expect(list.locator("tbody tr")).toHaveCount(25);
+    const layout = await list.evaluate((table) => ({
+      visible: Array.from(table.querySelectorAll("tbody tr")).filter(
+        (row) => row.getBoundingClientRect().bottom <= innerHeight,
+      ).length,
+      overflow: document.documentElement.scrollWidth > innerWidth,
+    }));
+    expect(layout.visible).toBeGreaterThanOrEqual(8);
+    expect(layout.overflow).toBe(false);
+    await expect(page.locator(".dispute-catalog button.primary")).toHaveCount(
+      1,
     );
-    await page.reload();
-    await expect(
-      page.getByLabel("Idade máxima da categoria 1.2", { exact: true }),
-    ).toHaveValue("18");
+    await page.screenshot({ path: `.preview-artifacts/disputas-${width}.png` });
+    await page.getByRole("button", { name: "Próxima", exact: true }).click();
+    await expect(list.locator("tbody tr")).toHaveCount(5);
+    await page.getByLabel("Naipe", { exact: true }).selectOption("feminino");
+    await expect(list.locator("tbody tr")).toHaveCount(15);
+    await list.getByRole("button", { name: "Campeonato", exact: true }).click();
+    await expect
+      .poll(() => f.queries.at(-1))
+      .toMatchObject({
+        gender: "feminino",
+        offset: 0,
+        sort: "championship",
+        direction: "asc",
+      });
+    const first = list
+      .getByRole("button", { name: /^Abrir Liga Regional/ })
+      .first();
+    await first.click();
     await page
       .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
       .click();
-    await expect(
-      page.getByRole("table", { name: "Campeonatos", exact: true }).last(),
-    ).toContainText("Liga Regional");
-    await expect(
-      page.getByRole("button", { name: "Sair", exact: true }),
-    ).toBeVisible();
-    await page.screenshot({
-      path: `.preview-artifacts/admin-expansion-${phase}-listing-${width}.png`,
-    });
+    await expect(page.getByLabel("Naipe", { exact: true })).toHaveValue(
+      "feminino",
+    );
+    await expect(first).toBeFocused();
   });
+}
 
 test("unsaved season and dispute removals require a visible modal confirmation", async ({
   page,
@@ -297,6 +375,7 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   await fixture(page);
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
+  await openFirstDispute(page);
   const addDispute = page.getByRole("button", {
     name: "Adicionar disputa à temporada 1",
     exact: true,
@@ -364,30 +443,29 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   await expect(page.getByLabel("Ano da temporada 2")).toHaveCount(0);
 });
 
-test("championship save shows a dismissible toast", async ({ page }) => {
+test("championship save shows a dismissible toast", async ({ page }, info) => {
   await fixture(page);
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
-  await page
-    .getByRole("button", { name: "Salvar campeonato", exact: true })
-    .click();
   const toast = page.getByRole("region", { name: "Notificação" });
-  await expect(toast).toContainText("Campeonato salvo");
-  for (const viewport of [
-    { width: 1366, height: 768 },
-    { width: 1920, height: 1080 },
-  ]) {
-    await page.setViewportSize(viewport);
-    await page.screenshot({
-      path: `dist/ui-ux-captures/competition-toast-after-${viewport.width}x${viewport.height}.png`,
-      animations: "disabled",
-    });
+  await expect(toast).toContainText("Cadastro salvo");
+  if (info.project.name === "desktop") {
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.screenshot({
+        path: `dist/ui-ux-captures/competition-toast-after-${viewport.width}x${viewport.height}.png`,
+        animations: "disabled",
+      });
+    }
   }
   await toast.getByRole("button", { name: "Dispensar notificação" }).click();
   await expect(toast).toHaveCount(0);
-  await expect(page.getByTestId("competition-save-state")).toContainText(
-    "Salvo",
-  );
+  await expect(
+    page.getByRole("row", { name: /Liga Regional.*2026/ }),
+  ).toBeVisible();
 });
 
 test("competition is saved and restored with multiple seasons and explicit disputes", async ({
@@ -396,6 +474,7 @@ test("competition is saved and restored with multiple seasons and explicit dispu
   await fixture(page);
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
+  await openFirstDispute(page);
   const add = page.getByRole("button", {
     name: "Adicionar disputa à temporada 1",
     exact: true,
@@ -451,11 +530,11 @@ test("competition is saved and restored with multiple seasons and explicit dispu
     .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Recentes", exact: true }),
+    page.getByRole("heading", { name: "Disputas", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Abrir Liga Regional", exact: true }),
-  ).toHaveCount(2);
+    page.getByRole("button", { name: /^Abrir Liga Regional/ }),
+  ).toHaveCount(3);
   expect(
     await page.evaluate(() => ({
       local: localStorage.length,
@@ -463,7 +542,7 @@ test("competition is saved and restored with multiple seasons and explicit dispu
     })),
   ).toEqual({ local: 0, session: 0 });
   await page
-    .getByRole("button", { name: "Abrir Liga Regional", exact: true })
+    .getByRole("button", { name: /^Abrir Liga Regional/ })
     .first()
     .click();
   await page.setViewportSize({ width: 320, height: 800 });
@@ -474,30 +553,93 @@ test("competition is saved and restored with multiple seasons and explicit dispu
   ).toBe(true);
 });
 
-test("unsaved work prevents accidental logout and survives reauthentication in memory", async ({
+test("adds a season and a dispute in dialogs while keeping existing records", async ({
+  page,
+}) => {
+  const f = await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  const table = page.getByRole("table", { name: "Disputas" });
+  await expect(table.locator("tbody tr")).toHaveCount(1);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(
+    await page.evaluate(() => document.documentElement.clientWidth),
+  );
+  await page.getByRole("button", { name: "Adicionar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Nova temporada", exact: true })
+    .click();
+  const season = page.getByRole("dialog", {
+    name: "Nova temporada",
+    exact: true,
+  });
+  const championship = season.getByRole("combobox", {
+    name: "Campeonato",
+    exact: true,
+  });
+  await championship.fill("Liga");
+  await expect(
+    season.getByRole("option", { name: "Liga Regional", exact: true }),
+  ).toBeVisible();
+  await championship.press("ArrowDown");
+  await championship.press("Enter");
+  await expect(
+    season.getByText("Liga Regional", { exact: true }),
+  ).toBeVisible();
+  await season.getByLabel("Temporada", { exact: true }).fill("2027");
+  await season.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(table.locator("tbody tr")).toHaveCount(2);
+  const row = table.getByRole("row", { name: /Liga Regional.*2027/ });
+  const actions = row.getByRole("button", { name: /Ações de Liga Regional/ });
+  // The table scrolls on narrow screens; Playwright brings the action into view.
+  await actions.click();
+  await page
+    .getByRole("button", { name: "Nova disputa nesta temporada", exact: true })
+    .click();
+  const dispute = page.getByRole("dialog", {
+    name: "Nova disputa",
+    exact: true,
+  });
+  await expect(
+    dispute.getByRole("combobox", { name: "Temporada", exact: true }),
+  ).toHaveValue(f.saved()!.seasons[0].id);
+  await dispute.getByLabel("Naipe", { exact: true }).selectOption("feminino");
+  await dispute.getByLabel("Disputa de teste").check();
+  await dispute.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(
+    table.getByRole("row", { name: /2027.*Feminino.*Teste/ }),
+  ).toBeVisible();
+  expect(f.saved()?.seasons.map((s) => [s.year, s.disputes.length])).toEqual([
+    [2027, 2],
+    [2026, 1],
+  ]);
+});
+
+test("modal draft survives cancellation and reauthentication", async ({
   page,
 }) => {
   const f = await fixture(page);
   // Expire the editing operation after the independently scheduled initial listing.
-  // Otherwise its delayed GET may expire first and hide Save before the click.
+  // Otherwise listing may expire first and hide Save before the click.
   const initialListing = page.waitForResponse(
     (response) =>
-      new URL(response.url()).pathname === "/api/competitions" &&
-      response.request().method() === "GET",
+      new URL(response.url()).pathname ===
+        "/api/competition-administration/listing" &&
+      response.request().method() === "POST",
   );
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await initialListing;
-  await create(page);
+  const draftDialog = await draft(page);
   await page.getByLabel("Nome do campeonato").fill("Edição preservada");
   page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("button", { name: "Sair", exact: true }).click();
+  await page.keyboard.press("Escape");
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Edição preservada",
   );
   f.expire();
-  await page
-    .getByRole("button", { name: "Salvar campeonato", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Acesso administrativo", exact: true }),
   ).toBeVisible();
@@ -508,11 +650,9 @@ test("unsaved work prevents accidental logout and survives reauthentication in m
     "Edição preservada",
   );
   await page
-    .getByRole("button", { name: "Salvar campeonato", exact: true })
+    .getByRole("button", { name: "Repetir envio", exact: true })
     .click();
-  await expect(page.getByTestId("competition-save-state")).toContainText(
-    "Salvo",
-  );
+  await expect(draftDialog).toHaveCount(0);
 });
 
 test("uncertain save retries the same command and conflicts preserve edits until explicit reload", async ({
@@ -520,21 +660,18 @@ test("uncertain save retries the same command and conflicts preserve edits until
 }) => {
   const f = await fixture(page);
   await page.goto("http://127.0.0.1:5174/foundation.html");
-  await create(page);
+  const draftDialog = await draft(page);
   f.setMode("uncertain");
-  await page
-    .getByRole("button", { name: "Salvar campeonato", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("envio");
   await expect(page.getByLabel("Nome do campeonato")).toBeDisabled();
   await page
     .getByRole("button", { name: "Repetir envio", exact: true })
     .click();
-  await expect(page.getByTestId("competition-save-state")).toContainText(
-    "Salvo",
-  );
+  await expect(draftDialog).toHaveCount(0);
   expect(f.attempts()).toHaveLength(2);
   expect(f.attempts()[0]).toBe(f.attempts()[1]);
+  await openFirstDispute(page);
   await page.getByLabel("Nome do campeonato").fill("Minha edição preservada");
   f.setMode("conflict");
   await page

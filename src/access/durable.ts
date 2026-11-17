@@ -132,6 +132,11 @@ import {
 } from "../competition/administration-contract";
 import type { Json } from "../server/database.types";
 
+import {
+  disputeListQuerySchema,
+  type DisputeListQuery,
+} from "../competition/catalog-contract";
+
 type RpcResult<T> =
   | { ok: true; value: T }
   | { ok: false; status: number; code: string; message: string };
@@ -259,6 +264,16 @@ export class SessionStore extends DurableObject<Env> {
   }
   close() {
     return safely(() => this.session.close());
+  }
+  listAdminDisputes(query: DisputeListQuery) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.listDisputes(
+          accessToken,
+          disputeListQuerySchema.parse(query),
+        ),
+      ),
+    );
   }
   getDisputeAdministration(id: string) {
     return safely(() =>

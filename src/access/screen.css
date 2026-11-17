@@ -46,6 +46,14 @@ button:disabled {
   justify-content: space-between;
   font-weight: 700;
 }
+.access-header .secondary {
+  color: var(--bb-text);
+  background: var(--bb-surface);
+  border-color: var(--bb-control-line);
+}
+.access-header .secondary:hover {
+  background: var(--bb-background);
+}
 .access-preview {
   color: #42526b;
   font-size: 0.875rem;

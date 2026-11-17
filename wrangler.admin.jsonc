@@ -1,0 +1,52 @@
+{
+  "name": "base-do-basquete-admin",
+  "main": "src/server/admin-worker.ts",
+  "account_id": "16b4a5e0a99a031d28051ebadb4811cc",
+  "compatibility_date": "2026-10-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "dist-foundation",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "run_worker_first": true,
+  },
+  "vars": {
+    "FLEXIBLE_COMPETITION": "false",
+    "APP_ORIGIN": "https://base-do-basquete-admin.renato-lucindo-jr.workers.dev",
+    "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
+  },
+  "secrets": {
+    "required": ["SUPABASE_PUBLISHABLE_KEY", "SESSION_ENCRYPTION_KEY"],
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SESSIONS",
+        "class_name": "SessionStore",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["SessionStore"],
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "LOGIN_LIMITER",
+      "namespace_id": "176082831549",
+      "simple": {
+        "limit": 10,
+        "period": 60,
+      },
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+    "redact_query_string": true,
+  },
+}

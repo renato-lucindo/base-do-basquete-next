@@ -853,6 +853,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      list_admin_disputes: { Args: { p_query: Json }; Returns: Json };
       get_dispute_administration: {
         Args: { p_competition_id: string };
         Returns: Json;
