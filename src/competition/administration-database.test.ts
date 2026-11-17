@@ -263,3 +263,62 @@ it("exposes only the selected test in an authenticated preview and restores the 
     await db.exec("reset role");
   }
 });
+
+it("keeps interrupted published games and obsolete decisions pending until reviewed", async () => {
+  const fixture = await readFile("supabase/tests/publication.sql", "utf8");
+  await db.exec(fixture.slice(0, fixture.indexOf("set local role anon;")));
+  try {
+    const occurrences = await readFile(
+      "supabase/tests/game_occurrences.sql",
+      "utf8",
+    );
+    await db.exec(
+      occurrences.slice(
+        occurrences.indexOf("create function pg_temp.oc_command"),
+        occurrences.indexOf("set local role anon;"),
+      ),
+    );
+    await db.exec(
+      "set local role authenticated; select set_config('request.jwt.claim.sub',pg_temp.pu_id(98)::text,true)",
+    );
+    await db.exec("select public.publish_sheet_game(pg_temp.pu_command())");
+    await db.exec(`select public.save_game_occurrence(pg_temp.oc_command(20,0,'{"kind":"cancelled"}',pg_temp.pu_id(9)));
+      select public.save_game_occurrence(pg_temp.oc_command(21,0,'{"kind":"interrupted"}'))`);
+    const complete = (n: number) =>
+      db.query(
+        "select public.save_dispute_administration(jsonb_build_object('commandId',$1::uuid,'disputeId',pg_temp.pu_id(3),'expectedVersion',2,'action','complete','visibility',null,'reason',null)) result",
+        [id(n)],
+      );
+    const expectPending = async (n: number) => {
+      await db.exec("savepoint pending_occurrence");
+      await expect(complete(n)).rejects.toMatchObject({
+        code: "PT409",
+        message: "dispute_pending_games",
+        detail: expect.stringContaining("f9200000-0000-4000-8000-000000000008"),
+      });
+      await db.exec(
+        "rollback to savepoint pending_occurrence;release savepoint pending_occurrence",
+      );
+    };
+    await expectPending(250);
+    await db.exec(
+      `select public.save_game_occurrence(pg_temp.oc_command(22,1,'{"kind":"postponed"}'))`,
+    );
+    await expectPending(251);
+    await db.exec(
+      `select public.save_game_occurrence(pg_temp.oc_command(23,2,'{"kind":"cancelled"}'))`,
+    );
+    await db.exec(
+      "reset role;update public.games set version=version+1 where id=pg_temp.pu_id(8);set local role authenticated",
+    );
+    await expectPending(252);
+    await db.exec(
+      "select public.save_game_occurrence(pg_temp.oc_command(24,3,'null'))",
+    );
+    expect((await complete(253)).rows).toEqual([
+      { result: expect.objectContaining({ status: "completed" }) },
+    ]);
+  } finally {
+    await db.exec("rollback");
+  }
+});
