@@ -43,6 +43,14 @@ Registrar evidências proporcionais ao que mudou e indicar os itens não aplicá
 
 ---
 
+## Protótipo do perfil público da equipe
+
+Gere o HTML offline com `node docs/design/prototipos/perfil-equipe/build.cjs` e abra `docs/design/.preview-artifacts/perfil-equipe/index.html`. Pela busca do cabeçalho, procure **Associação Atlética da Serra**. Em Campeonatos, abra uma Classificação e selecione a mesma equipe para conferir a entrada por disputa.
+
+A Visão geral mostra as participações agrupadas por situação e as conquistas coletivas. Estatísticas, Elencos e Jogos compartilham a inscrição selecionada. No celular, o detalhe do elenco ocupa a largura disponível e o retorno restaura a lista. O HTML usa fixtures para status, classificação e cobertura estatística. A publicação administrativa do status e o perfil público real são etapas próprias.
+
+O verificador integra `npm run design:verify`. Após gerar o HTML, execute `node docs/design/prototipos/perfil-equipe/verify.cjs --webkit` para testar também em WebKit quando instalado. As capturas ficam junto ao HTML.
+
 ## Reforma de UI/UX — piloto de 03/11/2026
 
 Direção aprovada: **público primeiro no celular, administração no desktop**, tema claro e azul, tabelas e formulários compactos. As decisões e os limites estão em [REFORMA-UIUX.md](REFORMA-UIUX.md).

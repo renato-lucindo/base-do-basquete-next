@@ -24,6 +24,7 @@ for (const file of [
   "verify-hierarchy.cjs",
   "prototipos/reforma-uiux/verify.cjs",
   "catalogo/verify.cjs",
+  "prototipos/perfil-equipe/verify.cjs",
 ]) {
   execFileSync(process.execPath, [path.join(__dirname, file)], {
     stdio: "inherit",

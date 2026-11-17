@@ -1,5 +1,11 @@
 # Progresso atual
 
+## Protótipo do perfil de equipe
+
+- Unidade `codex/prototipo-perfil-equipe` baseada em `4891dc6`, com [CI aprovada na base](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43967897859). [Histórico da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/prototipo-perfil-equipe) e [CI da branch](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fprototipo-perfil-equipe).
+- [Protótipo offline](design/README.md#protótipo-do-perfil-público-da-equipe) com quatro abas, duas entradas e fixtures. A revisão humana do protótipo é o próximo passo. A implementação pública depende da situação oficial publicada da disputa. O estado do serviço consta no registro do perfil do atleta abaixo.
+- A unidade usa worktree isolado. A edição de `CONTRIBUTING.md` e as skills locais do checkout de origem estão preservadas.
+
 ## Design system
 
 - Unidade `codex/design-system`, baseada em `a7f8aee`. [CI da base integrada](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43897953923) com sucesso. [Commits da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/design-system) e [execuções de CI](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fdesign-system) identificam o SHA e resultado de cada rodada.
