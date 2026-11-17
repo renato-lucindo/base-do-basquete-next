@@ -9,6 +9,7 @@
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 80;
+  pointer-events: none;
   display: flex;
   gap: 0.625rem;
   align-items: flex-start;
@@ -50,6 +51,7 @@
   font-size: 0.875rem;
 }
 .admin-toast-close {
+  pointer-events: auto;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
