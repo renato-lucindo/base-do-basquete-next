@@ -11,7 +11,7 @@ import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
 import { AdminDialog } from "../competition/admin-dialog";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { projectSheet } from "../scoresheet/projection";
 import {
   preparationContextSchema,
@@ -595,7 +595,11 @@ export function GameSheetWorkspace(props: Props) {
   }
   return (
     <section className="game-sheet" aria-busy={busy}>
-      <AdminToast message={props.enabled && !auxiliary ? status : ""} />
+      <AdminToast
+        tone={error ? "error" : "success"}
+        announce={false}
+        message={props.enabled && !auxiliary && !busy ? error || status : ""}
+      />
       <div className="sheet-navigation">
         <h3 ref={heading} tabIndex={-1}>
           Relacionados e súmula

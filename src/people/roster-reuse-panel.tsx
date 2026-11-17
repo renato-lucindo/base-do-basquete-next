@@ -1,4 +1,6 @@
 import { compareJerseys } from "../domain/jersey";
+import { AdminToast } from "../ui-system/admin-toast";
+import { ageWarningText } from "./age-warning";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import type { RegistrationSnapshot } from "../teams/contract";
@@ -46,6 +48,9 @@ export function RosterReusePanel(p: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
+  const [ageWarnings, setAgeWarnings] = useState<
+    { id: string; name: string; message: string }[]
+  >([]);
   const [complete, setComplete] = useState(false);
   const [uncertain, setUncertain] = useState(false);
   const pending = useRef<ApplyRosterReuse | null>(null);
@@ -245,6 +250,19 @@ export function RosterReusePanel(p: Props) {
       pending.current = null;
       setUncertain(false);
       setComplete(true);
+      setAgeWarnings(
+        receipt.items.flatMap((item, index) =>
+          item.ageWarning
+            ? [
+                {
+                  id: item.personId,
+                  name: selected[index].name,
+                  message: ageWarningText(item.ageWarning),
+                },
+              ]
+            : [],
+        ),
+      );
       setStatus(`${receipt.items.length} atleta(s) reaproveitado(s).`);
       p.onSaved();
     } catch (failure) {
@@ -294,6 +312,29 @@ export function RosterReusePanel(p: Props) {
             ? "Envio sem confirmação; tente novamente com o mesmo comando."
             : status}
       </p>
+      <AdminToast
+        tone={error ? "error" : ageWarnings.length ? "warning" : "success"}
+        announce={!error && ageWarnings.length > 0}
+        message={
+          busy || !p.enabled
+            ? ""
+            : error ||
+              (complete
+                ? ageWarnings.length
+                  ? "Elenco salvo. Confira os avisos de idade."
+                  : status
+                : "")
+        }
+      />
+      {ageWarnings.length > 0 && (
+        <ul className="bb-advisory" aria-label="Avisos de idade">
+          {ageWarnings.map(({ id, name, message }) => (
+            <li key={id}>
+              <strong>{name}</strong> · {message}
+            </li>
+          ))}
+        </ul>
+      )}
       {complete ? (
         <button type="button" onClick={p.onClose}>
           Retornar ao elenco atualizado

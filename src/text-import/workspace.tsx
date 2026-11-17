@@ -1,3 +1,4 @@
+import { AdminToast } from "../ui-system/admin-toast";
 import { useEffect, useRef, useState } from "react";
 import { api, isSessionFailure } from "../competition/api";
 import type { RegistrationSnapshot } from "../teams/contract";
@@ -267,6 +268,19 @@ export function TextImportWorkspace(props: Props) {
         </>
       ) : (
         <>
+          <AdminToast
+            tone={error || model.error ? "error" : "warning"}
+            announce={!(error || model.error)}
+            message={
+              model.busy || !props.enabled
+                ? ""
+                : error ||
+                  model.error ||
+                  (model.savedWithAgeWarning
+                    ? "Inscrições salvas. Confira os avisos de idade nas linhas."
+                    : "")
+            }
+          />
           <p role="status">
             {complete} {complete === 1 ? "confirmado" : "confirmados"} ·{" "}
             {model.readyCount} prontos selecionados ·{" "}

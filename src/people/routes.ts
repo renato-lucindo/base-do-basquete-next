@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningHeader } from "./age-warning";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { savePersonSchema } from "./contract";
@@ -66,6 +67,7 @@ export async function peopleRoute(request: Request, env: Env, url: URL) {
                 origin: env.APP_ORIGIN,
                 maxBytes: 4096,
               }),
+              request.headers.get(ageWarningHeader) === "1",
             )
           : await session.saveStaff(
               await readMutationJson(request, saveStaffSchema, {

@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { saveResultSchema } from "../competition/contract";
+import { ageWarningSchema } from "./age-warning";
+
+export const saveRosterResultSchema = saveResultSchema.extend({
+  ageWarning: ageWarningSchema.optional(),
+});
 import { publicPersonSchema } from "./contract";
 export const rosterEntrySchema = z
   .object({

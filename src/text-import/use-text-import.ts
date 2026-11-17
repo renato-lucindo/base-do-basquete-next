@@ -53,6 +53,7 @@ export function useTextImport(props: Props) {
     pendingRef = useRef<Pending | null>(null);
   const [conflict, setConflict] = useState(false),
     [error, setError] = useState("");
+  const [savedWithAgeWarning, setSavedWithAgeWarning] = useState(false);
   const [matches, setMatches] = useState<
     Record<string, MatchingResult["items"][number]>
   >({});
@@ -330,6 +331,7 @@ export function useTextImport(props: Props) {
           version: r.version,
           results: [...current.results, r.result],
         });
+        if (r.result.ageWarning) setSavedWithAgeWarning(true);
         setBaseline(JSON.stringify(current.document));
       }
       setPending(null);
@@ -355,6 +357,7 @@ export function useTextImport(props: Props) {
   async function interpret(target: TextReview["target"]) {
     if (busyRef.current || pendingRef.current || conflict) return;
     setBusy(true);
+    setSavedWithAgeWarning(false);
     setError("");
     setRowErrors({});
     try {
@@ -516,6 +519,7 @@ export function useTextImport(props: Props) {
       return;
     setBusy(true);
     setError("");
+    setSavedWithAgeWarning(false);
     const before = stateRef.current.results.length;
     try {
       let s = stateRef.current;
@@ -602,6 +606,7 @@ export function useTextImport(props: Props) {
   }
   async function load(id: string, ask = true) {
     if (busyRef.current || (ask && !mayLeave())) return;
+    setSavedWithAgeWarning(false);
     setBusy(true);
     setError("");
     try {
@@ -638,6 +643,7 @@ export function useTextImport(props: Props) {
     setBaseline("");
     setPending(null);
     setConflict(false);
+    setSavedWithAgeWarning(false);
     setError("");
     setMatches({});
     matchesRef.current = {};
@@ -666,6 +672,7 @@ export function useTextImport(props: Props) {
     rowIssues,
     readyCount,
     applied,
+    savedWithAgeWarning,
     mayLeave,
     interpret,
     field,

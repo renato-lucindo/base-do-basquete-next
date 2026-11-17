@@ -52,7 +52,7 @@ for (const area of ["jogos", "equipes", "informacoes"])
           .click();
       else
         await expect(
-          page.getByRole("textbox", {
+          page.getByRole("combobox", {
             name: "Categoria da disputa 1.1",
             exact: true,
           }),

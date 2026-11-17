@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { z } from "zod";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
-import { saveResultSchema } from "../competition/contract";
+import { ageWarningText, type AgeWarning } from "./age-warning";
 import {
   emptyPerson,
   personSchema,
@@ -15,6 +15,7 @@ import {
   rosterListingSchema,
   rosterSnapshotSchema,
   saveRosterSchema,
+  saveRosterResultSchema,
   type SaveRoster,
   type RosterSnapshot,
 } from "./roster-contract";
@@ -36,7 +37,7 @@ import {
 import { PersonFields } from "./person-fields";
 import { PersonPicker } from "./person-picker";
 import { AdminDialog } from "../competition/admin-dialog";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { InitialProfileBatch } from "../player-profile/initial-batch";
 import { ProfilePublicationPanel } from "../player-profile/publication-panel";
 import { TransferPanel } from "./transfer-panel";
@@ -121,6 +122,8 @@ export function MembersWorkspace({
     [duplicate, setDuplicate] = useState(false);
   const [error, setError] = useState(""),
     [status, setStatus] = useState("");
+  const [ageWarning, setAgeWarning] = useState<AgeWarning>();
+  const [actionFailed, setActionFailed] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     form = useRef<HTMLFormElement>(null),
@@ -155,7 +158,7 @@ export function MembersWorkspace({
     ReturnType<typeof draftProfile>["metadata"] | null
   >(null);
   const acknowledged = useRef(
-    new Map<string, { id: string; version: number }>(),
+    new Map<string, { id: string; version: number; ageWarning?: AgeWarning }>(),
   );
   const unconfirmed = useRef(new Set<string>());
   useEffect(() => {
@@ -295,6 +298,8 @@ export function MembersWorkspace({
     deferredProfile.current = null;
     acknowledged.current.clear();
     unconfirmed.current.clear();
+    setAgeWarning(undefined);
+    setActionFailed(false);
     setPartialSaved(false);
     setEditor(value);
     setBaseline(JSON.stringify(value.command));
@@ -509,7 +514,7 @@ export function MembersWorkspace({
     if (known) return known;
     unconfirmed.current.add(command.commandId);
     try {
-      const result = await api(path, saveResultSchema, command);
+      const result = await api(path, saveRosterResultSchema, command);
       const expectedId =
         "person" in command ? command.person.id : command.entry.id;
       if (
@@ -657,6 +662,9 @@ export function MembersWorkspace({
     setBusy(true);
     setError("");
     setStatus("");
+    setAgeWarning(undefined);
+    setActionFailed(false);
+    let savedWarning: AgeWarning | undefined;
     try {
       if (editor.kind === "person") {
         const result =
@@ -671,6 +679,7 @@ export function MembersWorkspace({
           throw new Error("Não foi possível confirmar o cadastro solicitado.");
         if (editor.roster && rosterNeedsSave) {
           const receipt = await persist("/api/roster", editor.roster.command);
+          savedWarning = receipt.ageWarning;
           const row = await api(
             `/api/roster/${receipt.id}`,
             rosterSnapshotSchema,
@@ -717,6 +726,7 @@ export function MembersWorkspace({
       } else {
         const path = editor.kind === "roster" ? "/api/roster" : "/api/staff";
         const result = await persist(path, editor.command);
+        savedWarning = result.ageWarning;
         const value =
           editor.kind === "roster"
             ? await api(`${path}/${result.id}`, rosterSnapshotSchema)
@@ -736,9 +746,11 @@ export function MembersWorkspace({
         deferredProfile.current = null;
         if (command) await publishProfile(command, true);
       }
+      setAgeWarning(savedWarning);
       setRefresh((v) => v + 1);
       onSaved();
     } catch (failure) {
+      setActionFailed(true);
       if (
         failure instanceof ApiFailure &&
         failure.code === "identity_confirmation_required"
@@ -972,8 +984,24 @@ export function MembersWorkspace({
   return (
     <section className="members-workspace">
       <AdminToast
+        tone={
+          actionFailed && error
+            ? "error"
+            : ageWarning || status === "Cadastro salvo. Publicação pendente"
+              ? "warning"
+              : "success"
+        }
+        announce={!(actionFailed && error)}
         message={
-          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+          !enabled || busy
+            ? ""
+            : actionFailed && error
+              ? error
+              : !uncertain && !conflict && !dirty
+                ? ageWarning && status
+                  ? "Vínculo salvo. " + ageWarningText(ageWarning)
+                  : status
+                : ""
         }
       />
       <div className="competition-title">

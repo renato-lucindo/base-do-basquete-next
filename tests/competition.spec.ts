@@ -127,7 +127,7 @@ async function create(page: Page) {
     .selectOption("feminino");
   await page
     .getByLabel("Categoria da disputa 1.1", { exact: true })
-    .fill("Adulto");
+    .selectOption("adult");
 }
 
 for (const width of [1366, 1920])
@@ -147,7 +147,10 @@ for (const width of [1366, 1920])
       .click();
     await page
       .getByLabel("Categoria da disputa 1.2", { exact: true })
-      .fill("Sub-18");
+      .selectOption("base");
+    await page
+      .getByLabel("Idade máxima da categoria 1.2", { exact: true })
+      .selectOption("18");
     await page.evaluate(() => scrollTo(0, 0));
     const phase = process.env.ADMIN_CAPTURE_BASELINE ? "before" : "after";
     await page.screenshot({
@@ -180,8 +183,8 @@ for (const width of [1366, 1920])
     );
     await page.reload();
     await expect(
-      page.getByLabel("Categoria da disputa 1.2", { exact: true }),
-    ).toHaveValue("Sub-18");
+      page.getByLabel("Idade máxima da categoria 1.2", { exact: true }),
+    ).toHaveValue("18");
     await page
       .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
       .click();
@@ -214,7 +217,10 @@ test("unsaved season and dispute removals require a visible modal confirmation",
     exact: true,
   });
   await addDispute.click();
-  await category.fill("Sub-18");
+  await category.selectOption("base");
+  await page
+    .getByLabel("Idade máxima da categoria 1.2", { exact: true })
+    .selectOption("18");
   await removeDispute.click();
   const dialog = page.getByRole("dialog", {
     name: "Remover disputa?",
@@ -234,7 +240,10 @@ test("unsaved season and dispute removals require a visible modal confirmation",
   }
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
-  await expect(category).toHaveValue("Sub-18");
+  await expect(category).toHaveValue("base");
+  await expect(
+    page.getByLabel("Idade máxima da categoria 1.2", { exact: true }),
+  ).toHaveValue("18");
   await removeDispute.click();
   await dialog
     .getByRole("button", { name: "Confirmar remoção", exact: true })
@@ -306,7 +315,10 @@ test("competition is saved and restored with multiple seasons and explicit dispu
     .selectOption("masculino");
   await page
     .getByLabel("Categoria da disputa 1.2", { exact: true })
-    .fill("Sub-18");
+    .selectOption("base");
+  await page
+    .getByLabel("Idade máxima da categoria 1.2", { exact: true })
+    .selectOption("18");
   await page.getByLabel("Divisão da disputa 1.2", { exact: true }).fill("B");
   await page
     .getByRole("button", { name: "Adicionar temporada", exact: true })
@@ -314,7 +326,10 @@ test("competition is saved and restored with multiple seasons and explicit dispu
   await page.getByLabel("Ano da temporada 2", { exact: true }).fill("2026");
   await page
     .getByLabel("Categoria da disputa 2.1", { exact: true })
-    .fill("Adulto");
+    .selectOption("master");
+  await page
+    .getByLabel("Idade mínima da categoria 2.1", { exact: true })
+    .selectOption("50");
   await page
     .getByRole("button", { name: "Salvar campeonato", exact: true })
     .click();

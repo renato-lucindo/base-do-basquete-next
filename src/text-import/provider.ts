@@ -54,11 +54,11 @@ export class SupabaseTextImport {
       throw unavailable();
     return result;
   }
-  async get(token: string, id: string) {
+  async get(token: string, id: string, ageWarnings = false) {
     const r = await this.checked(
       textReviewSnapshotSchema,
       "get_text_review",
-      { p_id: id },
+      { p_id: id, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
     if (r.id !== id) throw unavailable();
@@ -91,11 +91,11 @@ export class SupabaseTextImport {
       throw unavailable();
     return r;
   }
-  async confirm(token: string, command: ConfirmTextRow) {
+  async confirm(token: string, command: ConfirmTextRow, ageWarnings = false) {
     const r = await this.checked(
       confirmTextResultSchema,
       "confirm_text_row",
-      { p_command: command },
+      { p_command: command, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
     if (

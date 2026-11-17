@@ -110,11 +110,35 @@ async function checkExamples(page) {
   await expect(
     page.getByRole("status").filter({ hasText: "Agenda atualizada." }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Mostrar notificação" }).click();
+  await page.getByRole("button", { name: "Mostrar sucesso" }).click();
   const toast = page.getByRole("region", { name: "Notificação" });
+  await expect(toast).toHaveAttribute("data-tone", "success");
   await expect(toast).toContainText("Local de jogo salvo");
   await toast.getByRole("button", { name: "Dispensar notificação" }).click();
   await expect(toast).toBeHidden();
+  for (const [label, tone] of [
+    ["erro", "error"],
+    ["aviso", "warning"],
+  ]) {
+    await page.getByRole("button", { name: "Mostrar " + label }).click();
+    await expect(toast).toHaveAttribute("data-tone", tone);
+    await expect(toast.locator(".admin-toast-icon svg")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    if (tone === "warning") {
+      await expect(toast.locator(".admin-toast-icon")).toHaveCSS(
+        "color",
+        "rgb(0, 0, 0)",
+      );
+      await expect(toast.locator(".admin-toast-icon")).toHaveCSS(
+        "border-top-color",
+        "rgb(0, 0, 0)",
+      );
+    }
+    await toast.getByRole("button", { name: "Dispensar notificação" }).click();
+    await expect(toast).toBeHidden();
+  }
 }
 
 async function main() {

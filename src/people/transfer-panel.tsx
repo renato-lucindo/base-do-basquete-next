@@ -1,3 +1,5 @@
+import { AdminToast } from "../ui-system/admin-toast";
+import { ageWarningText, type AgeWarning } from "./age-warning";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { rosterSnapshotSchema, type RosterSnapshot } from "./roster-contract";
@@ -49,6 +51,7 @@ export function TransferPanel(p: Props) {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [status, setStatus] = useState(""),
+    [ageWarning, setAgeWarning] = useState<AgeWarning>(),
     [conflict, setConflict] = useState(false),
     [completed, setCompleted] = useState(false),
     [confirmed, setConfirmed] = useState(false),
@@ -274,6 +277,7 @@ export function TransferPanel(p: Props) {
       setCompleted(true);
       setProposal(null);
       setConfirmed(false);
+      setAgeWarning(ack.ageWarning);
       setStatus(
         ack.kind === "return"
           ? "Retorno concluído com novo vínculo. Histórico preservado."
@@ -366,6 +370,18 @@ export function TransferPanel(p: Props) {
           {error}
         </p>
       )}
+      <AdminToast
+        tone={error ? "error" : ageWarning ? "warning" : "success"}
+        announce={!error && !!ageWarning}
+        message={
+          busy || !p.enabled
+            ? ""
+            : error ||
+              (ageWarning && status
+                ? status + " " + ageWarningText(ageWarning)
+                : status)
+        }
+      />
       <p role="status" tabIndex={-1} ref={resultStatus}>
         {busy
           ? "Aguarde…"

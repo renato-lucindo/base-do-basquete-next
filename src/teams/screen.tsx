@@ -3,7 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { AdminDialog } from "../competition/admin-dialog";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import { RegistrationRemovalPanel } from "./removal-panel";
@@ -409,8 +409,12 @@ export function TeamsWorkspace({
       aria-busy={busy}
     >
       <AdminToast
+        tone={error ? "error" : "success"}
+        announce={!error}
         message={
-          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+          enabled && !busy
+            ? error || (!uncertain && !conflict && !dirty ? status : "")
+            : ""
         }
       />
       {removing && (
