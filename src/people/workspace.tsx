@@ -514,7 +514,15 @@ export function MembersWorkspace({
     if (known) return known;
     unconfirmed.current.add(command.commandId);
     try {
-      const result = await api(path, saveRosterResultSchema, command);
+      const result = await api(
+        path,
+        saveRosterResultSchema,
+        command,
+        undefined,
+        {
+          ageWarnings: path === "/api/roster",
+        },
+      );
       const expectedId =
         "person" in command ? command.person.id : command.entry.id;
       if (

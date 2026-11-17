@@ -300,7 +300,9 @@ export function TransferPanel(p: Props) {
     try {
       if (!pending.current.ack) {
         const c = pending.current.command,
-          ack = await api(path, transferResultSchema, c);
+          ack = await api(path, transferResultSchema, c, undefined, {
+            ageWarnings: true,
+          });
         if (
           ack.commandId !== c.commandId ||
           ack.disputeId !== c.disputeId ||

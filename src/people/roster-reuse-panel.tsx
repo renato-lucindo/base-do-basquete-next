@@ -233,6 +233,8 @@ export function RosterReusePanel(p: Props) {
         "/api/roster/reuse",
         rosterReuseResultSchema,
         command,
+        undefined,
+        { ageWarnings: true },
       );
       if (!active.current) return;
       if (

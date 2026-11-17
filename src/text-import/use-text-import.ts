@@ -323,6 +323,8 @@ export function useTextImport(props: Props) {
           "/api/text-import/confirm",
           confirmTextResultSchema,
           p.command,
+          undefined,
+          { ageWarnings: true },
         );
         if (r.id !== current.document.id || r.result.rowId !== p.command.rowId)
           throw Error("A resposta não corresponde à linha enviada.");
@@ -613,6 +615,9 @@ export function useTextImport(props: Props) {
       const snap = await api(
         `/api/text-import/${id}`,
         textReviewSnapshotSchema,
+        undefined,
+        undefined,
+        { ageWarnings: true },
       );
       if (
         snap.disputeId !== props.disputeId ||
