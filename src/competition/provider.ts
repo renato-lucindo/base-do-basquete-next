@@ -17,6 +17,11 @@ import {
   type SaveCompetitionAdministration,
 } from "./administration-contract";
 
+import {
+  disputeListPageSchema,
+  type DisputeListQuery,
+} from "./catalog-contract";
+
 type Functions = Database["public"]["Functions"];
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 export class SupabaseCompetitions {
@@ -33,6 +38,12 @@ export class SupabaseCompetitions {
         { p_query: query, p_offset: offset },
         token,
       ),
+    );
+  }
+  async listDisputes(token: string, query: DisputeListQuery) {
+    return checked(
+      disputeListPageSchema,
+      await this.rpc("list_admin_disputes", { p_query: query }, token),
     );
   }
   async get(token: string, id: string) {

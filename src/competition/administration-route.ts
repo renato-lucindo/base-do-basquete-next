@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { disputeListQuerySchema } from "./catalog-contract";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import {
@@ -25,25 +26,29 @@ export async function competitionAdministrationRoute(
   const id = z.uuid().safeParse(part);
   const options = { origin: env.APP_ORIGIN, maxBytes: 262144 };
   const result =
-    request.method === "GET" && id.success
-      ? await session.getDisputeAdministration(id.data)
-      : request.method === "POST" && part === "competition"
-        ? await session.saveCompetitionAdministration(
-            await readMutationJson(
-              request,
-              saveCompetitionAdministrationSchema,
-              options,
-            ),
-          )
-        : request.method === "POST" && part === "dispute"
-          ? await session.saveDisputeAdministration(
+    request.method === "POST" && part === "listing"
+      ? await session.listAdminDisputes(
+          await readMutationJson(request, disputeListQuerySchema, options),
+        )
+      : request.method === "GET" && id.success
+        ? await session.getDisputeAdministration(id.data)
+        : request.method === "POST" && part === "competition"
+          ? await session.saveCompetitionAdministration(
               await readMutationJson(
                 request,
-                disputeAdministrationCommandSchema,
+                saveCompetitionAdministrationSchema,
                 options,
               ),
             )
-          : null;
+          : request.method === "POST" && part === "dispute"
+            ? await session.saveDisputeAdministration(
+                await readMutationJson(
+                  request,
+                  disputeAdministrationCommandSchema,
+                  options,
+                ),
+              )
+            : null;
   if (!result)
     throw new HttpError(405, "invalid_method", "Método não permitido.");
   if (!result.ok)
