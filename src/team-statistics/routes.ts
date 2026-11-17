@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { SupabaseTeamStatistics } from "./provider";
 const bad = () =>
@@ -79,10 +80,13 @@ export async function publicTeamsRoute(
   const registrationId = params.get("registrationId");
   if (registrationId !== null && !z.uuid().safeParse(registrationId).success)
     throw bad();
-  const db = new SupabaseTeamStatistics({
-    url: env.SUPABASE_URL,
-    key: env.SUPABASE_PUBLISHABLE_KEY,
-  });
+  const db = new SupabaseTeamStatistics(
+    {
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    },
+    await publicReadTransport(request, env),
+  );
   const page = match[2]
     ? await db.getDetail(id.data, match[2], registrationId, params)
     : await db.getPage(id.data, params);

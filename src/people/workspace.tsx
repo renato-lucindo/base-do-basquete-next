@@ -65,6 +65,7 @@ type Props = {
   gender: "masculino" | "feminino";
   enabled: boolean;
   canEdit: boolean;
+  globalsReadOnly?: boolean;
   guard: { current: () => boolean };
   onSessionLost: () => void;
   onSaved: () => void;
@@ -80,6 +81,7 @@ export function MembersWorkspace({
   gender,
   enabled,
   canEdit,
+  globalsReadOnly = false,
   guard,
   onSessionLost,
   onSaved,
@@ -459,9 +461,13 @@ export function MembersWorkspace({
         wanted === "none" ||
         (wanted === "athlete" && !p.athlete) ||
         (wanted !== "athlete" && !p.coach)
-      )
+      ) {
+        if (globalsReadOnly) {
+          setError("Selecione uma pessoa com o papel já cadastrado.");
+          return;
+        }
         personEditor(p, wanted, rosterEntry);
-      else membership(p, wanted);
+      } else membership(p, wanted);
     } catch (failure) {
       report(failure);
     } finally {
@@ -1048,7 +1054,7 @@ export function MembersWorkspace({
         <button
           className="secondary"
           type="button"
-          disabled={disabled}
+          disabled={disabled || globalsReadOnly}
           onClick={() => {
             if (mayLeave()) setBatchOpen(true);
           }}
@@ -1102,7 +1108,7 @@ export function MembersWorkspace({
             <section aria-label="Localizar pessoa">
               <div className="competition-actions">
                 <button
-                  disabled={disabled}
+                  disabled={disabled || globalsReadOnly}
                   onClick={() => personEditor(undefined, target)}
                 >
                   {target === "athlete"
@@ -1433,7 +1439,7 @@ export function MembersWorkspace({
                         <div className="competition-actions">
                           <button
                             className="secondary"
-                            disabled={disabled}
+                            disabled={disabled || globalsReadOnly}
                             aria-label={`Perfil público de ${r.person.name}`}
                             onClick={() => {
                               if (mayLeave()) {
@@ -1464,13 +1470,20 @@ export function MembersWorkspace({
                           <button
                             className="secondary"
                             disabled={disabled}
-                            aria-label={`Editar pessoa ${r.person.name}`}
+                            aria-label={
+                              (globalsReadOnly
+                                ? "Editar camisa de "
+                                : "Editar pessoa ") + r.person.name
+                            }
                             onClick={() => {
-                              if (mayLeave())
+                              if (globalsReadOnly) editRoster(r);
+                              else if (mayLeave())
                                 void usePerson(r.personId, "none", r);
                             }}
                           >
-                            Editar pessoa
+                            {globalsReadOnly
+                              ? "Editar camisa"
+                              : "Editar pessoa"}
                           </button>
                           {r.active && (
                             <button

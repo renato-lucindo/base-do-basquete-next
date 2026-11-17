@@ -124,6 +124,14 @@ import {
   type SaveCompetition,
 } from "../competition/contract";
 
+import {
+  disputeAdministrationCommandSchema,
+  saveCompetitionAdministrationSchema,
+  type DisputeAdministrationCommand,
+  type SaveCompetitionAdministration,
+} from "../competition/administration-contract";
+import type { Json } from "../server/database.types";
+
 type RpcResult<T> =
   | { ok: true; value: T }
   | { ok: false; status: number; code: string; message: string };
@@ -251,6 +259,47 @@ export class SessionStore extends DurableObject<Env> {
   }
   close() {
     return safely(() => this.session.close());
+  }
+  getDisputeAdministration(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.getAdministration(accessToken, id),
+      ),
+    );
+  }
+  saveDisputeAdministration(command: DisputeAdministrationCommand) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.saveAdministration(
+          accessToken,
+          disputeAdministrationCommandSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveCompetitionAdministration(command: SaveCompetitionAdministration) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.saveWithAdministration(
+          accessToken,
+          saveCompetitionAdministrationSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  readTestDispute(id: string, operation: string, args: string) {
+    return safely(() =>
+      this.session.runAuthorized(async ({ accessToken }) =>
+        JSON.stringify(
+          await this.competitions.readTestDispute(
+            accessToken,
+            id,
+            operation,
+            JSON.parse(args) as Json,
+          ),
+        ),
+      ),
+    );
   }
   listCompetitions(query: string, offset: number) {
     return safely(() =>

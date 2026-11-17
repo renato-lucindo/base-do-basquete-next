@@ -21,6 +21,9 @@ import {
 type Functions = Database["public"]["Functions"];
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 const messages = {
+  dispute_closed: "Reabra a disputa antes de alterar a importação.",
+  test_global_read_only:
+    "Em uma disputa de teste, selecione pessoas e equipes já cadastradas.",
   transfer_required:
     "Este atleta já tem histórico na disputa. Use a operação de transferência ou retorno no elenco para abrir outro vínculo.",
   identity_confirmation_required:

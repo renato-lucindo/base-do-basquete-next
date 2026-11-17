@@ -33,9 +33,12 @@ it.each(["zero", "upgrade"] as const)(
       // fixture's disabled administrator, keeping Auth identities and G4 intact.
       await db.exec("delete from public.admin_access");
       await db.exec(
-        (
-          await readFile("supabase/tests/roster_reuse_context.sql", "utf8")
-        ).split("-- REUSE_CONTEXT_ASSERTIONS")[0],
+        (await readFile("supabase/tests/roster_reuse_context.sql", "utf8"))
+          .split("-- REUSE_CONTEXT_ASSERTIONS")[0]
+          .replace(
+            "(pg_temp.rr_id(11),pg_temp.rr_id(2),'feminino','Adulto')",
+            "(pg_temp.rr_id(11),pg_temp.rr_id(2),'feminino','Sub-22')",
+          ),
       );
       const before = (
         await db.query(
@@ -58,7 +61,6 @@ it.each(["zero", "upgrade"] as const)(
       ).split("-- REUSE_WRITE_ASSERTIONS");
       await db.exec(helpers);
       await db.exec(`select set_config('request.jwt.claim.sub',pg_temp.rr_id(900)::text,true);savepoint reuse_bulk;
-        update public.disputes set category='Sub-22' where id=pg_temp.rr_id(11);
         insert into public.persons(id,name,public_birth_year)
           select pg_temp.rr_id(10000+n),'Atleta em lote '||n,2002 from generate_series(1,200) n;
         insert into private.athletes(person_id,sex) select pg_temp.rr_id(10000+n),'female' from generate_series(1,200) n;

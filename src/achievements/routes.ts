@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveAchievementDraftSchema } from "./draft-contract";
@@ -128,10 +129,13 @@ export async function publicAchievementRoute(
       .transform((v) => v.toLowerCase())
       .safeParse(match?.[1]);
   if (!id.success || url.search) throw bad();
-  const r = await new SupabaseAchievements({
-    url: env.SUPABASE_URL,
-    key: env.SUPABASE_PUBLISHABLE_KEY,
-  }).getPublic(id.data);
+  const r = await new SupabaseAchievements(
+    {
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+    },
+    await publicReadTransport(request, env),
+  ).getPublic(id.data);
   if (r === null)
     throw new HttpError(
       404,

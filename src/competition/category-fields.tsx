@@ -10,9 +10,11 @@ export function CategoryFields({
   label,
   suffix,
   onChange,
+  disabled = false,
 }: {
   label: string;
   suffix: string;
+  disabled?: boolean;
   onChange: (label: string) => void;
 }) {
   const { kind, age } =
@@ -30,6 +32,7 @@ export function CategoryFields({
         Categoria
         <select
           name="category"
+          disabled={disabled}
           aria-label={`Categoria da disputa ${suffix}`}
           value={kind}
           onChange={(event) =>
@@ -51,6 +54,7 @@ export function CategoryFields({
           {ageLabel}
           <select
             name="categoryAge"
+            disabled={disabled}
             aria-label={`${ageLabel} da categoria ${suffix}`}
             required
             value={age}

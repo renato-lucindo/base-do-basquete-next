@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { finalizeSheetSchema, finalizePdfSchema } from "./finalization";
@@ -147,10 +148,13 @@ export async function publicGameRoute(request: Request, env: Env, url: URL) {
   const match = /^\/api\/public\/games\/([^/]+)$/u.exec(url.pathname),
     id = z.uuid().safeParse(match?.[1]);
   if (!id.success || url.search) throw badInput();
-  const provider = new SupabasePublications({
-      url: env.SUPABASE_URL,
-      key: env.SUPABASE_PUBLISHABLE_KEY,
-    }),
+  const provider = new SupabasePublications(
+      {
+        url: env.SUPABASE_URL,
+        key: env.SUPABASE_PUBLISHABLE_KEY,
+      },
+      await publicReadTransport(request, env),
+    ),
     r = await provider.getPublic(id.data);
   if (r === null)
     throw new HttpError(

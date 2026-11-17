@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { previewDisputeId } from "./preview";
 
 // Only the dedicated Pages deployment supplies this public configuration.
 export const siteDisputeId =
-  typeof document === "undefined"
+  typeof document === "undefined" || previewDisputeId()
     ? null
     : (z
         .uuid()

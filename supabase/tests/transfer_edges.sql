@@ -50,7 +50,7 @@ rollback to transfer_sex;
 
 -- Published/PDF contexts already lock gender. Preserve that guard instead of
 -- disabling it to manufacture a state the product cannot create.
-select pg_temp.tr_rejected('update public.disputes set gender=''feminino'' where id=pg_temp.pu_id(3)','PT400');
+select pg_temp.tr_rejected('update public.disputes set gender=''feminino'' where id=pg_temp.pu_id(3)',case when to_regclass('private.dispute_administration') is null then 'PT400' else 'PT409' end);
 savepoint transfer_gender_guard;
 update public.roster_entries set ended_at=clock_timestamp(),version=version+1 where dispute_id=pg_temp.pu_id(3) and ended_at is null;
 select pg_temp.tr_rejected('update public.disputes set gender=''feminino'' where id=pg_temp.pu_id(3)','PT409');
