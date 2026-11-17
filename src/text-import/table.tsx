@@ -1,3 +1,4 @@
+import { ageWarningText } from "../people/age-warning";
 import { positions, type ImportPlayer, type PlayerField } from "./contract";
 import type { TextImportModel } from "./use-text-import";
 import type { ImportCandidate } from "./matching-contract";
@@ -77,6 +78,9 @@ export function ImportTable({
               };
               return displayed[key];
             }
+            const ageWarning = model.state?.results.find(
+              (result) => result.rowId === row.id,
+            )?.ageWarning;
             const problems = model.rowIssues.get(row.id) ?? [];
             const differences = current
               ? row.provided.filter(
@@ -231,6 +235,11 @@ export function ImportTable({
                         ? "Pendente"
                         : "Pronto"}
                   </strong>
+                  {ageWarning && (
+                    <p className="bb-advisory">
+                      <strong>Atenção</strong> · {ageWarningText(ageWarning)}
+                    </p>
+                  )}
                   <details>
                     <summary>Texto original</summary>
                     <pre>{row.source}</pre>

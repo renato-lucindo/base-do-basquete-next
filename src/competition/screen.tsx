@@ -7,7 +7,8 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
 import { AdminDialog } from "./admin-dialog";
-import { AdminToast } from "./admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
+import { CategoryFields } from "./category-fields";
 import {
   competitionSchema,
   listingSchema,
@@ -49,7 +50,7 @@ const allIds = (draft: Competition) =>
 const newDispute = () => ({
   id: crypto.randomUUID(),
   gender: "masculino" as const,
-  category: "",
+  category: "Adulto",
   division: null,
 });
 const currentYear = () =>
@@ -388,7 +389,11 @@ export function CompetitionWorkspace({
       className={`competition-workspace${compact ? " compact-pilot" : ""}`}
       aria-busy={opening || saving}
     >
-      <AdminToast message={enabled && !saving && !opening ? notice : ""} />
+      <AdminToast
+        tone={error ? "error" : "success"}
+        announce={!error}
+        message={enabled && !saving && !opening ? error || notice : ""}
+      />
       {error && (
         <p ref={errorRef} tabIndex={-1} role="alert" className="access-error">
           {error}
@@ -730,21 +735,15 @@ export function CompetitionWorkspace({
                               <option value="feminino">Feminino</option>
                             </select>
                           </label>
-                          <label>
-                            Categoria
-                            <input
-                              aria-label={`Categoria da disputa ${si + 1}.${di + 1}`}
-                              required
-                              maxLength={80}
-                              value={dispute.category}
-                              onChange={(event) =>
-                                change((d) => {
-                                  d.seasons[si].disputes[di].category =
-                                    event.target.value;
-                                })
-                              }
-                            />
-                          </label>
+                          <CategoryFields
+                            suffix={`${si + 1}.${di + 1}`}
+                            label={dispute.category}
+                            onChange={(value) =>
+                              change((draft) => {
+                                draft.seasons[si].disputes[di].category = value;
+                              })
+                            }
+                          />
                           <label>
                             Divisão (opcional)
                             <input

@@ -16,7 +16,9 @@ it.each(["zero", "upgrade"] as const)(
       const names = (await readdir("supabase/migrations"))
           .filter((n) => n.endsWith(".sql"))
           .sort(),
-        added = names.filter((n) => n.endsWith("_roster_reuse_write.sql"));
+        added = names.filter((n) =>
+          /_(roster_reuse_write|dispute_age_categories)\.sql$/u.test(n),
+        );
       for (const n of names.filter(
         (n) => mode === "zero" || !added.includes(n),
       ))
@@ -56,17 +58,27 @@ it.each(["zero", "upgrade"] as const)(
       ).split("-- REUSE_WRITE_ASSERTIONS");
       await db.exec(helpers);
       await db.exec(`select set_config('request.jwt.claim.sub',pg_temp.rr_id(900)::text,true);savepoint reuse_bulk;
-        insert into public.persons(id,name) select pg_temp.rr_id(10000+n),'Atleta em lote '||n from generate_series(1,200) n;
+        update public.disputes set category='Sub-22' where id=pg_temp.rr_id(11);
+        insert into public.persons(id,name,public_birth_year)
+          select pg_temp.rr_id(10000+n),'Atleta em lote '||n,2002 from generate_series(1,200) n;
         insert into private.athletes(person_id,sex) select pg_temp.rr_id(10000+n),'female' from generate_series(1,200) n;
         insert into public.roster_entries(id,registration_id,dispute_id,person_id,jersey) select pg_temp.rr_id(20000+n),pg_temp.rr_id(30),pg_temp.rr_id(10),pg_temp.rr_id(10000+n),null from generate_series(1,200) n;
         set local role authenticated;
       `);
       const bulk = (
         await db.query<{ value: unknown }>(
-          `select public.apply_roster_reuse(jsonb_set(pg_temp.rw_command(799),'{items}',(select jsonb_agg(jsonb_build_object('sourceEntryId',pg_temp.rr_id(20000+n),'sourceVersion',1,'newEntryId',pg_temp.rr_id(30000+n),'jersey',null) order by n) from generate_series(1,200) n))) value`,
+          `select public.apply_roster_reuse(jsonb_set(pg_temp.rw_command(799),'{items}',(select jsonb_agg(jsonb_build_object('sourceEntryId',pg_temp.rr_id(20000+n),'sourceVersion',1,'newEntryId',pg_temp.rr_id(30000+n),'jersey',null) order by n) from generate_series(1,200) n)),true) value`,
         )
       ).rows[0].value;
-      expect(rosterReuseResultSchema.parse(bulk).items).toHaveLength(200);
+      const items = rosterReuseResultSchema.parse(bulk).items;
+      expect(items).toHaveLength(200);
+      expect(items.slice(0, 2).map((item) => item.ageWarning)).toEqual([
+        undefined,
+        undefined,
+      ]);
+      expect(items.slice(2).map((item) => item.ageWarning?.code)).toEqual(
+        Array(198).fill("sub22_quota"),
+      );
       await db.exec(`reset role;rollback to savepoint reuse_bulk;release savepoint reuse_bulk;savepoint reuse_capacity;
         insert into public.persons(id,name) select pg_temp.rr_id(40000+n),'Destino '||n from generate_series(1,1997) n;
         insert into private.athletes(person_id,sex) select pg_temp.rr_id(40000+n),'female' from generate_series(1,1997) n;

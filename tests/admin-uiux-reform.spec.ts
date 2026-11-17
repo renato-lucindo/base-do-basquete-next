@@ -129,7 +129,7 @@ test("Informacoes mantem categoria proporcional em desktop e reflow no celular",
 }, info) => {
   await gamesFixture(page);
   await page.goto(route(""));
-  const category = page.getByRole("textbox", {
+  const category = page.getByRole("combobox", {
     name: "Categoria da disputa 1.1",
     exact: true,
   });

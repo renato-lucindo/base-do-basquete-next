@@ -445,6 +445,13 @@
   color: var(--bb-success);
   margin-bottom: 0.75rem !important;
 }
+.bb-advisory {
+  border-inline-start: 0.25rem solid var(--bb-warning);
+  padding-inline-start: 0.625rem;
+}
+ul.bb-advisory {
+  padding-inline-start: 1.5rem;
+}
 .bb-error {
   color: var(--bb-danger);
   background: #fff3f1;

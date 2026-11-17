@@ -1,5 +1,11 @@
 # Progresso atual
 
+## Categorias etárias e notificações administrativas
+
+- Unidade `codex/categorias-etarias`, baseada em `4891dc6`. Cadastro de Adulto, Base e Master nas disputas e aviso após inscrições fora da faixa ou acima das duas vagas ativas do Sub-22. O design system inclui os três toasts e o catálogo atualizado.
+- A consulta ao DEV encontrou 11 disputas e zero colisões na classificação. A migration `20261117122456_dispute_age_categories.sql` está na unidade e foi exercitada em banco local isolado. A classificação no DEV e o deploy seguem pendentes de autorização específica.
+- Worktree próprio. Mantidas as alterações locais do checkout original. O SHA, as evidências de validação e a revisão de integração ficam na PR da branch.
+
 ## Design system
 
 - Unidade `codex/design-system`, baseada em `a7f8aee`. [CI da base integrada](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43897953923) com sucesso. [Commits da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/design-system) e [execuções de CI](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fdesign-system) identificam o SHA e resultado de cada rodada.

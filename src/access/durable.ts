@@ -354,10 +354,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  saveRoster(command: SaveRoster) {
+  saveRoster(command: SaveRoster, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.people.saveRoster(accessToken, saveRosterSchema.parse(command)),
+        this.people.saveRoster(
+          accessToken,
+          saveRosterSchema.parse(command),
+          ageWarnings,
+        ),
       ),
     );
   }
@@ -390,10 +394,10 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  getTextReview(id: string) {
+  getTextReview(id: string, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(
-        ({ accessToken }) => this.textImport.get(accessToken, id),
+        ({ accessToken }) => this.textImport.get(accessToken, id, ageWarnings),
         "import.review",
       ),
     );
@@ -415,13 +419,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  confirmTextRow(command: ConfirmTextRow) {
+  confirmTextRow(command: ConfirmTextRow, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(
         ({ accessToken }) =>
           this.textImport.confirm(
             accessToken,
             confirmTextRowSchema.parse(command),
+            ageWarnings,
           ),
         "import.confirm",
       ),
@@ -689,12 +694,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  applyRosterReuse(command: ApplyRosterReuse) {
+  applyRosterReuse(command: ApplyRosterReuse, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.rosterReuse.apply(
           accessToken,
           applyRosterReuseSchema.parse(command),
+          ageWarnings,
         ),
       ),
     );
@@ -706,10 +712,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  saveTransfer(command: SaveTransfer) {
+  saveTransfer(command: SaveTransfer, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.transfers.save(accessToken, saveTransferSchema.parse(command)),
+        this.transfers.save(
+          accessToken,
+          saveTransferSchema.parse(command),
+          ageWarnings,
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { ageWarningHeader } from "../people/age-warning";
 export class ApiFailure extends Error {
   constructor(
     readonly status: number,
@@ -19,6 +20,7 @@ export async function api<T>(
   schema: z.ZodType<T>,
   command?: object,
   signal?: AbortSignal,
+  options?: { ageWarnings?: boolean },
 ): Promise<T> {
   const response = await fetch(path, {
     method: command ? "POST" : "GET",
@@ -27,15 +29,18 @@ export async function api<T>(
     signal: signal
       ? AbortSignal.any([signal, AbortSignal.timeout(45000)])
       : AbortSignal.timeout(45000),
-    ...(command
-      ? {
-          headers: {
-            "Content-Type":
-              command instanceof Blob ? command.type : "application/json",
-          },
-          body: command instanceof Blob ? command : JSON.stringify(command),
-        }
-      : {}),
+    ...((command || options?.ageWarnings) && {
+      headers: {
+        ...(command && {
+          "Content-Type":
+            command instanceof Blob ? command.type : "application/json",
+        }),
+        ...(options?.ageWarnings && { [ageWarningHeader]: "1" }),
+      },
+    }),
+    ...(command && {
+      body: command instanceof Blob ? command : JSON.stringify(command),
+    }),
   });
   let body: unknown;
   try {

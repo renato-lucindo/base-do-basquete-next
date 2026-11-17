@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningSchema } from "../people/age-warning";
 export const TEXT_LIMIT = 20000,
   LINE_LIMIT = 500,
   ROW_LIMIT = 200;
@@ -189,6 +190,7 @@ export const textRowResultSchema = z
     rowId: z.uuid(),
     entityId: z.uuid(),
     entityVersion: version.min(1),
+    ageWarning: ageWarningSchema.optional(),
   })
   .strict();
 export type TextRowResult = z.infer<typeof textRowResultSchema>;

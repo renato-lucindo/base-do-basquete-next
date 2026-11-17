@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningHeader } from "./age-warning";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { applyRosterReuseSchema } from "./roster-reuse-contract";
@@ -64,7 +65,10 @@ export async function rosterReuseRoute(request: Request, env: Env, url: URL) {
     });
     const actor = await session.actor();
     if (!actor.ok) throw new HttpError(actor.status, actor.code, actor.message);
-    const result = await session.applyRosterReuse(command);
+    const result = await session.applyRosterReuse(
+      command,
+      request.headers.get(ageWarningHeader) === "1",
+    );
     if (!result.ok)
       throw new HttpError(result.status, result.code, result.message);
     return jsonResponse(result.value);

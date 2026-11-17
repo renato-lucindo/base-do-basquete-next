@@ -14,6 +14,7 @@ const paths = {
   trophy:
     "M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4M12 13v6M8 21h8M9 19h6",
   check: "m5 12 4 4L19 6",
+  warning: "M12 5v9m0 4v1",
   arrow: "M5 12h14m-5-5 5 5-5 5",
   file: "M14 2H5v20h14V7l-5-5ZM14 2v5h5M8 12h8M8 16h8",
 } as const;
