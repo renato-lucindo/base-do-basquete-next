@@ -17,12 +17,13 @@ it.each(["zero", "upgrade"])(
       const files = (await readdir("supabase/migrations"))
         .filter((f) => f.endsWith(".sql"))
         .sort();
-      // The activity trigger on officiating commands needs the original table.
-      // Apply both after the legacy seed when testing an upgrade.
+      // These migrations depend on the officiating tables and activity helper.
+      // Apply them in order after seeding the legacy schema.
       const added = files.filter(
         (f) =>
           f.endsWith("_game_officiating.sql") ||
-          f.endsWith("_dispute_activity_catalog.sql"),
+          f.endsWith("_dispute_activity_catalog.sql") ||
+          f.endsWith("_competition_organizers.sql"),
       );
       for (const f of files.filter(
         (f) => mode === "zero" || !added.includes(f),
