@@ -291,6 +291,7 @@ body:has(.dispute-catalog[data-active="true"]) .access-preview {
   min-height: 1.625rem;
   font-size: inherit;
   line-height: 1.3;
+  font-weight: 700;
   max-inline-size: clamp(9rem, 24vw, 16rem);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -392,9 +393,6 @@ body:has(.dispute-catalog[data-active="true"]) .access-preview {
   min-width: 2rem;
   min-height: 2rem;
 }
-.dispute-create-dialog button.dispute-close-action {
-  color: var(--bb-danger);
-}
 .dispute-create-dialog button.dispute-cancel-action {
   color: var(--bb-danger);
   border-color: var(--bb-danger);
@@ -410,8 +408,7 @@ body:has(.dispute-catalog[data-active="true"]) .access-preview {
   color: var(--bb-surface);
 }
 @media (hover: hover) {
-  .dispute-create-dialog
-    :is(.dispute-close-action, .dispute-cancel-action):hover:not(:disabled) {
+  .dispute-create-dialog .dispute-cancel-action:hover:not(:disabled) {
     background: color-mix(in srgb, var(--bb-danger) 8%, var(--bb-surface));
   }
   .dispute-create-dialog

@@ -395,11 +395,7 @@ export function DisputeFormDialog({
       footer={
         <>
           <button
-            className={
-              editing
-                ? "secondary dispute-discard-action"
-                : "secondary dispute-close-action"
-            }
+            className="secondary dispute-discard-action"
             type="button"
             disabled={busy}
             onClick={close}

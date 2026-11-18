@@ -343,10 +343,10 @@ export function DisputeCatalog({
   const columns = [
     ["activity", "Última alteração"],
     ["championship", "Campeonato"],
-    ["year", "Ano"],
     ["category", "Categoria"],
     ["gender", "Naipe"],
     ["division", "Divisão"],
+    ["year", "Ano"],
     ["status", "Situação"],
     ["visibility", "Visibilidade"],
   ] as const;
@@ -594,7 +594,6 @@ export function DisputeCatalog({
                         type="button"
                         id={"open-dispute-" + a.disputeId}
                         className="dispute-open"
-                        title={row.name}
                         disabled={opening}
                         aria-label={"Abrir " + rowLabel}
                         onClick={() => {
@@ -605,12 +604,12 @@ export function DisputeCatalog({
                         {row.name}
                       </button>
                     </td>
-                    <td className="dispute-year">{row.year}</td>
                     <td>{row.category}</td>
                     <td>
                       {row.gender === "masculino" ? "Masculino" : "Feminino"}
                     </td>
                     <td>{row.division ?? "—"}</td>
+                    <td className="dispute-year">{row.year}</td>
                     <td>
                       <span className="dispute-status" data-status={a.status}>
                         {disputeStatusLabels[a.status]}
