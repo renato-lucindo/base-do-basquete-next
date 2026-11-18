@@ -28,10 +28,7 @@ $$;
 create function private.guard_championship_organizer() returns trigger
 language plpgsql security definer set search_path='' as $$
 begin
-  if tg_op='INSERT' then
-    if exists (select from public.championships where id=new.id and organizer_id is null)
-      then raise sqlstate 'PT409' using message='championship_organizer_required'; end if;
-  elsif new.organizer_id is distinct from old.organizer_id and old.organizer_id is not null then
+  if new.organizer_id is distinct from old.organizer_id and old.organizer_id is not null then
     if new.organizer_id is null or exists (
       select from private.competition_organizers where id=old.organizer_id and kind='system'
     ) or exists (
@@ -44,29 +41,9 @@ begin
 end
 $$;
 
--- The existing aggregate writer inserts the root before the administrative fields.
-create constraint trigger require_championship_organizer
-  after insert on public.championships deferrable initially deferred
-  for each row execute function private.guard_championship_organizer();
 create trigger guard_championship_organizer
   after update of organizer_id on public.championships
   for each row execute function private.guard_championship_organizer();
-
-create function private.guard_test_championship() returns trigger
-language plpgsql security definer set search_path='' as $$
-begin
-  if exists (
-    select from public.seasons s join public.championships c on c.id=s.championship_id
-    join private.competition_organizers o on o.id=c.organizer_id and o.kind='system'
-    where s.id=new.season_id and not exists (
-      select from private.dispute_administration a where a.dispute_id=new.id and a.is_test
-    )
-  ) then raise sqlstate 'PT409' using message='championship_test_only'; end if;
-  return null;
-end
-$$;
-create constraint trigger guard_test_championship after insert on public.disputes
-  deferrable initially deferred for each row execute function private.guard_test_championship();
 
 create function private.resolve_competition_organizer(selection jsonb) returns uuid
 language plpgsql volatile security invoker set search_path='' as $$
@@ -197,7 +174,7 @@ language sql stable security invoker set search_path='' as $$
 $$;
 
 revoke all on function private.organizer_json(private.competition_organizers),
-  private.guard_championship_organizer(),private.guard_test_championship(),
+  private.guard_championship_organizer(),
   private.resolve_competition_organizer(jsonb),private.set_championship_organizer(uuid,uuid,jsonb,boolean),
   private.list_competition_organizers(text),public.list_competition_organizers(text),
   private.get_competition_with_organizer(uuid),public.get_competition_with_organizer(uuid)
@@ -226,6 +203,38 @@ create trigger record_championship_organizer_activity after update of organizer_
 for each row when(old.organizer_id is distinct from new.organizer_id)
 execute function private.record_dispute_activity('championship','id');
 
+
+-- Preserve the old endpoint and replay receipts. The old payload can edit
+-- existing contexts but cannot create a championship without an organizer.
+create function private.save_legacy_competition(p_command jsonb) returns jsonb
+language plpgsql volatile security definer set search_path='' as $$
+declare
+  actor uuid:=private.require_competition_admin();
+  cmd uuid;
+  replayed boolean;
+  result jsonb;
+begin
+  cmd:=(p_command->>'commandId')::uuid;
+  perform pg_advisory_xact_lock(hashtextextended(cmd::text,0));
+  select exists(select from private.competition_commands where command_id=cmd) into replayed;
+  result:=private.save_competition(p_command);
+  if not replayed then
+    if (result->>'version')::int=1
+      then raise sqlstate 'PT409' using message='championship_organizer_required'; end if;
+    perform private.set_championship_organizer((result->>'id')::uuid,actor,null,false);
+  end if;
+  return result;
+exception when invalid_text_representation then
+  raise sqlstate 'PT400' using message='invalid_context';
+end
+$$;
+create or replace function public.save_competition(p_command jsonb) returns jsonb
+language sql volatile security invoker set search_path='' as $$
+  select private.save_legacy_competition(p_command)
+$$;
+revoke execute on function private.save_competition(jsonb) from authenticated;
+revoke all on function private.save_legacy_competition(jsonb) from public,anon,authenticated,service_role;
+grant execute on function private.save_legacy_competition(jsonb) to authenticated;
 
 create or replace function public.save_competition_administration(p_command jsonb) returns jsonb
 language plpgsql volatile security definer set search_path='' as $$
