@@ -42,7 +42,7 @@ async function list(query: object = {}) {
   return disputeListPageSchema.parse(
     (
       await db.query<{ result: unknown }>(
-        "select public.list_admin_dispute_catalog($1) result",
+        "select public.list_admin_dispute_activity_catalog($1) result",
         [disputeListQuerySchema.parse(query)],
       )
     ).rows[0].result,
@@ -91,6 +91,34 @@ it("sorts youth, adult and masters by age and filters multiple championships", a
     ),
   ).toEqual(expected.toReversed());
   expect((await list({ ...filters, championshipIds: [id(6)] })).total).toBe(3);
+});
+it("ranks the dispute with a registration edit ahead of siblings, including after a deletion", async () => {
+  const sibling = async () =>
+    (await list({ q: "Divisão 01" })).items[0].lastActivityAt;
+  const initialSibling = await sibling();
+  const tracked = id(100);
+  await db.query("insert into public.teams(id,name) values($1,'Time')", [
+    id(500),
+  ]);
+  await db.query(
+    "insert into public.registrations(id,dispute_id,team_id,name) values($1,$2,$3,'Time')",
+    [id(501), tracked, id(500)],
+  );
+  const first = (await list()).items[0];
+  expect(first.administration.disputeId).toBe(tracked);
+  expect(first.lastActivityAt).not.toBeNull();
+  expect(await sibling()).toBe(initialSibling);
+  await db.query("update public.registrations set name=name where id=$1", [
+    id(501),
+  ]);
+  expect((await list()).items[0].lastActivityAt).toBe(first.lastActivityAt);
+  await db.query("delete from public.registrations where id=$1", [id(501)]);
+  const latest = (await list()).items[0];
+  expect(latest.administration.disputeId).toBe(tracked);
+  expect(Date.parse(latest.lastActivityAt!)).toBeGreaterThan(
+    Date.parse(first.lastActivityAt!),
+  );
+  expect(await sibling()).toBe(initialSibling);
 });
 it("rejects anonymous and revoked administrative reads", async () => {
   await db.exec("set role anon");

@@ -15,22 +15,10 @@
   position: relative;
   display: inline-block;
 }
-.dispute-actions-menu > button {
-  cursor: pointer;
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  border: 1px solid var(--bb-control-line);
-  border-radius: 0.3125rem;
-  min-height: 2rem;
+.dispute-list-heading .dispute-add {
+  min-height: 1.875rem;
   padding: 0.25rem 0.625rem;
-  background: #fff;
   font-size: 0.8125rem;
-  font-weight: 600;
-}
-.dispute-add {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -39,14 +27,11 @@
 .dispute-create-dialog .primary:hover {
   background: var(--bb-blue-hover);
 }
-.dispute-actions-menu > button:hover {
-  background: var(--bb-background);
-}
 .dispute-menu-items {
   position: fixed;
   inset: auto;
   margin: 0;
-  min-width: min(15rem, calc(100% - 1rem));
+  min-width: min(9rem, calc(100% - 1rem));
   max-width: calc(100% - 1rem);
   padding: 0.25rem;
   box-shadow: 0 0.375rem 1rem #17203326;
@@ -218,15 +203,11 @@
 .dispute-list-table tbody tr:hover {
   background: var(--bb-blue-soft);
 }
-.dispute-list-table td:not(:first-child) {
+.dispute-list-table td:not(:nth-child(2)) {
   white-space: nowrap;
 }
-.dispute-list-table td:first-child {
+.dispute-list-table td:nth-child(2) {
   min-width: 9rem;
-}
-.dispute-list-table .dispute-actions-menu > button {
-  min-height: 1.5rem;
-  padding: 0 0.375rem;
 }
 .dispute-list-table .dispute-open {
   display: block;
@@ -253,17 +234,40 @@
   font-size: 0.75rem;
   white-space: nowrap;
 }
-.dispute-status[data-status="planned"] {
-  color: #554372;
+/* Keep the exact status colors in the markers, with readable labels. */
+.dispute-status[data-status="planned"] > span {
+  color: #3b82f6;
 }
-.dispute-status[data-status="in_progress"] {
-  color: #825000;
+.dispute-status[data-status="in_progress"] > span {
+  color: #f97316;
 }
-.dispute-status[data-status="completed"] {
-  color: var(--bb-success);
+.dispute-status[data-status="completed"] > span {
+  color: #22c55e;
 }
-.dispute-status[data-status="cancelled"] {
-  color: var(--bb-danger);
+.dispute-status[data-status="cancelled"] > span {
+  color: #ef4444;
+}
+.dispute-activity {
+  font-variant-numeric: tabular-nums;
+}
+.dispute-list-table button.dispute-visibility,
+.dispute-list-table button.dispute-edit {
+  min-height: 1.5rem;
+  padding: 0.125rem 0.1875rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  background: transparent;
+  border: 0;
+  color: var(--bb-blue);
+}
+.dispute-list-table button.dispute-visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--bb-text);
+}
+.dispute-list-table button:is(.dispute-visibility, .dispute-edit):hover {
+  text-decoration: underline;
 }
 .dispute-visibility {
   font-size: 0.75rem;
@@ -371,8 +375,9 @@
   .dispute-list-options > span {
     margin-left: 0;
   }
-  .dispute-actions-menu > button,
-  .dispute-list-table .dispute-actions-menu > button {
+  .dispute-list-heading .dispute-add,
+  .dispute-list-table button.dispute-visibility,
+  .dispute-list-table button.dispute-edit {
     min-height: 2.75rem;
   }
   .dispute-list-table td {

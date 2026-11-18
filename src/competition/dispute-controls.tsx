@@ -8,7 +8,7 @@ import {
   type DisputeAdministrationCommand,
 } from "./administration-contract";
 
-type Action = DisputeAdministrationCommand["action"];
+type Action = Exclude<DisputeAdministrationCommand["action"], "set_visibility">;
 export function DisputeControls({
   state,
   disabled,
@@ -30,12 +30,10 @@ export function DisputeControls({
   const reasonId = useId();
   const closed = state.status === "completed" || state.status === "cancelled";
   const publicDispute = state.visibility === "public";
-  const visibility = publicDispute ? "private" : "public";
   const labels = {
     complete: "Concluir disputa",
     cancel: "Cancelar disputa",
     reopen: "Reabrir disputa",
-    set_visibility: publicDispute ? "Tornar privada" : "Tornar pública",
   };
   const messages = {
     complete:
@@ -44,9 +42,6 @@ export function DisputeControls({
       "Os resultados confirmados serão preservados. Jogos pendentes sairão da agenda pública.",
     reopen:
       "A disputa voltará à situação anterior e aceitará alterações esportivas.",
-    set_visibility: publicDispute
-      ? "O público perderá acesso à disputa e a seus dados, inclusive por links diretos."
-      : "A disputa aparecerá no catálogo e na busca. Conteúdo elegível ficará disponível.",
   };
   const requiredReason = action === "cancel" || action === "reopen";
   const open = (next: Action) => {
@@ -68,7 +63,7 @@ export function DisputeControls({
         disputeId: state.disputeId,
         expectedVersion: state.version,
         action,
-        visibility: action === "set_visibility" ? visibility : null,
+        visibility: null,
         reason: currentReason,
       };
     }
@@ -106,16 +101,7 @@ export function DisputeControls({
               ? "Pública"
               : "Privada"}
         </span>
-        {!state.isTest ? (
-          <button
-            type="button"
-            className="secondary"
-            disabled={disabled}
-            onClick={() => open("set_visibility")}
-          >
-            {labels.set_visibility}
-          </button>
-        ) : (
+        {state.isTest && (
           <a
             href={"/publico.html?previa=" + state.disputeId}
             target="_blank"

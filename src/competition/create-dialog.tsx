@@ -1,3 +1,4 @@
+import { DisputeControls } from "./dispute-controls";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { AdminDialog } from "./admin-dialog";
 import { CategoryFields } from "./category-fields";
@@ -35,6 +36,7 @@ export function DisputeFormDialog({
   championships,
   onClose,
   onSaved,
+  onAdministrationSaved,
   onSessionLost,
   guard,
 }: {
@@ -43,6 +45,7 @@ export function DisputeFormDialog({
   championships: ChampionshipOption[];
   onClose: () => void;
   onSaved: () => void;
+  onAdministrationSaved: (state: DisputeAdministration) => void;
   onSessionLost: () => void;
   guard: { current: () => boolean };
 }) {
@@ -65,6 +68,7 @@ export function DisputeFormDialog({
   const [category, setCategory] = useState(editing?.category ?? "Adulto");
   const [division, setDivision] = useState(editing?.division ?? "");
   const [isTest, setIsTest] = useState(false);
+  const [requiresRenameReason, setRequiresRenameReason] = useState(false);
   const [renameReason, setRenameReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -99,7 +103,7 @@ export function DisputeFormDialog({
     !!editing &&
     !!resolvedSnapshot &&
     name.trim().replace(/\s+/gu, " ") !== resolvedSnapshot.name &&
-    administration.some((value) => value.wasPublic);
+    (requiresRenameReason || administration.some((value) => value.wasPublic));
   const ready = editing
     ? !!original && !!state
     : creatingChampionship || !!resolvedSnapshot;
@@ -200,6 +204,7 @@ export function DisputeFormDialog({
           setCategory(current.category);
           setDivision(current.division ?? "");
           setRenameReason("");
+          setRequiresRenameReason(false);
         }
         setSnapshot(value);
         setAdministration(states);
@@ -332,6 +337,12 @@ export function DisputeFormDialog({
       const definite =
         failure instanceof ApiFailure && [400, 409].includes(failure.status);
       setUncertain(!definite);
+      if (
+        failure instanceof ApiFailure &&
+        failure.code === "championship_rename_reason_required"
+      ) {
+        setRequiresRenameReason(true);
+      }
       setConflict(
         failure instanceof ApiFailure &&
           failure.status === 409 &&
@@ -576,6 +587,27 @@ export function DisputeFormDialog({
             </button>
           )}
       </form>
+      {state && (
+        <DisputeControls
+          state={state}
+          disabled={busy || loading || uncertain || conflict}
+          onSaved={(updated) => {
+            setAdministration((previous) =>
+              previous.map((item) =>
+                item.disputeId === updated.disputeId ? updated : item,
+              ),
+            );
+            onAdministrationSaved(updated);
+          }}
+          onReload={() => {
+            setConflict(true);
+            setError(
+              "A disputa foi alterada em outra sessão. Recarregue os dados.",
+            );
+          }}
+          onSessionLost={onSessionLost}
+        />
+      )}
     </AdminDialog>
   );
 }

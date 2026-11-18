@@ -1,8 +1,9 @@
 # Lista administrativa de disputas
 
+- A ordem inicial é Última edição, com a atividade de cada disputa registrada separadamente. Histórico sem data atribuível à disputa aparece como traço.
 - Uma disputa por linha, com busca incremental, campeonatos por seleção múltipla e ordenação por categoria etária antes da paginação.
 - Adicionar abre um diálogo que associa a disputa ao ano informado do campeonato. Campeonato ou ano novo são criados no mesmo salvamento. Disputas do mesmo naipe e categoria precisam de divisões distintas na mesma temporada.
-- A linha abre Jogos no contexto escolhido. Edição de identificação, situação e visibilidade ficam no menu da lista. Voltar conserva os filtros.
+- A linha abre Jogos no contexto escolhido. Visibilidade é alterada em dois cliques na linha. Editar abre os dados e as ações de situação, incluindo cancelar com motivo. Voltar conserva os filtros.
 - Publicar a revisão no Worker administrativo para avaliação. Manter a PR aberta até o aceite visual do responsável.
 
 ## Atualização do Worker administrativo

@@ -1,11 +1,14 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import { AdminToast } from "../ui-system/admin-toast";
 import { Icon } from "../ui-system/components";
-import { AdminDialog } from "./admin-dialog";
-import { DisputeControls } from "./dispute-controls";
 import { DisputeFormDialog, type DisputeFormTarget } from "./create-dialog";
-import { disputeStatusLabels } from "./administration-contract";
+import {
+  disputeStatusLabels,
+  disputeAdministrationSchema,
+  type DisputeAdministration,
+  type DisputeAdministrationCommand,
+} from "./administration-contract";
 import {
   type ChampionshipOption,
   disputeListPageSchema,
@@ -15,7 +18,59 @@ import {
 } from "./catalog-contract";
 import "./catalog.css";
 
-function Actions({ label, children }: { label: string; children: ReactNode }) {
+const activityFormat = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  day: "2-digit",
+  month: "2-digit",
+  year: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+function VisibilityControl({
+  state,
+  label,
+  onSaved,
+  onFailure,
+}: {
+  state: DisputeAdministration;
+  label: string;
+  onSaved: (state: DisputeAdministration) => void;
+  onFailure: (failure: unknown) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const pending = useRef<DisputeAdministrationCommand | null>(null);
+  const current = state.visibility === "public" ? "Pública" : "Privada";
+  const next = state.visibility === "public" ? "private" : "public";
+
+  async function change() {
+    if (busy) return;
+    if (!pending.current || pending.current.expectedVersion !== state.version) {
+      pending.current = {
+        commandId: crypto.randomUUID(),
+        disputeId: state.disputeId,
+        expectedVersion: state.version,
+        action: "set_visibility",
+        visibility: next,
+        reason: null,
+      };
+    }
+    setBusy(true);
+    try {
+      const saved = await api(
+        "/api/competition-administration/dispute",
+        disputeAdministrationSchema,
+        pending.current,
+      );
+      pending.current = null;
+      onSaved(saved);
+    } catch (error) {
+      onFailure(error);
+    } finally {
+      setBusy(false);
+    }
+  }
   const id = useId();
   const button = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -46,16 +101,18 @@ function Actions({ label, children }: { label: string; children: ReactNode }) {
       window.removeEventListener("resize", update);
     };
   }, []);
+  if (state.isTest) return <span className="dispute-visibility">Teste</span>;
   return (
     <div className="dispute-actions-menu">
       <button
         ref={button}
         type="button"
         popoverTarget={id}
-        aria-label={label}
-        className="secondary"
+        disabled={busy}
+        aria-label={current + " · " + label}
+        className="dispute-visibility secondary"
       >
-        <span aria-hidden="true">⋯</span>
+        {busy ? "Salvando…" : current} <span aria-hidden="true">⌄</span>
       </button>
       <div
         ref={panel}
@@ -63,23 +120,27 @@ function Actions({ label, children }: { label: string; children: ReactNode }) {
         popover="auto"
         className="dispute-menu-items"
         onBeforeToggle={(event) => {
-          if (event.newState === "open") requestAnimationFrame(position);
+          if (event.newState === "open") position();
         }}
-        onClick={(event) => {
-          if (
-            !(event.target instanceof Element) ||
-            !event.target.closest("button, a")
-          )
-            return;
-          panel.current?.hidePopover();
-          button.current?.focus({ preventScroll: true });
+        onToggle={(event) => {
+          if (event.newState === "open") position();
         }}
       >
-        {children}
+        <button
+          type="button"
+          onClick={() => {
+            panel.current?.hidePopover();
+            button.current?.focus({ preventScroll: true });
+            void change();
+          }}
+        >
+          {next === "public" ? "Tornar pública" : "Tornar privada"}
+        </button>
       </div>
     </div>
   );
 }
+
 export function DisputeCatalog({
   enabled,
   refresh,
@@ -110,7 +171,7 @@ export function DisputeCatalog({
   const [notice, setNotice] = useState("");
   const [reload, setReload] = useState(0);
   const [create, setCreate] = useState<DisputeFormTarget | null>(null);
-  const [managing, setManaging] = useState<DisputeListRow | null>(null);
+  const [actionError, setActionError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const scroll = useRef(0);
   const lastRow = useRef<string | null>(null);
@@ -170,7 +231,6 @@ export function DisputeCatalog({
       sort: column,
       direction:
         query.sort === column && query.direction === "asc" ? "desc" : "asc",
-      recent: false,
     });
   }
   function reset() {
@@ -181,7 +241,25 @@ export function DisputeCatalog({
     setError("");
     setNotice("");
   }
+  function administrationSaved(
+    updated: DisputeAdministration,
+    message: string,
+  ) {
+    setPage((old) => ({
+      ...old,
+      items: old.items.map((row) =>
+        row.administration.disputeId === updated.disputeId
+          ? { ...row, administration: updated }
+          : row,
+      ),
+    }));
+    setActionError("");
+    setNotice(message);
+    setReload((value) => value + 1);
+  }
+
   const columns = [
+    ["activity", "Última edição"],
     ["championship", "Campeonato"],
     ["year", "Ano"],
     ["category", "Categoria"],
@@ -196,8 +274,7 @@ export function DisputeCatalog({
     query.gender ||
     query.status ||
     query.visibility ||
-    query.championshipIds.length ||
-    query.recent
+    query.championshipIds.length
   );
   return (
     <div className="dispute-catalog">
@@ -348,14 +425,6 @@ export function DisputeCatalog({
         </label>
       </div>
       <div className="dispute-list-options">
-        <label className="competition-radio">
-          <input
-            type="checkbox"
-            checked={query.recent}
-            onChange={(e) => filter({ recent: e.target.checked })}
-          />
-          Mais recentes primeiro
-        </label>
         {filtered && (
           <button type="button" className="dispute-text-action" onClick={reset}>
             Limpar filtros
@@ -390,7 +459,7 @@ export function DisputeCatalog({
                     scope="col"
                     key={key}
                     aria-sort={
-                      query.sort === key && !query.recent
+                      query.sort === key
                         ? query.direction === "asc"
                           ? "ascending"
                           : "descending"
@@ -399,7 +468,7 @@ export function DisputeCatalog({
                   >
                     <button type="button" onClick={() => sort(key)}>
                       {label}
-                      {query.sort === key && !query.recent && (
+                      {query.sort === key && (
                         <span aria-hidden="true">
                           {query.direction === "asc" ? " ↑" : " ↓"}
                         </span>
@@ -426,6 +495,17 @@ export function DisputeCatalog({
                   .join(" · ");
                 return (
                   <tr key={a.disputeId}>
+                    <td className="dispute-activity">
+                      {row.lastActivityAt ? (
+                        <time dateTime={row.lastActivityAt}>
+                          {activityFormat
+                            .format(new Date(row.lastActivityAt))
+                            .replace(", ", " ")}
+                        </time>
+                      ) : (
+                        <span aria-label="Sem edição registrada">—</span>
+                      )}
+                    </td>
                     <td>
                       <button
                         type="button"
@@ -460,50 +540,44 @@ export function DisputeCatalog({
                       </span>
                     </td>
                     <td>
-                      <span className="dispute-visibility">
-                        {a.isTest
-                          ? "Teste"
-                          : a.visibility === "public"
-                            ? "Pública"
-                            : "Privada"}
-                      </span>
+                      <VisibilityControl
+                        state={a}
+                        label={rowLabel}
+                        onSaved={(updated) =>
+                          administrationSaved(
+                            updated,
+                            updated.visibility === "public"
+                              ? "Disputa tornada pública."
+                              : "Disputa tornada privada.",
+                          )
+                        }
+                        onFailure={(failure) => {
+                          if (isSessionFailure(failure)) onSessionLost();
+                          else {
+                            setNotice("");
+                            setActionError(
+                              failure instanceof ApiFailure
+                                ? failure.message
+                                : "Não foi possível confirmar a alteração. Tente novamente.",
+                            );
+                            if (
+                              failure instanceof ApiFailure &&
+                              failure.code === "version_conflict"
+                            )
+                              setReload((value) => value + 1);
+                          }
+                        }}
+                      />
                     </td>
                     <td>
-                      <Actions label={"Ações de " + rowLabel}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            lastRow.current = a.disputeId;
-                            open(row.competitionId, a.disputeId);
-                          }}
-                        >
-                          Abrir disputa
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => add({ mode: "add", row })}
-                        >
-                          Adicionar neste campeonato
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => add({ mode: "edit", row })}
-                        >
-                          Editar dados da disputa
-                        </button>
-                        <button type="button" onClick={() => setManaging(row)}>
-                          Situação e visibilidade
-                        </button>
-                        {a.isTest && (
-                          <a
-                            href={"/publico.html?previa=" + a.disputeId}
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            Abrir prévia
-                          </a>
-                        )}
-                      </Actions>
+                      <button
+                        type="button"
+                        className="dispute-edit secondary"
+                        aria-label={"Editar " + rowLabel}
+                        onClick={() => add({ mode: "edit", row })}
+                      >
+                        Editar
+                      </button>
                     </td>
                   </tr>
                 );
@@ -547,11 +621,20 @@ export function DisputeCatalog({
         </button>
       </div>
       <AdminToast key={reload} message={notice} />
+      <AdminToast message={actionError} tone="error" />
       {create && (
         <DisputeFormDialog
           enabled={enabled}
           target={create}
           championships={page.championships}
+          onAdministrationSaved={(updated) =>
+            administrationSaved(
+              updated,
+              "Situação alterada para " +
+                disputeStatusLabels[updated.status].toLowerCase() +
+                ".",
+            )
+          }
           onSessionLost={onSessionLost}
           guard={guard}
           onClose={() => {
@@ -567,30 +650,6 @@ export function DisputeCatalog({
             setReload((n) => n + 1);
           }}
         />
-      )}
-      {managing && (
-        <AdminDialog
-          open={enabled}
-          busy={false}
-          title={
-            managing.name + " · " + managing.year + " · " + managing.category
-          }
-          onClose={() => setManaging(null)}
-        >
-          <DisputeControls
-            state={managing.administration}
-            disabled={false}
-            onSessionLost={onSessionLost}
-            onReload={() => {
-              setManaging(null);
-              setReload((n) => n + 1);
-            }}
-            onSaved={(administration) => {
-              setManaging({ ...managing, administration });
-              setReload((n) => n + 1);
-            }}
-          />
-        </AdminDialog>
       )}
     </div>
   );

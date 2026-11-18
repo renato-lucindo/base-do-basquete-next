@@ -12,9 +12,9 @@ export const disputeListQuerySchema = z
     gender: z.enum(["masculino", "feminino"]).nullable().default(null),
     status: disputeStatusSchema.nullable().default(null),
     visibility: z.enum(["public", "private", "test"]).nullable().default(null),
-    recent: z.boolean().default(false),
     sort: z
       .enum([
+        "activity",
         "championship",
         "year",
         "category",
@@ -23,7 +23,7 @@ export const disputeListQuerySchema = z
         "status",
         "visibility",
       ])
-      .default("year"),
+      .default("activity"),
     direction: z.enum(["asc", "desc"]).default("desc"),
     offset: z.number().int().min(0).max(100000).default(0),
   })
@@ -37,6 +37,7 @@ export const disputeListRowSchema = z
     gender: z.enum(["masculino", "feminino"]),
     category: z.string(),
     division: z.string().nullable(),
+    lastActivityAt: z.iso.datetime({ offset: true }).nullable(),
     administration: disputeAdministrationSchema,
   })
   .strict();

@@ -1,3 +1,7 @@
+import type {
+  DisputeAdministration,
+  DisputeAdministrationCommand,
+} from "../src/competition/administration-contract";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import type {
@@ -15,6 +19,21 @@ async function fixture(
   extra: CompetitionSnapshot[] = [],
 ) {
   let saved = initial;
+  const changes = new Map<string, DisputeAdministration>();
+  let renameReasonRequired = false;
+  function administration(id: string): DisputeAdministration {
+    return (
+      changes.get(id) ?? {
+        disputeId: id,
+        version: 1,
+        status: "planned",
+        visibility: "private",
+        lockReason: lockIdentification ? "registration" : null,
+        isTest: testIds.has(id),
+        wasPublic: false,
+      }
+    );
+  }
   const testIds = new Set<string>();
   const queries: DisputeListQuery[] = [];
   let mode: "normal" | "uncertain" | "conflict" = "normal";
@@ -47,6 +66,21 @@ async function fixture(
       };
       for (const id of body.testDisputeIds ?? []) testIds.add(id);
       attempts.push(body.commandId);
+      if (
+        renameReasonRequired &&
+        !(request.postDataJSON() as { renameReason?: string }).renameReason
+      ) {
+        return route.fulfill({
+          status: 409,
+          json: {
+            error: {
+              code: "championship_rename_reason_required",
+              message: "Informe o motivo da alteração do nome.",
+            },
+          },
+        });
+      }
+
       if (mode === "conflict") {
         if (saved)
           saved = {
@@ -139,15 +173,8 @@ async function fixture(
               gender: d.gender,
               category: d.category,
               division: d.division,
-              administration: {
-                disputeId: d.id,
-                version: 1,
-                status: "planned",
-                visibility: "private",
-                lockReason: null,
-                isTest: testIds.has(d.id),
-                wasPublic: false,
-              },
+              lastActivityAt: snapshot.savedAt,
+              administration: administration(d.id),
             })),
           ) ?? [],
       );
@@ -168,7 +195,12 @@ async function fixture(
               ? "test"
               : row.administration.visibility) === query.visibility),
       );
-      const column = query.sort === "championship" ? "name" : query.sort;
+      const column =
+        query.sort === "championship"
+          ? "name"
+          : query.sort === "activity"
+            ? "lastActivityAt"
+            : query.sort;
       if (column !== "visibility" && column !== "status")
         items.sort(
           (a, b) =>
@@ -193,31 +225,25 @@ async function fixture(
     if (request.method() === "GET")
       return route.fulfill({
         json: saved.seasons.flatMap((s) =>
-          s.disputes.map((d) => ({
-            disputeId: d.id,
-            version: 1,
-            status: "planned",
-            visibility: "private",
-            lockReason: lockIdentification ? "registration" : null,
-            isTest: false,
-            wasPublic: false,
-          })),
+          s.disputes.map((d) => administration(d.id)),
         ),
       });
-    const command = request.postDataJSON();
-    return route.fulfill({
-      json: {
-        disputeId: command.disputeId,
-        version: 2,
-        status: "planned",
-        visibility: command.visibility,
-        wasPublic: command.visibility === "public",
-        isTest: false,
-        lockReason: null,
-      },
-    });
+    const command = request.postDataJSON() as DisputeAdministrationCommand;
+    const previous = administration(command.disputeId);
+    const updated: DisputeAdministration = {
+      ...previous,
+      version: previous.version + 1,
+      visibility: command.visibility ?? previous.visibility,
+      wasPublic: previous.wasPublic || command.visibility === "public",
+      status: command.action === "cancel" ? "cancelled" : previous.status,
+    };
+    changes.set(command.disputeId, updated);
+    return route.fulfill({ json: updated });
   });
   return {
+    requireRenameReason: () => {
+      renameReasonRequired = true;
+    },
     setMode: (next: typeof mode) => {
       mode = next;
       attempts = [];
@@ -251,14 +277,18 @@ async function create(page: Page) {
   await expect(dialog).toHaveCount(0);
 }
 
-async function rowAction(page: Page, action: string) {
+async function editFirstDispute(page: Page) {
   await page
-    .getByRole("button", { name: /^Ações de Liga Regional/ })
+    .getByRole("button", { name: /^Editar Liga Regional/ })
     .first()
     .click();
-  await page.getByRole("button", { name: action, exact: true }).click();
 }
 
+async function addDispute(page: Page) {
+  await page.getByRole("button", { name: "Adicionar", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
+  await dialog.getByLabel("Ano da temporada").fill("2026");
+}
 test("protege a identificação no diálogo e administra a visibilidade pela lista", async ({
   page,
 }) => {
@@ -266,7 +296,7 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   state.lockIdentification();
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
-  await rowAction(page, "Editar dados da disputa");
+  await editFirstDispute(page);
   const edit = page.getByRole("dialog", { name: "Editar dados da disputa" });
   await expect(
     edit.getByText("A disputa já tem histórico de inscrições."),
@@ -280,19 +310,31 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
     await expect(edit.getByLabel(label, { exact: true })).toBeDisabled();
   }
   await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
-  await rowAction(page, "Situação e visibilidade");
+  const row = page
+    .getByRole("table", { name: "Disputas" })
+    .locator("tbody tr")
+    .first();
+  await expect(row.locator("time")).toHaveText("23/10/26 08:00");
+  await row.getByRole("button", { name: /^Privada/ }).click();
   await page
     .getByRole("button", { name: "Tornar pública", exact: true })
     .click();
+  await expect(page.getByText("Disputa tornada pública.")).toBeVisible();
+  await expect(row.getByRole("button", { name: /^Pública/ })).toBeVisible();
+  await editFirstDispute(page);
+  await edit
+    .getByRole("button", { name: "Cancelar disputa", exact: true })
+    .click();
   const confirmation = page.getByRole("dialog", {
-    name: "Tornar pública",
+    name: "Cancelar disputa",
     exact: true,
   });
+  await confirmation.getByLabel("Motivo").fill("Cancelamento do calendário");
   await confirmation
-    .getByRole("button", { name: "Tornar pública", exact: true })
+    .getByRole("button", { name: "Cancelar disputa", exact: true })
     .click();
-  await expect(confirmation).toHaveCount(0);
-  await expect(page.getByText("Planejada · Pública")).toBeVisible();
+  await expect(confirmation).toBeHidden();
+  await expect(edit.getByText("Cancelada · Pública")).toBeVisible();
 });
 
 test("mantém a prévia de teste ao navegar e restaura o catálogo normal ao sair", async ({
@@ -442,7 +484,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
   await first.getByRole("button", { name: "Salvar", exact: true }).click();
   const table = page.getByRole("table", { name: "Disputas" });
   await expect(table.locator("tbody tr")).toHaveCount(1);
-  await rowAction(page, "Adicionar neste campeonato");
+  await addDispute(page);
   const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
   await expect(dialog.locator('select[name="championship"]')).toHaveValue(
     f.saved()!.id,
@@ -463,7 +505,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
   await dialog.getByLabel("Divisão (opcional)").fill("2ª");
   await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(table.locator("tbody tr")).toHaveCount(2);
-  await rowAction(page, "Adicionar neste campeonato");
+  await addDispute(page);
   await dialog
     .getByLabel("Categoria da disputa nova", { exact: true })
     .selectOption("base");
@@ -472,7 +514,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
     .selectOption("15");
   await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(table.locator("tbody tr")).toHaveCount(3);
-  await rowAction(page, "Adicionar neste campeonato");
+  await addDispute(page);
   await dialog.getByLabel("Ano da temporada").fill("2027");
   await dialog.getByLabel("Disputa de teste").check();
   await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
@@ -611,7 +653,7 @@ test("uncertain save retries the same command and conflicts preserve edits until
   await expect(draftDialog).toHaveCount(0);
   expect(f.attempts()).toHaveLength(2);
   expect(f.attempts()[0]).toBe(f.attempts()[1]);
-  await rowAction(page, "Editar dados da disputa");
+  await editFirstDispute(page);
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Liga Regional",
   );
@@ -633,4 +675,25 @@ test("uncertain save retries the same command and conflicts preserve edits until
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Versão de outra sessão",
   );
+});
+
+test("a publicação em outra sessão revela a justificativa de renomeação sem perder o rascunho", async ({
+  page,
+}) => {
+  const state = await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  await editFirstDispute(page);
+  await page.getByLabel("Nome do campeonato").fill("Liga Regional atualizada");
+  state.requireRenameReason();
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await page
+    .getByLabel("Motivo da alteração do nome")
+    .fill("Correção de identificação");
+  await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
+    "Liga Regional atualizada",
+  );
+  await page.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(state.saved()?.name).toBe("Liga Regional atualizada");
 });
