@@ -1,5 +1,10 @@
 # Progresso atual
 
+## Revisão visual do design system
+
+- Unidade `codex/revisao-design-system` baseada em `745e964`. O [guia visual de 18/11/2026](design/catalogo/guia-completo-autonomo.html) rege alterações futuras de interface. A engrenagem recebeu contorno centralizado. O [guia de adoção](design/DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026) registra escopo e evidências.
+- Escopo de referência e catálogo offline. A [PR #86](https://github.com/renato-lucindo/base-do-basquete-next/pull/86) registra o SHA integrado e os checks. A [CI de `9c6adf5`](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44313865121) passou. A revisão seguinte reproduziu no WebKit e corrigiu o cancelamento da confirmação ilustrativa. Após o merge, incorporar a base nas PRs abertas e conferir seus checks. O checkout de origem mantém sua edição local de `CONTRIBUTING.md` e as skills pessoais. O estado dos serviços consta abaixo.
+
 ## Lista de disputas
 
 - Unidade `codex/lista-disputas` baseada em `71b8901`. Uma disputa por linha, filtros/ordenação na consulta paginada, botão Adicionar e cadastros em diálogo. Procedimento e evidências esperadas no [plano da unidade](PLAN-LISTA-DISPUTAS.md).

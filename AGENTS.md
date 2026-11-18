@@ -18,8 +18,8 @@ Padrão atual e comandos estão em `CONTRIBUTING.md`. A limpeza histórica dePRs
 
 ## Trabalho de interface
 
-Antes de editar uma interface ou protótipo, consulte o [design system](docs/design/DESIGN-SYSTEM.md), os [padrões comuns](docs/design/PADROES.md) e o padrão da área [pública](docs/design/PUBLICO.md) ou [administrativa](docs/design/ADMIN.md). Para componentes e fluxos CRUD no admin, consulte também os [padrões administrativos](docs/design/PADROES-ADMIN.md).
+Toda alteração de interface ou protótipo segue o [guia visual aprovado em 18/11/2026](docs/design/catalogo/guia-completo-autonomo.html). Antes de editar, leia a seção pertinente do guia, as [orientações de adoção](docs/design/DESIGN-SYSTEM.md), os [padrões comuns](docs/design/PADROES.md) e o padrão da área [pública](docs/design/PUBLICO.md) ou [administrativa](docs/design/ADMIN.md). Para componentes e fluxos CRUD no admin, consulte também os [padrões administrativos](docs/design/PADROES-ADMIN.md).
 
-Confira a tela atual e use os tokens, componentes e textos aprovados que atendam ao pedido. Preserve as decisões vigentes ao adaptar uma tela ou um protótipo. Antes de entregar, verifique a tela alterada e registre na PR o que foi reaproveitado ou por que foi necessária uma variação e o resultado das conferências aplicáveis. Siga o [fluxo de revisão de UI/UX](docs/design/README.md#fluxo-de-trabalho-dos-agentes).
+Confira a tela atual e use os tokens, componentes e textos aprovados que atendam ao pedido. Preserve as decisões vigentes ao adaptar uma tela ou um protótipo. Antes de entregar, verifique a tela alterada e registre na PR a seção do guia que foi aplicada, o que foi reaproveitado ou por que foi necessária uma variação e o resultado das conferências aplicáveis. Siga o [fluxo de revisão de UI/UX](docs/design/README.md#fluxo-de-trabalho-dos-agentes).
 
 Para identificar quais documentos ler em cada tipo de tarefa, consulte [`docs/INDICE.md`](docs/INDICE.md). Leitura seletiva e obrigatória — não leia toda a documentação em todas as tarefas.
