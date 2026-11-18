@@ -5,6 +5,7 @@ const paths = {
   search: "m21 21-5-5M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15Z",
   close: "m6 6 12 12M6 18 18 6",
   chevron: "m9 5 7 7-7 7",
+  chevronDown: "m5 9 7 7 7-7",
   back: "m14 5-7 7 7 7",
   plus: "M12 5v14M5 12h14",
   columns: "M8 4v16M16 4v16M4 4h16v16H4Z",
@@ -14,6 +15,9 @@ const paths = {
   trophy:
     "M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4M12 13v6M8 21h8M9 19h6",
   check: "m5 12 4 4L19 6",
+  lock: "M7 10h10a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Zm1 0V7a4 4 0 0 1 8 0v3",
+  globe:
+    "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18",
   warning: "M12 5v9m0 4v1",
   arrow: "M5 12h14m-5-5 5 5-5 5",
   file: "M14 2H5v20h14V7l-5-5ZM14 2v5h5M8 12h8M8 16h8",

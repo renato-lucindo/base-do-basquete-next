@@ -2,6 +2,7 @@ import { DisputeControls } from "./dispute-controls";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { AdminDialog } from "./admin-dialog";
 import { CategoryFields } from "./category-fields";
+import { CreateChampionshipPicker } from "./create-championship-picker";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import {
   disputeSchema,
@@ -63,6 +64,7 @@ export function DisputeFormDialog({
     [],
   );
   const [name, setName] = useState("");
+  const [renaming, setRenaming] = useState(false);
   const [year, setYear] = useState(String(target.row?.year ?? currentYear()));
   const [gender, setGender] = useState(editing?.gender ?? "masculino");
   const [category, setCategory] = useState(editing?.category ?? "Adulto");
@@ -78,12 +80,16 @@ export function DisputeFormDialog({
   const [error, setError] = useState("");
   const [divisionError, setDivisionError] = useState("");
   const pending = useRef<SaveCompetitionAdministration | null>(null);
-  const initialFocus = useRef<HTMLSelectElement>(null);
+  const championshipSearch = useRef<HTMLInputElement>(null);
+  const yearRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const divisionRef = useRef<HTMLInputElement>(null);
   const alertRef = useRef<HTMLParagraphElement>(null);
   const formId = useId();
   const creatingChampionship = championshipId === newChampionship;
+  const selectedChampionship = championships.find(
+    (item) => item.id === championshipId,
+  );
   const resolvedSnapshot = snapshot?.id === championshipId ? snapshot : null;
   const season = resolvedSnapshot?.seasons.find((value) =>
     editing ? value.id === editing.seasonId : value.year === Number(year),
@@ -149,6 +155,9 @@ export function DisputeFormDialog({
   useEffect(() => {
     if (error) alertRef.current?.focus();
   }, [error]);
+  useEffect(() => {
+    if (enabled && (renaming || creatingChampionship)) nameRef.current?.focus();
+  }, [enabled, renaming, creatingChampionship]);
 
   const editId = editing?.administration.disputeId;
   useEffect(() => {
@@ -371,7 +380,14 @@ export function DisputeFormDialog({
       open={enabled}
       title={editing ? "Editar dados da disputa" : "Adicionar disputa"}
       busy={busy}
-      initialFocus={editing || !championships.length ? nameRef : initialFocus}
+      initialFocus={
+        editing || suggestedChampionship === newChampionship
+          ? undefined
+          : suggestedChampionship
+            ? yearRef
+            : championshipSearch
+      }
+      iconClose
       closeOnBackdrop={!dirty && !uncertain && !busy}
       className="dispute-create-dialog"
       onClose={close}
@@ -403,44 +419,67 @@ export function DisputeFormDialog({
       >
         <fieldset disabled={inputDisabled}>
           {!editing && championships.length > 0 && (
-            <label className="create-wide">
-              Campeonato
-              <select
-                ref={initialFocus}
-                name="championship"
-                required
-                value={championshipId}
-                onChange={(event) => {
-                  setChampionshipId(event.target.value);
-                  changeIdentity();
-                }}
-              >
-                <option value="" disabled>
-                  Selecione o campeonato
-                </option>
-                {championships.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-                <option value={newChampionship}>Novo campeonato…</option>
-              </select>
-            </label>
+            <CreateChampionshipPicker
+              championships={championships}
+              chosen={selectedChampionship}
+              creating={creatingChampionship}
+              disabled={inputDisabled}
+              input={championshipSearch}
+              onChoose={(id) => {
+                setChampionshipId(id);
+                changeIdentity();
+              }}
+              onCreate={() => {
+                setChampionshipId(newChampionship);
+                changeIdentity();
+              }}
+              onClear={() => {
+                setChampionshipId("");
+                changeIdentity();
+              }}
+            />
           )}
-          {(editing || creatingChampionship) && (
-            <label className="create-wide">
-              Nome do campeonato
-              <input
-                ref={nameRef}
-                name="competition-name"
-                autoComplete="off"
-                value={name}
-                disabled={!!editing && !ready}
-                maxLength={120}
-                required
-                onChange={(event) => setName(event.target.value)}
-              />
-            </label>
+          {editing && !renaming && (
+            <div className="create-wide dispute-championship-picker">
+              <span className="dispute-field-label">Campeonato</span>
+              <div className="dispute-readonly">
+                {resolvedSnapshot?.name ?? editing.name}
+              </div>
+              <button
+                className="dispute-text-action"
+                type="button"
+                disabled={!ready}
+                onClick={() => setRenaming(true)}
+              >
+                Renomear campeonato
+              </button>
+            </div>
+          )}
+          {(renaming || creatingChampionship) && (
+            <div className="create-wide dispute-championship-inline">
+              <label>
+                Nome do campeonato
+                <input
+                  ref={nameRef}
+                  name="competition-name"
+                  autoComplete="off"
+                  value={name}
+                  disabled={!!editing && !ready}
+                  maxLength={120}
+                  required
+                  aria-describedby={
+                    renaming ? formId + "-rename-scope" : undefined
+                  }
+                  onChange={(event) => setName(event.target.value)}
+                />
+              </label>
+              {renaming && (
+                <small id={formId + "-rename-scope"}>
+                  Este nome é compartilhado com as outras disputas do
+                  campeonato.
+                </small>
+              )}
+            </div>
           )}
           {needsRenameReason && (
             <label className="create-wide">
@@ -454,9 +493,21 @@ export function DisputeFormDialog({
               />
             </label>
           )}
+          {(state?.lockReason || yearLocked) && (
+            <div className="create-wide dispute-lock-notice">
+              <strong>Campos protegidos pelo histórico</strong>
+              {state?.lockReason && (
+                <p>{disputeLockLabels[state.lockReason]}</p>
+              )}
+              {yearLocked && (
+                <p>O ano está protegido pelo histórico da temporada.</p>
+              )}
+            </div>
+          )}
           <label>
             Ano da temporada
             <input
+              ref={yearRef}
               type="number"
               name="year"
               min={1}
@@ -503,7 +554,7 @@ export function DisputeFormDialog({
               changeIdentity();
             }}
           />
-          <label>
+          <label className="create-wide">
             Divisão (opcional)
             <input
               ref={divisionRef}
@@ -531,14 +582,6 @@ export function DisputeFormDialog({
               </span>
             )}
           </label>
-          {state?.lockReason && (
-            <p className="create-wide">{disputeLockLabels[state.lockReason]}</p>
-          )}
-          {yearLocked && !state?.lockReason && (
-            <p className="create-wide">
-              O ano está protegido pelo histórico de outra disputa da temporada.
-            </p>
-          )}
           {!editing && (
             <label className="create-wide competition-radio">
               <input

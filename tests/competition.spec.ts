@@ -263,8 +263,11 @@ async function fixture(
 async function draft(page: Page) {
   await page.getByRole("button", { name: "Adicionar", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
-  const championship = dialog.locator('select[name="championship"]');
-  if (await championship.count()) await championship.selectOption("new");
+  const newChampionship = dialog.getByRole("button", {
+    name: "Criar novo campeonato",
+    exact: true,
+  });
+  if (await newChampionship.count()) await newChampionship.click();
   await dialog.getByLabel("Nome do campeonato").fill("Liga Regional");
   await dialog.getByLabel("Ano da temporada", { exact: true }).fill("2026");
   await dialog.getByLabel("Naipe", { exact: true }).selectOption("feminino");
@@ -291,7 +294,7 @@ async function addDispute(page: Page) {
 }
 test("protege a identificação no diálogo e administra a visibilidade pela lista", async ({
   page,
-}) => {
+}, info) => {
   const state = await fixture(page);
   state.lockIdentification();
   await page.goto("http://127.0.0.1:5174/foundation.html");
@@ -301,6 +304,10 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   await expect(
     edit.getByText("A disputa já tem histórico de inscrições."),
   ).toBeVisible();
+  await expect(
+    edit.getByText("Campos protegidos pelo histórico"),
+  ).toBeVisible();
+  await expect(edit.getByLabel("Nome do campeonato")).toHaveCount(0);
   for (const label of [
     "Ano da temporada",
     "Naipe",
@@ -309,16 +316,32 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   ]) {
     await expect(edit.getByLabel(label, { exact: true })).toBeDisabled();
   }
+  await page.screenshot({
+    path: `.preview-artifacts/disputas-edicao-${info.project.name}.png`,
+  });
   await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
   const row = page
     .getByRole("table", { name: "Disputas" })
     .locator("tbody tr")
     .first();
   await expect(row.locator("time")).toHaveText("23/10/26 08:00");
-  await row.getByRole("button", { name: /^Privada/ }).click();
-  await page
-    .getByRole("button", { name: "Tornar pública", exact: true })
-    .click();
+  const visibility = row.getByRole("button", { name: /^Privada/ });
+  await visibility.click();
+  const menu = page.getByRole("menu", { name: "Escolher visibilidade" });
+  const privateOption = menu.getByRole("menuitemradio", { name: "Privada" });
+  await expect(privateOption).toHaveAttribute("aria-checked", "true");
+  await expect(privateOption).toBeFocused();
+  expect(await menu.evaluate((node) => node.scrollWidth)).toBeLessThanOrEqual(
+    await menu.evaluate((node) => node.clientWidth),
+  );
+  await page.screenshot({
+    path: `.preview-artifacts/disputas-visibilidade-${info.project.name}.png`,
+  });
+  await page.keyboard.press("Escape");
+  await expect(menu).toBeHidden();
+  await expect(visibility).toBeFocused();
+  await visibility.click();
+  await menu.getByRole("menuitemradio", { name: "Pública" }).click();
   await expect(page.getByText("Disputa tornada pública.")).toBeVisible();
   await expect(row.getByRole("button", { name: /^Pública/ })).toBeVisible();
   await editFirstDispute(page);
@@ -486,9 +509,24 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
   await expect(table.locator("tbody tr")).toHaveCount(1);
   await addDispute(page);
   const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
-  await expect(dialog.locator('select[name="championship"]')).toHaveValue(
-    f.saved()!.id,
-  );
+  await expect(
+    dialog.getByText("Liga Regional", { exact: true }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Alterar campeonato" }).click();
+  const search = dialog.getByRole("combobox", { name: "Campeonato" });
+  await expect(search).toBeFocused();
+  await search.fill("regional");
+  await expect(
+    dialog.getByRole("option", { name: "Liga Regional" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: `.preview-artifacts/disputas-busca-${info.project.name}.png`,
+  });
+  await search.press("ArrowDown");
+  await search.press("Enter");
+  await expect(
+    dialog.getByText("Liga Regional", { exact: true }),
+  ).toBeVisible();
   await expect(dialog.getByLabel("Ano da temporada")).toHaveValue("2026");
   await dialog.getByLabel("Naipe", { exact: true }).selectOption("feminino");
   await dialog
@@ -654,6 +692,7 @@ test("uncertain save retries the same command and conflicts preserve edits until
   expect(f.attempts()).toHaveLength(2);
   expect(f.attempts()[0]).toBe(f.attempts()[1]);
   await editFirstDispute(page);
+  await page.getByRole("button", { name: "Renomear campeonato" }).click();
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Liga Regional",
   );
@@ -684,6 +723,7 @@ test("a publicação em outra sessão revela a justificativa de renomeação sem
   await page.goto("http://127.0.0.1:5174/foundation.html");
   await create(page);
   await editFirstDispute(page);
+  await page.getByRole("button", { name: "Renomear campeonato" }).click();
   await page.getByLabel("Nome do campeonato").fill("Liga Regional atualizada");
   state.requireRenameReason();
   await page.getByRole("button", { name: "Salvar", exact: true }).click();

@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { Icon } from "../ui-system/components";
 import "./admin-dialog.css";
 
 export function AdminDialog({
@@ -9,6 +10,7 @@ export function AdminDialog({
   children,
   className = "",
   closeLabel,
+  iconClose = false,
   footer,
   initialFocus,
   closeOnBackdrop = false,
@@ -20,6 +22,7 @@ export function AdminDialog({
   children: ReactNode;
   className?: string;
   closeLabel?: string;
+  iconClose?: boolean;
   footer?: ReactNode;
   initialFocus?: React.RefObject<HTMLElement | null>;
   closeOnBackdrop?: boolean;
@@ -77,12 +80,14 @@ export function AdminDialog({
         <h3 id={id}>{title}</h3>
         <button
           type="button"
-          className="secondary"
+          className={
+            iconClose ? "secondary admin-dialog-close-icon" : "secondary"
+          }
           disabled={busy}
           onClick={onClose}
           aria-label={closeLabel ?? "Fechar diálogo"}
         >
-          {closeLabel ?? "Fechar"}
+          {iconClose ? <Icon name="close" /> : (closeLabel ?? "Fechar")}
         </button>
       </header>
       <div className="admin-dialog-body">{children}</div>

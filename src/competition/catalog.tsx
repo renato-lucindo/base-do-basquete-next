@@ -28,6 +28,21 @@ const activityFormat = new Intl.DateTimeFormat("pt-BR", {
   hourCycle: "h23",
 });
 
+const visibilityOptions = [
+  {
+    value: "public",
+    label: "Pública",
+    icon: "globe",
+    description: "Disponível no catálogo e na busca.",
+  },
+  {
+    value: "private",
+    label: "Privada",
+    icon: "lock",
+    description: "Indisponível ao público, inclusive por link direto.",
+  },
+] as const;
+
 function VisibilityControl({
   state,
   label,
@@ -40,12 +55,13 @@ function VisibilityControl({
   onFailure: (failure: unknown) => void;
 }) {
   const [busy, setBusy] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const pending = useRef<DisputeAdministrationCommand | null>(null);
-  const current = state.visibility === "public" ? "Pública" : "Privada";
-  const next = state.visibility === "public" ? "private" : "public";
+  const current =
+    state.visibility === "public" ? visibilityOptions[0] : visibilityOptions[1];
 
-  async function change() {
-    if (busy) return;
+  async function change(next: (typeof visibilityOptions)[number]["value"]) {
+    if (busy || next === current.value) return;
     if (!pending.current || pending.current.expectedVersion !== state.version) {
       pending.current = {
         commandId: crypto.randomUUID(),
@@ -101,41 +117,107 @@ function VisibilityControl({
       window.removeEventListener("resize", update);
     };
   }, []);
-  if (state.isTest) return <span className="dispute-visibility">Teste</span>;
+  if (state.isTest)
+    return <span className="dispute-visibility-static">Teste · Privada</span>;
   return (
     <div className="dispute-actions-menu">
       <button
         ref={button}
         type="button"
         popoverTarget={id}
-        disabled={busy}
-        aria-label={current + " · " + label}
+        aria-disabled={busy}
+        aria-expanded={expanded}
+        aria-haspopup="menu"
+        aria-label={current.label + " · " + label}
         className="dispute-visibility secondary"
+        onClick={(event) => {
+          if (busy) event.preventDefault();
+        }}
       >
-        {busy ? "Salvando…" : current} <span aria-hidden="true">⌄</span>
+        <Icon name={current.icon} />
+        {busy ? "Salvando…" : current.label}
+        <Icon name="chevronDown" />
       </button>
       <div
         ref={panel}
         id={id}
         popover="auto"
+        role="menu"
+        aria-label="Escolher visibilidade"
         className="dispute-menu-items"
         onBeforeToggle={(event) => {
           if (event.newState === "open") position();
         }}
         onToggle={(event) => {
-          if (event.newState === "open") position();
+          const open = event.newState === "open";
+          setExpanded(open);
+          if (open) {
+            position();
+            panel.current
+              ?.querySelector<HTMLElement>('[aria-checked="true"]')
+              ?.focus({ preventScroll: true });
+          }
+        }}
+        onKeyDown={(event) => {
+          const options = Array.from(
+            event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "[role=menuitemradio]",
+            ),
+          );
+          const index = options.indexOf(
+            document.activeElement as HTMLButtonElement,
+          );
+          switch (event.key) {
+            case "ArrowDown":
+            case "ArrowUp":
+              event.preventDefault();
+              options[
+                (index +
+                  (event.key === "ArrowDown" ? 1 : -1) +
+                  options.length) %
+                  options.length
+              ]?.focus();
+              break;
+            case "Home":
+            case "End":
+              event.preventDefault();
+              options[event.key === "Home" ? 0 : options.length - 1]?.focus();
+              break;
+            case "Escape":
+              event.preventDefault();
+              panel.current?.hidePopover();
+              button.current?.focus({ preventScroll: true });
+              break;
+            case "Tab":
+              panel.current?.hidePopover();
+              button.current?.focus({ preventScroll: true });
+              break;
+          }
         }}
       >
-        <button
-          type="button"
-          onClick={() => {
-            panel.current?.hidePopover();
-            button.current?.focus({ preventScroll: true });
-            void change();
-          }}
-        >
-          {next === "public" ? "Tornar pública" : "Tornar privada"}
-        </button>
+        {visibilityOptions.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            role="menuitemradio"
+            tabIndex={-1}
+            aria-checked={option.value === current.value}
+            aria-label={option.label}
+            aria-describedby={id + "-" + option.value}
+            onClick={() => {
+              panel.current?.hidePopover();
+              button.current?.focus({ preventScroll: true });
+              void change(option.value);
+            }}
+          >
+            <Icon name={option.icon} />
+            <span>
+              <strong>{option.label}</strong>
+              <small id={id + "-" + option.value}>{option.description}</small>
+            </span>
+            {option.value === current.value && <Icon name="check" />}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -322,6 +404,7 @@ export function DisputeCatalog({
               {query.championshipIds.length
                 ? query.championshipIds.length + " selecionados"
                 : "Todos"}
+              <Icon name="chevronDown" />
             </summary>
             <fieldset className="dispute-championship-options">
               <legend className="admin-visually-hidden">Campeonatos</legend>
@@ -530,13 +613,6 @@ export function DisputeCatalog({
                     <td>{row.division ?? "—"}</td>
                     <td>
                       <span className="dispute-status" data-status={a.status}>
-                        <span aria-hidden="true">
-                          {a.status === "completed"
-                            ? "✓"
-                            : a.status === "cancelled"
-                              ? "×"
-                              : "●"}
-                        </span>
                         {disputeStatusLabels[a.status]}
                       </span>
                     </td>
