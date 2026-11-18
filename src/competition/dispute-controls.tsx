@@ -27,7 +27,9 @@ export function DisputeControls({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const request = useRef<DisputeAdministrationCommand | null>(null);
+  const reasonInput = useRef<HTMLTextAreaElement>(null);
   const reasonId = useId();
+  const sectionId = useId();
   const closed = state.status === "completed" || state.status === "cancelled";
   const publicDispute = state.visibility === "public";
   const labels = {
@@ -44,7 +46,8 @@ export function DisputeControls({
       "A disputa voltará à situação anterior e aceitará alterações esportivas.",
   };
   const requiredReason = action === "cancel" || action === "reopen";
-  const open = (next: Action) => {
+  const open = (next: Action, trigger: HTMLButtonElement) => {
+    trigger.focus({ preventScroll: true });
     setError("");
     setReason("");
     request.current = null;
@@ -92,53 +95,66 @@ export function DisputeControls({
   }
   return (
     <>
-      <div className="competition-actions">
-        <span>
-          {disputeStatusLabels[state.status]} ·{" "}
-          {state.isTest
-            ? "Teste · Privada"
-            : publicDispute
-              ? "Pública"
-              : "Privada"}
-        </span>
-        {state.isTest && (
-          <a
-            href={"/publico.html?previa=" + state.disputeId}
-            target="_blank"
-            rel="noopener"
-          >
-            Abrir prévia
-          </a>
-        )}
-        {state.status === "in_progress" && (
+      <section className="dispute-administration" aria-labelledby={sectionId}>
+        <h4 id={sectionId}>Situação da disputa</h4>
+        <div className="dispute-administration-actions">
+          <span>
+            {disputeStatusLabels[state.status]} ·{" "}
+            {state.isTest
+              ? "Teste · Privada"
+              : publicDispute
+                ? "Pública"
+                : "Privada"}
+          </span>
+          {state.isTest && (
+            <a
+              href={"/publico.html?previa=" + state.disputeId}
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir prévia
+            </a>
+          )}
+          {state.status === "in_progress" && (
+            <button
+              type="button"
+              className="secondary"
+              disabled={disabled}
+              onClick={(event) => open("complete", event.currentTarget)}
+            >
+              {labels.complete}
+            </button>
+          )}
           <button
             type="button"
-            className="secondary"
+            className={closed ? "secondary" : "secondary dispute-cancel-action"}
             disabled={disabled}
-            onClick={() => open("complete")}
+            onClick={(event) =>
+              open(closed ? "reopen" : "cancel", event.currentTarget)
+            }
           >
-            {labels.complete}
+            {closed ? labels.reopen : labels.cancel}
           </button>
-        )}
-        <button
-          type="button"
-          className="secondary"
-          disabled={disabled}
-          onClick={() => open(closed ? "reopen" : "cancel")}
-        >
-          {closed ? labels.reopen : labels.cancel}
-        </button>
-      </div>
+        </div>
+      </section>
       {action && (
         <AdminDialog
           open
           title={labels[action]}
           busy={busy}
+          className="dispute-create-dialog dispute-confirm-dialog"
+          iconClose
+          closeLabel="Fechar confirmação"
+          initialFocus={requiredReason ? reasonInput : undefined}
           onClose={() => setAction(null)}
           footer={
             <button
               type="button"
-              className="primary"
+              className={
+                action === "cancel"
+                  ? "primary dispute-confirm-cancel"
+                  : "primary"
+              }
               disabled={busy || (requiredReason && reason.trim().length < 3)}
               onClick={() => void confirm()}
             >
@@ -151,6 +167,7 @@ export function DisputeControls({
             <label htmlFor={reasonId}>
               Motivo
               <textarea
+                ref={reasonInput}
                 id={reasonId}
                 name="reason"
                 autoComplete="off"

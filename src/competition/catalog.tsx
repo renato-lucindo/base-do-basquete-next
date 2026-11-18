@@ -341,7 +341,7 @@ export function DisputeCatalog({
   }
 
   const columns = [
-    ["activity", "Última edição"],
+    ["activity", "Última alteração"],
     ["championship", "Campeonato"],
     ["year", "Ano"],
     ["category", "Categoria"],
@@ -559,8 +559,8 @@ export function DisputeCatalog({
                     </button>
                   </th>
                 ))}
-                <th scope="col">
-                  <span className="admin-visually-hidden">Ações</span>
+                <th scope="col" className="dispute-actions-heading">
+                  Ações
                 </th>
               </tr>
             </thead>
@@ -670,33 +670,37 @@ export function DisputeCatalog({
           )}
         </div>
       )}
-      <div className="dispute-pagination">
-        <span>
-          {page.total > 0
-            ? Math.min(query.offset + 1, page.total) +
-              "–" +
-              Math.min(query.offset + 25, page.total) +
-              " de " +
-              page.total
-            : ""}
-        </span>
-        <button
-          className="secondary"
-          disabled={loading || query.offset === 0}
-          onClick={() =>
-            setQuery((v) => ({ ...v, offset: Math.max(0, v.offset - 25) }))
-          }
-        >
-          Anterior
-        </button>
-        <button
-          className="secondary"
-          disabled={loading || !page.hasMore}
-          onClick={() => setQuery((v) => ({ ...v, offset: v.offset + 25 }))}
-        >
-          Próxima
-        </button>
-      </div>
+      {(query.offset > 0 || page.hasMore) && (
+        <div className="dispute-pagination">
+          <span>
+            {page.total > 0
+              ? Math.min(query.offset + 1, page.total) +
+                "–" +
+                Math.min(query.offset + 25, page.total) +
+                " de " +
+                page.total
+              : ""}
+          </span>
+          <button
+            type="button"
+            className="secondary"
+            disabled={loading || query.offset === 0}
+            onClick={() =>
+              setQuery((v) => ({ ...v, offset: Math.max(0, v.offset - 25) }))
+            }
+          >
+            Anterior
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            disabled={loading || !page.hasMore}
+            onClick={() => setQuery((v) => ({ ...v, offset: v.offset + 25 }))}
+          >
+            Próxima
+          </button>
+        </div>
+      )}
       <AdminToast key={reload} message={notice} />
       <AdminToast message={actionError} tone="error" />
       {create && (

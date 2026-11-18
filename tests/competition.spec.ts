@@ -319,12 +319,23 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   await page.screenshot({
     path: `.preview-artifacts/disputas-edicao-${info.project.name}.png`,
   });
-  await edit.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await expect(edit.getByRole("button", { name: "Fechar diálogo" })).toHaveCSS(
+    "color",
+    "rgb(180, 35, 24)",
+  );
+  await edit.getByRole("button", { name: "Fechar", exact: true }).click();
   const row = page
     .getByRole("table", { name: "Disputas" })
     .locator("tbody tr")
     .first();
   await expect(row.locator("time")).toHaveText("23/10/26 08:00");
+  await expect(page.getByText("1 disputa", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Anterior", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Próxima", exact: true }),
+  ).toHaveCount(0);
   const visibility = row.getByRole("button", { name: /^Privada/ });
   await visibility.click();
   const menu = page.getByRole("menu", { name: "Escolher visibilidade" });
@@ -345,17 +356,36 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   await expect(page.getByText("Disputa tornada pública.")).toBeVisible();
   await expect(row.getByRole("button", { name: /^Pública/ })).toBeVisible();
   await editFirstDispute(page);
-  await edit
-    .getByRole("button", { name: "Cancelar disputa", exact: true })
-    .click();
+  const cancelDispute = edit
+    .getByRole("region", { name: "Situação da disputa" })
+    .getByRole("button", { name: "Cancelar disputa", exact: true });
+  await expect(cancelDispute).toHaveCSS("border-top-color", "rgb(180, 35, 24)");
+  if (info.project.use.hasTouch) await cancelDispute.tap();
+  else await cancelDispute.click();
   const confirmation = page.getByRole("dialog", {
     name: "Cancelar disputa",
     exact: true,
   });
-  await confirmation.getByLabel("Motivo").fill("Cancelamento do calendário");
-  await confirmation
-    .getByRole("button", { name: "Cancelar disputa", exact: true })
-    .click();
+  const reason = confirmation.getByLabel("Motivo");
+  const confirmCancel = confirmation.getByRole("button", {
+    name: "Cancelar disputa",
+    exact: true,
+  });
+  await expect(reason).toBeFocused();
+  await expect(confirmCancel).toBeDisabled();
+  await reason.fill("  ");
+  await expect(confirmCancel).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(confirmation).toBeHidden();
+  await expect(cancelDispute).toBeFocused();
+  await cancelDispute.press("Enter");
+  await expect(reason).toHaveValue("");
+  await reason.fill("Cancelamento do calendário");
+  await expect(confirmCancel).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await page.screenshot({
+    path: `.preview-artifacts/disputas-cancelamento-${info.project.name}.png`,
+  });
+  await confirmCancel.click();
   await expect(confirmation).toBeHidden();
   await expect(edit.getByText("Cancelada · Pública")).toBeVisible();
 });
@@ -405,6 +435,12 @@ for (const width of [1366, 1920]) {
     await page.goto("http://127.0.0.1:5174/foundation.html");
     const list = page.getByRole("table", { name: "Disputas", exact: true });
     await expect(list.locator("tbody tr")).toHaveCount(25);
+    await expect(
+      list.getByRole("columnheader", { name: "Ações", exact: true }),
+    ).toBeVisible();
+    await expect(
+      list.getByRole("columnheader", { name: "Última alteração", exact: true }),
+    ).toHaveAttribute("aria-sort", "descending");
     const layout = await list.evaluate((table) => ({
       visible: Array.from(table.querySelectorAll("tbody tr")).filter(
         (row) => row.getBoundingClientRect().bottom <= innerHeight,
@@ -432,8 +468,20 @@ for (const width of [1366, 1920]) {
     await page.screenshot({ path: `.preview-artifacts/disputas-${width}.png` });
     await page.getByRole("button", { name: "Próxima", exact: true }).click();
     await expect(list.locator("tbody tr")).toHaveCount(5);
+    await expect(
+      page.getByRole("button", { name: "Anterior", exact: true }),
+    ).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Próxima", exact: true }),
+    ).toBeDisabled();
     await page.getByLabel("Naipe", { exact: true }).selectOption("feminino");
     await expect(list.locator("tbody tr")).toHaveCount(15);
+    await expect(
+      page.getByRole("button", { name: "Anterior", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Próxima", exact: true }),
+    ).toHaveCount(0);
     await list.getByRole("button", { name: "Campeonato", exact: true }).click();
     await expect
       .poll(() => f.queries.at(-1))
@@ -704,7 +752,9 @@ test("uncertain save retries the same command and conflicts preserve edits until
     "Minha edição preservada",
   );
   page.once("dialog", (dialog) => dialog.dismiss());
-  await page.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Cancelar edição", exact: true })
+    .click();
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Minha edição preservada",
   );

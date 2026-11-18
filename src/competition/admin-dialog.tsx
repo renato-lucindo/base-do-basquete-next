@@ -72,6 +72,7 @@ export function AdminDialog({
           onClose();
       }}
       onCancel={(event) => {
+        if (event.target !== event.currentTarget) return;
         event.preventDefault();
         if (!busy) onClose();
       }}

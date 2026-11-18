@@ -374,6 +374,11 @@ export function DisputeFormDialog({
     setDivisionError("");
   }
   const inputDisabled = busy || uncertain || conflict;
+  const closeLabel = editing
+    ? dirty || uncertain
+      ? "Cancelar edição"
+      : "Fechar"
+    : "Cancelar";
 
   return (
     <AdminDialog
@@ -394,12 +399,12 @@ export function DisputeFormDialog({
       footer={
         <>
           <button
-            className="secondary"
+            className="secondary dispute-close-action"
             type="button"
             disabled={busy}
             onClick={close}
           >
-            Cancelar
+            {closeLabel}
           </button>
           <button
             className="primary"
