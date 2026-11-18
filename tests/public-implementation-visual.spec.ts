@@ -52,8 +52,7 @@ test("súmula real mantém atletas na primeira tela e detalhes acessíveis", asy
   console.log(`SÚMULA ${info.project.name}: ${JSON.stringify(frame)}`);
   // The accepted always-visible global search adds one mobile row; the accepted equal-height rosters preserve five readable mobile rows.
   expect(
-    (frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0)) /
-      (info.project.name === "desktop" ? 1.5 : 1),
+    frame.firstY - (info.project.name === "mobile" ? frame.searchHeight : 0),
   ).toBeLessThan(info.project.name === "desktop" ? 400 : 460);
   expect(frame.visible).toBeGreaterThanOrEqual(
     Math.min(info.project.name === "desktop" ? 3 : 5, frame.total),
@@ -133,9 +132,9 @@ test("estatísticas reais mantêm linha e identidade fixa sem largura global", a
     path: `.preview-artifacts/estatisticas-real-${info.project.name}.png`,
     fullPage: false,
   });
-  expect(
-    frame.firstY / (info.project.name === "desktop" ? 1.5 : 1),
-  ).toBeLessThan(info.project.name === "desktop" ? 390 : 540);
+  expect(frame.firstY).toBeLessThan(
+    info.project.name === "desktop" ? 390 : 540,
+  );
   expect(frame.visible).toBeGreaterThanOrEqual(
     info.project.name === "desktop" ? 5 : 8,
   );

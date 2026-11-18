@@ -36,6 +36,9 @@ export function useProfilePanelSpace(ready: boolean, contentKey: string) {
         parseFloat(style.paddingBottom);
       const panel = panels.find((el) => !el.hidden)!;
       const panelStyle = getComputedStyle(panel);
+      const panelSpacing =
+        parseFloat(panelStyle.paddingTop) +
+        parseFloat(panelStyle.paddingBottom);
       const legendHeight = outerHeight(elements[1]);
       const overviewHeight =
         panels[0].firstElementChild!.getBoundingClientRect().height;
@@ -43,17 +46,15 @@ export function useProfilePanelSpace(ready: boolean, contentKey: string) {
         Math.max(
           panel.firstElementChild!.getBoundingClientRect().height,
           overviewHeight,
-        ) +
-        parseFloat(panelStyle.paddingTop) +
-        parseFloat(panelStyle.paddingBottom);
-      // Reuse the panel's vertical spacing as a small initial allowance. This
-      // accommodates a compact tab's extra row without reserving a full screen.
+        ) + panelSpacing;
+      // Leave room for two lines in a slightly taller tab, even when the
+      // panel's padding is smaller than the text.
+      const allowance = Math.max(
+        panelSpacing,
+        2 * (parseFloat(panelStyle.lineHeight) || 0),
+      );
       if (footprint.current === 0)
-        footprint.current =
-          naturalHeight +
-          legendHeight +
-          parseFloat(panelStyle.paddingTop) +
-          parseFloat(panelStyle.paddingBottom);
+        footprint.current = naturalHeight + legendHeight + allowance;
       footprint.current = Math.max(
         footprint.current,
         naturalHeight + legendHeight,

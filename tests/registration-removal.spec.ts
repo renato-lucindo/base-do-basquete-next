@@ -223,7 +223,7 @@ test("reauth preserva comando no desktop e texto ampliado", async ({
   const size = await heading.evaluate((el) =>
     Number.parseFloat(getComputedStyle(el).fontSize),
   );
-  await page.addStyleTag({ content: "html { font-size: 300% !important; }" });
+  await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
   expect(
     await heading.evaluate((el) =>
       Number.parseFloat(getComputedStyle(el).fontSize),

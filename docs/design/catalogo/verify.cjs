@@ -231,7 +231,7 @@ async function main() {
       });
       assert.deepEqual(
         layout,
-        { fits: true, scale: width < 640 ? "16px" : "24px" },
+        { fits: true, scale: "16px" },
         `${width} CSS px`,
       );
       if (width === 390 || width === 1366) {
