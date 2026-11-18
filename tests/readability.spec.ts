@@ -121,7 +121,7 @@ test("menu de colunas permanece dentro da tela quando a tabela encolhe", async (
   }
 });
 
-test("escala compartilhada amplia desktop e conserva celular", async ({
+test("escala compartilhada segue a fonte padrão no desktop e no celular", async ({
   page,
 }, info) => {
   const mobile = info.project.name === "mobile";
@@ -136,7 +136,7 @@ test("escala compartilhada amplia desktop e conserva celular", async ({
   const root = await page
     .locator("html")
     .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-  expect(root).toBe(mobile ? 16 : 24);
+  expect(root).toBe(16);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -152,10 +152,7 @@ test("escala compartilhada amplia desktop e conserva celular", async ({
   expect(accessibility.violations).toEqual([]);
   for (const width of [320, 639, 640, 1366]) {
     await page.setViewportSize({ width, height: 1080 });
-    await expect(page.locator("html")).toHaveCSS(
-      "font-size",
-      width < 640 ? "16px" : "24px",
-    );
+    await expect(page.locator("html")).toHaveCSS("font-size", "16px");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -187,7 +184,7 @@ test("escala compartilhada amplia desktop e conserva celular", async ({
   await page.setViewportSize({ width: 1366, height: 768 });
   for (const zoom of [1.5, 2]) {
     await page.addStyleTag({
-      content: `html { font-size: ${150 * zoom}% !important; }`,
+      content: `html { font-size: ${100 * zoom}% !important; }`,
     });
     const overflow = await page.evaluate(() =>
       [...document.querySelectorAll("body *")]
