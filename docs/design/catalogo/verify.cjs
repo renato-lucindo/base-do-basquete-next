@@ -211,12 +211,12 @@ async function checkApprovedGuide(page, prefix) {
     name: "Descartar alterações",
     exact: true,
   });
-  await expect(discardSample).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(discardSample).toHaveCSS("background-color", "rgb(229, 34, 7)");
   await expect(discardSample).toHaveCSS("color", "rgb(255, 255, 255)");
   await discardSample.click();
   await expect(
     confirm.getByRole("button", { name: "Descartar alterações", exact: true }),
-  ).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  ).toHaveCSS("background-color", "rgb(229, 34, 7)");
   await page.keyboard.press("Escape");
   await expect(confirm).toBeHidden();
   await expect(discardSample).toBeFocused();
@@ -233,7 +233,7 @@ async function checkApprovedGuide(page, prefix) {
   const create = page.locator("#create-dialog");
   await expect(
     create.getByRole("button", { name: "Fechar criação" }),
-  ).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  ).toHaveCSS("background-color", "rgb(229, 34, 7)");
   await expect(
     create.getByRole("button", { name: "Fechar criação" }),
   ).toHaveCSS("color", "rgb(255, 255, 255)");
@@ -259,7 +259,7 @@ async function checkApprovedGuide(page, prefix) {
     name: "Descartar alterações",
     exact: true,
   });
-  await expect(discard).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(discard).toHaveCSS("background-color", "rgb(229, 34, 7)");
   await expect(discard).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(edit.getByText("Faixa Etária", { exact: true })).toBeVisible();
   await discard.click();

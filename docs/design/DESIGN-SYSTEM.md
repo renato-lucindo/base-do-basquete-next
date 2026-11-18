@@ -2,6 +2,8 @@
 
 A base visual do MVP reúne superfícies claras, azul para ações e seleção, tipografia de leitura rápida e tabelas compactas. A consulta pública prioriza o celular. A operação administrativa prioriza o desktop, com reflow para telas menores. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) definem o comportamento dos fluxos.
 
+As cores semânticas aprovadas são vermelho USWDS vivo `#E52207` para perigo e verde USWDS vivo `#008817` para sucesso e check, nos tokens `--bb-danger` e `--bb-success`. O azul de ação é `#075FCA`. Valores de referência na [paleta USWDS](https://designsystem.digital.gov/design-tokens/color/system-tokens/).
+
 ## Referência visual aprovada em 18/11/2026
 
 Consulte o [guia visual aprovado](catalogo/guia-completo-autonomo.html) para toda mudança de interface pública, administrativa ou de protótipo. Abra a seção pertinente antes de editar. Use as amostras para escolher o componente e confira a aparência e os estados na tela renderizada. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) detalham os requisitos específicos de cada fluxo.

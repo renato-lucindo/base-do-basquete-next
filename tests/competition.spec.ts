@@ -327,7 +327,7 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
     edit.getByRole("button", { name: "Fechar diálogo" }),
     edit.getByRole("button", { name: "Descartar alterações", exact: true }),
   ]) {
-    await expect(button).toHaveCSS("background-color", "rgb(180, 35, 24)");
+    await expect(button).toHaveCSS("background-color", "rgb(229, 34, 7)");
     await expect(button).toHaveCSS("color", "rgb(255, 255, 255)");
   }
   await edit
@@ -368,7 +368,7 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   const cancelDispute = edit
     .getByRole("region", { name: "Situação da disputa" })
     .getByRole("button", { name: "Cancelar disputa", exact: true });
-  await expect(cancelDispute).toHaveCSS("border-top-color", "rgb(180, 35, 24)");
+  await expect(cancelDispute).toHaveCSS("border-top-color", "rgb(229, 34, 7)");
   if (info.project.use.hasTouch) await cancelDispute.tap();
   else await cancelDispute.click();
   const confirmation = page.getByRole("dialog", {
@@ -390,7 +390,7 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   await cancelDispute.press("Enter");
   await expect(reason).toHaveValue("");
   await reason.fill("Cancelamento do calendário");
-  await expect(confirmCancel).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(confirmCancel).toHaveCSS("background-color", "rgb(229, 34, 7)");
   await page.screenshot({
     path: `.preview-artifacts/disputas-cancelamento-${info.project.name}.png`,
   });

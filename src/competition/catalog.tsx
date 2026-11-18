@@ -359,7 +359,7 @@ export function DisputeCatalog({
     query.championshipIds.length
   );
   return (
-    <div className="dispute-catalog">
+    <div className="dispute-catalog" data-active={enabled || undefined}>
       <div className="dispute-list-heading">
         <h2 ref={heading} tabIndex={-1}>
           Disputas
