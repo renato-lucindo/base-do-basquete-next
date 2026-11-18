@@ -42,6 +42,9 @@ async function main() {
 </html>
 `,
   );
+  for (const name of ["guia-completo-autonomo.html", "disputas.html"]) {
+    await fs.copyFile(path.join(__dirname, name), path.join(directory, name));
+  }
   console.log(
     "Catálogo gerado em docs/design/.preview-artifacts/catalogo/index.html",
   );
