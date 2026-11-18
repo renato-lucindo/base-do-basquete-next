@@ -373,6 +373,23 @@ it("exposes only the selected test in an authenticated preview and restores the 
   c.competition.seasons[0].id = id(221);
   c.competition.seasons[0].disputes[0].id = id(222);
   await saveNewChampionship(c, true);
+  const next = { ...c, commandId: id(224), expectedVersion: 1 };
+  next.competition.seasons[0].disputes.push({
+    ...c.competition.seasons[0].disputes[0],
+    id: id(225),
+    division: null,
+    gender: "feminino",
+  });
+  await expect(
+    db.query("select public.save_competition($1)", [next]),
+  ).rejects.toMatchObject({ message: "championship_test_only" });
+  const newDispute = { ...next, testDisputeIds: [], renameReason: null };
+  await expect(
+    db.query("select public.save_competition_administration($1)", [newDispute]),
+  ).rejects.toMatchObject({ message: "championship_test_only" });
+  await db.query("select public.save_competition_administration($1)", [
+    { ...newDispute, testDisputeIds: [id(225)] },
+  ]);
   await expect(
     db.query("select public.save_dispute_administration($1)", [
       {

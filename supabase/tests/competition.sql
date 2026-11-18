@@ -29,6 +29,7 @@ create function pg_temp.ctx_save_with_organizer(c jsonb) returns jsonb language 
 $$;
 grant execute on function pg_temp.ctx_assert(boolean,text),pg_temp.ctx_error(text,text),
   pg_temp.ctx_id(integer),pg_temp.ctx_command(integer) to anon,authenticated;
+grant execute on function pg_temp.ctx_save_with_organizer(jsonb) to authenticated;
 
 delete from public.admin_access;
 insert into auth.users(id) values
