@@ -177,6 +177,22 @@ async function checkApprovedGuide(page, prefix) {
     path: path.join(directory, `${prefix}-engrenagem.png`),
   });
 
+  const visibility = page.locator("#visibility-open");
+  const menu = page.locator("#visibility-panel");
+  const confirm = page.locator("#confirm-modal");
+  await expect(visibility).toHaveText("Privada");
+  await visibility.click();
+  await menu.getByRole("button", { name: "Pública", exact: true }).click();
+  await confirm.getByRole("button", { name: "Confirmar alteração" }).click();
+  await expect(visibility).toHaveText("Pública");
+  await visibility.click();
+  await menu.getByRole("button", { name: "Privada", exact: true }).click();
+  await expect(confirm).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(confirm).toBeHidden();
+  await expect(visibility).toBeFocused();
+  await expect(visibility).toHaveText("Pública");
+
   await page
     .getByRole("link", { name: "Abrir exemplo de disputas" })
     .first()

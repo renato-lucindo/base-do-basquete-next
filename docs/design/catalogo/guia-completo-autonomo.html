@@ -137,7 +137,7 @@ const confirm=$('#confirm-modal');let confirmOp=null, confirmTrigger;
 function openConfirm({title,description,button='Confirmar',operation,trigger}){
  confirmOp=operation;confirmTrigger=trigger||document.activeElement;
  $('#confirm-title').textContent=title;$('#confirm-text').textContent=description;
- $('#confirm-accept').textContent=button;confirm.showModal();
+ $('#confirm-accept').textContent=button;confirm.returnValue='';confirm.showModal();
 }
 confirm.addEventListener('close',()=>{
  const proceed=confirm.returnValue==='confirm';const action=confirmOp;confirmOp=null;
