@@ -2,9 +2,13 @@
 
 A base visual do MVP reúne superfícies claras, azul para ações e seleção, tipografia de leitura rápida e tabelas compactas. A consulta pública prioriza o celular. A operação administrativa prioriza o desktop, com reflow para telas menores. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) definem o comportamento dos fluxos.
 
+As cores semânticas aprovadas são vermelho USWDS vivo `#E52207` para perigo e verde USWDS vivo `#008817` para sucesso e check, nos tokens `--bb-danger` e `--bb-success`. O azul de ação é `#075FCA`. Valores de referência na [paleta USWDS](https://designsystem.digital.gov/design-tokens/color/system-tokens/).
+
 ## Referência visual aprovada em 18/11/2026
 
 Consulte o [guia visual aprovado](catalogo/guia-completo-autonomo.html) para toda mudança de interface pública, administrativa ou de protótipo. Abra a seção pertinente antes de editar. Use as amostras para escolher o componente e confira a aparência e os estados na tela renderizada. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) detalham os requisitos específicos de cada fluxo.
+
+O padrão de tipografia aprovado acrescenta **2 px a cada tamanho de texto** nas áreas pública e administrativa. Com raiz de 16 px, a referência passa a ser **23 px** para título de página (**22 px** até 639 px), **19 px** para título de seção, **16 px** para corpo e **14 px** para detalhes. Aplique o acréscimo aos tamanhos dos componentes, preservando a fonte padrão do navegador e o zoom. A página administrativa de Disputas já aplica esse padrão e recebeu aceite visual. Os tokens compartilhados ainda refletem a escala anterior e serão atualizados na adoção pelas demais telas.
 
 - **Fundações e componentes.** Reaproveite os tokens oficiais e componentes do repositório. Siga a tipografia, a densidade, o traço dos ícones e a hierarquia de ações mostrados no guia. As escalas, cores auxiliares e ícones identificados como propostas permanecem referências para avaliação. A engrenagem `settings` é a referência visual de uma ação de configuração.
 - **Situação de disputa.** Use Planejada `#3B82F6`, Em andamento `#F97316`, Concluída `#22C55E` e Cancelada `#EF4444` como acentos de situação, com rótulo textual e indicador. Mantenha o azul de ação nos controles e links e as cores de feedback nos avisos.
@@ -34,13 +38,17 @@ Com as dependências do projeto instaladas, gere o HTML com `node docs/design/ca
 | Superfícies         | Use `--bb-surface` para conteúdo, `--bb-background` para o plano de fundo e `--bb-line` para divisores decorativos. Campos usam `--bb-control-line` para um contorno com contraste próprio.                                                                                             |
 | Texto e estado      | `--bb-text` e `--bb-muted` distinguem conteúdo principal e secundário. `--bb-success` e `--bb-danger` acompanham mensagens que identificam o estado em palavras.                                                                                                                        |
 | Tipografia          | [`theme.css`](../../src/ui-system/theme.css) aplica os tokens `--bb-font-*` com Inter e fallback de sistema. Na composição `.bb-ui`, corpo de 0,875 rem, seção de 1,0625 rem e título de 1,3125 rem, com título de 1,25 rem até 639 px. Use números tabulares nas métricas comparáveis. |
-| Escala e reflow     | [`readability.css`](../../src/ui-system/readability.css) aplica 100% até 639 CSS px e 150% a partir de 640 CSS px. Use rem para dimensões ligadas ao texto, permita quebra em nomes longos e reserve rolagem horizontal para regiões que precisem dela.                                 |
+| Escala e reflow     | [`readability.css`](../../src/ui-system/readability.css) mantém a fonte padrão do navegador em qualquer largura. Use rem para dimensões ligadas ao texto, permita quebra em nomes longos e reserve rolagem horizontal para regiões que precisem dela.                                   |
 | Densidade e forma   | A composição `.bb-ui` usa cantos de 0,3125 rem nos controles básicos, intervalo de 0,5 rem entre ações e 0,75 rem entre grupos de conteúdo. Controles principais no celular têm referência de 2,75 rem com fonte padrão.                                                                |
 | Administração atual | [`styles.css`](../../src/styles.css) consome o mesmo azul e tom neutro de fundo pelos aliases `--blue` e `--surface`. Os componentes administrativos carregam os estilos de suas áreas.                                                                                                 |
 
 ## Componentes
 
 ### Ações e formulários
+
+Na edição de Disputas, **Descartar alterações** tem rótulo fixo, preenchimento vermelho e texto branco. O botão **X** usa o mesmo preenchimento com ícone branco. Use a cor semântica de perigo e mantenha confirmação para perda de rascunho. A ação **Cancelar disputa** permanece na seção de situação com contorno vermelho e confirmação com motivo.
+
+Nos cadastros e edições de categorias **Base** e **Master**, exiba o rótulo persistente **Faixa Etária** acima do seletor de idade, associado ao controle. Alinhe **Categoria** e **Faixa Etária** quando houver espaço. A categoria **Adulto** apresenta apenas seu seletor.
 
 | Necessidade                               | Referência em código                                                                                                                                                                             | Conferência                                                                                                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |

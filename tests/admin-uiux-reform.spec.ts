@@ -124,25 +124,69 @@ test("Equipes mostra painel escolhido e retorno acessivel", async ({
     ),
   ).toBe(true);
 });
-test("Informacoes mantem categoria proporcional em desktop e reflow no celular", async ({
+test("Adicionar disputa mantém categoria proporcional em desktop e reflow no celular", async ({
   page,
 }, info) => {
   await gamesFixture(page);
-  await page.goto(route(""));
-  const category = page.getByRole("combobox", {
-    name: "Categoria da disputa 1.1",
+  await page.route("**/api/competition-administration/listing", (request) =>
+    request.fulfill({
+      json: {
+        items: [],
+        total: 0,
+        hasMore: false,
+        years: [],
+        championships: [],
+      },
+    }),
+  );
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  const add = page.getByRole("button", { name: "Adicionar", exact: true });
+  await add.click();
+  const dialog = page.getByRole("dialog", {
+    name: "Adicionar disputa",
     exact: true,
   });
-  await expect(category).toBeVisible();
-  if (info.project.name === "desktop")
-    expect((await category.boundingBox())!.width).toBeLessThanOrEqual(
-      240 * 1.5,
-    );
+  const category = dialog.getByRole("group", {
+    name: "Categoria",
+    exact: true,
+  });
+  const kind = category.getByRole("combobox", {
+    name: "Categoria da disputa nova",
+    exact: true,
+  });
+  await kind.selectOption("base");
+  const age = category.getByRole("combobox", {
+    name: "Faixa Etária da disputa nova",
+    exact: true,
+  });
+  await expect(age).toBeVisible();
+  await expect(
+    category.getByText("Faixa Etária", { exact: true }),
+  ).toBeVisible();
+  await age.selectOption("15");
+  await kind.selectOption("master");
+  await expect(age).toHaveValue("");
+  await age.selectOption("35");
+  await expect(age).toHaveValue("35");
+  const [kindBox, ageBox, dialogBox] = await Promise.all([
+    kind.boundingBox(),
+    age.boundingBox(),
+    dialog.boundingBox(),
+  ]);
+  if (info.project.name === "desktop") {
+    expect(kindBox!.width).toBeLessThanOrEqual(240 * 1.5);
+    expect(ageBox!.width).toBeCloseTo(kindBox!.width, 0);
+  }
+  expect(ageBox!.x + ageBox!.width).toBeLessThan(
+    dialogBox!.x + dialogBox!.width,
+  );
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await kind.selectOption("adult");
+  await expect(age).toHaveCount(0);
 });
 
 test("Falha ao ordenar nao apresenta linhas antigas sob a nova ordem", async ({

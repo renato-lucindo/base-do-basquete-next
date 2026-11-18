@@ -177,7 +177,7 @@ for (const width of [1366, 1920]) {
         document.documentElement.clientWidth,
     }));
     expect(metrics.compact).toBe(true);
-    expect(metrics.minWidth).toBe("1830px");
+    expect(metrics.minWidth).toBe("1220px");
     expect(metrics.pageOverflow).toBe(false);
     await page.screenshot({
       path: `.preview-artifacts/admin-after-importacao-${width}.png`,

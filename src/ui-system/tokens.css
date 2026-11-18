@@ -7,9 +7,13 @@
   --bb-line: #dbe3ed;
   --bb-background: #f6f8fb;
   --bb-surface: #fff;
-  --bb-danger: #b42318;
-  --bb-success: #21603e;
+  --bb-danger: #e52207;
+  --bb-success: #008817;
   --bb-warning: #ffc629;
+  --bb-status-planned: #3b82f6;
+  --bb-status-in-progress: #f97316;
+  --bb-status-completed: #22c55e;
+  --bb-status-cancelled: #ef4444;
   --bb-control-line: #7b8796;
   --bb-radius: 0.3125rem;
   --bb-font-family:

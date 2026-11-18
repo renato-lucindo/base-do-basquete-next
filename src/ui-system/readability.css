@@ -2,11 +2,6 @@
 html {
   font-size: 100%;
 }
-@media (min-width: 640px) {
-  html {
-    font-size: 150%;
-  }
-}
 .sr-only {
   position: absolute;
   width: 1px;

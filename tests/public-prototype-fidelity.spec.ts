@@ -73,7 +73,7 @@ for (const kind of ["estatisticas", "sumula"] as const) {
     // player names follow the explicit 14px legibility requirement.
     const approved = expected.map((item) => ({
       ...item,
-      size: `${(item.selector.includes(".reference-player") ? 14 : parseFloat(item.size!)) * (info.project.name === "desktop" ? 1.5 : 1)}px`,
+      size: item.selector.includes(".reference-player") ? "14px" : item.size,
     }));
     expect(await read()).toEqual(approved);
     expect(

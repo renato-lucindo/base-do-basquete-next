@@ -351,7 +351,7 @@ for (const viewport of [
       await page
         .locator("html")
         .evaluate((el) => getComputedStyle(el).fontSize),
-    ).toBe(viewport.width >= 640 ? "24px" : "16px");
+    ).toBe("16px");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

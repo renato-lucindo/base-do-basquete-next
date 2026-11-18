@@ -129,9 +129,7 @@ test("Equipes: largura intrínseca, sticky, barra superior e bordas", async ({
       };
     });
     expect(geometry.maxHeight).toBeCloseTo((width > 1050 ? 768 : 844) * 0.7, 0);
-    expect(geometry.padding).toBe(
-      (width > 1050 ? 14 : 10) * (width >= 640 ? 1.5 : 1),
-    );
+    expect(geometry.padding).toBe(width > 1050 ? 14 : 10);
     if (width > 1050) {
       expect(geometry.gap).toBeLessThanOrEqual(2);
       expect(geometry.center).toBeLessThanOrEqual(1);

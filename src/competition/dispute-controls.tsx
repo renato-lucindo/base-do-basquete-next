@@ -8,7 +8,7 @@ import {
   type DisputeAdministrationCommand,
 } from "./administration-contract";
 
-type Action = DisputeAdministrationCommand["action"];
+type Action = Exclude<DisputeAdministrationCommand["action"], "set_visibility">;
 export function DisputeControls({
   state,
   disabled,
@@ -27,15 +27,15 @@ export function DisputeControls({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const request = useRef<DisputeAdministrationCommand | null>(null);
+  const reasonInput = useRef<HTMLTextAreaElement>(null);
   const reasonId = useId();
+  const sectionId = useId();
   const closed = state.status === "completed" || state.status === "cancelled";
   const publicDispute = state.visibility === "public";
-  const visibility = publicDispute ? "private" : "public";
   const labels = {
     complete: "Concluir disputa",
     cancel: "Cancelar disputa",
     reopen: "Reabrir disputa",
-    set_visibility: publicDispute ? "Tornar privada" : "Tornar pública",
   };
   const messages = {
     complete:
@@ -44,12 +44,10 @@ export function DisputeControls({
       "Os resultados confirmados serão preservados. Jogos pendentes sairão da agenda pública.",
     reopen:
       "A disputa voltará à situação anterior e aceitará alterações esportivas.",
-    set_visibility: publicDispute
-      ? "O público perderá acesso à disputa e a seus dados, inclusive por links diretos."
-      : "A disputa aparecerá no catálogo e na busca. Conteúdo elegível ficará disponível.",
   };
   const requiredReason = action === "cancel" || action === "reopen";
-  const open = (next: Action) => {
+  const open = (next: Action, trigger: HTMLButtonElement) => {
+    trigger.focus({ preventScroll: true });
     setError("");
     setReason("");
     request.current = null;
@@ -68,7 +66,7 @@ export function DisputeControls({
         disputeId: state.disputeId,
         expectedVersion: state.version,
         action,
-        visibility: action === "set_visibility" ? visibility : null,
+        visibility: null,
         reason: currentReason,
       };
     }
@@ -97,62 +95,66 @@ export function DisputeControls({
   }
   return (
     <>
-      <div className="competition-actions">
-        <span>
-          {disputeStatusLabels[state.status]} ·{" "}
-          {state.isTest
-            ? "Teste · Privada"
-            : publicDispute
-              ? "Pública"
-              : "Privada"}
-        </span>
-        {!state.isTest ? (
+      <section className="dispute-administration" aria-labelledby={sectionId}>
+        <h4 id={sectionId}>Situação da disputa</h4>
+        <div className="dispute-administration-actions">
+          <span>
+            {disputeStatusLabels[state.status]} ·{" "}
+            {state.isTest
+              ? "Teste · Privada"
+              : publicDispute
+                ? "Pública"
+                : "Privada"}
+          </span>
+          {state.isTest && (
+            <a
+              href={"/publico.html?previa=" + state.disputeId}
+              target="_blank"
+              rel="noopener"
+            >
+              Abrir prévia
+            </a>
+          )}
+          {state.status === "in_progress" && (
+            <button
+              type="button"
+              className="secondary"
+              disabled={disabled}
+              onClick={(event) => open("complete", event.currentTarget)}
+            >
+              {labels.complete}
+            </button>
+          )}
           <button
             type="button"
-            className="secondary"
+            className={closed ? "secondary" : "secondary dispute-cancel-action"}
             disabled={disabled}
-            onClick={() => open("set_visibility")}
+            onClick={(event) =>
+              open(closed ? "reopen" : "cancel", event.currentTarget)
+            }
           >
-            {labels.set_visibility}
+            {closed ? labels.reopen : labels.cancel}
           </button>
-        ) : (
-          <a
-            href={"/publico.html?previa=" + state.disputeId}
-            target="_blank"
-            rel="noopener"
-          >
-            Abrir prévia
-          </a>
-        )}
-        {state.status === "in_progress" && (
-          <button
-            type="button"
-            className="secondary"
-            disabled={disabled}
-            onClick={() => open("complete")}
-          >
-            {labels.complete}
-          </button>
-        )}
-        <button
-          type="button"
-          className="secondary"
-          disabled={disabled}
-          onClick={() => open(closed ? "reopen" : "cancel")}
-        >
-          {closed ? labels.reopen : labels.cancel}
-        </button>
-      </div>
+        </div>
+      </section>
       {action && (
         <AdminDialog
           open
           title={labels[action]}
           busy={busy}
+          className="dispute-create-dialog dispute-confirm-dialog"
+          iconClose
+          closeLabel="Fechar confirmação"
+          initialFocus={requiredReason ? reasonInput : undefined}
           onClose={() => setAction(null)}
           footer={
             <button
               type="button"
-              className="primary"
+              className={
+                action === "cancel"
+                  ? "primary dispute-confirm-cancel"
+                  : "primary"
+              }
               disabled={busy || (requiredReason && reason.trim().length < 3)}
               onClick={() => void confirm()}
             >
@@ -165,6 +167,7 @@ export function DisputeControls({
             <label htmlFor={reasonId}>
               Motivo
               <textarea
+                ref={reasonInput}
                 id={reasonId}
                 name="reason"
                 autoComplete="off"

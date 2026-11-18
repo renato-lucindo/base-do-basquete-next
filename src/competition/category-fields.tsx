@@ -24,12 +24,12 @@ export function CategoryFields({
         ? ({ kind: "master", age: "" } as const)
         : categorySelection(label);
   const needsAge = kind === "base" || kind === "master";
-  const ageLabel = kind === "base" ? "Idade máxima" : "Idade mínima";
 
   return (
-    <>
+    <fieldset className="dispute-category-fields">
+      <legend className="admin-visually-hidden">Categoria</legend>
       <label>
-        Categoria
+        <span>Categoria</span>
         <select
           name="category"
           disabled={disabled}
@@ -51,11 +51,11 @@ export function CategoryFields({
       </label>
       {needsAge && (
         <label>
-          {ageLabel}
+          <span>Faixa Etária</span>
           <select
             name="categoryAge"
             disabled={disabled}
-            aria-label={`${ageLabel} da categoria ${suffix}`}
+            aria-label={`Faixa Etária da disputa ${suffix}`}
             required
             value={age}
             onChange={(event) =>
@@ -71,6 +71,6 @@ export function CategoryFields({
           </select>
         </label>
       )}
-    </>
+    </fieldset>
   );
 }
