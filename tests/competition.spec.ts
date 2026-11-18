@@ -828,6 +828,27 @@ test("keeps multiple championship checkboxes and opens the selected dispute in G
   await page.goto("http://127.0.0.1:5174/foundation.html");
   const table = page.getByRole("table", { name: "Disputas" });
   await expect(table.locator("tbody tr")).toHaveCount(6);
+  await page.getByRole("button", { name: "Adicionar", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
+  const championship = dialog.getByRole("combobox", { name: "Campeonato" });
+  const matches = dialog.getByRole("listbox", {
+    name: "Campeonatos encontrados",
+  });
+  await expect(championship).toBeFocused();
+  await expect(championship).toHaveAttribute("aria-expanded", "false");
+  await expect(matches).toBeHidden();
+  await championship.press("ArrowDown");
+  await expect(matches).toBeHidden();
+  await championship.fill("Escolar");
+  await expect(matches.getByRole("option")).toHaveText(["Copa Escolar"]);
+  await championship.press("Escape");
+  await expect(matches).toBeHidden();
+  await expect(championship).toBeFocused();
+  await championship.press("ArrowDown");
+  await expect(matches).toBeVisible();
+  await championship.fill("");
+  await expect(matches).toBeHidden();
+  await dialog.getByRole("button", { name: "Cancelar", exact: true }).click();
   await page
     .locator("summary")
     .filter({ hasText: /^Todos$/ })

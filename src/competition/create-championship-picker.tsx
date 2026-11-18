@@ -33,7 +33,7 @@ export function CreateChampionshipPicker({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const search = normalize(query);
-  const visible = open && !chosen && !creating && !disabled;
+  const visible = !!search && open && !chosen && !creating && !disabled;
   const options = championships.filter((item) =>
     normalize(item.name).includes(search),
   );
@@ -111,7 +111,10 @@ export function CreateChampionshipPicker({
               } else if (event.key === "Enter") {
                 event.preventDefault();
                 if (visible && options[active]) choose(options[active]);
-              } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              } else if (
+                search &&
+                (event.key === "ArrowDown" || event.key === "ArrowUp")
+              ) {
                 event.preventDefault();
                 setOpen(true);
                 setActive((index) =>

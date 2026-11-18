@@ -3,7 +3,8 @@
 ## Organizadores de campeonatos
 
 - Unidade `codex/organizadores`, a partir de `baa6ccd`. Organizador obrigatório em campeonato novo, salvo junto com a disputa. Campeonatos de teste usam **Admin** e aceitam apenas disputas de teste. Edição e lista refletem o vínculo compartilhado, com bloqueio após a primeira publicação.
-- Migration `20261118212656_competition_organizers` cria catálogo privado e prepara o vínculo FECABA para os dois campeonatos conferidos no DEV. PostgreSQL 17.11 local confirmou em sessões concorrentes a serialização de troca e publicação nas duas ordens. A rodada do Worker e o aceite visual serão registrados na PR.
+- Migration `20261118212656_competition_organizers` cria catálogo privado e prepara o vínculo FECABA para os dois campeonatos conferidos no DEV. PostgreSQL 17.11 local confirmou em sessões concorrentes a serialização de troca e publicação nas duas ordens. Aplicada no DEV como `20261118214455`. Copa ES e Circuito Capixaba de Basquete vinculados à FECABA (nove disputas). Datas de atividade preservadas.
+- [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87), HEAD `c2c2bb8`. O [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve esse SHA, versão `ec845c22-8275-4b52-9ab1-2d3eb029297d`, deployment `4dd3e6f9-1764-4caa-b15c-ebc0f47535ce`. Painel, health e bundle responderam 200. Busca e lista sem sessão retornaram 401. Vitest focal, 16 contratos SQL e 24 testes Chromium passaram. A [CI da PR](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44404557688) passou nos sete checks. O gate local completo também passou. Aceite visual recebido com ajuste solicitado para que a busca de campeonatos em **Adicionar disputa** comece recolhida. O roteiro da reforma está no [roadmap](ROADMAP.md#ordem-proposta-para-a-reforma-administrativa).
 
 ## Revisão visual do design system
 
