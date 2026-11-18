@@ -31,7 +31,7 @@ it.each(["zero", "upgrade", "existing_admin"] as const)(
         insert into auth.users(id) values('f9500000-0000-4000-8000-000000000097');
         insert into public.admin_access(user_id) values('f9500000-0000-4000-8000-000000000097');
         insert into public.teams(id,name) values('f9500000-0000-4000-8000-000000000003','Clube a preservar');
-        insert into public.championships(id,name) values('f9500000-0000-4000-8000-000000000094','Contexto a preservar');
+        insert into public.championships(id,name,organizer_id) values('f9500000-0000-4000-8000-000000000094','Contexto a preservar',(select id from private.competition_organizers where abbreviation='FECABA'));
         insert into public.seasons(id,championship_id,year) values('f9500000-0000-4000-8000-000000000095','f9500000-0000-4000-8000-000000000094',2026);
         insert into public.disputes(id,season_id,gender,category) values('f9500000-0000-4000-8000-000000000096','f9500000-0000-4000-8000-000000000095','masculino','Adulto');
         insert into public.registrations(id,dispute_id,team_id,name) values('f9500000-0000-4000-8000-000000000025','f9500000-0000-4000-8000-000000000096','f9500000-0000-4000-8000-000000000003','Inscrição a preservar');

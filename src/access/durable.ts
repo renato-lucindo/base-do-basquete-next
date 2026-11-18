@@ -323,10 +323,19 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  getCompetition(id: string) {
+  listCompetitionOrganizers(query: string) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.competitions.get(accessToken, id),
+        this.competitions.listOrganizers(accessToken, query),
+      ),
+    );
+  }
+  getCompetition(id: string, includeOrganizer = false) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        includeOrganizer
+          ? this.competitions.getWithOrganizer(accessToken, id)
+          : this.competitions.get(accessToken, id),
       ),
     );
   }

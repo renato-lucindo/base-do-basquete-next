@@ -3,13 +3,14 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { AdminDialog } from "./admin-dialog";
 import { CategoryFields } from "./category-fields";
 import { CreateChampionshipPicker } from "./create-championship-picker";
-import { api, ApiFailure, isSessionFailure } from "./api";
+import { OrganizerField, type OrganizerChoice } from "./organizer-field";
 import {
-  disputeSchema,
-  snapshotSchema,
-  saveResultSchema,
-  type CompetitionSnapshot,
-} from "./contract";
+  compatibleOrganizerSnapshotSchema,
+  organizerSelectionSchema,
+  type OrganizerSnapshot,
+} from "./organizer-contract";
+import { api, ApiFailure, isSessionFailure } from "./api";
+import { disputeSchema, saveResultSchema } from "./contract";
 import {
   disputeAdministrationListSchema,
   disputeLockLabels,
@@ -59,7 +60,7 @@ export function DisputeFormDialog({
         ? ""
         : newChampionship);
   const [championshipId, setChampionshipId] = useState(suggestedChampionship);
-  const [snapshot, setSnapshot] = useState<CompetitionSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<OrganizerSnapshot | null>(null);
   const [administration, setAdministration] = useState<DisputeAdministration[]>(
     [],
   );
@@ -70,6 +71,10 @@ export function DisputeFormDialog({
   const [category, setCategory] = useState(editing?.category ?? "Adulto");
   const [division, setDivision] = useState(editing?.division ?? "");
   const [isTest, setIsTest] = useState(false);
+  const [organizerChoice, setOrganizerChoice] =
+    useState<OrganizerChoice | null>(null);
+  const [organizerError, setOrganizerError] = useState("");
+  const [organizerBecameLocked, setOrganizerBecameLocked] = useState(false);
   const [requiresRenameReason, setRequiresRenameReason] = useState(false);
   const [renameReason, setRenameReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,6 +96,13 @@ export function DisputeFormDialog({
     (item) => item.id === championshipId,
   );
   const resolvedSnapshot = snapshot?.id === championshipId ? snapshot : null;
+  const organizer = resolvedSnapshot?.organizer ?? null;
+  const testChampionship = organizer?.kind === "system";
+  const organizerLocked =
+    organizerBecameLocked ||
+    !!resolvedSnapshot?.organizerLocked ||
+    (!!organizer && administration.some((value) => value.wasPublic));
+  const effectiveTest = testChampionship || isTest;
   const season = resolvedSnapshot?.seasons.find((value) =>
     editing ? value.id === editing.seasonId : value.year === Number(year),
   );
@@ -113,20 +125,22 @@ export function DisputeFormDialog({
   const ready = editing
     ? !!original && !!state
     : creatingChampionship || !!resolvedSnapshot;
-  const dirty = editing
-    ? !!original &&
-      (name !== resolvedSnapshot?.name ||
-        year !== String(season?.year) ||
-        gender !== original.gender ||
-        category !== original.category ||
-        division !== (original.division ?? ""))
-    : championshipId !== suggestedChampionship ||
-      !!name ||
-      year !== String(target.row?.year ?? currentYear()) ||
-      gender !== "masculino" ||
-      category !== "Adulto" ||
-      !!division ||
-      isTest;
+  const dirty =
+    !!organizerChoice ||
+    (editing
+      ? !!original &&
+        (name !== resolvedSnapshot?.name ||
+          year !== String(season?.year) ||
+          gender !== original.gender ||
+          category !== original.category ||
+          division !== (original.division ?? ""))
+      : championshipId !== suggestedChampionship ||
+        !!name ||
+        year !== String(target.row?.year ?? currentYear()) ||
+        gender !== "masculino" ||
+        category !== "Adulto" ||
+        !!division ||
+        isTest);
 
   function mayClose() {
     return (
@@ -165,6 +179,9 @@ export function DisputeFormDialog({
     setSnapshot(null);
     setAdministration([]);
     setError("");
+    setOrganizerError("");
+    setOrganizerBecameLocked(false);
+    setOrganizerChoice(null);
     if (!championshipId || creatingChampionship) {
       setLoading(false);
       return;
@@ -174,8 +191,8 @@ export function DisputeFormDialog({
     setLoading(true);
     void Promise.all([
       api(
-        "/api/competitions/" + championshipId,
-        snapshotSchema,
+        "/api/competitions/" + championshipId + "?organizer=1",
+        compatibleOrganizerSnapshotSchema,
         undefined,
         signal,
       ),
@@ -246,6 +263,28 @@ export function DisputeFormDialog({
     if (busy || loading || conflict || (!uncertain && !ready)) return;
     let command = pending.current;
     if (!uncertain) {
+      const organizerInput =
+        creatingChampionship && effectiveTest
+          ? { mode: "test" }
+          : !organizerLocked && organizerChoice?.mode === "existing"
+            ? { mode: "existing", id: organizerChoice.value.id }
+            : !organizerLocked && organizerChoice?.mode === "create"
+              ? {
+                  ...organizerChoice,
+                  abbreviation: organizerChoice.abbreviation.trim() || null,
+                }
+              : undefined;
+      if (creatingChampionship && !organizerInput) {
+        setOrganizerError("Selecione ou cadastre o organizador do campeonato.");
+        return;
+      }
+      const selection = organizerSelectionSchema
+        .optional()
+        .safeParse(organizerInput);
+      if (!selection.success) {
+        setOrganizerError("Confira o nome, a sigla e o tipo do organizador.");
+        return;
+      }
       const validatedDispute = disputeSchema.safeParse({
         id: original?.id ?? crypto.randomUUID(),
         gender,
@@ -321,8 +360,9 @@ export function DisputeFormDialog({
         commandId: crypto.randomUUID(),
         expectedVersion: resolvedSnapshot?.version ?? 0,
         competition,
-        testDisputeIds: isTest && !editing ? [dispute.id] : [],
+        testDisputeIds: effectiveTest && !editing ? [dispute.id] : [],
         renameReason: renameReason.trim() || null,
+        organizer: selection.data,
       });
       if (!parsed.success) {
         setError("Confira os campos do campeonato, da temporada e da disputa.");
@@ -346,6 +386,17 @@ export function DisputeFormDialog({
       const definite =
         failure instanceof ApiFailure && [400, 409].includes(failure.status);
       setUncertain(!definite);
+      if (
+        failure instanceof ApiFailure &&
+        failure.code.startsWith("championship_organizer_")
+      ) {
+        if (failure.code === "championship_organizer_locked") {
+          setOrganizerBecameLocked(true);
+          setOrganizerChoice(null);
+          setError(failure.message);
+        } else setOrganizerError(failure.message);
+        return;
+      }
       if (
         failure instanceof ApiFailure &&
         failure.code === "championship_rename_reason_required"
@@ -482,6 +533,55 @@ export function DisputeFormDialog({
               )}
             </div>
           )}
+          {!editing && (
+            <label className="create-wide competition-radio">
+              <input
+                type="checkbox"
+                checked={effectiveTest}
+                disabled={testChampionship}
+                onChange={(event) => {
+                  setIsTest(event.target.checked);
+                  setOrganizerError("");
+                }}
+              />
+              {creatingChampionship
+                ? "Campeonato de teste"
+                : "Disputa de teste"}
+            </label>
+          )}
+          {(creatingChampionship || resolvedSnapshot) &&
+            ((creatingChampionship && !effectiveTest) ||
+            (editing && !organizerLocked) ? (
+              <OrganizerField
+                current={organizer}
+                choice={organizerChoice}
+                onChange={(choice) => {
+                  setOrganizerChoice(choice);
+                  setOrganizerError("");
+                }}
+                onSessionLost={onSessionLost}
+                error={organizerError}
+                required={creatingChampionship}
+              />
+            ) : (
+              <div className="create-wide">
+                <span className="dispute-field-label">Organizador</span>
+                <div className="dispute-readonly">
+                  {creatingChampionship
+                    ? "Admin"
+                    : (organizer?.name ?? "Não definido")}
+                </div>
+                {testChampionship || creatingChampionship ? (
+                  <small>
+                    Este campeonato aceita apenas disputas de teste.
+                  </small>
+                ) : editing && organizerLocked ? (
+                  <small>
+                    Organizador bloqueado pelo histórico de publicação.
+                  </small>
+                ) : null}
+              </div>
+            ))}
           {needsRenameReason && (
             <label className="create-wide">
               Motivo da alteração do nome
@@ -583,16 +683,6 @@ export function DisputeFormDialog({
               </span>
             )}
           </label>
-          {!editing && (
-            <label className="create-wide competition-radio">
-              <input
-                type="checkbox"
-                checked={isTest}
-                onChange={(event) => setIsTest(event.target.checked)}
-              />
-              Disputa de teste
-            </label>
-          )}
         </fieldset>
         {loading && <p role="status">Carregando campeonato…</p>}
         {error && (

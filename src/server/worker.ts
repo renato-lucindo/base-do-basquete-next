@@ -262,12 +262,19 @@ async function competitionRoute(
       throw new HttpError(result.status, result.code, result.message);
     return jsonResponse(result.value);
   }
-  if (!root && request.method === "GET" && !url.search) {
+  if (
+    !root &&
+    request.method === "GET" &&
+    (!url.search || url.search === "?organizer=1")
+  ) {
     const id = z
       .uuid()
       .safeParse(url.pathname.slice("/api/competitions/".length));
     if (!id.success) throw badContext();
-    const result = await session.getCompetition(id.data);
+    const result = await session.getCompetition(
+      id.data,
+      url.search === "?organizer=1",
+    );
     if (!result.ok)
       throw new HttpError(result.status, result.code, result.message);
     return jsonResponse(result.value);

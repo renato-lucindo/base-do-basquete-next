@@ -31,6 +31,8 @@ A escala compartilhada, baseada na fonte padrão do navegador, também vale para
 
 A lista de Disputas recebeu aceite visual com acréscimo de 2 px na tipografia do cabeçalho, conteúdo, menus e diálogos. É a primeira aplicação do [novo padrão de tipografia](DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026).
 
+O organizador aparece ao lado do campeonato na lista e abaixo do nome no celular. O formulário usa busca por nome ou sigla e cadastro inline. Quando o vínculo está bloqueado, o organizador fica legível e o motivo aparece junto ao campo. O modo de teste preenche **Admin** automaticamente ao criar o campeonato.
+
 No cadastro de atleta, a data completa de nascimento preenche e bloqueia o campo de ano. Ao remover a data, o ano volta a aceitar edição manual. Em **Elenco → Perfil público**, a proposta mostra o ano que será publicado. A data completa fica privada.
 
 Ao salvar novo atleta ou alterar dados da ficha, **Publicar os dados do perfil?** mostra a prévia e oferece **Só salvar**, **Salvar e publicar** e **Voltar à edição**, com foco inicial em **Só salvar**. Só salvar conserva a versão publicada. Salvar e publicar confirma a ficha depois do cadastro e vínculo. A revisão de ficha publicada exige motivo. Camisa, dados privados e importação seguem seus fluxos de cadastro.

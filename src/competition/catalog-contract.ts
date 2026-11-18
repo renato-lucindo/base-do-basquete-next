@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { organizerSchema } from "./organizer-contract";
 import {
   disputeAdministrationSchema,
   disputeStatusSchema,
@@ -16,6 +17,7 @@ export const disputeListQuerySchema = z
       .enum([
         "activity",
         "championship",
+        "organizer",
         "year",
         "category",
         "gender",
@@ -33,6 +35,7 @@ export const disputeListRowSchema = z
     competitionId: z.uuid(),
     seasonId: z.uuid(),
     name: z.string(),
+    organizer: organizerSchema.nullable().optional(),
     year: z.number().int(),
     gender: z.enum(["masculino", "feminino"]),
     category: z.string(),

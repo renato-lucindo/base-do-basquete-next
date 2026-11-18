@@ -19,10 +19,23 @@ export async function competitionAdministrationRoute(
       "invalid_session",
       "Entre para acessar a área administrativa.",
     );
-  if (url.search)
-    throw new HttpError(400, "invalid_input", "Confira o contexto.");
   const session = env.SESSIONS.getByName(name);
   const part = url.pathname.slice("/api/competition-administration/".length);
+  if (request.method === "GET" && part === "organizers") {
+    const query = url.searchParams.get("q") ?? "";
+    if (
+      query.length > 120 ||
+      [...url.searchParams.keys()].some((key) => key !== "q") ||
+      url.searchParams.getAll("q").length > 1
+    )
+      throw new HttpError(400, "invalid_input", "Confira a busca.");
+    const result = await session.listCompetitionOrganizers(query);
+    if (!result.ok)
+      throw new HttpError(result.status, result.code, result.message);
+    return jsonResponse(result.value);
+  }
+  if (url.search)
+    throw new HttpError(400, "invalid_input", "Confira o contexto.");
   const id = z.uuid().safeParse(part);
   const options = { origin: env.APP_ORIGIN, maxBytes: 262144 };
   const result =

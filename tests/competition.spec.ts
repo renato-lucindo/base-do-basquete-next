@@ -12,6 +12,17 @@ import type {
   CompetitionSnapshot,
   SaveCompetition,
 } from "../src/competition/contract";
+import type {
+  Organizer,
+  OrganizerSelection,
+} from "../src/competition/organizer-contract";
+
+const fecaba: Organizer = {
+  id: "c7e4505a-5774-4af1-a893-08a87327817e",
+  name: "Federação Capixaba de Basquetebol",
+  abbreviation: "FECABA",
+  kind: "federation",
+};
 
 async function fixture(
   page: Page,
@@ -20,6 +31,8 @@ async function fixture(
 ) {
   let saved = initial;
   const changes = new Map<string, DisputeAdministration>();
+  const organizers = new Map<string, Organizer>();
+  const choices = [fecaba];
   let renameReasonRequired = false;
   function administration(id: string): DisputeAdministration {
     return (
@@ -63,6 +76,7 @@ async function fixture(
     if (request.method() === "POST") {
       const body = request.postDataJSON() as SaveCompetition & {
         testDisputeIds?: string[];
+        organizer?: OrganizerSelection;
       };
       for (const id of body.testDisputeIds ?? []) testIds.add(id);
       attempts.push(body.commandId);
@@ -101,6 +115,31 @@ async function fixture(
         });
       }
       if (!commands.has(body.commandId)) {
+        const selection = body.organizer;
+        if (selection) {
+          const value =
+            selection.mode === "test"
+              ? ({
+                  id: randomUUID(),
+                  name: "Admin",
+                  abbreviation: null,
+                  kind: "system",
+                } as const)
+              : selection.mode === "create"
+                ? { ...selection, id: randomUUID() }
+                : choices.find((choice) => choice.id === selection.id);
+          if (value) {
+            const { id, name, abbreviation, kind } = value;
+            organizers.set(body.competition.id, {
+              id,
+              name,
+              abbreviation,
+              kind,
+            });
+            if (selection.mode === "create")
+              choices.push({ id, name, abbreviation, kind });
+          }
+        }
         saved = {
           ...body.competition,
           version: (saved?.version ?? 0) + 1,
@@ -127,7 +166,18 @@ async function fixture(
     if (url.pathname !== "/api/competitions")
       return route.fulfill({
         status: saved ? 200 : 404,
-        json: saved ?? { error: { code: "context_not_found" } },
+        json:
+          saved && url.searchParams.has("organizer")
+            ? {
+                ...saved,
+                organizer: organizers.get(saved.id) ?? null,
+                organizerLocked:
+                  organizers.has(saved.id) &&
+                  saved.seasons.some((s) =>
+                    s.disputes.some((d) => administration(d.id).wasPublic),
+                  ),
+              }
+            : (saved ?? { error: { code: "context_not_found" } }),
       });
     const item = saved
       ? {
@@ -158,6 +208,17 @@ async function fixture(
     const request = route.request();
     const path = new URL(request.url()).pathname;
     if (path.endsWith("/competition")) return competitions(route);
+    if (path.endsWith("/organizers")) {
+      const query =
+        new URL(request.url()).searchParams.get("q")?.toLowerCase() ?? "";
+      return route.fulfill({
+        json: choices.filter(({ name, abbreviation }) =>
+          [name, abbreviation].some((value) =>
+            value?.toLowerCase().includes(query),
+          ),
+        ),
+      });
+    }
     if (path.endsWith("/listing")) {
       const query = request.postDataJSON() as DisputeListQuery;
       queries.push(query);
@@ -169,6 +230,7 @@ async function fixture(
               competitionId: snapshot.id,
               seasonId: s.id,
               name: snapshot.name,
+              organizer: organizers.get(snapshot.id) ?? null,
               year: s.year,
               gender: d.gender,
               category: d.category,
@@ -260,7 +322,7 @@ async function fixture(
   };
 }
 
-async function draft(page: Page) {
+async function draft(page: Page, pickOrganizer = true) {
   await page.getByRole("button", { name: "Adicionar", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Adicionar disputa" });
   const newChampionship = dialog.getByRole("button", {
@@ -271,8 +333,61 @@ async function draft(page: Page) {
   await dialog.getByLabel("Nome do campeonato").fill("Liga Regional");
   await dialog.getByLabel("Ano da temporada", { exact: true }).fill("2026");
   await dialog.getByLabel("Naipe", { exact: true }).selectOption("feminino");
+  if (pickOrganizer) {
+    const organizer = dialog.getByRole("combobox", { name: "Organizador" });
+    await organizer.fill("fecaba");
+    await dialog.getByRole("option", { name: /FECABA/ }).click();
+  }
   return dialog;
 }
+
+test("saves a reusable organizer in the championship dialog and presents its abbreviation", async ({
+  page,
+}, info) => {
+  const state = await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  const dialog = await draft(page, false);
+  await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toContainText(
+    "Selecione ou cadastre",
+  );
+  await dialog.getByRole("button", { name: "Cadastrar organizador" }).click();
+  await expect(dialog.getByLabel("Nome do organizador")).toBeFocused();
+  await dialog
+    .getByLabel("Nome do organizador")
+    .fill("Secretaria de Esportes de Vitória");
+  await dialog.getByLabel("Sigla (opcional)").fill("SEME");
+  await dialog.getByLabel("Tipo").selectOption("public_authority");
+  await page.screenshot({
+    path: `.preview-artifacts/organizador-formulario-${info.project.name}.png`,
+  });
+  await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(
+    page.getByRole("row", { name: /Liga Regional.*SEME/ }),
+  ).toBeVisible();
+  const sort = page.getByRole("button", { name: "Organizador", exact: true });
+  await sort.click();
+  await expect.poll(() => state.queries.at(-1)?.sort).toBe("organizer");
+  await page.screenshot({
+    path: `.preview-artifacts/organizador-lista-${info.project.name}.png`,
+  });
+});
+
+test("chooses Admin for a new test championship and keeps subsequent disputes in test mode", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  const dialog = await draft(page, false);
+  await dialog.getByLabel("Campeonato de teste").check();
+  await expect(dialog.getByText("Admin", { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole("button", { name: "Adicionar", exact: true }).click();
+  await expect(dialog.getByLabel("Disputa de teste")).toBeChecked();
+  await expect(dialog.getByLabel("Disputa de teste")).toBeDisabled();
+});
 
 async function create(page: Page) {
   const dialog = await draft(page);
