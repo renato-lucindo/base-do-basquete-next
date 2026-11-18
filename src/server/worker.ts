@@ -20,6 +20,8 @@ import { competitionSetupRoute } from "../regulation/setup-routes";
 import { z } from "zod";
 import { HttpError, jsonResponse, readMutationJson } from "./http";
 import { saveCompetitionSchema } from "../competition/contract";
+import { competitionAdministrationRoute } from "../competition/administration-route";
+import { publicDisputeStatusRoute } from "./public-read";
 import { teamsRoute } from "../teams/routes";
 import { gamesRoute } from "../games/routes";
 import { pdfSourcesRoute } from "../boxscore/routes";
@@ -50,6 +52,10 @@ export default {
         throw new HttpError(421, "invalid_host", "Endereço inválido.");
       if (url.pathname === "/api/health" && request.method === "GET")
         response = jsonResponse({ ok: true });
+      else if (url.pathname.startsWith("/api/competition-administration/"))
+        response = await competitionAdministrationRoute(request, env, url);
+      else if (url.pathname.startsWith("/api/public/dispute-status/"))
+        response = await publicDisputeStatusRoute(request, env, url);
       else if (url.pathname === "/api/public/discovery")
         response = await publicSearchRoute(request, env, url);
       else if (

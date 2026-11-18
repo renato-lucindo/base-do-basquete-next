@@ -97,7 +97,7 @@ export class SupabaseTransfers {
     if (c.disputeId !== ctx.disputeId) throw bad();
     return previewTransfer(c, ctx);
   }
-  async save(token: string, input: unknown) {
+  async save(token: string, input: unknown, ageWarnings = false) {
     const c = command(input);
     if (!c.acknowledgeImpact) throw bad();
     // The writer revalidates everything on a fresh operation; an existing receipt
@@ -105,7 +105,7 @@ export class SupabaseTransfers {
     const ack = await this.rpc(
       transferResultSchema,
       "transfer_roster_entry",
-      { p_command: c },
+      { p_command: c, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
     if (

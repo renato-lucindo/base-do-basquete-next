@@ -21,6 +21,9 @@ import {
 type Functions = Database["public"]["Functions"];
 type Send = (url: string, init: RequestInit) => Promise<Response>;
 const messages = {
+  dispute_closed: "Reabra a disputa antes de alterar a importação.",
+  test_global_read_only:
+    "Em uma disputa de teste, selecione pessoas e equipes já cadastradas.",
   transfer_required:
     "Este atleta já tem histórico na disputa. Use a operação de transferência ou retorno no elenco para abrir outro vínculo.",
   identity_confirmation_required:
@@ -54,11 +57,11 @@ export class SupabaseTextImport {
       throw unavailable();
     return result;
   }
-  async get(token: string, id: string) {
+  async get(token: string, id: string, ageWarnings = false) {
     const r = await this.checked(
       textReviewSnapshotSchema,
       "get_text_review",
-      { p_id: id },
+      { p_id: id, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
     if (r.id !== id) throw unavailable();
@@ -91,11 +94,11 @@ export class SupabaseTextImport {
       throw unavailable();
     return r;
   }
-  async confirm(token: string, command: ConfirmTextRow) {
+  async confirm(token: string, command: ConfirmTextRow, ageWarnings = false) {
     const r = await this.checked(
       confirmTextResultSchema,
       "confirm_text_row",
-      { p_command: command },
+      { p_command: command, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
     if (

@@ -432,3 +432,23 @@ test("newly published knockout games retain their phase in statistics and player
     await db.close();
   }
 });
+
+test("categorias etárias migram disputas e avisam sem bloquear o vínculo", async () => {
+  const db = await PGlite.create();
+  try {
+    const [seed, proof] = (
+      await readFile("supabase/tests/dispute_age_categories.sql", "utf8")
+    ).split("-- AFTER_AGE_MIGRATION");
+    await db.exec(platform);
+    const boundary = migrations.findIndex((m) =>
+      m.includes("create function private.classify_dispute_category"),
+    );
+    assert.ok(boundary > 0);
+    for (const m of migrations.slice(0, boundary)) await db.exec(m);
+    await db.exec(seed);
+    for (const m of migrations.slice(boundary)) await db.exec(m);
+    await db.exec(proof);
+  } finally {
+    await db.close();
+  }
+});

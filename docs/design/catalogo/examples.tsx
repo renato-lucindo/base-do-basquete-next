@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AdminToast } from "../../../src/competition/admin-toast";
+import { AdminToast, type ToastTone } from "../../../src/ui-system/admin-toast";
 import { ResourceState } from "../../../src/statistics/reference/resource-state";
 import { Badge, Field } from "../../../src/ui";
 import {
@@ -155,7 +155,12 @@ const states = [
 export function FeedbackExamples() {
   const [state, setState] = useState<(typeof states)[number]["key"]>("empty");
   const [reloaded, setReloaded] = useState(false);
-  const [toast, setToast] = useState(0);
+  const [toast, setToast] = useState<{ key: number; tone: ToastTone }>();
+  const toastMessages = {
+    success: "Local de jogo salvo",
+    error: "Não foi possível salvar o local de jogo",
+    warning: "Inscrição salva. Atleta acima da idade do Sub-17.",
+  };
 
   return (
     <section className="catalog-section" aria-labelledby="estados">
@@ -237,14 +242,34 @@ export function FeedbackExamples() {
               <Badge tone="danger">Rejeitado</Badge>
             </li>
           </ul>
-          <button
-            type="button"
-            onClick={() => setToast((attempt) => attempt + 1)}
-          >
-            Mostrar notificação
-          </button>
-          {toast > 0 && (
-            <AdminToast key={toast} message="Local de jogo salvo" />
+          <div className="catalog-inline">
+            {(
+              [
+                ["success", "sucesso"],
+                ["error", "erro"],
+                ["warning", "aviso"],
+              ] as const
+            ).map(([tone, label]) => (
+              <button
+                key={tone}
+                type="button"
+                onClick={() =>
+                  setToast((previous) => ({
+                    key: (previous?.key ?? 0) + 1,
+                    tone,
+                  }))
+                }
+              >
+                Mostrar {label}
+              </button>
+            ))}
+          </div>
+          {toast && (
+            <AdminToast
+              key={toast.key}
+              tone={toast.tone}
+              message={toastMessages[toast.tone]}
+            />
           )}
         </div>
       </div>

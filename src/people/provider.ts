@@ -11,6 +11,7 @@ import {
 } from "./contract";
 import {
   rosterListingSchema,
+  saveRosterResultSchema,
   rosterSnapshotSchema,
   type SaveRoster,
 } from "./roster-contract";
@@ -80,11 +81,11 @@ export class SupabasePeople {
       token,
     );
   }
-  saveRoster(token: string, command: SaveRoster) {
+  saveRoster(token: string, command: SaveRoster, ageWarnings = false) {
     return this.checked(
-      saveResultSchema,
+      saveRosterResultSchema,
       "save_roster_entry",
-      { p_command: command },
+      { p_command: command, ...(ageWarnings ? { p_age_warnings: true } : {}) },
       token,
     );
   }

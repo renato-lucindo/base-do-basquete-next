@@ -35,3 +35,17 @@ it("preserva código público de conflito para resolução explícita na UI", as
     code: "identity_confirmation_required",
   });
 });
+
+it("solicita avisos etários somente nas operações de elenco que optam pelo retorno", async () => {
+  const send = vi.fn(async () => Response.json({ ok: true }));
+  vi.stubGlobal("fetch", send);
+  await api("/api/roster", z.unknown(), { entry: {} }, undefined, {
+    ageWarnings: true,
+  });
+  expect(send).toHaveBeenCalledWith(
+    "/api/roster",
+    expect.objectContaining({
+      headers: { "Content-Type": "application/json", "X-BB-Age-Warnings": "1" },
+    }),
+  );
+});

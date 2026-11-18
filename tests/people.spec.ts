@@ -6,16 +6,20 @@ import {
   type PersonSnapshot,
   type SavePerson,
 } from "../src/people/contract";
+import type { AgeWarning } from "../src/people/age-warning";
 import type { SaveRoster } from "../src/people/roster-contract";
 import type { SaveStaff } from "../src/people/staff-contract";
 const id = (n: number) =>
   `a0000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 const timestamp = "2026-10-23T16:00:00Z";
-async function fixture(page: Page) {
+async function fixture(page: Page, ageWarning?: AgeWarning) {
   const persons = new Map<string, PersonSnapshot>();
   const roster = new Map<string, SaveRoster["entry"] & { version: number }>();
   const staff = new Map<string, SaveStaff["entry"] & { version: number }>();
-  const receipts = new Map<string, { id: string; version: number }>();
+  const receipts = new Map<
+    string,
+    { id: string; version: number; ageWarning?: AgeWarning }
+  >();
   const attempts: string[] = [];
   let authenticated = true,
     expireOnWrite = false,
@@ -279,6 +283,9 @@ async function fixture(page: Page) {
           receipts.set(command.commandId, {
             id: entry.id,
             version: value.version,
+            ...(ageWarning && command.expectedVersion === 0
+              ? { ageWarning }
+              : {}),
           });
         } else {
           const entry = command.entry;
@@ -408,7 +415,12 @@ async function savePersonOnly(page: Page) {
     .click();
   await page.getByRole("button", { name: "Só salvar", exact: true }).click();
 }
-async function newAthlete(page: Page, name: string, jersey: string) {
+async function newAthlete(
+  page: Page,
+  name: string,
+  jersey: string,
+  warning = false,
+) {
   await page
     .getByRole("button", { name: "Adicionar atleta", exact: true })
     .click();
@@ -421,8 +433,34 @@ async function newAthlete(page: Page, name: string, jersey: string) {
   await page.getByLabel("Nome da pessoa", { exact: true }).fill(name);
   await page.getByLabel("Camisa", { exact: true }).fill(jersey);
   await savePersonOnly(page);
-  await expect(page.getByText("Vínculo salvo.", { exact: true })).toBeVisible();
+  if (!warning)
+    await expect(
+      page.getByText("Vínculo salvo.", { exact: true }),
+    ).toBeVisible();
 }
+
+test("aviso etário amarelo acompanha vínculo salvo e fecha por teclado", async ({
+  page,
+}) => {
+  const f = await fixture(page, {
+    code: "above_maximum",
+    category: "Sub-17",
+    age: 18,
+  });
+  await open(page);
+  await newAthlete(page, "Ana Com Aviso", "00", true);
+  const toast = page.getByRole("region", { name: "Notificação" });
+  await expect(toast).toHaveAttribute("data-tone", "warning");
+  await expect(toast).toContainText("Vínculo salvo. Atleta com 18 anos");
+  await expect(toast.locator(".admin-toast-icon")).toHaveCSS(
+    "border-top-color",
+    "rgb(0, 0, 0)",
+  );
+  await toast.getByRole("button", { name: "Dispensar notificação" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(toast).toHaveCount(0);
+  expect(f.roster.size).toBe(1);
+});
 
 test("novo atleta informa camisa no primeiro diálogo e salva cadastro e elenco de uma vez", async ({
   page,

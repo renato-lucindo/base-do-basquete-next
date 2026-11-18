@@ -3,7 +3,7 @@ import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { MembersWorkspace } from "../people/workspace";
 import { AdminDialog } from "../competition/admin-dialog";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { TextImportWorkspace } from "../text-import/workspace";
 import { RegistrationWithdrawalPanel } from "../regulation/withdrawal-panel";
 import { RegistrationRemovalPanel } from "./removal-panel";
@@ -26,6 +26,7 @@ type Edit =
   | { kind: "registration"; command: SaveRegistration; team: TeamSnapshot };
 type Props = {
   disputeId: string;
+  globalsReadOnly?: boolean;
   gender: "masculino" | "feminino";
   enabled: boolean;
   guard: { current: () => boolean };
@@ -34,6 +35,7 @@ type Props = {
 };
 export function TeamsWorkspace({
   disputeId,
+  globalsReadOnly = false,
   gender,
   enabled,
   guard,
@@ -409,8 +411,12 @@ export function TeamsWorkspace({
       aria-busy={busy}
     >
       <AdminToast
+        tone={error ? "error" : "success"}
+        announce={!error}
         message={
-          enabled && !busy && !uncertain && !conflict && !dirty ? status : ""
+          enabled && !busy
+            ? error || (!uncertain && !conflict && !dirty ? status : "")
+            : ""
         }
       />
       {removing && (
@@ -507,7 +513,11 @@ export function TeamsWorkspace({
               className="teams-inline"
               aria-label="Localizar equipe global"
             >
-              <h4>Localizar ou criar equipe</h4>
+              <h4>
+                {globalsReadOnly
+                  ? "Localizar equipe"
+                  : "Localizar ou criar equipe"}
+              </h4>
               <p>
                 Selecione a identidade global. O nome público será definido na
                 inscrição.
@@ -553,6 +563,7 @@ export function TeamsWorkspace({
               )}
               <div className="competition-actions">
                 <button
+                  disabled={globalsReadOnly}
                   onClick={() => {
                     setFinding(false);
                     edit({
@@ -826,7 +837,7 @@ export function TeamsWorkspace({
                       </button>
                       <button
                         className="secondary"
-                        disabled={busy || withdrawalLocked}
+                        disabled={busy || withdrawalLocked || globalsReadOnly}
                         onClick={() => {
                           if (!mayLeave()) return;
                           setFinding(false);
@@ -856,6 +867,7 @@ export function TeamsWorkspace({
                       <MembersWorkspace
                         key={`${r.id}:${membersEpoch}`}
                         registration={r}
+                        globalsReadOnly={globalsReadOnly}
                         gender={gender}
                         enabled={enabled}
                         canEdit={

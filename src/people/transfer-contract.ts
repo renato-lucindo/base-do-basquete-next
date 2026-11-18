@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningSchema } from "./age-warning";
 import { registrationSchema } from "../teams/contract";
 import { rosterEntrySchema } from "./roster-contract";
 import { membershipMicros } from "./membership-time";
@@ -67,6 +68,7 @@ export const transferResultSchema = z
     destinationRegistrationId: uuid,
     effectiveAt: stamp,
     kind: z.enum(["transfer", "return"]),
+    ageWarning: ageWarningSchema.optional(),
   })
   .strict()
   .refine(

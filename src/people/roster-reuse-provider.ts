@@ -80,7 +80,7 @@ export class SupabaseRosterReuse {
     return view;
   }
 
-  async apply(token: string, input: unknown) {
+  async apply(token: string, input: unknown, ageWarnings = false) {
     const command = applyRosterReuseSchema.safeParse(input);
     if (!command.success) throw bad();
     // The SQL writer checks a stored receipt before checking changed context;
@@ -90,6 +90,7 @@ export class SupabaseRosterReuse {
       "apply_roster_reuse",
       {
         p_command: command.data,
+        ...(ageWarnings ? { p_age_warnings: true } : {}),
       },
       token,
     );

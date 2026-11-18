@@ -1,4 +1,6 @@
 import type { z } from "zod";
+import { ageWarningHeader } from "../people/age-warning";
+import { previewDisputeId } from "../public-ui/preview";
 export class ApiFailure extends Error {
   constructor(
     readonly status: number,
@@ -19,7 +21,9 @@ export async function api<T>(
   schema: z.ZodType<T>,
   command?: object,
   signal?: AbortSignal,
+  options?: { ageWarnings?: boolean },
 ): Promise<T> {
+  const previewId = path.startsWith("/api/public/") ? previewDisputeId() : null;
   const response = await fetch(path, {
     method: command ? "POST" : "GET",
     credentials: "same-origin",
@@ -27,15 +31,19 @@ export async function api<T>(
     signal: signal
       ? AbortSignal.any([signal, AbortSignal.timeout(45000)])
       : AbortSignal.timeout(45000),
-    ...(command
-      ? {
-          headers: {
-            "Content-Type":
-              command instanceof Blob ? command.type : "application/json",
-          },
-          body: command instanceof Blob ? command : JSON.stringify(command),
-        }
-      : {}),
+    ...((command || options?.ageWarnings || previewId) && {
+      headers: {
+        ...(command && {
+          "Content-Type":
+            command instanceof Blob ? command.type : "application/json",
+        }),
+        ...(options?.ageWarnings && { [ageWarningHeader]: "1" }),
+        ...(previewId && { "X-Dispute-Preview": previewId }),
+      },
+    }),
+    ...(command && {
+      body: command instanceof Blob ? command : JSON.stringify(command),
+    }),
   });
   let body: unknown;
   try {

@@ -4,7 +4,30 @@
 
 - Unidade `codex/prototipo-perfil-equipe` baseada em `4891dc6`, com [CI aprovada na base](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/43967897859). [Histórico da unidade](https://github.com/renato-lucindo/base-do-basquete-next/commits/codex/prototipo-perfil-equipe) e [CI da branch](https://github.com/renato-lucindo/base-do-basquete-next/actions?query=branch%3Acodex%2Fprototipo-perfil-equipe).
 - [Protótipo offline](design/README.md#protótipo-do-perfil-público-da-equipe) com quatro abas, duas entradas e fixtures. A revisão humana do protótipo é o próximo passo. A implementação pública depende da situação oficial publicada da disputa. O estado do serviço consta no registro do perfil do atleta abaixo.
-- A unidade usa worktree isolado. A edição de `CONTRIBUTING.md` e as skills locais do checkout de origem estão preservadas.
+- A [PR #81](https://github.com/renato-lucindo/base-do-basquete-next/pull/81) incorpora a main em `7d9633f` com o guia visual aprovado. Verificar a CI do novo HEAD. A unidade usa worktree isolado. A edição de `CONTRIBUTING.md` e as skills locais do checkout de origem estão preservadas.
+
+## Revisão visual do design system
+
+- Unidade `codex/revisao-design-system` baseada em `745e964`. O [guia visual de 18/11/2026](design/catalogo/guia-completo-autonomo.html) rege alterações futuras de interface. A engrenagem recebeu contorno centralizado. O [guia de adoção](design/DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026) registra escopo e evidências.
+- Escopo de referência e catálogo offline. A [PR #86](https://github.com/renato-lucindo/base-do-basquete-next/pull/86) registra o SHA integrado e os checks. A [CI de `9c6adf5`](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44313865121) passou. A revisão seguinte reproduziu no WebKit e corrigiu o cancelamento da confirmação ilustrativa. Após o merge, incorporar a base nas PRs abertas e conferir seus checks. O checkout de origem mantém sua edição local de `CONTRIBUTING.md` e as skills pessoais. O estado dos serviços consta abaixo.
+
+## Lista de disputas
+
+- Unidade `codex/lista-disputas` baseada em `71b8901`. Uma disputa por linha, filtros/ordenação na consulta paginada, botão Adicionar e cadastros em diálogo. Procedimento e evidências esperadas no [plano da unidade](PLAN-LISTA-DISPUTAS.md).
+- Validação local do catálogo: 8 linhas inteiras em 1366×768 com zoom a 100%. Migration de leitura `20261117204021_admin_dispute_listing` testada com PGlite. A confirmação da integração, do DEV e da publicação fica registrada na PR e no checkpoint de execução.
+
+## Administração de disputas
+
+- [PR #83](https://github.com/renato-lucindo/base-do-basquete-next/pull/83) integrada à main no SHA `71b8901628aefc9180c54934ebf31aa2b9364404`. [CI do SHA integrado](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44134240291) concluída com todos os checks aprovados. Regras na [ADR 023](decisoes/023-administracao-disputas.md). Worktree da unidade preservado em `codex/administracao-disputas`. Alterações de contribuição e skills do checkout original preservadas.
+- PostgreSQL 17.11 com conexões separadas confirmou o bloqueio concorrente de edição e cancelamento. A regressão da revisão cobre jogos adiados, interrompidos e decisões com versões obsoletas. DEV com as três migrations registradas como `20261117163812`, `20261117163815` e `20261117165533`. Exposição anônima anterior preservada e prévia/admin inacessíveis ao papel anônimo.
+- Worker dedicado [`base-do-basquete-admin`](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) publicado em 17/11/2026 com fonte `71b8901`, versão `cebc6b0f-8cea-4402-a8bf-ed8a0db3f86e` e deployment `da506319-6a5d-4943-a370-1fd537909498`. Sem Cloudflare Access por decisão do responsável, com login interno, Durable Object e segredo de sessão próprios. Banco Supabase DEV compartilhado e nenhuma rota de domínio principal. Smoke GET confirmou painel/health 200, APIs privadas 401 sem sessão e catálogo DEV 200. A validação com login real fica pendente. O preview público manteve a versão `0fffde67-41a6-42e9-bf5c-3369a0d7ffe3`.
+- Próximas mudanças de administração usam este Worker. Configuração de implantação em `wrangler.admin.jsonc`, conforme o [procedimento do admin](PLAN-LISTA-DISPUTAS.md#atualização-do-worker-administrativo). O primeiro deploy criou apenas o SQLite do Durable Object deste Worker.
+
+## Categorias etárias e notificações administrativas
+
+- Unidade `codex/categorias-etarias`, baseada em `4891dc6`. Cadastro de Adulto, Base e Master nas disputas e aviso após inscrições fora da faixa ou acima das duas vagas ativas do Sub-22. O design system inclui os três toasts e o catálogo atualizado.
+- A consulta ao DEV encontrou 11 disputas e zero colisões na classificação. A migration `20261117122456_dispute_age_categories.sql` está na unidade e foi exercitada em banco local isolado. A classificação no DEV e o deploy seguem pendentes de autorização específica.
+- Worktree próprio. Mantidas as alterações locais do checkout original. O SHA, as evidências de validação e a revisão de integração ficam na PR da branch.
 
 ## Design system
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningHeader } from "../people/age-warning";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import {
@@ -69,7 +70,12 @@ export async function textImportRoute(request: Request, env: Env, url: URL) {
     return result(await session.getImportPerson(id, disputeId, registrationId));
   }
   if (!root && request.method === "GET" && !url.search)
-    return result(await session.getTextReview(uuid(tail)));
+    return result(
+      await session.getTextReview(
+        uuid(tail),
+        request.headers.get(ageWarningHeader) === "1",
+      ),
+    );
   if (request.method === "POST" && !url.search) {
     if (root)
       return result(
@@ -105,6 +111,7 @@ export async function textImportRoute(request: Request, env: Env, url: URL) {
             origin: env.APP_ORIGIN,
             maxBytes: 4096,
           }),
+          request.headers.get(ageWarningHeader) === "1",
         ),
       );
   }

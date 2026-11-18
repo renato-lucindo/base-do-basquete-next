@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningHeader } from "./age-warning";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveTransferSchema } from "./transfer-contract";
@@ -58,7 +59,10 @@ export async function transferRoute(request: Request, env: Env, url: URL) {
     if (command.sourceEntryId !== source.data) throw bad();
     const r = match[2]
       ? await session.previewTransfer(command)
-      : await session.saveTransfer(command);
+      : await session.saveTransfer(
+          command,
+          request.headers.get(ageWarningHeader) === "1",
+        );
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);
   }

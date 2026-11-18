@@ -7,16 +7,24 @@ import { TeamsWorkspace } from "../teams/screen";
 import { GamesWorkspace } from "../games/workspace";
 import { PdfSourcesWorkspace } from "../boxscore/workspace";
 import { AdminDialog } from "./admin-dialog";
-import { AdminToast } from "./admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
+import { CategoryFields } from "./category-fields";
+import {
+  disputeAdministrationListSchema,
+  disputeLockLabels,
+  saveCompetitionAdministrationSchema,
+  type DisputeAdministration,
+  type SaveCompetitionAdministration,
+} from "./administration-contract";
+import { DisputeControls } from "./dispute-controls";
+import { DisputeCatalog } from "./catalog";
 import {
   competitionSchema,
-  listingSchema,
   snapshotSchema,
   saveCompetitionSchema,
   saveResultSchema,
   type Competition,
   type CompetitionSnapshot,
-  type CompetitionListing,
   type SaveCompetition,
 } from "./contract";
 import "./screen.css";
@@ -35,11 +43,9 @@ type Props = {
   onSessionLost: () => void;
   onCompactChange?: (value: boolean) => void;
 };
-type Pending = { fingerprint: string; command: SaveCompetition };
-const emptyList: CompetitionListing = {
-  items: [],
-  recents: [],
-  hasMore: false,
+type Pending = {
+  fingerprint: string;
+  command: SaveCompetition | SaveCompetitionAdministration;
 };
 const allIds = (draft: Competition) =>
   new Set([
@@ -49,7 +55,7 @@ const allIds = (draft: Competition) =>
 const newDispute = () => ({
   id: crypto.randomUUID(),
   gender: "masculino" as const,
-  category: "",
+  category: "Adulto",
   division: null,
 });
 const currentYear = () =>
@@ -66,12 +72,15 @@ export function CompetitionWorkspace({
   onSessionLost,
   onCompactChange,
 }: Props) {
-  const [list, setList] = useState(emptyList);
-  const [query, setQuery] = useState("");
-  const [offset, setOffset] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [administration, setAdministration] = useState<DisputeAdministration[]>(
+    [],
+  );
+  const [administrationError, setAdministrationError] = useState("");
+  const [administrationRefresh, setAdministrationRefresh] = useState(0);
+  const [testIds, setTestIds] = useState<string[]>([]);
+  const [renameReason, setRenameReason] = useState("");
   const [selected, setSelected] = useState("");
   const [pendingRemoval, setPendingRemoval] = useState<{
     kind: "season" | "dispute";
@@ -93,10 +102,53 @@ export function CompetitionWorkspace({
   const [conflict, setConflict] = useState(false);
   const pending = useRef<Pending | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const catalogGuard = useRef<() => boolean>(() => true);
   const errorRef = useRef<HTMLParagraphElement>(null);
   const restored = useRef(false);
-  const dirty = !!editor && JSON.stringify(editor.draft) !== editor.baseline;
+  const dirty =
+    !!editor &&
+    (JSON.stringify(editor.draft) !== editor.baseline || testIds.length > 0);
+  const administrationId = editor?.version ? editor.draft.id : null;
+  const administrationVersion = editor?.version;
+  useEffect(() => {
+    if (!enabled || !administrationId) return;
+    const controller = new AbortController();
+    setAdministrationError("");
+    void api(
+      "/api/competition-administration/" + administrationId,
+      disputeAdministrationListSchema,
+      undefined,
+      controller.signal,
+    )
+      .then((value) => {
+        if (!controller.signal.aborted) setAdministration(value);
+      })
+      .catch((failure) => {
+        if (!controller.signal.aborted)
+          setAdministrationError(
+            failure instanceof ApiFailure
+              ? failure.message
+              : "A situação das disputas está indisponível.",
+          );
+      });
+    return () => controller.abort();
+  }, [
+    enabled,
+    administrationId,
+    administrationVersion,
+    administrationRefresh,
+    tab,
+  ]);
+  const activeTestIds = testIds.filter((id) =>
+    editor?.draft.seasons.some((s) => s.disputes.some((d) => d.id === id)),
+  );
+  const needsRenameReason =
+    !!editor?.version &&
+    editor.draft.name.trim().replace(/\s+/gu, " ") !==
+      (JSON.parse(editor.baseline) as Competition).name &&
+    administration.some((d) => d.wasPublic);
+  const stateOf = (id: string) =>
+    administration.find((d) => d.disputeId === id);
   useEffect(() => {
     if (!editor) return;
     const ids = editor.draft.seasons.flatMap((s) =>
@@ -107,6 +159,7 @@ export function CompetitionWorkspace({
 
   function mayLeave() {
     return (
+      catalogGuard.current() &&
       teamsGuard.current() &&
       gamesGuard.current() &&
       pdfGuard.current() &&
@@ -133,49 +186,12 @@ export function CompetitionWorkspace({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty, uncertain]);
   useEffect(() => {
-    if (enabled) {
-      if (editor) nameRef.current?.focus();
-      else headingRef.current?.focus();
-    }
+    if (enabled && editor) nameRef.current?.focus();
   }, [editor?.draft.id]);
   useEffect(() => {
     if (error && enabled) errorRef.current?.focus();
   }, [error, enabled]);
 
-  useEffect(() => {
-    if (!enabled) return;
-    let active = true;
-    const controller = new AbortController();
-    setLoading(true);
-    const timer = setTimeout(() => {
-      void api(
-        `/api/competitions?q=${encodeURIComponent(query)}&offset=${offset}`,
-        listingSchema,
-        undefined,
-        controller.signal,
-      )
-        .then((value) => {
-          if (active) setList(value);
-        })
-        .catch((failure) => {
-          if (active) {
-            if (isSessionFailure(failure)) onSessionLost();
-            else
-              setError(
-                "Não foi possível carregar os campeonatos. Tente novamente.",
-              );
-          }
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-    }, 200);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [enabled, query, offset, refresh]);
   useEffect(() => {
     if (!enabled || restored.current) return;
     restored.current = true;
@@ -215,6 +231,9 @@ export function CompetitionWorkspace({
     targetTab = tab,
   ) {
     const draft = competitionSchema.parse(snapshotWithoutMetadata(snapshot));
+    setTestIds([]);
+    setRenameReason("");
+    if (editor?.draft.id !== draft.id) setAdministration([]);
     setPendingRemoval(null);
     setEditor({
       draft,
@@ -259,35 +278,6 @@ export function CompetitionWorkspace({
       setOpening(false);
     }
   }
-  function start() {
-    if (!mayLeave()) return;
-    setPendingRemoval(null);
-    const dispute = newDispute();
-    const draft: Competition = {
-      id: crypto.randomUUID(),
-      name: "",
-      seasons: [
-        { id: crypto.randomUUID(), year: currentYear(), disputes: [dispute] },
-      ],
-    };
-    setEditor({
-      draft,
-      version: 0,
-      baseline: JSON.stringify(draft),
-      savedIds: new Set(),
-    });
-    setSelected(dispute.id);
-    setTab("info");
-    setError("");
-    setUncertain(false);
-    setConflict(false);
-    pending.current = null;
-    history.replaceState(
-      null,
-      "",
-      `${location.pathname}${location.search}#novo-campeonato`,
-    );
-  }
   function back() {
     if (!mayLeave()) return;
     setPendingRemoval(null);
@@ -302,28 +292,39 @@ export function CompetitionWorkspace({
   async function save(event?: FormEvent) {
     event?.preventDefault();
     if (!editor || saving || conflict) return;
-    const parsed = saveCompetitionSchema.safeParse({
+    if (needsRenameReason && renameReason.trim().length < 3) {
+      setError("Informe o motivo da alteração do nome público.");
+      return;
+    }
+    const base = {
       commandId: crypto.randomUUID(),
       expectedVersion: editor.version,
       competition: editor.draft,
-    });
+    };
+    const parsed =
+      activeTestIds.length || needsRenameReason || renameReason.trim()
+        ? saveCompetitionAdministrationSchema.safeParse({
+            ...base,
+            testDisputeIds: activeTestIds,
+            renameReason: renameReason.trim() || null,
+          })
+        : saveCompetitionSchema.safeParse(base);
     if (!parsed.success) {
       setError(
         "Confira nome, anos, categorias e divisões. Anos e disputas não podem se repetir.",
       );
       return;
     }
-    const fingerprint = JSON.stringify({
-      expectedVersion: parsed.data.expectedVersion,
-      competition: parsed.data.competition,
-    });
+    const fingerprint = JSON.stringify({ ...parsed.data, commandId: null });
     if (!pending.current || pending.current.fingerprint !== fingerprint)
       pending.current = { fingerprint, command: parsed.data };
     setSaving(true);
     setError("");
     try {
       const result = await api(
-        "/api/competitions",
+        "testDisputeIds" in pending.current.command
+          ? "/api/competition-administration/competition"
+          : "/api/competitions",
         saveResultSchema,
         pending.current.command,
       );
@@ -339,7 +340,10 @@ export function CompetitionWorkspace({
         return;
       }
       if (failure instanceof ApiFailure && failure.status === 409) {
-        setConflict(true);
+        setConflict(failure.code !== "championship_rename_reason_required");
+        if (failure.code === "championship_rename_reason_required") {
+          setAdministrationRefresh((n) => n + 1);
+        }
         setUncertain(false);
         setError(failure.message);
       } else if (failure instanceof ApiFailure && failure.status === 400) {
@@ -388,99 +392,28 @@ export function CompetitionWorkspace({
       className={`competition-workspace${compact ? " compact-pilot" : ""}`}
       aria-busy={opening || saving}
     >
-      <AdminToast message={enabled && !saving && !opening ? notice : ""} />
+      <AdminToast
+        tone={error ? "error" : "success"}
+        announce={!error}
+        message={enabled && !saving && !opening ? error || notice : ""}
+      />
       {error && (
         <p ref={errorRef} tabIndex={-1} role="alert" className="access-error">
           {error}
         </p>
       )}
       {opening && <p role="status">Abrindo campeonato…</p>}
-      {!editor ? (
-        <>
-          <div className="competition-title competition-list-toolbar">
-            <h2 ref={headingRef} tabIndex={-1}>
-              Campeonatos
-            </h2>
-            <button onClick={start} disabled={opening}>
-              Novo campeonato
-            </button>
-            <label className="competition-search">
-              Buscar campeonato, ano ou disputa
-              <input
-                value={query}
-                name="competition-search"
-                autoComplete="off"
-                maxLength={120}
-                onChange={(event) => {
-                  setQuery(event.target.value);
-                  setOffset(0);
-                }}
-              />
-            </label>
-          </div>
-          {loading ? (
-            <p role="status">Carregando campeonatos…</p>
-          ) : (
-            <>
-              {list.recents.length > 0 && (
-                <section aria-labelledby="recentes">
-                  <h3 id="recentes">Recentes</h3>
-                  <CompetitionRows
-                    items={list.recents}
-                    open={(id) => void openCompetition(id)}
-                    disabled={opening}
-                  />
-                </section>
-              )}
-              <section aria-labelledby="todos-campeonatos">
-                <h3 id="todos-campeonatos">Todos os campeonatos</h3>
-                {list.items.length ? (
-                  <CompetitionRows
-                    items={list.items}
-                    open={(id) => void openCompetition(id)}
-                    disabled={opening}
-                  />
-                ) : (
-                  <p>
-                    {query
-                      ? "Nenhum campeonato encontrado."
-                      : "Ainda não há campeonatos cadastrados."}
-                  </p>
-                )}
-                <div className="competition-actions">
-                  {offset > 0 && (
-                    <button
-                      className="secondary"
-                      onClick={() => setOffset((n) => Math.max(0, n - 20))}
-                    >
-                      Página anterior
-                    </button>
-                  )}
-                  {list.hasMore && (
-                    <button
-                      className="secondary"
-                      onClick={() => setOffset((n) => n + 20)}
-                    >
-                      Próxima página
-                    </button>
-                  )}
-                </div>
-              </section>
-            </>
-          )}
-          {error && (
-            <button
-              className="secondary"
-              onClick={() => {
-                setError("");
-                setRefresh((n) => n + 1);
-              }}
-            >
-              Tentar novamente
-            </button>
-          )}
-        </>
-      ) : (
+      <div hidden={!!editor}>
+        <DisputeCatalog
+          enabled={enabled && !editor}
+          refresh={refresh}
+          opening={opening}
+          open={(id, dispute) => void openCompetition(id, dispute)}
+          guard={catalogGuard}
+          onSessionLost={onSessionLost}
+        />
+      </div>
+      {editor && (
         <>
           <div className="competition-context-header">
             <div className="competition-title">
@@ -667,6 +600,32 @@ export function CompetitionWorkspace({
                     }
                   />
                 </label>
+                {needsRenameReason && (
+                  <label>
+                    Motivo da alteração do nome
+                    <textarea
+                      name="renameReason"
+                      autoComplete="off"
+                      value={renameReason}
+                      onChange={(event) => setRenameReason(event.target.value)}
+                      required
+                      minLength={3}
+                      maxLength={2000}
+                    />
+                  </label>
+                )}
+                {administrationError && (
+                  <p role="status" className="error-text">
+                    {administrationError}{" "}
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() => setAdministrationRefresh((n) => n + 1)}
+                    >
+                      Tentar novamente
+                    </button>
+                  </p>
+                )}
                 {editor.draft.seasons.map((season, si) => (
                   <fieldset key={season.id} className="competition-season">
                     <legend>Temporada {season.year || si + 1}</legend>
@@ -681,6 +640,9 @@ export function CompetitionWorkspace({
                           min={1}
                           max={9999}
                           required
+                          disabled={season.disputes.some(
+                            (dispute) => stateOf(dispute.id)?.lockReason,
+                          )}
                           value={season.year || ""}
                           onChange={(event) =>
                             change((d) => {
@@ -705,98 +667,140 @@ export function CompetitionWorkspace({
                           </button>
                         )}
                     </div>
-                    {season.disputes.map((dispute, di) => (
-                      <fieldset
-                        key={dispute.id}
-                        className={`competition-dispute${selected === dispute.id ? " selected" : ""}`}
-                      >
-                        <legend>
-                          Disputa {si + 1}.{di + 1}
-                        </legend>
-                        <div className="competition-fields">
-                          <label>
-                            Naipe
-                            <select
-                              aria-label={`Naipe da disputa ${si + 1}.${di + 1}`}
-                              value={dispute.gender}
-                              onChange={(event) =>
-                                change((d) => {
-                                  d.seasons[si].disputes[di].gender = event
-                                    .target.value as "masculino" | "feminino";
-                                })
-                              }
-                            >
-                              <option value="masculino">Masculino</option>
-                              <option value="feminino">Feminino</option>
-                            </select>
-                          </label>
-                          <label>
-                            Categoria
-                            <input
-                              aria-label={`Categoria da disputa ${si + 1}.${di + 1}`}
-                              required
-                              maxLength={80}
-                              value={dispute.category}
-                              onChange={(event) =>
-                                change((d) => {
-                                  d.seasons[si].disputes[di].category =
-                                    event.target.value;
-                                })
-                              }
-                            />
-                          </label>
-                          <label>
-                            Divisão (opcional)
-                            <input
-                              aria-label={`Divisão da disputa ${si + 1}.${di + 1}`}
-                              maxLength={80}
-                              value={dispute.division ?? ""}
-                              onChange={(event) =>
-                                change((d) => {
-                                  d.seasons[si].disputes[di].division =
-                                    event.target.value;
-                                })
-                              }
-                            />
-                          </label>
-                        </div>
-                        <div className="competition-actions">
-                          <label className="competition-radio">
-                            <input
-                              type="radio"
-                              name="working-dispute"
-                              checked={selected === dispute.id}
-                              onChange={() => {
-                                if (!teamsGuard.current()) return;
-                                setSelected(dispute.id);
-                                if (
-                                  editor.version &&
-                                  editor.savedIds.has(dispute.id)
-                                )
-                                  setRoute(editor.draft.id, dispute.id, tab);
-                              }}
-                            />
-                            Usar esta disputa
-                          </label>
-                          {!editor.savedIds.has(dispute.id) &&
-                            season.disputes.length > 1 && (
-                              <button
-                                type="button"
-                                className="secondary"
-                                onClick={() =>
-                                  setPendingRemoval({
-                                    kind: "dispute",
-                                    seasonId: season.id,
-                                    disputeId: dispute.id,
+                    {season.disputes.map((dispute, di) => {
+                      const state = stateOf(dispute.id);
+                      const locked = !!state?.lockReason;
+                      return (
+                        <fieldset
+                          key={dispute.id}
+                          className={`competition-dispute${selected === dispute.id ? " selected" : ""}`}
+                        >
+                          <legend>
+                            Disputa {si + 1}.{di + 1}
+                          </legend>
+                          <div className="competition-fields">
+                            <label>
+                              Naipe
+                              <select
+                                aria-label={`Naipe da disputa ${si + 1}.${di + 1}`}
+                                disabled={locked}
+                                value={dispute.gender}
+                                onChange={(event) =>
+                                  change((d) => {
+                                    d.seasons[si].disputes[di].gender = event
+                                      .target.value as "masculino" | "feminino";
                                   })
                                 }
                               >
-                                Remover disputa {si + 1}.{di + 1}
-                              </button>
-                            )}
-                        </div>
-                      </fieldset>
-                    ))}
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                              </select>
+                            </label>
+                            <CategoryFields
+                              suffix={`${si + 1}.${di + 1}`}
+                              label={dispute.category}
+                              disabled={locked}
+                              onChange={(value) =>
+                                change((draft) => {
+                                  draft.seasons[si].disputes[di].category =
+                                    value;
+                                })
+                              }
+                            />
+                            <label>
+                              Divisão (opcional)
+                              <input
+                                aria-label={`Divisão da disputa ${si + 1}.${di + 1}`}
+                                maxLength={80}
+                                disabled={locked}
+                                value={dispute.division ?? ""}
+                                onChange={(event) =>
+                                  change((d) => {
+                                    d.seasons[si].disputes[di].division =
+                                      event.target.value;
+                                  })
+                                }
+                              />
+                            </label>
+                          </div>
+                          {state?.lockReason && (
+                            <p>{disputeLockLabels[state.lockReason]}</p>
+                          )}
+                          {state ? (
+                            <DisputeControls
+                              state={state}
+                              disabled={dirty || saving}
+                              onSessionLost={onSessionLost}
+                              onReload={() =>
+                                setAdministrationRefresh((n) => n + 1)
+                              }
+                              onSaved={(updated) => {
+                                setAdministration((rows) =>
+                                  rows.map((row) =>
+                                    row.disputeId === updated.disputeId
+                                      ? updated
+                                      : row,
+                                  ),
+                                );
+                                setNotice("Disputa atualizada");
+                              }}
+                            />
+                          ) : (
+                            !editor.savedIds.has(dispute.id) && (
+                              <label className="competition-radio">
+                                <input
+                                  type="checkbox"
+                                  checked={testIds.includes(dispute.id)}
+                                  onChange={(event) =>
+                                    setTestIds((ids) =>
+                                      event.target.checked
+                                        ? [...ids, dispute.id]
+                                        : ids.filter((id) => id !== dispute.id),
+                                    )
+                                  }
+                                />
+                                Disputa de teste
+                              </label>
+                            )
+                          )}
+                          <div className="competition-actions">
+                            <label className="competition-radio">
+                              <input
+                                type="radio"
+                                name="working-dispute"
+                                checked={selected === dispute.id}
+                                onChange={() => {
+                                  if (!teamsGuard.current()) return;
+                                  setSelected(dispute.id);
+                                  if (
+                                    editor.version &&
+                                    editor.savedIds.has(dispute.id)
+                                  )
+                                    setRoute(editor.draft.id, dispute.id, tab);
+                                }}
+                              />
+                              Usar esta disputa
+                            </label>
+                            {!editor.savedIds.has(dispute.id) &&
+                              season.disputes.length > 1 && (
+                                <button
+                                  type="button"
+                                  className="secondary"
+                                  onClick={() =>
+                                    setPendingRemoval({
+                                      kind: "dispute",
+                                      seasonId: season.id,
+                                      disputeId: dispute.id,
+                                    })
+                                  }
+                                >
+                                  Remover disputa {si + 1}.{di + 1}
+                                </button>
+                              )}
+                          </div>
+                        </fieldset>
+                      );
+                    })}
                     <button
                       type="button"
                       className="secondary"
@@ -921,6 +925,7 @@ export function CompetitionWorkspace({
               <TeamsWorkspace
                 key={context.id}
                 disputeId={context.id}
+                globalsReadOnly={stateOf(context.id)?.isTest}
                 gender={
                   savedCompetition?.seasons
                     .flatMap((s) => s.disputes)
@@ -1001,59 +1006,6 @@ export function CompetitionWorkspace({
   );
 }
 
-function CompetitionRows({
-  items,
-  open,
-  disabled,
-}: {
-  items: CompetitionListing["items"];
-  open: (id: string) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div
-      className="admin-table-scroll"
-      tabIndex={0}
-      role="region"
-      aria-label="Lista de campeonatos"
-    >
-      <table className="admin-data-table" aria-label="Campeonatos">
-        <thead>
-          <tr>
-            <th scope="col">Campeonato</th>
-            <th scope="col">Temporadas e disputas</th>
-            <th scope="col">Último trabalho salvo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td>
-                <button
-                  className="competition-open"
-                  aria-label={`Abrir ${item.name}`}
-                  disabled={disabled}
-                  onClick={() => open(item.id)}
-                >
-                  {item.name}
-                </button>
-              </td>
-              <td>
-                {item.contexts
-                  .map(
-                    (c) =>
-                      `${c.year} · ${c.gender === "feminino" ? "Feminino" : "Masculino"} · ${c.category}${c.division ? ` · ${c.division}` : ""}`,
-                  )
-                  .join(" / ")}
-              </td>
-              <td className="nowrap">{formatDate(item.savedAt)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",

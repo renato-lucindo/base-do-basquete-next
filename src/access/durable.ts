@@ -124,6 +124,19 @@ import {
   type SaveCompetition,
 } from "../competition/contract";
 
+import {
+  disputeAdministrationCommandSchema,
+  saveCompetitionAdministrationSchema,
+  type DisputeAdministrationCommand,
+  type SaveCompetitionAdministration,
+} from "../competition/administration-contract";
+import type { Json } from "../server/database.types";
+
+import {
+  disputeListQuerySchema,
+  type DisputeListQuery,
+} from "../competition/catalog-contract";
+
 type RpcResult<T> =
   | { ok: true; value: T }
   | { ok: false; status: number; code: string; message: string };
@@ -252,6 +265,57 @@ export class SessionStore extends DurableObject<Env> {
   close() {
     return safely(() => this.session.close());
   }
+  listAdminDisputes(query: DisputeListQuery) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.listDisputes(
+          accessToken,
+          disputeListQuerySchema.parse(query),
+        ),
+      ),
+    );
+  }
+  getDisputeAdministration(id: string) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.getAdministration(accessToken, id),
+      ),
+    );
+  }
+  saveDisputeAdministration(command: DisputeAdministrationCommand) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.saveAdministration(
+          accessToken,
+          disputeAdministrationCommandSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  saveCompetitionAdministration(command: SaveCompetitionAdministration) {
+    return safely(() =>
+      this.session.runAuthorized(({ accessToken }) =>
+        this.competitions.saveWithAdministration(
+          accessToken,
+          saveCompetitionAdministrationSchema.parse(command),
+        ),
+      ),
+    );
+  }
+  readTestDispute(id: string, operation: string, args: string) {
+    return safely(() =>
+      this.session.runAuthorized(async ({ accessToken }) =>
+        JSON.stringify(
+          await this.competitions.readTestDispute(
+            accessToken,
+            id,
+            operation,
+            JSON.parse(args) as Json,
+          ),
+        ),
+      ),
+    );
+  }
   listCompetitions(query: string, offset: number) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
@@ -354,10 +418,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  saveRoster(command: SaveRoster) {
+  saveRoster(command: SaveRoster, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.people.saveRoster(accessToken, saveRosterSchema.parse(command)),
+        this.people.saveRoster(
+          accessToken,
+          saveRosterSchema.parse(command),
+          ageWarnings,
+        ),
       ),
     );
   }
@@ -390,10 +458,10 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  getTextReview(id: string) {
+  getTextReview(id: string, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(
-        ({ accessToken }) => this.textImport.get(accessToken, id),
+        ({ accessToken }) => this.textImport.get(accessToken, id, ageWarnings),
         "import.review",
       ),
     );
@@ -415,13 +483,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  confirmTextRow(command: ConfirmTextRow) {
+  confirmTextRow(command: ConfirmTextRow, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(
         ({ accessToken }) =>
           this.textImport.confirm(
             accessToken,
             confirmTextRowSchema.parse(command),
+            ageWarnings,
           ),
         "import.confirm",
       ),
@@ -689,12 +758,13 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  applyRosterReuse(command: ApplyRosterReuse) {
+  applyRosterReuse(command: ApplyRosterReuse, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
         this.rosterReuse.apply(
           accessToken,
           applyRosterReuseSchema.parse(command),
+          ageWarnings,
         ),
       ),
     );
@@ -706,10 +776,14 @@ export class SessionStore extends DurableObject<Env> {
       ),
     );
   }
-  saveTransfer(command: SaveTransfer) {
+  saveTransfer(command: SaveTransfer, ageWarnings = false) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.transfers.save(accessToken, saveTransferSchema.parse(command)),
+        this.transfers.save(
+          accessToken,
+          saveTransferSchema.parse(command),
+          ageWarnings,
+        ),
       ),
     );
   }

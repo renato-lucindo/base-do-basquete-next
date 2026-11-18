@@ -129,11 +129,10 @@ Usar combobox/autocomplete pesquisável sempre que o catálogo tiver mais de ~10
 
 ### Toast (notificações complementares)
 
-- Usar somente para confirmações secundárias ("Localidade salva") — nunca para erros que exigem ação.
-- Posição consistente (geralmente canto inferior direito ou topo centralizado).
-- Auto-dispensar após ~4 s; fornecer botão de fechar manualmente.
-- Não bloquear conteúdo; não empilhar mais de 3 toasts simultaneamente.
-- Erros persistentes **não** são toasts — ficam no contexto da ação ou em banner.
+- Usar verde com check para sucesso, vermelho com X para falha na execução e amarelo com exclamação e contorno pretos para aviso ou conclusão com ressalva.
+- Exibir no canto inferior direito. Manter texto de status, contraste e fechamento manual nas três variantes.
+- Dispensar o sucesso após seis segundos. Manter erros e avisos até serem dispensados ou até a saída da tela.
+- Manter erros de campo e instruções de recuperação perto da ação correspondente. Quando já anunciados no contexto, o toast complementar dispensa um segundo anúncio.
 
 ### Estados da página
 

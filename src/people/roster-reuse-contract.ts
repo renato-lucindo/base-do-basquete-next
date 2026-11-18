@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ageWarningSchema } from "./age-warning";
 import { rosterEntrySchema } from "./roster-contract";
 const uuid = z.uuid().transform((v) => v.toLowerCase());
 const version = z.number().int().min(1).max(2147483647);
@@ -153,6 +154,7 @@ export const rosterReuseResultSchema = z
             personId: uuid,
             newEntryId: uuid,
             version: z.literal(1),
+            ageWarning: ageWarningSchema.optional(),
           })
           .strict(),
       )

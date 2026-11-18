@@ -33,7 +33,11 @@ test("public discovery uses anonymous published tables, validates transport and 
         assert.equal(request.headers.get("Authorization"), null);
         assert.equal(request.headers.get("apikey"), "fixture-publishable");
         assert.equal(u.hostname, "public.example.test");
-        if (u.pathname === "/rest/v1/published_games")
+        if (u.pathname === "/rest/v1/rpc/list_public_catalog_games") {
+          assert.deepEqual(await request.json(), {
+            p_dispute_id: g.disputeId,
+            p_after: null,
+          });
           return Response.json([
             {
               id: g.id,
@@ -44,6 +48,7 @@ test("public discovery uses anonymous published tables, validates transport and 
               away: g.facts.teams.away.points,
             },
           ]);
+        }
         if (u.pathname === "/rest/v1/published_player_games")
           return Response.json([
             { person: g.facts.players[0].person, disputeId: g.disputeId },
@@ -89,6 +94,10 @@ test("public discovery uses anonymous published tables, validates transport and 
       ).status,
       405,
     );
+    const preview = await mf.dispatchFetch(origin + "/api/public/catalog", {
+      headers: { "X-Dispute-Preview": g.disputeId },
+    });
+    assert.equal(preview.status, 401);
     assert.equal(calls.length, 0);
     assert.equal(
       (
@@ -115,7 +124,7 @@ test("public discovery uses anonymous published tables, validates transport and 
     );
     const page = await response.json();
     assert.equal(page.games[0].disputeId, g.disputeId);
-    assert.equal(calls[1].searchParams.get("dispute_id"), `eq.${g.disputeId}`);
+    assert.equal(calls[1].pathname, "/rest/v1/rpc/list_public_catalog_games");
     const search = await mf.dispatchFetch(
       origin + "/api/public/search?q=Atleta",
     );

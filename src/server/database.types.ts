@@ -79,6 +79,8 @@ export type Database = {
       disputes: {
         Row: {
           category: string;
+          category_age: number | null;
+          category_kind: string | null;
           division: string | null;
           gender: string;
           id: string;
@@ -818,7 +820,10 @@ export type Database = {
       confirm_achievements: { Args: { p_command: Json }; Returns: Json };
       confirm_game_stages: { Args: { p_command: Json }; Returns: Json };
       confirm_player_profile: { Args: { p_command: Json }; Returns: Json };
-      confirm_text_row: { Args: { p_command: Json }; Returns: Json };
+      confirm_text_row: {
+        Args: { p_command: Json; p_age_warnings?: boolean };
+        Returns: Json;
+      };
       finish_pdf_source: { Args: { p_command: Json }; Returns: Json };
       get_achievement_context: {
         Args: { p_dispute_id: string };
@@ -846,6 +851,20 @@ export type Database = {
           p_draft_offset?: number;
           p_publication_offset?: number;
         };
+        Returns: Json;
+      };
+      list_admin_disputes: { Args: { p_query: Json }; Returns: Json };
+      get_dispute_administration: {
+        Args: { p_competition_id: string };
+        Returns: Json;
+      };
+      save_dispute_administration: { Args: { p_command: Json }; Returns: Json };
+      save_competition_administration: {
+        Args: { p_command: Json };
+        Returns: Json;
+      };
+      read_test_dispute: {
+        Args: { p_id: string; p_operation: string; p_args: Json };
         Returns: Json;
       };
       get_competition: { Args: { p_id: string }; Returns: Json };
@@ -961,7 +980,10 @@ export type Database = {
       };
       get_staff_entry: { Args: { p_id: string }; Returns: Json };
       get_team: { Args: { p_id: string }; Returns: Json };
-      get_text_review: { Args: { p_id: string }; Returns: Json };
+      get_text_review: {
+        Args: { p_id: string; p_age_warnings?: boolean };
+        Returns: Json;
+      };
       get_transfer_context: {
         Args: {
           p_destination_registration_id: string;
@@ -1090,7 +1112,10 @@ export type Database = {
       };
       save_pdf_review: { Args: { p_command: Json }; Returns: Json };
       save_person: { Args: { p_command: Json }; Returns: Json };
-      apply_roster_reuse: { Args: { p_command: Json }; Returns: Json };
+      apply_roster_reuse: {
+        Args: { p_command: Json; p_age_warnings?: boolean };
+        Returns: Json;
+      };
       save_registration: { Args: { p_command: Json }; Returns: Json };
       save_registration_withdrawal: {
         Args: { p_command: Json };
@@ -1099,11 +1124,17 @@ export type Database = {
       save_regulation: { Args: { p_command: Json }; Returns: Json };
       get_regulation_draft: { Args: { p_dispute_id: string }; Returns: Json };
       save_regulation_draft: { Args: { p_command: Json }; Returns: Json };
-      save_roster_entry: { Args: { p_command: Json }; Returns: Json };
+      save_roster_entry: {
+        Args: { p_command: Json; p_age_warnings?: boolean };
+        Returns: Json;
+      };
       save_staff_entry: { Args: { p_command: Json }; Returns: Json };
       save_team: { Args: { p_command: Json }; Returns: Json };
       save_text_review: { Args: { p_command: Json }; Returns: Json };
-      transfer_roster_entry: { Args: { p_command: Json }; Returns: Json };
+      transfer_roster_entry: {
+        Args: { p_command: Json; p_age_warnings?: boolean };
+        Returns: Json;
+      };
     };
     Enums: {
       [_ in never]: never;

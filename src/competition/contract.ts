@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeCategory } from "./category";
 
 const label = (max: number) =>
   z
@@ -11,7 +12,9 @@ export const disputeSchema = z
   .object({
     id: z.uuid(),
     gender: z.enum(["masculino", "feminino"]),
-    category: label(80),
+    category: label(80)
+      .refine((value) => value !== "Sub-" && value !== "+")
+      .transform(normalizeCategory),
     division: z
       .string()
       .trim()

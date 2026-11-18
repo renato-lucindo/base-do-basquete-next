@@ -20,7 +20,7 @@ import {
 } from "./view-contract";
 import { DefinitionEditor } from "./definition-editor";
 import { createDefaultDefinition, hasCustomRules } from "./defaults";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { RegulationProjection } from "./projection";
 import { AchievementPanel } from "../achievements/panel";
 import { StandingsPublicationPanel } from "./publication-panel";
@@ -95,6 +95,7 @@ export function RegulationWorkspace({
     [loadAttempt, setLoadAttempt] = useState(0),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
+    [saveWarning, setSaveWarning] = useState(false),
     [status, setStatus] = useState(""),
     [proposal, setProposal] = useState<RegulationPreviewResult | null>(null),
     [reason, setReason] = useState(""),
@@ -455,6 +456,7 @@ export function RegulationWorkspace({
       setReadPending(false);
       setConflict(false);
       if (own !== undefined) {
+        setSaveWarning(v.version > own + 1);
         setStatus(
           v.version > own + 1
             ? "Regulamento salvo. Há uma revisão posterior para conferir."
@@ -582,8 +584,12 @@ export function RegulationWorkspace({
   return (
     <section className="regulation" ref={panel}>
       <AdminToast
+        tone={error ? "error" : saveWarning ? "warning" : "success"}
+        announce={false}
         message={
-          enabled && !busy && !uncertain && !readPending && !dirty ? status : ""
+          enabled && !busy
+            ? error || (!uncertain && !readPending && !dirty ? status : "")
+            : ""
         }
       />
       <div className="competition-title" tabIndex={-1}>

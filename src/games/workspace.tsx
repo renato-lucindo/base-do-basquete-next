@@ -34,7 +34,7 @@ import {
   type Officiating,
 } from "./officiating-contract";
 import { AdminDialog } from "../competition/admin-dialog";
-import { AdminToast } from "../competition/admin-toast";
+import { AdminToast } from "../ui-system/admin-toast";
 import { type RegistrationSnapshot } from "../teams/contract";
 import {
   gameListingSchema,
@@ -100,6 +100,7 @@ export function GamesWorkspace(props: Props) {
     [uncertain, setUncertain] = useState(false),
     [conflict, setConflict] = useState(false),
     [error, setError] = useState(""),
+    [saveWarning, setSaveWarning] = useState(false),
     [status, setStatus] = useState("");
   const [chosen, setChosen] = useState<RegistrationSnapshot[]>([]),
     [auxiliary, setAuxiliary] = useState(false),
@@ -350,6 +351,7 @@ export function GamesWorkspace(props: Props) {
       );
       const intent = saveAction.current;
       const organizationWarning = flexible ? await formatAction.current() : "";
+      setSaveWarning(!!organizationWarning);
       accept(snapshot);
       if (intent === "next") beginNew(snapshot.game);
       setStatus(
@@ -503,15 +505,11 @@ export function GamesWorkspace(props: Props) {
   return (
     <section className="games-workspace" ref={workspace}>
       <AdminToast
+        tone={error ? "error" : saveWarning ? "warning" : "success"}
+        announce={!error}
         message={
-          props.enabled &&
-          !sheetVisible &&
-          !auxiliary &&
-          !busy &&
-          !uncertain &&
-          !conflict &&
-          !dirty
-            ? status
+          props.enabled && !sheetVisible && !auxiliary && !busy
+            ? error || (!uncertain && !conflict && !dirty ? status : "")
             : ""
         }
       />

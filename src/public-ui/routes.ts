@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { HttpError, jsonResponse } from "../server/http";
 import { PublicCatalog } from "./catalog-provider";
 import { discoveryQuerySchema } from "./search-contract";
@@ -31,10 +32,13 @@ export async function publicSearchRoute(request: Request, env: Env, url: URL) {
       "Informe de 2 a 120 caracteres e confira os filtros.",
     );
   return jsonResponse(
-    await new PublicSearch({
-      url: env.SUPABASE_URL,
-      key: env.SUPABASE_PUBLISHABLE_KEY,
-    }).search(q.data, request.signal),
+    await new PublicSearch(
+      {
+        url: env.SUPABASE_URL,
+        key: env.SUPABASE_PUBLISHABLE_KEY,
+      },
+      await publicReadTransport(request, env),
+    ).search(q.data, request.signal),
   );
 }
 export async function publicCatalogRoute(request: Request, env: Env, url: URL) {
@@ -49,11 +53,14 @@ export async function publicCatalogRoute(request: Request, env: Env, url: URL) {
     )
   )
     throw new HttpError(400, "invalid_input", "Confira a consulta pública.");
-  const provider = new PublicCatalog({
-    url: env.SUPABASE_URL,
-    key: env.SUPABASE_PUBLISHABLE_KEY,
-    flexible: env.FLEXIBLE_COMPETITION === "true",
-  });
+  const provider = new PublicCatalog(
+    {
+      url: env.SUPABASE_URL,
+      key: env.SUPABASE_PUBLISHABLE_KEY,
+      flexible: env.FLEXIBLE_COMPETITION === "true",
+    },
+    await publicReadTransport(request, env),
+  );
   if (search) {
     const q = url.searchParams.get("q")?.trim() ?? "";
     if (q.length < 2 || q.length > 120)

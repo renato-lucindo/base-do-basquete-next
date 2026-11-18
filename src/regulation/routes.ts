@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicReadTransport } from "../server/public-read";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
 import { saveRegulationSchema } from "./persistence-contract";
@@ -18,11 +19,14 @@ export async function publicStandingsRoute(
   if (!id.success || url.search)
     throw new HttpError(400, "invalid_input", "Disputa inválida.");
   return jsonResponse(
-    await new SupabasePublicStandings({
-      url: env.SUPABASE_URL,
-      key: env.SUPABASE_PUBLISHABLE_KEY,
-      flexible: env.FLEXIBLE_COMPETITION === "true",
-    }).get(id.data.toLowerCase()),
+    await new SupabasePublicStandings(
+      {
+        url: env.SUPABASE_URL,
+        key: env.SUPABASE_PUBLISHABLE_KEY,
+        flexible: env.FLEXIBLE_COMPETITION === "true",
+      },
+      await publicReadTransport(request, env),
+    ).get(id.data.toLowerCase()),
   );
 }
 const bad = () =>

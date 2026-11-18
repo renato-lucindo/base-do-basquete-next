@@ -4,6 +4,10 @@
     "lib": ["ES2023"],
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/server/worker.ts", "worker-configuration.d.ts"],
+  "include": [
+    "src/server/worker.ts",
+    "src/server/admin-worker.ts",
+    "worker-configuration.d.ts"
+  ],
   "exclude": ["src/**/*.test.ts"]
 }

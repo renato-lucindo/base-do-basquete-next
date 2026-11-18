@@ -37,10 +37,11 @@ it("discovers an explicitly confirmed dispute even with no published result", as
 it("reads only the published projection with anonymous credentials and a stable cursor", async () => {
   const provider = new PublicCatalog(config, async (url, init) => {
     const u = new URL(url);
-    expect(u.pathname).toBe("/rest/v1/published_games");
-    expect(u.searchParams.get("select")).not.toContain("*");
-    expect(u.searchParams.get("game_id")).toBe(`gt.${pubId(7)}`);
-    expect(u.searchParams.get("dispute_id")).toBe(`eq.${r.disputeId}`);
+    expect(u.pathname).toBe("/rest/v1/rpc/list_public_catalog_games");
+    expect(JSON.parse(String(init.body))).toEqual({
+      p_dispute_id: r.disputeId,
+      p_after: pubId(7),
+    });
     expect(new Headers(init.headers).get("Authorization")).toBeNull();
     expect(new Headers(init.headers).get("apikey")).toBe(config.key);
     return Response.json([row]);
