@@ -511,6 +511,7 @@ export function DisputeCatalog({
                         type="button"
                         id={"open-dispute-" + a.disputeId}
                         className="dispute-open"
+                        title={row.name}
                         disabled={opening}
                         aria-label={"Abrir " + rowLabel}
                         onClick={() => {
