@@ -141,6 +141,72 @@ async function checkExamples(page) {
   }
 }
 
+async function checkApprovedGuide(page, prefix) {
+  const guide = pathToFileURL(
+    path.join(directory, "guia-completo-autonomo.html"),
+  ).href;
+  await page.goto(guide);
+  await expect(
+    page.getByRole("heading", { name: "Iconografia" }),
+  ).toBeVisible();
+  const settings = page.locator('[title="settings"] svg');
+  await expect(settings).toBeVisible();
+  const geometry = await settings.evaluate((svg) => {
+    const border = svg.querySelector("path").getBBox();
+    const frame = svg.viewBox.baseVal;
+    const center = svg.querySelector("circle");
+    const stroke = Number(svg.getAttribute("stroke-width"));
+    const x = border.x - frame.x;
+    const y = border.y - frame.y;
+    return {
+      square: Math.abs(border.width - border.height) < 0.05,
+      centered:
+        Math.abs(x + border.width / 2 - frame.width / 2) < 0.05 &&
+        Math.abs(y + border.height / 2 - frame.height / 2) < 0.05 &&
+        center.cx.baseVal.value === frame.x + frame.width / 2 &&
+        center.cy.baseVal.value === frame.y + frame.height / 2,
+      unclipped:
+        x > stroke / 2 &&
+        y > stroke / 2 &&
+        x + border.width + stroke / 2 < frame.width &&
+        y + border.height + stroke / 2 < frame.height,
+    };
+  });
+  assert.deepEqual(geometry, { square: true, centered: true, unclipped: true });
+  await page.locator('[title="settings"]').screenshot({
+    path: path.join(directory, `${prefix}-engrenagem.png`),
+  });
+
+  const visibility = page.locator("#visibility-open");
+  const menu = page.locator("#visibility-panel");
+  const confirm = page.locator("#confirm-modal");
+  await expect(visibility).toHaveText("Privada");
+  await visibility.click();
+  await menu.getByRole("button", { name: "Pública", exact: true }).click();
+  await confirm.getByRole("button", { name: "Confirmar alteração" }).click();
+  await expect(visibility).toHaveText("Pública");
+  await visibility.click();
+  await menu.getByRole("button", { name: "Privada", exact: true }).click();
+  await expect(confirm).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(confirm).toBeHidden();
+  await expect(visibility).toBeFocused();
+  await expect(visibility).toHaveText("Pública");
+
+  await page
+    .getByRole("link", { name: "Abrir exemplo de disputas" })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/disputas\.html$/);
+  await expect(
+    page.getByRole("heading", { name: "Gestão de disputas", level: 1 }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: /Voltar ao catálogo/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Design system" }),
+  ).toBeVisible();
+}
+
 async function main() {
   const engine = process.argv.includes("--webkit") ? webkit : chromium;
   const browser = await engine.launch();
@@ -250,6 +316,8 @@ async function main() {
       page.getByRole("status").filter({ hasText: "Local salvo" }),
     ).toHaveText("Local salvo como Quadra da Enseada.");
     await expect(trigger).toBeFocused();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await checkApprovedGuide(page, prefix);
     console.log(
       "Catálogo validado em 6 larguras, com navegação, buscas, filtros, legendas, formulário, diálogo, estados, toast e axe.",
     );

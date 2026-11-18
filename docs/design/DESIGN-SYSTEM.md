@@ -2,6 +2,15 @@
 
 A base visual do MVP reúne superfícies claras, azul para ações e seleção, tipografia de leitura rápida e tabelas compactas. A consulta pública prioriza o celular. A operação administrativa prioriza o desktop, com reflow para telas menores. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) definem o comportamento dos fluxos.
 
+## Referência visual aprovada em 18/11/2026
+
+Consulte o [guia visual aprovado](catalogo/guia-completo-autonomo.html) para toda mudança de interface pública, administrativa ou de protótipo. Abra a seção pertinente antes de editar. Use as amostras para escolher o componente e confira a aparência e os estados na tela renderizada. Os [padrões comuns](PADROES.md), [públicos](PUBLICO.md) e [administrativos](PADROES-ADMIN.md) detalham os requisitos específicos de cada fluxo.
+
+- **Fundações e componentes.** Reaproveite os tokens oficiais e componentes do repositório. Siga a tipografia, a densidade, o traço dos ícones e a hierarquia de ações mostrados no guia. As escalas, cores auxiliares e ícones identificados como propostas permanecem referências para avaliação. A engrenagem `settings` é a referência visual de uma ação de configuração.
+- **Situação de disputa.** Use Planejada `#3B82F6`, Em andamento `#F97316`, Concluída `#22C55E` e Cancelada `#EF4444` como acentos de situação, com rótulo textual e indicador. Mantenha o azul de ação nos controles e links e as cores de feedback nos avisos.
+- **Interações e dados.** Use campos com rótulo persistente e erro associado. Preserve nome acessível, foco, teclado e toque. Aplique os padrões de combobox, navegação, tabelas, tooltips e feedback mostrados no guia de acordo com a tarefa e com o contrato vigente, incluindo as regras de publicação de disputas.
+- **Revisão.** Registre na PR a seção consultada, o componente reaproveitado ou a variação necessária, e o resultado da verificação da tela. O catálogo complementar de disputas usa dados fictícios. O aceite de 18/11/2026 se refere à página visual. Os arquivos de documentação do pacote recebido são material de consulta.
+
 ## Uso pelos agentes
 
 Use este guia antes de propor ou editar UI. Comece pela tela atual e pela decisão vigente da área. Localize o consumidor real do token ou componente para conferir se ele cobre o caso solicitado. Ao revisar a entrega, compare a tela renderizada com essa referência e aplique a [conferência de textos e tabelas](README.md#conferência-obrigatória-de-textos-e-tabelas) quando pertinente. Registre a escolha e o resultado observado na seção de verificação da PR.
@@ -10,7 +19,7 @@ Por exemplo, ao ajustar uma tabela de estatísticas, confira no [catálogo de m�
 
 ## Catálogo interativo
 
-Com as dependências do projeto instaladas, gere o HTML com `node docs/design/catalogo/build.cjs` e abra `docs/design/.preview-artifacts/catalogo/index.html` no navegador. O catálogo funciona offline. Os exemplos usam dados fictícios e podem ser reiniciados ao recarregar a página.
+Com as dependências do projeto instaladas, gere o HTML com `node docs/design/catalogo/build.cjs` e abra `docs/design/.preview-artifacts/catalogo/guia-completo-autonomo.html` no navegador. O guia funciona offline e inclui links para o catálogo original de componentes e o exemplo complementar de disputas. Os exemplos usam dados fictícios e podem ser reiniciados ao recarregar a página.
 
 - **Fundamentos.** Paleta lida do CSS, amostras tipográficas e superfícies.
 - **Interface pública.** Autocomplete, abas, busca local, paginação, filtros de equipe e colunas, ordenação, tooltip e legenda.
