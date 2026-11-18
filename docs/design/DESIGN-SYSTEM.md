@@ -42,6 +42,10 @@ Com as dependências do projeto instaladas, gere o HTML com `node docs/design/ca
 
 ### Ações e formulários
 
+Na edição de Disputas, **Descartar alterações** tem rótulo fixo, preenchimento vermelho e texto branco. O botão **X** usa o mesmo preenchimento com ícone branco. Use a cor semântica de perigo e mantenha confirmação para perda de rascunho. A ação **Cancelar disputa** permanece na seção de situação com contorno vermelho e confirmação com motivo.
+
+Nos cadastros e edições de categorias **Base** e **Master**, exiba o rótulo persistente **Faixa Etária** acima do seletor de idade, associado ao controle. Alinhe **Categoria** e **Faixa Etária** quando houver espaço. A categoria **Adulto** apresenta apenas seu seletor.
+
 | Necessidade                               | Referência em código                                                                                                                                                                             | Conferência                                                                                                                                            |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Botão primário, secundário e desabilitado | [Base administrativa](../../src/styles.css) e [botões públicos](../../src/ui-system/theme.css)                                                                                                   | A ação principal usa `.primary` no admin e `.bb-button.bb-primary` no público. Desabilite quando a ação estiver indisponível.                          |

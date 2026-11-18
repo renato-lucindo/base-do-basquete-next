@@ -357,28 +357,34 @@
   min-width: 2rem;
   min-height: 2rem;
 }
-.dispute-create-dialog
-  button:is(.admin-dialog-close-icon, .dispute-close-action) {
+.dispute-create-dialog button.dispute-close-action {
   color: var(--bb-danger);
 }
 .dispute-create-dialog button.dispute-cancel-action {
   color: var(--bb-danger);
   border-color: var(--bb-danger);
 }
-.dispute-create-dialog .dispute-confirm-cancel:not(:disabled) {
+.dispute-create-dialog
+  button:is(
+    .admin-dialog-close-icon,
+    .dispute-discard-action,
+    .dispute-confirm-cancel
+  ):not(:disabled) {
   background: var(--bb-danger);
   border-color: var(--bb-danger);
+  color: var(--bb-surface);
 }
 @media (hover: hover) {
   .dispute-create-dialog
-    :is(
-      .admin-dialog-close-icon,
-      .dispute-close-action,
-      .dispute-cancel-action
-    ):hover:not(:disabled) {
+    :is(.dispute-close-action, .dispute-cancel-action):hover:not(:disabled) {
     background: color-mix(in srgb, var(--bb-danger) 8%, var(--bb-surface));
   }
-  .dispute-create-dialog .dispute-confirm-cancel:hover:not(:disabled) {
+  .dispute-create-dialog
+    button:is(
+      .admin-dialog-close-icon,
+      .dispute-discard-action,
+      .dispute-confirm-cancel
+    ):hover:not(:disabled) {
     background: color-mix(in srgb, var(--bb-danger) 86%, black);
   }
 }
@@ -440,11 +446,6 @@
   border: 0;
   margin: 0;
   padding: 0;
-}
-.dispute-category-fields legend {
-  padding: 0;
-  margin-bottom: 0.25rem;
-  font-size: 0.8125rem;
 }
 .dispute-create-form .create-wide {
   grid-column: 1/-1;

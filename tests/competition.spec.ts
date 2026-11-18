@@ -321,9 +321,18 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   });
   await expect(edit.getByRole("button", { name: "Fechar diálogo" })).toHaveCSS(
     "color",
-    "rgb(180, 35, 24)",
+    "rgb(255, 255, 255)",
   );
-  await edit.getByRole("button", { name: "Fechar", exact: true }).click();
+  for (const button of [
+    edit.getByRole("button", { name: "Fechar diálogo" }),
+    edit.getByRole("button", { name: "Descartar alterações", exact: true }),
+  ]) {
+    await expect(button).toHaveCSS("background-color", "rgb(180, 35, 24)");
+    await expect(button).toHaveCSS("color", "rgb(255, 255, 255)");
+  }
+  await edit
+    .getByRole("button", { name: "Descartar alterações", exact: true })
+    .click();
   const row = page
     .getByRole("table", { name: "Disputas" })
     .locator("tbody tr")
@@ -388,6 +397,62 @@ test("protege a identificação no diálogo e administra a visibilidade pela lis
   await confirmCancel.click();
   await expect(confirmation).toBeHidden();
   await expect(edit.getByText("Cancelada · Pública")).toBeVisible();
+});
+
+test("edição mantém descarte fixo e identifica a faixa etária sem perder o rascunho", async ({
+  page,
+}, info) => {
+  const state = await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  await create(page);
+  await editFirstDispute(page);
+  const edit = page.getByRole("dialog", { name: "Editar dados da disputa" });
+  const discard = edit.getByRole("button", {
+    name: "Descartar alterações",
+    exact: true,
+  });
+  const category = edit.getByLabel("Categoria da disputa em edição", {
+    exact: true,
+  });
+  const age = edit.getByLabel("Faixa Etária da disputa em edição", {
+    exact: true,
+  });
+  await expect(discard).toBeVisible();
+  await expect(age).toHaveCount(0);
+  await category.selectOption("base");
+  await expect(edit.getByText("Faixa Etária", { exact: true })).toBeVisible();
+  await age.selectOption("15");
+  await category.selectOption("master");
+  await expect(age).toHaveValue("");
+  await age.selectOption("35");
+  await expect(discard).toBeVisible();
+  await page.screenshot({
+    path: `.preview-artifacts/disputas-faixa-etaria-${info.project.name}.png`,
+  });
+  for (const button of [
+    discard,
+    edit.getByRole("button", { name: "Fechar diálogo" }),
+  ]) {
+    page.once("dialog", (confirmation) => confirmation.dismiss());
+    await button.click();
+    await expect(age).toHaveValue("35");
+    await expect(discard).toBeVisible();
+  }
+  await category.selectOption("adult");
+  await expect(age).toHaveCount(0);
+  await discard.click();
+  await expect(edit).toHaveCount(0);
+  await editFirstDispute(page);
+  await category.selectOption("base");
+  await age.selectOption("15");
+  await edit.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(edit).toHaveCount(0);
+  state.lockIdentification();
+  await editFirstDispute(page);
+  await expect(age).toHaveValue("15");
+  await expect(age).toBeDisabled();
+  await expect(edit.getByText("Faixa Etária", { exact: true })).toBeVisible();
+  await expect(discard).toBeVisible();
 });
 
 test("mantém a prévia de teste ao navegar e restaura o catálogo normal ao sair", async ({
@@ -540,7 +605,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
     .getByLabel("Categoria da disputa nova", { exact: true })
     .selectOption("base");
   await first
-    .getByLabel("Faixa da categoria da disputa nova", { exact: true })
+    .getByLabel("Faixa Etária da disputa nova", { exact: true })
     .selectOption("15");
   await expect(
     first
@@ -581,7 +646,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
     .getByLabel("Categoria da disputa nova", { exact: true })
     .selectOption("base");
   await dialog
-    .getByLabel("Faixa da categoria da disputa nova", { exact: true })
+    .getByLabel("Faixa Etária da disputa nova", { exact: true })
     .selectOption("15");
   await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(dialog.getByRole("alert")).toContainText(
@@ -596,7 +661,7 @@ test("uses one dialog and prevents duplicate disputes while accepting other divi
     .getByLabel("Categoria da disputa nova", { exact: true })
     .selectOption("base");
   await dialog
-    .getByLabel("Faixa da categoria da disputa nova", { exact: true })
+    .getByLabel("Faixa Etária da disputa nova", { exact: true })
     .selectOption("15");
   await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(table.locator("tbody tr")).toHaveCount(3);
@@ -753,7 +818,7 @@ test("uncertain save retries the same command and conflicts preserve edits until
   );
   page.once("dialog", (dialog) => dialog.dismiss());
   await page
-    .getByRole("button", { name: "Cancelar edição", exact: true })
+    .getByRole("button", { name: "Descartar alterações", exact: true })
     .click();
   await expect(page.getByLabel("Nome do campeonato")).toHaveValue(
     "Minha edição preservada",

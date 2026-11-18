@@ -156,10 +156,18 @@ test("Adicionar disputa mantém categoria proporcional em desktop e reflow no ce
   });
   await kind.selectOption("base");
   const age = category.getByRole("combobox", {
-    name: "Faixa da categoria da disputa nova",
+    name: "Faixa Etária da disputa nova",
     exact: true,
   });
   await expect(age).toBeVisible();
+  await expect(
+    category.getByText("Faixa Etária", { exact: true }),
+  ).toBeVisible();
+  await age.selectOption("15");
+  await kind.selectOption("master");
+  await expect(age).toHaveValue("");
+  await age.selectOption("35");
+  await expect(age).toHaveValue("35");
   const [kindBox, ageBox, dialogBox] = await Promise.all([
     kind.boundingBox(),
     age.boundingBox(),
@@ -177,6 +185,8 @@ test("Adicionar disputa mantém categoria proporcional em desktop e reflow no ce
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await kind.selectOption("adult");
+  await expect(age).toHaveCount(0);
 });
 
 test("Falha ao ordenar nao apresenta linhas antigas sob a nova ordem", async ({

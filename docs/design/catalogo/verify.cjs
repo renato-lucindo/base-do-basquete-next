@@ -193,6 +193,34 @@ async function checkApprovedGuide(page, prefix) {
   await expect(visibility).toBeFocused();
   await expect(visibility).toHaveText("Pública");
 
+  const sampleCategory = page.locator("#demo-category");
+  const sampleAge = page.getByLabel("Faixa Etária", { exact: true });
+  await expect(sampleAge).toBeHidden();
+  for (const [category, age] of [
+    ["Base", "15"],
+    ["Master", "35"],
+  ]) {
+    await sampleCategory.selectOption(category);
+    await expect(sampleAge).toBeVisible();
+    await sampleAge.selectOption(age);
+    await expect(sampleAge).toHaveValue(age);
+  }
+  await sampleCategory.selectOption("Adulto");
+  await expect(sampleAge).toBeHidden();
+  const discardSample = page.getByRole("button", {
+    name: "Descartar alterações",
+    exact: true,
+  });
+  await expect(discardSample).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(discardSample).toHaveCSS("color", "rgb(255, 255, 255)");
+  await discardSample.click();
+  await expect(
+    confirm.getByRole("button", { name: "Descartar alterações", exact: true }),
+  ).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await page.keyboard.press("Escape");
+  await expect(confirm).toBeHidden();
+  await expect(discardSample).toBeFocused();
+
   await page
     .getByRole("link", { name: "Abrir exemplo de disputas" })
     .first()
@@ -201,6 +229,41 @@ async function checkApprovedGuide(page, prefix) {
   await expect(
     page.getByRole("heading", { name: "Gestão de disputas", level: 1 }),
   ).toBeVisible();
+  await page.locator("#new-btn").click();
+  const create = page.locator("#create-dialog");
+  await expect(
+    create.getByRole("button", { name: "Fechar criação" }),
+  ).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(
+    create.getByRole("button", { name: "Fechar criação" }),
+  ).toHaveCSS("color", "rgb(255, 255, 255)");
+  for (const [category, age] of [
+    ["base", "Sub-15"],
+    ["master", "35+"],
+  ]) {
+    await page.locator("#category").selectOption(category);
+    await expect(
+      create.getByText("Faixa Etária", { exact: true }),
+    ).toBeVisible();
+    await page.locator("#age-picker").click();
+    await page.getByRole("option", { name: age, exact: true }).click();
+    await expect(page.locator("#age-picker")).toHaveText(age);
+  }
+  await page.locator("#category").selectOption("adulto");
+  await expect(page.locator("#age-field")).toBeHidden();
+  page.once("dialog", (dialog) => dialog.accept());
+  await create.getByRole("button", { name: "Fechar criação" }).click();
+  await page.locator("#edit-example").click();
+  const edit = page.locator("#edit-dialog");
+  const discard = edit.getByRole("button", {
+    name: "Descartar alterações",
+    exact: true,
+  });
+  await expect(discard).toHaveCSS("background-color", "rgb(180, 35, 24)");
+  await expect(discard).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(edit.getByText("Faixa Etária", { exact: true })).toBeVisible();
+  await discard.click();
+  await expect(edit).toBeHidden();
   await page.getByRole("link", { name: /Voltar ao catálogo/ }).click();
   await expect(
     page.getByRole("heading", { name: "Design system" }),

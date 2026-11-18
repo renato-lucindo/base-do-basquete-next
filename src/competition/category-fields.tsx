@@ -27,43 +27,49 @@ export function CategoryFields({
 
   return (
     <fieldset className="dispute-category-fields">
-      <legend>Categoria</legend>
-      <select
-        name="category"
-        disabled={disabled}
-        aria-label={`Categoria da disputa ${suffix}`}
-        value={kind}
-        onChange={(event) =>
-          onChange(categoryLabel(event.target.value as CategoryKind, ""))
-        }
-      >
-        {kind === "legacy" && (
-          <option value="legacy" disabled>
-            {label} (legado)
-          </option>
-        )}
-        <option value="adult">Adulto</option>
-        <option value="base">Base</option>
-        <option value="master">Master</option>
-      </select>
-      {needsAge && (
+      <legend className="admin-visually-hidden">Categoria</legend>
+      <label>
+        <span>Categoria</span>
         <select
-          name="categoryAge"
+          name="category"
           disabled={disabled}
-          aria-label={`Faixa da categoria da disputa ${suffix}`}
-          required
-          value={age}
+          aria-label={`Categoria da disputa ${suffix}`}
+          value={kind}
           onChange={(event) =>
-            onChange(categoryLabel(kind, event.target.value))
+            onChange(categoryLabel(event.target.value as CategoryKind, ""))
           }
         >
-          <option value="">Selecione</option>
-          {(kind === "base" ? baseAges : masterAges).map((value) => (
-            <option key={value} value={value}>
-              {categoryLabel(kind, String(value))}
+          {kind === "legacy" && (
+            <option value="legacy" disabled>
+              {label} (legado)
             </option>
-          ))}
+          )}
+          <option value="adult">Adulto</option>
+          <option value="base">Base</option>
+          <option value="master">Master</option>
         </select>
+      </label>
+      {needsAge && (
+        <label>
+          <span>Faixa Etária</span>
+          <select
+            name="categoryAge"
+            disabled={disabled}
+            aria-label={`Faixa Etária da disputa ${suffix}`}
+            required
+            value={age}
+            onChange={(event) =>
+              onChange(categoryLabel(kind, event.target.value))
+            }
+          >
+            <option value="">Selecione</option>
+            {(kind === "base" ? baseAges : masterAges).map((value) => (
+              <option key={value} value={value}>
+                {categoryLabel(kind, String(value))}
+              </option>
+            ))}
+          </select>
+        </label>
       )}
     </fieldset>
   );
