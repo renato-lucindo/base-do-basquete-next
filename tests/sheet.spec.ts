@@ -432,10 +432,12 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page
     .getByLabel("Ordem das ações", { exact: true })
     .selectOption("period");
-  await expect(page.locator(".sheet-actions li").first()).toContainText("Q1");
-  await expect(page.locator(".sheet-actions li").first()).toHaveClass(
-    /sheet-period-red/,
+  await expect(page.locator(".sheet-history tbody tr").first()).toContainText(
+    "Q1",
   );
+  await expect(
+    page.locator(".sheet-history tbody tr").first().getByRole("cell").nth(1),
+  ).toHaveClass(/sheet-period-red/);
   await page
     .getByRole("button", { name: "Editar ação 1", exact: true })
     .click();
@@ -448,8 +450,8 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page.getByLabel("Ação", { exact: true }).fill("1");
   await page.keyboard.press("Enter");
   await expect(editDialog).toBeHidden();
-  await expect(page.locator(".sheet-actions li").last()).toContainText(
-    "#12 - 1p",
+  await expect(page.locator(".sheet-history tbody tr").last()).toContainText(
+    "1p",
   );
   await page
     .getByRole("button", { name: "Excluir ação 2", exact: true })
@@ -462,7 +464,7 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await expect(deleteDialog).toContainText("A participação do atleta");
   await page.keyboard.press("Escape");
   await expect(deleteDialog).toBeHidden();
-  await expect(page.locator(".sheet-actions li")).toHaveCount(2);
+  await expect(page.locator(".sheet-history tbody tr")).toHaveCount(2);
   await page
     .getByRole("button", { name: "Excluir ação 2", exact: true })
     .click();
@@ -470,11 +472,11 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page
     .getByRole("button", { name: "Confirmar exclusão da ação", exact: true })
     .click();
-  await expect(page.locator(".sheet-actions li")).toHaveCount(1);
+  await expect(page.locator(".sheet-history tbody tr")).toHaveCount(1);
   await page
     .getByRole("button", { name: "Desfazer ação ou ajuste", exact: true })
     .click();
-  await expect(page.locator(".sheet-actions li")).toHaveCount(2);
+  await expect(page.locator(".sheet-history tbody tr")).toHaveCount(2);
   page.once("dialog", (d) => d.dismiss());
   await page
     .getByRole("button", { name: "Voltar aos dados do jogo", exact: true })

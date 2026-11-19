@@ -15,12 +15,24 @@ test.describe("desktop scoresheet MVP", () => {
     await page
       .getByRole("button", { name: "Concluir preparação e lançar ações" })
       .click();
+    const helpButton = page.getByRole("button", { name: "Códigos e atalhos" });
+    await helpButton.click();
+    const help = page.getByRole("dialog", { name: "Códigos e atalhos" });
+    await expect(help).toContainText("TD · Tempo debitado");
+    await help.press("Escape");
+    await expect(helpButton).toBeFocused();
+    await expect(
+      page.getByRole("button", { name: "Importar PDFs", exact: true }),
+    ).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Novo jogo", exact: true }),
+    ).toBeHidden();
     await page.getByLabel("Períodos da súmula").selectOption("5");
     const add = async (period: number, minute: string) => {
       await page
         .getByLabel("Quarto ou prorrogação", { exact: true })
         .selectOption(String(period));
-      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TO");
+      await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TD");
       await page.keyboard.press("Enter");
       await page.getByLabel(/Minuto decorrido/).fill(minute);
       await page.keyboard.press("Enter");
@@ -31,15 +43,21 @@ test.describe("desktop scoresheet MVP", () => {
     await add(4, "9");
     await add(5, "4");
     const times = page.getByLabel("Tempos debitados da equipe A");
+    await expect(times.locator("..")).toHaveClass(/sheet-staff-line/);
+    await expect(
+      page
+        .getByRole("table", { name: "Parciais das equipes" })
+        .getByRole("columnheader", { name: "OT1" }),
+    ).toBeVisible();
     for (const viewport of [
       { width: 1366, height: 768 },
       { width: 1920, height: 1080 },
     ]) {
       await page.setViewportSize(viewport);
-      await expect(times).toContainText("Q1: 3′");
-      await expect(times).toContainText("Q2: 8′");
-      await expect(times).toContainText("Q4: 9′");
-      await expect(times).toContainText("OT1: 4′");
+      await expect(times).toContainText("Q1 3′");
+      await expect(times).toContainText("Q2 8′");
+      await expect(times).toContainText("Q4 9′");
+      await expect(times).toContainText("OT1 4′");
       await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
       await expect(times.locator(".sheet-ink-blue")).toHaveCount(2);
     }
@@ -63,10 +81,10 @@ test.describe("desktop scoresheet MVP", () => {
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
-      "OT1: 4′",
+      "OT1 4′",
     );
   });
-  test("desktop action history uses horizontal columns at both requested viewports", async ({
+  test("desktop action history uses a numbered table at both requested viewports", async ({
     page,
   }) => {
     await desktopSheetFixture(page);
@@ -85,21 +103,19 @@ test.describe("desktop scoresheet MVP", () => {
       await page.keyboard.press("Enter");
     }
     const history = page.getByRole("region", {
-      name: "Ações de pontos",
+      name: "Registro de ações",
       exact: true,
     });
-    const items = history.locator(".sheet-actions li");
+    const items = history.locator("tbody tr");
     await expect(items).toHaveCount(10);
     for (const [width, height] of [
       [1366, 768],
       [1920, 1080],
     ]) {
       await page.setViewportSize({ width, height });
-      const first = await items.nth(0).boundingBox();
-      const second = await items.nth(1).boundingBox();
-      expect(first && second).toBeTruthy();
-      expect(Math.abs(first!.y - second!.y)).toBeLessThan(3);
-      expect(second!.x).toBeGreaterThan(first!.x + 20);
+      await expect(history.getByRole("columnheader").first()).toHaveText("Nº");
+      await expect(items.first().getByRole("cell").first()).toHaveText("10");
+      await expect(items.nth(1).getByRole("cell").first()).toHaveText("9");
       await history.scrollIntoViewIfNeeded();
       await page.screenshot({
         path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
@@ -164,14 +180,14 @@ test.describe("desktop scoresheet MVP", () => {
     await page.getByLabel("Ação", { exact: true }).fill("2");
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
-    await expect(page.locator(".sheet-actions li")).toContainText(["1p"]);
+    await expect(page.locator(".sheet-history tbody tr")).toContainText(["1p"]);
     await action.click();
     await page.getByLabel("Ação", { exact: true }).fill("2");
     await dialog
       .getByRole("button", { name: "Salvar edição da ação", exact: true })
       .click();
     await expect(dialog).toBeHidden();
-    await expect(page.locator(".sheet-actions li")).toContainText(["2p"]);
+    await expect(page.locator(".sheet-history tbody tr")).toContainText(["2p"]);
     const toast = page.getByRole("region", { name: "Notificação" });
     await expect(toast).toContainText("Ação editada no rascunho");
     await toast.getByRole("button", { name: "Dispensar notificação" }).click();
@@ -270,27 +286,28 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(fouls.nth(1)).toHaveClass(/sheet-first-half/);
     await expect(fouls.nth(2)).not.toHaveClass(/sheet-first-half/);
     await expect(
-      page.getByRole("region", { name: "Ações de faltas", exact: true }),
+      page.getByRole("region", { name: "Registro de ações", exact: true }),
     ).toContainText("Tc (3)");
     await expect(
-      page.getByRole("region", { name: "Ações de faltas", exact: true }),
+      page.getByRole("region", { name: "Registro de ações", exact: true }),
     ).toContainText("U2 (GD)");
     for (let n = 0; n < 11; n++) await add("home", 1, "1", "11");
-    await expect(page.locator(".sheet-actions li")).toHaveCount(10);
+    await expect(page.locator(".sheet-history tbody tr")).toHaveCount(10);
     await expect(
       page.getByLabel("Entrou Jogador A 11", { exact: true }),
     ).toBeChecked();
-    const quarters = page.getByRole("group", { name: "Quartos", exact: true });
-    for (const q of ["Q2", "Q3", "Q4", "OT1", "OT2"])
-      await quarters.getByLabel(q, { exact: true }).uncheck();
-    await page
-      .getByRole("group", { name: "Equipes", exact: true })
-      .getByLabel("Equipe A", { exact: true })
-      .uncheck();
-    await expect(page.locator(".sheet-actions li")).toHaveCount(1);
-    await expect(page.locator(".sheet-actions li")).toContainText(
-      "4. Q1 - B - #1 - P (1)",
-    );
+    await page.getByLabel("Filtrar ações por período").selectOption("1");
+    await page.getByLabel("Filtrar ações por equipe").selectOption("away");
+    const filtered = page.locator(".sheet-history tbody tr");
+    await expect(filtered).toHaveCount(1);
+    await expect(filtered.first().getByRole("cell")).toHaveText([
+      "4",
+      "Q1",
+      "B",
+      "#1",
+      "P (1)",
+      "EditarExcluir",
+    ]);
     await page.locator(".sheet-desktop-teams").last().screenshot({
       path: ".preview-artifacts/sheet-desktop-periods-fouls.png",
     });
@@ -360,8 +377,8 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(staff).toContainText("B1");
     await expect(staff).toContainText("B2");
     await expect(staff).toContainText("D2");
-    await expect(staff).toContainText("Técnico em exercício");
-    await expect(page.locator(".sheet-actions li")).toHaveCount(2);
+    await expect(staff).not.toContainText("Técnico em exercício");
+    await expect(page.locator(".sheet-history tbody tr")).toHaveCount(2);
     await page.getByRole("button", { name: "Desfazer ação ou ajuste" }).click();
     await expect(staff).not.toContainText("B2");
     await page.getByRole("button", { name: "Refazer ação ou ajuste" }).click();

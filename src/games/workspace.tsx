@@ -264,7 +264,7 @@ export function GamesWorkspace(props: Props) {
     setError("");
     try {
       accept(await api(`/api/games/${id}/editor`, gameEditorSnapshotSchema));
-      setStatus("Jogo salvo");
+      setStatus("");
     } catch (e) {
       report(e);
     } finally {
@@ -513,44 +513,46 @@ export function GamesWorkspace(props: Props) {
             : ""
         }
       />
-      <div className="competition-title" tabIndex={-1}>
-        <h3 ref={heading} className="sr-only">
-          Jogos
-        </h3>
-        {!editor && !auxiliary && !sheetVisible && (
-          <label className="competition-search">
-            Buscar jogo
-            <input
-              maxLength={120}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setOffset(0);
-              }}
-            />
-          </label>
-        )}
+      {!sheetVisible && !auxiliary && (
+        <div className="competition-title" tabIndex={-1}>
+          <h3 ref={heading} className="sr-only">
+            Jogos
+          </h3>
+          {!editor && (
+            <label className="competition-search">
+              Buscar jogo
+              <input
+                maxLength={120}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setOffset(0);
+                }}
+              />
+            </label>
+          )}
 
-        {props.onImportPdfs && (
+          {props.onImportPdfs && (
+            <button
+              disabled={busy}
+              onClick={() => {
+                if (mayLeave()) props.onImportPdfs?.();
+              }}
+            >
+              Importar PDFs
+            </button>
+          )}
           <button
-            disabled={busy || auxiliary || sheetVisible}
+            disabled={busy || decisionLocked}
             onClick={() => {
-              if (mayLeave()) props.onImportPdfs?.();
+              if (!mayLeave()) return;
+              beginNew();
             }}
           >
-            Importar PDFs
+            Novo jogo
           </button>
-        )}
-        <button
-          disabled={busy || auxiliary || sheetVisible || decisionLocked}
-          onClick={() => {
-            if (!mayLeave()) return;
-            beginNew();
-          }}
-        >
-          Novo jogo
-        </button>
-      </div>
+        </div>
+      )}
       {!showDialog && feedback}
       {auxiliary ? (
         <>

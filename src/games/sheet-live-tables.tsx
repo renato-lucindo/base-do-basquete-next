@@ -3,6 +3,18 @@ import { periodColor, periodLabel } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import type { projectSheet } from "../scoresheet/projection";
+function firstHalfClass(
+  period: number | undefined,
+  previous: number | undefined,
+  next: number | undefined,
+) {
+  if (period === undefined || period > 2) return "";
+  return [
+    "sheet-first-half",
+    previous === undefined || previous > 2 ? "sheet-half-start" : "",
+    next === undefined || next > 2 ? "sheet-half-end" : "",
+  ].join(" ");
+}
 type Projection = ReturnType<typeof projectSheet>;
 export function SheetLiveTables({
   document: d,
@@ -27,7 +39,12 @@ export function SheetLiveTables({
 }) {
   return (
     <>
-      <div className="sheet-team-score">
+      <div
+        className="sheet-team-score"
+        tabIndex={0}
+        role="region"
+        aria-label="Parciais"
+      >
         <table aria-label="Parciais das equipes">
           <thead>
             <tr>
@@ -65,15 +82,38 @@ export function SheetLiveTables({
             ))}
           </tbody>
         </table>
-        <p>
-          Parcial selecionada {periodLabel(period)}:{" "}
-          {p.totals.teams.home.periods[period - 1] ?? 0} ×{" "}
-          {p.totals.teams.away.periods[period - 1] ?? 0}
-        </p>
       </div>
       <div className="sheet-desktop-teams">
         {(["home", "away"] as const).map((side) => {
           const letter = side === "home" ? "A" : "B";
+          const timeouts = d.events
+            .filter((event) => event.side === side && event.target === "TO")
+            .sort(
+              (a, b) => a.period - b.period || Number(a.code) - Number(b.code),
+            );
+          const timeoutSummary = (
+            <span
+              className="sheet-staff-timeouts"
+              aria-label={`Tempos debitados da equipe ${letter}`}
+            >
+              <abbr title="Tempos debitados">TD</abbr>
+              {timeouts.length
+                ? timeouts.map((event, index) => (
+                    <span className="sheet-timeout-item" key={event.id}>
+                      {index > 0 && <span aria-hidden="true"> · </span>}
+                      {periodLabel(event.period)}{" "}
+                      <strong
+                        className={`sheet-ink-${periodColor(event.period)}`}
+                      >
+                        {event.code}′
+                      </strong>
+                    </span>
+                  ))
+                : d.formatVersion === 2
+                  ? "—"
+                  : "Não informados na súmula legada"}
+            </span>
+          );
           return (
             <section
               className="sheet-team-card"
@@ -84,31 +124,6 @@ export function SheetLiveTables({
               <h4>
                 Equipe {letter} · {game[side].name}
               </h4>
-              {
-                <p aria-label={`Tempos debitados da equipe ${letter}`}>
-                  <strong>Tempos debitados: </strong>
-                  {d.events.filter((e) => e.side === side && e.target === "TO")
-                    .length
-                    ? d.events
-                        .filter((e) => e.side === side && e.target === "TO")
-                        .map((e) => (
-                          <span
-                            key={e.id}
-                            className={
-                              periodColor(e.period) === "red"
-                                ? "sheet-ink-red"
-                                : "sheet-ink-blue"
-                            }
-                            title={`${periodLabel(e.period)} · minuto ${e.code} decorrido`}
-                          >
-                            {periodLabel(e.period)}: {e.code}′{" "}
-                          </span>
-                        ))
-                    : d.formatVersion === 2
-                      ? "Nenhum"
-                      : "Não informados na súmula legada"}
-                </p>
-              }
               <table
                 className="sheet-live-table"
                 aria-label={`Súmula equipe ${letter}`}
@@ -196,7 +211,7 @@ export function SheetLiveTables({
                               <td
                                 key={i}
                                 data-period={f?.period}
-                                className={`sheet-foul-cell ${f ? "sheet-ink-" + f.color : ""} ${f?.firstHalf ? "sheet-first-half" : ""}`}
+                                className={`sheet-foul-cell ${f ? "sheet-ink-" + f.color : ""} ${firstHalfClass(f?.period, r.fouls[i - 1]?.period, i < 4 ? r.fouls[i + 1]?.period : undefined)}`}
                                 title={
                                   f
                                     ? `${i + 1}ª falta · ${periodLabel(f.period)} · ${f.code}`
@@ -250,8 +265,17 @@ export function SheetLiveTables({
                       );
                     return (
                       <>
+                        {!coachId && (
+                          <div className="sheet-staff-line">
+                            <span>Técnico: Não informado</span>
+                            {timeoutSummary}
+                          </div>
+                        )}
                         {ids.map((id) => {
                           const state = people[id];
+                          const marks = [...(state?.marks ?? [])].sort(
+                            (a, b) => a.period - b.period,
+                          );
                           const role =
                             id === coachId
                               ? "Técnico"
@@ -264,11 +288,12 @@ export function SheetLiveTables({
                             <div key={id} className="sheet-staff-line">
                               <span className="sheet-staff-identity">
                                 {role}: {staffName(id)}
-                                {id && team.activeCoachId === id && (
-                                  <strong className="sheet-acting-coach">
-                                    Técnico em exercício
-                                  </strong>
-                                )}
+                                {id !== coachId &&
+                                  team.activeCoachId === id && (
+                                    <strong className="sheet-acting-coach">
+                                      Técnico em exercício
+                                    </strong>
+                                  )}
                                 {state?.status !== "eligible" &&
                                   state?.status && (
                                     <strong className="sheet-staff-status">
@@ -276,15 +301,16 @@ export function SheetLiveTables({
                                     </strong>
                                   )}
                               </span>
-                              {state?.marks.map((mark) => (
+                              {marks.map((mark, index) => (
                                 <span
                                   key={mark.id + mark.code}
-                                  className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${mark.period <= 2 ? "sheet-first-half" : ""}`}
+                                  className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(mark.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
                                   title={`${periodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
                                 >
                                   {mark.code.replace(/C$/u, "c")}
                                 </span>
                               ))}
+                              {id === coachId && timeoutSummary}
                             </div>
                           );
                         })}
@@ -306,15 +332,17 @@ export function SheetLiveTables({
                           e.side === side &&
                           (e.target === "C" || e.target === "B"),
                       )
-                      .map((e) => (
+                      .sort((a, b) => a.period - b.period)
+                      .map((e, index, marks) => (
                         <span
                           key={e.id}
-                          className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${e.period <= 2 ? "sheet-first-half" : ""}`}
+                          className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(e.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
                           title={`${periodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
                         >
                           {e.code.replace(/C$/u, "c")}
                         </span>
                       ))}
+                    {timeoutSummary}
                   </div>
                 )}
               </div>

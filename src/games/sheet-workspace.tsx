@@ -11,6 +11,7 @@ import { SheetPreparation } from "./sheet-preparation";
 import { SheetLiveTables } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
 import { AdminDialog } from "../competition/admin-dialog";
+import { Icon } from "../ui-system/components";
 import { AdminToast } from "../ui-system/admin-toast";
 import { projectSheet } from "../scoresheet/projection";
 import {
@@ -48,6 +49,7 @@ type History = {
   past: PersistedSheet[];
   future: PersistedSheet[];
 };
+const isTimeoutTarget = (value: string) => /^(TD|TO)$/iu.test(value.trim());
 const sides = ["home", "away"] as const;
 const sideName = (s: Side) => (s === "home" ? "A" : "B");
 export function GameSheetWorkspace(props: Props) {
@@ -78,6 +80,7 @@ export function GameSheetWorkspace(props: Props) {
     [successor, setSuccessor] = useState(""),
     [editing, setEditing] = useState<string | null>(null),
     [deleting, setDeleting] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
   const pending = useRef<SaveSheet | null>(null),
     initialized = useRef(false),
     auxGuard = useRef(() => true),
@@ -289,7 +292,14 @@ export function GameSheetWorkspace(props: Props) {
     targetRef.current?.select();
   };
   useEffect(() => {
-    if (!props.enabled || auxiliary || locked || deleting || preparationOpen)
+    if (
+      !props.enabled ||
+      auxiliary ||
+      locked ||
+      deleting ||
+      preparationOpen ||
+      helpOpen
+    )
       return;
     const shortcut = (e: KeyboardEvent) => {
       if (
@@ -314,7 +324,15 @@ export function GameSheetWorkspace(props: Props) {
     };
     window.addEventListener("keydown", shortcut);
     return () => window.removeEventListener("keydown", shortcut);
-  }, [props.enabled, auxiliary, locked, editing, deleting, preparationOpen]);
+  }, [
+    props.enabled,
+    auxiliary,
+    locked,
+    editing,
+    deleting,
+    preparationOpen,
+    helpOpen,
+  ]);
   function mutate(next: PersistedSheet) {
     if (locked || !history) return false;
     try {
@@ -360,7 +378,7 @@ export function GameSheetWorkspace(props: Props) {
       });
   }
   function checkedTarget() {
-    const value = target.trim().toUpperCase();
+    const value = isTimeoutTarget(target) ? "TO" : target.trim().toUpperCase();
     if (
       !d ||
       (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C", "TO"]).includes(
@@ -370,12 +388,12 @@ export function GameSheetWorkspace(props: Props) {
     ) {
       setError(
         d?.formatVersion === 2
-          ? "Escolha uma camisa, C para técnico, AT para assistente ou TO para pedido de tempo."
-          : "Escolha uma camisa, B para banco, C para técnico ou TO para pedido de tempo.",
+          ? "Escolha uma camisa, C para técnico, AT para assistente ou TD para tempo debitado."
+          : "Escolha uma camisa, B para banco, C para técnico ou TD para tempo debitado.",
       );
       return null;
     }
-    setTarget(value);
+    setTarget(value === "TO" ? "TD" : value);
     return value;
   }
   function beginEditing(event: PersistedSheet["events"][number]) {
@@ -384,7 +402,7 @@ export function GameSheetWorkspace(props: Props) {
     setEditing(event.id);
     setSide(event.side);
     setPeriod(event.period);
-    setTarget(event.target);
+    setTarget(event.target === "TO" ? "TD" : event.target);
     setCode(event.code);
     setSuccessor(event.successorId ?? "");
   }
@@ -623,12 +641,6 @@ export function GameSheetWorkspace(props: Props) {
           </button>
         </div>
       </div>
-      <p>
-        {props.game.home.name} × {props.game.away.name}.{" "}
-        {snapshot?.confirmed
-          ? "Súmula confirmada; novas alterações ficam privadas até republicar."
-          : "Rascunho privado; salvar não publica o resultado."}
-      </p>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1} className="access-error">
           {error}
@@ -722,14 +734,19 @@ export function GameSheetWorkspace(props: Props) {
                 disabled={locked || !!deleting || !!editing}
                 className="sheet-input"
               >
-                <legend>Lançar ações</legend>
-                <p>
-                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
-                  quarto · Alt+Q: escolher período.{" "}
-                  {d.formatVersion === 2
-                    ? "C: técnico · AT: assistente · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5)."
-                    : "B: banco · C: técnico · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5). Tempos anteriores não informados no legado devem ser conferidos na fonte."}
-                </p>
+                <legend>
+                  <span className="sheet-entry-title">
+                    Lançar ações
+                    <button
+                      type="button"
+                      className="secondary sheet-info-trigger"
+                      aria-label="Códigos e atalhos"
+                      onClick={() => setHelpOpen(true)}
+                    >
+                      <Icon name="info" />
+                    </button>
+                  </span>
+                </legend>
                 <div className="competition-fields">
                   <label>
                     Equipe da ação
@@ -778,7 +795,7 @@ export function GameSheetWorkspace(props: Props) {
                     />
                   </label>
                   <label>
-                    {target.trim().toUpperCase() === "TO"
+                    {isTimeoutTarget(target)
                       ? "Minuto decorrido (1–10, OT: 1–5)"
                       : "Ação"}
                     <input
@@ -864,19 +881,111 @@ export function GameSheetWorkspace(props: Props) {
                     ))}
                   </select>
                 </label>
-                <details>
-                  <summary>Códigos aceitos</summary>
-                  <p>
-                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U,
-                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C.{" "}
-                    {d.formatVersion === 2
-                      ? "Técnico: B1/BC, C1/CC ou D/D1/D2/D3/DC. Assistente: D/D1/D2/D3/DC (B2 automática vinculada)."
-                      : "Banco: B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC."}{" "}
-                    C no sufixo indica falta compensada.
-                  </p>
-                </details>
               </fieldset>
             )}
+            <AdminDialog
+              title="Códigos e atalhos"
+              open={helpOpen}
+              busy={false}
+              iconClose
+              onClose={() => setHelpOpen(false)}
+              className="sheet-help-dialog"
+            >
+              <p>
+                Digite a camisa ou o alvo, pressione <kbd>Enter</kbd>, digite o
+                código e pressione <kbd>Enter</kbd> para registrar.
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Alvo</th>
+                    <th scope="col">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Nº do jogador</th>
+                    <td>
+                      Cestas: <code>1</code>, <code>2</code> ou <code>3</code>.
+                      Faltas: <code>P</code>, <code>T</code>, <code>U</code> ou{" "}
+                      <code>D</code>.
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <code>C</code> · Técnico
+                    </th>
+                    <td>
+                      Faltas: <code>B</code>, <code>C</code> ou <code>D</code>.
+                    </td>
+                  </tr>
+                  {d.formatVersion === 2 ? (
+                    <tr>
+                      <th scope="row">
+                        <code>AT</code> · Assistente
+                      </th>
+                      <td>
+                        Falta: <code>D</code>.
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <th scope="row">
+                        <code>B</code> · Banco
+                      </th>
+                      <td>
+                        Faltas: <code>B1</code>, <code>B2</code> ou{" "}
+                        <code>Bc</code>.
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    <th scope="row">
+                      <code>TD</code> · Tempo debitado
+                    </th>
+                    <td>
+                      Minuto do pedido: <code>1–10</code> no quarto ou{" "}
+                      <code>1–5</code> na prorrogação.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                <strong>Observação:</strong> Acrescente à sigla da falta a
+                quantidade de lances livres concedidos ou <code>c</code> para
+                falta compensada. Exemplos: <code>P2</code> (pessoal com 2
+                lances livres) · <code>Tc</code> (técnica compensada).
+              </p>
+              <h4>Atalhos de teclado</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Atalho</th>
+                    <th scope="col">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + A</kbd> / <kbd>Alt + B</kbd>
+                    </th>
+                    <td>Selecionar a equipe.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + 1</kbd> a <kbd>Alt + 4</kbd>
+                    </th>
+                    <td>Selecionar o quarto correspondente.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + Q</kbd>
+                    </th>
+                    <td>Ir para o seletor de período.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </AdminDialog>
             {projection && (
               <SheetLiveTables
                 document={d}
@@ -971,7 +1080,7 @@ export function GameSheetWorkspace(props: Props) {
                       />
                     </label>
                     <label>
-                      {target.trim().toUpperCase() === "TO"
+                      {isTimeoutTarget(target)
                         ? "Minuto decorrido (1–10, OT: 1–5)"
                         : "Ação"}
                       <input
