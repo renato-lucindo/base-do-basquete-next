@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { sheetPeriodLabel } from "./sheet-period-label";
 import { compareJerseys } from "../domain/jersey";
 import { periodColor } from "../domain/scoresheet";
@@ -107,6 +108,12 @@ export function SheetLiveTables({
           .sort(
             (a, b) => a.period - b.period || Number(a.code) - Number(b.code),
           );
+        const timeoutsByPeriod = new Map<number, typeof timeouts>();
+        for (const event of timeouts) {
+          const requests = timeoutsByPeriod.get(event.period);
+          if (requests) requests.push(event);
+          else timeoutsByPeriod.set(event.period, [event]);
+        }
         const timeoutSummary = (
           <span
             className="sheet-staff-timeouts"
@@ -114,15 +121,18 @@ export function SheetLiveTables({
           >
             <span className="sheet-timeout-label">Tempo Debitado:</span>
             {timeouts.length
-              ? timeouts.map((event, index) => (
-                  <span className="sheet-timeout-item" key={event.id}>
+              ? Array.from(timeoutsByPeriod, ([period, requests], index) => (
+                  <span className="sheet-timeout-item" key={period}>
                     {index > 0 && <span aria-hidden="true"> · </span>}
-                    {sheetPeriodLabel(event.period)}{" "}
-                    <strong
-                      className={`sheet-ink-${periodColor(event.period)}`}
-                    >
-                      {event.code}′
-                    </strong>
+                    {sheetPeriodLabel(period)}{" "}
+                    {requests.map((event, minuteIndex) => (
+                      <Fragment key={event.id}>
+                        {minuteIndex > 0 && ", "}
+                        <strong className={`sheet-ink-${periodColor(period)}`}>
+                          {event.code}′
+                        </strong>
+                      </Fragment>
+                    ))}
                   </span>
                 ))
               : d.formatVersion === 2

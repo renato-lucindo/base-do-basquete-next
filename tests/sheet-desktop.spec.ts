@@ -61,6 +61,7 @@ test.describe("desktop scoresheet MVP", () => {
     await add(2, "8");
     await add(3, "5");
     await add(4, "9");
+    await add(4, "2");
     await add(5, "4");
     const times = page.getByLabel("Tempos debitados da equipe A");
     await expect(times.locator("..")).toHaveClass(/sheet-staff-line/);
@@ -76,10 +77,10 @@ test.describe("desktop scoresheet MVP", () => {
       await page.setViewportSize(viewport);
       await expect(times).toContainText("Q1 3′");
       await expect(times).toContainText("Q2 8′");
-      await expect(times).toContainText("Q4 9′");
+      await expect(times).toContainText("Q4 2′, 9′");
       await expect(times).toContainText("PE1 4′");
       await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
-      await expect(times.locator(".sheet-ink-blue")).toHaveCount(2);
+      await expect(times.locator(".sheet-ink-blue")).toHaveCount(3);
     }
     await add(2, "7");
     await expect(page.getByRole("alert")).toContainText(
@@ -92,7 +93,7 @@ test.describe("desktop scoresheet MVP", () => {
     await page.getByRole("button", { name: "Salvar rascunho" }).click();
     expect(
       fixture.snapshot()?.document.events.filter((e) => e.target === "TO"),
-    ).toHaveLength(5);
+    ).toHaveLength(6);
     await page.reload();
     await page
       .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })

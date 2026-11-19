@@ -17,6 +17,8 @@
 
 - Revisão d818e89. Instruções com tabelas discretas, seletor Disputa atual e barra reorganizada, falta por extenso, nomes em uma linha e assistente vazio na outra equipe quando aplicável. Gate de UI, testes focais e empacotamento passaram. Worker serve esse SHA, versão b263d9f6-6dcc-41f7-8fe7-f56bb810a907, deployment d95cd8da-1df3-454c-928a-eae95eaccde0. Painel, health e bundle 200, catálogo sem sessão 401. [CI do SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44550374500) aprovada. Aguardar aceite visual na PR #87.
 
+- Revisão 567d986. Alinhamento das áreas de ações e publicação, divisor da comissão, tooltip somente em nome cortado, retorno à direita do seletor e rótulos PE. Gate de UI e dez testes focais passaram. Worker serve esse SHA, versão 65ba2680-6253-49e9-a665-4085ec646ed0 e deployment dbf09a7e-67eb-4fc4-a6d5-7546466dfd26. Painel, health e bundle 200, catálogo sem sessão 401. [CI do SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44559513175) falhou por transbordamento da barra administrativa em 320 px com texto ampliado. Aguardar aceite visual na PR #87.
+
 ## Revisão visual do design system
 
 - Unidade `codex/revisao-design-system` baseada em `745e964`. O [guia visual de 18/11/2026](design/catalogo/guia-completo-autonomo.html) rege alterações futuras de interface. A engrenagem recebeu contorno centralizado. O [guia de adoção](design/DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026) registra escopo e evidências.
