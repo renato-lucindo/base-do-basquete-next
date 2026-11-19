@@ -158,6 +158,7 @@ export function FinalizeSheetPanel(p: SheetPublicationProps) {
         </label>
       )}
       <div className="competition-actions sheet-save-commands">
+        {p.draftAction}
         <button
           className="primary"
           disabled={
@@ -173,7 +174,6 @@ export function FinalizeSheetPanel(p: SheetPublicationProps) {
                 ? "Salvar e republicar"
                 : "Salvar e publicar"}
         </button>
-        {p.draftAction}
       </div>
     </section>
   );

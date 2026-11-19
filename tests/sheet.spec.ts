@@ -449,7 +449,7 @@ test("edita e exclui ação individual, ordena por quarto, desfaz e preserva gua
   await page.keyboard.press("Enter");
   await expect(editDialog).toBeHidden();
   await expect(page.locator(".sheet-history tbody tr").last()).toContainText(
-    "1p",
+    "1 ponto",
   );
   await page
     .getByRole("button", { name: "Excluir ação 2", exact: true })

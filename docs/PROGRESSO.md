@@ -10,9 +10,8 @@
 
 ## Súmula administrativa
 
-- Ajustes solicitados na [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87), SHA `b7330d8`. Ajuda por ícone, entrada `TD` com persistência compatível, parciais compactas, histórico numerado com filtros visíveis e tempos na linha do técnico. Tipo, build e verificação do HTML em desktop e celular passaram. A [CI da revisão](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44430727486) passou.
-- Revisão visual `5566271` da PR #87 com tipografia, campos, botões e tabelas do guia administrativo. Gate de UI e 47 testes Chromium passaram, com 33 casos ignorados pela distribuição entre desktop e celular. [CI deste SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44432989048) passou.
-- [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve `5566271`, versão `61794dd6-2c33-4f42-b225-bd2e56f265ea`, deployment `2591dfb1-d81c-41e5-8ff8-bfc9d181db90`. Painel, health e bundle responderam 200, catálogo sem sessão retornou 401. Aguardar aceite visual no Worker. PR aberta.
+- [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87), revisão `22fd5df`. Grade alinhada em duas colunas, 12 linhas por equipe, histórico com rolagem interna e operações com lápis azul e lixeira vermelha. Publicação e histórico mantêm os contratos existentes. O catálogo e o modelo de PR registram as regras aplicadas. Validação Chromium com fixtures em desktop, celular e reflow a 200%, além do catálogo nas seis larguras. Dois testes locais de premiações atingiram o limite de tempo na execução concorrente e passaram isoladamente.
+- [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve `22fd5df`, versão `d1a05f54-bedc-45e3-bc5f-acb8796c67e8`, deployment `9321e069-d0c9-4520-a497-6c2a28be5b42`. Painel, health e bundle responderam 200. Catálogo sem sessão retornou 401. [CI deste SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44526635410) aprovada nos sete checks. Aguardar aceite visual no Worker. PR aberta.
 
 ## Revisão visual do design system
 

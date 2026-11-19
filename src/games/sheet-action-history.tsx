@@ -151,7 +151,13 @@ export function SheetActionHistory({
                   </td>
                   <td>{event.side === "home" ? "A" : "B"}</td>
                   <td>{targets[event.target] ?? "#" + event.target}</td>
-                  <td>{action.annotation.replace(/^TO ·/u, "TD ·")}</td>
+                  <td>
+                    {action.annotation
+                      .replace(/^TO ·/u, "TD ·")
+                      .replace(/^([123])p\b/u, (_, points: string) =>
+                        points === "1" ? "1 ponto" : points + " pontos",
+                      )}
+                  </td>
                   <td>
                     <div className="sheet-row-actions">
                       <button

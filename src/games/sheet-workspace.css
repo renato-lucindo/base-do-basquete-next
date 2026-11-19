@@ -486,7 +486,8 @@
   background: var(--bb-background);
   z-index: 1;
 }
-.sheet-history th:nth-child(-n + 3) {
+.sheet-history th:nth-child(2),
+.sheet-history th:nth-child(3) {
   width: 1%;
 }
 .sheet-staff-timeouts {
@@ -702,6 +703,7 @@
 }
 .sheet-team-card h4 {
   font-size: var(--sheet-body);
+  min-block-size: 1.8125rem;
   line-height: 1.2;
   background: var(--bb-background);
   border-bottom: 1px solid var(--bb-line);
@@ -891,4 +893,18 @@
   .sheet-history-filters label:last-child {
     flex: 1 1 calc(50% - 0.5rem);
   }
+}
+
+.sheet-team-score thead th {
+  height: 1.8125rem;
+}
+.sheet-history th:first-child {
+  min-width: 2.5rem;
+  width: 2.5rem;
+}
+.sheet-history th:last-child {
+  text-align: center;
+}
+.sheet-row-actions {
+  justify-content: center;
 }

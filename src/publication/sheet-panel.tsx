@@ -297,6 +297,7 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
       aria-busy={busy}
     >
       <div className="competition-actions sheet-save-commands">
+        {p.draftAction}
         <button
           className={state ? "secondary" : "primary"}
           disabled={p.disabled || blocked}
@@ -306,7 +307,6 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
             ? "Salvar e republicar"
             : "Salvar e publicar"}
         </button>
-        {p.draftAction}
       </div>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1}>

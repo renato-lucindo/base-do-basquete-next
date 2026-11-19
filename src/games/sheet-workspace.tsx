@@ -731,6 +731,8 @@ export function GameSheetWorkspace(props: Props) {
                     ? "Súmula não salva"
                     : status}
           </p>
+        </div>
+        <div className="competition-actions sheet-navigation-links">
           {d && !auxiliary && (
             <button
               type="button"
@@ -738,19 +740,19 @@ export function GameSheetWorkspace(props: Props) {
               disabled={busy || publicationLocked}
               onClick={() => void reload()}
             >
-              Recarregar súmula
+              <Icon name="refresh" /> Recarregar súmula
+            </button>
+          )}
+          {!preparationOpen && !auxiliary && (
+            <button
+              type="button"
+              className="sheet-info-trigger"
+              onClick={() => setHelpOpen(true)}
+            >
+              <Icon name="info" /> Instruções
             </button>
           )}
         </div>
-        {!preparationOpen && !auxiliary && (
-          <button
-            type="button"
-            className="sheet-info-trigger"
-            onClick={() => setHelpOpen(true)}
-          >
-            <Icon name="info" /> Instruções
-          </button>
-        )}
       </div>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1} className="access-error">

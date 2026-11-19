@@ -19,6 +19,17 @@ test.describe("desktop scoresheet MVP", () => {
     await helpButton.click();
     const help = page.getByRole("dialog", { name: "Instruções" });
     await expect(help).toContainText("TD · Tempo debitado");
+    const closeButton = help.locator(".admin-dialog-close-icon");
+    const closeBox = (await closeButton.boundingBox())!;
+    const iconBox = (await closeButton.locator("svg").boundingBox())!;
+    expect(iconBox.y + iconBox.height / 2).toBeCloseTo(
+      closeBox.y + closeBox.height / 2,
+      0,
+    );
+    expect(iconBox.x + iconBox.width / 2).toBeCloseTo(
+      closeBox.x + closeBox.width / 2,
+      0,
+    );
     await help.press("Escape");
     await expect(helpButton).toBeFocused();
     await expect(
@@ -155,6 +166,17 @@ test.describe("desktop scoresheet MVP", () => {
       expect(partials!.width).toBeCloseTo(rosterA!.width, 0);
       expect(entry!.width).toBeCloseTo(rosterB!.width, 0);
       expect(partials!.height).toBeCloseTo(entry!.height, 0);
+      const partialHead = await page
+        .getByRole("table", { name: "Parciais das equipes" })
+        .locator("thead")
+        .boundingBox();
+      const teamHead = await rosterCards
+        .first()
+        .getByRole("heading")
+        .boundingBox();
+      expect(
+        Math.abs(partialHead!.height - teamHead!.height),
+      ).toBeLessThanOrEqual(1);
       expect(historyBox!.width).toBeCloseTo(rosterA!.width, 0);
       expect(savePanel!.width).toBeCloseTo(rosterB!.width, 0);
       await expect(
@@ -241,14 +263,18 @@ test.describe("desktop scoresheet MVP", () => {
     await dialog.getByLabel("Ação", { exact: true }).fill("2");
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
-    await expect(page.locator(".sheet-history tbody tr")).toContainText(["1p"]);
+    await expect(page.locator(".sheet-history tbody tr")).toContainText([
+      "1 ponto",
+    ]);
     await action.click();
     await dialog.getByLabel("Ação", { exact: true }).fill("2");
     await dialog
       .getByRole("button", { name: "Salvar edição da ação", exact: true })
       .click();
     await expect(dialog).toBeHidden();
-    await expect(page.locator(".sheet-history tbody tr")).toContainText(["2p"]);
+    await expect(page.locator(".sheet-history tbody tr")).toContainText([
+      "2 pontos",
+    ]);
     const toast = page.getByRole("region", { name: "Notificação" });
     await expect(toast).toContainText("Ação editada no rascunho");
     await toast.getByRole("button", { name: "Dispensar notificação" }).click();
