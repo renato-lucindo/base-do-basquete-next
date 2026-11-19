@@ -15,6 +15,14 @@ test("partida aceita: 12 linhas, 00 ao final, parciais sem faltas e legenda comp
     r.fulfill({ json: result }),
   );
   await page.goto("http://127.0.0.1:5174/resultado.html#" + result.id);
+  for (const region of [
+    page.getByRole("region", { name: "Parciais e placar final" }),
+    page.locator(".period-filter"),
+  ]) {
+    await expect(
+      region.getByRole("button", { name: "PR1: 1ª prorrogação", exact: true }),
+    ).toHaveText("PR1");
+  }
   for (const side of ["home", "away"]) {
     const body = page.locator(`[data-team="${side}"] tbody`);
     await expect(body.locator("tr")).toHaveCount(12);

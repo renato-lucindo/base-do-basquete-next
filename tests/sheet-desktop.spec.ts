@@ -68,7 +68,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       page
         .getByRole("table", { name: "Parciais das equipes" })
-        .getByRole("columnheader", { name: "PE1" }),
+        .getByRole("columnheader", { name: "PR1" }),
     ).toBeVisible();
     for (const viewport of [
       { width: 1366, height: 768 },
@@ -78,7 +78,7 @@ test.describe("desktop scoresheet MVP", () => {
       await expect(times).toContainText("Q1 3′");
       await expect(times).toContainText("Q2 8′");
       await expect(times).toContainText("Q4 2′, 9′");
-      await expect(times).toContainText("PE1 4′");
+      await expect(times).toContainText("PR1 4′");
       await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
       await expect(times.locator(".sheet-ink-blue")).toHaveCount(3);
     }
@@ -100,7 +100,7 @@ test.describe("desktop scoresheet MVP", () => {
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
-      "PE1 4′",
+      "PR1 4′",
     );
   });
   test("desktop action history uses a numbered table at both requested viewports", async ({
@@ -395,10 +395,10 @@ test.describe("desktop scoresheet MVP", () => {
       exact: true,
     });
     await expect(
-      partials.getByRole("columnheader", { name: "PE1", exact: true }),
+      partials.getByRole("columnheader", { name: "PR1", exact: true }),
     ).toBeVisible();
     await expect(
-      partials.getByRole("columnheader", { name: "PE2", exact: true }),
+      partials.getByRole("columnheader", { name: "PR2", exact: true }),
     ).toBeVisible();
     const team = partials.getByRole("row").filter({
       has: page.getByRole("rowheader", { name: "A · Lobos", exact: true }),

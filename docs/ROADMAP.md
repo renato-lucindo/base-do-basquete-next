@@ -38,7 +38,7 @@ A ordem dos IDs não representa prioridade. O identificador original é preserva
 - Cada equipe tem até dois tempos debitados em Q1 e Q2 somados, três em Q3 e Q4 somados, com até dois nos dois minutos finais de Q4, e um por prorrogação. Os limites são independentes entre metades e prorrogações.
 - O minuto usa a cor do período, com identificação textual. O formulário aceita `TO` como atalho legado e o documento continua gravando `target: "TO"`. Períodos são gravados como números. A [ADR 009](decisoes/009-sumula-persistida.md) descreve a compatibilidade.
 
-Na tradução oficial CBB 2026, o art. 18 usa **tempo debitado** e o art. 8 usa **tempo extra (prorrogação)**. O item B.7.1 identifica os espaços de prorrogação na súmula oficial com a sigla `OT`. O rótulo `PE` é uma convenção da interface administrativa do projeto. [Regras Oficiais de Basquetebol 2026, arts. 8 e 18 e anexo B](https://dcf17fmbywxbi.cloudfront.net/official-notes/nota-IW5O.pdf)
+Na tradução oficial CBB 2026, o art. 18 usa **tempo debitado** e o art. 8 usa **tempo extra (prorrogação)**. O item B.7.1 identifica os espaços de prorrogação na súmula oficial com a sigla `OT`. A interface usa `PR1`, `PR2` e assim por diante para identificar cada prorrogação. [Regras Oficiais de Basquetebol 2026, arts. 8 e 18 e anexo B](https://dcf17fmbywxbi.cloudfront.net/official-notes/nota-IW5O.pdf)
 
 ### FUT-002 — Recordes da Carreira no perfil do jogador
 

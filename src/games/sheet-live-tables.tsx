@@ -1,7 +1,6 @@
 import { Fragment } from "react";
-import { sheetPeriodLabel } from "./sheet-period-label";
 import { compareJerseys } from "../domain/jersey";
-import { periodColor } from "../domain/scoresheet";
+import { periodColor, periodLabel } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import type { projectSheet } from "../scoresheet/projection";
@@ -46,7 +45,7 @@ export function SheetPartials({
                 scope="col"
                 className={i + 1 === period ? "sheet-current-period" : ""}
               >
-                {sheetPeriodLabel(i + 1)}
+                {periodLabel(i + 1)}
               </th>
             ))}
             <th scope="col">Total</th>
@@ -124,7 +123,7 @@ export function SheetLiveTables({
               ? Array.from(timeoutsByPeriod, ([period, requests], index) => (
                   <span className="sheet-timeout-item" key={period}>
                     {index > 0 && <span aria-hidden="true"> · </span>}
-                    {sheetPeriodLabel(period)}{" "}
+                    {periodLabel(period)}{" "}
                     {requests.map((event, minuteIndex) => (
                       <Fragment key={event.id}>
                         {minuteIndex > 0 && ", "}
@@ -159,7 +158,7 @@ export function SheetLiveTables({
                   <th scope="col">Nº</th>
                   <th scope="col">Atleta</th>
                   <th scope="col">Entrou</th>
-                  {["Q1", "Q2", "Q3", "Q4 + PE"].map((q, i) => (
+                  {["Q1", "Q2", "Q3", "Q4 + PR"].map((q, i) => (
                     <th
                       scope="col"
                       key={q}
@@ -242,12 +241,12 @@ export function SheetLiveTables({
                             className={`sheet-foul-cell ${f ? "sheet-ink-" + f.color : ""} ${firstHalfClass(f?.period, r.fouls[i - 1]?.period, i < 4 ? r.fouls[i + 1]?.period : undefined)}`}
                             title={
                               f
-                                ? `${i + 1}ª falta · ${sheetPeriodLabel(f.period)} · ${f.code}`
+                                ? `${i + 1}ª falta · ${periodLabel(f.period)} · ${f.code}`
                                 : `${i + 1}ª falta`
                             }
                             aria-label={
                               f
-                                ? `${i + 1}ª falta · ${sheetPeriodLabel(f.period)} · ${f.code}`
+                                ? `${i + 1}ª falta · ${periodLabel(f.period)} · ${f.code}`
                                 : `${i + 1}ª falta vazia`
                             }
                           >
@@ -349,7 +348,7 @@ export function SheetLiveTables({
                               <span
                                 key={mark.id + mark.code}
                                 className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(mark.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
-                                title={`${sheetPeriodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
+                                title={`${periodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
                               >
                                 {mark.code.replace(/C$/u, "c")}
                               </span>
@@ -387,7 +386,7 @@ export function SheetLiveTables({
                       <span
                         key={e.id}
                         className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(e.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
-                        title={`${sheetPeriodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
+                        title={`${periodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
                       >
                         {e.code.replace(/C$/u, "c")}
                       </span>

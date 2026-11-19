@@ -1,7 +1,11 @@
-import { sheetPeriodLabel } from "./sheet-period-label";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../ui-system/components";
-import { parseFoul, periodColor, type Foul } from "../domain/scoresheet";
+import {
+  parseFoul,
+  periodColor,
+  periodLabel,
+  type Foul,
+} from "../domain/scoresheet";
 import type { AnnotatedAction, HistoryQuery } from "../scoresheet/projection";
 
 const actionKinds = {
@@ -111,7 +115,7 @@ export function SheetActionHistory({
             <option value="">Todos</option>
             {Array.from({ length: periods }, (_, i) => (
               <option key={i + 1} value={i + 1}>
-                {sheetPeriodLabel(i + 1)}
+                {periodLabel(i + 1)}
               </option>
             ))}
           </select>
@@ -172,7 +176,7 @@ export function SheetActionHistory({
                 <tr key={event.id}>
                   <td>{sequence}</td>
                   <td className={`sheet-period-${periodColor(event.period)}`}>
-                    {sheetPeriodLabel(event.period)}
+                    {periodLabel(event.period)}
                   </td>
                   <td>{event.side === "home" ? "A" : "B"}</td>
                   <td>{targets[event.target] ?? "#" + event.target}</td>

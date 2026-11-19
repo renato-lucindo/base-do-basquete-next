@@ -1,4 +1,3 @@
-import { sheetPeriodLabel } from "./sheet-period-label";
 import { FinalizeSheetPanel } from "../publication/finalize-sheet-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
 import { SheetPublicationPanel } from "../publication/sheet-panel";
@@ -7,7 +6,7 @@ import { publicationStateSchema } from "../publication/data-contract";
 import { publicResultSchema } from "../publication/pdf-contract";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
-import { aggregate, type Side } from "../domain/scoresheet";
+import { aggregate, periodLabel, type Side } from "../domain/scoresheet";
 import { deleteAction } from "../scoresheet/actions";
 import { authorAction } from "./sheet-event-author";
 import { identifyPlayerEvents } from "./sheet-identity";
@@ -862,7 +861,7 @@ export function GameSheetWorkspace(props: Props) {
                     >
                       {Array.from({ length: d.periods }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
-                          {sheetPeriodLabel(i + 1)}
+                          {periodLabel(i + 1)}
                         </option>
                       ))}
                     </select>
@@ -889,7 +888,7 @@ export function GameSheetWorkspace(props: Props) {
                   </label>
                   <label>
                     {isTimeoutTarget(target)
-                      ? "Minuto decorrido (1–10, PE: 1–5)"
+                      ? "Minuto decorrido (1–10, PR: 1–5)"
                       : "Ação"}
                     <input
                       ref={codeRef}
@@ -1152,7 +1151,7 @@ export function GameSheetWorkspace(props: Props) {
                       >
                         {Array.from({ length: d.periods }, (_, i) => (
                           <option key={i + 1} value={i + 1}>
-                            {sheetPeriodLabel(i + 1)}
+                            {periodLabel(i + 1)}
                           </option>
                         ))}
                       </select>
@@ -1178,7 +1177,7 @@ export function GameSheetWorkspace(props: Props) {
                     </label>
                     <label>
                       {isTimeoutTarget(target)
-                        ? "Minuto decorrido (1–10, PE: 1–5)"
+                        ? "Minuto decorrido (1–10, PR: 1–5)"
                         : "Ação"}
                       <input
                         ref={editCodeRef}
