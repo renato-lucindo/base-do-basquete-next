@@ -1409,7 +1409,9 @@ export function GamesWorkspace(props: Props) {
                       </button>
                     </th>
                   ))}
-                  <th scope="col">Operações</th>
+                  <th scope="col" className="game-list-operations">
+                    Operações
+                  </th>
                 </tr>
               </thead>
               <tbody>

@@ -101,6 +101,7 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
     await list.evaluate((region) => {
       region.scrollTop = 0;
     });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await page.screenshot({
       path: ".preview-artifacts/admin-games-list-1920.png",
     });

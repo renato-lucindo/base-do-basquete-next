@@ -387,7 +387,8 @@
   gap: 0.5rem;
 }
 .game-list-matchup > span {
-  overflow-wrap: anywhere;
+  max-inline-size: 28ch;
+  overflow-wrap: break-word;
 }
 .game-list-score {
   white-space: nowrap;
@@ -410,12 +411,11 @@
   flex: none;
 }
 .game-list-operations {
+  width: 1%;
   white-space: nowrap;
 }
-.game-list-operations .game-list-action {
-  border-color: transparent;
-  background: transparent;
-  color: var(--bb-blue);
+.game-list-scroll th.game-list-operations {
+  text-align: center;
 }
 .game-list-action + .game-list-action {
   margin-inline-start: 0.25rem;
@@ -430,10 +430,12 @@
 }
 .games-workspace .competition-title {
   align-items: end;
+  flex-direction: row;
 }
 .game-list-filters {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 0 0 min(100%, 50.25rem);
   align-items: end;
   gap: 0.5rem 0.75rem;
 }
@@ -441,7 +443,7 @@
   display: grid;
   gap: 0.25rem;
   margin: 0;
-  width: min(100%, 12rem);
+  min-width: 0;
 }
 .game-list-filters :is(input, select) {
   width: 100%;
@@ -459,12 +461,7 @@
 }
 @media (max-width: 639px) {
   .game-list-filters {
-    width: 100%;
-    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .games-workspace .game-list-filters label {
-    width: 100%;
   }
 }
 .games-workspace > .competition-title button.primary {
