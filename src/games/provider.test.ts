@@ -215,7 +215,7 @@ it("envia ordenacao fechada para RPC propria e conserva listagem antiga", async 
     direction: "desc",
   });
   expect(send.mock.calls[0][0]).toBe(
-    "https://db.example.test/rest/v1/rpc/list_games_ordered",
+    "https://db.example.test/rest/v1/rpc/list_admin_games_with_scores",
   );
   expect(JSON.parse(send.mock.calls[0][1]!.body as string)).toEqual({
     p_dispute_id: id,

@@ -2,7 +2,7 @@ import { GameFormatAssignment } from "./format-assignment";
 import { GameVisibilityPanel } from "./visibility-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
 import type { GameOrder } from "./contract";
-import { useEffect, useId, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
@@ -34,6 +34,7 @@ import {
   type Officiating,
 } from "./officiating-contract";
 import { AdminDialog } from "../competition/admin-dialog";
+import { Icon } from "../ui-system/components";
 import { AdminToast } from "../ui-system/admin-toast";
 import { type RegistrationSnapshot } from "../teams/contract";
 import {
@@ -41,6 +42,7 @@ import {
   gameSchema,
   durationMinutes,
   type GameSnapshot,
+  type GameListItem,
   type SaveGame,
 } from "./contract";
 type Props = {
@@ -73,10 +75,14 @@ export function GamesWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
     formatAction = useRef<() => Promise<string>>(async () => "");
   const [formatDirty, setFormatDirty] = useState(false);
-  const listPosition = useRef({ y: 0, id: "" }),
+  const listPosition = useRef({ y: 0, top: 0, left: 0, id: "" }),
+    listScroll = useRef<HTMLDivElement>(null),
+    nextBatch = useRef<HTMLDivElement>(null),
+    listVersion = useRef({ scope: "", epoch: -1 }),
+    sheetChanged = useRef(false),
     stageId = useId(),
     workspace = useRef<HTMLElement>(null);
-  const [list, setList] = useState<{ items: GameSnapshot[]; hasMore: boolean }>(
+  const [list, setList] = useState<{ items: GameListItem[]; hasMore: boolean }>(
       { items: [], hasMore: false },
     ),
     [query, setQuery] = useState(""),
@@ -86,7 +92,8 @@ export function GamesWorkspace(props: Props) {
       direction: "asc",
     }),
     [epoch, setEpoch] = useState(0),
-    [loading, setLoading] = useState(false);
+    [loading, setLoading] = useState(false),
+    [listError, setListError] = useState("");
   const [editor, setEditor] = useState<{
       game: SaveGame["game"];
       version: number;
@@ -190,34 +197,107 @@ export function GamesWorkspace(props: Props) {
   }
   useEffect(() => {
     if (!props.enabled) return;
-    let active = true;
     const controller = new AbortController();
+    const signal = controller.signal;
+    const scope = JSON.stringify([
+      props.disputeId,
+      query,
+      order.column,
+      order.direction,
+    ]);
+    const newScope = listVersion.current.scope !== scope;
+    const replace = newScope || listVersion.current.epoch !== epoch;
+    if (newScope) {
+      setList({ items: [], hasMore: false });
+      if (listScroll.current) listScroll.current.scrollTop = 0;
+    }
     setLoading(true);
-    setList({ items: [], hasMore: false });
-    setError("");
-    const timer = setTimeout(() => {
-      void api(
-        `/api/games?disputeId=${props.disputeId}&q=${encodeURIComponent(query)}&offset=${offset}&sort=${order.column}&direction=${order.direction}`,
-        gameListingSchema,
-        undefined,
-        controller.signal,
-      )
-        .then((r) => {
-          if (active) setList(r);
-        })
-        .catch((e) => {
-          if (active) report(e);
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-    }, 150);
+    setListError("");
+    const timer = setTimeout(
+      async () => {
+        const items: GameListItem[] = [];
+        try {
+          let more = false;
+          for (
+            let pageOffset = replace ? 0 : offset;
+            pageOffset <= offset;
+            pageOffset += 20
+          ) {
+            const result = await api(
+              `/api/games?disputeId=${props.disputeId}&q=${encodeURIComponent(query)}&offset=${pageOffset}&sort=${order.column}&direction=${order.direction}`,
+              gameListingSchema,
+              undefined,
+              signal,
+            );
+            items.push(...result.items);
+            more = result.hasMore;
+            if (!more) break;
+          }
+          if (signal.aborted) return;
+          listVersion.current = { scope, epoch };
+          setList((previous) => ({
+            items: [
+              ...new Map(
+                (replace ? items : [...previous.items, ...items]).map(
+                  (game) => [game.id, game],
+                ),
+              ).values(),
+            ],
+            hasMore: more,
+          }));
+        } catch (failure) {
+          if (signal.aborted) return;
+          if (isSessionFailure(failure)) props.onSessionLost();
+          setListError(
+            failure instanceof Error
+              ? failure.message
+              : "Não foi possível carregar os jogos.",
+          );
+        } finally {
+          if (!signal.aborted) setLoading(false);
+        }
+      },
+      offset === 0 ? 150 : 0,
+    );
     return () => {
-      active = false;
       clearTimeout(timer);
       controller.abort();
     };
-  }, [props.enabled, props.disputeId, query, offset, order, epoch]);
+  }, [
+    props.enabled,
+    props.disputeId,
+    query,
+    offset,
+    order,
+    epoch,
+    props.onSessionLost,
+  ]);
+  useEffect(() => {
+    const root = listScroll.current;
+    const target = nextBatch.current;
+    if (
+      !root ||
+      !target ||
+      editor ||
+      sheetVisible ||
+      !props.enabled ||
+      !list.hasMore ||
+      loading ||
+      listError
+    )
+      return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          observer.disconnect();
+          setOffset((value) => value + 20);
+        }
+      },
+      { root, rootMargin: "0px 0px 96px 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [editor, sheetVisible, props.enabled, list, loading, listError]);
   function accept(snapshot: GameEditorSnapshot) {
     const s = snapshot.game;
     if (s.disputeId !== props.disputeId)
@@ -257,13 +337,28 @@ export function GamesWorkspace(props: Props) {
     setUncertain(false);
     setConflict(false);
   }
-  async function load(id: string) {
+  async function load(id: string, directSheet = false) {
     if (!mayLeave()) return;
-    listPosition.current = { y: window.scrollY, id };
+    if (!editor) {
+      listPosition.current = {
+        y: window.scrollY,
+        top: listScroll.current?.scrollTop ?? 0,
+        left: listScroll.current?.scrollLeft ?? 0,
+        id: `${directSheet ? "open-sheet-" : "open-game-"}${id}`,
+      };
+      sheetChanged.current = false;
+    }
     setBusy(true);
     setError("");
     try {
-      accept(await api(`/api/games/${id}/editor`, gameEditorSnapshotSchema));
+      const snapshot = await api(
+        `/api/games/${id}/editor`,
+        gameEditorSnapshotSchema,
+      );
+      if (snapshot.game.id !== id)
+        throw Error("Os dados recebidos não correspondem ao jogo.");
+      accept(snapshot);
+      if (directSheet) setSheetVisible(true);
       setStatus("");
     } catch (e) {
       report(e);
@@ -445,10 +540,18 @@ export function GamesWorkspace(props: Props) {
       setEditor(null);
       requestAnimationFrame(() => {
         window.document
-          .getElementById(`open-game-${listPosition.current.id}`)
+          .getElementById(listPosition.current.id)
           ?.focus({ preventScroll: true });
+        listScroll.current?.scrollTo(
+          listPosition.current.left,
+          listPosition.current.top,
+        );
         window.scrollTo(0, listPosition.current.y);
       });
+      if (sheetChanged.current) {
+        sheetChanged.current = false;
+        setEpoch((value) => value + 1);
+      }
       setStatus("");
       pending.current = null;
       knownAck.current = null;
@@ -534,6 +637,7 @@ export function GamesWorkspace(props: Props) {
 
           {props.onImportPdfs && (
             <button
+              className="secondary"
               disabled={busy}
               onClick={() => {
                 if (mayLeave()) props.onImportPdfs?.();
@@ -543,6 +647,7 @@ export function GamesWorkspace(props: Props) {
             </button>
           )}
           <button
+            className="primary"
             disabled={busy || decisionLocked}
             onClick={() => {
               if (!mayLeave()) return;
@@ -588,7 +693,10 @@ export function GamesWorkspace(props: Props) {
           enabled={props.enabled}
           guard={sheetGuard}
           onSessionLost={props.onSessionLost}
-          onSaved={props.onSaved}
+          onSaved={() => {
+            sheetChanged.current = true;
+            props.onSaved();
+          }}
           onBack={() => setSheetVisible(false)}
           onBackToGames={closeEditor}
         />
@@ -599,6 +707,7 @@ export function GamesWorkspace(props: Props) {
           busy={busy}
           onClose={closeEditor}
           closeLabel="Voltar à lista de jogos"
+          iconClose
           className="game-editor-dialog"
           closeOnBackdrop
           footer={
@@ -629,10 +738,10 @@ export function GamesWorkspace(props: Props) {
                   disabled={busy}
                   onClick={closeEditor}
                 >
-                  Cancelar
+                  Descartar alterações
                 </button>
                 <button
-                  className="secondary"
+                  className="primary"
                   disabled={busy || conflict || decisionLocked}
                   onClick={() => void save()}
                 >
@@ -644,6 +753,7 @@ export function GamesWorkspace(props: Props) {
                 </button>
                 {!editor.version && !uncertain && (
                   <button
+                    className="secondary"
                     disabled={busy || conflict || decisionLocked}
                     onClick={() => void save("next")}
                   >
@@ -1094,18 +1204,9 @@ export function GamesWorkspace(props: Props) {
         </AdminDialog>
       ) : (
         <>
-          {loading && <p role="status">Carregando jogos…</p>}
-          {error && (
-            <button
-              type="button"
-              className="secondary"
-              onClick={() => setEpoch((n) => n + 1)}
-            >
-              Tentar novamente
-            </button>
-          )}
           <div
-            className="admin-table-scroll"
+            className="admin-table-scroll game-list-scroll"
+            ref={listScroll}
             role="region"
             aria-label="Tabela de jogos"
             aria-busy={loading}
@@ -1127,43 +1228,50 @@ export function GamesWorkspace(props: Props) {
                       ["state", "Situação"],
                     ] as const
                   ).map(([column, label]) => (
-                    <th
-                      key={column}
-                      scope="col"
-                      className={column === "number" ? "numeric" : undefined}
-                      aria-sort={
-                        order.column === column
-                          ? order.direction === "asc"
-                            ? "ascending"
-                            : "descending"
-                          : undefined
-                      }
-                    >
-                      <button
-                        type="button"
-                        className="admin-sort"
-                        aria-label={`Ordenar por ${label}`}
-                        onClick={() => {
-                          setOrder({
-                            column,
-                            direction:
-                              order.column === column &&
-                              order.direction === "asc"
-                                ? "desc"
-                                : "asc",
-                          });
-                          setOffset(0);
-                        }}
+                    <Fragment key={column}>
+                      <th
+                        scope="col"
+                        className={column === "number" ? "numeric" : undefined}
+                        aria-sort={
+                          order.column === column
+                            ? order.direction === "asc"
+                              ? "ascending"
+                              : "descending"
+                            : undefined
+                        }
                       >
-                        {label}
-                        {order.column === column && (
-                          <span aria-hidden="true">
-                            {order.direction === "asc" ? " ↑" : " ↓"}
-                          </span>
-                        )}
-                      </button>
-                    </th>
+                        <button
+                          type="button"
+                          className="admin-sort"
+                          aria-label={`Ordenar por ${label}`}
+                          onClick={() => {
+                            setOrder({
+                              column,
+                              direction:
+                                order.column === column &&
+                                order.direction === "asc"
+                                  ? "desc"
+                                  : "asc",
+                            });
+                            setOffset(0);
+                          }}
+                        >
+                          {label}
+                          {order.column === column && (
+                            <span aria-hidden="true">
+                              {order.direction === "asc" ? " ↑" : " ↓"}
+                            </span>
+                          )}
+                        </button>
+                      </th>
+                      {column === "matchup" && (
+                        <th scope="col" className="game-list-score">
+                          Placar
+                        </th>
+                      )}
+                    </Fragment>
                   ))}
+                  <th scope="col">Operações</th>
                 </tr>
               </thead>
               <tbody>
@@ -1175,10 +1283,14 @@ export function GamesWorkspace(props: Props) {
                         className="competition-name"
                         id={`open-game-${g.id}`}
                         aria-label={`Abrir jogo ${g.home.name} × ${g.away.name}`}
+                        disabled={busy}
                         onClick={() => void load(g.id)}
                       >
                         {g.home.name} × {g.away.name}
                       </button>
+                    </td>
+                    <td className="game-list-score nowrap">
+                      {g.score ? `${g.score.home} × ${g.score.away}` : "—"}
                     </td>
                     <td className="nowrap">
                       {g.date
@@ -1187,36 +1299,57 @@ export function GamesWorkspace(props: Props) {
                     </td>
                     <td className="nowrap">{g.time ?? "A definir"}</td>
                     <td>{g.venue ?? "A definir"}</td>
-                    <td className="nowrap">
-                      {g.state === "finished"
-                        ? flexible
+                    <td>
+                      <span
+                        className={`game-list-state${g.state === "finished" ? " is-finished" : ""}`}
+                      >
+                        <Icon
+                          name={g.state === "finished" ? "check" : "clock"}
+                        />
+                        {g.state === "finished"
                           ? "Resultado registrado"
-                          : "Resultado publicado"
-                        : "Sem resultado"}
+                          : "Sem resultado"}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className="secondary game-list-sheet"
+                        id={`open-sheet-${g.id}`}
+                        aria-label={`Súmula de ${g.home.name} × ${g.away.name}`}
+                        disabled={busy}
+                        onClick={() => void load(g.id, true)}
+                      >
+                        <Icon name="file" /> Súmula
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-          {!loading && !error && !list.items.length && (
-            <p>Nenhum jogo encontrado nesta disputa.</p>
-          )}
-          <div className="competition-actions">
-            <button
-              className="secondary"
-              disabled={loading || !offset}
-              onClick={() => setOffset(Math.max(0, offset - 20))}
-            >
-              Jogos anteriores
-            </button>
-            <button
-              className="secondary"
-              disabled={loading || !list.hasMore}
-              onClick={() => setOffset(offset + 20)}
-            >
-              Mais jogos
-            </button>
+            {loading && <p role="status">Carregando jogos…</p>}
+            {listError && (
+              <div className="game-list-error">
+                <p role="alert">{listError}</p>
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setEpoch((value) => value + 1)}
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            )}
+            {!loading && !listError && !list.items.length && (
+              <p>Nenhum jogo encontrado nesta disputa.</p>
+            )}
+            {list.hasMore && !listError && (
+              <div
+                ref={nextBatch}
+                className="game-list-next"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </>
       )}

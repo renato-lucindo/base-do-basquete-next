@@ -260,3 +260,17 @@
     max-width: 100%;
   }
 }
+
+.competition-context-header .competition-context-selection h2 {
+  font-size: calc(var(--bb-font-heading) + 0.125rem);
+}
+.competition-context-header .competition-tabs > :is(button, a),
+.competition-context-header .competition-back {
+  min-height: 2.25rem;
+  font-size: var(--bb-font-body);
+  padding-block: 0.375rem;
+}
+.competition-context-header .competition-tabs > a {
+  display: inline-flex;
+  align-items: center;
+}

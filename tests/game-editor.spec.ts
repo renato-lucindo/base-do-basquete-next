@@ -98,7 +98,10 @@ test("diálogo aprovado: etapa lateral, rodadas opcionais e ações sempre visí
       .boundingBox();
     const check = await page.locator(".game-knockout-check").boundingBox();
     expect(stage!.x).toBeGreaterThan(check!.x);
-    expect(Math.abs(stage!.y - check!.y)).toBeLessThan(4);
+    expect(
+      Math.abs(stage!.y - check!.y),
+      JSON.stringify({ width, stage, check }),
+    ).toBeLessThan(4);
     await expect(
       page.getByRole("button", {
         name: "Salvar e adicionar outro",

@@ -68,7 +68,7 @@ export class SupabaseGames {
     const parsed = order ? gameOrderSchema.parse(order) : undefined;
     const r = await this.checked(
       gameListingSchema,
-      parsed ? "list_games_ordered" : "list_games",
+      parsed ? "list_admin_games_with_scores" : "list_games",
       {
         p_dispute_id: disputeId,
         p_query: query,

@@ -1125,14 +1125,14 @@ async function fixture(options = {}) {
         if (
           [
             "/rest/v1/rpc/list_games",
-            "/rest/v1/rpc/list_games_ordered",
+            "/rest/v1/rpc/list_admin_games_with_scores",
           ].includes(url.pathname)
         ) {
           assert.equal(
             request.headers.get("authorization"),
             "Bearer fixture-access",
           );
-          if (url.pathname.endsWith("/list_games_ordered"))
+          if (url.pathname.endsWith("/list_admin_games_with_scores"))
             assert.deepEqual(await request.json(), {
               p_dispute_id: id,
               p_query: "",
@@ -2156,7 +2156,7 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       ).status,
       200,
     );
-    assert.ok(f.calls.some((p) => p.endsWith("/list_games_ordered")));
+    assert.ok(f.calls.some((p) => p.endsWith("/list_admin_games_with_scores")));
     assert.equal((await send("GET", `/api/games/${id}`)).status, 404);
     const venues = await send("GET", "/api/games/venues?q=Azul&offset=20");
     assert.equal(venues.status, 200);

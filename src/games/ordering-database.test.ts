@@ -93,3 +93,36 @@ it("ordena toda a disputa antes da pagina, com numeros naturais, ausentes ao fim
     `set local role anon;select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92))$q$,'42501');reset role;`,
   );
 });
+
+it("returns a confirmed score for a hidden game, preserves zero and rejects non-admins", async () => {
+  await db.exec("rollback;");
+  const fixture = await readFile("supabase/tests/publication.sql", "utf8");
+  await db.exec(fixture.slice(0, fixture.indexOf("set local role anon;")));
+  await db.exec(`
+    set local role authenticated;
+    set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098';
+    select public.publish_sheet_game(pg_temp.pu_command());
+    reset role;
+    update private.dispute_administration set visibility='private'
+      where dispute_id=pg_temp.pu_id(3);
+    set local role authenticated;
+  `);
+  const { rows } = await db.query<{ result: unknown }>(`
+    select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc') result
+  `);
+  const { items } = gameListingSchema.parse(rows[0].result);
+  expect(items).toHaveLength(2);
+  expect(items.find((game) => game.id.endsWith("000000000008"))?.score).toEqual(
+    { home: 2, away: 0 },
+  );
+  expect(
+    items.find((game) => game.id.endsWith("000000000009"))?.score,
+  ).toBeNull();
+  await db.exec(`
+    set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000099';
+    select pg_temp.pu_error($q$select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc')$q$,'PT403');
+    set local role anon;
+    select pg_temp.pu_error($q$select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc')$q$,'42501');
+    rollback;
+  `);
+});

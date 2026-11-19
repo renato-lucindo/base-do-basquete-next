@@ -53,6 +53,7 @@ export async function gamesFixture(page: Page) {
     ]),
   );
   const registration = (id: string) => registrations.get(id)!;
+  const scores = new Map<string, { home: number; away: number }>();
   await page.route(/\/api\/registrations(\?|\/|$)/, async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
@@ -233,7 +234,9 @@ export async function gamesFixture(page: Page) {
         });
       return route.fulfill({
         json: {
-          items: items.slice(offset, offset + 20),
+          items: items
+            .slice(offset, offset + 20)
+            .map((game) => ({ ...game, score: scores.get(game.id) ?? null })),
           hasMore: items.length > offset + 20,
         },
       });
@@ -325,6 +328,7 @@ export async function gamesFixture(page: Page) {
   });
   return {
     games,
+    scores,
     officials,
     scales,
     registrations,

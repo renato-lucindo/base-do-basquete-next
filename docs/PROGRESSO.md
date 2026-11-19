@@ -19,6 +19,12 @@
 
 - Revisão 567d986. Alinhamento das áreas de ações e publicação, divisor da comissão, tooltip somente em nome cortado, retorno à direita do seletor e rótulos PE. Gate de UI e dez testes focais passaram. Worker serve esse SHA, versão 65ba2680-6253-49e9-a665-4085ec646ed0 e deployment dbf09a7e-67eb-4fc4-a6d5-7546466dfd26. Painel, health e bundle 200, catálogo sem sessão 401. [CI do SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44559513175) falhou por transbordamento da barra administrativa em 320 px com texto ampliado. Aguardar aceite visual na PR #87.
 
+- Revisão 6aa7f7b. Tempos agrupados por período, contorno único nas parciais e correção de reflow a 320 px com texto ampliado. Testes focais e build passaram. Worker serve esse SHA, versão cbc65ae9-3231-4b6f-8f34-82fb733cf292, deployment 7225a63c-bd32-49f7-b9e2-d01db5ed5c28. Painel, health e bundle 200, catálogo sem sessão 401. [CI do SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44563502733) aprovada nos sete checks. Aguardar aceite visual na PR #87.
+
+## Lista administrativa de Jogos
+
+- Implementada na PR #87 para atualizar o Worker enquanto a súmula aguarda aceite. Placar confirmado pela consulta administrativa, traço sem resultado, acesso direto à súmula, rolagem interna e editor alinhado ao guia. A função de leitura `20261119164818_admin_game_listing_scores` foi aplicada no DEV como `20261119165358`. A consulta da disputa conferida retornou 20 jogos com placar e a função recusou acesso anônimo. Testes locais de autorização, placar, rolagem, retorno e diálogo passaram.
+
 ## Revisão visual do design system
 
 - Unidade `codex/revisao-design-system` baseada em `745e964`. O [guia visual de 18/11/2026](design/catalogo/guia-completo-autonomo.html) rege alterações futuras de interface. A engrenagem recebeu contorno centralizado. O [guia de adoção](design/DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026) registra escopo e evidências.

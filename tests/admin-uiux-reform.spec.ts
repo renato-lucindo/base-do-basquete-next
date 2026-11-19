@@ -4,7 +4,7 @@ import { tid } from "./fixtures/text-import";
 import { scanAccessibility } from "./fixtures/accessibility";
 const route = (area: string) =>
   `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}${area}`;
-test("Jogos ordena no servidor antes de paginar e conserva contexto ao fechar editor", async ({
+test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição e súmula", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -26,10 +26,30 @@ test("Jogos ordena no servidor antes de paginar e conserva contexto ao fechar ed
       number: String(i),
       version: 1,
       savedAt: "2026-10-23T19:00:00Z",
-      state: "scheduled",
+      state: i === 1 ? "finished" : "scheduled",
       timeZone: "America/Sao_Paulo",
       scheduledAt: null,
     });
+  f.scores.set(tid(501), { home: 20, away: 0 });
+  await page.route("**/api/games/*/sheet", (route) =>
+    route.fulfill({ json: null }),
+  );
+  let failNextBatch = true;
+  await page.route(/\/api\/games\?/, (route) => {
+    if (
+      failNextBatch &&
+      new URL(route.request().url()).searchParams.get("offset") === "20"
+    ) {
+      failNextBatch = false;
+      return route.fulfill({
+        status: 503,
+        json: {
+          error: { code: "unavailable", message: "Falha ao carregar o lote." },
+        },
+      });
+    }
+    return route.fallback();
+  });
   await page.goto(route("/jogos"));
   const table = page.getByRole("table", {
     name: "Jogos da disputa",
@@ -41,41 +61,58 @@ test("Jogos ordena no servidor antes de paginar e conserva contexto ao fechar ed
   await expect(
     table.getByRole("columnheader", { name: /Data/ }),
   ).toHaveAttribute("aria-sort", "ascending");
-  const request = page.waitForRequest(
-    (r) => new URL(r.url()).searchParams.get("sort") === "number",
-  );
   await table
     .getByRole("button", { name: "Ordenar por Nº", exact: true })
     .click();
-  await request;
-  await expect(table.locator("tbody tr")).toHaveCount(20);
-  await expect(
-    table.locator("tbody tr").first().locator("td").first(),
-  ).toHaveText("1");
-  await table
-    .getByRole("button", { name: "Ordenar por Nº", exact: true })
-    .click();
-  await expect(
-    table.locator("tbody tr").first().locator("td").first(),
-  ).toHaveText("35");
-  await page.getByRole("button", { name: "Mais jogos", exact: true }).click();
-  await expect(
-    table.locator("tbody tr").first().locator("td").first(),
-  ).toHaveText("15");
-  await table.locator("tbody tr").first().getByRole("button").click();
+  const rows = table.locator("tbody tr");
+  await expect(rows).toHaveCount(20);
+  await expect(rows.first().locator("td").first()).toHaveText("1");
+  await expect(rows.first().locator(".game-list-score")).toHaveText("20 × 0");
+  await expect(rows.first()).toContainText("Resultado registrado");
+  await expect(rows.nth(1).locator(".game-list-score")).toHaveText("—");
+  const list = page.getByRole("region", { name: "Tabela de jogos" });
+  await list.evaluate((region) => {
+    region.scrollTop = region.scrollHeight;
+  });
+  await expect(list.getByRole("alert")).toHaveText("Falha ao carregar o lote.");
+  await expect(rows).toHaveCount(20);
+  await list.getByRole("button", { name: "Tentar novamente" }).click();
+  await expect(rows).toHaveCount(35);
+  await expect(rows.first().locator("td").first()).toHaveText("1");
+  await expect(rows.last().locator("td").first()).toHaveText("35");
+  const edit = rows
+    .last()
+    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true });
+  await edit.click();
   await page
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
-  await expect(table.getByRole("columnheader", { name: /Nº/ })).toHaveAttribute(
-    "aria-sort",
-    "descending",
-  );
-  await expect(
-    table.locator("tbody tr").first().locator("td").first(),
-  ).toHaveText("15");
+  await expect(edit).toBeFocused();
+  await expect
+    .poll(() => list.evaluate((region) => region.scrollTop))
+    .toBeGreaterThan(0);
+  await expect(rows).toHaveCount(35);
   await expect(
     page.getByRole("textbox", { name: "Buscar jogo", exact: true }),
   ).toHaveValue("Local");
+  const sheet = rows
+    .last()
+    .getByRole("button", { name: "Súmula de Lobos × Lobos B", exact: true });
+  await sheet.click();
+  await expect(
+    page.getByRole("group", { name: "Navegação da súmula" }),
+  ).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Editar jogo" })).toHaveCount(
+    0,
+  );
+  await page
+    .getByRole("button", { name: "Lista de jogos", exact: true })
+    .click();
+  await expect(sheet).toBeFocused();
+  await table
+    .getByRole("button", { name: "Ordenar por Nº", exact: true })
+    .click();
+  await expect(rows.first().locator("td").first()).toHaveText("35");
   expect(errors).toEqual([]);
 });
 test("Equipes mostra painel escolhido e retorno acessivel", async ({

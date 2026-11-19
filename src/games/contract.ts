@@ -102,8 +102,13 @@ export const gameSnapshotSchema = z
       g.away.disputeId === g.disputeId &&
       (g.scheduledAt !== null) === (g.date !== null && g.time !== null),
   );
+const scoreSide = z.number().int().min(0).max(2147483647);
+const gameListItemSchema = gameSnapshotSchema.safeExtend({
+  score: z.object({ home: scoreSide, away: scoreSide }).strict().nullish(),
+});
+export type GameListItem = z.infer<typeof gameListItemSchema>;
 export const gameListingSchema = z
-  .object({ items: z.array(gameSnapshotSchema).max(20), hasMore: z.boolean() })
+  .object({ items: z.array(gameListItemSchema).max(20), hasMore: z.boolean() })
   .strict();
 export type GameSnapshot = z.infer<typeof gameSnapshotSchema>;
 export type SaveGame = z.infer<typeof saveGameSchema>;
