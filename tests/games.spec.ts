@@ -31,7 +31,7 @@ test("lista jogos com horários reais adicionais e preserva horários ao editar 
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await expect(
-    page.getByRole("row").filter({ hasText: "Lobos × Lobos B" }),
+    page.getByRole("cell", { name: /Lobos\s*—\s*Lobos B/ }),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
   await page
@@ -217,7 +217,9 @@ test("cadastra partida diretamente, conserva data sem horário e retoma sem plac
   });
   await page.reload();
   await expect(page.getByText("Quadra Azul", { exact: true })).toBeVisible();
-  await expect(page.getByText("Sem resultado", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "Sem resultado", exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: /Editar jogo Lobos/ }).click();
   await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
     "2026-10-23",
