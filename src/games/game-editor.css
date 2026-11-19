@@ -412,10 +412,6 @@
 .game-list-add svg {
   flex: none;
 }
-.game-list-add svg {
-  width: 0.875rem;
-  height: 0.875rem;
-}
 .game-list-operations {
   width: 1%;
   white-space: nowrap;
@@ -425,9 +421,6 @@
 }
 .game-list-action + .game-list-action {
   margin-inline-start: 0.25rem;
-}
-.competition-workspace .games-workspace button.game-list-edit:not(:disabled) {
-  color: var(--bb-blue);
 }
 .game-list-scroll > :is(p, .game-list-error) {
   margin: 0;
@@ -458,15 +451,6 @@
   width: 100%;
   min-width: 0;
 }
-.games-workspace > .competition-title button.game-list-clear {
-  border-color: transparent;
-  color: var(--bb-blue);
-  background: transparent;
-}
-.games-workspace > .competition-title button.game-list-clear:hover,
-.games-workspace > .competition-title button.game-list-clear:active {
-  background: var(--bb-blue-soft);
-}
 .game-list-updating {
   align-self: center;
   color: var(--bb-muted);
@@ -491,4 +475,12 @@
   background: var(--bb-surface);
   color: var(--bb-text);
   border-color: var(--bb-control-line);
+}
+
+.game-list-add svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.competition-workspace .games-workspace button.game-list-edit:not(:disabled) {
+  color: var(--bb-blue);
 }
