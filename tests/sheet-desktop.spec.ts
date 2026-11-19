@@ -15,9 +15,9 @@ test.describe("desktop scoresheet MVP", () => {
     await page
       .getByRole("button", { name: "Concluir preparação e lançar ações" })
       .click();
-    const helpButton = page.getByRole("button", { name: "Códigos e atalhos" });
+    const helpButton = page.getByRole("button", { name: "Instruções" });
     await helpButton.click();
-    const help = page.getByRole("dialog", { name: "Códigos e atalhos" });
+    const help = page.getByRole("dialog", { name: "Instruções" });
     await expect(help).toContainText("TD · Tempo debitado");
     await help.press("Escape");
     await expect(helpButton).toBeFocused();
@@ -69,9 +69,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(page.getByRole("alert")).toContainText(
       "Pedido de tempo inválido",
     );
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     expect(
       fixture.snapshot()?.document.events.filter((e) => e.target === "TO"),
     ).toHaveLength(5);
@@ -116,7 +114,7 @@ test.describe("desktop scoresheet MVP", () => {
       path: ".preview-artifacts/sumula-worker-ui-desktop.png",
       animations: "disabled",
     });
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
       await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
       await page.keyboard.press("Enter");
       await page.getByLabel("Ação", { exact: true }).fill("1");
@@ -127,21 +125,64 @@ test.describe("desktop scoresheet MVP", () => {
       exact: true,
     });
     const items = history.locator("tbody tr");
-    await expect(items).toHaveCount(10);
+    await expect(items).toHaveCount(15);
     for (const [width, height] of [
       [1366, 768],
       [1920, 1080],
     ]) {
       await page.setViewportSize({ width, height });
       await expect(history.getByRole("columnheader").first()).toHaveText("Nº");
-      await expect(items.first().getByRole("cell").first()).toHaveText("10");
-      await expect(items.nth(1).getByRole("cell").first()).toHaveText("9");
+      await expect(items.first().getByRole("cell").first()).toHaveText("15");
+      await expect(items.nth(1).getByRole("cell").first()).toHaveText("14");
       await history.scrollIntoViewIfNeeded();
       await page.screenshot({
         path: `dist/ui-ux-captures/sheet-history-after-${width}x${height}.png`,
         animations: "disabled",
       });
+      const partials = await page
+        .getByRole("region", { name: "Parciais", exact: true })
+        .boundingBox();
+      const entry = await page
+        .getByRole("group", { name: "Lançar ações" })
+        .boundingBox();
+      const rosterCards = page.locator(".sheet-launch-teams .sheet-team-card");
+      const rosterA = await rosterCards.first().boundingBox();
+      const rosterB = await rosterCards.last().boundingBox();
+      const historyBox = await history.boundingBox();
+      const savePanel = await page
+        .getByRole("region", { name: "Salvamento e publicação" })
+        .boundingBox();
+      expect(partials!.width).toBeCloseTo(rosterA!.width, 0);
+      expect(entry!.width).toBeCloseTo(rosterB!.width, 0);
+      expect(partials!.height).toBeCloseTo(entry!.height, 0);
+      expect(historyBox!.width).toBeCloseTo(rosterA!.width, 0);
+      expect(savePanel!.width).toBeCloseTo(rosterB!.width, 0);
+      await expect(
+        page
+          .getByRole("table", { name: "Parciais das equipes" })
+          .getByRole("columnheader", { name: "Q1", exact: true }),
+      ).toHaveCSS("border-right-width", "1px");
+      await expect(
+        rosters.first().getByRole("columnheader", { name: "Total" }),
+      ).toHaveCSS("text-align", "center");
+      await expect(rosters.first().getByRole("rowheader").first()).toHaveCSS(
+        "font-weight",
+        "400",
+      );
+      await expect(
+        page.getByRole("button", { name: "Histórico completo" }),
+      ).toHaveCount(0);
+      await history.focus();
+      await page.keyboard.press("End");
+      await expect
+        .poll(() => history.evaluate((node) => node.scrollTop))
+        .toBeGreaterThan(0);
+      await expect(items.last().getByRole("cell").first()).toHaveText("1");
+      await history.evaluate((node) => {
+        node.scrollTop = 0;
+      });
       const firstAction = items.first();
+      await expect(firstAction.locator("button svg")).toHaveCount(2);
       await firstAction.getByRole("button", { name: /Excluir ação/ }).click();
       const dialog = page.getByRole("dialog", {
         name: "Excluir esta ação?",
@@ -197,12 +238,12 @@ test.describe("desktop scoresheet MVP", () => {
         animations: "disabled",
       });
     }
-    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await dialog.getByLabel("Ação", { exact: true }).fill("2");
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(page.locator(".sheet-history tbody tr")).toContainText(["1p"]);
     await action.click();
-    await page.getByLabel("Ação", { exact: true }).fill("2");
+    await dialog.getByLabel("Ação", { exact: true }).fill("2");
     await dialog
       .getByRole("button", { name: "Salvar edição da ação", exact: true })
       .click();
@@ -312,7 +353,7 @@ test.describe("desktop scoresheet MVP", () => {
       page.getByRole("region", { name: "Registro de ações", exact: true }),
     ).toContainText("U2 (GD)");
     for (let n = 0; n < 11; n++) await add("home", 1, "1", "11");
-    await expect(page.locator(".sheet-history tbody tr")).toHaveCount(10);
+    await expect(page.locator(".sheet-history tbody tr")).toHaveCount(18);
     await expect(
       page.getByLabel("Entrou Jogador A 11", { exact: true }),
     ).toBeChecked();
@@ -326,7 +367,7 @@ test.describe("desktop scoresheet MVP", () => {
       "B",
       "#1",
       "P (1)",
-      "EditarExcluir",
+      /Editar\s+Excluir/u,
     ]);
     await page.locator(".sheet-desktop-teams").last().screenshot({
       path: ".preview-artifacts/sheet-desktop-periods-fouls.png",
@@ -339,7 +380,7 @@ test.describe("desktop scoresheet MVP", () => {
     await openDesktopSheet(page);
     await chooseFive(page);
     await page
-      .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
+      .getByRole("button", { name: "Salvar rascunho", exact: true })
       .click();
     await expect(
       page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
@@ -403,9 +444,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(staff).not.toContainText("B2");
     await page.getByRole("button", { name: "Refazer ação ou ajuste" }).click();
     await expect(staff).toContainText("B2");
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     expect(f.snapshot()?.document.formatVersion).toBe(2);
     expect(f.snapshot()?.document.events).toMatchObject([
       { target: "C", actorId: tid(300), code: "B1" },
@@ -469,9 +508,7 @@ test.describe("desktop scoresheet MVP", () => {
       await expect(staff).toBeVisible();
       expect((await staff.boundingBox())!.width).toBeLessThan(viewport.width);
     }
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     expect(
       f.snapshot()?.document.events.map((e) => [e.actorId, e.code]),
     ).toEqual([
@@ -485,6 +522,19 @@ test.describe("desktop scoresheet MVP", () => {
     ({ isMobile }) => isMobile,
     "Desktop-only MVP; no mobile adaptation in this unit.",
   );
+  test("preparation keeps twelve slots per side even with empty rosters", async ({
+    page,
+  }) => {
+    await desktopSheetFixture(page, 0);
+    await openDesktopSheet(page);
+    await expect(page.locator(".sheet-preparation-table tbody tr")).toHaveCount(
+      24,
+    );
+    await expect(
+      page.locator(".sheet-preparation-table tbody input[type=checkbox]"),
+    ).toHaveCount(0);
+  });
+
   test("eleven athletes arrive automatically in twelve slots and preparation gates both sides", async ({
     page,
   }) => {
@@ -533,6 +583,9 @@ test.describe("desktop scoresheet MVP", () => {
         .boundingBox();
     expect(left && right && left.x + left.width <= right.x + 2).toBeTruthy();
     expect(Math.abs(left!.y - right!.y)).toBeLessThan(4);
+    const liveTeams = page.locator(".sheet-live-table");
+    await expect(liveTeams.locator("tbody tr")).toHaveCount(24);
+    await expect(liveTeams.locator(".sheet-empty-player")).toHaveCount(2);
     await page
       .locator(".sheet-desktop-teams")
       .last()
@@ -577,7 +630,7 @@ test.describe("desktop scoresheet MVP", () => {
     ).not.toBeChecked();
     await page.getByLabel("Titular Jogador B 5", { exact: true }).uncheck();
     await page
-      .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
+      .getByRole("button", { name: "Salvar rascunho", exact: true })
       .click();
     await expect(
       page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),

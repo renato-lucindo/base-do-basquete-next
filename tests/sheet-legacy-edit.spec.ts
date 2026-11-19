@@ -93,9 +93,7 @@ for (const version of [undefined, 2] as const)
     await page
       .getByRole("button", { name: "Concluir preparação e lançar ações" })
       .click();
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     await expect(
       page.getByText("Rascunho da súmula salvo", { exact: true }),
     ).toBeVisible();
@@ -182,9 +180,7 @@ for (const version of [undefined, 2] as const)
       "Q1 3′",
     );
     f.loseNextSheetAck();
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     await page.getByRole("button", { name: "Repetir envio da súmula" }).click();
     await expect(
       page.getByText("Rascunho da súmula salvo", { exact: true }),
@@ -346,7 +342,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   const shirt = page.getByLabel("Camisa de Jogador A 1", { exact: true });
   await shirt.fill("17");
   await shirt.press("Enter");
-  await page.getByRole("button", { name: "Salvar rascunho da súmula" }).click();
+  await page.getByRole("button", { name: "Salvar rascunho" }).click();
   await expect(page.getByRole("alert")).toContainText("motivo");
   await page
     .getByLabel("Motivo da revisão da súmula")

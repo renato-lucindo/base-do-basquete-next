@@ -11,7 +11,8 @@
 ## Súmula administrativa
 
 - Ajustes solicitados na [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87), SHA `b7330d8`. Ajuda por ícone, entrada `TD` com persistência compatível, parciais compactas, histórico numerado com filtros visíveis e tempos na linha do técnico. Tipo, build e verificação do HTML em desktop e celular passaram. A [CI da revisão](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44430727486) passou.
-- [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve `b7330d8`, versão `fbf2e68c-f5d6-4218-b3cd-18d6c5f537fa`, deployment `19fc2c8f-6a41-433c-85c8-5c1be871f32c`. Painel, health e bundle responderam 200. Aguardar conferência visual da súmula.
+- Revisão visual `5566271` da PR #87 com tipografia, campos, botões e tabelas do guia administrativo. Gate de UI e 47 testes Chromium passaram, com 33 casos ignorados pela distribuição entre desktop e celular. [CI deste SHA](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44432989048) passou.
+- [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve `5566271`, versão `61794dd6-2c33-4f42-b225-bd2e56f265ea`, deployment `2591dfb1-d81c-41e5-8ff8-bfc9d181db90`. Painel, health e bundle responderam 200, catálogo sem sessão retornou 401. Aguardar aceite visual no Worker. PR aberta.
 
 ## Revisão visual do design system
 

@@ -80,7 +80,7 @@ test("scoresheet offers visible returns and protects unsaved preparation", async
     path: ".preview-artifacts/flow-sheet-preparation.png",
   });
   const back = page.getByRole("button", {
-    name: "Voltar à lista de jogos",
+    name: "Lista de jogos",
     exact: true,
   });
   await expect(back).toBeInViewport();
@@ -118,13 +118,13 @@ test("saved preparation returns through game data and list without losing the sa
   await openDesktopSheet(page);
   await page.getByLabel("Titular Jogador A 1", { exact: true }).check();
   await page
-    .getByRole("button", { name: "Salvar rascunho da súmula", exact: true })
+    .getByRole("button", { name: "Salvar rascunho", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Rascunho da súmula salvo" }),
   ).toBeVisible();
   const data = page.getByRole("button", {
-    name: "Voltar aos dados do jogo",
+    name: "Dados do jogo",
     exact: true,
   });
   await expect(data).toBeInViewport();
@@ -147,7 +147,7 @@ test("saved preparation returns through game data and list without losing the sa
   expect(f.commands).toHaveLength(1);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page
-    .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
+    .getByRole("button", { name: "Lista de jogos", exact: true })
     .click();
   await expect(
     page.getByRole("button", {

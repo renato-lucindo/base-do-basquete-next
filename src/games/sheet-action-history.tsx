@@ -1,10 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Icon } from "../ui-system/components";
 import { periodColor, periodLabel } from "../domain/scoresheet";
-import {
-  selectActionHistory,
-  type AnnotatedAction,
-  type HistoryQuery,
-} from "../scoresheet/projection";
+import type { AnnotatedAction, HistoryQuery } from "../scoresheet/projection";
 
 const actionKinds = {
   points: "Pontos",
@@ -35,41 +32,32 @@ export function SheetActionHistory({
   const [side, setSide] = useState("");
   const [period, setPeriod] = useState("");
   const [kind, setKind] = useState("");
-  const [full, setFull] = useState(false);
   const [order, setOrder] = useState<HistoryQuery["order"]>("entry");
-  const [page, setPage] = useState(0);
-  const matches = actions.filter(
-    (action) =>
-      (!side || side === action.event.side) &&
-      (!period || Number(period) === action.event.period) &&
-      (!kind || kind === action.kind),
-  );
-  const result = selectActionHistory(matches, {
-    mode: full ? "history" : "recent",
-    sides: ["home", "away"],
-    periods: Array.from({ length: periods }, (_, i) => i + 1),
-    kinds: ["points", "fouls", "timeouts"],
-    order,
-    page,
-  });
-  const rows =
-    !full && order === "entry" ? [...result.items].reverse() : result.items;
+  const region = useRef<HTMLDivElement>(null);
+  const selectedPeriod = Number(period) > periods ? "" : period;
+  const rows = useMemo(() => {
+    const matches = actions.filter(
+      ({ event, kind: actionKind }) =>
+        (!side || side === event.side) &&
+        (!selectedPeriod || Number(selectedPeriod) === event.period) &&
+        (!kind || kind === actionKind),
+    );
+    return order === "entry"
+      ? matches.reverse()
+      : matches.sort(
+          (a, b) => a.event.period - b.event.period || a.sequence - b.sequence,
+        );
+  }, [actions, kind, order, selectedPeriod, side]);
+
+  useEffect(() => {
+    if (region.current) region.current.scrollTop = 0;
+  }, [side, selectedPeriod, kind, order]);
 
   return (
-    <section className="sheet-history" aria-label="Conferência das ações">
-      <div className="sheet-history-heading">
-        <h4>{full ? "Histórico de ações" : "Últimas ações"}</h4>
-        <button
-          type="button"
-          className="secondary"
-          onClick={() => {
-            setFull(!full);
-            setPage(0);
-          }}
-        >
-          {full ? "Últimas 10" : "Histórico completo"}
-        </button>
-      </div>
+    <section className="sheet-history" aria-labelledby="sheet-history-title">
+      <h4 className="sheet-section-heading" id="sheet-history-title">
+        Últimas ações
+      </h4>
       <fieldset disabled={disabled} className="sheet-history-filters">
         <legend className="sr-only">Filtrar ações</legend>
         <label>
@@ -79,7 +67,6 @@ export function SheetActionHistory({
             value={side}
             onChange={(e) => {
               setSide(e.target.value);
-              setPage(0);
             }}
           >
             <option value="">Todas</option>
@@ -91,10 +78,9 @@ export function SheetActionHistory({
           Período
           <select
             aria-label="Filtrar ações por período"
-            value={period}
+            value={selectedPeriod}
             onChange={(e) => {
               setPeriod(e.target.value);
-              setPage(0);
             }}
           >
             <option value="">Todos</option>
@@ -112,7 +98,6 @@ export function SheetActionHistory({
             value={kind}
             onChange={(e) => {
               setKind(e.target.value);
-              setPage(0);
             }}
           >
             <option value="">Todos</option>
@@ -130,7 +115,6 @@ export function SheetActionHistory({
             value={order}
             onChange={(e) => {
               setOrder(e.target.value as HistoryQuery["order"]);
-              setPage(0);
             }}
           >
             <option value="entry">Ordem de lançamento</option>
@@ -140,6 +124,7 @@ export function SheetActionHistory({
       </fieldset>
       <div
         className="sheet-history-scroll"
+        ref={region}
         role="region"
         aria-label="Registro de ações"
         tabIndex={0}
@@ -168,7 +153,7 @@ export function SheetActionHistory({
                   <td>{targets[event.target] ?? "#" + event.target}</td>
                   <td>{action.annotation.replace(/^TO ·/u, "TD ·")}</td>
                   <td>
-                    <div className="competition-actions">
+                    <div className="sheet-row-actions">
                       <button
                         type="button"
                         disabled={disabled}
@@ -176,7 +161,7 @@ export function SheetActionHistory({
                         aria-label={`Editar ação ${sequence}`}
                         onClick={() => onEdit(action)}
                       >
-                        Editar
+                        <Icon name="edit" /> Editar
                       </button>
                       <button
                         type="button"
@@ -185,7 +170,7 @@ export function SheetActionHistory({
                         aria-label={`Excluir ação ${sequence}`}
                         onClick={() => onDelete(event.id)}
                       >
-                        Excluir
+                        <Icon name="trash" /> Excluir
                       </button>
                     </div>
                   </td>
@@ -204,25 +189,6 @@ export function SheetActionHistory({
           </tbody>
         </table>
       </div>
-      {full && matches.length > 10 && (
-        <div className="competition-actions">
-          <button
-            type="button"
-            disabled={disabled || result.page === 0}
-            onClick={() => setPage(result.page - 1)}
-          >
-            Ações anteriores
-          </button>
-          <span>Página {result.page + 1}</span>
-          <button
-            type="button"
-            disabled={disabled || !result.hasMore}
-            onClick={() => setPage(result.page + 1)}
-          >
-            Próximas ações
-          </button>
-        </div>
-      )}
     </section>
   );
 }

@@ -10,7 +10,7 @@ Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar alt
 
 - Identifique a principal tarefa e o primeiro dado útil antes de projetar. Contexto, filtros e controles devem ajudar a encontrá-lo.
 - Tema claro, azul como destaque, linguagem visual sóbria, tabelas, listas, divisores e alinhamento consistente. Consulte tokens e componentes reais; sugestões externas não substituem identidade aprovada.
-- Aproveite a largura desktop para reduzir rolagem e espaços vazios. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.
+- Use a largura desktop conforme a tarefa. Dimensione tabelas e colunas pelo conteúdo e aproveite o espaço ao lado para dados e ações relacionados. Reserve a largura inteira para tabelas que precisem dela. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.
 - Compactar nunca autoriza texto ilegível, alvos pequenos, omissão de contexto necessário ou etapas escondidas. Prefira hierarquia por proximidade, tamanho, peso e contraste.
 - Rótulos em português brasileiro natural; siglas recebem somente o significado curto aprovado, acessível também por teclado e toque.
 

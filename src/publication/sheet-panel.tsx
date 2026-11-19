@@ -1,7 +1,6 @@
 import { aggregate } from "../domain/scoresheet";
-import { PublicationHistory } from "./history";
 import { toEngineSheet } from "../games/sheet-contract";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { z } from "zod";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
@@ -19,7 +18,6 @@ import {
   initialGDReview,
   publishedGD,
 } from "./collective-review";
-import { TeamStatisticsPanel } from "./team-statistics-panel";
 import {
   publicationStateSchema,
   publicationVersionSchema,
@@ -33,6 +31,9 @@ export type SheetPublicationProps = {
   sourceVersion: number;
   gameVersion: number;
   confirmed: boolean;
+  alreadyPublished: boolean;
+  draftAction: ReactNode;
+  onAcknowledged: () => void;
   reason: string;
   onReason: (v: string) => void;
   disabled: boolean;
@@ -46,9 +47,6 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
   const [teamReview, setTeamReview] = useState(() =>
     initialGDReview(deriveSheetTeamStatistics(p.document)),
   );
-  const [historicalLocked, setHistoricalLocked] = useState(false);
-  const [historyEpoch, setHistoryEpoch] = useState(0);
-  const historicalGuard = useRef<() => boolean>(() => true);
   const reviewDocument = useRef("");
   const documentKey = JSON.stringify(p.document);
   const [state, setState] = useState<PublicationState | null>(null),
@@ -61,7 +59,7 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
     heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     epoch = useRef(0);
-  const blocked = busy || uncertain || ack !== null || historicalLocked;
+  const blocked = busy || uncertain || ack !== null;
   const totals = aggregate(toEngineSheet(p.document));
   const collective = deriveSheetTeamStatistics(p.document);
   useEffect(() => {
@@ -75,7 +73,6 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
   useEffect(() => {
     p.guard.current = () =>
       !busy &&
-      historicalGuard.current() &&
       (!(uncertain || ack) ||
         window.confirm(
           "Há uma publicação sem reconciliação concluída. Deseja sair e conferir depois?",
@@ -253,6 +250,7 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
           "Não foi possível confirmar a publicação. Repita o mesmo envio.",
         );
       setAck(r);
+      p.onAcknowledged();
       pending.current = null;
       setUncertain(false);
       await finish(r);
@@ -298,13 +296,18 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
       className="sheet-publication"
       aria-busy={busy}
     >
-      <button
-        className={state ? "secondary" : "primary"}
-        disabled={p.disabled || blocked}
-        onClick={() => void prepare()}
-      >
-        {p.confirmed ? "Salvar e republicar" : "Confirmar e publicar"}
-      </button>
+      <div className="competition-actions sheet-save-commands">
+        <button
+          className={state ? "secondary" : "primary"}
+          disabled={p.disabled || blocked}
+          onClick={() => void prepare()}
+        >
+          {p.alreadyPublished || p.confirmed
+            ? "Salvar e republicar"
+            : "Salvar e publicar"}
+        </button>
+        {p.draftAction}
+      </div>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1}>
           {error}
@@ -399,36 +402,6 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
             </button>
           )}
         </>
-      )}
-      {(p.confirmed || state?.published || ack) && (
-        <p>
-          <a
-            href={`/resultado.html#${p.game.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ver resultado publicado
-          </a>
-        </p>
-      )}
-      <PublicationHistory
-        key={historyEpoch}
-        gameId={p.game.id}
-        enabled={!p.disabled && !busy}
-        onSessionLost={p.onSessionLost}
-      />
-      {(p.confirmed || state?.published || ack) && (
-        <TeamStatisticsPanel
-          gameId={p.game.id}
-          disabled={p.disabled || busy || uncertain || ack !== null}
-          onLock={setHistoricalLocked}
-          guard={historicalGuard}
-          onSessionLost={p.onSessionLost}
-          onUpdated={() => {
-            setState(null);
-            setHistoryEpoch((n) => n + 1);
-          }}
-        />
       )}
     </section>
   );
