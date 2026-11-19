@@ -252,13 +252,6 @@ export function CompetitionWorkspace({
               >
                 Equipes publicadas
               </a>
-              <button
-                type="button"
-                className="secondary competition-back"
-                onClick={back}
-              >
-                Voltar aos campeonatos
-              </button>
             </nav>
             <div className="competition-context-selection">
               <h2 ref={heading} tabIndex={-1}>
@@ -282,6 +275,13 @@ export function CompetitionWorkspace({
                   ))}
                 </select>
               </label>
+              <button
+                type="button"
+                className="secondary competition-back"
+                onClick={back}
+              >
+                Voltar aos campeonatos
+              </button>
             </div>
           </div>
           <div hidden={area !== "regulation"}>

@@ -570,12 +570,17 @@
 }
 
 .game-sheet
-  :is(.sheet-input, .sheet-history-filters, .sheet-edit-fields)
-  label {
+  :is(
+    .sheet-input label,
+    .sheet-history-filters label,
+    .sheet-edit-fields label,
+    .sheet-save-reason
+  ) {
   display: grid;
   gap: 0.1875rem;
   font-size: var(--sheet-detail);
   font-weight: 500;
+  line-height: 1.4;
 }
 .competition-workspace
   .game-sheet
@@ -775,6 +780,10 @@
 .sheet-staff-line {
   line-height: 1.25;
 }
+.sheet-assistant-line {
+  border-top: 1px solid var(--bb-line);
+  padding-block-start: 0.25rem;
+}
 .sheet-timeout-item strong {
   font-weight: 650;
 }
@@ -943,5 +952,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 1000px) {
+  .sheet-layout-pair > .sheet-save-panel {
+    padding-block-start: 0;
+    border: 0;
+    border-inline-start: 1px solid var(--bb-line);
+    border-radius: 0;
   }
 }

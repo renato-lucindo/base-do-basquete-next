@@ -67,7 +67,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       page
         .getByRole("table", { name: "Parciais das equipes" })
-        .getByRole("columnheader", { name: "OT1" }),
+        .getByRole("columnheader", { name: "PE1" }),
     ).toBeVisible();
     for (const viewport of [
       { width: 1366, height: 768 },
@@ -77,7 +77,7 @@ test.describe("desktop scoresheet MVP", () => {
       await expect(times).toContainText("Q1 3′");
       await expect(times).toContainText("Q2 8′");
       await expect(times).toContainText("Q4 9′");
-      await expect(times).toContainText("OT1 4′");
+      await expect(times).toContainText("PE1 4′");
       await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
       await expect(times.locator(".sheet-ink-blue")).toHaveCount(2);
     }
@@ -99,7 +99,7 @@ test.describe("desktop scoresheet MVP", () => {
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
-      "OT1 4′",
+      "PE1 4′",
     );
   });
   test("desktop action history uses a numbered table at both requested viewports", async ({
@@ -117,12 +117,6 @@ test.describe("desktop scoresheet MVP", () => {
       })
       .click();
     await page.setViewportSize({ width: 1366, height: 768 });
-    const navigation = page.getByRole("navigation", {
-      name: "Áreas do campeonato",
-    });
-    await expect(navigation.locator(":scope > :last-child")).toHaveText(
-      "Voltar aos campeonatos",
-    );
     const championship = await page
       .getByRole("heading", { name: "Liga de teste" })
       .boundingBox();
@@ -130,6 +124,10 @@ test.describe("desktop scoresheet MVP", () => {
       .getByRole("combobox", { name: "Disputa atual" })
       .boundingBox();
     expect(championship!.x + championship!.width).toBeLessThan(dispute!.x);
+    const back = await page
+      .getByRole("button", { name: "Voltar aos campeonatos", exact: true })
+      .boundingBox();
+    expect(back!.x).toBeGreaterThan(dispute!.x + dispute!.width);
     await page.evaluate(() => window.scrollTo(0, 0));
     const register = page.getByRole("button", {
       name: "Registrar ação",
@@ -148,7 +146,12 @@ test.describe("desktop scoresheet MVP", () => {
     const name = rosters
       .first()
       .getByRole("rowheader", { name: longName, exact: true });
-    await expect(name).toHaveAttribute("title", longName);
+    const nameText = name.locator(".sheet-athlete-label");
+    await nameText.hover();
+    await expect(nameText).toHaveAttribute("title", longName);
+    const shortName = rosters.last().locator(".sheet-athlete-label").last();
+    await shortName.hover();
+    await expect(shortName).not.toHaveAttribute("title", /.+/u);
     expect(
       await name
         .locator(".sheet-athlete-label")
@@ -367,10 +370,10 @@ test.describe("desktop scoresheet MVP", () => {
       exact: true,
     });
     await expect(
-      partials.getByRole("columnheader", { name: "OT1", exact: true }),
+      partials.getByRole("columnheader", { name: "PE1", exact: true }),
     ).toBeVisible();
     await expect(
-      partials.getByRole("columnheader", { name: "OT2", exact: true }),
+      partials.getByRole("columnheader", { name: "PE2", exact: true }),
     ).toBeVisible();
     const team = partials.getByRole("row").filter({
       has: page.getByRole("rowheader", { name: "A · Lobos", exact: true }),
@@ -498,6 +501,14 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       cards.first().getByLabel("Tempos debitados da equipe A"),
     ).toContainText("Tempo Debitado:");
+    await expect(cards.first().locator(".sheet-assistant-line")).toHaveCSS(
+      "border-top-width",
+      "1px",
+    );
+    await expect(cards.last().locator(".sheet-assistant-line")).toHaveCSS(
+      "border-top-width",
+      "1px",
+    );
     const cardA = await cards.first().boundingBox();
     const cardB = await cards.last().boundingBox();
     expect(cardA!.height).toBeCloseTo(cardB!.height, 0);

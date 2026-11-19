@@ -1,5 +1,6 @@
+import { sheetPeriodLabel } from "./sheet-period-label";
 import { compareJerseys } from "../domain/jersey";
-import { periodColor, periodLabel } from "../domain/scoresheet";
+import { periodColor } from "../domain/scoresheet";
 import type { PersistedSheet, SheetSnapshot } from "./sheet-contract";
 import type { GameSnapshot } from "./contract";
 import type { projectSheet } from "../scoresheet/projection";
@@ -44,7 +45,7 @@ export function SheetPartials({
                 scope="col"
                 className={i + 1 === period ? "sheet-current-period" : ""}
               >
-                {periodLabel(i + 1)}
+                {sheetPeriodLabel(i + 1)}
               </th>
             ))}
             <th scope="col">Total</th>
@@ -116,7 +117,7 @@ export function SheetLiveTables({
               ? timeouts.map((event, index) => (
                   <span className="sheet-timeout-item" key={event.id}>
                     {index > 0 && <span aria-hidden="true"> · </span>}
-                    {periodLabel(event.period)}{" "}
+                    {sheetPeriodLabel(event.period)}{" "}
                     <strong
                       className={`sheet-ink-${periodColor(event.period)}`}
                     >
@@ -148,7 +149,7 @@ export function SheetLiveTables({
                   <th scope="col">Nº</th>
                   <th scope="col">Atleta</th>
                   <th scope="col">Entrou</th>
-                  {["Q1", "Q2", "Q3", "Q4 + OT"].map((q, i) => (
+                  {["Q1", "Q2", "Q3", "Q4 + PE"].map((q, i) => (
                     <th
                       scope="col"
                       key={q}
@@ -174,13 +175,21 @@ export function SheetLiveTables({
                   return (
                     <tr key={identity.rosterEntryId}>
                       <td>{r.jersey}</td>
-                      <th
-                        scope="row"
-                        className="sheet-athlete-name"
-                        title={playerName}
-                      >
+                      <th scope="row" className="sheet-athlete-name">
                         <div className="sheet-athlete">
-                          <span className="sheet-athlete-label">
+                          <span
+                            className="sheet-athlete-label"
+                            onMouseEnter={({ currentTarget }) => {
+                              if (
+                                currentTarget.scrollWidth >
+                                currentTarget.clientWidth
+                              )
+                                currentTarget.title = playerName;
+                            }}
+                            onMouseLeave={({ currentTarget }) =>
+                              currentTarget.removeAttribute("title")
+                            }
+                          >
                             {playerName}
                           </span>
                           {identity.starter && <small title="Titular">*</small>}
@@ -223,12 +232,12 @@ export function SheetLiveTables({
                             className={`sheet-foul-cell ${f ? "sheet-ink-" + f.color : ""} ${firstHalfClass(f?.period, r.fouls[i - 1]?.period, i < 4 ? r.fouls[i + 1]?.period : undefined)}`}
                             title={
                               f
-                                ? `${i + 1}ª falta · ${periodLabel(f.period)} · ${f.code}`
+                                ? `${i + 1}ª falta · ${sheetPeriodLabel(f.period)} · ${f.code}`
                                 : `${i + 1}ª falta`
                             }
                             aria-label={
                               f
-                                ? `${i + 1}ª falta · ${periodLabel(f.period)} · ${f.code}`
+                                ? `${i + 1}ª falta · ${sheetPeriodLabel(f.period)} · ${f.code}`
                                 : `${i + 1}ª falta vazia`
                             }
                           >
@@ -304,7 +313,14 @@ export function SheetLiveTables({
                                 ? "Capitão"
                                 : "Sucessor";
                         return (
-                          <div key={id} className="sheet-staff-line">
+                          <div
+                            key={id}
+                            className={
+                              role === "Ass. Técnico"
+                                ? "sheet-staff-line sheet-assistant-line"
+                                : "sheet-staff-line"
+                            }
+                          >
                             <span className="sheet-staff-identity">
                               {role}: {staffName(id)}
                               {id !== coachId && team.activeCoachId === id && (
@@ -323,7 +339,7 @@ export function SheetLiveTables({
                               <span
                                 key={mark.id + mark.code}
                                 className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(mark.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
-                                title={`${periodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
+                                title={`${sheetPeriodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
                               >
                                 {mark.code.replace(/C$/u, "c")}
                               </span>
@@ -334,7 +350,9 @@ export function SheetLiveTables({
                       })}
                       {!assigned.assistantStaffEntryId &&
                         d.staff[other].assistantStaffEntryId && (
-                          <div className="sheet-staff-line">Ass. Técnico:</div>
+                          <div className="sheet-staff-line sheet-assistant-line">
+                            Ass. Técnico:
+                          </div>
                         )}
                     </>
                   );
@@ -359,7 +377,7 @@ export function SheetLiveTables({
                       <span
                         key={e.id}
                         className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(e.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
-                        title={`${periodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
+                        title={`${sheetPeriodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
                       >
                         {e.code.replace(/C$/u, "c")}
                       </span>

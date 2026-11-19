@@ -1195,6 +1195,26 @@ test("manual publication confirms identities, keeps participation editable and r
     })
     .click();
   await page.getByLabel("Entrou Atleta home 5", { exact: true }).check();
+  for (const [width, height] of [
+    [1366, 768],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    const titles = ["Últimas ações", "Salvamento e publicação"];
+    const [historyTitle, saveTitle] = await Promise.all(
+      titles.map((name) =>
+        page.getByRole("heading", { name, exact: true }).boundingBox(),
+      ),
+    );
+    const filter = await page
+      .getByLabel("Filtrar ações por equipe")
+      .boundingBox();
+    const reason = await page
+      .getByRole("textbox", { name: "Motivo da revisão da súmula" })
+      .boundingBox();
+    expect(historyTitle!.y).toBeCloseTo(saveTitle!.y, 0);
+    expect(filter!.y).toBeCloseTo(reason!.y, 0);
+  }
   expect(f.published()).toEqual(firstPublic);
   await page
     .getByRole("textbox", { name: "Motivo da revisão da súmula", exact: true })
