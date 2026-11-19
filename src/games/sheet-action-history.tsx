@@ -172,6 +172,7 @@ export function SheetActionHistory({
                       <button
                         type="button"
                         disabled={disabled}
+                        className="sheet-row-action"
                         aria-label={`Editar ação ${sequence}`}
                         onClick={() => onEdit(action)}
                       >
@@ -180,6 +181,7 @@ export function SheetActionHistory({
                       <button
                         type="button"
                         disabled={disabled}
+                        className="sheet-row-action sheet-remove-action"
                         aria-label={`Excluir ação ${sequence}`}
                         onClick={() => onDelete(event.id)}
                       >

@@ -87,7 +87,7 @@ test.describe("desktop scoresheet MVP", () => {
   test("desktop action history uses a numbered table at both requested viewports", async ({
     page,
   }) => {
-    await desktopSheetFixture(page);
+    await desktopSheetFixture(page, 12);
     await openDesktopSheet(page);
     await chooseFive(page);
     await page
@@ -96,6 +96,26 @@ test.describe("desktop scoresheet MVP", () => {
         exact: true,
       })
       .click();
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const register = page.getByRole("button", {
+      name: "Registrar ação",
+      exact: true,
+    });
+    await expect(register).toHaveCSS("background-color", "rgb(7, 95, 202)");
+    await expect(
+      page.getByRole("button", { name: "Revisar preparação", exact: true }),
+    ).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    await expect(page.getByLabel("Camisa ou alvo", { exact: true })).toHaveCSS(
+      "font-size",
+      "16px",
+    );
+    const rosters = page.locator(".sheet-live-table");
+    await expect(rosters.locator("tbody tr")).toHaveCount(24);
+    await page.screenshot({
+      path: ".preview-artifacts/sumula-worker-ui-desktop.png",
+      animations: "disabled",
+    });
     for (let i = 0; i < 10; i++) {
       await page.getByLabel("Camisa ou alvo", { exact: true }).fill("1");
       await page.keyboard.press("Enter");
@@ -597,10 +617,17 @@ test("scoresheet reflows at CSS widths equivalent to 200% desktop zoom", async (
     expect(boxes).toHaveLength(2);
     for (const box of boxes) expect(box.bottom).toBeGreaterThan(box.top);
     expect(boxes[1].top).toBeGreaterThanOrEqual(boxes[0].bottom - 1);
-    const overflow = await grid.evaluate(
-      (node) => node.scrollWidth > node.clientWidth + 1,
+    const overflow = await grid.evaluate((node) => ({
+      width: node.clientWidth,
+      content: node.scrollWidth,
+      cards: [...node.querySelectorAll(".sheet-team-card")].map((card) => [
+        card.clientWidth,
+        card.scrollWidth,
+      ]),
+    }));
+    expect(overflow.content, JSON.stringify(overflow)).toBeLessThanOrEqual(
+      overflow.width + 1,
     );
-    expect(overflow).toBe(false);
     await grid.screenshot({
       path: `.preview-artifacts/sheet-zoom200-${phase}-after-${source}.png`,
       animations: "disabled",

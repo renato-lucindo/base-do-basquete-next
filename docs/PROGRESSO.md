@@ -8,6 +8,11 @@
 
 - Revisão `491786d` da PR #87. Busca de campeonatos começa recolhida no diálogo **Adicionar disputa**, com foco no campo e resultados após digitação. Quatro testes Chromium em desktop e celular passaram. Worker serve `491786d`, versão `b42751fd-af46-4a61-8882-58324c735c78`, deployment `fdb3bc5e-93c0-4ada-8569-6b0371dcb00f`. Painel, health e bundle retornaram 200 e catálogo sem sessão retornou 401. A [CI da revisão](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44411791368) passou nos sete checks. Aguardar conferência do ajuste e autorização de merge.
 
+## Súmula administrativa
+
+- Ajustes solicitados na [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87), SHA `b7330d8`. Ajuda por ícone, entrada `TD` com persistência compatível, parciais compactas, histórico numerado com filtros visíveis e tempos na linha do técnico. Tipo, build e verificação do HTML em desktop e celular passaram. A [CI da revisão](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/44430727486) passou.
+- [Worker administrativo](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/admin) serve `b7330d8`, versão `fbf2e68c-f5d6-4218-b3cd-18d6c5f537fa`, deployment `19fc2c8f-6a41-433c-85c8-5c1be871f32c`. Painel, health e bundle responderam 200. Aguardar conferência visual da súmula.
+
 ## Revisão visual do design system
 
 - Unidade `codex/revisao-design-system` baseada em `745e964`. O [guia visual de 18/11/2026](design/catalogo/guia-completo-autonomo.html) rege alterações futuras de interface. A engrenagem recebeu contorno centralizado. O [guia de adoção](design/DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026) registra escopo e evidências.

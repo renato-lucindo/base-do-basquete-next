@@ -298,7 +298,11 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
       className="sheet-publication"
       aria-busy={busy}
     >
-      <button disabled={p.disabled || blocked} onClick={() => void prepare()}>
+      <button
+        className={state ? "secondary" : "primary"}
+        disabled={p.disabled || blocked}
+        onClick={() => void prepare()}
+      >
         {p.confirmed ? "Salvar e republicar" : "Confirmar e publicar"}
       </button>
       {error && (
@@ -378,6 +382,7 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
             </>
           ) : (
             <button
+              className="primary"
               disabled={busy || p.disabled || (!uncertain && !ready)}
               onClick={() => void publish()}
             >

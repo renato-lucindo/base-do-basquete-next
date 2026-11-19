@@ -622,6 +622,17 @@ export function GameSheetWorkspace(props: Props) {
         <h3 ref={heading} tabIndex={-1}>
           Relacionados e súmula
         </h3>
+        <p role="status" className="sheet-draft-status">
+          {busy
+            ? "Aguarde…"
+            : uncertain
+              ? "Envio da súmula não confirmado"
+              : conflict
+                ? "Conflito na súmula"
+                : dirty
+                  ? "Súmula não salva"
+                  : status}
+        </p>
         <div className="competition-actions">
           <button
             className="secondary"
@@ -646,17 +657,6 @@ export function GameSheetWorkspace(props: Props) {
           {error}
         </p>
       )}
-      <p role="status">
-        {busy
-          ? "Aguarde…"
-          : uncertain
-            ? "Envio da súmula não confirmado"
-            : conflict
-              ? "Conflito na súmula"
-              : dirty
-                ? "Súmula não salva"
-                : status}
-      </p>
       {auxiliary ? (
         <>
           <button
@@ -688,22 +688,11 @@ export function GameSheetWorkspace(props: Props) {
         </>
       ) : d ? (
         <>
-          <div className="sheet-step-bar">
-            <strong>
-              {preparationOpen ? "1. Preparar equipes" : "2. Lançar e conferir"}
-            </strong>
-            {!preparationOpen && (
-              <button
-                disabled={locked || !!editing || !!deleting}
-                onClick={() => setPreparationOpen(true)}
-              >
-                Revisar preparação
-              </button>
-            )}
-          </div>
           {preparationOpen && (
             <>
-              <h4>Preparar relacionados e comissão</h4>
+              <h4 className="sheet-section-heading">
+                Preparar relacionados e comissão
+              </h4>
               {candidatesLoading && (
                 <p role="status">Carregando elencos e comissão…</p>
               )}
@@ -720,6 +709,7 @@ export function GameSheetWorkspace(props: Props) {
                 />
               )}
               <button
+                className="primary"
                 disabled={locked || candidatesLoading || !context}
                 onClick={() => void save(true)}
               >
@@ -812,6 +802,9 @@ export function GameSheetWorkspace(props: Props) {
                       }}
                     />
                   </label>
+                  <button type="button" className="primary" onClick={addAction}>
+                    Registrar ação
+                  </button>
                 </div>
                 {d.formatVersion === 2 &&
                   /Indique explicitamente outro atleta elegível/u.test(
@@ -832,8 +825,7 @@ export function GameSheetWorkspace(props: Props) {
                       </select>
                     </label>
                   )}
-                <div className="competition-actions">
-                  <button onClick={addAction}>Registrar ação</button>
+                <div className="competition-actions sheet-entry-controls">
                   <button
                     disabled={!history.past.length || !!editing}
                     onClick={() => {
@@ -862,25 +854,32 @@ export function GameSheetWorkspace(props: Props) {
                   >
                     Refazer ação ou ajuste
                   </button>
-                </div>
-                <label>
-                  Períodos da súmula
-                  <select
-                    aria-label="Períodos da súmula"
-                    value={d.periods}
-                    onChange={(e) => {
-                      const periods = Number(e.target.value);
-                      if (mutate({ ...d, periods }))
-                        setPeriod((p) => Math.min(p, periods));
-                    }}
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => setPreparationOpen(true)}
                   >
-                    {Array.from({ length: 9 }, (_, i) => (
-                      <option key={i + 4} value={i + 4}>
-                        {i + 4} períodos
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    Revisar preparação
+                  </button>
+                  <label>
+                    Períodos da súmula
+                    <select
+                      aria-label="Períodos da súmula"
+                      value={d.periods}
+                      onChange={(e) => {
+                        const periods = Number(e.target.value);
+                        if (mutate({ ...d, periods }))
+                          setPeriod((p) => Math.min(p, periods));
+                      }}
+                    >
+                      {Array.from({ length: 9 }, (_, i) => (
+                        <option key={i + 4} value={i + 4}>
+                          {i + 4} períodos
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
               </fieldset>
             )}
             <AdminDialog
@@ -1118,7 +1117,7 @@ export function GameSheetWorkspace(props: Props) {
                       </label>
                     )}
                   <div className="competition-actions">
-                    <button type="submit" disabled={locked}>
+                    <button type="submit" className="primary" disabled={locked}>
                       Salvar edição da ação
                     </button>
                     <button
@@ -1150,6 +1149,7 @@ export function GameSheetWorkspace(props: Props) {
               <div className="competition-actions">
                 <button
                   type="button"
+                  className="sheet-danger"
                   disabled={locked}
                   onClick={() => {
                     if (engine && deleting) {
@@ -1192,7 +1192,7 @@ export function GameSheetWorkspace(props: Props) {
               />
             </label>
           )}
-          <div className="competition-actions">
+          <div className="competition-actions sheet-draft-actions">
             <button
               disabled={
                 busy || publicationLocked || conflict || !!editing || !!deleting
