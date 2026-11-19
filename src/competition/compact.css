@@ -106,29 +106,10 @@
     padding: 0.375rem 0.5rem;
     font-size: 0.875rem;
   }
-  .compact-pilot button,
-  .compact-pilot .competition-public-link {
+  .compact-pilot button {
     min-height: 2.125rem;
     padding: 0.3125rem 0.625rem;
     font-size: 0.875rem;
-  }
-  .compact-pilot .competition-tabs {
-    gap: 0.25rem;
-    margin: 0 0 0.625rem;
-    padding: 0 0 0.5rem;
-  }
-  .compact-pilot .competition-tabs button,
-  .compact-pilot .competition-public-link {
-    border: 0;
-    border-radius: 0;
-    border-bottom: 0.125rem solid transparent;
-    background: none;
-    color: #42526b;
-  }
-  .compact-pilot .competition-tabs [aria-current="page"] {
-    background: #eef6ff;
-    color: #075fca;
-    border-bottom-color: #075fca;
   }
   .compact-pilot .competition-title .competition-search {
     margin: 0;
@@ -660,12 +641,6 @@
   .compact-pilot :is(button, input, select, textarea, summary):focus-visible {
     outline: 0.1875rem solid var(--admin-blue);
     outline-offset: 0.125rem;
-  }
-  .compact-pilot .competition-tabs {
-    border-bottom: 1px solid var(--admin-line);
-  }
-  .compact-pilot .competition-tabs [aria-current="page"] {
-    font-weight: 700;
   }
   .compact-pilot .text-import-workspace {
     margin-top: 0.5rem;

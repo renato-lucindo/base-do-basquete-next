@@ -210,48 +210,52 @@ export function CompetitionWorkspace({
         <>
           <div className="competition-context-header">
             <nav className="competition-tabs" aria-label="Áreas do campeonato">
-              <button
-                type="button"
-                className="secondary"
-                aria-current={area === "teams" ? "page" : undefined}
-                onClick={() => changeArea("teams")}
-              >
-                Equipes e elencos
-              </button>
-              <button
-                type="button"
-                className="secondary"
-                aria-current={area === "games" ? "page" : undefined}
-                onClick={() => changeArea("games")}
-              >
-                Jogos
-              </button>
-              <button
-                type="button"
-                className="secondary"
-                aria-current={area === "regulation" ? "page" : undefined}
-                onClick={() => changeArea("regulation")}
-              >
-                {flexibleCompetitionEnabled()
-                  ? "Formato e classificação"
-                  : "Regulamento"}
-              </button>
-              <a
-                className="competition-public-link"
-                href={`/estatisticas.html#${context.id}?scope=all`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Estatísticas publicadas
-              </a>
-              <a
-                className="competition-public-link"
-                href={`/equipes.html#${context.id}?scope=all`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Equipes publicadas
-              </a>
+              <div className="competition-admin-tabs">
+                <button
+                  type="button"
+                  className="secondary"
+                  aria-current={area === "teams" ? "page" : undefined}
+                  onClick={() => changeArea("teams")}
+                >
+                  Equipes e elencos
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  aria-current={area === "games" ? "page" : undefined}
+                  onClick={() => changeArea("games")}
+                >
+                  Jogos
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  aria-current={area === "regulation" ? "page" : undefined}
+                  onClick={() => changeArea("regulation")}
+                >
+                  {flexibleCompetitionEnabled()
+                    ? "Formato e classificação"
+                    : "Regulamento"}
+                </button>
+              </div>
+              <div className="competition-public-links">
+                <a
+                  className="competition-public-link"
+                  href={`/estatisticas.html#${context.id}?scope=all`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Estatísticas publicadas
+                </a>
+                <a
+                  className="competition-public-link"
+                  href={`/equipes.html#${context.id}?scope=all`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Equipes publicadas
+                </a>
+              </div>
             </nav>
             <div className="competition-context-selection">
               <h2 ref={heading} tabIndex={-1}>

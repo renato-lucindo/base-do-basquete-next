@@ -64,9 +64,16 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
     name: "Jogos da disputa",
     exact: true,
   });
-  await page
-    .getByRole("textbox", { name: "Buscar jogo", exact: true })
-    .fill("Local");
+  const search = page.getByRole("textbox", {
+    name: "Buscar jogo",
+    exact: true,
+  });
+  const clear = page.getByRole("button", {
+    name: "Limpar filtros",
+    exact: true,
+  });
+  await expect(clear).toHaveCount(0);
+  await search.fill("Local");
   await expect(
     table.getByRole("columnheader", { name: /Data/ }),
   ).toHaveAttribute("aria-sort", "ascending");
@@ -109,6 +116,7 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
   const edit = rows
     .last()
     .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true });
+  await expect(edit).toHaveCSS("color", "rgb(7, 95, 202)");
   await edit.click();
   await page
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
@@ -135,6 +143,16 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
     .getByRole("button", { name: "Lista de jogos", exact: true })
     .click();
   await expect(sheet).toBeFocused();
+  await expect
+    .poll(() => list.evaluate((region) => region.scrollTop))
+    .toBeGreaterThan(0);
+  await clear.click();
+  await expect(search).toBeFocused();
+  await expect.poll(() => list.evaluate((region) => region.scrollTop)).toBe(0);
+  await expect(table.locator("th[aria-sort]")).toHaveAttribute(
+    "aria-sort",
+    "ascending",
+  );
   await table
     .getByRole("button", { name: "Ordenar por Nº", exact: true })
     .click();
@@ -155,6 +173,68 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
   await date.fill("2026-11-20");
   await expect(
     page.getByText("Nenhum jogo encontrado nesta disputa."),
+  ).toBeVisible();
+  await date.fill("2026-11-19");
+  await expect(rows.first()).toContainText("Equipe 21");
+
+  let releaseSearch!: () => void;
+  let releaseReset!: () => void;
+  const holdSearch = new Promise<void>((resolve) => {
+    releaseSearch = resolve;
+  });
+  const holdReset = new Promise<void>((resolve) => {
+    releaseReset = resolve;
+  });
+  await page.route(/\/api\/games\?/, async (route) => {
+    const params = new URL(route.request().url()).searchParams;
+    if (params.get("q") === "Busca pendente") await holdSearch;
+    if (
+      params.get("q") === "" &&
+      params.get("offset") === "0" &&
+      !params.has("teamId")
+    )
+      await holdReset;
+    await route.fallback();
+  });
+  try {
+    const pending = page.waitForRequest((request) => {
+      const url = new URL(request.url());
+      return (
+        url.pathname === "/api/games" &&
+        url.searchParams.get("q") === "Busca pendente"
+      );
+    });
+    await search.fill("Busca pendente");
+    await pending;
+    const reset = page.waitForRequest((request) => {
+      const url = new URL(request.url());
+      return url.pathname === "/api/games" && url.searchParams.get("q") === "";
+    });
+    await clear.click();
+    const params = new URL((await reset).url()).searchParams;
+    expect(params.get("offset")).toBe("0");
+    expect(params.get("sort")).toBe("number");
+    expect(params.get("direction")).toBe("desc");
+    for (const key of ["teamId", "state", "date"])
+      expect(params.has(key)).toBe(false);
+    for (const field of [search, team, state, date])
+      await expect(field).toHaveValue("");
+    await expect(search).toBeFocused();
+    await expect(clear).toHaveCount(0);
+    await expect(rows.first()).toContainText("Equipe 21");
+  } finally {
+    releaseReset();
+    releaseSearch();
+  }
+  await expect(rows.first().locator("td").first()).toHaveText("35");
+  const add = page.getByRole("button", { name: "Novo jogo", exact: true });
+  await expect(add.locator("svg[aria-hidden=true] path")).toHaveAttribute(
+    "d",
+    "M12 5v14M5 12h14",
+  );
+  await add.click();
+  await expect(
+    page.getByRole("dialog", { name: "Novo jogo", exact: true }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });

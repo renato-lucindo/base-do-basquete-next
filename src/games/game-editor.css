@@ -395,7 +395,8 @@
   font-variant-numeric: tabular-nums;
 }
 .game-list-state,
-.game-list-action {
+.game-list-action,
+.game-list-add {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -407,8 +408,13 @@
   color: var(--bb-success);
 }
 .game-list-state svg,
-.game-list-action svg {
+.game-list-action svg,
+.game-list-add svg {
   flex: none;
+}
+.game-list-add svg {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 .game-list-operations {
   width: 1%;
@@ -419,6 +425,9 @@
 }
 .game-list-action + .game-list-action {
   margin-inline-start: 0.25rem;
+}
+.competition-workspace .games-workspace button.game-list-edit:not(:disabled) {
+  color: var(--bb-blue);
 }
 .game-list-scroll > :is(p, .game-list-error) {
   margin: 0;
@@ -448,6 +457,15 @@
 .game-list-filters :is(input, select) {
   width: 100%;
   min-width: 0;
+}
+.games-workspace > .competition-title button.game-list-clear {
+  border-color: transparent;
+  color: var(--bb-blue);
+  background: transparent;
+}
+.games-workspace > .competition-title button.game-list-clear:hover,
+.games-workspace > .competition-title button.game-list-clear:active {
+  background: var(--bb-blue-soft);
 }
 .game-list-updating {
   align-self: center;

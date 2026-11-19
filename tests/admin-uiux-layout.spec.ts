@@ -2,6 +2,67 @@ import { test, expect } from "@playwright/test";
 import { gamesFixture } from "./fixtures/games";
 import { tid } from "./fixtures/text-import";
 import { scanAccessibility } from "./fixtures/accessibility";
+
+test("navegação do campeonato tem estados visíveis e links públicos em outra aba", async ({
+  page,
+}, info) => {
+  await gamesFixture(page);
+  await page.goto(
+    `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
+  );
+  const nav = page.getByRole("navigation", { name: "Áreas do campeonato" });
+  const teams = nav.getByRole("button", { name: "Equipes e elencos" });
+  const games = nav.getByRole("button", { name: "Jogos", exact: true });
+  const regulation = nav.getByRole("button", { name: "Regulamento" });
+  const statistics = nav.getByRole("link", { name: "Estatísticas publicadas" });
+  const publicTeams = nav.getByRole("link", { name: "Equipes publicadas" });
+  const back = page.getByRole("button", { name: "Voltar aos campeonatos" });
+  await expect(games).toHaveAttribute("aria-current", "page");
+  await expect(games).toHaveCSS("font-weight", "700");
+  await expect(games).toHaveCSS("background-color", "rgb(238, 245, 255)");
+  for (const control of [teams, regulation, statistics, publicTeams])
+    await expect(control).toHaveCSS("border-top-width", "1px");
+
+  if (info.project.name === "desktop") {
+    for (const control of [teams, statistics, back]) {
+      await control.hover();
+      await expect(control).toHaveCSS("background-color", "rgb(238, 245, 255)");
+      await page.mouse.down();
+      await expect(control).not.toHaveCSS("box-shadow", "none");
+      await page.mouse.move(1, 1);
+      await page.mouse.up();
+    }
+  }
+
+  await teams.focus();
+  for (const control of [games, regulation, statistics, publicTeams]) {
+    await page.keyboard.press("Tab");
+    await expect(control).toBeFocused();
+    await expect(control).toHaveCSS("outline-style", "solid");
+  }
+  await page.context().route(/\/(estatisticas|equipes)\.html$/, (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: "<title>Consulta pública</title>",
+    }),
+  );
+  for (const [link, path] of [
+    [publicTeams, "equipes"],
+    [statistics, "estatisticas"],
+  ] as const) {
+    await link.focus();
+    const opened = page.waitForEvent("popup");
+    await page.keyboard.press("Enter");
+    const popup = await opened;
+    await popup.waitForURL(`**/${path}.html#${tid(3)}?scope=all`);
+    await popup.close();
+  }
+  await expect(games).toHaveAttribute("aria-current", "page");
+  await teams.focus();
+  await page.keyboard.press("Enter");
+  await expect(teams).toHaveAttribute("aria-current", "page");
+});
+
 for (const area of ["jogos", "equipes"])
   test(`reflow e geometria ${area}`, async ({ page }, info) => {
     const f = await gamesFixture(page),
@@ -98,6 +159,23 @@ for (const area of ["jogos", "equipes"])
             exact: true,
           }),
         ).toHaveCSS("font-size", "16px");
+        if (width >= 1366) {
+          const [regulation, statistics, dispute, back] = await Promise.all([
+            page.getByRole("button", { name: "Regulamento" }).boundingBox(),
+            page
+              .getByRole("link", { name: "Estatísticas publicadas" })
+              .boundingBox(),
+            page.getByRole("combobox", { name: "Disputa atual" }).boundingBox(),
+            page
+              .getByRole("button", { name: "Voltar aos campeonatos" })
+              .boundingBox(),
+          ]);
+          expect(regulation!.y).toBeCloseTo(statistics!.y, 0);
+          expect(statistics!.x).toBeGreaterThan(
+            regulation!.x + regulation!.width,
+          );
+          expect(back!.x).toBeGreaterThan(dispute!.x + dispute!.width);
+        }
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

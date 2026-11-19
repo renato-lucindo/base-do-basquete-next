@@ -75,6 +75,11 @@ const document = (s: GameSnapshot) =>
     knockoutStage: s.knockoutStage ?? null,
   });
 const initialOrder: GameOrder = { column: "date", direction: "asc" };
+const emptyFilters: GameListFilters = {
+  teamId: null,
+  state: null,
+  date: null,
+};
 
 export function GamesWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
@@ -82,6 +87,7 @@ export function GamesWorkspace(props: Props) {
   const [formatDirty, setFormatDirty] = useState(false);
   const listPosition = useRef({ y: 0, top: 0, left: 0, id: "" }),
     listScroll = useRef<HTMLDivElement>(null),
+    searchField = useRef<HTMLInputElement>(null),
     nextBatch = useRef<HTMLDivElement>(null),
     listVersion = useRef({ scope: "", epoch: -1 }),
     sheetChanged = useRef(false),
@@ -94,11 +100,7 @@ export function GamesWorkspace(props: Props) {
     }>({ items: [], hasMore: false, order: initialOrder }),
     [searchInput, setSearchInput] = useState(""),
     [query, setQuery] = useState(""),
-    [filters, setFilters] = useState<GameListFilters>({
-      teamId: null,
-      state: null,
-      date: null,
-    }),
+    [filters, setFilters] = useState(emptyFilters),
     [teams, setTeams] = useState<RegistrationSnapshot[]>([]),
     [teamLoadError, setTeamLoadError] = useState(false),
     [teamAttempt, setTeamAttempt] = useState(0),
@@ -668,6 +670,21 @@ export function GamesWorkspace(props: Props) {
     setFilters((current) => ({ ...current, ...next }));
     setOffset(0);
   }
+  function clearListFilters() {
+    setSearchInput("");
+    setQuery("");
+    setFilters(emptyFilters);
+    setOffset(0);
+    if (listScroll.current) listScroll.current.scrollTop = 0;
+    searchField.current?.focus({ preventScroll: true });
+  }
+  const hasListFilters = !!(
+    searchInput ||
+    query ||
+    filters.teamId ||
+    filters.state ||
+    filters.date
+  );
   const listRetry = listError && (
     <div className="game-list-error">
       <p role="alert">{listError}</p>
@@ -705,6 +722,7 @@ export function GamesWorkspace(props: Props) {
               <label>
                 Buscar jogo
                 <input
+                  ref={searchField}
                   maxLength={120}
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
@@ -760,6 +778,15 @@ export function GamesWorkspace(props: Props) {
               </label>
             </div>
           )}
+          {!editor && hasListFilters && (
+            <button
+              type="button"
+              className="game-list-clear"
+              onClick={clearListFilters}
+            >
+              Limpar filtros
+            </button>
+          )}
 
           {props.onImportPdfs && (
             <button
@@ -773,14 +800,15 @@ export function GamesWorkspace(props: Props) {
             </button>
           )}
           <button
-            className="primary"
+            type="button"
+            className="primary game-list-add"
             disabled={busy || decisionLocked}
             onClick={() => {
               if (!mayLeave()) return;
               beginNew();
             }}
           >
-            Novo jogo
+            <Icon name="plus" /> Novo jogo
           </button>
           {!editor && loading && list.items.length > 0 && (
             <span className="game-list-updating" role="status">
@@ -1449,7 +1477,7 @@ export function GamesWorkspace(props: Props) {
                     <td className="game-list-operations">
                       <button
                         type="button"
-                        className="secondary game-list-action"
+                        className="secondary game-list-action game-list-edit"
                         id={`open-game-${g.id}`}
                         aria-label={`Editar jogo ${g.home.name} × ${g.away.name}`}
                         disabled={busy}
