@@ -869,7 +869,7 @@ test("keeps multiple championship checkboxes and opens the selected dispute in G
   await table
     .getByRole("button", { name: /^Abrir Liga Regional.*feminino/ })
     .click();
-  const contest = page.getByLabel("Disputa de trabalho", { exact: true });
+  const contest = page.getByLabel("Disputa atual", { exact: true });
   await expect(contest).toHaveValue(snapshots[0].seasons[0].disputes[0].id);
   await expect(
     page.getByRole("button", { name: "Jogos", exact: true }),

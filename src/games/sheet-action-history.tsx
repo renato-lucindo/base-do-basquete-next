@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../ui-system/components";
-import { periodColor, periodLabel } from "../domain/scoresheet";
+import {
+  parseFoul,
+  periodColor,
+  periodLabel,
+  type Foul,
+} from "../domain/scoresheet";
 import type { AnnotatedAction, HistoryQuery } from "../scoresheet/projection";
 
 const actionKinds = {
@@ -15,6 +20,30 @@ const targets: Record<string, string> = {
   B: "Banco",
   TO: "TD",
 };
+
+const foulLabels: Record<Foul["kind"], string> = {
+  P: "Falta pessoal",
+  T: "Falta técnica",
+  U: "Falta antidesportiva",
+  D: "Falta desqualificante",
+  B: "Falta de banco",
+  C: "Falta do técnico",
+};
+
+function actionLabel({ annotation, event, kind }: AnnotatedAction) {
+  if (kind === "timeouts") return annotation.replace(/^TO ·/u, "TD ·");
+  if (kind === "points")
+    return annotation.replace(/^([123])p\b/u, (_, points: string) =>
+      points === "1" ? "1 ponto" : points + " pontos",
+    );
+  const foul = parseFoul(event.code, event.target);
+  if (!foul) return annotation;
+  const description =
+    event.code.toUpperCase() === "B2"
+      ? "Desqualificante no banco"
+      : foulLabels[foul.kind];
+  return annotation.replace(/^\S+/u, (code) => `${code} - ${description}`);
+}
 
 export function SheetActionHistory({
   actions,
@@ -151,13 +180,7 @@ export function SheetActionHistory({
                   </td>
                   <td>{event.side === "home" ? "A" : "B"}</td>
                   <td>{targets[event.target] ?? "#" + event.target}</td>
-                  <td>
-                    {action.annotation
-                      .replace(/^TO ·/u, "TD ·")
-                      .replace(/^([123])p\b/u, (_, points: string) =>
-                        points === "1" ? "1 ponto" : points + " pontos",
-                      )}
-                  </td>
+                  <td>{actionLabel(action)}</td>
                   <td>
                     <div className="sheet-row-actions">
                       <button

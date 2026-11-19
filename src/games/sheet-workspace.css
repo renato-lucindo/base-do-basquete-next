@@ -502,9 +502,8 @@
 .sheet-timeout-item {
   white-space: nowrap;
 }
-.sheet-staff-timeouts abbr {
-  text-decoration: none;
-  font-weight: 650;
+.sheet-timeout-label {
+  white-space: nowrap;
 }
 /* The approved type scale is scoped to the administrative scoresheet. */
 .game-sheet {
@@ -749,9 +748,17 @@
 }
 .sheet-live-table .sheet-athlete-name {
   text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
   font-weight: 400;
+}
+.sheet-athlete {
+  display: flex;
+  align-items: baseline;
+  gap: 0.1875rem;
+  white-space: nowrap;
+}
+.sheet-athlete-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sheet-live-table tbody tr {
   height: 1.375rem;
@@ -907,4 +914,34 @@
 }
 .sheet-row-actions {
   justify-content: center;
+}
+
+.sheet-help-dialog thead th {
+  font-weight: 700;
+}
+.sheet-help-dialog tbody th {
+  width: 29%;
+  font-weight: 400;
+}
+.sheet-help-dialog .sheet-help-note {
+  margin-block: 0.75rem 1rem;
+  color: var(--bb-muted);
+  font-size: var(--sheet-detail);
+}
+.sheet-help-dialog .sheet-help-note p {
+  margin: 0;
+}
+.sheet-help-dialog .sheet-help-note p + p {
+  margin-top: 0.1875rem;
+}
+.sheet-launch-teams {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+@media (min-width: 1000px) {
+  .sheet-launch-teams .sheet-team-card h4 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

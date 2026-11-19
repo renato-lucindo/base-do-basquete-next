@@ -281,15 +281,11 @@ test("duas inscrições usam uma equipe global, retomam e isolam disputa", async
     "Lobos",
     "Lobos B",
   ]);
-  await page
-    .getByLabel("Disputa de trabalho", { exact: true })
-    .selectOption(other);
+  await page.getByLabel("Disputa atual", { exact: true }).selectOption(other);
   await expect(
     page.getByText("Nenhuma inscrição nesta disputa.", { exact: true }),
   ).toBeVisible();
-  await page
-    .getByLabel("Disputa de trabalho", { exact: true })
-    .selectOption(dispute);
+  await page.getByLabel("Disputa atual", { exact: true }).selectOption(dispute);
   await expect(
     page.getByRole("button", { name: "Expandir Lobos B", exact: true }),
   ).toBeVisible();
@@ -380,9 +376,9 @@ test("rascunho sobrevive à reautenticação e confirma troca de destino", async
   await page
     .getByRole("button", { name: "Fechar diálogo", exact: true })
     .click();
-  await expect(
-    page.getByLabel("Disputa de trabalho", { exact: true }),
-  ).toHaveValue(dispute);
+  await expect(page.getByLabel("Disputa atual", { exact: true })).toHaveValue(
+    dispute,
+  );
   f.expire();
   await page
     .getByRole("button", { name: "Salvar inscrição", exact: true })

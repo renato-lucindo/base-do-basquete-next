@@ -436,12 +436,10 @@ test("reauth preserva revisão e guarda mudança de disputa;320px não corta con
     .getByLabel("Observações da revisão", { exact: true })
     .fill("Não descartar");
   page.once("dialog", (d) => d.dismiss());
-  await page
-    .getByLabel("Disputa de trabalho", { exact: true })
-    .selectOption(tid(30));
-  await expect(
-    page.getByLabel("Disputa de trabalho", { exact: true }),
-  ).toHaveValue(tid(3));
+  await page.getByLabel("Disputa atual", { exact: true }).selectOption(tid(30));
+  await expect(page.getByLabel("Disputa atual", { exact: true })).toHaveValue(
+    tid(3),
+  );
   await page.setViewportSize({ width: 320, height: 780 });
   await expect
     .poll(() =>

@@ -1052,17 +1052,20 @@ export function GameSheetWorkspace(props: Props) {
                   </tr>
                 </tbody>
               </table>
-              <p>
-                <strong>Observação:</strong> Acrescente à sigla da falta a
-                quantidade de lances livres concedidos ou <code>c</code> para
-                falta compensada. Exemplos: <code>P2</code> (pessoal com 2
-                lances livres) · <code>Tc</code> (técnica compensada).
-              </p>
-              <h4>Atalhos de teclado</h4>
+              <div className="sheet-help-note">
+                <p>
+                  Acrescente à sigla da falta a quantidade de lances livres
+                  concedidos ou <code>c</code> para falta compensada.
+                </p>
+                <p>
+                  Exemplos: <code>P2</code> (pessoal com 2 lances livres) ·{" "}
+                  <code>Tc</code> (técnica compensada).
+                </p>
+              </div>
               <table>
                 <thead>
                   <tr>
-                    <th scope="col">Atalho</th>
+                    <th scope="col">Atalhos de teclado</th>
                     <th scope="col">Ação</th>
                   </tr>
                 </thead>

@@ -97,6 +97,7 @@ export function SheetLiveTables({
     <div className="sheet-desktop-teams sheet-launch-teams">
       {(["home", "away"] as const).map((side) => {
         const letter = side === "home" ? "A" : "B";
+        const other = side === "home" ? "away" : "home";
         const players = p.players
           .filter((r) => r.side === side)
           .sort((a, b) => compareJerseys(a.jersey, b.jersey));
@@ -110,7 +111,7 @@ export function SheetLiveTables({
             className="sheet-staff-timeouts"
             aria-label={`Tempos debitados da equipe ${letter}`}
           >
-            <abbr title="Tempos debitados">TD</abbr>
+            <span className="sheet-timeout-label">Tempo Debitado:</span>
             {timeouts.length
               ? timeouts.map((event, index) => (
                   <span className="sheet-timeout-item" key={event.id}>
@@ -178,12 +179,16 @@ export function SheetLiveTables({
                         className="sheet-athlete-name"
                         title={playerName}
                       >
-                        {playerName}
-                        {identity.starter && <small title="Titular"> *</small>}
-                        {d.staff[side].captainRosterEntryId ===
-                          identity.rosterEntryId && (
-                          <small title="Capitão"> C</small>
-                        )}
+                        <div className="sheet-athlete">
+                          <span className="sheet-athlete-label">
+                            {playerName}
+                          </span>
+                          {identity.starter && <small title="Titular">*</small>}
+                          {d.staff[side].captainRosterEntryId ===
+                            identity.rosterEntryId && (
+                            <small title="Capitão">C</small>
+                          )}
+                        </div>
                       </th>
                       <td>
                         <input
@@ -327,6 +332,10 @@ export function SheetLiveTables({
                           </div>
                         );
                       })}
+                      {!assigned.assistantStaffEntryId &&
+                        d.staff[other].assistantStaffEntryId && (
+                          <div className="sheet-staff-line">Ass. Técnico:</div>
+                        )}
                     </>
                   );
                 })()

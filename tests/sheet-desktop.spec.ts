@@ -19,6 +19,15 @@ test.describe("desktop scoresheet MVP", () => {
     await helpButton.click();
     const help = page.getByRole("dialog", { name: "Instruções" });
     await expect(help).toContainText("TD · Tempo debitado");
+    await expect(
+      help.getByText("Atalhos de teclado", { exact: true }),
+    ).toHaveCount(1);
+    await expect(
+      help.getByRole("columnheader", { name: "Atalhos de teclado" }),
+    ).toHaveCSS("font-weight", "700");
+    await expect(
+      help.getByRole("rowheader", { name: "Nº do jogador" }),
+    ).toHaveCSS("font-weight", "400");
     const closeButton = help.locator(".admin-dialog-close-icon");
     const closeBox = (await closeButton.boundingBox())!;
     const iconBox = (await closeButton.locator("svg").boundingBox())!;
@@ -96,7 +105,9 @@ test.describe("desktop scoresheet MVP", () => {
   test("desktop action history uses a numbered table at both requested viewports", async ({
     page,
   }) => {
-    await desktopSheetFixture(page, 12);
+    const f = await desktopSheetFixture(page, 12);
+    const longName = "Jogador Alexandre Gonçalves dos Santos Toledo da Silva";
+    f.context.sides.home.roster[11].person.name = longName;
     await openDesktopSheet(page);
     await chooseFive(page);
     await page
@@ -106,6 +117,19 @@ test.describe("desktop scoresheet MVP", () => {
       })
       .click();
     await page.setViewportSize({ width: 1366, height: 768 });
+    const navigation = page.getByRole("navigation", {
+      name: "Áreas do campeonato",
+    });
+    await expect(navigation.locator(":scope > :last-child")).toHaveText(
+      "Voltar aos campeonatos",
+    );
+    const championship = await page
+      .getByRole("heading", { name: "Liga de teste" })
+      .boundingBox();
+    const dispute = await page
+      .getByRole("combobox", { name: "Disputa atual" })
+      .boundingBox();
+    expect(championship!.x + championship!.width).toBeLessThan(dispute!.x);
     await page.evaluate(() => window.scrollTo(0, 0));
     const register = page.getByRole("button", {
       name: "Registrar ação",
@@ -121,6 +145,18 @@ test.describe("desktop scoresheet MVP", () => {
     );
     const rosters = page.locator(".sheet-live-table");
     await expect(rosters.locator("tbody tr")).toHaveCount(24);
+    const name = rosters
+      .first()
+      .getByRole("rowheader", { name: longName, exact: true });
+    await expect(name).toHaveAttribute("title", longName);
+    expect(
+      await name
+        .locator(".sheet-athlete-label")
+        .evaluate((element) => element.scrollWidth > element.clientWidth),
+    ).toBe(true);
+    const bodyA = await rosters.first().locator("tbody").boundingBox();
+    const bodyB = await rosters.last().locator("tbody").boundingBox();
+    expect(bodyA!.height).toBeCloseTo(bodyB!.height, 0);
     await page.screenshot({
       path: ".preview-artifacts/sumula-worker-ui-desktop.png",
       animations: "disabled",
@@ -374,10 +410,10 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(fouls.nth(2)).not.toHaveClass(/sheet-first-half/);
     await expect(
       page.getByRole("region", { name: "Registro de ações", exact: true }),
-    ).toContainText("Tc (3)");
+    ).toContainText("Tc - Falta técnica (3)");
     await expect(
       page.getByRole("region", { name: "Registro de ações", exact: true }),
-    ).toContainText("U2 (GD)");
+    ).toContainText("U2 - Falta antidesportiva (GD)");
     for (let n = 0; n < 11; n++) await add("home", 1, "1", "11");
     await expect(page.locator(".sheet-history tbody tr")).toHaveCount(18);
     await expect(
@@ -392,7 +428,7 @@ test.describe("desktop scoresheet MVP", () => {
       "Q1",
       "B",
       "#1",
-      "P (1)",
+      "P - Falta pessoal (1)",
       /Editar\s+Excluir/u,
     ]);
     await page.locator(".sheet-desktop-teams").last().screenshot({
@@ -455,6 +491,16 @@ test.describe("desktop scoresheet MVP", () => {
     };
     await add("C", "B1");
     await add("AT", "D2");
+    const cards = page.locator(".sheet-launch-teams .sheet-team-card");
+    await expect(
+      cards.last().locator(".sheet-coach-fouls .sheet-staff-line").last(),
+    ).toHaveText("Ass. Técnico:");
+    await expect(
+      cards.first().getByLabel("Tempos debitados da equipe A"),
+    ).toContainText("Tempo Debitado:");
+    const cardA = await cards.first().boundingBox();
+    const cardB = await cards.last().boundingBox();
+    expect(cardA!.height).toBeCloseTo(cardB!.height, 0);
     const staff = page
       .locator(".sheet-desktop-teams:visible .sheet-team-card")
       .first()
