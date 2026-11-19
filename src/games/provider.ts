@@ -9,6 +9,7 @@ import {
   gameListingSchema,
   gameOrderSchema,
   type GameOrder,
+  type GameListFilters,
   venueListingSchema,
   roundListingSchema,
   gameSnapshotSchema,
@@ -64,17 +65,34 @@ export class SupabaseGames {
     query: string,
     offset: number,
     order?: GameOrder,
+    filters?: GameListFilters,
   ) {
-    const parsed = order ? gameOrderSchema.parse(order) : undefined;
+    const parsed = order
+      ? gameOrderSchema.parse(order)
+      : filters
+        ? { column: "date", direction: "asc" }
+        : undefined;
+    const fn = filters
+      ? "list_admin_games_filtered"
+      : parsed
+        ? "list_admin_games_with_scores"
+        : "list_games";
     const r = await this.checked(
       gameListingSchema,
-      parsed ? "list_admin_games_with_scores" : "list_games",
+      fn,
       {
         p_dispute_id: disputeId,
         p_query: query,
         p_offset: offset,
         ...(parsed
           ? { p_sort: parsed.column, p_direction: parsed.direction }
+          : {}),
+        ...(filters
+          ? {
+              p_team_id: filters.teamId,
+              p_state: filters.state,
+              p_date: filters.date,
+            }
           : {}),
       },
       token,

@@ -267,7 +267,7 @@
 .competition-context-header .competition-tabs > :is(button, a),
 .competition-context-header .competition-back {
   min-height: 2.25rem;
-  font-size: var(--bb-font-body);
+  font-size: calc(var(--bb-font-body) + 0.125rem);
   padding-block: 0.375rem;
 }
 .competition-context-header .competition-tabs > a {

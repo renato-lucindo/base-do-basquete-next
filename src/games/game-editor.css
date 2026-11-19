@@ -358,10 +358,15 @@
 }
 
 .games-workspace .game-list-scroll {
-  max-block-size: min(60dvh, 38rem);
+  max-block-size: max(14rem, calc(100dvh - 15rem));
   overflow: auto;
   border: 1px solid var(--bb-line);
   border-radius: var(--bb-radius);
+}
+@media (max-width: 1000px) {
+  .games-workspace .game-list-scroll {
+    max-block-size: max(12rem, calc(100dvh - 20rem));
+  }
 }
 .game-list-scroll .admin-data-table {
   width: 100%;
@@ -376,12 +381,20 @@
 .game-list-scroll :is(th, td) {
   padding: 0.375rem 0.625rem;
 }
+.game-list-matchup {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.game-list-matchup > span {
+  overflow-wrap: anywhere;
+}
 .game-list-score {
-  text-align: center;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .game-list-state,
-.game-list-sheet {
+.game-list-action {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -393,8 +406,19 @@
   color: var(--bb-success);
 }
 .game-list-state svg,
-.game-list-sheet svg {
+.game-list-action svg {
   flex: none;
+}
+.game-list-operations {
+  white-space: nowrap;
+}
+.game-list-operations .game-list-action {
+  border-color: transparent;
+  background: transparent;
+  color: var(--bb-blue);
+}
+.game-list-action + .game-list-action {
+  margin-inline-start: 0.25rem;
 }
 .game-list-scroll > :is(p, .game-list-error) {
   margin: 0;
@@ -407,8 +431,41 @@
 .games-workspace .competition-title {
   align-items: end;
 }
-.games-workspace .competition-title .competition-search {
-  flex: 0 1 19rem;
+.game-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+}
+.games-workspace .game-list-filters label {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  width: min(100%, 12rem);
+}
+.game-list-filters :is(input, select) {
+  width: 100%;
+  min-width: 0;
+}
+.game-list-updating {
+  align-self: center;
+  color: var(--bb-muted);
+}
+.game-list-error p {
+  margin-block: 0 0.375rem;
+}
+.games-workspace > .game-list-error {
+  margin-block-end: 0.5rem;
+}
+@media (max-width: 639px) {
+  .game-list-filters {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .games-workspace .game-list-filters label {
+    width: 100%;
+  }
 }
 .games-workspace > .competition-title button.primary {
   background: var(--bb-blue);

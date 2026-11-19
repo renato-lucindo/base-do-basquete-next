@@ -1023,6 +1023,19 @@ export type Database = {
         };
         Returns: Json;
       };
+      list_admin_games_filtered: {
+        Args: {
+          p_dispute_id: string;
+          p_query: string;
+          p_offset: number;
+          p_sort: string;
+          p_direction: string;
+          p_team_id: string | null;
+          p_state: string | null;
+          p_date: string | null;
+        };
+        Returns: Json;
+      };
       list_game_officials: {
         Args: { p_offset?: number; p_query?: string };
         Returns: Json;

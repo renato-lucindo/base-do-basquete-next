@@ -1,8 +1,8 @@
 import { GameFormatAssignment } from "./format-assignment";
 import { GameVisibilityPanel } from "./visibility-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
-import type { GameOrder } from "./contract";
-import { Fragment, useEffect, useId, useRef, useState } from "react";
+import type { GameListFilters, GameOrder } from "./contract";
+import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
 import { TeamsWorkspace } from "../teams/screen";
@@ -36,7 +36,10 @@ import {
 import { AdminDialog } from "../competition/admin-dialog";
 import { Icon } from "../ui-system/components";
 import { AdminToast } from "../ui-system/admin-toast";
-import { type RegistrationSnapshot } from "../teams/contract";
+import {
+  registrationListingSchema,
+  type RegistrationSnapshot,
+} from "../teams/contract";
 import {
   gameListingSchema,
   gameSchema,
@@ -71,6 +74,8 @@ const document = (s: GameSnapshot) =>
     round: s.round ?? null,
     knockoutStage: s.knockoutStage ?? null,
   });
+const initialOrder: GameOrder = { column: "date", direction: "asc" };
+
 export function GamesWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
     formatAction = useRef<() => Promise<string>>(async () => "");
@@ -82,15 +87,23 @@ export function GamesWorkspace(props: Props) {
     sheetChanged = useRef(false),
     stageId = useId(),
     workspace = useRef<HTMLElement>(null);
-  const [list, setList] = useState<{ items: GameListItem[]; hasMore: boolean }>(
-      { items: [], hasMore: false },
-    ),
+  const [list, setList] = useState<{
+      items: GameListItem[];
+      hasMore: boolean;
+      order: GameOrder;
+    }>({ items: [], hasMore: false, order: initialOrder }),
+    [searchInput, setSearchInput] = useState(""),
     [query, setQuery] = useState(""),
-    [offset, setOffset] = useState(0),
-    [order, setOrder] = useState<GameOrder>({
-      column: "date",
-      direction: "asc",
+    [filters, setFilters] = useState<GameListFilters>({
+      teamId: null,
+      state: null,
+      date: null,
     }),
+    [teams, setTeams] = useState<RegistrationSnapshot[]>([]),
+    [teamLoadError, setTeamLoadError] = useState(false),
+    [teamAttempt, setTeamAttempt] = useState(0),
+    [offset, setOffset] = useState(0),
+    [order, setOrder] = useState<GameOrder>(initialOrder),
     [epoch, setEpoch] = useState(0),
     [loading, setLoading] = useState(false),
     [listError, setListError] = useState("");
@@ -196,6 +209,45 @@ export function GamesWorkspace(props: Props) {
       );
   }
   useEffect(() => {
+    if (searchInput === query) return;
+    const timer = setTimeout(() => {
+      setQuery(searchInput);
+      setOffset(0);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [searchInput, query]);
+  useEffect(() => {
+    if (!props.enabled) return;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    setTeamLoadError(false);
+    async function loadTeams() {
+      const options: RegistrationSnapshot[] = [];
+      for (let teamOffset = 0; ; teamOffset += 20) {
+        const params = new URLSearchParams({
+          disputeId: props.disputeId,
+          offset: String(teamOffset),
+        });
+        const result = await api(
+          `/api/registrations?${params}`,
+          registrationListingSchema,
+          undefined,
+          signal,
+        );
+        if (signal.aborted) return;
+        options.push(...result.items);
+        if (!result.hasMore) break;
+      }
+      setTeams(options);
+    }
+    void loadTeams().catch((failure: unknown) => {
+      if (signal.aborted) return;
+      if (isSessionFailure(failure)) props.onSessionLost();
+      else setTeamLoadError(true);
+    });
+    return () => controller.abort();
+  }, [props.enabled, props.disputeId, props.onSessionLost, teamAttempt]);
+  useEffect(() => {
     if (!props.enabled) return;
     const controller = new AbortController();
     const signal = controller.signal;
@@ -204,69 +256,76 @@ export function GamesWorkspace(props: Props) {
       query,
       order.column,
       order.direction,
+      filters,
     ]);
     const newScope = listVersion.current.scope !== scope;
-    const replace = newScope || listVersion.current.epoch !== epoch;
-    if (newScope) {
-      setList({ items: [], hasMore: false });
-      if (listScroll.current) listScroll.current.scrollTop = 0;
-    }
+    const replace =
+      offset === 0 || newScope || listVersion.current.epoch !== epoch;
     setLoading(true);
     setListError("");
-    const timer = setTimeout(
-      async () => {
-        const items: GameListItem[] = [];
-        try {
-          let more = false;
-          for (
-            let pageOffset = replace ? 0 : offset;
-            pageOffset <= offset;
-            pageOffset += 20
-          ) {
-            const result = await api(
-              `/api/games?disputeId=${props.disputeId}&q=${encodeURIComponent(query)}&offset=${pageOffset}&sort=${order.column}&direction=${order.direction}`,
-              gameListingSchema,
-              undefined,
-              signal,
-            );
-            items.push(...result.items);
-            more = result.hasMore;
-            if (!more) break;
-          }
-          if (signal.aborted) return;
-          listVersion.current = { scope, epoch };
-          setList((previous) => ({
-            items: [
-              ...new Map(
-                (replace ? items : [...previous.items, ...items]).map(
-                  (game) => [game.id, game],
-                ),
-              ).values(),
-            ],
-            hasMore: more,
-          }));
-        } catch (failure) {
-          if (signal.aborted) return;
-          if (isSessionFailure(failure)) props.onSessionLost();
-          setListError(
-            failure instanceof Error
-              ? failure.message
-              : "Não foi possível carregar os jogos.",
+    async function loadGames() {
+      const items: GameListItem[] = [];
+      try {
+        let more = false;
+        for (
+          let pageOffset = replace ? 0 : offset;
+          pageOffset <= offset;
+          pageOffset += 20
+        ) {
+          const params = new URLSearchParams({
+            disputeId: props.disputeId,
+            q: query,
+            offset: String(pageOffset),
+            sort: order.column,
+            direction: order.direction,
+          });
+          if (filters.teamId) params.set("teamId", filters.teamId);
+          if (filters.state) params.set("state", filters.state);
+          if (filters.date) params.set("date", filters.date);
+          const result = await api(
+            `/api/games?${params}`,
+            gameListingSchema,
+            undefined,
+            signal,
           );
-        } finally {
-          if (!signal.aborted) setLoading(false);
+          items.push(...result.items);
+          more = result.hasMore;
+          if (!more) break;
         }
-      },
-      offset === 0 ? 150 : 0,
-    );
-    return () => {
-      clearTimeout(timer);
-      controller.abort();
-    };
+        if (signal.aborted) return;
+        listVersion.current = { scope, epoch };
+        if (newScope && listScroll.current) listScroll.current.scrollTop = 0;
+        setList((previous) => ({
+          items: [
+            ...new Map(
+              (replace ? items : [...previous.items, ...items]).map((game) => [
+                game.id,
+                game,
+              ]),
+            ).values(),
+          ],
+          hasMore: more,
+          order,
+        }));
+      } catch (failure) {
+        if (signal.aborted) return;
+        if (isSessionFailure(failure)) props.onSessionLost();
+        setListError(
+          failure instanceof Error
+            ? failure.message
+            : "Não foi possível carregar os jogos.",
+        );
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    }
+    void loadGames();
+    return () => controller.abort();
   }, [
     props.enabled,
     props.disputeId,
     query,
+    filters,
     offset,
     order,
     epoch,
@@ -605,6 +664,22 @@ export function GamesWorkspace(props: Props) {
     knownAck.current = null;
     saveAction.current = "save";
   }
+  function changeListFilters(next: Partial<GameListFilters>) {
+    setFilters((current) => ({ ...current, ...next }));
+    setOffset(0);
+  }
+  const listRetry = listError && (
+    <div className="game-list-error">
+      <p role="alert">{listError}</p>
+      <button
+        type="button"
+        className="secondary"
+        onClick={() => setEpoch((value) => value + 1)}
+      >
+        Tentar novamente
+      </button>
+    </div>
+  );
   return (
     <section className="games-workspace" ref={workspace}>
       <AdminToast
@@ -622,17 +697,68 @@ export function GamesWorkspace(props: Props) {
             Jogos
           </h3>
           {!editor && (
-            <label className="competition-search">
-              Buscar jogo
-              <input
-                maxLength={120}
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setOffset(0);
-                }}
-              />
-            </label>
+            <div
+              className="game-list-filters"
+              role="group"
+              aria-label="Filtros dos jogos"
+            >
+              <label>
+                Buscar jogo
+                <input
+                  maxLength={120}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+              </label>
+              <label>
+                Equipe
+                <select
+                  value={filters.teamId ?? ""}
+                  onChange={(e) =>
+                    changeListFilters({ teamId: e.target.value || null })
+                  }
+                >
+                  <option value="">Todas</option>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Situação
+                <select
+                  value={filters.state ?? ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    changeListFilters({
+                      state:
+                        value === "finished" || value === "scheduled"
+                          ? value
+                          : null,
+                    });
+                  }}
+                >
+                  <option value="">Todas</option>
+                  <option value="finished">Resultado registrado</option>
+                  <option value="scheduled">Sem resultado</option>
+                </select>
+              </label>
+              <label>
+                Data
+                <input
+                  type="date"
+                  min="0001-01-01"
+                  max="9999-12-31"
+                  value={filters.date ?? ""}
+                  onChange={(e) => {
+                    if (e.target.validity.valid)
+                      changeListFilters({ date: e.target.value || null });
+                  }}
+                />
+              </label>
+            </div>
           )}
 
           {props.onImportPdfs && (
@@ -655,6 +781,23 @@ export function GamesWorkspace(props: Props) {
             }}
           >
             Novo jogo
+          </button>
+          {!editor && loading && list.items.length > 0 && (
+            <span className="game-list-updating" role="status">
+              Atualizando jogos…
+            </span>
+          )}
+        </div>
+      )}
+      {!sheetVisible && !auxiliary && !editor && teamLoadError && (
+        <div className="game-list-error">
+          <p role="alert">Não foi possível carregar as equipes do filtro.</p>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => setTeamAttempt((current) => current + 1)}
+          >
+            Recarregar equipes
           </button>
         </div>
       )}
@@ -1204,6 +1347,7 @@ export function GamesWorkspace(props: Props) {
         </AdminDialog>
       ) : (
         <>
+          {offset === 0 && listRetry}
           <div
             className="admin-table-scroll game-list-scroll"
             ref={listScroll}
@@ -1228,48 +1372,42 @@ export function GamesWorkspace(props: Props) {
                       ["state", "Situação"],
                     ] as const
                   ).map(([column, label]) => (
-                    <Fragment key={column}>
-                      <th
-                        scope="col"
-                        className={column === "number" ? "numeric" : undefined}
-                        aria-sort={
-                          order.column === column
-                            ? order.direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
+                    <th
+                      key={column}
+                      scope="col"
+                      className={column === "number" ? "numeric" : undefined}
+                      aria-sort={
+                        list.order.column === column
+                          ? list.order.direction === "asc"
+                            ? "ascending"
+                            : "descending"
+                          : undefined
+                      }
+                    >
+                      <button
+                        type="button"
+                        className="admin-sort"
+                        aria-label={`Ordenar por ${label}`}
+                        onClick={() => {
+                          setOrder({
+                            column,
+                            direction:
+                              order.column === column &&
+                              order.direction === "asc"
+                                ? "desc"
+                                : "asc",
+                          });
+                          setOffset(0);
+                        }}
                       >
-                        <button
-                          type="button"
-                          className="admin-sort"
-                          aria-label={`Ordenar por ${label}`}
-                          onClick={() => {
-                            setOrder({
-                              column,
-                              direction:
-                                order.column === column &&
-                                order.direction === "asc"
-                                  ? "desc"
-                                  : "asc",
-                            });
-                            setOffset(0);
-                          }}
-                        >
-                          {label}
-                          {order.column === column && (
-                            <span aria-hidden="true">
-                              {order.direction === "asc" ? " ↑" : " ↓"}
-                            </span>
-                          )}
-                        </button>
-                      </th>
-                      {column === "matchup" && (
-                        <th scope="col" className="game-list-score">
-                          Placar
-                        </th>
-                      )}
-                    </Fragment>
+                        {label}
+                        {list.order.column === column && (
+                          <span aria-hidden="true">
+                            {list.order.direction === "asc" ? " ↑" : " ↓"}
+                          </span>
+                        )}
+                      </button>
+                    </th>
                   ))}
                   <th scope="col">Operações</th>
                 </tr>
@@ -1279,18 +1417,13 @@ export function GamesWorkspace(props: Props) {
                   <tr key={g.id}>
                     <td className="numeric nowrap">{g.number ?? "—"}</td>
                     <td>
-                      <button
-                        className="competition-name"
-                        id={`open-game-${g.id}`}
-                        aria-label={`Abrir jogo ${g.home.name} × ${g.away.name}`}
-                        disabled={busy}
-                        onClick={() => void load(g.id)}
-                      >
-                        {g.home.name} × {g.away.name}
-                      </button>
-                    </td>
-                    <td className="game-list-score nowrap">
-                      {g.score ? `${g.score.home} × ${g.score.away}` : "—"}
+                      <div className="game-list-matchup">
+                        <span>{g.home.name}</span>
+                        <strong className="game-list-score">
+                          {g.score ? `${g.score.home} × ${g.score.away}` : "—"}
+                        </strong>
+                        <span>{g.away.name}</span>
+                      </div>
                     </td>
                     <td className="nowrap">
                       {g.date
@@ -1311,10 +1444,20 @@ export function GamesWorkspace(props: Props) {
                           : "Sem resultado"}
                       </span>
                     </td>
-                    <td>
+                    <td className="game-list-operations">
                       <button
                         type="button"
-                        className="secondary game-list-sheet"
+                        className="secondary game-list-action"
+                        id={`open-game-${g.id}`}
+                        aria-label={`Editar jogo ${g.home.name} × ${g.away.name}`}
+                        disabled={busy}
+                        onClick={() => void load(g.id)}
+                      >
+                        <Icon name="edit" /> Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary game-list-action"
                         id={`open-sheet-${g.id}`}
                         aria-label={`Súmula de ${g.home.name} × ${g.away.name}`}
                         disabled={busy}
@@ -1327,19 +1470,10 @@ export function GamesWorkspace(props: Props) {
                 ))}
               </tbody>
             </table>
-            {loading && <p role="status">Carregando jogos…</p>}
-            {listError && (
-              <div className="game-list-error">
-                <p role="alert">{listError}</p>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() => setEpoch((value) => value + 1)}
-                >
-                  Tentar novamente
-                </button>
-              </div>
+            {loading && list.items.length === 0 && (
+              <p role="status">Carregando jogos…</p>
             )}
+            {offset > 0 && listRetry}
             {!loading && !listError && !list.items.length && (
               <p>Nenhum jogo encontrado nesta disputa.</p>
             )}

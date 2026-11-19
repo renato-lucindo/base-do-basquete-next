@@ -96,7 +96,7 @@ test.describe("desktop scoresheet MVP", () => {
     ).toHaveLength(6);
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
@@ -478,7 +478,7 @@ test.describe("desktop scoresheet MVP", () => {
     f.context.sides.home.lastJerseys[f.context.sides.home.roster[0].id] = "77";
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
       .click();
     await page
       .getByRole("button", { name: "Preparar súmula", exact: true })
@@ -560,7 +560,7 @@ test.describe("desktop scoresheet MVP", () => {
     ]);
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await page.getByRole("button", { name: "Revisar preparação" }).click();

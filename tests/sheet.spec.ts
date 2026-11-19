@@ -241,7 +241,7 @@ async function open(page: Page) {
     `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Preparar súmula", exact: true })
@@ -340,7 +340,7 @@ test("relaciona pessoas reais, lança por teclado e retoma rascunho sem publicar
   ]);
   expect(f.snapshot()?.confirmed).toBe(false);
   await page.reload();
-  await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await page.getByRole("button", { name: /Editar jogo Lobos/ }).click();
   await page
     .getByRole("button", { name: "Preparar súmula", exact: true })
     .click();

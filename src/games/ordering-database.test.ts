@@ -84,13 +84,41 @@ it("ordena toda a disputa antes da pagina, com numeros naturais, ausentes ao fim
   );
   expect((await list("state", "asc")).items[0].number).toBe("30");
   expect((await list("state", "desc")).items[0].state).toBe("scheduled");
+  const filtered = async (
+    team: number,
+    state: string | null,
+    date: string | null,
+    offset = 0,
+  ) =>
+    gameListingSchema.parse(
+      (
+        await db.query<{ r: unknown }>(
+          "select public.list_admin_games_filtered(pg_temp.g_id(92),'', $4,'number','asc',pg_temp.g_id($1),$2,$3) r",
+          [team, state, date, offset],
+        )
+      ).rows[0].r,
+    );
+  expect((await filtered(96, "scheduled", null)).hasMore).toBe(true);
+  expect(
+    (await filtered(96, "scheduled", null, 20)).items.map((g) => g.number),
+  ).not.toContain("30");
+  // Game 29 falls outside the first unfiltered page and matches as a visitor.
+  expect(
+    (await filtered(96, "scheduled", "2026-01-02")).items.map((g) => g.number),
+  ).toEqual(["29"]);
+  expect(
+    (await filtered(95, "finished", "2026-01-01")).items.map((g) => g.number),
+  ).toEqual(["30"]);
+  expect((await filtered(999, "finished", "2026-01-01")).items).toEqual([]);
   await db.exec(`select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',0,'unsafe','asc')$q$,'PT400');
    select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',0,'date','unsafe')$q$,'PT400');
    select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',-1,'date','asc')$q$,'PT400');
+   select pg_temp.g_error($q$select public.list_admin_games_filtered(pg_temp.g_id(92),'',0,'date','asc',null,'unsafe',null)$q$,'PT400');
    set local request.jwt.claim.sub='d1000000-0000-4000-8000-000000000099';`);
   expect((await list()).items).toEqual([]);
   await db.exec(
-    `set local role anon;select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92))$q$,'42501');reset role;`,
+    `select pg_temp.g_error($q$select public.list_admin_games_filtered(pg_temp.g_id(92),'',0,'date','asc',pg_temp.g_id(95),null,null)$q$,'PT403');
+    set local role anon;select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92))$q$,'42501');reset role;`,
   );
 });
 

@@ -150,3 +150,15 @@ export const gameOrderSchema = z
   })
   .strict();
 export type GameOrder = z.infer<typeof gameOrderSchema>;
+
+export const gameListFiltersSchema = z
+  .object({
+    teamId: z.uuid().nullable(),
+    state: gameSnapshotSchema.shape.state.nullable(),
+    date: z.iso
+      .date()
+      .refine((date) => !date.startsWith("0000-"))
+      .nullable(),
+  })
+  .strict();
+export type GameListFilters = z.infer<typeof gameListFiltersSchema>;

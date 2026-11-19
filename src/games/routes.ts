@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { sessionName } from "../access/cookie";
 import { HttpError, jsonResponse, readMutationJson } from "../server/http";
-import { saveGameSchema, gameOrderSchema } from "./contract";
+import {
+  saveGameSchema,
+  gameOrderSchema,
+  gameListFiltersSchema,
+} from "./contract";
 import { saveSheetSchema } from "./sheet-contract";
 import { saveGameEditorSchema } from "./officiating-contract";
 import { saveGameVisibilitySchema } from "./visibility-contract";
@@ -187,8 +191,16 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
     if (
       [...url.searchParams.keys()].some(
         (k) =>
-          !["q", "offset", "disputeId", "sort", "direction"].includes(k) ||
-          url.searchParams.getAll(k).length !== 1,
+          ![
+            "q",
+            "offset",
+            "disputeId",
+            "sort",
+            "direction",
+            "teamId",
+            "state",
+            "date",
+          ].includes(k) || url.searchParams.getAll(k).length !== 1,
       )
     )
       throw badInput();
@@ -208,14 +220,26 @@ export async function gamesRoute(request: Request, env: Env, url: URL) {
       column: url.searchParams.get("sort") ?? "date",
       direction: url.searchParams.get("direction") ?? "asc",
     });
-    if (!order.success) throw badInput();
+    const filters = gameListFiltersSchema.safeParse({
+      teamId: url.searchParams.get("teamId"),
+      state: url.searchParams.get("state"),
+      date: url.searchParams.get("date"),
+    });
+    if (!order.success || !filters.success) throw badInput();
+    const activeFilters =
+      filters.data.teamId || filters.data.state || filters.data.date
+        ? filters.data
+        : undefined;
     const r = await session.listGames(
       dispute.data,
       query,
       offset,
-      url.searchParams.has("sort") || url.searchParams.has("direction")
+      activeFilters ||
+        url.searchParams.has("sort") ||
+        url.searchParams.has("direction")
         ? order.data
         : undefined,
+      activeFilters,
     );
     if (!r.ok) throw new HttpError(r.status, r.code, r.message);
     return jsonResponse(r.value);

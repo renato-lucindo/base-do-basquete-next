@@ -69,7 +69,7 @@ for (const width of [1366, 1920])
         area === "jogos"
           ? page
               .getByRole("button", {
-                name: "Abrir jogo Lobos × Lobos B",
+                name: "Editar jogo Lobos × Lobos B",
                 exact: true,
               })
               .first()

@@ -1,4 +1,4 @@
-import type { GameOrder } from "../games/contract";
+import type { GameListFilters, GameOrder } from "../games/contract";
 import { SupabasePublications } from "../publication/provider";
 import type { ReviseTeamStatistics } from "../publication/team-statistics-contract";
 import { SupabaseAchievements } from "../achievements/provider";
@@ -543,10 +543,11 @@ export class SessionStore extends DurableObject<Env> {
     query: string,
     offset: number,
     order?: GameOrder,
+    filters?: GameListFilters,
   ) {
     return safely(() =>
       this.session.runAuthorized(({ accessToken }) =>
-        this.games.list(accessToken, disputeId, query, offset, order),
+        this.games.list(accessToken, disputeId, query, offset, order, filters),
       ),
     );
   }

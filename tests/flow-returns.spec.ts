@@ -60,7 +60,7 @@ test("saved game exposes return without scrolling and preserves the games search
     page.getByRole("button", { name: "Novo jogo", exact: true }),
   ).toBeFocused();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
@@ -103,7 +103,7 @@ test("scoresheet offers visible returns and protects unsaved preparation", async
   await back.click();
   await expect(
     page.getByRole("button", {
-      name: "Abrir jogo Lobos × Lobos B",
+      name: "Editar jogo Lobos × Lobos B",
       exact: true,
     }),
   ).toBeVisible();
@@ -136,7 +136,7 @@ test("saved preparation returns through game data and list without losing the sa
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Preparar súmula", exact: true })
@@ -151,7 +151,7 @@ test("saved preparation returns through game data and list without losing the sa
     .click();
   await expect(
     page.getByRole("button", {
-      name: "Abrir jogo Lobos × Lobos B",
+      name: "Editar jogo Lobos × Lobos B",
       exact: true,
     }),
   ).toBeFocused();

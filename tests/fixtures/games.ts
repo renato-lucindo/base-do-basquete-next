@@ -191,13 +191,16 @@ export async function gamesFixture(page: Page) {
         ),
         offset = Number(url.searchParams.get("offset") ?? 0),
         column = url.searchParams.get("sort") ?? "date",
-        direction = url.searchParams.get("direction") ?? "asc";
+        direction = url.searchParams.get("direction") ?? "asc",
+        teamId = url.searchParams.get("teamId"),
+        state = url.searchParams.get("state"),
+        date = url.searchParams.get("date");
       const key = (g: GameSnapshot) =>
         column === "matchup"
           ? g.home.name + " × " + g.away.name
           : column === "state"
             ? g.state === "finished"
-              ? "Resultado publicado"
+              ? "Resultado registrado"
               : "Sem resultado"
             : column === "date"
               ? g.date
@@ -212,6 +215,10 @@ export async function gamesFixture(page: Page) {
         .filter(
           (g) =>
             g.disputeId === url.searchParams.get("disputeId") &&
+            (!teamId ||
+              [g.homeRegistrationId, g.awayRegistrationId].includes(teamId)) &&
+            (!state || g.state === state) &&
+            (!date || g.date === date) &&
             [g.home.name, g.away.name, g.venue ?? "", g.number ?? ""]
               .join(" ")
               .toLocaleLowerCase("pt-BR")

@@ -111,7 +111,7 @@ for (const version of [undefined, 2] as const)
     ]);
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await page.getByRole("button", { name: "Revisar preparação" }).click();
@@ -198,7 +198,7 @@ for (const version of [undefined, 2] as const)
     });
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(points).toContainText("#17");
@@ -260,7 +260,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
@@ -308,7 +308,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   });
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(
     page.getByLabel("Data dos horários reais", { exact: true }),
@@ -365,7 +365,7 @@ test("finished game: separate date and range preserve drafts, same-day times and
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   const date = page.getByLabel("Data dos horários reais", { exact: true });
   const start = page.getByLabel("Hora de início", { exact: true });
@@ -440,7 +440,7 @@ test("finished game: separate date and range preserve drafts, same-day times and
   });
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(date).toHaveValue("2026-11-01");
   await expect(start).toHaveValue("20:12");
