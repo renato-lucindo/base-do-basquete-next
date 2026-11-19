@@ -5,7 +5,7 @@ import { SheetPublicationPanel } from "../publication/sheet-panel";
 import { PublicationHistory } from "../publication/history";
 import { publicationStateSchema } from "../publication/data-contract";
 import { publicResultSchema } from "../publication/pdf-contract";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { aggregate, type Side } from "../domain/scoresheet";
 import { deleteAction } from "../scoresheet/actions";
@@ -59,6 +59,7 @@ const sideName = (s: Side) => (s === "home" ? "A" : "B");
 export function GameSheetWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
     PublicationPanel = flexible ? FinalizeSheetPanel : SheetPublicationPanel;
+  const reasonLabelId = useId();
   const [history, setHistory] = useState<History | null>(null),
     [baseline, setBaseline] = useState(""),
     [version, setVersion] = useState(0),
@@ -1293,12 +1294,17 @@ export function GameSheetWorkspace(props: Props) {
               <h4 className="sheet-section-heading" id="sheet-save-title">
                 Salvamento e publicação
               </h4>
-              {(snapshot?.confirmed || flexible) && (
+              {(snapshot?.confirmed ||
+                publicationForGame?.alreadyPublished ||
+                flexible) && (
                 <label className="sheet-save-reason">
-                  {flexible
-                    ? "Comentário (opcional)"
-                    : "Motivo da revisão da súmula"}
+                  <span id={reasonLabelId}>
+                    {flexible
+                      ? "Comentário (opcional)"
+                      : "Motivo da revisão da súmula"}
+                  </span>
                   <textarea
+                    aria-labelledby={reasonLabelId}
                     maxLength={500}
                     value={reason}
                     disabled={locked}

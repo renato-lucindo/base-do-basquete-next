@@ -291,16 +291,16 @@ test("axe súmula na preparação e lançamento por teclado", async ({
   await scan(page, info, "admin-sheet-action");
 });
 
-test("axe conferência e publicação manual", async ({ page }, info) => {
+test("axe publicação direta da súmula", async ({ page }, info) => {
   await publicationFixture(page);
   await open(page);
   await page
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
-    page.getByRole("status", { name: "Placar a publicar", exact: true }),
-  ).toContainText("2 × 0");
-  await scan(page, info, "admin-publication-confirm");
+    page.getByRole("status").filter({ hasText: "Resultado publicado" }),
+  ).toBeVisible();
+  await scan(page, info, "admin-sheet-publication");
 });
 
 test("relaciona pessoas reais, lança por teclado e retoma rascunho sem publicar", async ({
@@ -579,25 +579,18 @@ test("coletivos automáticos: publica zero sem campos nem confirmação de falta
   f.source().document.periods = 5;
   f.source().document.events[0].period = 5;
   await open(page);
-  await page
-    .getByRole("button", { name: "Salvar e publicar", exact: true })
-    .click();
   const panel = page.getByRole("region", {
     name: "Publicação deste jogo",
     exact: true,
   });
   await expect(
     panel.getByRole("heading", { name: "Conferir publicação deste jogo" }),
-  ).toBeVisible();
-  await expect(
-    panel.getByRole("checkbox", { name: /Conferi o total de GD/ }),
   ).toHaveCount(0);
-  await expect(panel.getByLabel(/GD — total da equipe/)).toHaveCount(0);
-  await expect(panel.getByLabel(/GD — desqualificações/).first()).toHaveText(
-    "GD: 0",
-  );
+  await expect(
+    panel.getByText("Estatísticas coletivas a publicar"),
+  ).toHaveCount(0);
   const publish = panel.getByRole("button", {
-    name: "Publicar este jogo",
+    name: "Salvar e publicar",
     exact: true,
   });
   await expect(publish).toBeEnabled();
@@ -645,15 +638,6 @@ test("coletivos automáticos: publica GD e T identificadas sem confirmação man
   await page
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
-  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
-    "GD: 1",
-  );
-  await expect(page.getByLabel(/T — faltas técnicas/).first()).toHaveText(
-    "T: 2",
-  );
-  await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
-    .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
@@ -672,9 +656,6 @@ test("coletivos automáticos: recalcula GD ao republicar edição ainda não sal
   await page
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
-    .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
@@ -689,21 +670,26 @@ test("coletivos automáticos: recalcula GD ao republicar edição ainda não sal
     await page.getByLabel("Ação", { exact: true }).press("Enter");
   }
   expect(f.source().version).toBe(savedVersion);
-  await page
-    .getByLabel("Motivo da revisão da súmula", { exact: true })
-    .fill("Inclusão das técnicas registradas no fim da partida.");
-  await page
-    .getByRole("button", { name: "Salvar e republicar", exact: true })
-    .click();
-  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
-    "GD: 1",
+  const reason = page.getByLabel("Motivo da revisão da súmula", {
+    exact: true,
+  });
+  const publish = page.getByRole("button", {
+    name: "Salvar e republicar",
+    exact: true,
+  });
+  await reason.fill("TD");
+  await publish.click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Informe o motivo da revisão",
   );
-  await expect(
-    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
-  ).toBeEnabled();
-  await page
-    .getByRole("button", { name: "Republicar este jogo", exact: true })
-    .click();
+  expect(f.published()?.version).toBe(1);
+  expect(f.attempts).toHaveLength(1);
+  await reason.fill("Inclusão das técnicas registradas no fim da partida.");
+  await publish.click();
+  await expect(page.getByText("Conferir publicação deste jogo")).toHaveCount(0);
+  await expect(page.getByText("Estatísticas coletivas a publicar")).toHaveCount(
+    0,
+  );
   await expect.poll(() => f.published()?.version).toBe(2);
   expect(
     f.published()!.facts.teams.home.teamStatistics?.disqualifications,
@@ -717,9 +703,6 @@ test("coletivos automáticos: falha ao ler a fonte publicada permite repetir ape
   await open(page);
   await page
     .getByRole("button", { name: "Salvar e publicar", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
@@ -753,18 +736,14 @@ test("coletivos automáticos: falha ao ler a fonte publicada permite repetir ape
   await expect(page.getByRole("alert")).toContainText(
     "Fonte publicada indisponível",
   );
-  await expect(
-    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
-  ).toHaveCount(0);
-  await prepare.click();
-  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
-    "GD: 2",
-  );
-  await expect(
-    page.getByRole("button", { name: "Republicar este jogo", exact: true }),
-  ).toBeEnabled();
   expect(f.commands).toHaveLength(1);
   expect(f.source()).toEqual(before);
+  await prepare.click();
+  await expect.poll(() => f.published()?.version).toBe(2);
+  expect(f.commands).toHaveLength(2);
+  expect(
+    f.published()?.facts.teams.home.teamStatistics?.disqualifications,
+  ).toBe(2);
 });
 
 test("coletivos: preserva GD publicada e acessos dependem do resultado disponível", async ({
@@ -785,9 +764,6 @@ test("coletivos: preserva GD publicada e acessos dependem do resultado disponív
   await page
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
-    .click();
   await expect(result).toBeVisible();
   await expect(history).toBeVisible();
   await expect(
@@ -796,11 +772,12 @@ test("coletivos: preserva GD publicada e acessos dependem do resultado disponív
 
   f.setPublishedGD(2, 0);
   await page
+    .getByLabel("Motivo da revisão da súmula")
+    .fill("Revisão da súmula arquivada.");
+  await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
     .click();
-  await expect(page.getByLabel(/GD — desqualificações/).first()).toHaveText(
-    "GD: 2",
-  );
+  await expect.poll(() => f.published()?.version).toBe(2);
 
   f.hideResult();
   await page.evaluate(() => window.dispatchEvent(new Event("focus")));
@@ -817,36 +794,6 @@ test("coletivos: preserva GD publicada e acessos dependem do resultado disponív
     f.published()!.facts.teams.home.teamStatistics?.disqualifications,
   ).toBe(2);
 });
-test("coletivos: alterar e desfazer a súmula exige recarregar a versão para publicar", async ({
-  page,
-}) => {
-  await publicationFixture(page);
-  await open(page);
-  await page
-    .getByRole("button", { name: "Salvar e publicar", exact: true })
-    .click();
-  const publish = page.getByRole("button", {
-    name: "Publicar este jogo",
-    exact: true,
-  });
-  await expect(publish).toBeEnabled();
-  const played = page.getByLabel("Entrou Atleta home 5", { exact: true });
-  await played.check();
-  await expect(publish).toBeDisabled();
-  await played.uncheck();
-  await expect(publish).toBeDisabled();
-  await expect(
-    page.getByRole("checkbox", { name: /Conferi o total de GD de/ }),
-  ).toHaveCount(0);
-  await page
-    .getByRole("button", {
-      name: "Recarregar estado da publicação",
-      exact: true,
-    })
-    .click();
-  await expect(publish).toBeEnabled();
-});
-
 async function publicationFixture(page: Page) {
   const f = await fixture(page),
     game = f.games.get(tid(80))!,
@@ -1146,21 +1093,6 @@ test("manual publication confirms identities, keeps participation editable and r
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
-    page.getByLabel("Placar a publicar", { exact: true }),
-  ).toContainText("2 × 0");
-
-  await page
-    .getByRole("region", { name: "Publicação deste jogo", exact: true })
-    .screenshot({
-      path: `.preview-artifacts/manual-publication-320-${test.info().project.name}.png`,
-    });
-  await expect(page.getByLabel(/FR — faltas recebidas/).first()).toHaveText(
-    "FR: 0",
-  );
-  await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
-    .click();
-  await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
   await page
@@ -1222,9 +1154,6 @@ test("manual publication confirms identities, keeps participation editable and r
   await page
     .getByRole("button", { name: "Salvar e republicar", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Republicar este jogo", exact: true })
-    .click();
   await expect.poll(() => f.source().version).toBe(4);
   expect(
     f.source().document.participants.find((p) => p.rosterEntryId === tid(100))
@@ -1256,7 +1185,7 @@ test("manual fallback requires an explicit decision and uncertain publication re
     .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
-    page.getByRole("button", { name: "Publicar este jogo", exact: true }),
+    page.getByRole("button", { name: "Salvar e publicar", exact: true }),
   ).toBeDisabled();
   await page
     .getByLabel("Usar súmula manual em vez do PDF", { exact: true })
@@ -1265,7 +1194,7 @@ test("manual fallback requires an explicit decision and uncertain publication re
     .getByLabel("Motivo da publicação", { exact: true })
     .fill("Súmula oficial revisada pelo responsável.");
   await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
     page.getByRole("button", { name: "Repetir publicação", exact: true }),
@@ -1287,12 +1216,9 @@ test("known publication with failed source retrieval retries only the read", asy
 }) => {
   const f = await publicationFixture(page);
   await open(page);
-  await page
-    .getByRole("button", { name: "Salvar e publicar", exact: true })
-    .click();
   f.failRead();
   await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
     page.getByRole("button", {
@@ -1322,27 +1248,23 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
   await open(page);
   await open(second);
   await second.getByLabel("Entrou Atleta home 5", { exact: true }).check();
-  for (const tab of [page, second])
-    await tab
-      .getByRole("button", { name: "Salvar e publicar", exact: true })
-      .click();
   await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
     page.getByRole("status").filter({ hasText: "Resultado publicado" }),
   ).toBeVisible();
   await second
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(
-    second.getByRole("alert").filter({ hasText: "Outra aba publicou" }),
+    second.getByRole("alert").filter({ hasText: "O jogo mudou" }),
   ).toBeVisible();
   await expect(
     second.getByLabel("Entrou Atleta home 5", { exact: true }),
   ).toBeChecked();
   await expect(
-    second.getByRole("button", { name: "Publicar este jogo", exact: true }),
+    second.getByRole("button", { name: "Salvar e publicar", exact: true }),
   ).toBeDisabled();
   expect(f.source().version).toBe(2);
   second.once("dialog", (d) => d.accept());
@@ -1358,7 +1280,7 @@ test("two tabs keep a stale publication draft until explicit reload", async ({
   await expect(
     second.getByLabel("Atleta A vaga 1", { exact: true }),
   ).toBeDisabled();
-  expect(f.attempts).toHaveLength(2);
+  expect(f.attempts).toHaveLength(1);
 });
 
 test("expired publication session preserves the frozen command and protects leaving a clean sheet", async ({
@@ -1366,12 +1288,9 @@ test("expired publication session preserves the frozen command and protects leav
 }) => {
   const f = await publicationFixture(page);
   await open(page);
-  await page
-    .getByRole("button", { name: "Salvar e publicar", exact: true })
-    .click();
   f.expirePublication();
   await page
-    .getByRole("button", { name: "Publicar este jogo", exact: true })
+    .getByRole("button", { name: "Salvar e publicar", exact: true })
     .click();
   await expect(page.getByLabel("E-mail", { exact: true })).toBeVisible();
   expect(
