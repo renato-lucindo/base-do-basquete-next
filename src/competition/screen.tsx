@@ -209,77 +209,81 @@ export function CompetitionWorkspace({
       {competition && context && (
         <>
           <div className="competition-context-header">
-            <div className="competition-title">
+            <nav className="competition-tabs" aria-label="Áreas do campeonato">
+              <button
+                type="button"
+                className="secondary"
+                aria-current={area === "teams" ? "page" : undefined}
+                onClick={() => changeArea("teams")}
+              >
+                Equipes e elencos
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                aria-current={area === "games" ? "page" : undefined}
+                onClick={() => changeArea("games")}
+              >
+                Jogos
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                aria-current={area === "regulation" ? "page" : undefined}
+                onClick={() => changeArea("regulation")}
+              >
+                {flexibleCompetitionEnabled()
+                  ? "Formato e classificação"
+                  : "Regulamento"}
+              </button>
+              <a
+                className="competition-public-link"
+                href={`/estatisticas.html#${context.id}?scope=all`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Estatísticas publicadas
+              </a>
+              <a
+                className="competition-public-link"
+                href={`/equipes.html#${context.id}?scope=all`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Equipes publicadas
+              </a>
+            </nav>
+            <div className="competition-context-selection">
               <h2 ref={heading} tabIndex={-1}>
                 {competition.name}
               </h2>
-              <button type="button" className="secondary" onClick={back}>
+              <label className="competition-destination">
+                Disputa atual
+                <select
+                  aria-label="Disputa atual"
+                  value={selected}
+                  onChange={(event) => {
+                    if (!mayLeave()) return;
+                    setSelected(event.target.value);
+                    setRoute(competition.id, event.target.value, area);
+                  }}
+                >
+                  {contexts.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                className="secondary competition-back"
+                onClick={back}
+              >
                 Voltar aos campeonatos
               </button>
             </div>
-            <label className="competition-destination">
-              Disputa de trabalho
-              <select
-                aria-label="Disputa de trabalho"
-                value={selected}
-                onChange={(event) => {
-                  if (!mayLeave()) return;
-                  setSelected(event.target.value);
-                  setRoute(competition.id, event.target.value, area);
-                }}
-              >
-                {contexts.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
-          <nav className="competition-tabs" aria-label="Áreas do campeonato">
-            <button
-              type="button"
-              className="secondary"
-              aria-current={area === "teams" ? "page" : undefined}
-              onClick={() => changeArea("teams")}
-            >
-              Equipes e elencos
-            </button>
-            <button
-              type="button"
-              className="secondary"
-              aria-current={area === "games" ? "page" : undefined}
-              onClick={() => changeArea("games")}
-            >
-              Jogos
-            </button>
-            <button
-              type="button"
-              className="secondary"
-              aria-current={area === "regulation" ? "page" : undefined}
-              onClick={() => changeArea("regulation")}
-            >
-              {flexibleCompetitionEnabled()
-                ? "Formato e classificação"
-                : "Regulamento"}
-            </button>
-            <a
-              className="competition-public-link"
-              href={`/estatisticas.html#${context.id}?scope=all`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Estatísticas publicadas
-            </a>
-            <a
-              className="competition-public-link"
-              href={`/equipes.html#${context.id}?scope=all`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Equipes publicadas
-            </a>
-          </nav>
           <div hidden={area !== "regulation"}>
             {flexibleCompetitionEnabled() ? (
               <CompetitionSetupWorkspace

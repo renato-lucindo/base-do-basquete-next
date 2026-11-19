@@ -1,23 +1,23 @@
 .game-editor-dialog {
   width: min(53rem, calc(100vw - 2rem));
-  border-radius: 0.5625rem;
+  border-radius: var(--bb-radius);
 }
 .game-editor-dialog .admin-dialog-header {
-  padding: 1.1875rem 1.5625rem;
+  padding: 0.75rem 1rem;
 }
 .game-editor-dialog .admin-dialog-header h3 {
-  font-size: 1.4rem;
+  font-size: calc(var(--bb-font-section) + 0.125rem);
 }
 .game-editor-dialog .admin-dialog-body {
-  padding: 1.125rem 1.5625rem 0;
+  padding: 0.875rem 1rem;
 }
 .game-editor-dialog .teams-inline {
   display: block;
 }
 .game-editor-dialog .game-context {
   margin: 0 0 1.125rem;
-  color: #42526b;
-  font-size: 0.8125rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
 }
 .game-editor-dialog
   :is(.game-confrontation, .game-agenda, .game-classification) {
@@ -28,7 +28,7 @@
   min-width: 0;
 }
 .game-editor-dialog legend {
-  font-size: 0.8125rem;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   font-weight: 650;
   padding: 0;
   margin-bottom: 0.75rem;
@@ -49,8 +49,8 @@
 }
 .game-editor-dialog .game-agenda legend span {
   font-weight: 400;
-  color: #42526b;
-  font-size: 0.75rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
 }
 .game-editor-dialog .game-opponents {
   display: grid;
@@ -64,16 +64,16 @@
 .game-editor-dialog label {
   display: flex;
   flex-direction: column;
-  font-size: 0.8125rem;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   gap: 0.4375rem;
 }
 .game-editor-dialog input:not([type="checkbox"]) {
   width: 100%;
   min-width: 0;
-  min-height: 2.5625rem;
-  padding: 0.5625rem 0.625rem;
-  font-size: 0.875rem;
-  border: 1px solid #8998ad;
+  min-height: 2.25rem;
+  padding: 0.375rem 0.625rem;
+  font-size: calc(var(--bb-font-body) + 0.125rem);
+  border: 1px solid var(--bb-control-line);
   border-radius: 0.3125rem;
 }
 .game-editor-dialog input:focus-visible {
@@ -99,7 +99,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #42526b;
+  color: var(--bb-muted);
   font-size: 1.2rem;
 }
 .game-editor-dialog .game-picker-clear:hover {
@@ -113,8 +113,8 @@
   margin: 0.5625rem 0 1.1875rem;
 }
 .game-editor-dialog .game-registration-tools p {
-  color: #42526b;
-  font-size: 0.75rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   margin: 0;
 }
 .game-editor-dialog .game-add-registration {
@@ -123,13 +123,13 @@
   border: 0;
   padding: 0.3125rem 0;
   min-height: 2rem;
-  font-size: 0.75rem;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
 }
 .game-editor-dialog .game-add-registration:hover {
   text-decoration: underline;
 }
 .game-editor-dialog .game-agenda {
-  border-top: 1px solid #d9e2ee;
+  border-top: 1px solid var(--bb-line);
   padding-top: 1.0625rem;
 }
 .game-editor-dialog .game-agenda-grid {
@@ -138,8 +138,8 @@
   gap: 0.75rem;
 }
 .game-editor-dialog .game-agenda-hint {
-  font-size: 0.75rem;
-  color: #42526b;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
+  color: var(--bb-muted);
   margin: 0.5625rem 0 1.125rem;
 }
 .game-editor-dialog .game-classification {
@@ -150,6 +150,7 @@
   align-items: start;
 }
 .game-editor-dialog .game-knockout-fields {
+  --game-knockout-control-height: 2.625rem;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: minmax(4.25rem, auto) auto;
@@ -161,10 +162,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  min-height: 2.5625rem;
+  min-height: var(--game-knockout-control-height);
   gap: 0.5rem;
   font-weight: 600;
   cursor: pointer;
+}
+.game-editor-dialog .game-knockout-fields .game-picker-input input {
+  min-height: var(--game-knockout-control-height);
 }
 .game-editor-dialog .game-knockout-check input {
   width: 1.0625rem;
@@ -177,26 +181,26 @@
 .game-editor-dialog .game-knockout-hint {
   grid-column: 1;
   font-size: 0.6875rem;
-  color: #42526b;
+  color: var(--bb-muted);
   margin: 0;
 }
 .game-editor-dialog .game-field-error {
   color: #a12720;
-  font-size: 0.75rem;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   margin: 0.375rem 0 0;
 }
 .game-editor-dialog input[aria-invalid="true"] {
   border-color: #a12720;
 }
 .game-editor-dialog .game-officiating {
-  border-top: 1px solid #d9e2ee;
+  border-top: 1px solid var(--bb-line);
 }
 .game-editor-dialog .game-officiating summary {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.625rem;
-  font-size: 0.8125rem;
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   font-weight: 650;
   cursor: pointer;
   min-height: 3.0625rem;
@@ -211,12 +215,12 @@
 }
 .game-editor-dialog .game-officiating summary span {
   font-weight: 400;
-  color: #42526b;
-  font-size: 0.75rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
 }
 .game-editor-dialog .game-publication-note {
-  color: #42526b;
-  font-size: 0.75rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   margin: 0 0 1.125rem;
 }
 .game-editor-dialog .admin-dialog-footer {
@@ -225,13 +229,13 @@
   justify-content: space-between;
   gap: 0.75rem;
   flex: none;
-  border-top: 1px solid #d9e2ee;
-  padding: 0.9375rem 1.5625rem;
-  background: #fafbfd;
+  border-top: 1px solid var(--bb-line);
+  padding: 0.75rem 1rem;
+  background: var(--bb-background);
 }
 .game-editor-dialog .game-save-note {
-  color: #42526b;
-  font-size: 0.75rem;
+  color: var(--bb-muted);
+  font-size: calc(var(--bb-font-detail) + 0.125rem);
   min-width: 0;
 }
 .game-editor-dialog .game-footer-actions {
@@ -241,13 +245,25 @@
   justify-content: flex-end;
 }
 .game-editor-dialog .game-footer-actions button {
-  min-height: 2.5625rem;
-  font-size: 0.8125rem;
-  padding: 0.5625rem 0.8125rem;
+  min-height: 2.25rem;
+  font-size: calc(var(--bb-font-body) + 0.125rem);
+  padding: 0.375rem 0.625rem;
 }
-.game-editor-dialog .game-cancel {
-  border-color: transparent;
-  background: transparent;
+.competition-workspace
+  .game-editor-dialog
+  :is(.game-cancel, .admin-dialog-close-icon) {
+  border-color: var(--bb-danger);
+  background: var(--bb-danger);
+  color: var(--bb-surface);
+}
+.competition-workspace .game-editor-dialog button.primary {
+  border-color: var(--bb-blue);
+  background: var(--bb-blue);
+  color: var(--bb-surface);
+}
+.game-editor-dialog .admin-dialog-close-icon {
+  min-width: 2.5rem;
+  min-height: 2rem;
 }
 .game-editor-dialog .game-picker-options {
   z-index: 20;
@@ -276,7 +292,7 @@
     padding: 0.875rem 1rem;
   }
   .game-editor-dialog .admin-dialog-header > button {
-    font-size: 0.75rem;
+    font-size: calc(var(--bb-font-detail) + 0.125rem);
     padding: 0.4375rem;
   }
   .game-editor-dialog .admin-dialog-body {
@@ -306,7 +322,7 @@
     column-gap: 0.75rem;
   }
   .game-editor-dialog .game-knockout-check {
-    font-size: 0.75rem;
+    font-size: calc(var(--bb-font-detail) + 0.125rem);
   }
   .game-editor-dialog .game-registration-tools {
     align-items: flex-start;
@@ -330,7 +346,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .game-editor-dialog .game-footer-actions button {
-    font-size: 0.75rem;
+    font-size: calc(var(--bb-font-detail) + 0.125rem);
     padding: 0.5rem;
     min-height: 2.75rem;
   }
@@ -339,4 +355,132 @@
     grid-column: 1/-1;
     min-height: 1.875rem;
   }
+}
+
+.games-workspace .game-list-scroll {
+  max-block-size: max(14rem, calc(100dvh - 15rem));
+  overflow: auto;
+  border: 1px solid var(--bb-line);
+  border-radius: var(--bb-radius);
+}
+@media (max-width: 1000px) {
+  .games-workspace .game-list-scroll {
+    max-block-size: max(12rem, calc(100dvh - 20rem));
+  }
+}
+.game-list-scroll .admin-data-table {
+  width: 100%;
+  min-width: 50rem;
+}
+.game-list-scroll th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bb-background);
+}
+.game-list-scroll :is(th, td) {
+  padding: 0.375rem 0.625rem;
+}
+.game-list-matchup {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.game-list-matchup > span {
+  max-inline-size: 28ch;
+  overflow-wrap: break-word;
+}
+.game-list-score {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.game-list-state,
+.game-list-action,
+.game-list-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.game-list-state {
+  color: var(--bb-muted);
+}
+.game-list-state.is-finished {
+  color: var(--bb-success);
+}
+.game-list-state svg,
+.game-list-action svg,
+.game-list-add svg {
+  flex: none;
+}
+.game-list-operations {
+  width: 1%;
+  white-space: nowrap;
+}
+.game-list-scroll th.game-list-operations {
+  text-align: center;
+}
+.game-list-action + .game-list-action {
+  margin-inline-start: 0.25rem;
+}
+.game-list-scroll > :is(p, .game-list-error) {
+  margin: 0;
+  padding: 0.5rem 0.625rem;
+}
+.game-list-next {
+  min-width: 50rem;
+  height: 1px;
+}
+.games-workspace .competition-title {
+  align-items: end;
+  flex-direction: row;
+}
+.game-list-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 0 0 min(100%, 50.25rem);
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+}
+.games-workspace .game-list-filters label {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  min-width: 0;
+}
+.game-list-filters :is(input, select) {
+  width: 100%;
+  min-width: 0;
+}
+.game-list-updating {
+  align-self: center;
+  color: var(--bb-muted);
+}
+.game-list-error p {
+  margin-block: 0 0.375rem;
+}
+.games-workspace > .game-list-error {
+  margin-block-end: 0.5rem;
+}
+@media (max-width: 639px) {
+  .game-list-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.games-workspace > .competition-title button.primary {
+  background: var(--bb-blue);
+  border-color: var(--bb-blue);
+  color: var(--bb-surface);
+}
+.games-workspace > .competition-title button.secondary {
+  background: var(--bb-surface);
+  color: var(--bb-text);
+  border-color: var(--bb-control-line);
+}
+
+.game-list-add svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+.competition-workspace .games-workspace button.game-list-edit:not(:disabled) {
+  color: var(--bb-blue);
 }

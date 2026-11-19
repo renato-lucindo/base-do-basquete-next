@@ -10,9 +10,18 @@ let db: PGlite;
 beforeAll(async () => {
   db = await PGlite.create();
   await db.exec(platform);
-  for (const file of (await readdir("supabase/migrations")).sort())
-    if (file.endsWith(".sql"))
-      await db.exec(await readFile("supabase/migrations/" + file, "utf8"));
+  for (const file of (await readdir("supabase/migrations")).sort()) {
+    if (!file.endsWith(".sql")) continue;
+    if (file.endsWith("_competition_organizers.sql")) {
+      await db.exec(`
+        insert into public.championships(id,name) values('${id(290)}','Liga anterior');
+        insert into public.seasons(id,championship_id,year) values('${id(291)}','${id(290)}',2026);
+        insert into public.disputes(id,season_id,gender,category) values('${id(292)}','${id(291)}','masculino','Adulto');
+        update private.dispute_administration set visibility='legacy',was_public=true where dispute_id='${id(292)}';
+      `);
+    }
+    await db.exec(await readFile("supabase/migrations/" + file, "utf8"));
+  }
   await db.query("insert into auth.users(id) values ($1)", [id(1)]);
   await db.query("insert into public.admin_access(user_id) values ($1)", [
     id(1),
@@ -48,8 +57,147 @@ function command(n: number, category = "Adulto", year = 2026, version = 0) {
   };
 }
 
+async function saveNewChampionship(
+  value: ReturnType<typeof command>,
+  test = false,
+) {
+  const organizer = test
+    ? { mode: "test" }
+    : {
+        mode: "existing",
+        id: (
+          await db.query<{ id: string }>(
+            "select id from private.competition_organizers where abbreviation='FECABA'",
+          )
+        ).rows[0].id,
+      };
+  return db.query("select public.save_competition_administration($1)", [
+    {
+      ...value,
+      organizer,
+      testDisputeIds: test
+        ? value.competition.seasons.flatMap((s) => s.disputes.map((d) => d.id))
+        : [],
+      renameReason: null,
+    },
+  ]);
+}
+
+it("requires an organizer in both writers, and creates a named organizer only once", async () => {
+  const fresh = command(60);
+  fresh.competition.id = id(260);
+  fresh.competition.seasons[0].id = id(261);
+  fresh.competition.seasons[0].disputes[0].id = id(262);
+  await expect(
+    db.query("select public.save_competition($1)", [fresh]),
+  ).rejects.toMatchObject({ message: "championship_organizer_required" });
+  const required = { ...fresh, testDisputeIds: [], renameReason: null };
+  const save = (value: object) =>
+    db.query("select public.save_competition_administration($1) as result", [
+      value,
+    ]);
+  await expect(save(required)).rejects.toMatchObject({
+    message: "championship_organizer_required",
+  });
+  const created = {
+    ...required,
+    organizer: {
+      mode: "create",
+      name: "Associação  Escolar",
+      abbreviation: "AE",
+      kind: "student",
+    },
+  };
+  expect((await save(created)).rows).toEqual([
+    { result: { id: id(260), version: 1 } },
+  ]);
+  expect((await save(created)).rows).toEqual([
+    { result: { id: id(260), version: 1 } },
+  ]);
+  const matches = await db.query<{ result: { name: string; id: string }[] }>(
+    "select public.list_competition_organizers('ae') as result",
+  );
+  expect(matches.rows[0].result).toMatchObject([
+    { name: "Associação Escolar" },
+  ]);
+  const change = {
+    ...required,
+    commandId: id(999),
+    expectedVersion: 1,
+    organizer: { ...created.organizer, name: "ASSOCIAÇÃO ESCOLAR" },
+  };
+  await expect(save(change)).rejects.toMatchObject({
+    message: "championship_organizer_duplicate",
+  });
+  const snapshot = await db.query<{
+    result: { organizerLocked: boolean; version: number };
+  }>("select public.get_competition_with_organizer($1) result", [id(260)]);
+  expect(snapshot.rows[0].result).toMatchObject({
+    organizerLocked: false,
+    version: 1,
+  });
+});
+
+it("allows assigning a published legacy championship once, and audits the association", async () => {
+  const legacy = command(61, "Adulto", 2026, 1);
+  legacy.competition.id = id(290);
+  legacy.competition.name = "Liga anterior";
+  legacy.competition.seasons[0].id = id(291);
+  legacy.competition.seasons[0].disputes[0].id = id(292);
+  const organizer = (
+    await db.query<{ id: string }>(
+      "select id from private.competition_organizers where abbreviation='FECABA'",
+    )
+  ).rows[0].id;
+  const read = async () =>
+    (
+      await db.query(
+        "select public.get_competition_with_organizer($1) result",
+        [id(290)],
+      )
+    ).rows[0];
+  expect(await read()).toMatchObject({
+    result: { organizer: null, organizerLocked: false },
+  });
+  const save = (value: object) =>
+    db.query("select public.save_competition_administration($1)", [value]);
+  const value = { ...legacy, testDisputeIds: [], renameReason: null };
+  await save({ ...value, organizer: { mode: "existing", id: organizer } });
+  expect(await read()).toMatchObject({
+    result: { organizer: { id: organizer }, organizerLocked: true },
+  });
+  await expect(
+    save({
+      ...value,
+      commandId: id(998),
+      expectedVersion: 2,
+      organizer: {
+        mode: "create",
+        name: "Outra entidade",
+        abbreviation: null,
+        kind: "independent",
+      },
+    }),
+  ).rejects.toMatchObject({ message: "championship_organizer_locked" });
+  expect(
+    (
+      await db.query(
+        "select after_value from private.competition_administration_audit where championship_id=$1 and action='set_organizer'",
+        [id(290)],
+      )
+    ).rows,
+  ).toEqual([{ after_value: organizer }]);
+  expect(
+    (
+      await db.query(
+        "select id from private.competition_organizers where name='Outra entidade'",
+      )
+    ).rows,
+  ).toEqual([]);
+});
+
 it("allows identification changes before use and keeps the lock after removing an empty registration", async () => {
-  await db.query("select public.save_competition($1)", [command(1)]);
+  await saveNewChampionship(command(1));
   await db.query("select public.save_competition($1)", [
     command(2, "Sub-22", 2027, 1),
   ]);
@@ -85,7 +233,7 @@ it("lists a public dispute before content exists and removes the direct lookup w
   c.competition.id = id(210);
   c.competition.seasons[0].id = id(211);
   c.competition.seasons[0].disputes[0].id = id(212);
-  await db.query("select public.save_competition($1)", [c]);
+  await saveNewChampionship(c);
   const catalogue = async () =>
     (
       await db.query<{ disputes: unknown }>(
@@ -224,8 +372,23 @@ it("exposes only the selected test in an authenticated preview and restores the 
   c.competition.id = id(220);
   c.competition.seasons[0].id = id(221);
   c.competition.seasons[0].disputes[0].id = id(222);
+  await saveNewChampionship(c, true);
+  const next = { ...c, commandId: id(224), expectedVersion: 1 };
+  next.competition.seasons[0].disputes.push({
+    ...c.competition.seasons[0].disputes[0],
+    id: id(225),
+    division: null,
+    gender: "feminino",
+  });
+  await expect(
+    db.query("select public.save_competition($1)", [next]),
+  ).rejects.toMatchObject({ message: "championship_test_only" });
+  const newDispute = { ...next, testDisputeIds: [], renameReason: null };
+  await expect(
+    db.query("select public.save_competition_administration($1)", [newDispute]),
+  ).rejects.toMatchObject({ message: "championship_test_only" });
   await db.query("select public.save_competition_administration($1)", [
-    { ...c, testDisputeIds: [id(222)], renameReason: null },
+    { ...newDispute, testDisputeIds: [id(225)] },
   ]);
   await expect(
     db.query("select public.save_dispute_administration($1)", [

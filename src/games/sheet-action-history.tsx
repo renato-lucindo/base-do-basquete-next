@@ -1,18 +1,50 @@
-import { useState } from "react";
-import { periodLabel, periodColor } from "../domain/scoresheet";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Icon } from "../ui-system/components";
 import {
-  selectActionHistory,
-  type AnnotatedAction,
-  type HistoryQuery,
-} from "../scoresheet/projection";
-const defaults = (): HistoryQuery => ({
-  mode: "recent",
-  periods: Array.from({ length: 12 }, (_, i) => i + 1),
-  sides: ["home", "away"],
-  kinds: ["points", "fouls", "timeouts"],
-  order: "entry",
-  page: 0,
-});
+  parseFoul,
+  periodColor,
+  periodLabel,
+  type Foul,
+} from "../domain/scoresheet";
+import type { AnnotatedAction, HistoryQuery } from "../scoresheet/projection";
+
+const actionKinds = {
+  points: "Pontos",
+  fouls: "Faltas",
+  timeouts: "Tempos debitados",
+} as const;
+
+const targets: Record<string, string> = {
+  C: "Técnico",
+  AT: "Assistente",
+  B: "Banco",
+  TO: "TD",
+};
+
+const foulLabels: Record<Foul["kind"], string> = {
+  P: "Falta pessoal",
+  T: "Falta técnica",
+  U: "Falta antidesportiva",
+  D: "Falta desqualificante",
+  B: "Falta de banco",
+  C: "Falta do técnico",
+};
+
+function actionLabel({ annotation, event, kind }: AnnotatedAction) {
+  if (kind === "timeouts") return annotation.replace(/^TO ·/u, "TD ·");
+  if (kind === "points")
+    return annotation.replace(/^([123])p\b/u, (_, points: string) =>
+      points === "1" ? "1 ponto" : points + " pontos",
+    );
+  const foul = parseFoul(event.code, event.target);
+  if (!foul) return annotation;
+  const description =
+    event.code.toUpperCase() === "B2"
+      ? "Desqualificante no banco"
+      : foulLabels[foul.kind];
+  return annotation.replace(/^\S+/u, (code) => `${code} - ${description}`);
+}
+
 export function SheetActionHistory({
   actions,
   periods,
@@ -26,189 +58,166 @@ export function SheetActionHistory({
   onEdit: (action: AnnotatedAction) => void;
   onDelete: (id: string) => void;
 }) {
-  const [q, setQ] = useState<HistoryQuery>(defaults),
-    result = selectActionHistory(actions, q);
-  const toggle = <K extends "periods" | "sides" | "kinds">(
-    key: K,
-    value: HistoryQuery[K][number],
-  ) =>
-    setQ((old) => ({
-      ...old,
-      mode: "history",
-      page: 0,
-      [key]: old[key].includes(value as never)
-        ? old[key].filter((v) => v !== value)
-        : [...old[key], value],
-    }));
+  const [side, setSide] = useState("");
+  const [period, setPeriod] = useState("");
+  const [kind, setKind] = useState("");
+  const [order, setOrder] = useState<HistoryQuery["order"]>("entry");
+  const region = useRef<HTMLDivElement>(null);
+  const selectedPeriod = Number(period) > periods ? "" : period;
+  const rows = useMemo(() => {
+    const matches = actions.filter(
+      ({ event, kind: actionKind }) =>
+        (!side || side === event.side) &&
+        (!selectedPeriod || Number(selectedPeriod) === event.period) &&
+        (!kind || kind === actionKind),
+    );
+    return order === "entry"
+      ? matches.reverse()
+      : matches.sort(
+          (a, b) => a.event.period - b.event.period || a.sequence - b.sequence,
+        );
+  }, [actions, kind, order, selectedPeriod, side]);
+
+  useEffect(() => {
+    if (region.current) region.current.scrollTop = 0;
+  }, [side, selectedPeriod, kind, order]);
+
   return (
-    <section className="sheet-history" aria-label="Conferência das ações">
-      <h4>Ações registradas</h4>
+    <section className="sheet-history" aria-labelledby="sheet-history-title">
+      <h4 className="sheet-section-heading" id="sheet-history-title">
+        Últimas ações
+      </h4>
       <fieldset disabled={disabled} className="sheet-history-filters">
-        <legend>Pesquisar ações</legend>
-        <fieldset>
-          <legend>Quartos</legend>
-          {Array.from({ length: periods }, (_, i) => (
-            <label key={i}>
-              <input
-                type="checkbox"
-                checked={q.periods.includes(i + 1)}
-                onChange={() => toggle("periods", i + 1)}
-              />
-              {periodLabel(i + 1)}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>Equipes</legend>
-          {(["home", "away"] as const).map((side) => (
-            <label key={side}>
-              <input
-                type="checkbox"
-                checked={q.sides.includes(side)}
-                onChange={() => toggle("sides", side)}
-              />
-              {side === "home" ? "Equipe A" : "Equipe B"}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>Tipo</legend>
-          {(["points", "fouls", "timeouts"] as const).map((kind) => (
-            <label key={kind}>
-              <input
-                type="checkbox"
-                checked={q.kinds.includes(kind)}
-                onChange={() => toggle("kinds", kind)}
-              />
-              {kind === "points"
-                ? "Pontos"
-                : kind === "timeouts"
-                  ? "Pedidos de tempo"
-                  : "Faltas"}
-            </label>
-          ))}
-        </fieldset>
+        <legend className="sr-only">Filtrar ações</legend>
+        <label>
+          Equipe
+          <select
+            aria-label="Filtrar ações por equipe"
+            value={side}
+            onChange={(e) => {
+              setSide(e.target.value);
+            }}
+          >
+            <option value="">Todas</option>
+            <option value="home">Equipe A</option>
+            <option value="away">Equipe B</option>
+          </select>
+        </label>
+        <label>
+          Período
+          <select
+            aria-label="Filtrar ações por período"
+            value={selectedPeriod}
+            onChange={(e) => {
+              setPeriod(e.target.value);
+            }}
+          >
+            <option value="">Todos</option>
+            {Array.from({ length: periods }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {periodLabel(i + 1)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Tipo
+          <select
+            aria-label="Filtrar ações por tipo"
+            value={kind}
+            onChange={(e) => {
+              setKind(e.target.value);
+            }}
+          >
+            <option value="">Todos</option>
+            {Object.entries(actionKinds).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           Ordem das ações
           <select
             aria-label="Ordem das ações"
-            value={q.order}
-            onChange={(e) =>
-              setQ((old) => ({
-                ...old,
-                order: e.target.value as HistoryQuery["order"],
-                page: 0,
-              }))
-            }
+            value={order}
+            onChange={(e) => {
+              setOrder(e.target.value as HistoryQuery["order"]);
+            }}
           >
             <option value="entry">Ordem de lançamento</option>
-            <option value="period">Quarto Q1 → Q2 → Q3 → Q4 → OT</option>
+            <option value="period">Por período</option>
           </select>
         </label>
-        <button
-          type="button"
-          onClick={() => setQ((old) => ({ ...old, mode: "history", page: 0 }))}
-        >
-          Consultar histórico
-        </button>
-        <button type="button" onClick={() => setQ(defaults())}>
-          Últimas 10
-        </button>
       </fieldset>
-      <p role="status">
-        {q.mode === "recent"
-          ? `Últimas ${result.items.length} ações de ${actions.length}`
-          : `${result.total} ações encontradas · página ${result.page + 1}`}
-      </p>
-      {result.items.length ? (
-        <div className="sheet-history-groups">
-          {(["points", "fouls", "timeouts"] as const)
-            .filter((kind) => result.items.some((item) => item.kind === kind))
-            .map((kind) => (
-              <section
-                key={kind}
-                aria-label={
-                  kind === "points"
-                    ? "Ações de pontos"
-                    : kind === "timeouts"
-                      ? "Pedidos de tempo"
-                      : "Ações de faltas"
-                }
-              >
-                <h5>
-                  {kind === "points"
-                    ? "Pontos"
-                    : kind === "timeouts"
-                      ? "Pedidos de tempo"
-                      : "Faltas"}
-                </h5>
-                <ol className="sheet-actions">
-                  {result.items
-                    .filter((a) => a.kind === kind)
-                    .map((a) => (
-                      <li
-                        key={a.event.id}
-                        className={`sheet-period-${periodColor(a.event.period)}`}
+      <div
+        className="sheet-history-scroll"
+        ref={region}
+        role="region"
+        aria-label="Registro de ações"
+        tabIndex={0}
+      >
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Nº</th>
+              <th scope="col">Período</th>
+              <th scope="col">Equipe</th>
+              <th scope="col">Alvo</th>
+              <th scope="col">Ação</th>
+              <th scope="col">Operações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((action) => {
+              const { event, sequence } = action;
+              return (
+                <tr key={event.id}>
+                  <td>{sequence}</td>
+                  <td className={`sheet-period-${periodColor(event.period)}`}>
+                    {periodLabel(event.period)}
+                  </td>
+                  <td>{event.side === "home" ? "A" : "B"}</td>
+                  <td>{targets[event.target] ?? "#" + event.target}</td>
+                  <td>{actionLabel(action)}</td>
+                  <td>
+                    <div className="sheet-row-actions">
+                      <button
+                        type="button"
+                        disabled={disabled}
+                        className="sheet-row-action"
+                        aria-label={`Editar ação ${sequence}`}
+                        onClick={() => onEdit(action)}
                       >
-                        <span>
-                          {a.sequence}. {periodLabel(a.event.period)} -{" "}
-                          {a.event.side === "home" ? "A" : "B"} -{" "}
-                          {/^[0-9]/u.test(a.event.target)
-                            ? "#" + a.event.target
-                            : a.event.target === "TO"
-                              ? "Equipe"
-                              : a.event.target === "C"
-                                ? "Técnico"
-                                : a.event.target === "AT"
-                                  ? "Ass. Técnico"
-                                  : "Banco"}{" "}
-                          - {a.annotation}
-                        </span>
-                        <div className="competition-actions">
-                          <button
-                            disabled={disabled}
-                            aria-label={`Editar ação ${a.sequence}`}
-                            onClick={() => onEdit(a)}
-                          >
-                            Editar
-                          </button>
-                          <button
-                            disabled={disabled}
-                            aria-label={`Excluir ação ${a.sequence}`}
-                            onClick={() => onDelete(a.event.id)}
-                          >
-                            Excluir
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                </ol>
-              </section>
-            ))}
-        </div>
-      ) : (
-        <p>
-          {actions.length
-            ? "Nenhuma ação corresponde aos filtros."
-            : "Sem ações registradas."}
-        </p>
-      )}
-      {q.mode === "history" && (
-        <div className="competition-actions">
-          <button
-            disabled={disabled || result.page === 0}
-            onClick={() => setQ((old) => ({ ...old, page: result.page - 1 }))}
-          >
-            Ações anteriores
-          </button>
-          <button
-            disabled={disabled || !result.hasMore}
-            onClick={() => setQ((old) => ({ ...old, page: result.page + 1 }))}
-          >
-            Próximas ações
-          </button>
-        </div>
-      )}
+                        <Icon name="edit" /> Editar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={disabled}
+                        className="sheet-row-action sheet-remove-action"
+                        aria-label={`Excluir ação ${sequence}`}
+                        onClick={() => onDelete(event.id)}
+                      >
+                        <Icon name="trash" /> Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {!rows.length && (
+              <tr>
+                <td colSpan={6}>
+                  {actions.length
+                    ? "Nenhuma ação corresponde aos filtros."
+                    : "Sem ações registradas."}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

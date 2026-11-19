@@ -1,5 +1,6 @@
 import type { PublicResult } from "./pdf-contract";
 import { compareJerseys } from "../domain/jersey";
+import { periodLabel } from "../domain/scoresheet";
 export type Side = "home" | "away";
 export type Period = "all" | number;
 export const scoringKeys = ["points", "two", "three", "free"] as const;
@@ -135,7 +136,7 @@ export const periodShort = (period: Period) =>
     ? "Jogo todo"
     : period <= 4
       ? `${period}º Q`
-      : `${period - 4}ª PR`;
+      : periodLabel(period);
 export const periodName = (period: Period) =>
   period === "all"
     ? "Jogo todo"

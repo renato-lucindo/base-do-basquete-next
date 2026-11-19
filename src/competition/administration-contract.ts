@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { saveCompetitionSchema } from "./contract";
+import { organizerSelectionSchema } from "./organizer-contract";
 
 export const disputeStatusSchema = z.enum([
   "planned",
@@ -29,6 +30,7 @@ export const saveCompetitionAdministrationSchema = saveCompetitionSchema.extend(
   {
     testDisputeIds: z.array(z.uuid()).max(2048),
     renameReason: reason,
+    organizer: organizerSelectionSchema.optional(),
   },
 );
 export const disputeAdministrationCommandSchema = z

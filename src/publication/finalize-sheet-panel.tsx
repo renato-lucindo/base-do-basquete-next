@@ -9,7 +9,6 @@ import {
 } from "./data-contract";
 import type { PublishSheet } from "./contract";
 import type { SheetPublicationProps } from "./sheet-panel";
-import { PublicationHistory } from "./history";
 
 type Ack = ReturnType<typeof publicationSheetResultSchema.parse>;
 export function FinalizeSheetPanel(p: SheetPublicationProps) {
@@ -115,6 +114,7 @@ export function FinalizeSheetPanel(p: SheetPublicationProps) {
       pending.current = null;
       if (!alive.current) return;
       setAck(r);
+      p.onAcknowledged();
       setUncertain(false);
       await p.onPublished(r, false);
       if (alive.current) {
@@ -157,39 +157,24 @@ export function FinalizeSheetPanel(p: SheetPublicationProps) {
           Usar a súmula manual em vez do PDF deste jogo
         </label>
       )}
-      <button
-        disabled={
-          p.disabled || busy || (!!choice && !manual && !uncertain && !ack)
-        }
-        onClick={() => void finish()}
-      >
-        {ack
-          ? "Recuperar resultado salvo"
-          : uncertain
-            ? "Repetir finalização"
-            : p.confirmed
-              ? "Salvar correção e atualizar resultado"
-              : "Finalizar jogo"}
-      </button>
-      {(p.confirmed || ack) && (
-        <p>
-          <a
-            href={`/resultado.html#${p.game.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ver resultado
-          </a>
-        </p>
-      )}
-      <details>
-        <summary>Histórico do resultado</summary>
-        <PublicationHistory
-          gameId={p.game.id}
-          enabled={!p.disabled && !busy}
-          onSessionLost={p.onSessionLost}
-        />
-      </details>
+      <div className="competition-actions sheet-save-commands">
+        {p.draftAction}
+        <button
+          className="primary"
+          disabled={
+            p.disabled || busy || (!!choice && !manual && !uncertain && !ack)
+          }
+          onClick={() => void finish()}
+        >
+          {ack
+            ? "Recuperar resultado salvo"
+            : uncertain
+              ? "Repetir finalização"
+              : p.alreadyPublished || p.confirmed
+                ? "Salvar e republicar"
+                : "Salvar e publicar"}
+        </button>
+      </div>
     </section>
   );
 }

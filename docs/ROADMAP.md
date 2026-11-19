@@ -6,23 +6,39 @@ O escopo e as pendências estão em [MATRIZ-ESCOPO.md](MATRIZ-ESCOPO.md); a exec
 
 Concluir o MVP exige validar os percursos do escopo vigente, resolver bloqueios e obter os aceites aplicáveis. Funcionalidade adiada não vira automaticamente pós-MVP: preserve sua classificação e decisão originais até o responsável alterá-las explicitamente.
 
+## Ordem proposta para a reforma administrativa
+
+**Disputas** é a entrada para o trabalho em campeonatos. Dentro da disputa, manter sempre visíveis o contexto atual, o seletor **Disputa de trabalho** e **Voltar aos campeonatos**, com os filtros da lista preservados. A navegação da disputa reúne **Jogos**, **Equipes e elencos**, **Formato e classificação**, **Importações** e **Publicação**. Os cadastros de uso compartilhado e a gestão de acessos ficam na navegação administrativa global.
+
+| Ordem | Área                         | Mudança proposta                                                                                                                                                                                                                                                                                             |
+| ----- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | Jogos e navegação da disputa | Reformar a tela que abre ao selecionar uma disputa. Priorizar lista de jogos, filtros e **Novo jogo**. Abrir **Dados do jogo**, **Súmula** e **Publicação do jogo** no contexto do jogo. Agrupar ações secundárias perto do item e preservar filtros e posição ao voltar.                                    |
+| 2     | Equipes e elencos            | Manter a lista de equipes inscritas ao lado do elenco em desktop e o retorno à equipe no celular. Separar as ações de **Inscrição**, **Elenco** e **Comissão técnica**, deixando claro quando uma edição altera o cadastro global.                                                                           |
+| 3     | Formato e classificação      | Separar **Formato**, **Classificação** e **Histórico** na mesma área. Mostrar primeiro a estrutura esportiva em uso e apresentar os efeitos antes de alterar regras, fases ou critérios com jogos já registrados. A revisão de interface preserva os fluxos ativo e experimental até decisão sobre ativação. |
+| 4     | Importações                  | Reunir **Súmulas em PDF** e **Equipes e elencos por texto** em duas filas. Exibir destino, pendências e confirmação por item. Manter atalhos contextuais em Jogos e Equipes, com a disputa, o jogo ou a equipe já preenchidos.                                                                               |
+| 5     | Publicação da disputa        | Concentrar situação pública, atalhos de prévia e pendências de publicação. Cada ação que exige revisão abre diretamente o jogo, perfil ou classificação correspondente. Reaproveitar a alteração rápida de visibilidade em Disputas e as publicações automáticas dos fluxos em que já existem.               |
+| 6     | Cadastros globais            | Criar um destino para **Pessoas**, **Equipes** e **Organizações**. A página mantém identidades reutilizadas entre disputas, enquanto vínculos de atleta, comissão e inscrição são tratados na disputa. Preservar criação inline nos formulários em que ela evita perda de contexto.                          |
+| 7     | Acessos por organização      | Planejar membros e papéis depois de validar quais ações pertencem à organização, ao campeonato e à disputa. A autorização deve ser aplicada no servidor e validada com organizações distintas.                                                                                                               |
+
+Cada etapa deve chegar ao Worker administrativo com um percurso completo para aceite visual. Para comparar o resultado, registrar quantos cliques são necessários nas ações frequentes, quantas linhas úteis aparecem a 100% em 1366 × 768 e se a troca de contexto preserva seleção, foco e rascunhos. Usar os tamanhos de texto aprovados no design system conforme as telas forem reformadas.
+
 ## Objetivos registrados
 
 A ordem dos IDs não representa prioridade. O identificador original é preservado mesmo quando um objetivo muda de fase. Cada entrada informa seu escopo e status atuais.
 
 ### FUT-001 — Tempos debitados na súmula
 
-**Status:** Priorizada para o MVP; implementação técnica relatada na [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38), ainda Draft e não integrada/aceita. Situação de execução e CI no [checkpoint](PROGRESSO.md). **Origem:** pedido de 29/10/2026. **Decisão do responsável em 30/10/2026:** incluir os pedidos de tempo no MVP, deixando de ser exclusivamente pós-MVP. Esta atualização registra a prioridade; não inicia a implementação nem altera as PRs ativas.
+**Status** — Implementado no MVP. A [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) foi integrada em 02/11/2026. O painel administrativo usa os rótulos atualizados na [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87). O pedido de 29/10/2026 foi priorizado pelo responsável em 30/10/2026.
 
 **Objetivo e benefício:** registrar o minuto de cada tempo debitado por equipe na súmula, com entrada rápida por teclado e identificação do quarto.
 
-**Comportamento solicitado:**
+**Comportamento vigente**
 
-- Entrada `TO` → `ENTER` → minuto de `1` a `10`.
-- Limite solicitado de dois tempos por equipe no primeiro tempo, compartilhados entre Q1/Q2; três no segundo tempo, compartilhados entre Q3/Q4. Não interpretar como limite por quarto.
-- Fonte segue a coloração do quarto já definida para a súmula: vermelho nos ímpares, azul nos pares; preservar também a identificação textual do período.
+- Selecione a equipe e o período, digite `TD`, pressione `Enter`, informe o minuto decorrido e pressione `Enter` para registrar. A faixa é de 1 a 10 no quarto e de 1 a 5 na prorrogação.
+- Cada equipe tem até dois tempos debitados em Q1 e Q2 somados, três em Q3 e Q4 somados, com até dois nos dois minutos finais de Q4, e um por prorrogação. Os limites são independentes entre metades e prorrogações.
+- O minuto usa a cor do período, com identificação textual. O formulário aceita `TO` como atalho legado e o documento continua gravando `target: "TO"`. Períodos são gravados como números. A [ADR 009](decisoes/009-sumula-persistida.md) descreve a compatibilidade.
 
-**Dependências e pontos para o planejamento futuro:** identificar a equipe destinatária do comando e o quarto vigente; definir confirmação do minuto, correção/remoção e persistência/publicação compatíveis com o histórico da súmula. Conferir a regra FIBA oficial vigente antes de implementar, incluindo restrições dos minutos finais, prorrogações e significado do minuto informado (decorrido ou restante). Os limites acima registram o pedido, não uma verificação normativa completa. Não inferir transferência de tempos entre metades ou prorrogações.
+Na tradução oficial CBB 2026, o art. 18 usa **tempo debitado** e o art. 8 usa **tempo extra (prorrogação)**. O item B.7.1 identifica os espaços de prorrogação na súmula oficial com a sigla `OT`. A interface usa `PR1`, `PR2` e assim por diante para identificar cada prorrogação. [Regras Oficiais de Basquetebol 2026, arts. 8 e 18 e anexo B](https://dcf17fmbywxbi.cloudfront.net/official-notes/nota-IW5O.pdf)
 
 ### FUT-002 — Recordes da Carreira no perfil do jogador
 

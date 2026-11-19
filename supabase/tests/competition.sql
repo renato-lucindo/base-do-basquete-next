@@ -22,8 +22,14 @@ create function pg_temp.ctx_command(n integer default 0) returns jsonb language 
           jsonb_build_object('id',pg_temp.ctx_id(n+4),'gender','feminino','category','Adulto','division',null),
           jsonb_build_object('id',pg_temp.ctx_id(n+5),'gender','masculino','category','Adulto','division','B'))))))
 $$;
+create function pg_temp.ctx_save_with_organizer(c jsonb) returns jsonb language sql as $$
+  select public.save_competition_administration(c || jsonb_build_object(
+    'testDisputeIds','[]'::jsonb,'renameReason',null,
+    'organizer',jsonb_build_object('mode','existing','id',public.list_competition_organizers('FECABA')->0->'id')))
+$$;
 grant execute on function pg_temp.ctx_assert(boolean,text),pg_temp.ctx_error(text,text),
   pg_temp.ctx_id(integer),pg_temp.ctx_command(integer) to anon,authenticated;
+grant execute on function pg_temp.ctx_save_with_organizer(jsonb) to authenticated;
 
 delete from public.admin_access;
 insert into auth.users(id) values
@@ -39,8 +45,9 @@ select pg_temp.ctx_assert((public.list_competitions()->'items')='[]'::jsonb,'non
 select pg_temp.ctx_error('select public.save_competition(pg_temp.ctx_command())','PT403');
 set local request.jwt.claim.sub='20000000-0000-4000-8000-000000000090';
 select pg_temp.ctx_error($q$insert into public.championships(id,name) values(pg_temp.ctx_id(2),'Bypass')$q$,'42501');
-select pg_temp.ctx_assert((public.save_competition(pg_temp.ctx_command())->>'version')::int=1,'first save');
-select pg_temp.ctx_assert((public.save_competition(pg_temp.ctx_command())->>'version')::int=1,'idempotent replay');
+select pg_temp.ctx_error('select public.save_competition(pg_temp.ctx_command())','PT409');
+select pg_temp.ctx_assert((pg_temp.ctx_save_with_organizer(pg_temp.ctx_command())->>'version')::int=1,'first save');
+select pg_temp.ctx_assert((pg_temp.ctx_save_with_organizer(pg_temp.ctx_command())->>'version')::int=1,'idempotent replay');
 select pg_temp.ctx_assert((select count(*)=1 from public.championships),'no duplicate on replay');
 select pg_temp.ctx_assert((public.get_competition(pg_temp.ctx_id(2))->'seasons'->0->'disputes') @>
   '[{"gender":"feminino","category":"Adulto","division":null}]','context returned');
@@ -49,7 +56,7 @@ select pg_temp.ctx_error($q$select public.save_competition(jsonb_set(pg_temp.ctx
 select pg_temp.ctx_error($q$select public.save_competition(jsonb_set(jsonb_set(pg_temp.ctx_command(10),'{competition,seasons,0,disputes,1,gender}','"feminino"'),'{competition,seasons,0,disputes,1,division}','null'))$q$,'PT400');
 select pg_temp.ctx_assert(public.get_competition(pg_temp.ctx_id(12)) is null,'invalid aggregate rolled back');
 -- Saved child identities cannot be omitted or reassigned to a different parent.
-select public.save_competition(pg_temp.ctx_command(20));
+select pg_temp.ctx_save_with_organizer(pg_temp.ctx_command(20));
 select pg_temp.ctx_error($q$select public.save_competition(jsonb_set(jsonb_set(jsonb_set(pg_temp.ctx_command(20),'{commandId}',to_jsonb(pg_temp.ctx_id(29))),'{expectedVersion}','1'),'{competition,seasons,0,id}',to_jsonb(pg_temp.ctx_id(3))))$q$,'PT400');
 select pg_temp.ctx_error($q$select public.save_competition(jsonb_set(jsonb_set(jsonb_set(pg_temp.ctx_command(),'{commandId}',to_jsonb(pg_temp.ctx_id(7))),'{expectedVersion}','1'),'{competition,seasons,0,disputes}','[]'))$q$,'PT400');
 -- Reads must not modify saved order or versions.

@@ -1,16 +1,20 @@
 import { FinalizeSheetPanel } from "../publication/finalize-sheet-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
 import { SheetPublicationPanel } from "../publication/sheet-panel";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { PublicationHistory } from "../publication/history";
+import { publicationStateSchema } from "../publication/data-contract";
+import { publicResultSchema } from "../publication/pdf-contract";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { aggregate, periodLabel, type Side } from "../domain/scoresheet";
 import { deleteAction } from "../scoresheet/actions";
 import { authorAction } from "./sheet-event-author";
 import { identifyPlayerEvents } from "./sheet-identity";
 import { SheetPreparation } from "./sheet-preparation";
-import { SheetLiveTables } from "./sheet-live-tables";
+import { SheetLiveTables, SheetPartials } from "./sheet-live-tables";
 import { SheetActionHistory } from "./sheet-action-history";
 import { AdminDialog } from "../competition/admin-dialog";
+import { Icon } from "../ui-system/components";
 import { AdminToast } from "../ui-system/admin-toast";
 import { projectSheet } from "../scoresheet/projection";
 import {
@@ -48,11 +52,13 @@ type History = {
   past: PersistedSheet[];
   future: PersistedSheet[];
 };
+const isTimeoutTarget = (value: string) => /^(TD|TO)$/iu.test(value.trim());
 const sides = ["home", "away"] as const;
 const sideName = (s: Side) => (s === "home" ? "A" : "B");
 export function GameSheetWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
     PublicationPanel = flexible ? FinalizeSheetPanel : SheetPublicationPanel;
+  const reasonLabelId = useId();
   const [history, setHistory] = useState<History | null>(null),
     [baseline, setBaseline] = useState(""),
     [version, setVersion] = useState(0),
@@ -60,6 +66,13 @@ export function GameSheetWorkspace(props: Props) {
     [snapshot, setSnapshot] = useState<SheetSnapshot | null>(null),
     [reason, setReason] = useState(""),
     [publicationLocked, setPublicationLocked] = useState(false);
+  const [publicationRefresh, setPublicationRefresh] = useState(0);
+  const [publication, setPublication] = useState<{
+    gameId: string;
+    alreadyPublished: boolean;
+    hasHistory: boolean;
+    resultVisible: boolean;
+  } | null>(null);
   const [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
     [conflict, setConflict] = useState(false),
@@ -78,11 +91,12 @@ export function GameSheetWorkspace(props: Props) {
     [successor, setSuccessor] = useState(""),
     [editing, setEditing] = useState<string | null>(null),
     [deleting, setDeleting] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
   const pending = useRef<SaveSheet | null>(null),
     initialized = useRef(false),
     auxGuard = useRef(() => true),
     publicationGuard = useRef(() => true),
-    heading = useRef<HTMLHeadingElement>(null),
+    navigation = useRef<HTMLDivElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
     targetRef = useRef<HTMLInputElement>(null),
     codeRef = useRef<HTMLInputElement>(null),
@@ -99,6 +113,70 @@ export function GameSheetWorkspace(props: Props) {
   const d = history?.present,
     dirty = !!d && JSON.stringify(d) !== baseline,
     locked = busy || uncertain || conflict || publicationLocked;
+  const gameId = props.game.id;
+  const hasSheet = !!d;
+  const publicationForGame =
+    publication?.gameId === gameId ? publication : null;
+
+  useEffect(() => {
+    if (!props.enabled || !hasSheet) return;
+    let controller: AbortController | undefined;
+    async function refresh() {
+      controller?.abort();
+      const request = new AbortController();
+      controller = request;
+      try {
+        const state = await api(
+          `/api/games/${gameId}/publication`,
+          publicationStateSchema,
+          undefined,
+          request.signal,
+        );
+        if (request.signal.aborted || state.gameId !== gameId) return;
+        const availability = {
+          gameId,
+          alreadyPublished: !!state.published,
+          hasHistory: state.history.length > 0,
+          resultVisible: false,
+        };
+        setPublication((previous) => ({
+          ...availability,
+          resultVisible:
+            !!state.published &&
+            previous?.gameId === gameId &&
+            previous.resultVisible,
+        }));
+        if (!state.published) return;
+        const result = await api(
+          `/api/public/games/${gameId}`,
+          publicResultSchema,
+          undefined,
+          request.signal,
+        ).catch(() => null);
+        if (!request.signal.aborted)
+          setPublication({
+            ...availability,
+            resultVisible: result?.id === gameId,
+          });
+      } catch {
+        // An unavailable result must not prevent editing the administrative sheet.
+      }
+    }
+    void refresh();
+    window.addEventListener("focus", refresh);
+    return () => {
+      controller?.abort();
+      window.removeEventListener("focus", refresh);
+    };
+  }, [
+    props.enabled,
+    hasSheet,
+    gameId,
+    gameVersion,
+    version,
+    publicationRefresh,
+  ]);
+
   const eligibleSuccessors = useMemo(() => {
     if (!d || d.formatVersion !== 2) return [];
     const editIndex = editing
@@ -164,7 +242,7 @@ export function GameSheetWorkspace(props: Props) {
         button.focus();
         returningToSide.current = null;
       }
-    } else heading.current?.focus();
+    } else navigation.current?.focus();
   }, [props.enabled, auxiliary, !!history, !!context]);
   useEffect(() => {
     if (error && props.enabled) alert.current?.focus();
@@ -289,7 +367,14 @@ export function GameSheetWorkspace(props: Props) {
     targetRef.current?.select();
   };
   useEffect(() => {
-    if (!props.enabled || auxiliary || locked || deleting || preparationOpen)
+    if (
+      !props.enabled ||
+      auxiliary ||
+      locked ||
+      deleting ||
+      preparationOpen ||
+      helpOpen
+    )
       return;
     const shortcut = (e: KeyboardEvent) => {
       if (
@@ -314,7 +399,15 @@ export function GameSheetWorkspace(props: Props) {
     };
     window.addEventListener("keydown", shortcut);
     return () => window.removeEventListener("keydown", shortcut);
-  }, [props.enabled, auxiliary, locked, editing, deleting, preparationOpen]);
+  }, [
+    props.enabled,
+    auxiliary,
+    locked,
+    editing,
+    deleting,
+    preparationOpen,
+    helpOpen,
+  ]);
   function mutate(next: PersistedSheet) {
     if (locked || !history) return false;
     try {
@@ -360,7 +453,7 @@ export function GameSheetWorkspace(props: Props) {
       });
   }
   function checkedTarget() {
-    const value = target.trim().toUpperCase();
+    const value = isTimeoutTarget(target) ? "TO" : target.trim().toUpperCase();
     if (
       !d ||
       (!(d.formatVersion === 2 ? ["C", "AT", "TO"] : ["B", "C", "TO"]).includes(
@@ -370,12 +463,12 @@ export function GameSheetWorkspace(props: Props) {
     ) {
       setError(
         d?.formatVersion === 2
-          ? "Escolha uma camisa, C para técnico, AT para assistente ou TO para pedido de tempo."
-          : "Escolha uma camisa, B para banco, C para técnico ou TO para pedido de tempo.",
+          ? "Escolha uma camisa, C para técnico, AT para assistente ou TD para tempo debitado."
+          : "Escolha uma camisa, B para banco, C para técnico ou TD para tempo debitado.",
       );
       return null;
     }
-    setTarget(value);
+    setTarget(value === "TO" ? "TD" : value);
     return value;
   }
   function beginEditing(event: PersistedSheet["events"][number]) {
@@ -384,7 +477,7 @@ export function GameSheetWorkspace(props: Props) {
     setEditing(event.id);
     setSide(event.side);
     setPeriod(event.period);
-    setTarget(event.target);
+    setTarget(event.target === "TO" ? "TD" : event.target);
     setCode(event.code);
     setSuccessor(event.successorId ?? "");
   }
@@ -600,51 +693,73 @@ export function GameSheetWorkspace(props: Props) {
         announce={false}
         message={props.enabled && !auxiliary && !busy ? error || status : ""}
       />
-      <div className="sheet-navigation">
-        <h3 ref={heading} tabIndex={-1}>
-          Relacionados e súmula
-        </h3>
-        <div className="competition-actions">
+      <div
+        className="sheet-navigation"
+        ref={navigation}
+        tabIndex={-1}
+        role="group"
+        aria-label="Navegação da súmula"
+      >
+        <div className="competition-actions sheet-navigation-links">
           <button
+            type="button"
+            className="secondary"
+            disabled={busy}
+            onClick={props.onBackToGames}
+          >
+            <Icon name="back" /> Lista de jogos
+          </button>
+          <button
+            type="button"
             className="secondary"
             disabled={busy}
             onClick={() => {
               if (mayLeave()) props.onBack();
             }}
           >
-            Voltar aos dados do jogo
-          </button>
-          <button
-            className="secondary"
-            disabled={busy}
-            onClick={props.onBackToGames}
-          >
-            Voltar à lista de jogos
+            Dados do jogo
           </button>
         </div>
+        <div className="sheet-status-controls">
+          <p role="status" className="sheet-draft-status">
+            {busy
+              ? "Aguarde…"
+              : uncertain
+                ? "Envio da súmula não confirmado"
+                : conflict
+                  ? "Conflito na súmula"
+                  : dirty
+                    ? "Súmula não salva"
+                    : status}
+          </p>
+        </div>
+        <div className="competition-actions sheet-navigation-links">
+          {d && !auxiliary && (
+            <button
+              type="button"
+              className="sheet-text-action"
+              disabled={busy || publicationLocked}
+              onClick={() => void reload()}
+            >
+              <Icon name="refresh" /> Recarregar súmula
+            </button>
+          )}
+          {!preparationOpen && !auxiliary && (
+            <button
+              type="button"
+              className="sheet-info-trigger"
+              onClick={() => setHelpOpen(true)}
+            >
+              <Icon name="info" /> Instruções
+            </button>
+          )}
+        </div>
       </div>
-      <p>
-        {props.game.home.name} × {props.game.away.name}.{" "}
-        {snapshot?.confirmed
-          ? "Súmula confirmada; novas alterações ficam privadas até republicar."
-          : "Rascunho privado; salvar não publica o resultado."}
-      </p>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1} className="access-error">
           {error}
         </p>
       )}
-      <p role="status">
-        {busy
-          ? "Aguarde…"
-          : uncertain
-            ? "Envio da súmula não confirmado"
-            : conflict
-              ? "Conflito na súmula"
-              : dirty
-                ? "Súmula não salva"
-                : status}
-      </p>
       {auxiliary ? (
         <>
           <button
@@ -676,22 +791,11 @@ export function GameSheetWorkspace(props: Props) {
         </>
       ) : d ? (
         <>
-          <div className="sheet-step-bar">
-            <strong>
-              {preparationOpen ? "1. Preparar equipes" : "2. Lançar e conferir"}
-            </strong>
-            {!preparationOpen && (
-              <button
-                disabled={locked || !!editing || !!deleting}
-                onClick={() => setPreparationOpen(true)}
-              >
-                Revisar preparação
-              </button>
-            )}
-          </div>
           {preparationOpen && (
             <>
-              <h4>Preparar relacionados e comissão</h4>
+              <h4 className="sheet-section-heading">
+                Preparar relacionados e comissão
+              </h4>
               {candidatesLoading && (
                 <p role="status">Carregando elencos e comissão…</p>
               )}
@@ -708,6 +812,7 @@ export function GameSheetWorkspace(props: Props) {
                 />
               )}
               <button
+                className="primary"
                 disabled={locked || candidatesLoading || !context}
                 onClick={() => void save(true)}
               >
@@ -716,20 +821,24 @@ export function GameSheetWorkspace(props: Props) {
             </>
           )}
           <div hidden={preparationOpen}>
-            {!editing && (
+            <div className="sheet-layout-pair sheet-entry-pair">
+              {projection && (
+                <SheetPartials
+                  document={d}
+                  projection={projection}
+                  game={props.game}
+                  period={period}
+                />
+              )}
               <fieldset
-                hidden={!!editing}
+                aria-hidden={!!editing || undefined}
                 disabled={locked || !!deleting || !!editing}
                 className="sheet-input"
               >
-                <legend>Lançar ações</legend>
-                <p>
-                  Camisa + Enter + ação + Enter. Alt+A/B: equipe · Alt+1–4:
-                  quarto · Alt+Q: escolher período.{" "}
-                  {d.formatVersion === 2
-                    ? "C: técnico · AT: assistente · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5)."
-                    : "B: banco · C: técnico · TO: tempo debitado (Enter → minuto decorrido 1–10, na prorrogação 1–5). Tempos anteriores não informados no legado devem ser conferidos na fonte."}
-                </p>
+                <legend className="sr-only">Lançar ações</legend>
+                <h4 className="sheet-entry-title" aria-hidden="true">
+                  Lançar ações
+                </h4>
                 <div className="competition-fields">
                   <label>
                     Equipe da ação
@@ -778,8 +887,8 @@ export function GameSheetWorkspace(props: Props) {
                     />
                   </label>
                   <label>
-                    {target.trim().toUpperCase() === "TO"
-                      ? "Minuto decorrido (1–10, OT: 1–5)"
+                    {isTimeoutTarget(target)
+                      ? "Minuto decorrido (1–10, PR: 1–5)"
                       : "Ação"}
                     <input
                       ref={codeRef}
@@ -795,6 +904,9 @@ export function GameSheetWorkspace(props: Props) {
                       }}
                     />
                   </label>
+                  <button type="button" className="primary" onClick={addAction}>
+                    Registrar ação
+                  </button>
                 </div>
                 {d.formatVersion === 2 &&
                   /Indique explicitamente outro atleta elegível/u.test(
@@ -815,9 +927,9 @@ export function GameSheetWorkspace(props: Props) {
                       </select>
                     </label>
                   )}
-                <div className="competition-actions">
-                  <button onClick={addAction}>Registrar ação</button>
+                <div className="competition-actions sheet-entry-controls">
                   <button
+                    aria-label="Desfazer ação ou ajuste"
                     disabled={!history.past.length || !!editing}
                     onClick={() => {
                       const last = history.past.at(-1);
@@ -829,9 +941,10 @@ export function GameSheetWorkspace(props: Props) {
                         });
                     }}
                   >
-                    Desfazer ação ou ajuste
+                    Desfazer
                   </button>
                   <button
+                    aria-label="Refazer ação ou ajuste"
                     disabled={!history.future.length || !!editing}
                     onClick={() => {
                       const last = history.future.at(-1);
@@ -843,60 +956,152 @@ export function GameSheetWorkspace(props: Props) {
                         });
                     }}
                   >
-                    Refazer ação ou ajuste
+                    Refazer
                   </button>
-                </div>
-                <label>
-                  Períodos da súmula
-                  <select
-                    aria-label="Períodos da súmula"
-                    value={d.periods}
-                    onChange={(e) => {
-                      const periods = Number(e.target.value);
-                      if (mutate({ ...d, periods }))
-                        setPeriod((p) => Math.min(p, periods));
-                    }}
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => setPreparationOpen(true)}
                   >
-                    {Array.from({ length: 9 }, (_, i) => (
-                      <option key={i + 4} value={i + 4}>
-                        {i + 4} períodos
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <details>
-                  <summary>Códigos aceitos</summary>
-                  <p>
-                    1: lance livre convertido · 2/3: cestas. Atleta: P, T1, U,
-                    D; P/U/D aceitam sufixos1/2/3/C, T aceita1/C.{" "}
-                    {d.formatVersion === 2
-                      ? "Técnico: B1/BC, C1/CC ou D/D1/D2/D3/DC. Assistente: D/D1/D2/D3/DC (B2 automática vinculada)."
-                      : "Banco: B1/B2/BC. Técnico: C1/CC ou D/D1/D2/D3/DC."}{" "}
-                    C no sufixo indica falta compensada.
-                  </p>
-                </details>
+                    Revisar preparação
+                  </button>
+                  <label>
+                    Períodos
+                    <select
+                      aria-label="Períodos da súmula"
+                      value={d.periods}
+                      onChange={(e) => {
+                        const periods = Number(e.target.value);
+                        if (mutate({ ...d, periods }))
+                          setPeriod((p) => Math.min(p, periods));
+                      }}
+                    >
+                      {Array.from({ length: 9 }, (_, i) => (
+                        <option key={i + 4} value={i + 4}>
+                          {i + 4} períodos
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
               </fieldset>
-            )}
+            </div>
+            <AdminDialog
+              title="Instruções"
+              open={helpOpen}
+              busy={false}
+              iconClose
+              onClose={() => setHelpOpen(false)}
+              className="sheet-help-dialog"
+            >
+              <p>
+                Digite a camisa ou o alvo, pressione <kbd>Enter</kbd>, digite o
+                código e pressione <kbd>Enter</kbd> para registrar.
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Alvo</th>
+                    <th scope="col">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Nº do jogador</th>
+                    <td>
+                      Cestas: <code>1</code>, <code>2</code> ou <code>3</code>.
+                      Faltas: <code>P</code>, <code>T</code>, <code>U</code> ou{" "}
+                      <code>D</code>.
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <code>C</code> · Técnico
+                    </th>
+                    <td>
+                      Faltas: <code>B</code>, <code>C</code> ou <code>D</code>.
+                    </td>
+                  </tr>
+                  {d.formatVersion === 2 ? (
+                    <tr>
+                      <th scope="row">
+                        <code>AT</code> · Assistente
+                      </th>
+                      <td>
+                        Falta: <code>D</code>.
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <th scope="row">
+                        <code>B</code> · Banco
+                      </th>
+                      <td>
+                        Faltas: <code>B1</code>, <code>B2</code> ou{" "}
+                        <code>Bc</code>.
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    <th scope="row">
+                      <code>TD</code> · Tempo debitado
+                    </th>
+                    <td>
+                      Minuto do pedido: <code>1–10</code> no quarto ou{" "}
+                      <code>1–5</code> na prorrogação.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="sheet-help-note">
+                <p>
+                  Acrescente à sigla da falta a quantidade de lances livres
+                  concedidos ou <code>c</code> para falta compensada.
+                </p>
+                <p>
+                  Exemplos: <code>P2</code> (pessoal com 2 lances livres) ·{" "}
+                  <code>Tc</code> (técnica compensada).
+                </p>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Atalhos de teclado</th>
+                    <th scope="col">Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + A</kbd> / <kbd>Alt + B</kbd>
+                    </th>
+                    <td>Selecionar a equipe.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + 1</kbd> a <kbd>Alt + 4</kbd>
+                    </th>
+                    <td>Selecionar o quarto correspondente.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      <kbd>Alt + Q</kbd>
+                    </th>
+                    <td>Ir para o seletor de período.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </AdminDialog>
             {projection && (
               <SheetLiveTables
                 document={d}
                 projection={projection}
                 game={props.game}
-                period={period}
                 name={name}
                 staffNames={snapshot?.staff}
                 staffName={staffName}
                 disabled={locked}
                 onPlayed={(id, played) => changeParticipant(id, { played })}
-              />
-            )}
-            {projection && (
-              <SheetActionHistory
-                actions={projection.actions}
-                periods={d.periods}
-                disabled={locked || !!editing || !!deleting}
-                onEdit={({ event }) => beginEditing(event)}
-                onDelete={setDeleting}
               />
             )}
             {editing && (
@@ -971,8 +1176,8 @@ export function GameSheetWorkspace(props: Props) {
                       />
                     </label>
                     <label>
-                      {target.trim().toUpperCase() === "TO"
-                        ? "Minuto decorrido (1–10, OT: 1–5)"
+                      {isTimeoutTarget(target)
+                        ? "Minuto decorrido (1–10, PR: 1–5)"
                         : "Ação"}
                       <input
                         ref={editCodeRef}
@@ -1009,7 +1214,7 @@ export function GameSheetWorkspace(props: Props) {
                       </label>
                     )}
                   <div className="competition-actions">
-                    <button type="submit" disabled={locked}>
+                    <button type="submit" className="primary" disabled={locked}>
                       Salvar edição da ação
                     </button>
                     <button
@@ -1041,6 +1246,7 @@ export function GameSheetWorkspace(props: Props) {
               <div className="competition-actions">
                 <button
                   type="button"
+                  className="sheet-danger"
                   disabled={locked}
                   onClick={() => {
                     if (engine && deleting) {
@@ -1070,88 +1276,133 @@ export function GameSheetWorkspace(props: Props) {
               </div>
             </AdminDialog>
           </div>
-          {(snapshot?.confirmed || flexible) && (
-            <label>
-              {flexible
-                ? "Comentário (opcional)"
-                : "Motivo da revisão da súmula"}
-              <textarea
-                maxLength={500}
-                value={reason}
-                disabled={locked}
-                onChange={(e) => setReason(e.target.value)}
+          <div className={preparationOpen ? undefined : "sheet-layout-pair"}>
+            {!preparationOpen && projection && (
+              <SheetActionHistory
+                actions={projection.actions}
+                periods={d.periods}
+                disabled={locked || !!editing || !!deleting}
+                onEdit={({ event }) => beginEditing(event)}
+                onDelete={setDeleting}
               />
-            </label>
-          )}
-          <div className="competition-actions">
-            <button
-              disabled={
-                busy || publicationLocked || conflict || !!editing || !!deleting
-              }
-              onClick={() => void save()}
+            )}
+            <section
+              className="sheet-save-panel"
+              aria-labelledby="sheet-save-title"
             >
-              {uncertain
-                ? "Repetir envio da súmula"
-                : "Salvar rascunho da súmula"}
-            </button>
-            <button
-              disabled={busy || publicationLocked}
-              onClick={() => void reload()}
-            >
-              Recarregar súmula
-            </button>
+              <h4 className="sheet-section-heading" id="sheet-save-title">
+                Salvamento e publicação
+              </h4>
+              {(snapshot?.confirmed ||
+                publicationForGame?.alreadyPublished ||
+                flexible) && (
+                <label className="sheet-save-reason">
+                  <span id={reasonLabelId}>
+                    {flexible
+                      ? "Comentário (opcional)"
+                      : "Motivo da revisão da súmula"}
+                  </span>
+                  <textarea
+                    aria-labelledby={reasonLabelId}
+                    maxLength={500}
+                    value={reason}
+                    disabled={locked}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </label>
+              )}
+              <PublicationPanel
+                key={`${props.game.id}:${gameVersion}:${version}`}
+                game={props.game}
+                document={d}
+                sourceVersion={version}
+                gameVersion={gameVersion}
+                confirmed={!!snapshot?.confirmed}
+                alreadyPublished={!!publicationForGame?.alreadyPublished}
+                onAcknowledged={() =>
+                  setPublicationRefresh((count) => count + 1)
+                }
+                draftAction={
+                  <button
+                    type="button"
+                    className="secondary"
+                    disabled={
+                      busy ||
+                      publicationLocked ||
+                      conflict ||
+                      !!editing ||
+                      !!deleting
+                    }
+                    onClick={() => void save()}
+                  >
+                    {uncertain ? "Repetir envio da súmula" : "Salvar rascunho"}
+                  </button>
+                }
+                reason={reason}
+                onReason={setReason}
+                disabled={
+                  !props.enabled ||
+                  busy ||
+                  uncertain ||
+                  conflict ||
+                  !!editing ||
+                  !!deleting
+                }
+                guard={publicationGuard}
+                onLock={setPublicationLocked}
+                onConflict={() => setConflict(true)}
+                onSessionLost={props.onSessionLost}
+                onPublished={async (result, explicitReload) => {
+                  const latest = await api(
+                    `/api/games/${props.game.id}/sheet`,
+                    sheetSnapshotSchema,
+                  );
+                  if (
+                    latest.gameId !== props.game.id ||
+                    !latest.confirmed ||
+                    latest.version < result.sourceVersion ||
+                    latest.gameVersion < result.gameVersion
+                  )
+                    throw new ApiFailure(
+                      503,
+                      "A publicação foi confirmada, mas a fonte salva não pôde ser reconciliada. Recarregue a súmula publicada.",
+                    );
+                  if (
+                    !explicitReload &&
+                    (latest.version !== result.sourceVersion ||
+                      latest.gameVersion !== result.gameVersion)
+                  )
+                    throw new ApiFailure(
+                      409,
+                      "A publicação foi confirmada e a súmula recebeu outras alterações. Recarregue para conferir.",
+                    );
+                  accept(latest);
+                  setReason("");
+                  setStatus("Resultado publicado");
+                  props.onSaved();
+                }}
+              />
+              <div className="competition-actions sheet-publication-links">
+                {publicationForGame?.resultVisible && (
+                  <a
+                    href={`/resultado.html#${gameId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Ver resultado publicado
+                  </a>
+                )}
+                {publicationForGame?.hasHistory && (
+                  <PublicationHistory
+                    inDialog
+                    gameId={gameId}
+                    enabled={props.enabled && !busy && !editing && !deleting}
+                    onSessionLost={props.onSessionLost}
+                  />
+                )}
+              </div>
+            </section>
           </div>
-          <PublicationPanel
-            key={`${props.game.id}:${gameVersion}:${version}`}
-            game={props.game}
-            document={d}
-            sourceVersion={version}
-            gameVersion={gameVersion}
-            confirmed={!!snapshot?.confirmed}
-            reason={reason}
-            onReason={setReason}
-            disabled={
-              !props.enabled ||
-              busy ||
-              uncertain ||
-              conflict ||
-              !!editing ||
-              !!deleting
-            }
-            guard={publicationGuard}
-            onLock={setPublicationLocked}
-            onConflict={() => setConflict(true)}
-            onSessionLost={props.onSessionLost}
-            onPublished={async (result, explicitReload) => {
-              const latest = await api(
-                `/api/games/${props.game.id}/sheet`,
-                sheetSnapshotSchema,
-              );
-              if (
-                latest.gameId !== props.game.id ||
-                !latest.confirmed ||
-                latest.version < result.sourceVersion ||
-                latest.gameVersion < result.gameVersion
-              )
-                throw new ApiFailure(
-                  503,
-                  "A publicação foi confirmada, mas a fonte salva não pôde ser reconciliada. Recarregue a súmula publicada.",
-                );
-              if (
-                !explicitReload &&
-                (latest.version !== result.sourceVersion ||
-                  latest.gameVersion !== result.gameVersion)
-              )
-                throw new ApiFailure(
-                  409,
-                  "A publicação foi confirmada e a súmula recebeu outras alterações. Recarregue para conferir.",
-                );
-              accept(latest);
-              setReason("");
-              setStatus("Resultado publicado");
-              props.onSaved();
-            }}
-          />
         </>
       ) : (
         !busy && (

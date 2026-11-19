@@ -29,6 +29,14 @@
   margin: 0;
   font-size: 1.125rem;
 }
+.admin-dialog-header > button.admin-dialog-close-icon {
+  display: inline-grid;
+  place-items: center;
+  line-height: 1;
+}
+.admin-dialog-header > button.admin-dialog-close-icon > svg {
+  display: block;
+}
 .admin-dialog-body {
   padding: 1rem;
   overflow-y: auto;

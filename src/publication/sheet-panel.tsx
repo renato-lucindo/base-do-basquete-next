@@ -1,7 +1,4 @@
-import { aggregate } from "../domain/scoresheet";
-import { PublicationHistory } from "./history";
-import { toEngineSheet } from "../games/sheet-contract";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { z } from "zod";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { gameSnapshotSchema, type GameSnapshot } from "../games/contract";
@@ -14,12 +11,10 @@ import { prepareManualPublication } from "./manual";
 import type { PublishSheet } from "./contract";
 import { deriveSheetTeamStatistics } from "./sheet-team-statistics";
 import {
-  CollectiveReview,
   gdReviewReady,
   initialGDReview,
   publishedGD,
 } from "./collective-review";
-import { TeamStatisticsPanel } from "./team-statistics-panel";
 import {
   publicationStateSchema,
   publicationVersionSchema,
@@ -33,6 +28,9 @@ export type SheetPublicationProps = {
   sourceVersion: number;
   gameVersion: number;
   confirmed: boolean;
+  alreadyPublished: boolean;
+  draftAction: ReactNode;
+  onAcknowledged: () => void;
   reason: string;
   onReason: (v: string) => void;
   disabled: boolean;
@@ -43,39 +41,26 @@ export type SheetPublicationProps = {
   onPublished: (r: Ack, explicitReload: boolean) => Promise<void>;
 };
 export function SheetPublicationPanel(p: SheetPublicationProps) {
-  const [teamReview, setTeamReview] = useState(() =>
-    initialGDReview(deriveSheetTeamStatistics(p.document)),
-  );
-  const [historicalLocked, setHistoricalLocked] = useState(false);
-  const [historyEpoch, setHistoryEpoch] = useState(0);
-  const historicalGuard = useRef<() => boolean>(() => true);
-  const reviewDocument = useRef("");
-  const documentKey = JSON.stringify(p.document);
-  const [state, setState] = useState<PublicationState | null>(null),
-    [busy, setBusy] = useState(false),
+  const [busy, setBusy] = useState(false),
     [uncertain, setUncertain] = useState(false),
     [ack, setAck] = useState<Ack | null>(null),
+    [choice, setChoice] = useState<PublicationState | null>(null),
     [fallback, setFallback] = useState(false),
     [error, setError] = useState("");
   const pending = useRef<PublishSheet | null>(null),
-    heading = useRef<HTMLHeadingElement>(null),
     alert = useRef<HTMLParagraphElement>(null),
+    sourceChoice = useRef<HTMLInputElement>(null),
     epoch = useRef(0);
-  const blocked = busy || uncertain || ack !== null || historicalLocked;
-  const totals = aggregate(toEngineSheet(p.document));
-  const collective = deriveSheetTeamStatistics(p.document);
-  useEffect(() => {
-    if (reviewDocument.current && reviewDocument.current !== documentKey) {
-      reviewDocument.current = "";
-    }
-  }, [documentKey]);
+  const blocked = busy || uncertain || ack !== null;
+  const revision = p.confirmed || p.alreadyPublished;
+  const reasonError = "Informe o motivo da revisão (10 a 500 caracteres).";
+  const reasonLabelId = useId();
   useEffect(() => {
     p.onLock(blocked);
   }, [blocked, p.onLock]);
   useEffect(() => {
     p.guard.current = () =>
       !busy &&
-      historicalGuard.current() &&
       (!(uncertain || ack) ||
         window.confirm(
           "Há uma publicação sem reconciliação concluída. Deseja sair e conferir depois?",
@@ -91,8 +76,8 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
   );
   useEffect(() => {
     if (error) alert.current?.focus();
-    else if (state) heading.current?.focus();
-  }, [error, state]);
+    else if (choice?.requiresFallback) sourceChoice.current?.focus();
+  }, [error, choice]);
   function report(e: unknown) {
     if (isSessionFailure(e)) p.onSessionLost();
     setError(
@@ -101,10 +86,11 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
         : "Não foi possível concluir a publicação.",
     );
   }
-  async function prepare() {
-    if (p.disabled || blocked) return;
-    setError("");
-    setState(null);
+  async function buildCommand(n: number) {
+    if (revision && p.reason.trim().length < 10) {
+      setError(reasonError);
+      return;
+    }
     try {
       validatePersistedSheet(p.document, true);
     } catch {
@@ -113,134 +99,127 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
       );
       return;
     }
-    const n = ++epoch.current;
-    setBusy(true);
-    try {
-      const [s, g] = await Promise.all([
-        api(`/api/games/${p.game.id}/publication`, publicationStateSchema),
-        api(`/api/games/${p.game.id}`, gameSnapshotSchema),
-      ]);
+    const [state, game] = await Promise.all([
+      api(`/api/games/${p.game.id}/publication`, publicationStateSchema),
+      api(`/api/games/${p.game.id}`, gameSnapshotSchema),
+    ]);
+    if (n !== epoch.current) return;
+    if (
+      state.gameId !== p.game.id ||
+      game.id !== p.game.id ||
+      game.version !== p.gameVersion ||
+      game.home.id !== p.game.home.id ||
+      game.away.id !== p.game.away.id
+    )
+      throw new ApiFailure(
+        409,
+        "O jogo mudou. Recarregue a súmula antes de publicar.",
+      );
+
+    if (
+      state.requiresFallback &&
+      (!fallback || choice?.version !== state.version)
+    ) {
+      setChoice(state);
+      setFallback(false);
+      return;
+    }
+    if (
+      (state.version > 0 || state.requiresFallback) &&
+      p.reason.trim().length < 10
+    ) {
+      setChoice(state);
+      setError(
+        state.requiresFallback && !revision
+          ? "Informe o motivo da publicação (10 a 500 caracteres)."
+          : reasonError,
+      );
+      return;
+    }
+
+    let previous: ReturnType<typeof publishedGD> | undefined;
+    if (
+      state.published?.source.kind === "sheet" &&
+      state.published.source.version === p.sourceVersion
+    ) {
+      const frozen = await api(
+        `/api/games/${p.game.id}/publication/versions/${state.version}`,
+        publicationVersionSchema,
+      );
       if (n !== epoch.current) return;
       if (
-        s.gameId !== p.game.id ||
-        g.id !== p.game.id ||
-        g.version !== p.gameVersion ||
-        g.home.id !== p.game.home.id ||
-        g.away.id !== p.game.away.id
+        frozen.gameId !== p.game.id ||
+        frozen.version !== state.version ||
+        frozen.sourceKind !== "sheet" ||
+        frozen.sourceVersion !== p.sourceVersion ||
+        JSON.stringify(frozen.snapshot) !== JSON.stringify(state.published)
       )
         throw new ApiFailure(
           409,
-          "O jogo mudou. Recarregue a súmula antes de publicar.",
+          "A publicação mudou. Recarregue a súmula antes de publicar.",
         );
-      let previous: ReturnType<typeof publishedGD> | undefined;
       if (
-        s.published?.source.kind === "sheet" &&
-        s.published.source.version === p.sourceVersion
-      ) {
-        const frozen = await api(
-          `/api/games/${p.game.id}/publication/versions/${s.version}`,
-          publicationVersionSchema,
-        );
-        if (n !== epoch.current) return;
-        if (
-          frozen.gameId !== p.game.id ||
-          frozen.version !== s.version ||
-          frozen.sourceKind !== "sheet" ||
-          frozen.sourceVersion !== p.sourceVersion ||
-          JSON.stringify(frozen.snapshot) !== JSON.stringify(s.published)
-        )
-          throw new ApiFailure(
-            409,
-            "A publicação mudou. Recarregue o estado antes de publicar.",
-          );
-        if (
-          JSON.stringify(persistedSheetSchema.parse(frozen.document)) ===
-          JSON.stringify(persistedSheetSchema.parse(p.document))
-        )
-          previous = publishedGD(s.published);
-      }
-      setState(s);
-      setFallback(false);
-      reviewDocument.current = JSON.stringify(p.document);
-      setTeamReview(initialGDReview(collective, previous));
-    } catch (e) {
-      if (n === epoch.current) {
-        if (e instanceof ApiFailure && e.status === 409) p.onConflict();
-        report(e);
-      }
-    } finally {
-      if (n === epoch.current) setBusy(false);
+        JSON.stringify(persistedSheetSchema.parse(frozen.document)) ===
+        JSON.stringify(persistedSheetSchema.parse(p.document))
+      )
+        previous = publishedGD(state.published);
     }
+    const collective = deriveSheetTeamStatistics(p.document);
+    const teamReview = initialGDReview(collective, previous);
+    if (!gdReviewReady(teamReview, collective))
+      throw Error("Não foi possível calcular os totais coletivos da súmula.");
+
+    return prepareManualPublication(
+      {
+        requestId: crypto.randomUUID(),
+        gameId: p.game.id,
+        gameVersion: p.gameVersion,
+        basePublicationVersion: state.version,
+        source: {
+          kind: "sheet",
+          baseSheetVersion: p.sourceVersion,
+          document: structuredClone(p.document),
+          teamReview: {
+            home: {
+              disqualifications: Number(teamReview.home.total),
+              foulsReceived: collective.home.foulsReceived,
+            },
+            away: {
+              disqualifications: Number(teamReview.away.total),
+              foulsReceived: collective.away.foulsReceived,
+            },
+          },
+        },
+        reason: p.reason,
+        fallback: state.requiresFallback && fallback,
+      },
+      undefined,
+      state.requiresFallback,
+    ).command;
   }
   async function finish(r: Ack, explicit = false) {
     await p.onPublished(r, explicit);
     setAck(null);
-    pending.current = null;
     setUncertain(false);
-    setState(null);
+    setChoice(null);
+    setFallback(false);
   }
   async function publish() {
-    if (p.disabled || busy || !state || ack) return;
+    if (p.disabled || busy || ack) return;
+    const n = ++epoch.current;
+    let acknowledged = false;
     setError("");
-    if (!pending.current && !gdReviewReady(teamReview, collective)) {
-      setError("Não foi possível calcular os totais coletivos da súmula.");
-      return;
-    }
-    if (
-      !pending.current &&
-      reviewDocument.current !== JSON.stringify(p.document)
-    ) {
-      setError(
-        "A súmula mudou. Recarregue a revisão antes de publicar os totais coletivos.",
-      );
-      return;
-    }
-    let command = pending.current;
-    if (!command) {
-      try {
-        command = prepareManualPublication(
-          {
-            requestId: crypto.randomUUID(),
-            gameId: p.game.id,
-            gameVersion: p.gameVersion,
-            basePublicationVersion: state.version,
-            source: {
-              kind: "sheet",
-              baseSheetVersion: p.sourceVersion,
-              document: structuredClone(p.document),
-              teamReview: Object.fromEntries(
-                (["home", "away"] as const).map((side) => [
-                  side,
-                  {
-                    disqualifications: Number(teamReview[side].total),
-                    foulsReceived: collective[side].foulsReceived,
-                  },
-                ]),
-              ) as NonNullable<PublishSheet["source"]["teamReview"]>,
-            },
-            reason: p.reason,
-            fallback,
-          },
-          undefined,
-          state.requiresFallback,
-        ).command;
-      } catch (e) {
-        setError(
-          e instanceof Error && e.message.includes("desqualificações")
-            ? e.message
-            : "Confira o fechamento, os totais coletivos, a decisão de fonte e o motivo da publicação.",
-        );
-        return;
-      }
-    }
-    pending.current = command;
     setBusy(true);
     try {
+      const command = pending.current ?? (await buildCommand(n));
+      if (!command || n !== epoch.current) return;
+      pending.current = command;
       const r = await api(
         `/api/games/${p.game.id}/publication/sheet`,
         publicationSheetResultSchema,
         command,
       );
+      if (n !== epoch.current) return;
       if (
         r.requestId !== command.requestId ||
         r.gameId !== command.gameId ||
@@ -252,24 +231,24 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
           503,
           "Não foi possível confirmar a publicação. Repita o mesmo envio.",
         );
+      acknowledged = true;
       setAck(r);
+      p.onAcknowledged();
       pending.current = null;
       setUncertain(false);
       await finish(r);
     } catch (e) {
-      if (!pending.current) {
-        report(e);
-      } else if (e instanceof ApiFailure && [400, 409].includes(e.status)) {
+      if (n !== epoch.current) return;
+      if (e instanceof ApiFailure && [400, 409].includes(e.status)) {
         pending.current = null;
         setUncertain(false);
-        if (e.status === 409) p.onConflict();
-        report(e);
-      } else {
+        if (e.status === 409 && !acknowledged) p.onConflict();
+      } else if (pending.current) {
         setUncertain(true);
-        report(e);
       }
+      report(e);
     } finally {
-      setBusy(false);
+      if (n === epoch.current) setBusy(false);
     }
   }
   async function recover() {
@@ -284,146 +263,61 @@ export function SheetPublicationPanel(p: SheetPublicationProps) {
       setBusy(false);
     }
   }
-  const needsReason =
-      !!state && (p.confirmed || state.version > 0 || state.requiresFallback),
-    ready =
-      !!state &&
-      reviewDocument.current === JSON.stringify(p.document) &&
-      gdReviewReady(teamReview, collective) &&
-      (!state.requiresFallback || fallback) &&
-      (!needsReason || p.reason.trim().length >= 10);
   return (
     <section
       aria-label="Publicação deste jogo"
       className="sheet-publication"
       aria-busy={busy}
     >
-      <button disabled={p.disabled || blocked} onClick={() => void prepare()}>
-        {p.confirmed ? "Salvar e republicar" : "Confirmar e publicar"}
-      </button>
+      {choice?.requiresFallback && (
+        <label>
+          <input
+            ref={sourceChoice}
+            type="checkbox"
+            checked={fallback}
+            disabled={blocked || p.disabled}
+            onChange={(e) => setFallback(e.target.checked)}
+          />{" "}
+          Usar súmula manual em vez do PDF
+        </label>
+      )}
+      {choice && !revision && (
+        <label className="sheet-save-reason">
+          <span id={reasonLabelId}>Motivo da publicação</span>
+          <textarea
+            aria-labelledby={reasonLabelId}
+            maxLength={500}
+            value={p.reason}
+            disabled={blocked || p.disabled}
+            onChange={(e) => p.onReason(e.target.value)}
+          />
+        </label>
+      )}
+      <div className="competition-actions sheet-save-commands">
+        {p.draftAction}
+        <button
+          type="button"
+          className="primary"
+          disabled={
+            p.disabled ||
+            busy ||
+            (!uncertain && !ack && !!choice?.requiresFallback && !fallback)
+          }
+          onClick={() => void (ack ? recover() : publish())}
+        >
+          {ack
+            ? "Recarregar súmula publicada"
+            : uncertain
+              ? "Repetir publicação"
+              : revision
+                ? "Salvar e republicar"
+                : "Salvar e publicar"}
+        </button>
+      </div>
       {error && (
         <p role="alert" ref={alert} tabIndex={-1}>
           {error}
         </p>
-      )}
-      {state && (
-        <>
-          <h4 ref={heading} tabIndex={-1}>
-            Conferir publicação deste jogo
-          </h4>
-          <p>
-            <output aria-label="Placar a publicar">
-              {p.game.home.name} {totals.teams.home.points} ×{" "}
-              {totals.teams.away.points} {p.game.away.name}
-            </output>
-          </p>
-          <p>
-            {state.version
-              ? `Versão pública atual: ${state.version}.`
-              : "Este jogo ainda não foi publicado."}{" "}
-            Confira o resultado, os cinco titulares e o capitão de cada equipe.
-          </p>
-          {state.requiresFallback && (
-            <label>
-              <input
-                type="checkbox"
-                checked={fallback}
-                disabled={blocked || p.disabled}
-                onChange={(e) => setFallback(e.target.checked)}
-              />{" "}
-              Usar súmula manual em vez do PDF
-            </label>
-          )}
-          <CollectiveReview
-            facts={collective}
-            review={
-              reviewDocument.current === documentKey
-                ? teamReview
-                : initialGDReview(collective)
-            }
-            onChange={setTeamReview}
-            disabled={blocked || p.disabled}
-            readOnly
-            names={{ home: p.game.home.name, away: p.game.away.name }}
-          />
-          {reviewDocument.current !== documentKey && (
-            <p role="status">
-              A súmula mudou. Recarregue o estado da publicação para atualizar
-              os totais automáticos.
-            </p>
-          )}
-          {!p.confirmed && needsReason && (
-            <label>
-              Motivo da publicação
-              <textarea
-                maxLength={500}
-                value={p.reason}
-                disabled={blocked || p.disabled}
-                onChange={(e) => p.onReason(e.target.value)}
-              />
-            </label>
-          )}
-          {needsReason && (
-            <p>Informe o motivo (10 a 500 caracteres) antes de publicar.</p>
-          )}
-          {ack ? (
-            <>
-              <p>Publicação confirmada. Falta recarregar a fonte salva.</p>
-              <button
-                disabled={busy || p.disabled}
-                onClick={() => void recover()}
-              >
-                Recarregar súmula publicada
-              </button>
-            </>
-          ) : (
-            <button
-              disabled={busy || p.disabled || (!uncertain && !ready)}
-              onClick={() => void publish()}
-            >
-              {uncertain
-                ? "Repetir publicação"
-                : state.version
-                  ? "Republicar este jogo"
-                  : "Publicar este jogo"}
-            </button>
-          )}
-          {!blocked && (
-            <button disabled={p.disabled} onClick={() => void prepare()}>
-              Recarregar estado da publicação
-            </button>
-          )}
-        </>
-      )}
-      {(p.confirmed || state?.published || ack) && (
-        <p>
-          <a
-            href={`/resultado.html#${p.game.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ver resultado publicado
-          </a>
-        </p>
-      )}
-      <PublicationHistory
-        key={historyEpoch}
-        gameId={p.game.id}
-        enabled={!p.disabled && !busy}
-        onSessionLost={p.onSessionLost}
-      />
-      {(p.confirmed || state?.published || ack) && (
-        <TeamStatisticsPanel
-          gameId={p.game.id}
-          disabled={p.disabled || busy || uncertain || ack !== null}
-          onLock={setHistoricalLocked}
-          guard={historicalGuard}
-          onSessionLost={p.onSessionLost}
-          onUpdated={() => {
-            setState(null);
-            setHistoryEpoch((n) => n + 1);
-          }}
-        />
       )}
     </section>
   );

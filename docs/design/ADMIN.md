@@ -23,6 +23,8 @@ Contratos de identidade, dados privados, 0/00, atomicidade/recibos e publicaçã
 
 Decisão de 03/11/2026: reorganizar tarefas preservando as abas atuais, padronizar todas as telas para desktop e incluir o painel equipes/elenco 30/70. Jogos terá ordenação de uma coluna por vez sobre todos os registros; Informações terá campos proporcionais. Busca global permanece somente pública. O responsável escolheu validar um piloto navegável antes da expansão às rotas reais. Detalhes e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md).
 
+Na súmula, a preparação mantém as vagas visíveis e a operação exibe 12 linhas por equipe. As parciais ficam ao lado do lançamento, e o histórico de ações rola dentro da tabela. **Salvar e publicar** e **Salvar e republicar** concluem a ação no painel de salvamento, com as estatísticas coletivas calculadas automaticamente. No fluxo legado, a revisão exige motivo de 10 a 500 caracteres. A escolha da súmula manual aparece quando ela precisa substituir a fonte PDF. O histórico de edição consulta versões publicadas. O acesso ao resultado aparece quando a rota pública pode servi-lo.
+
 No desktop, conferir **1366×768** e **1920×1080** com nomes longos, listas representativas (12 atletas quando houver elenco), dropdowns e diálogos abertos. Verificar o percurso completo, cancelamento, teclado, zoom, foco, vazios, erro, recuperação e retorno. Validar mobile se a alteração o afetar.
 
 Registrar SHA, ambiente, comando, resultado e limites. Revisão do autor, axe ou fixtures não substituem revisão independente, aceite humano ou prova autenticada remota. Nenhuma sugestão estética amplia o MVP. Evidências anteriores ficam no [índice histórico](../../historico/documentacao/README.md) e são consultadas somente quando pertinentes.
@@ -30,6 +32,8 @@ Registrar SHA, ambiente, comando, resultado e limites. Revisão do autor, axe ou
 A escala compartilhada, baseada na fonte padrão do navegador, também vale para acesso, formulários, menus e diálogos administrativos. Títulos que repetem a aba ficam somente semânticos, com foco em uma área visível. No contexto da disputa, listas e seletores mostram a inscrição; a distinção de nome global permanece nos formulários em que é necessária.
 
 A lista de Disputas recebeu aceite visual com acréscimo de 2 px na tipografia do cabeçalho, conteúdo, menus e diálogos. É a primeira aplicação do [novo padrão de tipografia](DESIGN-SYSTEM.md#referência-visual-aprovada-em-18112026).
+
+O organizador aparece ao lado do campeonato na lista e abaixo do nome no celular. O formulário usa busca por nome ou sigla e cadastro inline. Quando o vínculo está bloqueado, o organizador fica legível e o motivo aparece junto ao campo. O modo de teste preenche **Admin** automaticamente ao criar o campeonato.
 
 No cadastro de atleta, a data completa de nascimento preenche e bloqueia o campo de ano. Ao remover a data, o ano volta a aceitar edição manual. Em **Elenco → Perfil público**, a proposta mostra o ano que será publicado. A data completa fica privada.
 

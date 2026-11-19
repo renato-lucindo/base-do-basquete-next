@@ -24,7 +24,7 @@ beforeAll(async () => {
     id(1),
   ]);
   await db.query(
-    "insert into public.championships(id,name) values ($1,'Copa')",
+    "insert into public.championships(id,name,organizer_id) values ($1,'Copa',(select id from private.competition_organizers where abbreviation='FECABA'))",
     [id(2)],
   );
   await db.query(
@@ -65,10 +65,10 @@ it("pages disputes independently of championships and filters the full set befor
 it("sorts youth, adult and masters by age and filters multiple championships", async () => {
   const categories = ["55+", "Adulto", "Sub-23", "30+", "Sub-15", "Sub-12"];
   for (const n of [4, 6]) {
-    await db.query("insert into public.championships(id,name) values ($1,$2)", [
-      id(n),
-      "Liga " + n,
-    ]);
+    await db.query(
+      "insert into public.championships(id,name,organizer_id) values ($1,$2,(select id from private.competition_organizers where abbreviation='FECABA'))",
+      [id(n), "Liga " + n],
+    );
     await db.query(
       "insert into public.seasons(id,championship_id,year) values ($1,$2,2027)",
       [id(n + 1), id(n)],

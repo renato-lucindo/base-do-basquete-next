@@ -2,6 +2,10 @@ import { z } from "zod";
 import { forbidden, providerJson, unavailable } from "../access/provider";
 import { invalidSession } from "../access/vault";
 import { HttpError } from "../server/http";
+import {
+  organizerListSchema,
+  organizerSnapshotSchema,
+} from "./organizer-contract";
 import type { Database, Json } from "../server/database.types";
 import {
   listingSchema,
@@ -44,10 +48,22 @@ export class SupabaseCompetitions {
     return checked(
       disputeListPageSchema,
       await this.rpc(
-        "list_admin_dispute_activity_catalog",
+        "list_admin_disputes_with_organizers",
         { p_query: query },
         token,
       ),
+    );
+  }
+  async listOrganizers(token: string, query: string) {
+    return checked(
+      organizerListSchema,
+      await this.rpc("list_competition_organizers", { p_query: query }, token),
+    );
+  }
+  async getWithOrganizer(token: string, id: string) {
+    return checked(
+      organizerSnapshotSchema,
+      await this.rpc("get_competition_with_organizer", { p_id: id }, token),
     );
   }
   async get(token: string, id: string) {
@@ -198,6 +214,13 @@ const conflictMessages: Record<string, string> = {
     "A situação atual da disputa não permite esta ação.",
   test_dispute_private: "Disputas de teste são privadas. Use Abrir prévia.",
   test_dispute_creation_only: "Escolha a modalidade ao cadastrar a disputa.",
+  championship_organizer_required: "Selecione o organizador do campeonato.",
+  championship_organizer_invalid: "Confira os dados do organizador.",
+  championship_organizer_duplicate:
+    "Já existe um organizador com esse nome. Busque e selecione o cadastro existente.",
+  championship_organizer_locked:
+    "O organizador está bloqueado pelo histórico de publicação ou pelo modo Teste.",
+  championship_test_only: "Este campeonato aceita apenas disputas de teste.",
   championship_rename_reason_required:
     "Informe o motivo da alteração do nome público.",
 };

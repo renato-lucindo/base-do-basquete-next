@@ -93,9 +93,7 @@ for (const version of [undefined, 2] as const)
     await page
       .getByRole("button", { name: "Concluir preparação e lançar ações" })
       .click();
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     await expect(
       page.getByText("Rascunho da súmula salvo", { exact: true }),
     ).toBeVisible();
@@ -113,7 +111,7 @@ for (const version of [undefined, 2] as const)
     ]);
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await page.getByRole("button", { name: "Revisar preparação" }).click();
@@ -165,7 +163,7 @@ for (const version of [undefined, 2] as const)
       .getByRole("button", { name: "Concluir preparação e lançar ações" })
       .click();
     const points = page.getByRole("region", {
-      name: "Ações de pontos",
+      name: "Registro de ações",
       exact: true,
     });
     await expect(points).toContainText("#17");
@@ -174,17 +172,15 @@ for (const version of [undefined, 2] as const)
     await page.keyboard.press("Enter");
     await page.getByLabel("Ação", { exact: true }).fill("3");
     await page.keyboard.press("Enter");
-    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TO");
+    await page.getByLabel("Camisa ou alvo", { exact: true }).fill("TD");
     await page.keyboard.press("Enter");
     await page.getByLabel(/Minuto decorrido/).fill("3");
     await page.keyboard.press("Enter");
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
-      "Q1: 3′",
+      "Q1 3′",
     );
     f.loseNextSheetAck();
-    await page
-      .getByRole("button", { name: "Salvar rascunho da súmula" })
-      .click();
+    await page.getByRole("button", { name: "Salvar rascunho" }).click();
     await page.getByRole("button", { name: "Repetir envio da súmula" }).click();
     await expect(
       page.getByText("Rascunho da súmula salvo", { exact: true }),
@@ -202,12 +198,12 @@ for (const version of [undefined, 2] as const)
     });
     await page.reload();
     await page
-      .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+      .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
       .click();
     await page.getByRole("button", { name: "Preparar súmula" }).click();
     await expect(points).toContainText("#17");
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
-      "Q1: 3′",
+      "Q1 3′",
     );
     await page.getByRole("button", { name: "Revisar preparação" }).click();
     await shirt.fill("18");
@@ -264,7 +260,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(
     page.getByLabel("Inscrição mandante", { exact: true }),
@@ -312,7 +308,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   });
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(
     page.getByLabel("Data dos horários reais", { exact: true }),
@@ -346,7 +342,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
   const shirt = page.getByLabel("Camisa de Jogador A 1", { exact: true });
   await shirt.fill("17");
   await shirt.press("Enter");
-  await page.getByRole("button", { name: "Salvar rascunho da súmula" }).click();
+  await page.getByRole("button", { name: "Salvar rascunho" }).click();
   await expect(page.getByRole("alert")).toContainText("motivo");
   await page
     .getByLabel("Motivo da revisão da súmula")
@@ -355,7 +351,7 @@ test("confirmed v1 game: actual times and officiating can be saved; jersey corre
     .getByRole("button", { name: "Concluir preparação e lançar ações" })
     .click();
   await expect(
-    page.getByRole("region", { name: "Ações de pontos", exact: true }),
+    page.getByRole("region", { name: "Registro de ações", exact: true }),
   ).toContainText("#17");
   expect(f.snapshot()!.confirmed).toBe(true);
 });
@@ -369,7 +365,7 @@ test("finished game: separate date and range preserve drafts, same-day times and
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   const date = page.getByLabel("Data dos horários reais", { exact: true });
   const start = page.getByLabel("Hora de início", { exact: true });
@@ -444,7 +440,7 @@ test("finished game: separate date and range preserve drafts, same-day times and
   });
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B" })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
     .click();
   await expect(date).toHaveValue("2026-11-01");
   await expect(start).toHaveValue("20:12");

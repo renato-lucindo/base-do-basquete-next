@@ -88,7 +88,7 @@ export function parseFoul(code: string, target: string): Foul | null {
 }
 
 export function periodLabel(period: number): string {
-  return period <= 4 ? `Q${period}` : `OT${period - 4}`;
+  return period <= 4 ? `Q${period}` : `PR${period - 4}`;
 }
 export function periodColor(period: number): "red" | "blue" {
   return period % 2 === 1 ? "red" : "blue";

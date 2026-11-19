@@ -343,6 +343,7 @@ export function DisputeCatalog({
   const columns = [
     ["activity", "Última alteração"],
     ["championship", "Campeonato"],
+    ["organizer", "Organizador"],
     ["category", "Categoria"],
     ["gender", "Naipe"],
     ["division", "Divisão"],
@@ -541,6 +542,11 @@ export function DisputeCatalog({
                   <th
                     scope="col"
                     key={key}
+                    className={
+                      key === "organizer"
+                        ? "dispute-organizer-column"
+                        : undefined
+                    }
                     aria-sort={
                       query.sort === key
                         ? query.direction === "asc"
@@ -557,6 +563,21 @@ export function DisputeCatalog({
                         </span>
                       )}
                     </button>
+                    {key === "championship" && (
+                      <button
+                        className="dispute-organizer-mobile"
+                        type="button"
+                        aria-pressed={query.sort === "organizer"}
+                        onClick={() => sort("organizer")}
+                      >
+                        Organizador
+                        {query.sort === "organizer" && (
+                          <span aria-hidden="true">
+                            {query.direction === "asc" ? " ↑" : " ↓"}
+                          </span>
+                        )}
+                      </button>
+                    )}
                   </th>
                 ))}
                 <th scope="col" className="dispute-actions-heading">
@@ -567,6 +588,10 @@ export function DisputeCatalog({
             <tbody>
               {page.items.map((row) => {
                 const a = row.administration;
+                const organizer =
+                  row.organizer?.abbreviation ??
+                  row.organizer?.name ??
+                  "Não definido";
                 const rowLabel = [
                   row.name,
                   row.year,
@@ -603,7 +628,14 @@ export function DisputeCatalog({
                       >
                         {row.name}
                       </button>
+                      <span className="dispute-organizer-mobile">
+                        <span className="admin-visually-hidden">
+                          Organizador:{" "}
+                        </span>
+                        {organizer}
+                      </span>
                     </td>
+                    <td className="dispute-organizer-column">{organizer}</td>
                     <td>{row.category}</td>
                     <td>
                       {row.gender === "masculino" ? "Masculino" : "Feminino"}

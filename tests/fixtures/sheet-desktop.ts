@@ -226,7 +226,7 @@ export async function openDesktopSheet(page: Page) {
     `http://127.0.0.1:${process.env.SHEET_TEST_PORT ?? "5174"}/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Preparar súmula", exact: true })

@@ -31,11 +31,11 @@ test("lista jogos com horários reais adicionais e preserva horários ao editar 
     `http://127.0.0.1:5174/foundation.html#campeonato/${tid(1)}/${tid(3)}/jogos`,
   );
   await expect(
-    page.getByRole("row").filter({ hasText: "Lobos × Lobos B" }),
+    page.getByRole("cell", { name: /Lobos\s*—\s*Lobos B/ }),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await expect(page.getByLabel("Hora de início", { exact: true })).toHaveValue(
     "15:35",
@@ -217,8 +217,10 @@ test("cadastra partida diretamente, conserva data sem horário e retoma sem plac
   });
   await page.reload();
   await expect(page.getByText("Quadra Azul", { exact: true })).toBeVisible();
-  await expect(page.getByText("Sem resultado", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await expect(
+    page.getByRole("cell", { name: "Sem resultado", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /Editar jogo Lobos/ }).click();
   await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
     "2026-10-23",
   );
@@ -303,7 +305,7 @@ test("registra horários reais, calcula duração com virada do dia e recupera a
     endAt: "2026-10-31T00:47",
   });
   await page.reload();
-  await page.getByRole("button", { name: /Abrir jogo Lobos/ }).click();
+  await page.getByRole("button", { name: /Editar jogo Lobos/ }).click();
   await expect(page.getByLabel("Data do jogo", { exact: true })).toHaveValue(
     "2026-10-30",
   );

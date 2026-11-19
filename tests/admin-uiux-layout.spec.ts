@@ -29,8 +29,6 @@ for (const area of ["jogos", "equipes"])
     });
     const widths = info.project.name === "desktop" ? [1366, 1920] : [320, 390];
     for (const width of widths) {
-      // Prove that short content leaves spare width after the table on every OS.
-      // Long content may legitimately fill the region with different system fonts.
       if (area === "jogos") {
         home.name = "Lobos";
         f.games.get(tid(501))!.venue = "Quadra";
@@ -56,14 +54,13 @@ for (const area of ["jogos", "equipes"])
         ),
       ).toBe(true);
       if (area === "jogos" && width >= 1366) {
-        const region = await page
-            .getByRole("region", { name: "Tabela de jogos", exact: true })
-            .boundingBox(),
-          table = await page
-            .getByRole("table", { name: "Jogos da disputa", exact: true })
-            .boundingBox();
-        expect(table!.x).toBe(region!.x);
-        expect(table!.width).toBeLessThan(region!.width - 30);
+        const size = await page
+          .getByRole("region", { name: "Tabela de jogos" })
+          .evaluate((region) => ({
+            width: region.clientWidth,
+            table: region.querySelector("table")!.getBoundingClientRect().width,
+          }));
+        expect(size.table).toBeCloseTo(size.width, 0);
       }
       if (area === "jogos") {
         home.name = longName;
@@ -72,19 +69,35 @@ for (const area of ["jogos", "equipes"])
         await page.reload();
         await expect(
           page.getByRole("button", {
-            name: `Abrir jogo ${longName} × ${away.name}`,
+            name: `Editar jogo ${longName} × ${away.name}`,
             exact: true,
           }),
         ).toBeVisible();
-        const region = await page
-            .getByRole("region", { name: "Tabela de jogos", exact: true })
-            .boundingBox(),
-          table = await page
-            .getByRole("table", { name: "Jogos da disputa", exact: true })
-            .boundingBox();
-        expect(table!.x).toBe(region!.x);
+        const sizes = await page
+          .getByRole("region", { name: "Tabela de jogos" })
+          .evaluate((region) => {
+            const table = region
+              .querySelector("table")!
+              .getBoundingClientRect();
+            return {
+              left: table.left - region.getBoundingClientRect().left,
+              border: region.clientLeft,
+              width: region.clientWidth,
+              tableWidth: table.width,
+            };
+          });
+        expect(sizes.left).toBeCloseTo(sizes.border, 0);
         if (width >= 1366)
-          expect(table!.width).toBeLessThanOrEqual(region!.width + 1);
+          expect(sizes.tableWidth).toBeLessThanOrEqual(sizes.width + 1);
+        await expect(
+          page.getByRole("button", { name: "Jogos", exact: true }),
+        ).toHaveCSS("font-size", "16px");
+        await expect(
+          page.getByRole("button", {
+            name: "Voltar aos campeonatos",
+            exact: true,
+          }),
+        ).toHaveCSS("font-size", "16px");
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

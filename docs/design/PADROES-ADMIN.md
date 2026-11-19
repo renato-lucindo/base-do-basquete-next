@@ -47,7 +47,7 @@ Defina primeiro o percurso e o aceite em [ADMIN.md](ADMIN.md). Use as regras aba
 - Cabeçalhos curtos; não repetir contexto já visível no breadcrumb ou título de página.
 - Alinhamento consistente: texto à esquerda, números à direita, status centralizado quando ícone.
 - Ordenação por coluna com indicador visual (seta); apenas a coluna ativa exibe a seta.
-- Aproveitar a largura disponível no desktop — sem espaços brancos excessivos.
+- Dimensionar a tabela pelo conteúdo e pelo bloco ao qual ela pertence. Na súmula, parciais e últimas ações acompanham a largura da equipe A. Lançamento e salvamento ficam ao lado. Centralizar quartos, prorrogações e totais da súmula.
 
 ### Filtros e busca
 
@@ -60,7 +60,7 @@ Defina primeiro o percurso e o aceite em [ADMIN.md](ADMIN.md). Use as regras aba
 ### Ações na tabela
 
 - Conte os cliques da tarefa recorrente do ponto de partida até a confirmação. Coloque a ação junto ao dado e retire menus ou confirmações redundantes quando a escolha já indicar o efeito. Na lista de disputas, alterar visibilidade leva dois cliques e o toast confirma o resultado do servidor. Cancelamento continua exigindo motivo e confirmação.
-- Ações frequentes (editar, ver elenco, publicar) visíveis e focáveis na linha, sem depender de hover.
+- Ações frequentes (editar, ver elenco, publicar) visíveis e focáveis na linha, sem depender de hover. Na súmula, **Editar** usa lápis e texto azuis. **Excluir** usa lixeira e texto vermelhos. Use a variante textual transparente e separe os controles com um divisor.
 - Ações destrutivas (excluir, arquivar) com confirmação contextual; não esconder em menu de três pontos quando forem frequentes.
 - Na edição de Disputas, o botão de saída mantém o rótulo **Descartar alterações** em todos os estados. Use preenchimento vermelho e texto branco, assim como no botão **X**, que tem ícone branco. Com alterações pendentes, ambos pedem confirmação de descarte. Com o formulário limpo, fecham diretamente. **Cancelar disputa** fica na seção **Situação da disputa**, com contorno vermelho, motivo obrigatório e confirmação própria.
 - Ação de lote (selecionar todos, exportar): toolbar secundária aparece ao selecionar, não ocupa espaço fixo.

@@ -265,13 +265,20 @@ export function TeamStatisticsPanel(p: Props) {
           </label>
           <button
             type="button"
+            onMouseDown={(event) => {
+              // Keep the view in place until the pointer confirms the action.
+              if (event.button === 0) event.preventDefault();
+            }}
             disabled={
               p.disabled ||
               busy ||
               (!uncertain &&
                 (!gdReviewReady(review, facts) || reason.trim().length < 10))
             }
-            onClick={() => void publish()}
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              void publish();
+            }}
           >
             {uncertain ? "Repetir revisão" : "Publicar estatísticas conferidas"}
           </button>

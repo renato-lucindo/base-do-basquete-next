@@ -1,6 +1,6 @@
 # 009 — súmula persistida e identidade contextual
 
-**Vigência (01/11/2026):** identidade, rascunho e recibos permanecem vigentes. A restrição G2 `confirm=false` e as frases que tratam confirmação/publicação como futuras foram superadas por [011](011-publicacao-por-jogo.md). Comissão e motor v2 da PR #38 ainda não substituem o contrato da main nesta base.
+**Vigência** — Identidade, rascunho e recibos permanecem vigentes. A restrição G2 `confirm=false` e as referências à publicação futura foram superadas pela [ADR 011](011-publicacao-por-jogo.md). A [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38), integrada em 02/11/2026, ampliou o contrato para comissão identificada no formato v2 e edição compatível com o formato v1.
 
 O motor da especificação, já exercitado no protótipo, continua responsável pelas regras da súmula. Seus identificadores numéricos são apenas chaves locais: um adaptador transforma relacionados com UUID em slots1–24 e capitão em slot da mesma equipe. Nenhum UUID é truncado/convertido em número ou confundido com identidade global. Persistência mantém UUID do vínculo, inscrição/pessoa e camisa da ocasião; nomes vêm do servidor, nunca do comando do browser.
 
@@ -18,7 +18,9 @@ As regras de ações/exclusão também são verificadas no escritor SQL, para n�
 
 Por instrução expressa do responsável nesta unidade, a camisa do mesmo relacionado pode ser corrigida após ações, inclusive numa fonte confirmada com motivo de revisão. UUID do vínculo e lado permanecem fixos. Eventos novos guardam `playerRosterEntryId`; eventos antigos são associados deterministicamente pelo par lado + camisa original, distinguindo `0` de `00`, antes de qualquer alteração. Referência já presente deve coincidir; ambiguidade ou inconsistência bloqueia a edição. A nova camisa é aplicada aos alvos tipados desse vínculo, preservando IDs, ordem, códigos e autoria de comissão. Não há substituição textual, alteração do elenco global ou de outro jogo.
 
-O formato v1 permanece v1: não converter faltas B/C antigas para autores v2 por inferência. Pedidos de tempo explicitamente informados passam a ser aceitos também em v1, com as mesmas cotas e minutos do motor v2. Ausência no legado não prova que nenhum tempo foi pedido; a interface indica a informação ausente e exige conferência da fonte. Ler não reescreve documentos, recibos nem publicações. Persistir exige os comandos autorizados/versionados existentes; uma correção confirmada não republica implicitamente. Esta ampliação permanece na PR aberta até integração autorizada.
+O formato v1 conserva a autoria original das faltas B/C. Os formatos v1 e v2 aceitam tempos debitados explicitamente informados, com as mesmas cotas e faixas de minuto. A ausência de eventos de tempo debitado em um documento histórico pode refletir ausência de registro. As consultas preservam documentos, recibos e publicações. A persistência usa os comandos autorizados e versionados. Republicar uma correção exige o comando de publicação.
+
+Na entrada administrativa, `TD` é o rótulo do comando e `TO` é aceito como atalho legado. O documento de ambos os formatos guarda `target: "TO"` para tempo debitado. A exibição converte o alvo para `TD`. O período da ação é um número, com 1 a 4 para os quartos e 5 em diante para as prorrogações. A escolha de rótulo da interface é independente desses valores persistidos e das versões publicadas.
 
 ## Proveniência e prevenção de regressões
 

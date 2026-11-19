@@ -103,7 +103,7 @@ test("persiste escala, reutiliza o catálogo e exclui identidades já selecionad
     .getByRole("button", { name: "Voltar à lista de jogos", exact: true })
     .click();
   await page
-    .getByRole("button", { name: /^Abrir jogo / })
+    .getByRole("button", { name: /^Editar jogo / })
     .first()
     .click();
   await expect(

@@ -1125,20 +1125,32 @@ async function fixture(options = {}) {
         if (
           [
             "/rest/v1/rpc/list_games",
-            "/rest/v1/rpc/list_games_ordered",
+            "/rest/v1/rpc/list_admin_games_with_scores",
+            "/rest/v1/rpc/list_admin_games_filtered",
           ].includes(url.pathname)
         ) {
           assert.equal(
             request.headers.get("authorization"),
             "Bearer fixture-access",
           );
-          if (url.pathname.endsWith("/list_games_ordered"))
+          if (url.pathname.endsWith("/list_admin_games_with_scores"))
             assert.deepEqual(await request.json(), {
               p_dispute_id: id,
               p_query: "",
               p_offset: 20,
               p_sort: "number",
               p_direction: "desc",
+            });
+          if (url.pathname.endsWith("/list_admin_games_filtered"))
+            assert.deepEqual(await request.json(), {
+              p_dispute_id: id,
+              p_query: "",
+              p_offset: 0,
+              p_sort: "date",
+              p_direction: "asc",
+              p_team_id: id,
+              p_state: "finished",
+              p_date: "2026-11-19",
             });
           return Response.json({ items: [], hasMore: false });
         }
@@ -2156,7 +2168,17 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       ).status,
       200,
     );
-    assert.ok(f.calls.some((p) => p.endsWith("/list_games_ordered")));
+    assert.ok(f.calls.some((p) => p.endsWith("/list_admin_games_with_scores")));
+    assert.equal(
+      (
+        await send(
+          "GET",
+          `/api/games?disputeId=${id}&teamId=${id}&state=finished&date=2026-11-19`,
+        )
+      ).status,
+      200,
+    );
+    assert.ok(f.calls.some((p) => p.endsWith("/list_admin_games_filtered")));
     assert.equal((await send("GET", `/api/games/${id}`)).status, 404);
     const venues = await send("GET", "/api/games/venues?q=Azul&offset=20");
     assert.equal(venues.status, 200);
@@ -2219,6 +2241,10 @@ test("game routes enforce session, fixed RPCs, origin and contextual commands", 
       `/api/games?disputeId=${id}&sort=unsafe`,
       `/api/games?disputeId=${id}&direction=unsafe`,
       `/api/games?disputeId=${id}&sort=date&sort=number`,
+      `/api/games?disputeId=${id}&teamId=unknown`,
+      `/api/games?disputeId=${id}&state=cancelled`,
+      `/api/games?disputeId=${id}&date=2026-02-30`,
+      `/api/games?disputeId=${id}&date=2026-11-19&date=2026-11-20`,
       `/api/games/invalid`,
     ])
       assert.equal((await send("GET", path)).status, 400, path);

@@ -84,12 +84,73 @@ it("ordena toda a disputa antes da pagina, com numeros naturais, ausentes ao fim
   );
   expect((await list("state", "asc")).items[0].number).toBe("30");
   expect((await list("state", "desc")).items[0].state).toBe("scheduled");
+  const filtered = async (
+    team: number,
+    state: string | null,
+    date: string | null,
+    offset = 0,
+  ) =>
+    gameListingSchema.parse(
+      (
+        await db.query<{ r: unknown }>(
+          "select public.list_admin_games_filtered(pg_temp.g_id(92),'', $4,'number','asc',pg_temp.g_id($1),$2,$3) r",
+          [team, state, date, offset],
+        )
+      ).rows[0].r,
+    );
+  expect((await filtered(96, "scheduled", null)).hasMore).toBe(true);
+  expect(
+    (await filtered(96, "scheduled", null, 20)).items.map((g) => g.number),
+  ).not.toContain("30");
+  // Game 29 falls outside the first unfiltered page and matches as a visitor.
+  expect(
+    (await filtered(96, "scheduled", "2026-01-02")).items.map((g) => g.number),
+  ).toEqual(["29"]);
+  expect(
+    (await filtered(95, "finished", "2026-01-01")).items.map((g) => g.number),
+  ).toEqual(["30"]);
+  expect((await filtered(999, "finished", "2026-01-01")).items).toEqual([]);
   await db.exec(`select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',0,'unsafe','asc')$q$,'PT400');
    select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',0,'date','unsafe')$q$,'PT400');
    select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92),'',-1,'date','asc')$q$,'PT400');
+   select pg_temp.g_error($q$select public.list_admin_games_filtered(pg_temp.g_id(92),'',0,'date','asc',null,'unsafe',null)$q$,'PT400');
    set local request.jwt.claim.sub='d1000000-0000-4000-8000-000000000099';`);
   expect((await list()).items).toEqual([]);
   await db.exec(
-    `set local role anon;select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92))$q$,'42501');reset role;`,
+    `select pg_temp.g_error($q$select public.list_admin_games_filtered(pg_temp.g_id(92),'',0,'date','asc',pg_temp.g_id(95),null,null)$q$,'PT403');
+    set local role anon;select pg_temp.g_error($q$select public.list_games_ordered(pg_temp.g_id(92))$q$,'42501');reset role;`,
   );
+});
+
+it("returns a confirmed score for a hidden game, preserves zero and rejects non-admins", async () => {
+  await db.exec("rollback;");
+  const fixture = await readFile("supabase/tests/publication.sql", "utf8");
+  await db.exec(fixture.slice(0, fixture.indexOf("set local role anon;")));
+  await db.exec(`
+    set local role authenticated;
+    set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000098';
+    select public.publish_sheet_game(pg_temp.pu_command());
+    reset role;
+    update private.dispute_administration set visibility='private'
+      where dispute_id=pg_temp.pu_id(3);
+    set local role authenticated;
+  `);
+  const { rows } = await db.query<{ result: unknown }>(`
+    select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc') result
+  `);
+  const { items } = gameListingSchema.parse(rows[0].result);
+  expect(items).toHaveLength(2);
+  expect(items.find((game) => game.id.endsWith("000000000008"))?.score).toEqual(
+    { home: 2, away: 0 },
+  );
+  expect(
+    items.find((game) => game.id.endsWith("000000000009"))?.score,
+  ).toBeNull();
+  await db.exec(`
+    set local request.jwt.claim.sub='f9200000-0000-4000-8000-000000000099';
+    select pg_temp.pu_error($q$select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc')$q$,'PT403');
+    set local role anon;
+    select pg_temp.pu_error($q$select public.list_admin_games_with_scores(pg_temp.pu_id(3),'',0,'date','asc')$q$,'42501');
+    rollback;
+  `);
 });

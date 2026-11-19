@@ -53,6 +53,7 @@ export async function gamesFixture(page: Page) {
     ]),
   );
   const registration = (id: string) => registrations.get(id)!;
+  const scores = new Map<string, { home: number; away: number }>();
   await page.route(/\/api\/registrations(\?|\/|$)/, async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
@@ -190,13 +191,16 @@ export async function gamesFixture(page: Page) {
         ),
         offset = Number(url.searchParams.get("offset") ?? 0),
         column = url.searchParams.get("sort") ?? "date",
-        direction = url.searchParams.get("direction") ?? "asc";
+        direction = url.searchParams.get("direction") ?? "asc",
+        teamId = url.searchParams.get("teamId"),
+        state = url.searchParams.get("state"),
+        date = url.searchParams.get("date");
       const key = (g: GameSnapshot) =>
         column === "matchup"
           ? g.home.name + " × " + g.away.name
           : column === "state"
             ? g.state === "finished"
-              ? "Resultado publicado"
+              ? "Resultado registrado"
               : "Sem resultado"
             : column === "date"
               ? g.date
@@ -211,6 +215,10 @@ export async function gamesFixture(page: Page) {
         .filter(
           (g) =>
             g.disputeId === url.searchParams.get("disputeId") &&
+            (!teamId ||
+              [g.homeRegistrationId, g.awayRegistrationId].includes(teamId)) &&
+            (!state || g.state === state) &&
+            (!date || g.date === date) &&
             [g.home.name, g.away.name, g.venue ?? "", g.number ?? ""]
               .join(" ")
               .toLocaleLowerCase("pt-BR")
@@ -233,7 +241,9 @@ export async function gamesFixture(page: Page) {
         });
       return route.fulfill({
         json: {
-          items: items.slice(offset, offset + 20),
+          items: items
+            .slice(offset, offset + 20)
+            .map((game) => ({ ...game, score: scores.get(game.id) ?? null })),
           hasMore: items.length > offset + 20,
         },
       });
@@ -325,6 +335,7 @@ export async function gamesFixture(page: Page) {
   });
   return {
     games,
+    scores,
     officials,
     scales,
     registrations,

@@ -187,7 +187,7 @@ for (const lost of [false, true])
     };
     await add("2");
     await page
-      .getByRole("button", { name: "Finalizar jogo", exact: true })
+      .getByRole("button", { name: "Salvar e publicar", exact: true })
       .click();
     if (lost)
       await page
@@ -195,14 +195,14 @@ for (const lost of [false, true])
         .click();
     await expect(
       page.getByRole("button", {
-        name: "Salvar correção e atualizar resultado",
+        name: "Salvar e republicar",
         exact: true,
       }),
     ).toBeVisible();
     await add("3");
     await page
       .getByRole("button", {
-        name: "Salvar correção e atualizar resultado",
+        name: "Salvar e republicar",
         exact: true,
       })
       .click();

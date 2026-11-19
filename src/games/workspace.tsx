@@ -1,7 +1,7 @@
 import { GameFormatAssignment } from "./format-assignment";
 import { GameVisibilityPanel } from "./visibility-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
-import type { GameOrder } from "./contract";
+import type { GameListFilters, GameOrder } from "./contract";
 import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "../competition/api";
 import { saveResultSchema } from "../competition/contract";
@@ -34,13 +34,18 @@ import {
   type Officiating,
 } from "./officiating-contract";
 import { AdminDialog } from "../competition/admin-dialog";
+import { Icon } from "../ui-system/components";
 import { AdminToast } from "../ui-system/admin-toast";
-import { type RegistrationSnapshot } from "../teams/contract";
+import {
+  registrationListingSchema,
+  type RegistrationSnapshot,
+} from "../teams/contract";
 import {
   gameListingSchema,
   gameSchema,
   durationMinutes,
   type GameSnapshot,
+  type GameListItem,
   type SaveGame,
 } from "./contract";
 type Props = {
@@ -69,24 +74,39 @@ const document = (s: GameSnapshot) =>
     round: s.round ?? null,
     knockoutStage: s.knockoutStage ?? null,
   });
+const initialOrder: GameOrder = { column: "date", direction: "asc" };
+
 export function GamesWorkspace(props: Props) {
   const flexible = flexibleCompetitionEnabled(),
     formatAction = useRef<() => Promise<string>>(async () => "");
   const [formatDirty, setFormatDirty] = useState(false);
-  const listPosition = useRef({ y: 0, id: "" }),
+  const listPosition = useRef({ y: 0, top: 0, left: 0, id: "" }),
+    listScroll = useRef<HTMLDivElement>(null),
+    nextBatch = useRef<HTMLDivElement>(null),
+    listVersion = useRef({ scope: "", epoch: -1 }),
+    sheetChanged = useRef(false),
     stageId = useId(),
     workspace = useRef<HTMLElement>(null);
-  const [list, setList] = useState<{ items: GameSnapshot[]; hasMore: boolean }>(
-      { items: [], hasMore: false },
-    ),
+  const [list, setList] = useState<{
+      items: GameListItem[];
+      hasMore: boolean;
+      order: GameOrder;
+    }>({ items: [], hasMore: false, order: initialOrder }),
+    [searchInput, setSearchInput] = useState(""),
     [query, setQuery] = useState(""),
-    [offset, setOffset] = useState(0),
-    [order, setOrder] = useState<GameOrder>({
-      column: "date",
-      direction: "asc",
+    [filters, setFilters] = useState<GameListFilters>({
+      teamId: null,
+      state: null,
+      date: null,
     }),
+    [teams, setTeams] = useState<RegistrationSnapshot[]>([]),
+    [teamLoadError, setTeamLoadError] = useState(false),
+    [teamAttempt, setTeamAttempt] = useState(0),
+    [offset, setOffset] = useState(0),
+    [order, setOrder] = useState<GameOrder>(initialOrder),
     [epoch, setEpoch] = useState(0),
-    [loading, setLoading] = useState(false);
+    [loading, setLoading] = useState(false),
+    [listError, setListError] = useState("");
   const [editor, setEditor] = useState<{
       game: SaveGame["game"];
       version: number;
@@ -189,35 +209,154 @@ export function GamesWorkspace(props: Props) {
       );
   }
   useEffect(() => {
-    if (!props.enabled) return;
-    let active = true;
-    const controller = new AbortController();
-    setLoading(true);
-    setList({ items: [], hasMore: false });
-    setError("");
+    if (searchInput === query) return;
     const timer = setTimeout(() => {
-      void api(
-        `/api/games?disputeId=${props.disputeId}&q=${encodeURIComponent(query)}&offset=${offset}&sort=${order.column}&direction=${order.direction}`,
-        gameListingSchema,
-        undefined,
-        controller.signal,
-      )
-        .then((r) => {
-          if (active) setList(r);
-        })
-        .catch((e) => {
-          if (active) report(e);
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
+      setQuery(searchInput);
+      setOffset(0);
     }, 150);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [props.enabled, props.disputeId, query, offset, order, epoch]);
+    return () => clearTimeout(timer);
+  }, [searchInput, query]);
+  useEffect(() => {
+    if (!props.enabled) return;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    setTeamLoadError(false);
+    async function loadTeams() {
+      const options: RegistrationSnapshot[] = [];
+      for (let teamOffset = 0; ; teamOffset += 20) {
+        const params = new URLSearchParams({
+          disputeId: props.disputeId,
+          offset: String(teamOffset),
+        });
+        const result = await api(
+          `/api/registrations?${params}`,
+          registrationListingSchema,
+          undefined,
+          signal,
+        );
+        if (signal.aborted) return;
+        options.push(...result.items);
+        if (!result.hasMore) break;
+      }
+      setTeams(options);
+    }
+    void loadTeams().catch((failure: unknown) => {
+      if (signal.aborted) return;
+      if (isSessionFailure(failure)) props.onSessionLost();
+      else setTeamLoadError(true);
+    });
+    return () => controller.abort();
+  }, [props.enabled, props.disputeId, props.onSessionLost, teamAttempt]);
+  useEffect(() => {
+    if (!props.enabled) return;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const scope = JSON.stringify([
+      props.disputeId,
+      query,
+      order.column,
+      order.direction,
+      filters,
+    ]);
+    const newScope = listVersion.current.scope !== scope;
+    const replace =
+      offset === 0 || newScope || listVersion.current.epoch !== epoch;
+    setLoading(true);
+    setListError("");
+    async function loadGames() {
+      const items: GameListItem[] = [];
+      try {
+        let more = false;
+        for (
+          let pageOffset = replace ? 0 : offset;
+          pageOffset <= offset;
+          pageOffset += 20
+        ) {
+          const params = new URLSearchParams({
+            disputeId: props.disputeId,
+            q: query,
+            offset: String(pageOffset),
+            sort: order.column,
+            direction: order.direction,
+          });
+          if (filters.teamId) params.set("teamId", filters.teamId);
+          if (filters.state) params.set("state", filters.state);
+          if (filters.date) params.set("date", filters.date);
+          const result = await api(
+            `/api/games?${params}`,
+            gameListingSchema,
+            undefined,
+            signal,
+          );
+          items.push(...result.items);
+          more = result.hasMore;
+          if (!more) break;
+        }
+        if (signal.aborted) return;
+        listVersion.current = { scope, epoch };
+        if (newScope && listScroll.current) listScroll.current.scrollTop = 0;
+        setList((previous) => ({
+          items: [
+            ...new Map(
+              (replace ? items : [...previous.items, ...items]).map((game) => [
+                game.id,
+                game,
+              ]),
+            ).values(),
+          ],
+          hasMore: more,
+          order,
+        }));
+      } catch (failure) {
+        if (signal.aborted) return;
+        if (isSessionFailure(failure)) props.onSessionLost();
+        setListError(
+          failure instanceof Error
+            ? failure.message
+            : "Não foi possível carregar os jogos.",
+        );
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    }
+    void loadGames();
+    return () => controller.abort();
+  }, [
+    props.enabled,
+    props.disputeId,
+    query,
+    filters,
+    offset,
+    order,
+    epoch,
+    props.onSessionLost,
+  ]);
+  useEffect(() => {
+    const root = listScroll.current;
+    const target = nextBatch.current;
+    if (
+      !root ||
+      !target ||
+      editor ||
+      sheetVisible ||
+      !props.enabled ||
+      !list.hasMore ||
+      loading ||
+      listError
+    )
+      return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          observer.disconnect();
+          setOffset((value) => value + 20);
+        }
+      },
+      { root, rootMargin: "0px 0px 96px 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [editor, sheetVisible, props.enabled, list, loading, listError]);
   function accept(snapshot: GameEditorSnapshot) {
     const s = snapshot.game;
     if (s.disputeId !== props.disputeId)
@@ -257,14 +396,29 @@ export function GamesWorkspace(props: Props) {
     setUncertain(false);
     setConflict(false);
   }
-  async function load(id: string) {
+  async function load(id: string, directSheet = false) {
     if (!mayLeave()) return;
-    listPosition.current = { y: window.scrollY, id };
+    if (!editor) {
+      listPosition.current = {
+        y: window.scrollY,
+        top: listScroll.current?.scrollTop ?? 0,
+        left: listScroll.current?.scrollLeft ?? 0,
+        id: `${directSheet ? "open-sheet-" : "open-game-"}${id}`,
+      };
+      sheetChanged.current = false;
+    }
     setBusy(true);
     setError("");
     try {
-      accept(await api(`/api/games/${id}/editor`, gameEditorSnapshotSchema));
-      setStatus("Jogo salvo");
+      const snapshot = await api(
+        `/api/games/${id}/editor`,
+        gameEditorSnapshotSchema,
+      );
+      if (snapshot.game.id !== id)
+        throw Error("Os dados recebidos não correspondem ao jogo.");
+      accept(snapshot);
+      if (directSheet) setSheetVisible(true);
+      setStatus("");
     } catch (e) {
       report(e);
     } finally {
@@ -445,10 +599,18 @@ export function GamesWorkspace(props: Props) {
       setEditor(null);
       requestAnimationFrame(() => {
         window.document
-          .getElementById(`open-game-${listPosition.current.id}`)
+          .getElementById(listPosition.current.id)
           ?.focus({ preventScroll: true });
+        listScroll.current?.scrollTo(
+          listPosition.current.left,
+          listPosition.current.top,
+        );
         window.scrollTo(0, listPosition.current.y);
       });
+      if (sheetChanged.current) {
+        sheetChanged.current = false;
+        setEpoch((value) => value + 1);
+      }
       setStatus("");
       pending.current = null;
       knownAck.current = null;
@@ -502,6 +664,22 @@ export function GamesWorkspace(props: Props) {
     knownAck.current = null;
     saveAction.current = "save";
   }
+  function changeListFilters(next: Partial<GameListFilters>) {
+    setFilters((current) => ({ ...current, ...next }));
+    setOffset(0);
+  }
+  const listRetry = listError && (
+    <div className="game-list-error">
+      <p role="alert">{listError}</p>
+      <button
+        type="button"
+        className="secondary"
+        onClick={() => setEpoch((value) => value + 1)}
+      >
+        Tentar novamente
+      </button>
+    </div>
+  );
   return (
     <section className="games-workspace" ref={workspace}>
       <AdminToast
@@ -513,44 +691,117 @@ export function GamesWorkspace(props: Props) {
             : ""
         }
       />
-      <div className="competition-title" tabIndex={-1}>
-        <h3 ref={heading} className="sr-only">
-          Jogos
-        </h3>
-        {!editor && !auxiliary && !sheetVisible && (
-          <label className="competition-search">
-            Buscar jogo
-            <input
-              maxLength={120}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setOffset(0);
-              }}
-            />
-          </label>
-        )}
+      {!sheetVisible && !auxiliary && (
+        <div className="competition-title" tabIndex={-1}>
+          <h3 ref={heading} className="sr-only">
+            Jogos
+          </h3>
+          {!editor && (
+            <div
+              className="game-list-filters"
+              role="group"
+              aria-label="Filtros dos jogos"
+            >
+              <label>
+                Buscar jogo
+                <input
+                  maxLength={120}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+              </label>
+              <label>
+                Equipe
+                <select
+                  value={filters.teamId ?? ""}
+                  onChange={(e) =>
+                    changeListFilters({ teamId: e.target.value || null })
+                  }
+                >
+                  <option value="">Todas</option>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Situação
+                <select
+                  value={filters.state ?? ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    changeListFilters({
+                      state:
+                        value === "finished" || value === "scheduled"
+                          ? value
+                          : null,
+                    });
+                  }}
+                >
+                  <option value="">Todas</option>
+                  <option value="finished">Resultado registrado</option>
+                  <option value="scheduled">Sem resultado</option>
+                </select>
+              </label>
+              <label>
+                Data
+                <input
+                  type="date"
+                  min="0001-01-01"
+                  max="9999-12-31"
+                  value={filters.date ?? ""}
+                  onChange={(e) => {
+                    if (e.target.validity.valid)
+                      changeListFilters({ date: e.target.value || null });
+                  }}
+                />
+              </label>
+            </div>
+          )}
 
-        {props.onImportPdfs && (
+          {props.onImportPdfs && (
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => {
+                if (mayLeave()) props.onImportPdfs?.();
+              }}
+            >
+              Importar PDFs
+            </button>
+          )}
           <button
-            disabled={busy || auxiliary || sheetVisible}
+            type="button"
+            className="primary game-list-add"
+            disabled={busy || decisionLocked}
             onClick={() => {
-              if (mayLeave()) props.onImportPdfs?.();
+              if (!mayLeave()) return;
+              beginNew();
             }}
           >
-            Importar PDFs
+            <Icon name="plus" /> Novo jogo
           </button>
-        )}
-        <button
-          disabled={busy || auxiliary || sheetVisible || decisionLocked}
-          onClick={() => {
-            if (!mayLeave()) return;
-            beginNew();
-          }}
-        >
-          Novo jogo
-        </button>
-      </div>
+          {!editor && loading && list.items.length > 0 && (
+            <span className="game-list-updating" role="status">
+              Atualizando jogos…
+            </span>
+          )}
+        </div>
+      )}
+      {!sheetVisible && !auxiliary && !editor && teamLoadError && (
+        <div className="game-list-error">
+          <p role="alert">Não foi possível carregar as equipes do filtro.</p>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => setTeamAttempt((current) => current + 1)}
+          >
+            Recarregar equipes
+          </button>
+        </div>
+      )}
       {!showDialog && feedback}
       {auxiliary ? (
         <>
@@ -586,7 +837,10 @@ export function GamesWorkspace(props: Props) {
           enabled={props.enabled}
           guard={sheetGuard}
           onSessionLost={props.onSessionLost}
-          onSaved={props.onSaved}
+          onSaved={() => {
+            sheetChanged.current = true;
+            props.onSaved();
+          }}
           onBack={() => setSheetVisible(false)}
           onBackToGames={closeEditor}
         />
@@ -597,6 +851,7 @@ export function GamesWorkspace(props: Props) {
           busy={busy}
           onClose={closeEditor}
           closeLabel="Voltar à lista de jogos"
+          iconClose
           className="game-editor-dialog"
           closeOnBackdrop
           footer={
@@ -627,10 +882,10 @@ export function GamesWorkspace(props: Props) {
                   disabled={busy}
                   onClick={closeEditor}
                 >
-                  Cancelar
+                  Descartar alterações
                 </button>
                 <button
-                  className="secondary"
+                  className="primary"
                   disabled={busy || conflict || decisionLocked}
                   onClick={() => void save()}
                 >
@@ -642,6 +897,7 @@ export function GamesWorkspace(props: Props) {
                 </button>
                 {!editor.version && !uncertain && (
                   <button
+                    className="secondary"
                     disabled={busy || conflict || decisionLocked}
                     onClick={() => void save("next")}
                   >
@@ -1092,18 +1348,10 @@ export function GamesWorkspace(props: Props) {
         </AdminDialog>
       ) : (
         <>
-          {loading && <p role="status">Carregando jogos…</p>}
-          {error && (
-            <button
-              type="button"
-              className="secondary"
-              onClick={() => setEpoch((n) => n + 1)}
-            >
-              Tentar novamente
-            </button>
-          )}
+          {offset === 0 && listRetry}
           <div
-            className="admin-table-scroll"
+            className="admin-table-scroll game-list-scroll"
+            ref={listScroll}
             role="region"
             aria-label="Tabela de jogos"
             aria-busy={loading}
@@ -1130,8 +1378,8 @@ export function GamesWorkspace(props: Props) {
                       scope="col"
                       className={column === "number" ? "numeric" : undefined}
                       aria-sort={
-                        order.column === column
-                          ? order.direction === "asc"
+                        list.order.column === column
+                          ? list.order.direction === "asc"
                             ? "ascending"
                             : "descending"
                           : undefined
@@ -1154,14 +1402,17 @@ export function GamesWorkspace(props: Props) {
                         }}
                       >
                         {label}
-                        {order.column === column && (
+                        {list.order.column === column && (
                           <span aria-hidden="true">
-                            {order.direction === "asc" ? " ↑" : " ↓"}
+                            {list.order.direction === "asc" ? " ↑" : " ↓"}
                           </span>
                         )}
                       </button>
                     </th>
                   ))}
+                  <th scope="col" className="game-list-operations">
+                    Operações
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1169,14 +1420,13 @@ export function GamesWorkspace(props: Props) {
                   <tr key={g.id}>
                     <td className="numeric nowrap">{g.number ?? "—"}</td>
                     <td>
-                      <button
-                        className="competition-name"
-                        id={`open-game-${g.id}`}
-                        aria-label={`Abrir jogo ${g.home.name} × ${g.away.name}`}
-                        onClick={() => void load(g.id)}
-                      >
-                        {g.home.name} × {g.away.name}
-                      </button>
+                      <div className="game-list-matchup">
+                        <span>{g.home.name}</span>
+                        <strong className="game-list-score">
+                          {g.score ? `${g.score.home} × ${g.score.away}` : "—"}
+                        </strong>
+                        <span>{g.away.name}</span>
+                      </div>
                     </td>
                     <td className="nowrap">
                       {g.date
@@ -1185,36 +1435,58 @@ export function GamesWorkspace(props: Props) {
                     </td>
                     <td className="nowrap">{g.time ?? "A definir"}</td>
                     <td>{g.venue ?? "A definir"}</td>
-                    <td className="nowrap">
-                      {g.state === "finished"
-                        ? flexible
+                    <td>
+                      <span
+                        className={`game-list-state${g.state === "finished" ? " is-finished" : ""}`}
+                      >
+                        <Icon
+                          name={g.state === "finished" ? "check" : "clock"}
+                        />
+                        {g.state === "finished"
                           ? "Resultado registrado"
-                          : "Resultado publicado"
-                        : "Sem resultado"}
+                          : "Sem resultado"}
+                      </span>
+                    </td>
+                    <td className="game-list-operations">
+                      <button
+                        type="button"
+                        className="secondary game-list-action game-list-edit"
+                        id={`open-game-${g.id}`}
+                        aria-label={`Editar jogo ${g.home.name} × ${g.away.name}`}
+                        disabled={busy}
+                        onClick={() => void load(g.id)}
+                      >
+                        <Icon name="edit" /> Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary game-list-action"
+                        id={`open-sheet-${g.id}`}
+                        aria-label={`Súmula de ${g.home.name} × ${g.away.name}`}
+                        disabled={busy}
+                        onClick={() => void load(g.id, true)}
+                      >
+                        <Icon name="file" /> Súmula
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-          {!loading && !error && !list.items.length && (
-            <p>Nenhum jogo encontrado nesta disputa.</p>
-          )}
-          <div className="competition-actions">
-            <button
-              className="secondary"
-              disabled={loading || !offset}
-              onClick={() => setOffset(Math.max(0, offset - 20))}
-            >
-              Jogos anteriores
-            </button>
-            <button
-              className="secondary"
-              disabled={loading || !list.hasMore}
-              onClick={() => setOffset(offset + 20)}
-            >
-              Mais jogos
-            </button>
+            {loading && list.items.length === 0 && (
+              <p role="status">Carregando jogos…</p>
+            )}
+            {offset > 0 && listRetry}
+            {!loading && !listError && !list.items.length && (
+              <p>Nenhum jogo encontrado nesta disputa.</p>
+            )}
+            {list.hasMore && !listError && (
+              <div
+                ref={nextBatch}
+                className="game-list-next"
+                aria-hidden="true"
+              />
+            )}
           </div>
         </>
       )}

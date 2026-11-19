@@ -71,7 +71,7 @@ test("histórico pagina e abre versão sem substituir a decisão em edição", a
   }
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Situação e decisões do jogo", exact: true })
@@ -267,7 +267,7 @@ test("duas abas recusam versão antiga sem substituir edição", async ({
   await f.addTab(other);
   await other.goto(page.url());
   await other
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await other
     .getByRole("button", { name: "Situação e decisões do jogo", exact: true })
@@ -324,7 +324,7 @@ test("confere e salva cancelamento dentro do jogo sem perder a resposta incerta"
   expect(options.occurrenceCommits).toBe(1);
   await page.reload();
   await page
-    .getByRole("button", { name: "Abrir jogo Lobos × Lobos B", exact: true })
+    .getByRole("button", { name: "Editar jogo Lobos × Lobos B", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Situação e decisões do jogo", exact: true })

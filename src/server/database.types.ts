@@ -39,18 +39,21 @@ export type Database = {
         Row: {
           id: string;
           name: string;
+          organizer_id: string | null;
           saved_at: string;
           version: number;
         };
         Insert: {
           id: string;
           name: string;
+          organizer_id?: string | null;
           saved_at?: string;
           version?: number;
         };
         Update: {
           id?: string;
           name?: string;
+          organizer_id?: string | null;
           saved_at?: string;
           version?: number;
         };
@@ -858,6 +861,11 @@ export type Database = {
         Returns: Json;
       };
       list_admin_dispute_catalog: { Args: { p_query: Json }; Returns: Json };
+      list_admin_disputes_with_organizers: {
+        Args: { p_query: Json };
+        Returns: Json;
+      };
+      list_competition_organizers: { Args: { p_query: string }; Returns: Json };
       list_admin_disputes: { Args: { p_query: Json }; Returns: Json };
       get_dispute_administration: {
         Args: { p_competition_id: string };
@@ -873,6 +881,7 @@ export type Database = {
         Returns: Json;
       };
       get_competition: { Args: { p_id: string }; Returns: Json };
+      get_competition_with_organizer: { Args: { p_id: string }; Returns: Json };
       get_game: { Args: { p_id: string }; Returns: Json };
       get_game_editor: { Args: { p_id: string }; Returns: Json };
       get_game_occurrence_state: {
@@ -1002,6 +1011,29 @@ export type Database = {
       };
       list_competitions: {
         Args: { p_offset?: number; p_query?: string };
+        Returns: Json;
+      };
+      list_admin_games_with_scores: {
+        Args: {
+          p_dispute_id: string;
+          p_query: string;
+          p_offset: number;
+          p_sort: string;
+          p_direction: string;
+        };
+        Returns: Json;
+      };
+      list_admin_games_filtered: {
+        Args: {
+          p_dispute_id: string;
+          p_query: string;
+          p_offset: number;
+          p_sort: string;
+          p_direction: string;
+          p_team_id: string | null;
+          p_state: string | null;
+          p_date: string | null;
+        };
         Returns: Json;
       };
       list_game_officials: {
