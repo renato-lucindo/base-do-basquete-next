@@ -28,17 +28,17 @@ A ordem dos IDs não representa prioridade. O identificador original é preserva
 
 ### FUT-001 — Tempos debitados na súmula
 
-**Status:** Priorizada para o MVP; implementação técnica relatada na [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38), ainda Draft e não integrada/aceita. Situação de execução e CI no [checkpoint](PROGRESSO.md). **Origem:** pedido de 29/10/2026. **Decisão do responsável em 30/10/2026:** incluir os pedidos de tempo no MVP, deixando de ser exclusivamente pós-MVP. Esta atualização registra a prioridade; não inicia a implementação nem altera as PRs ativas.
+**Status** — Implementado no MVP. A [PR #38](https://github.com/renato-lucindo/base-do-basquete-next/pull/38) foi integrada em 02/11/2026. O painel administrativo usa os rótulos atualizados na [PR #87](https://github.com/renato-lucindo/base-do-basquete-next/pull/87). O pedido de 29/10/2026 foi priorizado pelo responsável em 30/10/2026.
 
 **Objetivo e benefício:** registrar o minuto de cada tempo debitado por equipe na súmula, com entrada rápida por teclado e identificação do quarto.
 
-**Comportamento solicitado:**
+**Comportamento vigente**
 
-- Entrada `TO` → `ENTER` → minuto de `1` a `10`.
-- Limite solicitado de dois tempos por equipe no primeiro tempo, compartilhados entre Q1/Q2; três no segundo tempo, compartilhados entre Q3/Q4. Não interpretar como limite por quarto.
-- Fonte segue a coloração do quarto já definida para a súmula: vermelho nos ímpares, azul nos pares; preservar também a identificação textual do período.
+- Selecione a equipe e o período, digite `TD`, pressione `Enter`, informe o minuto decorrido e pressione `Enter` para registrar. A faixa é de 1 a 10 no quarto e de 1 a 5 na prorrogação.
+- Cada equipe tem até dois tempos debitados em Q1 e Q2 somados, três em Q3 e Q4 somados, com até dois nos dois minutos finais de Q4, e um por prorrogação. Os limites são independentes entre metades e prorrogações.
+- O minuto usa a cor do período, com identificação textual. O formulário aceita `TO` como atalho legado e o documento continua gravando `target: "TO"`. Períodos são gravados como números. A [ADR 009](decisoes/009-sumula-persistida.md) descreve a compatibilidade.
 
-**Dependências e pontos para o planejamento futuro:** identificar a equipe destinatária do comando e o quarto vigente; definir confirmação do minuto, correção/remoção e persistência/publicação compatíveis com o histórico da súmula. Conferir a regra FIBA oficial vigente antes de implementar, incluindo restrições dos minutos finais, prorrogações e significado do minuto informado (decorrido ou restante). Os limites acima registram o pedido, não uma verificação normativa completa. Não inferir transferência de tempos entre metades ou prorrogações.
+Na tradução oficial CBB 2026, o art. 18 usa **tempo debitado** e o art. 8 usa **tempo extra (prorrogação)**. O item B.7.1 identifica os espaços de prorrogação na súmula oficial com a sigla `OT`. O rótulo `PE` é uma convenção da interface administrativa do projeto. [Regras Oficiais de Basquetebol 2026, arts. 8 e 18 e anexo B](https://dcf17fmbywxbi.cloudfront.net/official-notes/nota-IW5O.pdf)
 
 ### FUT-002 — Recordes da Carreira no perfil do jogador
 
