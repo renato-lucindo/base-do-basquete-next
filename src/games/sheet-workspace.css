@@ -202,7 +202,6 @@
 }
 .sheet-current-period {
   background: var(--bb-blue-soft);
-  box-shadow: inset 0 0 0 0.125rem var(--bb-blue);
 }
 .sheet-coach-fouls {
   padding: 0.3125rem;
@@ -771,8 +770,14 @@
 .sheet-history :is(td, th):first-child {
   text-align: right;
 }
-.sheet-current-period {
-  box-shadow: inset 0 -2px var(--bb-blue);
+.sheet-team-score .sheet-current-period {
+  border-inline: 2px solid var(--bb-blue);
+}
+.sheet-team-score thead .sheet-current-period {
+  border-block-start: 2px solid var(--bb-blue);
+}
+.sheet-team-score tbody tr:last-child .sheet-current-period {
+  border-block-end: 2px solid var(--bb-blue);
 }
 .sheet-coach-fouls {
   padding: 0.25rem 0.5rem;

@@ -206,6 +206,30 @@ test.describe("desktop scoresheet MVP", () => {
       expect(partials!.width).toBeCloseTo(rosterA!.width, 0);
       expect(entry!.width).toBeCloseTo(rosterB!.width, 0);
       expect(partials!.height).toBeCloseTo(entry!.height, 0);
+      const selected = page
+        .getByRole("table", { name: "Parciais das equipes" })
+        .locator(".sheet-current-period");
+      await expect(selected).toHaveCount(3);
+      await expect(selected.first()).toHaveCSS(
+        "background-color",
+        "rgb(238, 245, 255)",
+      );
+      await expect(selected.first()).toHaveCSS(
+        "border-top-color",
+        "rgb(7, 95, 202)",
+      );
+      await expect(selected.nth(1)).toHaveCSS(
+        "border-left-color",
+        "rgb(7, 95, 202)",
+      );
+      await expect(selected.nth(1)).toHaveCSS(
+        "border-bottom-color",
+        "rgb(219, 227, 237)",
+      );
+      await expect(selected.last()).toHaveCSS(
+        "border-bottom-color",
+        "rgb(7, 95, 202)",
+      );
       const partialHead = await page
         .getByRole("table", { name: "Parciais das equipes" })
         .locator("thead")
@@ -223,7 +247,7 @@ test.describe("desktop scoresheet MVP", () => {
         page
           .getByRole("table", { name: "Parciais das equipes" })
           .getByRole("columnheader", { name: "Q1", exact: true }),
-      ).toHaveCSS("border-right-width", "1px");
+      ).toHaveCSS("border-right-width", "2px");
       await expect(
         rosters.first().getByRole("columnheader", { name: "Total" }),
       ).toHaveCSS("text-align", "center");
