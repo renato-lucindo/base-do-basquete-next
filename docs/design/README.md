@@ -1,49 +1,47 @@
-# Design — fontes vigentes
+# Design — índice e fluxo de agentes
 
 ## Leitura por tarefa
 
-1. [Design system](DESIGN-SYSTEM.md): referência visual, escala aprovada e componentes reais. Consulte a seção pertinente do [catálogo aprovado em 18/11/2026](catalogo/guia-completo-autonomo.html).
-2. [Padrões comuns](PADROES.md): hierarquia, textos, legendas, tabelas, acessibilidade e responsividade.
-3. [Público](PUBLICO.md) ou [Administração](ADMIN.md), conforme a área. Para componentes administrativos, consulte [PADROES-ADMIN.md](PADROES-ADMIN.md).
-4. Implementação real em `src/`, para localizar o consumidor e o componente existente. Código antigo não substitui uma decisão visual vigente.
+- [Design system](DESIGN-SYSTEM.md) — regras de adoção do [guia visual aprovado em 18/11/2026](catalogo/guia-completo-autonomo.html) e referências aos componentes do produto.
+- [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
+- [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
+- [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
+- [ADMIN.md](ADMIN.md): percursos administrativos e aceite proporcional; componentes e comportamentos ficam em PADROES-ADMIN.
+- Evidência histórica, somente se necessária: [VALIDACAO-DESIGN-PUBLICO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md), com evidências e limites dos protótipos.
 
-A hierarquia documental está na [seção 8 do índice](../INDICE.md#8-hierarquia-de-decisões). Regras de Git, CI e serviços continuam em [CONTRIBUTING.md](../../CONTRIBUTING.md). Estado de execução fica em [PROGRESSO.md](../PROGRESSO.md).
+## Hierarquia de decisões
 
-## Referências retiradas
+A fonte única da hierarquia documental e dos critérios de resolução de conflitos é a [seção 8 de docs/INDICE.md](../INDICE.md#8-hierarquia-de-decis%C3%B5es). As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`.
 
-Capturas antigas, pilotos, ZIPs recebidos, fontes originais e relatórios da reforma anterior foram retirados deste conjunto de referências. Permanecem no [histórico de design](../../historico/documentacao/design/README.md) para rastreabilidade e reprodução técnica. Não orientar telas, textos, navegação, cores, tipografia ou legendas por esses materiais. Não usá-los como fallback quando o catálogo não cobrir um componente.
-
-Os runners históricos continuam executados pela CI para preservar verificações de cálculos, contratos e regressão. Sua execução não devolve autoridade visual aos exemplos antigos. Novas telas e protótipos usam as fontes vigentes listadas acima.
+Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da área e com os dados efetivamente disponíveis. Resolva divergências conforme o índice, sem inventar cobertura nem alterar domínio ou publicação por conveniência visual.
 
 ## Fluxo de trabalho dos agentes
 
-1. **Entender:** identificar a tarefa, o primeiro dado útil e a decisão vigente da área.
-2. **Projetar:** consultar o catálogo aprovado, localizar o componente real e reutilizar tokens e padrões pertinentes. Pesquisas de skills são auxiliares e não substituem decisões do projeto; origem e uso ficam em [SKILLS.md](SKILLS.md).
-3. **Implementar:** tratar teclado, foco, toque, leitor de tela, erro, vazio, carregamento e reflow desde o início.
-4. **Revisar:** conferir a interface renderizada contra o pedido, o catálogo e os padrões. Usar `web-design-guidelines` quando disponível, consultando sua fonte atual antes da revisão.
-5. **Verificar:** executar provas proporcionais à mudança, registrar ambiente/SHA/resultado/limites e atualizar o checkpoint. Axe apoia a revisão; não comprova conformidade integral nem aceite humano.
+1. **Entender.** Identificar a tarefa e o primeiro dado útil, consultar a tela atual, a seção aplicável do guia visual aprovado e o padrão vigente da área. Limitar a alteração ao escopo da tarefa no MVP.
+2. **Projetar.** Localizar no código o token ou componente que atende ao caso e reutilizá-lo. Se a tarefa exigir uma variação, registrar o motivo na PR. Usar `ui-ux-pro-max` para pesquisas específicas de fluxo, componentes e hierarquia, de acordo com as decisões vigentes.
+3. **Implementar:** cuidar desde o início de teclado, leitor de tela, foco, erro, carregamento, vazio, densidade e zoom.
+4. **Revisar:** usar `web-design-guidelines` sobre arquivos de UI alterados, buscar diretrizes atualizadas da fonte indicada pela skill antes da revisão e registrar achados por arquivo/linha. Executar também a conferência obrigatória abaixo; repetir um padrão antigo na implementação não dispensa compará-lo com a regra vigente.
+5. **Verificar.** Comparar a interface renderizada com o pedido e os padrões vigentes. Conferir textos, controles, estados e tamanhos atingidos pela mudança. Registrar na PR a seção aplicada, um resultado observável da conferência e as provas proporcionais, com SHA e limites. Usar axe como apoio à inspeção manual.
 
-## Conferência obrigatória de textos e tabelas
+**Skills e instalação híbrida:** consulte [SKILLS.md](SKILLS.md) para origem, licença, versão, hashes e execução. `ui-ux-pro-max` está versionada com catálogos e scripts; `web-design-guidelines` continua por instalação local ou consulta à fonte, pois não foi comprovada licença de redistribuição da coleção. Preservar instalações pessoais e `skills-lock.json` de outros checkouts, sem alegar revisão não executada.
 
-- Textos auxiliares comunicam ações necessárias ou estados concretos, sem explicações permanentes sobre funcionamento normal.
-- Cabeçalhos completos não recebem tooltip exclusivamente de ajuda. Abreviações usam somente o significado curto aprovado no catálogo de métricas, igual no cabeçalho, seletor e legenda.
-- Existe no máximo uma **Legenda permanentemente aberta**, ao final de todo o conteúdo da aba ativa, depois da paginação e antes do rodapé. Não usar `details`/`summary` ou um botão de expansão para a legenda estatística.
-- A legenda contém somente as abreviações visíveis e seus significados. `J` significa **Jogos**, sem complementos sobre participação, totais, médias ou cobertura.
-- Expansões de filtros, conquistas e recordes seguem seus próprios contratos; não são exemplo para recolher a legenda.
-- A revisão lê o conteúdo real de tooltips e notas, inclusive em foco/toque. Registra um par sigla/significado, a posição da legenda e as larguras/estados verificados.
-- Tabelas e colunas têm largura proporcional ao conteúdo; rolagem horizontal fica na região da tabela. Conferir tipografia, cores, ícones, botões, teclado e reflow contra o guia.
-- Recursos herdados não ampliam escopo. Evolução do perfil não deve reaparecer por existir em um template antigo.
+### Conferência obrigatória de textos e tabelas
 
-## Catálogo e verificação
+Antes de entregar qualquer tela nova ou alterada, pública ou administrativa, conferir os [padrões de apresentação](PADROES.md#textos-de-apresentação) e registrar o resultado na revisão/evidência da PR. Os itens são critérios de entrega do agente, sem acrescentar confirmações ao percurso do usuário.
 
-Com Node 24+ e as dependências do lockfile:
+- [ ] Textos auxiliares comunicam somente ações necessárias ou estados concretos; não há avisos genéricos, repetições ou explicações do funcionamento normal.
+- [ ] Cabeçalhos completos não têm tooltip nem botão exclusivamente de ajuda; nas abreviações, o tooltip contém apenas o significado aprovado, consistente com os demais controles.
+- [ ] Tooltips de registros/ícones usam somente o conteúdo aprovado para sua finalidade, sem ampliar explicações por iniciativa da implementação.
+- [ ] Existe no máximo uma legenda estatística, no final do conteúdo ativo, depois de tabelas/rankings/paginação e antes do rodapé. Usa a apresentação existente e somente abreviações visíveis, sem parágrafos técnicos ou estilo próprio.
+- [ ] Os textos de cada sigla no cabeçalho/tooltip, seletor e legenda são idênticos aos nomes curtos do catálogo compartilhado; não têm complementos locais, inclusive para J, totais, médias, cobertura ou ausência.
+- [ ] Foi lido o conteúdo efetivo de todas as legendas, tooltips e notas da tela, inclusive nos estados de foco/toque e em abas/expansões. A evidência registra ao menos um exemplo real de par sigla/significado e a posição final da legenda; passar geometria, axe ou testes de cálculo não substitui esta revisão textual.
+- [ ] Recursos herdados de um template não ampliam o escopo. No perfil do atleta, Evolução está fora do escopo do protótipo solicitado em 11/11/2026; não aparece em navegação, painéis ou gráficos.
+- [ ] A largura da tabela e das colunas atende à tarefa e se alinha aos blocos relacionados. Ícones, cores, hierarquia dos botões, alinhamentos, teclado, foco, toque, nomes acessíveis e reflow foram comparados com o guia na tela renderizada.
 
-```powershell
-npm ci --ignore-scripts
-node docs/design/catalogo/build.cjs
-node docs/design/catalogo/verify.cjs
-```
+Registrar evidências proporcionais ao que mudou e indicar os itens não aplicáveis. Mudança exclusivamente documental pede revisão do texto, links e conflitos; não declarar uma conferência visual ou de interação que não foi executada. Novas decisões substituem os trechos conflitantes nos documentos de referência; pendências de implementação ficam no plano da unidade e no checkpoint, separadas do padrão aprovado.
 
-Abra `docs/design/.preview-artifacts/catalogo/guia-completo-autonomo.html` para o guia aprovado e `index.html` para as amostras dos componentes reais. O catálogo complementar de disputas usa fixtures e não comprova estado de serviços.
+## Referências visuais
 
-`npm run design:build` e `npm run design:verify` também reproduzem os artefatos históricos. Capturas dessas suítes são provas técnicas, sem autoridade para decisões novas. Mudança somente documental requer revisão de texto, links e conflitos; mudanças executáveis seguem os gates de contribuição.
+Use somente o design system, o catálogo aprovado e os padrões vigentes. Capturas antigas e os guias de reforma/integração superados foram excluídos. Fontes de protótipos, ZIPs e fixtures exigidos pelos testes permanecem nos caminhos originais exclusivamente para uso técnico; não orientam telas novas.
+
+Para consultar o catálogo atual, execute `node docs/design/catalogo/build.cjs` e abra `docs/design/.preview-artifacts/catalogo/guia-completo-autonomo.html`.

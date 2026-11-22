@@ -205,5 +205,5 @@ Use as skills para pesquisar padrões de componentes, acessibilidade e hierarqui
 
 - [`PADROES.md`](PADROES.md): padrões comuns a ambas as áreas
 - [`ADMIN.md`](ADMIN.md): percursos e aceite proporcional
-- [`PUBLICO.md`](PUBLICO.md): apresentação pública de súmula, estatísticas e perfis
+- [PUBLICO.md](PUBLICO.md): apresentação pública de súmula e estatísticas
 - [`SKILLS.md`](SKILLS.md): origem e uso das skills de UI/UX

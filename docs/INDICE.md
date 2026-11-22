@@ -78,14 +78,14 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 
 1. [`docs/decisoes/009-sumula-persistida.md`](decisoes/009-sumula-persistida.md) — contrato de persistência da súmula
 2. [`docs/decisoes/016-estatisticas-de-snapshots-confirmados.md`](decisoes/016-estatisticas-de-snapshots-confirmados.md) — fonte das estatísticas
-3. [`docs/design/DESIGN-SYSTEM.md`](design/DESIGN-SYSTEM.md) — referência visual vigente, catálogo e componentes reais
+3. [design system vigente](design/DESIGN-SYSTEM.md) — design system e componentes vigentes
 4. [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) — evidências históricas e limites dos protótipos
 5. [`historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md`](../historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md) — evidência histórica de validação da súmula desktop real
 6. [`historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md`](../historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md) — evidência histórica de validação das estatísticas
 7. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` — fórmulas e regras esportivas
 
 > [!NOTE]
-> O diretório `docs/design/` contém apenas os padrões e o catálogo vigentes. Os protótipos antigos estão em `historico/documentacao/design/`, exclusivamente para rastreabilidade e regressão técnica; não são referência visual.
+> Os protótipos permanecem apenas como fontes técnicas das verificações existentes. Para decisões de UI, usar o design system, o catálogo aprovado e os padrões vigentes.
 
 ### 3.8 Importação e gerenciamento de atletas/equipes
 
@@ -131,7 +131,7 @@ Estes documentos estão em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/
 | [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md)                                                                           | Componentes, CRUD, formulários, modais, filtros, combobox, feedback                | Admin   |
 | [`docs/design/ADMIN.md`](design/ADMIN.md)                                                                                           | Percursos e aceite proporcional                                                    | Admin   |
 | [`docs/design/PUBLICO.md`](design/PUBLICO.md)                                                                                       | Fluxos, páginas de disputa e regras de publicação                                  | Público |
-| [`docs/design/DESIGN-SYSTEM.md`](design/DESIGN-SYSTEM.md)                                                                           | Design system vigente e componentes reais                                          | Ambas   |
+| [design system vigente](design/DESIGN-SYSTEM.md)                                                                                    | Design system e componentes vigentes                                               | Ambas   |
 | [`docs/design/SKILLS.md`](design/SKILLS.md)                                                                                         | Origem, licença, hashes e uso das skills `ui-ux-pro-max` e `web-design-guidelines` | Ambas   |
 | [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) | Evidências históricas dos protótipos públicos (consulta pontual)                   | Público |
 
@@ -179,7 +179,6 @@ Preservados para consulta pontual. **Não substituem decisões vigentes.**
 | [`historico/progresso/`](../historico/progresso/README.md)                  | Checkpoints anteriores de progresso                                                              |
 | [`histórico de validações`](../historico/documentacao/README.md#validacoes) | Evidências de validação técnica (por percurso)                                                   |
 | [`docs/evidencias/`](evidencias/)                                           | Benchmarks, concorrência e capturas de testes                                                    |
-| [`historico/documentacao/design/`](../historico/documentacao/design/)       | Protótipos e evidências históricos, sem autoridade visual                                        |
 
 > [!NOTE]
 > `historico/documentacao/AJUSTES-DE-EXPERIENCIA.md` contém feedbacks de protótipo de 22–27/10. Regras permanentes aplicáveis foram absorvidas em `docs/design/`. Não tratar as orientações históricas como requisitos atuais sem verificar se foram incorporadas.

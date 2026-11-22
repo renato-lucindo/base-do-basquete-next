@@ -1,4 +1,4 @@
-// Fonte: historico/documentacao/design/estatisticas/react-prototype/upstream/scrollable-table.tsx
+// Fonte: docs/design/prototipos/estatisticas/react-prototype/upstream/scrollable-table.tsx
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 export function ScrollableTable({

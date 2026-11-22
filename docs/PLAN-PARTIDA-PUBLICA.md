@@ -13,7 +13,7 @@
 - [x] Centralizar comparação de camisas (0, 1…99, 00; ausentes depois), aplicar nos consumidores públicos/admin e documentar a regra. Testar ordenação e preservação de identidades.
 - [x] Criar consulta de leitura por versão publicada, contrato estrito e testes SQL isolados de privacidade, recortes, revisão e cronologia. Não expor documento, IDs internos, razões ou rascunho.
 - [x] Adaptar a página e detalhes acessíveis, reutilizar definições de métricas; comprovar máximos/empates, DNP/zero/ausência, preenchimentos, filtros, totais e fallback PDF/legado.
-- [x] Conferir 1366/1920/320/390, zoom 200%, teclado/toque e axe; rodar gate e consumidores afetados, registrar resultados reais e abrir uma PR para main. [PR76](https://github.com/renato-lucindo/base-do-basquete-next/pull/76), [provas e limites](../historico/documentacao/design/relatorios/VALIDACAO-PARTIDA-PUBLICA.md).
+- [x] Conferir 1366/1920/320/390, zoom 200%, teclado/toque e axe; rodar gate e consumidores afetados, registrar resultados reais e abrir uma PR para main. [PR76](https://github.com/renato-lucindo/base-do-basquete-next/pull/76), [provas e limites](design/VALIDACAO-PARTIDA-PUBLICA.md).
 
 ## Estado inicial
 

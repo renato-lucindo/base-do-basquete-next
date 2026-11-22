@@ -1,4 +1,4 @@
-// Fonte: historico/documentacao/design/estatisticas/react-prototype/upstream/resource-state.tsx
+// Fonte: docs/design/prototipos/estatisticas/react-prototype/upstream/resource-state.tsx
 import type { ReactNode } from "react";
 
 type ResourceStateKind = "empty" | "error" | "loading";

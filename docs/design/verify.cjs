@@ -8,10 +8,7 @@ assert.equal(
     .createHash("sha256")
     .update(
       fs.readFileSync(
-        path.join(
-          __dirname,
-          "../../historico/documentacao/design/referencias/pagina-estatisticas-react-r6.zip",
-        ),
+        path.join(__dirname, "referencias/pagina-estatisticas-react-r6.zip"),
       ),
     )
     .digest("hex"),
@@ -19,13 +16,13 @@ assert.equal(
 );
 for (const file of [
   "build.cjs",
-  "../../historico/documentacao/design/estatisticas/react-prototype/typecheck.cjs",
-  "../../historico/documentacao/design/estatisticas/react-prototype/features.test.cjs",
-  "../../historico/documentacao/design/sumula/verify.cjs",
-  "../../historico/documentacao/design/sumula/verify-periods.cjs",
-  "../../historico/documentacao/design/estatisticas/react-prototype/verify.cjs",
+  "prototipos/estatisticas/react-prototype/typecheck.cjs",
+  "prototipos/estatisticas/react-prototype/features.test.cjs",
+  "prototipos/sumula/verify.cjs",
+  "prototipos/sumula/verify-periods.cjs",
+  "prototipos/estatisticas/react-prototype/verify.cjs",
   "verify-hierarchy.cjs",
-  "../../historico/documentacao/design/reforma-uiux/verify.cjs",
+  "prototipos/reforma-uiux/verify.cjs",
   "catalogo/verify.cjs",
 ]) {
   execFileSync(process.execPath, [path.join(__dirname, file)], {

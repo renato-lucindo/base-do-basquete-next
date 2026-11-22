@@ -1,4 +1,4 @@
-// Fonte: historico/documentacao/design/estatisticas/react-prototype/adapted/team-filter.tsx
+// Fonte: docs/design/prototipos/estatisticas/react-prototype/adapted/team-filter.tsx
 // Team-filter fieldset extracted from upstream/boxscore-statistics-explorer.tsx.
 // Local adapter replaces URL mutations with a controlled array; original choices and actions retained.
 import { useEffect, useRef, useState } from "react";

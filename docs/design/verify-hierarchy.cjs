@@ -13,13 +13,13 @@ async function main() {
     for (const [name, file, selector, minimum] of [
       [
         "sumula",
-        "../../historico/documentacao/design/sumula/Sumula do jogo publicado.html",
+        "prototipos/sumula/Sumula do jogo publicado.html",
         ".roster-table tbody tr",
         8,
       ],
       [
         "estatisticas",
-        "../../historico/documentacao/design/estatisticas/react-prototype/preview.html",
+        "prototipos/estatisticas/react-prototype/preview.html",
         "tr[data-athlete]",
         8,
       ],

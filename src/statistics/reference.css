@@ -15,7 +15,7 @@
   text-decoration: none;
 }
 
-/* Fonte: historico/documentacao/design/estatisticas/styles.css */
+/* Fonte: docs/design/prototipos/estatisticas/styles.css */
 .public-site.statistics-public {
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   color: #172033;
@@ -740,7 +740,7 @@
   }
 }
 
-/* Fonte: historico/documentacao/design/estatisticas/react-prototype/adapted/reference-table.css */
+/* Fonte: docs/design/prototipos/estatisticas/react-prototype/adapted/reference-table.css */
 /* Table rules extracted from upstream/boxscore-statistics.css; help-icon rules removed. */
 .public-site.statistics-public .reference-explorer > .scrollable-table {
   min-width: 0;
@@ -1004,7 +1004,7 @@
   transform: translateY(-1px);
 }
 
-/* Fonte: historico/documentacao/design/estatisticas/react-prototype/overrides.css */
+/* Fonte: docs/design/prototipos/estatisticas/react-prototype/overrides.css */
 /* Host tokens and scoped integration of the supplied table components. */
 .public-site.statistics-public .header-inner {
   height: 3rem;

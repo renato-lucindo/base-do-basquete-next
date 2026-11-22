@@ -1,4 +1,4 @@
-// Fonte: historico/documentacao/design/estatisticas/react-prototype/adapted/column-picker.tsx
+// Fonte: docs/design/prototipos/estatisticas/react-prototype/adapted/column-picker.tsx
 // Column-options JSX extracted from upstream/boxscore-statistics-explorer.tsx.
 // Controlled adapter: responsive defaults, optional team and metrics, accessible popup/focus.
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";

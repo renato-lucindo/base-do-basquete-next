@@ -28,7 +28,7 @@ Superfícies: fundo cinza-azulado, identificação e conteúdo em branco, contex
 
 ## Capturas e inspeção
 
-[Comparação antes/depois](../historico/documentacao/design/evidencias/refinamento-publico/COMPARACAO.md). Todas são capturas do navegador com fixtures locais; não são mockups. Antes: build local da implementação v9 (`8f7b38d`), materialmente igual a `a465e9c` em `src` (diff vazio). Depois: código desta unidade.
+Comparação antes/depois. Todas são capturas do navegador com fixtures locais; não são mockups. Antes: build local da implementação v9 (`8f7b38d`), materialmente igual a `a465e9c` em `src` (diff vazio). Depois: código desta unidade.
 
 Capturadas as quatro abas em 320/390/640/1366/1920, além de Jogadores/Equipes/busca em 390/1366. Inspeção visual do perfil: agrupamento branco sobre fundo suave, números destacados, abas legíveis, nomes completos na tabela, trajetória aberta e recordes sem zeros destacados. A rolagem da tabela permanece interna. Jogadores/Equipes/busca tiveram suas capturas abertas e examinadas; a comparação automática das legendas confirmou a mesma escala. A comparação selecionada é versionada; matriz completa e logs ficam em `.preview-artifacts/refinement/` neste worktree.
 

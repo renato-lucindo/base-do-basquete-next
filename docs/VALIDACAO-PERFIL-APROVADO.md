@@ -48,7 +48,7 @@ Perfil e jogos verificados em **320, 390, 1366 e 1920 px**. Dez configurações 
 
 **Zoom real 200%:** `chrome.tabs.getZoom=2`, DPR 2, viewport CSS de 683 px em janela de 1366 × 768; largura de documento também 683 px. Capturas CDP nos dois estados. Foram inspecionadas capturas desktop, celular e zoom; 14 imagens finais e as provas JSON estão na entrega local `outputs/implementacao-perfil` do chat.
 
-Capturas versionadas: [desktop](../historico/documentacao/design/evidencias/perfil-aprovado/recordes-1366.png), [celular](../historico/documentacao/design/evidencias/perfil-aprovado/recordes-390.png) e [celular expandido](../historico/documentacao/design/evidencias/perfil-aprovado/recordes-390-expandido.png).
+Capturas versionadas: desktop, celular e celular expandido.
 
 ## Continuidade
 
