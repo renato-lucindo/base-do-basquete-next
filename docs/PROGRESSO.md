@@ -2,18 +2,18 @@
 
 Atualizado em 22/11/2026. Estado anterior preservado no [histórico](../historico/progresso/2026-11-22-antes-perfis-equipes.md).
 
-## Perfis de equipes
+## Perfis de equipes — implementação validada
 
 - HTML revisado aceito e implementação autorizada em 22/11. [Requisitos](design/PERFIS-EQUIPES.md), [plano](PLAN-PERFIS-EQUIPES.md), [validação](design/VALIDACAO-PERFIS-EQUIPES.md).
-- Branch `codex/perfis-equipes`, base `824a3d59da5323202d869a4d93a1038bcd377044`, worktree `C:/Users/12405304716/.codex/worktrees/perfis-equipes/Base do Basquete-v1`. [PR #89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), base main, única desta unidade. Código inicial completo `bf214f0`; conferir HEAD real na retomada.
-- Implementados os modos geral e por inscrição, classificação/coletivos completos, jogadores por inscrição, campanhas/status, recentes por ano, jogos sem Resultado, conquistas históricas e legenda expandida. Busca, aliases antigos, filtros e retorno preservados.
-- Gate completo local PASS em 22/11: 179 arquivos / 848 testes unitários, transportes, banco local, lint/formato/tipos, builds e runtime Worker/PDF, fronteira cliente e segredos. Código executável não mudou após esse gate; testes adicionais cobrem retorno mobile e larguras.
-- Browsers finais do perfil 10 PASS (inclui foco de retorno mobile, 1366/1920 e reflow 320/texto200%); equipes 14 PASS; busca/navegação 30 PASS. Design build/verify PASS. Revisão posterior corrigiu seletores antigos, toque na escolha da inscrição e fixtures fora do contrato; 4 casos de acessibilidade/agenda e 7 regressões de busca/999 inscrições/boxscore passaram, com um skip preexistente de tipografia.
-- CI inicial [45050998992](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45050998992), `bf214f0`: checks e design PASS; browsers/WebKit falharam e motivaram as correções acima. Atualizar a mesma PR com a revisão e exigir validate do HEAD. O resultado atual deve ser conferido na PR; este checkpoint não afirma CI aprovada.
-- Próximo passo: acompanhar a CI completa da revisão, corrigir eventual falha e apresentar a implementação para avaliação. Primeiro ensaio local atingiu falta de disco; outro ensaio geral foi interrompido após detectar os defeitos já corrigidos. Não são prova de aprovação da regressão inteira.
+- Branch `codex/perfis-equipes`, base `824a3d59da5323202d869a4d93a1038bcd377044`, [PR #89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), base main. Código executável validado em `cfee448fdd36cd288dd4a7861c643abb6a07d442`; atualização posterior somente documental. Worktree `C:/Users/12405304716/.codex/worktrees/perfis-equipes/Base do Basquete-v1`.
+- Implementados perfis geral e da inscrição, classificação/coletivos completos, jogadores por inscrição, campanhas/status, recentes por ano, jogos sem Resultado, conquistas históricas e legenda expandida. Busca, aliases antigos, URL e retorno preservados.
+- [CI do código](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45052047536) **PASS**, sete checks incluindo validate: 848 testes unitários/179 arquivos; Chromium desktop 502 PASS, mobile 377 PASS/125 skips preexistentes da matriz; WebKit 44 PASS; design e gate completo (banco local, transportes, builds, runtime Worker/PDF, fronteira cliente e segredos). Conferir checks do HEAD documental atual na PR antes de integrar; fontes executáveis permanecem idênticas ao SHA aprovado.
+- Corrigidas na mesma unidade as falhas da primeira CI: seletores antigos, alvos de toque na escolha da inscrição e fixtures que interceptavam outras páginas ou excediam 100 jogos/página. Reexecuções focais passaram; nenhum teste desativado ou timeout ampliado. Ensaios locais gerais interrompidos, inclusive um por falta temporária de disco, não são apresentados como aprovação. Evidência completa na CI acima.
+- Conferidos geral/jogadores/escolha de inscrição com axe, retorno mobile com foco, classificação por grupo após recarga e reflow 320 px/texto200%; larguras 390/1366/1440/1920. Sem mudança executável após a CI aprovada; esta atualização documental reutiliza essas provas.
 
-## Autorizações e continuidade
+## Próximo passo e autorizações
 
-- Sem deploy, migration, DDL ou publicação de dados nesta unidade. Serviços remotos não alterados. CONTRIBUTING exige avaliação no Worker autorizado e novo aceite visual antes do merge; alvo/autorização de deploy desta unidade ainda não definidos.
-- Automação existente `retomar-perfis-de-equipes` preservada, originalmente marcada para 22/11 às 15:40:23 de Brasília. Atualizar a mesma se for necessário aguardar CI ao encerrar; pausar quando restar somente ação humana. Última cota real consultada: 64% usados na janela 5h, reset Unix `1795385440`; não houve reset manual/créditos.
-- PR #88 de limpeza de referências em outra branch preservada. Checkout original `sync/trabalho-casa` mantém alterações humanas em CONTRIBUTING e skills locais, não incorporadas nesta unidade.
+- **Aguarda definição/autorização do Worker de avaliação, publicação do SHA e novo aceite visual antes do merge**, conforme CONTRIBUTING. A configuração `wrangler.jsonc` associa o Worker chamado preview também ao domínio público; não presumir que esse alvo é uma avaliação isolada.
+- Sem deploy, migration, DDL ou publicação de dados nesta unidade; serviços remotos não alterados. Não integrar ou publicar por causa do aceite do HTML, da CI ou desta retomada.
+- Heartbeat existente `retomar-perfis-de-equipes`: pausar quando restar somente ação humana. Se a CI do checkpoint documental ainda estiver pendente ao encerrar, atualizar a mesma automação para conferir a PR/HEAD reais; não criar duplicata. Última cota real: 73% usados/27% restantes na janela 5h, reset Unix `1795385440`; nenhum reset manual/crédito consumido.
+- PR #88 em outra branch e checkout original `sync/trabalho-casa` preservados. As alterações humanas em CONTRIBUTING e skills locais não foram incorporadas nesta unidade.

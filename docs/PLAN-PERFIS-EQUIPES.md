@@ -22,7 +22,7 @@
 - [x] 2. Leitura pública: criar `loader.ts` sobre os contratos existentes, com identidade por UUID, cancelamento, limites, paginação completa de catálogo e tratamento de 404 por fonte. Testar fontes vazias, privacidade, prévia e erro parcial explícito.
 - [x] 3. Perfil geral e contextual: `public-page.tsx`, componentes próprios e CSS sobre o design system. Reutilizar tabela/controles de jogadores, coletivos, classificação e ícones existentes. Adaptar a classificação embutida para preservar o ID da equipe na URL. Testar navegação e todos os pedidos aceitos.
 - [x] 4. Entradas e compatibilidade: montar o novo perfil em `equipe.html`, busca global com destino geral, inscrições com destino contextual, retorno compartilhável entre disputas. Atualizar testes que verificavam a interface substituída.
-- [ ] 5. Validar e entregar: Vitest focal, browsers afetados, comparação visual com o HTML, revisão de diretrizes, gate consolidado e CI do SHA da PR. Atualizar checkpoint e evidências. Manter a PR aberta para avaliação no Worker e nova aprovação de integração conforme CONTRIBUTING.
+- [x] 5. Validar e entregar: Vitest focal, browsers afetados, comparação visual com o HTML, revisão de diretrizes, gate consolidado e CI do SHA da PR. Atualizar checkpoint e evidências. Manter a PR aberta para avaliação no Worker e nova aprovação de integração conforme CONTRIBUTING.
 
 ## Registro de execução
 
@@ -31,3 +31,5 @@
 - Execução e revisão final pelo agente principal; não há ferramenta de subagente disponível nesta sessão. Não declarar parecer independente.
 
 - Implementação e revisão focal concluídas. Gate completo local aprovado (848 testes unitários, banco local, transportes, builds, Worker/PDF, fronteira cliente e segredos). Design verificado. Primeira CI executada; correções de acessibilidade e fixtures comprovadas focalmente. Exigir CI completa da revisão, sem tratar ensaios interrompidos como aprovação. [Evidência](design/VALIDACAO-PERFIS-EQUIPES.md).
+
+- Encerramento da implementação: código `cfee448`, PR #89, CI completa `45052047536` aprovada nos sete checks. Atualização posterior apenas documental. Aguarda Worker autorizado e novo aceite visual antes de integrar; nenhum serviço foi publicado.

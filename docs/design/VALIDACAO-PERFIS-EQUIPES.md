@@ -1,6 +1,6 @@
 # Validação dos perfis de equipes
 
-Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd377044`. Requisitos e HTML aceitos em [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md). Evidência local de 22/11/2026; SHA final e CI ficam na PR desta unidade.
+Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd377044`. Requisitos e HTML aceitos em [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md). Evidência de 22/11/2026. Código executável `cfee448fdd36cd288dd4a7861c643abb6a07d442`; atualização posterior somente documental, sem invalidar os artefatos verificados.
 
 ## Resultado implementado
 
@@ -17,7 +17,9 @@ Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd3
 - Revisão das suítes antigas: 72 casos passaram, dois falharam por seletor antigo/área de toque e foram corrigidos. Reexecução focal desses dois casos: 4 PASS (desktop/mobile). Fixtures corrigidas para respeitar a disputa, paginação de 100 jogos e consultas de outras páginas; regressões correspondentes: 7 PASS / 1 skip preexistente na matriz explícita de tipografia. Não foram desativados testes nem ampliados timeouts.
 - `design:build` e `design:verify`: PASS; referências geradas não integram o diff final.
 - Primeiro ensaio geral interrompido por `ENOSPC` durante banco local simultâneo com browsers; espaço liberado ao terminar o banco. Execução geral local seguinte interrompida após encontrar falhas da navegação antiga e problemas das fixtures. Não declarar esses ensaios como regressão completa aprovada.
-- CI inicial [45050998992](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45050998992), código `bf214f0`: checks e design passaram; Chromium/WebKit detectaram seletores antigos, alvos pequenos e fixtures incompatíveis. Correções comprovadas focalmente acima. A CI completa da revisão deve passar antes de integrar; resultado atual é conferido na PR #89.
+- CI inicial [45050998992](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45050998992), código `bf214f0`: checks e design passaram; Chromium/WebKit detectaram seletores antigos, alvos pequenos e fixtures incompatíveis. Correções comprovadas focalmente acima. A revisão foi aprovada na CI completa abaixo.
+
+- CI final do código [45052047536](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45052047536), `cfee448`: **sete checks PASS**, incluindo validate. Chromium desktop 502 PASS; mobile 377 PASS e 125 skips já previstos pela matriz; WebKit 44 PASS. Gate completo com 848 unitários/179 arquivos e design PASS. Fontes executáveis inalteradas após essa prova; resultado do HEAD documental é conferido na PR #89.
 
 ## Revisão da interface
 
