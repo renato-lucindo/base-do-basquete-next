@@ -1,99 +1,49 @@
-# Design — índice e fluxo de agentes
+# Design — fontes vigentes
 
 ## Leitura por tarefa
 
-- [Design system](DESIGN-SYSTEM.md) — regras de adoção do [guia visual aprovado em 18/11/2026](catalogo/guia-completo-autonomo.html) e referências aos componentes do produto.
-- [PADROES.md](PADROES.md): hierarquia, acessibilidade, formulários, navegação, responsividade.
-- [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
-- [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
-- [ADMIN.md](ADMIN.md): percursos administrativos e aceite proporcional; componentes e comportamentos ficam em PADROES-ADMIN.
-- [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
-- Evidência histórica, somente se necessária: [VALIDACAO-DESIGN-PUBLICO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md), com evidências e limites dos protótipos.
+1. [Design system](DESIGN-SYSTEM.md): referência visual, escala aprovada e componentes reais. Consulte a seção pertinente do [catálogo aprovado em 18/11/2026](catalogo/guia-completo-autonomo.html).
+2. [Padrões comuns](PADROES.md): hierarquia, textos, legendas, tabelas, acessibilidade e responsividade.
+3. [Público](PUBLICO.md) ou [Administração](ADMIN.md), conforme a área. Para componentes administrativos, consulte [PADROES-ADMIN.md](PADROES-ADMIN.md).
+4. Implementação real em `src/`, para localizar o consumidor e o componente existente. Código antigo não substitui uma decisão visual vigente.
 
-## Hierarquia de decisões
+A hierarquia documental está na [seção 8 do índice](../INDICE.md#8-hierarquia-de-decisões). Regras de Git, CI e serviços continuam em [CONTRIBUTING.md](../../CONTRIBUTING.md). Estado de execução fica em [PROGRESSO.md](../PROGRESSO.md).
 
-A fonte única da hierarquia documental e dos critérios de resolução de conflitos é a [seção 8 de docs/INDICE.md](../INDICE.md#8-hierarquia-de-decis%C3%B5es). As regras de Git, CI, autorização e checkpoints permanecem em `AGENTS.md` e `CONTRIBUTING.md`.
+## Referências retiradas
 
-Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da área e com os dados efetivamente disponíveis. Resolva divergências conforme o índice, sem inventar cobertura nem alterar domínio ou publicação por conveniência visual.
+Capturas antigas, pilotos, ZIPs recebidos, fontes originais e relatórios da reforma anterior foram retirados deste conjunto de referências. Permanecem no [histórico de design](../../historico/documentacao/design/README.md) para rastreabilidade e reprodução técnica. Não orientar telas, textos, navegação, cores, tipografia ou legendas por esses materiais. Não usá-los como fallback quando o catálogo não cobrir um componente.
+
+Os runners históricos continuam executados pela CI para preservar verificações de cálculos, contratos e regressão. Sua execução não devolve autoridade visual aos exemplos antigos. Novas telas e protótipos usam as fontes vigentes listadas acima.
 
 ## Fluxo de trabalho dos agentes
 
-1. **Entender.** Identificar a tarefa e o primeiro dado útil, consultar a tela atual, a seção aplicável do guia visual aprovado e o padrão vigente da área. Limitar a alteração ao escopo da tarefa no MVP.
-2. **Projetar.** Localizar no código o token ou componente que atende ao caso e reutilizá-lo. Se a tarefa exigir uma variação, registrar o motivo na PR. Usar `ui-ux-pro-max` para pesquisas específicas de fluxo, componentes e hierarquia, de acordo com as decisões vigentes.
-3. **Implementar:** cuidar desde o início de teclado, leitor de tela, foco, erro, carregamento, vazio, densidade e zoom.
-4. **Revisar:** usar `web-design-guidelines` sobre arquivos de UI alterados, buscar diretrizes atualizadas da fonte indicada pela skill antes da revisão e registrar achados por arquivo/linha. Executar também a conferência obrigatória abaixo; repetir um padrão antigo na implementação não dispensa compará-lo com a regra vigente.
-5. **Verificar.** Comparar a interface renderizada com o pedido e os padrões vigentes. Conferir textos, controles, estados e tamanhos atingidos pela mudança. Registrar na PR a seção aplicada, um resultado observável da conferência e as provas proporcionais, com SHA e limites. Usar axe como apoio à inspeção manual.
+1. **Entender:** identificar a tarefa, o primeiro dado útil e a decisão vigente da área.
+2. **Projetar:** consultar o catálogo aprovado, localizar o componente real e reutilizar tokens e padrões pertinentes. Pesquisas de skills são auxiliares e não substituem decisões do projeto; origem e uso ficam em [SKILLS.md](SKILLS.md).
+3. **Implementar:** tratar teclado, foco, toque, leitor de tela, erro, vazio, carregamento e reflow desde o início.
+4. **Revisar:** conferir a interface renderizada contra o pedido, o catálogo e os padrões. Usar `web-design-guidelines` quando disponível, consultando sua fonte atual antes da revisão.
+5. **Verificar:** executar provas proporcionais à mudança, registrar ambiente/SHA/resultado/limites e atualizar o checkpoint. Axe apoia a revisão; não comprova conformidade integral nem aceite humano.
 
-**Skills e instalação híbrida:** consulte [SKILLS.md](SKILLS.md) para origem, licença, versão, hashes e execução. `ui-ux-pro-max` está versionada com catálogos e scripts; `web-design-guidelines` continua por instalação local ou consulta à fonte, pois não foi comprovada licença de redistribuição da coleção. Preservar instalações pessoais e `skills-lock.json` de outros checkouts, sem alegar revisão não executada.
+## Conferência obrigatória de textos e tabelas
 
-### Conferência obrigatória de textos e tabelas
+- Textos auxiliares comunicam ações necessárias ou estados concretos, sem explicações permanentes sobre funcionamento normal.
+- Cabeçalhos completos não recebem tooltip exclusivamente de ajuda. Abreviações usam somente o significado curto aprovado no catálogo de métricas, igual no cabeçalho, seletor e legenda.
+- Existe no máximo uma **Legenda permanentemente aberta**, ao final de todo o conteúdo da aba ativa, depois da paginação e antes do rodapé. Não usar `details`/`summary` ou um botão de expansão para a legenda estatística.
+- A legenda contém somente as abreviações visíveis e seus significados. `J` significa **Jogos**, sem complementos sobre participação, totais, médias ou cobertura.
+- Expansões de filtros, conquistas e recordes seguem seus próprios contratos; não são exemplo para recolher a legenda.
+- A revisão lê o conteúdo real de tooltips e notas, inclusive em foco/toque. Registra um par sigla/significado, a posição da legenda e as larguras/estados verificados.
+- Tabelas e colunas têm largura proporcional ao conteúdo; rolagem horizontal fica na região da tabela. Conferir tipografia, cores, ícones, botões, teclado e reflow contra o guia.
+- Recursos herdados não ampliam escopo. Evolução do perfil não deve reaparecer por existir em um template antigo.
 
-Antes de entregar qualquer tela nova ou alterada, pública ou administrativa, conferir os [padrões de apresentação](PADROES.md#textos-de-apresentação) e registrar o resultado na revisão/evidência da PR. Os itens são critérios de entrega do agente, sem acrescentar confirmações ao percurso do usuário.
+## Catálogo e verificação
 
-- [ ] Textos auxiliares comunicam somente ações necessárias ou estados concretos; não há avisos genéricos, repetições ou explicações do funcionamento normal.
-- [ ] Cabeçalhos completos não têm tooltip nem botão exclusivamente de ajuda; nas abreviações, o tooltip contém apenas o significado aprovado, consistente com os demais controles.
-- [ ] Tooltips de registros/ícones usam somente o conteúdo aprovado para sua finalidade, sem ampliar explicações por iniciativa da implementação.
-- [ ] Existe no máximo uma legenda estatística, no final do conteúdo ativo, depois de tabelas/rankings/paginação e antes do rodapé. Usa a apresentação existente e somente abreviações visíveis, sem parágrafos técnicos ou estilo próprio.
-- [ ] Os textos de cada sigla no cabeçalho/tooltip, seletor e legenda são idênticos aos nomes curtos do catálogo compartilhado; não têm complementos locais, inclusive para J, totais, médias, cobertura ou ausência.
-- [ ] Foi lido o conteúdo efetivo de todas as legendas, tooltips e notas da tela, inclusive nos estados de foco/toque e em abas/expansões. A evidência registra ao menos um exemplo real de par sigla/significado e a posição final da legenda; passar geometria, axe ou testes de cálculo não substitui esta revisão textual.
-- [ ] Recursos herdados de um template não ampliam o escopo. No perfil do atleta, Evolução está fora do escopo do protótipo solicitado em 11/11/2026; não aparece em navegação, painéis ou gráficos.
-- [ ] A largura da tabela e das colunas atende à tarefa e se alinha aos blocos relacionados. Ícones, cores, hierarquia dos botões, alinhamentos, teclado, foco, toque, nomes acessíveis e reflow foram comparados com o guia na tela renderizada.
-
-Registrar evidências proporcionais ao que mudou e indicar os itens não aplicáveis. Mudança exclusivamente documental pede revisão do texto, links e conflitos; não declarar uma conferência visual ou de interação que não foi executada. Novas decisões substituem os trechos conflitantes nos documentos de referência; pendências de implementação ficam no plano da unidade e no checkpoint, separadas do padrão aprovado.
-
----
-
-## Reforma de UI/UX — piloto de 03/11/2026
-
-Direção aprovada: **público primeiro no celular, administração no desktop**, tema claro e azul, tabelas e formulários compactos. As decisões e os limites estão em [REFORMA-UIUX.md](REFORMA-UIUX.md).
-
-- [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfil contínuo de carreira com conquistas/resumo/três recentes/campeonatos, súmula com a composição atual e parciais/elencos/faltas, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
-- Para servir localmente: `node docs/design/prototipos/reforma-uiux/server.cjs`, depois abrir [o piloto local](http://127.0.0.1:4189/).
-- Fontes compartilhadas em `src/ui-system/`; a tabela passou a ser utilizada também no perfil real após autorização de 04/11. Build e verificação do piloto incluídos em `npm run design:build` e `npm run design:verify`.
-- Em 04/11 o responsável autorizou implementar na mesma PR #51 o último plano de perfil/jogo. Perfil integrado à rota real e súmula vigente preservada; o piloto foi aceito e o responsável autorizou a sequência público real → busca no servidor → administração → preparação da liberação. Estado de cada unidade e CI no checkpoint, sem inferir deploy/DDL. Uma unidade/PR por vez, sem pilha dependente.
-
-## Protótipos públicos para implementação
-
-Esta unidade reúne duas referências navegáveis com dados fictícios: a súmula pública revisada e a página de estatísticas r6 enviada pelo responsável, com cabeçalho e controles compactados. A implementação nas rotas reais será uma unidade posterior.
-
-## Abrir
-
-- [Súmula do jogo](prototipos/sumula/Sumula%20do%20jogo%20publicado.html).
-- [Estatísticas de atletas](prototipos/estatisticas/Estatisticas%20de%20atletas.html).
-
-Baixe e abra os HTMLs no navegador; ambos são autocontidos. O GitHub exibe o código, não executa esses arquivos. Não há dependência de API, conta, banco ou conexão de rede.
-
-Para servir a súmula localmente: `node docs/design/prototipos/sumula/server.cjs`, depois abra http://127.0.0.1:4187/. O servidor só responde no loopback e serve uma lista explícita de arquivos.
-
-## Fontes e validação
-
-Na raiz do repositório, com Node24+:
+Com Node 24+ e as dependências do lockfile:
 
 ```powershell
 npm ci --ignore-scripts
-npx playwright install chromium
-npm run design:build
-npm run design:verify
+node docs/design/catalogo/build.cjs
+node docs/design/catalogo/verify.cjs
 ```
 
-As dependências vêm do lockfile do projeto. O build da súmula incorpora HTML, CSS, fixtures e renderer em um arquivo. O build de estatísticas usa React e os componentes adaptados do pacote r6, confere hashes de seis fontes originais e gera seu HTML. `esbuild` usa a versão já presente no lockfile do projeto.
+Abra `docs/design/.preview-artifacts/catalogo/guia-completo-autonomo.html` para o guia aprovado e `index.html` para as amostras dos componentes reais. O catálogo complementar de disputas usa fixtures e não comprova estado de serviços.
 
-Os verificadores cobrem cálculos, ausência versus zero, filtros/ordenação, quartos, faltas, painéis, teclado, toque, rolagem interna e axe. A verificação de hierarquia mede a primeira linha útil e as linhas visíveis nas duas larguras. A CI executa esse conjunto junto com o gate existente quando houver alterações executáveis.
-
-As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
-
-## Origem e adaptações
-
-O [ZIP r6 original](referencias/pagina-estatisticas-react-r6.zip) foi preservado byte a byte. SHA256: `3ad8e05c9244dda6b879363a26b11f9e743e9356208573a8ad20440439709878`. As instruções internas foram tratadas como referência técnica, sem substituir o pedido do responsável.
-
-A cópia extraída contém as fontes necessárias à reprodução, o arquivo legado de fixtures usado pelo gerador, licenças e a referência de componentes. Os scripts de build/tipagem/verificação foram ajustados para caminhos portáveis e dependências do repositório. As fontes próprias foram formatadas; os seis arquivos em `upstream/` continuam intactos. A interface de estatísticas recebeu apenas a revisão de hierarquia descrita acima, preservando o comportamento r6. O pacote original também preserva sua documentação e capturas históricas.
-
-Em estatísticas, `react-prototype/prepare.cjs` regenera os adaptadores a partir de `upstream/` e das fixtures legadas. Caso esses componentes sejam alterados, atualize o gerador correspondente e formate o resultado. O build normal usa os adaptadores já versionados.
-
-Consulte [os padrões permanentes](PADROES.md) e [o contrato de integração](INTEGRACAO.md) antes de implementar.
-
-## Administração real e preparação da liberação
-
-O padrão aceito foi incorporado às rotas reais: Jogos com ordenação no servidor antes da paginação, Informações com campos proporcionais e equipes/elencos em dois painéis, preservando os componentes de edição existentes. [Provas, capturas e limites](VALIDACAO-ADMIN-UIUX.md). Estado da PR/CI e autorização da migration em [PROGRESSO.md](../PROGRESSO.md); implementação local não representa aplicação de banco ou deploy.
-
-[Validação final, pacote local e plano de liberação/rollback](PREPARACAO-LIBERACAO-UIUX.md). A preparação não executa deploy nem publicação de dados; fonte do pacote, evidências e limites estão identificados no relatório.
+`npm run design:build` e `npm run design:verify` também reproduzem os artefatos históricos. Capturas dessas suítes são provas técnicas, sem autoridade para decisões novas. Mudança somente documental requer revisão de texto, links e conflitos; mudanças executáveis seguem os gates de contribuição.

@@ -8,13 +8,9 @@ Para mudanças de UI/UX, consulte o [índice documental](docs/README.md), os [pa
 
 Seguimos GitHub Flow: branches curtas de `main`, uma PR por unidade de volta à `main`, CI e integração antes da próxima unidade dependente. Leia [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) e o início de [docs/PROGRESSO.md](docs/PROGRESSO.md) antes de trabalhar. A consolidação histórica está registrada em [historico/documentacao/analises/CONSOLIDACAO-PRS.md](historico/documentacao/analises/CONSOLIDACAO-PRS.md). Integrar código não aplica migrations nem publica serviços automaticamente.
 
-A primeira entrega é um protótipo navegável com dados fictícios para avaliar os três percursos de `docs/EXPERIENCIA.md` do pacote. Após avaliação e feedback incremental, o responsável autorizou a fundação real; o preview fictício permanece disponível.
+As referências visuais atuais são o [design system](docs/design/DESIGN-SYSTEM.md), o catálogo aprovado e os padrões da área. Protótipos e capturas antigos ficam no histórico para rastreabilidade, sem orientar interfaces novas.
 
 ## Avaliar de outra máquina
-
-[Abrir o protótipo protegido](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/) e [ver as composições](https://base-do-basquete-prototipo.renato-lucindo-jr.workers.dev/docs/evidencias/). No Cloudflare Access, usar `renato.lucindo.jr@gmail.com` e o código recebido por e-mail. Apenas essa identidade está autorizada. Login humano e aceite dos percursos ainda dependem da avaliação do responsável.
-
-O Access protege esta apresentação fictícia. Os rascunhos são próprios de cada navegador e não sincronizam entre máquinas. Roteiro em `historico/documentacao/validacoes/VALIDACAO-PROTOTIPO.md`.
 
 O [preview com persistência real](https://base-do-basquete-next-preview.renato-lucindo-jr.workers.dev/) tem Worker e build próprios. Cloudflare Access restringe toda a apresentação ao responsável; a administração exige também o login interno por senha. Consultas de fatos publicados dispensam esse segundo login. Permite criar/editar campeonato, temporadas e disputas na mesma página, buscar e retomar o trabalho; Recentes muda após salvar, não ao visitar. Versões e comandos idempotentes protegem a gravação. Em 23/10/2026, o responsável confirmou login/recarga/saída e cadastro/salvamento/retomada do contexto real; depois confirmou equipes/inscrições e orientou os ajustes do importador. Evidências em [historico/documentacao/validacoes/VALIDACAO-CONTEXTO.md](historico/documentacao/validacoes/VALIDACAO-CONTEXTO.md) e [historico/documentacao/analises/ACESSO-ADMINISTRATIVO.md](historico/documentacao/analises/ACESSO-ADMINISTRATIVO.md).
 

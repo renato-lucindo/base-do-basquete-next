@@ -13,16 +13,19 @@ worker-configuration.d.ts
 **/.preview-artifacts/
 
 # Immutable inputs retained from the supplied design package (hashes checked).
-docs/design/prototipos/estatisticas/react-prototype/upstream/
-docs/design/prototipos/estatisticas/app.js
+historico/documentacao/design/estatisticas/react-prototype/upstream/
+historico/documentacao/design/estatisticas/app.js
 # Self-contained outputs are generated from reviewed sources.
-docs/design/prototipos/sumula/Sumula do jogo publicado.html
-docs/design/prototipos/estatisticas/react-prototype/preview.html
-docs/design/prototipos/estatisticas/Estatisticas de atletas.html
-docs/design/prototipos/reforma-uiux/Piloto UIUX.html
+historico/documentacao/design/sumula/Sumula do jogo publicado.html
+historico/documentacao/design/estatisticas/react-prototype/preview.html
+historico/documentacao/design/estatisticas/Estatisticas de atletas.html
+historico/documentacao/design/reforma-uiux/Piloto UIUX.html
 # Standalone pages from the user-reviewed visual reference.
 docs/design/catalogo/guia-completo-autonomo.html
 docs/design/catalogo/disputas.html
 # Generated browser reports are local diagnostics, excluded from Git.
-docs/design/prototipos/sumula/verification*.json
-docs/design/prototipos/estatisticas/react-prototype/verification.json
+historico/documentacao/design/sumula/verification*.json
+historico/documentacao/design/estatisticas/react-prototype/verification.json
+
+# Historical evidence and immutable visual source packages are not new UI.
+historico/documentacao/design/

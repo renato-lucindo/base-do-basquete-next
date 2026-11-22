@@ -1,6 +1,6 @@
 # Correção das bordas da tabela de Jogadores
 
-Plano explícito do responsável de05/11/2026, branch `codex/tabela-mobile-bordas`, base41452f9. O vídeo mostrou faixas brancas ao insistir no arraste além das bordas. O responsável confirmou que deseja preservar a rolagem interna, altura limitada e colunas fixas. PR/SHA/CI/deployment efetivos ficam no [checkpoint](../PROGRESSO.md).
+Plano explícito do responsável de05/11/2026, branch `codex/tabela-mobile-bordas`, base41452f9. O vídeo mostrou faixas brancas ao insistir no arraste além das bordas. O responsável confirmou que deseja preservar a rolagem interna, altura limitada e colunas fixas. PR/SHA/CI/deployment efetivos ficam no [checkpoint](../../../../docs/PROGRESSO.md).
 
 ## Correção e revisão
 
@@ -26,4 +26,4 @@ Falhas exploratórias preservadas nos logs locais: acesso direto a longhands CSS
 
 Gate local exit0:704unitários/146arquivos, transporte11, banco isolado13, Worker/HTTP30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos PASS. Log `.preview-artifacts/mobile-boundaries-gate-final.log`. O pedido adicional de Pos. entrou durante o gate; após o CSS final, formato/tipos foram reconferidos,6browsers Chromium e3WebKit de alinhamento passaram, além de2gestos touch com vídeo atualizado. CI da PR e do SHA integrado ainda deve ser conferida no código final antes de integrar/publicar. Publicar somente no Worker independente **base-do-basquete-next-uiux** após essas verificações, com build fresco do SHA integrado. Preservar domínio principal, Access, sessões, segredos e backend. Nenhuma migration, DML ou publicação de dados. No celular real, conferir os mesmos gestos do vídeo no preview atualizado; registrar essa confirmação separadamente quando disponível.
 
-Capturas finais com fixtures: [320px](evidencias/bordas-mobile/bordas-320.png) e [390px](evidencias/bordas-mobile/bordas-390.png). Mostram alinhamento, não substituem evidência dinâmica.
+Capturas finais com fixtures: [320px](../evidencias/bordas-mobile/bordas-320.png) e [390px](../evidencias/bordas-mobile/bordas-390.png). Mostram alinhamento, não substituem evidência dinâmica.

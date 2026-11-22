@@ -1,6 +1,6 @@
 # Validação — busca pública e autocomplete
 
-04/11/2026, branch `codex/busca-global`, base834693f após PR52. SHA/CI/aplicação real em [PROGRESSO.md](../PROGRESSO.md); contrato em [ADR020](../decisoes/020-busca-publica-normalizada.md).
+04/11/2026, branch `codex/busca-global`, base834693f após PR52. SHA/CI/aplicação real em [PROGRESSO.md](../../../../docs/PROGRESSO.md); contrato em [ADR020](../../../../docs/decisoes/020-busca-publica-normalizada.md).
 
 ## Resultado e limites
 
@@ -33,10 +33,10 @@ Advisors antes/depois: mesmos4 avisos informativos RLS sem política,11 FKs sem 
 
 ## Capturas e operação revisável
 
-[Autocomplete390](evidencias/busca-publica/autocomplete-390.png), [desktop](evidencias/busca-publica/autocomplete-desktop.png), [participações da equipe](evidencias/busca-publica/participacoes-equipe.png), [reflow320/texto200%](evidencias/busca-publica/reflow-320-texto200.png). Somente fixtures identificadas, sem alegar acesso real ao banco.
+[Autocomplete390](../evidencias/busca-publica/autocomplete-390.png), [desktop](../evidencias/busca-publica/autocomplete-desktop.png), [participações da equipe](../evidencias/busca-publica/participacoes-equipe.png), [reflow320/texto200%](../evidencias/busca-publica/reflow-320-texto200.png). Somente fixtures identificadas, sem alegar acesso real ao banco.
 
 Browsers finais44PASS (busca/navegação/classificação/tabelas/retorno), mais10PASS após ajuste final de linguagem/isolamento CSS. Fonte estável; gate final PASS:697 unitários/144 arquivos, transporte7, banco13, Workerd30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos. Revisão por arquivo/linha: search-form.tsx:104 (Escape/foco), search-contract.ts:130 (correlação da disputa), search.css:4 (painel vertical sem herdar layout antigo), search-state.ts (cancelamento/correlação), search-database.test.ts (prova de limite e publicação).
 
 Migration preparada SHA-256 (UTF-8/LF, blob Git) `a444b816b374eeea0f78a9b2df7f13598cbe753701420216db21a0496b851b19`. Aplicação executada somente no projeto de desenvolvimento identificado, em uma transação de migration com histórico, sem DML/seed, dados publicados, deploy ou mudança de Access. Histórico, definições/grants, consulta anônima somente leitura, entradas inválidas, negação dos helpers e advisors conferidos conforme registro acima. Reversão técnica, se necessária e autorizada: remover apenas as três funções novas na ordem RPC → helper de entidades → normalizador, sem CASCADE nem alteração de dados. Não executar reversão automaticamente.
 
-Preview local desta unidade: [abrir com fixtures](http://127.0.0.1:5180/publico.html), isolado dos previews4189/5177 e sem banco/sessão. Porta configurável por PUBLIC_PREVIEW_PORT; cache Vite por porta. Smoke Playwright390px: busca “joao”, escolha por teclado, abertura do perfil contínuo e zero pageerrors. [Captura do preview](evidencias/busca-publica/preview-local-390.png). Script/logo identificam dados fictícios, sem alegar implementação remota.
+Preview local desta unidade: [abrir com fixtures](http://127.0.0.1:5180/publico.html), isolado dos previews4189/5177 e sem banco/sessão. Porta configurável por PUBLIC_PREVIEW_PORT; cache Vite por porta. Smoke Playwright390px: busca “joao”, escolha por teclado, abertura do perfil contínuo e zero pageerrors. [Captura do preview](../evidencias/busca-publica/preview-local-390.png). Script/logo identificam dados fictícios, sem alegar implementação remota.

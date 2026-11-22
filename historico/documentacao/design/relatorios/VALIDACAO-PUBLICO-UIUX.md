@@ -1,6 +1,6 @@
 # Validação — páginas públicas reais compactas
 
-Unidade `codex/publico-uiux`, baseada na main9cb3660 após integrar PR51. Relatório de04/11/2026; SHA e CI definitivos em [PROGRESSO.md](../PROGRESSO.md). Implementação nas rotas reais com fixtures interceptadas no navegador; não se trata de banco publicado nem de aceite visual de produção.
+Unidade `codex/publico-uiux`, baseada na main9cb3660 após integrar PR51. Relatório de04/11/2026; SHA e CI definitivos em [PROGRESSO.md](../../../../docs/PROGRESSO.md). Implementação nas rotas reais com fixtures interceptadas no navegador; não se trata de banco publicado nem de aceite visual de produção.
 
 ## Comportamento e contratos preservados
 
@@ -38,6 +38,6 @@ Nenhuma alteração de API, banco, DDL, deploy ou publicação de dados. O formu
 
 Fixtures locais identificadas nos testes; não são dados humanos. Algumas fixtures isoladas não fornecem catálogo e mostram contexto indisponível, preservando o estado real.
 
-- [Jogadores1366](evidencias/publico-uiux/jogadores-1366.png), [equipes1920](evidencias/publico-uiux/equipes-1920.png): largura excedente depois das colunas.
-- [Jogadores390](evidencias/publico-uiux/jogadores-390.png): nome longo, equipe agrupada e oito linhas visíveis.
-- [Jogos390](evidencias/publico-uiux/jogos-390.png): agenda sem placares inventados.
+- [Jogadores1366](../evidencias/publico-uiux/jogadores-1366.png), [equipes1920](../evidencias/publico-uiux/equipes-1920.png): largura excedente depois das colunas.
+- [Jogadores390](../evidencias/publico-uiux/jogadores-390.png): nome longo, equipe agrupada e oito linhas visíveis.
+- [Jogos390](../evidencias/publico-uiux/jogos-390.png): agenda sem placares inventados.

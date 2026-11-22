@@ -18,7 +18,7 @@ test("documentação e capturas não instalam browsers, inclusive checkpoints", 
   const plan = verificationPlan([
     "docs/design/PUBLICO.md",
     "historico/progresso/2026-11-05-checkpoint.md",
-    "docs/design/evidencias/mobile.png",
+    "historico/documentacao/design/evidencias/mobile.png",
     "CONTRIBUTING.md",
   ]);
   assert.equal(plan.scope, "docs");

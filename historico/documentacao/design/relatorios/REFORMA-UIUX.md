@@ -1,6 +1,6 @@
 # Reforma de UI/UX
 
-Decisões expressas do responsável em 03/11/2026, após entrevista nesta conversa. Este documento define a direção; execução, SHA e CI ficam em [PROGRESSO.md](../PROGRESSO.md). O [piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html) usa exclusivamente fixtures e não comprova integração com dados reais.
+Decisões expressas do responsável em 03/11/2026, após entrevista nesta conversa. Este documento define a direção; execução, SHA e CI ficam em [PROGRESSO.md](../../../../docs/PROGRESSO.md). O [piloto navegável](../reforma-uiux/Piloto%20UIUX.html) usa exclusivamente fixtures e não comprova integração com dados reais.
 
 ## Direção e prioridade
 
@@ -55,7 +55,7 @@ O responsável reprovou o jogo de `72aba24` por considerá-lo inferior à págin
 
 ### Provas e checkpoint
 
-Build e verificação do piloto integram `npm run design:build`/`npm run design:verify`; o verificador cobre 17 cenários e gera 20 capturas, inclusive comparação da súmula com o componente atual renderizado com fixture local. Conferir 320/390/1366/1920, zoom CSS200, nomes longos, ausência, ordenação/filtros/checkboxes, retorno, painéis, teclado/foco e axe. Provas vigentes em [VALIDACAO-REFORMA-UIUX.md](VALIDACAO-REFORMA-UIUX.md), SHA/CI em [PROGRESSO.md](../PROGRESSO.md); testes não constituem aceite humano.
+Build e verificação do piloto integram `npm run design:build`/`npm run design:verify`; o verificador cobre 17 cenários e gera 20 capturas, inclusive comparação da súmula com o componente atual renderizado com fixture local. Conferir 320/390/1366/1920, zoom CSS200, nomes longos, ausência, ordenação/filtros/checkboxes, retorno, painéis, teclado/foco e axe. Provas vigentes em [VALIDACAO-REFORMA-UIUX.md](VALIDACAO-REFORMA-UIUX.md), SHA/CI em [PROGRESSO.md](../../../../docs/PROGRESSO.md); testes não constituem aceite humano.
 
 Cota real no início e antes do gate; aos15% restantes na janela de5h, checkpoint e mesma retomada para reset observado+2min conforme CONTRIBUTING.md. Avaliação visual pendente não autoriza aprovação automática nem expansão.
 

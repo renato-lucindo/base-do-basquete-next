@@ -4,7 +4,7 @@ import { publishedSheet } from "./fixtures/published-game";
 import { publicationSheet } from "./fixtures/publication";
 
 for (const kind of ["estatisticas", "sumula"] as const) {
-  test(`${kind}: componentes reais conservam a apresentação aprovada`, async ({
+  test(`${kind}: controles preservam a compatibilidade com a fixture histórica`, async ({
     page,
   }, info) => {
     await page.setViewportSize(
@@ -14,8 +14,8 @@ for (const kind of ["estatisticas", "sumula"] as const) {
     );
     const reference =
       kind === "estatisticas"
-        ? "/docs/design/prototipos/estatisticas/Estatisticas%20de%20atletas.html"
-        : "/docs/design/prototipos/sumula/Sumula%20do%20jogo%20publicado.html";
+        ? "/historico/documentacao/design/estatisticas/Estatisticas%20de%20atletas.html"
+        : "/historico/documentacao/design/sumula/Sumula%20do%20jogo%20publicado.html";
     const selectors =
       kind === "estatisticas"
         ? [
@@ -69,13 +69,13 @@ for (const kind of ["estatisticas", "sumula"] as const) {
         .first()
         .waitFor();
     }
-    // Shared navigation now follows the accepted reform pilot. Preserve the scoresheet body and reference controls;
-    // player names follow the explicit 14px legibility requirement.
-    const approved = expected.map((item) => ({
+    // Historical fixture for regression only. Current UI decisions come from
+    // docs/design/DESIGN-SYSTEM.md and the public presentation rules.
+    const historicalControls = expected.map((item) => ({
       ...item,
       size: item.selector.includes(".reference-player") ? "14px" : item.size,
     }));
-    expect(await read()).toEqual(approved);
+    expect(await read()).toEqual(historicalControls);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

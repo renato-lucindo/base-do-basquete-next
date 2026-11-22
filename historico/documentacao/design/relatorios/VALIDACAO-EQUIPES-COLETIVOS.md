@@ -1,6 +1,6 @@
 # FR, T e GD — validação da unidade
 
-Unidade `codex/equipes-fr-t-gd`, [PR64](https://github.com/renato-lucindo/base-do-basquete-next/pull/64). [Plano aprovado](../superpowers/plans/2026-11-05-equipes-fr-t-gd.md). Estado de execução no [checkpoint](../PROGRESSO.md).
+Unidade `codex/equipes-fr-t-gd`, [PR64](https://github.com/renato-lucindo/base-do-basquete-next/pull/64). [Plano aprovado](../../../../docs/superpowers/plans/2026-11-05-equipes-fr-t-gd.md). Estado de execução no [checkpoint](../../../../docs/PROGRESSO.md).
 
 ## Resultado implementado
 
@@ -44,7 +44,7 @@ A regra externa de manter submit habilitado cede à exigência explícita do pla
 
 Migration `20261106114943_complete_sheet_team_statistics.sql`, SHA256 **2c52e384be58aa78a0398ea89433dec1c8f00c82d264a1c0091b39ff395697c8**, aplicada em06/11/2026 às11:49UTC no **base-do-basquete-next-dev / nizmasjddyrhmevvfviz**. SQL idêntico ao testado; nome local reconciliado com a versão atribuída pelo servidor. Somente funções/triggers/privilégios; sem backfill, seed ou mudança em tabelas. Instala cálculo FR, guarda GD no escritor, preservação de fase e RPC de correção versionada. Rascunhos/históricos continuam legíveis. A guarda passa a rejeitar clientes antigos que publiquem súmula sem os dois totais GD.
 
-[Quadro](../evidencias/2026-11-05-equipes-fr-t-gd.md)/JSON:25jogos/50lados,T15,**50GD confirmadas pelo responsável, soma4**. Leitura imediatamente anterior à migration:25/25 versões correspondem ao manifesto, mantendo a divergência do jogo15/publicação3/súmula7→8. Quatro totais1:CESB/jogo2,Veteranos VV/jogo1,Serra Extremos/jogo3,AMPRL/jogo16; demais46totais0 explicitamente confirmados. FR2 do IVV/Cetaf no jogo nº3 corresponde às FC2 registradas da LUSB; responsável aceitou o esclarecimento.
+[Quadro](../../../../docs/evidencias/2026-11-05-equipes-fr-t-gd.md)/JSON:25jogos/50lados,T15,**50GD confirmadas pelo responsável, soma4**. Leitura imediatamente anterior à migration:25/25 versões correspondem ao manifesto, mantendo a divergência do jogo15/publicação3/súmula7→8. Quatro totais1:CESB/jogo2,Veteranos VV/jogo1,Serra Extremos/jogo3,AMPRL/jogo16; demais46totais0 explicitamente confirmados. FR2 do IVV/Cetaf no jogo nº3 corresponde às FC2 registradas da LUSB; responsável aceitou o esclarecimento.
 
 Cada comando mantém UUID/payload em caso de incerteza, confere versão atual e cria nova versão pública, preservando documentos atuais e anteriores. Não usar salvamento comum da súmula. Baseline local guarda hashes de jogos, súmulas atuais, entradas, históricos, demais fatos publicados e fases. Comprovantes posteriores devem confrontar cobertura50/50, agregados das duas disputas, fase/placar/fatos individuais e divergência atual preservados.
 

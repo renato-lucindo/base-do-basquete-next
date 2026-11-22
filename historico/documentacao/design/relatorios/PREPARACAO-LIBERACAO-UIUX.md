@@ -1,6 +1,6 @@
 # Reforma UI/UX — validação final e preparação de liberação
 
-04/11/2026. A sequência autorizada está implementada nas PRs51–54 e o piloto foi aceito. Esta entrega prepara o pacote e o procedimento de liberação; **não executa deploy nem publica dados**. Estado Git/CI documental e continuidade em [PROGRESSO.md](../PROGRESSO.md).
+04/11/2026. A sequência autorizada está implementada nas PRs51–54 e o piloto foi aceito. Esta entrega prepara o pacote e o procedimento de liberação; **não executa deploy nem publica dados**. Estado Git/CI documental e continuidade em [PROGRESSO.md](../../../../docs/PROGRESSO.md).
 
 ## Fonte validada e cobertura
 

@@ -43,4 +43,4 @@ O apelido aparece como complemento, sem prefixo. Cabeçalhos/contextos usam os t
 - [Carreira em320px com texto200%](texto200-carreira.png): tabelas com rolagem interna, conquistas empilhadas somente quando o contêiner fica muito estreito e trajetória sem cortar nomes.
 - [Ver jogos em viewport683×384/DPR2](zoom200-jogos.png): reflow equivalente a1366×768 em zoom200%, sem transbordamento da página. Essa simulação não substitui zoom nativo manual em todos os navegadores.
 
-[Resultados, comandos e limites](../../../VALIDACAO-REFINAMENTO-PUBLICO.md). As imagens não comprovam conformidade integral à WCAG nem substituem aceite visual.
+[Resultados, comandos e limites](../../../../../docs/VALIDACAO-REFINAMENTO-PUBLICO.md). As imagens não comprovam conformidade integral à WCAG nem substituem aceite visual.

@@ -22,8 +22,8 @@ A súmula usa o mesmo arranjo e CSS do HTML aprovado, incluindo colunas fixas, t
 
 ## Capturas da implementação
 
-- [Súmula desktop](evidencias/implementacao-resultado-desktop.png) e [mobile](evidencias/implementacao-resultado-mobile.png).
-- [Estatísticas desktop](evidencias/implementacao-estatisticas-desktop.png) e [mobile](evidencias/implementacao-estatisticas-mobile.png).
+- [Súmula desktop](../evidencias/implementacao-resultado-desktop.png) e [mobile](../evidencias/implementacao-resultado-mobile.png).
+- [Estatísticas desktop](../evidencias/implementacao-estatisticas-desktop.png) e [mobile](../evidencias/implementacao-estatisticas-mobile.png).
 
 Medições focais nas rotas reais com nomes longos: primeira linha da súmula em 339px/364px (desktop/mobile); estatísticas em 242,5px/394px, com 17/10 linhas completas na primeira tela. Comparação de fontes, cores e largura com os HTMLs aprovados, 1440×900 e 390×844, passou. Também passaram as interações, axe e ampliação de texto em 320px/200% na bateria focal (59 PASS/7 SKIP); o gate isolado também passou (591 Vitest/121 arquivos, 6 transportes, 13 PostgreSQL, builds, 25 testes Worker, quatro PDFs e scanner de segredos). A execução completa Playwright local terminou com 465 PASS/105 SKIP e dois testes que ainda procuravam a mensagem antiga de ausência por quarto; os seletores foram atualizados e todos os oito testes dessa rota passaram na repetição focal. Os outros 465 resultados são reutilizáveis porque não houve mudança de comportamento após essa bateria. A CI do SHA da PR executa novamente a composição completa; seu resultado real fica no check validate e na descrição da PR.
 

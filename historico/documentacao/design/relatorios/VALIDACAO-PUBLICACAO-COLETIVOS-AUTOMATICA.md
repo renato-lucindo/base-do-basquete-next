@@ -1,6 +1,6 @@
 # Publicação com totais coletivos automáticos
 
-06/11/2026. Pedido: retirar a confirmação manual de faltas que bloqueava uma súmula válida com GDzero. Implementação em codex/publicacao-coletivos-automatica,base maince882f8. [Plano](../superpowers/plans/2026-11-06-publicacao-coletivos-automatica.md); decisão vigente no [ADR018](../decisoes/018-equipes-de-resultados-confirmados.md).
+06/11/2026. Pedido: retirar a confirmação manual de faltas que bloqueava uma súmula válida com GDzero. Implementação em codex/publicacao-coletivos-automatica,base maince882f8. [Plano](../../../../docs/superpowers/plans/2026-11-06-publicacao-coletivos-automatica.md); decisão vigente no [ADR018](../../../../docs/decisoes/018-equipes-de-resultados-confirmados.md).
 
 ## Diagnóstico e resultado
 

@@ -1,6 +1,6 @@
 # Integração futura das páginas públicas
 
-Contrato **específico dos protótipos de súmula e estatísticas**. Para regras gerais, consulte [PADROES.md](PADROES.md); para o fluxo público aprovado, consulte [PUBLICO.md](PUBLICO.md). Este arquivo descreve comportamento e limites de integração, não declara que a implementação real já foi feita ou liberada.
+Contrato **específico dos protótipos de súmula e estatísticas**. Para regras gerais, consulte [PADROES.md](../../../../docs/design/PADROES.md); para o fluxo público aprovado, consulte [PUBLICO.md](../../../../docs/design/PUBLICO.md). Este arquivo descreve comportamento e limites de integração, não declara que a implementação real já foi feita ou liberada.
 
 ## Limite desta PR
 
@@ -31,7 +31,7 @@ Colunas disponíveis: Pos., Atleta, Equipe, J, PTS, PPJ, PP%, 2P, 3P, LL, F, T, 
 - Seletor com 13 colunas opcionais; posição/atleta permanecem. Nenhuma mantém somente essas duas colunas e o ranking. No celular, T/U/5F/GD começam ocultas e podem ser recuperadas. Escolhas manuais persistem na sessão entre filtros e redimensionamento.
 - Camisa após nome; tooltip curto nas siglas; seta apenas na coluna ordenada. Não reintroduzir avatares ou ornamentos removidos.
 
-Na implementação real de Jogadores, o refinamento autorizado em05/11/2026 prevalece sobre detalhes históricos do protótipo: camisa predominante por inscrição contando relacionados sem participação, empates de frequência preservados,30linhas, paginação antes da legenda e destaque das maiores faltas positivas. Definições e opções visíveis seguem [PUBLICO.md](PUBLICO.md#refinamento-de-jogadores--decisão-de05112026). Histórico completo e cálculos compartilhados permanecem inalterados.
+Na implementação real de Jogadores, o refinamento autorizado em05/11/2026 prevalece sobre detalhes históricos do protótipo: camisa predominante por inscrição contando relacionados sem participação, empates de frequência preservados,30linhas, paginação antes da legenda e destaque das maiores faltas positivas. Definições e opções visíveis seguem [PUBLICO.md](../../../../docs/design/PUBLICO.md#refinamento-de-jogadores--decisão-de05112026). Histórico completo e cálculos compartilhados permanecem inalterados.
 
 ## Aceite da implementação
 

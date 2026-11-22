@@ -124,9 +124,10 @@ jobs:
           name: design-publico-${{ github.sha }}
           path: |
             docs/design/.preview-artifacts/
-            docs/design/prototipos/sumula/*.png
-            docs/design/prototipos/estatisticas/react-prototype/*.png
-            docs/design/prototipos/reforma-uiux/*.png
+            historico/documentacao/.preview-artifacts/
+            historico/documentacao/design/sumula/*.png
+            historico/documentacao/design/estatisticas/react-prototype/*.png
+            historico/documentacao/design/reforma-uiux/*.png
           include-hidden-files: true
 
   webkit-boundaries:
