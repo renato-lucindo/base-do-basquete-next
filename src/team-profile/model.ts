@@ -1,5 +1,6 @@
 import type { PublicContext, CatalogGame } from "../public-ui/catalog-contract";
 import type { PublicStandings } from "../regulation/public-contract";
+import type { RecentResult } from "../regulation/recent-results";
 import type { PublicAchievements } from "../achievements/publication-contract";
 import {
   publicScheduleRows,
@@ -61,64 +62,101 @@ export function chronologicalTeamGames<
   );
 }
 export function participationGames(p: TeamParticipation): TeamGame[] {
+  const scheduled: TeamGame[] = [];
+  const projectedIds = new Set(p.standings?.games.map((g) => g.id) ?? []);
   if (p.standings) {
     const byId = new Map(p.standings.games.map((g) => [g.id, g]));
-    return publicScheduleRows(p.standings, p.catalog)
-      .filter((g) => {
-        const source = byId.get(g.id)!;
-        return (
-          [source.homeRegistrationId, source.awayRegistrationId].includes(
+    scheduled.push(
+      ...publicScheduleRows(p.standings, p.catalog)
+        .filter((g) => {
+          const source = byId.get(g.id)!;
+          return (
+            [source.homeRegistrationId, source.awayRegistrationId].includes(
+              p.registrationId,
+            ) && source.state !== "excluded"
+          );
+        })
+        .map((g) => ({
+          ...g,
+          context: p.context,
+          registrationId: p.registrationId,
+          counted: ["played", "awarded"].includes(byId.get(g.id)!.state),
+        })),
+    );
+  }
+  return [
+    ...scheduled,
+    ...p.catalog
+      .filter(
+        (g) =>
+          g.disputeId === p.disputeId &&
+          !projectedIds.has(g.id) &&
+          [g.game.home.registrationId, g.game.away.registrationId].includes(
             p.registrationId,
-          ) && source.state !== "excluded"
-        );
-      })
+          ),
+      )
       .map((g) => ({
-        ...g,
+        id: g.id,
+        disputeId: g.disputeId,
+        number: g.game.number,
+        home: g.game.home.name,
+        away: g.game.away.name,
+        homeProfile: {
+          teamId: g.game.home.team.id,
+          registrationId: g.game.home.registrationId,
+        },
+        awayProfile: {
+          teamId: g.game.away.team.id,
+          registrationId: g.game.away.registrationId,
+        },
+        published: true,
+        date: g.game.date,
+        time: g.game.time,
+        venue: g.game.venue,
+        score: g.score,
+        phase: null,
+        seriesGame: null,
+        walkover: false,
         context: p.context,
         registrationId: p.registrationId,
-        counted: ["played", "awarded"].includes(byId.get(g.id)!.state),
-      }));
-  }
-  return p.catalog
-    .filter((g) =>
-      [g.game.home.registrationId, g.game.away.registrationId].includes(
-        p.registrationId,
-      ),
-    )
-    .map((g) => ({
-      id: g.id,
-      disputeId: g.disputeId,
-      number: g.game.number,
-      home: g.game.home.name,
-      away: g.game.away.name,
-      homeProfile: {
-        teamId: g.game.home.team.id,
-        registrationId: g.game.home.registrationId,
-      },
-      awayProfile: {
-        teamId: g.game.away.team.id,
-        registrationId: g.game.away.registrationId,
-      },
-      published: true,
-      date: g.game.date,
-      time: g.game.time,
-      venue: g.game.venue,
-      score: g.score,
-      phase: null,
-      seriesGame: null,
-      walkover: false,
-      context: p.context,
-      registrationId: p.registrationId,
-      counted: false,
-    }));
+        counted: g.score.home !== g.score.away,
+      })),
+  ];
+}
+/** Published results remain visible before their regulation is organized.
+ * An explicit projection state always wins over the catalog for the same game. */
+export function participationResults(
+  p: TeamParticipation,
+): (RecentResult["game"] & { winnerRegistrationId: string | null })[] {
+  const projected = new Map(p.standings?.games.map((g) => [g.id, g]) ?? []);
+  return participationGames(p)
+    .filter((g) => g.counted)
+    .map((g) => {
+      const official = projected.get(g.id);
+      if (official) return official;
+      const homeRegistrationId = g.homeProfile!.registrationId;
+      const awayRegistrationId = g.awayProfile!.registrationId;
+      return {
+        id: g.id,
+        date: g.date,
+        time: g.time,
+        homeRegistrationId,
+        awayRegistrationId,
+        score: g.score
+          ? { homePoints: g.score.home, awayPoints: g.score.away }
+          : null,
+        state: "played" as const,
+        winnerRegistrationId: g.score
+          ? g.score.home > g.score.away
+            ? homeRegistrationId
+            : awayRegistrationId
+          : null,
+      };
+    });
 }
 export function participationCampaign(p: TeamParticipation) {
-  if (!p.standings) return null;
-  const games = p.standings.games.filter(
-    (g) =>
-      [g.homeRegistrationId, g.awayRegistrationId].includes(p.registrationId) &&
-      ["played", "awarded"].includes(g.state),
-  );
+  const games = participationResults(p);
+  if (!p.standings && !games.length) return null;
   const wins = games.filter(
     (g) => g.winnerRegistrationId === p.registrationId,
   ).length;

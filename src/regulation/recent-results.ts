@@ -1,13 +1,22 @@
 import type { PublicStandings } from "./public-contract";
 
 export type RecentResult = {
-  game: PublicStandings["games"][number];
+  game: Pick<
+    PublicStandings["games"][number],
+    | "id"
+    | "date"
+    | "time"
+    | "homeRegistrationId"
+    | "awayRegistrationId"
+    | "score"
+    | "state"
+  >;
   won: boolean;
   opponentId: string;
 };
 
 export function recentGroupResults(
-  games: PublicStandings["games"],
+  games: (RecentResult["game"] & { winnerRegistrationId: string | null })[],
   countedGameIds: readonly string[],
 ): Map<string, RecentResult[]> {
   const counted = new Set(countedGameIds);

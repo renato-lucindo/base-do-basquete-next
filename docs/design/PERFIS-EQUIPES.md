@@ -8,6 +8,7 @@ O responsável aceitou o HTML e autorizou implementar em 22/11/2026. A referênc
 - Jogos exibe placar e contexto sem coluna Resultado. Agenda somente quando já pública. A legenda fica expandida, uma por painel, depois de todo o conteúdo.
 - Conquistas à direita no desktop: pódios confirmados históricos. Geral permite categoria/naipe independentes; disputa fixa categoria+naipe, abrangendo outras competições, anos e divisões identificadas. No celular, adaptar ao padrão de jogador.
 - Elencos nesta entrega significa participantes publicados de resultados por inscrição. Publicação de elenco oficial continua fora do escopo.
+- Resultados já publicados continuam em jogos, campanha e sequência quando ainda não constam da classificação. Estados explícitos da projeção prevalecem para o mesmo jogo; fase e colocação oficial não são deduzidas do catálogo.
 - Estatísticas gerais mantêm uma linha por participação, sem somar categorias. Fontes ausentes usam o estado indisponível existente, sem zeros presumidos.
 - Preservar design system, escala vigente, privacidade, identidades e duas inscrições da mesma equipe; entradas da busca levam ao geral e inscrições ao contexto. Estado na URL e retorno preservados.
 

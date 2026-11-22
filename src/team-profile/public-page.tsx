@@ -26,6 +26,7 @@ import {
   participationCampaign,
   participationPosition,
   participationGames,
+  participationResults,
   type TeamProfile,
   type TeamParticipation,
   type TeamGame,
@@ -77,15 +78,24 @@ function Select({
   );
 }
 function RecentSequence({ p }: { p: TeamParticipation }) {
-  if (!p.standings) return <>—</>;
-  const s = p.standings,
-    ids = s.games
-      .filter((g) => ["played", "awarded"].includes(g.state))
-      .map((g) => g.id),
-    results = recentGroupResults(s.games, ids).get(p.registrationId) ?? [];
-  const names = new Map(s.registrations.map((r) => [r.id, r.name]));
+  const games = participationResults(p),
+    results =
+      recentGroupResults(
+        games,
+        games.map((g) => g.id),
+      ).get(p.registrationId) ?? [];
+  const registrations = [
+    ...(p.standings?.registrations ?? []),
+    ...p.catalog.flatMap((g) =>
+      [g.game.home, g.game.away].map(({ registrationId, ...r }) => ({
+        ...r,
+        id: registrationId,
+      })),
+    ),
+  ];
+  const names = new Map(registrations.map((r) => [r.id, r.name]));
   const compact = new Map(
-    s.registrations.map((r) => [r.id, r.team.abbreviation || r.name]),
+    registrations.map((r) => [r.id, r.team.abbreviation || r.name]),
   );
   return (
     <RecentResultsCell

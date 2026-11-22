@@ -13,6 +13,8 @@ import { pubId } from "../../tests/fixtures/publication";
 import { teamProfileFixture } from "../../tests/fixtures/team-profile";
 import {
   participationCampaign,
+  participationPosition,
+  participationResults,
   participationGames,
   type TeamParticipation,
 } from "./model";
@@ -130,7 +132,59 @@ describe("perfil da equipe", () => {
     expect(gs.filter((g) => g.counted)).toHaveLength(2);
     expect(gs.filter((g) => !g.counted)[0].score).toBeNull();
     const noStandings = { ...p, standings: null };
-    expect(participationCampaign(noStandings)).toBeNull();
+    expect(participationCampaign(noStandings)?.games).toBe(2);
     expect(participationGames(noStandings)).toHaveLength(2);
+  });
+  it("mantém resultados publicados quando a classificação confirmada ainda está vazia", () => {
+    const f = teamProfileFixture();
+    const p: TeamParticipation = {
+      disputeId: f.source.disputeId,
+      registrationId: f.registrationId,
+      name: "Lobos",
+      context: f.catalog.disputes[0].context,
+      status: "in_progress",
+      placement: null,
+      catalog: f.catalog.games,
+      standings: {
+        ...f.standings,
+        games: [],
+        registrations: [],
+        definition: {
+          ...f.standings.definition,
+          groupPhases: [],
+          knockoutPhases: [],
+          series: [],
+        },
+        projection: { ...f.standings.projection, groupPhases: [], series: [] },
+      },
+    };
+    expect(participationGames(p)).toHaveLength(2);
+    expect(participationCampaign(p)).toMatchObject({
+      games: 2,
+      wins: 2,
+      losses: 0,
+    });
+    expect(participationPosition(p).label).toBe("—");
+    expect(participationResults(p)).toHaveLength(2);
+  });
+  it("não recupera pelo catálogo um resultado excluído ou pendente na projeção", () => {
+    const f = teamProfileFixture();
+    const standings = structuredClone(f.standings);
+    standings.games[0].state = "excluded";
+    standings.games[1].state = "pending";
+    const p: TeamParticipation = {
+      disputeId: f.source.disputeId,
+      registrationId: f.registrationId,
+      name: "Lobos",
+      context: f.catalog.disputes[0].context,
+      status: "in_progress",
+      placement: null,
+      catalog: f.catalog.games,
+      standings,
+    };
+    expect(participationCampaign(p)?.games).toBe(0);
+    expect(
+      participationGames(p).some((g) => g.id === standings.games[0].id),
+    ).toBe(false);
   });
 });

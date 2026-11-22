@@ -12,6 +12,39 @@ import {
   buildStatisticsPage,
   parseStatisticsQuery,
 } from "../src/statistics/query";
+test("resultados publicados aparecem mesmo com classificação confirmada sem fases", async ({
+  page,
+}) => {
+  const f = await teamProfileBrowserFixture(page);
+  f.standings.games = [];
+  f.standings.registrations = [];
+  f.standings.definition.registrationIds = [];
+  f.standings.definition.groupPhases = [];
+  f.standings.definition.knockoutPhases = [];
+  f.standings.definition.series = [];
+  f.standings.projection.groupPhases = [];
+  f.standings.projection.series = [];
+  f.standings.projection.lineage = [];
+  await page.goto(f.url);
+  await expect(page.locator(".team-profile-games tbody tr")).toHaveCount(2);
+  await expect(
+    page.getByText("Nenhuma fase configurada nesta versão pública."),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Ver perfil geral", exact: true })
+    .click();
+  await expect(page.locator(".team-profile-campaigns tbody tr")).toHaveCount(2);
+  const campaign = page.locator(".team-profile-campaigns tbody tr").first();
+  await expect(campaign.locator("td").nth(2)).toHaveText("2");
+  await expect(campaign.locator(".standings-results li")).toHaveCount(2);
+  await expect(page.locator(".team-profile-games tbody tr")).toHaveCount(3);
+  await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+  await expect(page.locator(".team-profile-games tbody tr")).toHaveCount(3);
+  await expect(
+    page.getByRole("columnheader", { name: "Resultado", exact: true }),
+  ).toHaveCount(0);
+});
+
 test("perfil geral e disputa preservam identidade e apresentam as tabelas aceitas", async ({
   page,
 }) => {

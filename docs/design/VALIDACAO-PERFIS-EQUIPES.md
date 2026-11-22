@@ -5,7 +5,7 @@ Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd3
 ## Resultado implementado
 
 - Perfil geral com cinco abas e perfil da inscrição com três. Busca leva ao geral; inscrições mantêm disputa e inscrição. URL conserva aba, ano, filtros, ordenação, fase/grupo e retorno.
-- Campanhas, sequência de cinco resultados por inscrição e recentes do ano escolhido, reunindo categorias por data. Situação usa o estado oficial. Campanha sem projeção fica indisponível; agenda não conta como resultado.
+- Campanhas, sequência de cinco resultados por inscrição e recentes do ano escolhido, reunindo categorias por data. Situação usa o estado oficial. Resultados publicados preenchem jogos, campanha e sequência mesmo antes da organização da classificação. Um estado explícito da projeção prevalece para o mesmo jogo (inclusive exclusão/pendência); agenda não conta como resultado.
 - Visão da disputa reutiliza classificação e estatísticas coletivas completas, destacando a inscrição. Jogadores reutiliza tabela completa, colunas, fases, totais/médias, paginação de 30 e camisas 0/00/DNP. Filtro de inscrição é aplicado antes da agregação.
 - Conquistas históricas confirmadas à direita no desktop e após o conteúdo no celular. Jogos sem coluna Resultado. Legenda expandida, única e após o conteúdo da aba.
 - Somente APIs públicas existentes; prévia e site de disputa única não ampliam escopo. Sem migration, DDL, publicação de dados ou deploy.
@@ -40,3 +40,9 @@ Revisão de UI pelo próprio agente com as [Web Interface Guidelines](https://ra
 Fixtures sintéticas somente em testes e protótipo. Elencos mostra participantes publicados de resultados; elenco oficial completo continua fora do escopo. Composição do histórico faz várias requisições, com concorrência e capacidade limitadas; falha de fonte não vira zero. Não foi aferido desempenho com histórico de mil inscrições.
 
 Não houve avaliação desta implementação em Worker remoto. CONTRIBUTING exige publicar no Worker autorizado e obter novo aceite visual antes de integrar. A autorização de implementação do HTML não substitui esse aceite nem define um alvo de deploy.
+
+## Correção da Copa ES Sub-15
+
+A avaliação do preview revelou classificação publicada vazia (zero jogos/fases), apesar de26 resultados públicos. O perfil tomava essa projeção vazia como fonte exclusiva e ocultava o catálogo. Corrigida a composição em `team-profile/model.ts`: preserva resultados publicados ausentes da projeção, respeita estados oficiais para IDs presentes, mantém uma inscrição por campanha e não presume colocação/fase. Sequência usa os mesmos resultados e nomes públicos. O componente de sequência compartilhado recebe somente os campos que renderiza, sem fabricar versão ou metadados esportivos.
+
+Reprodução com fixture sintética da classificação vazia; testes de jogos/campanha/posição e de exclusão/pendência. Caso de browser verifica geral/contextual, sequência e aba Jogos. Conferência de leitura dos dados públicos reais: LUSB9jogos,6vitórias,3derrotas,575pontos a favor e439contra. Sem alteração de dados, definição de fases, premiações ou publicação esportiva. Resultados finais de validação e versão do preview ficam na PR.
