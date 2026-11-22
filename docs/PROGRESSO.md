@@ -4,17 +4,17 @@ Atualizado em 22/11/2026. Estado observado nesta unidade; histórico não autori
 
 ## Limpeza das referências de design
 
-- Branch `codex/limpeza-referencias-design`, baseada em `origin/main` `824a3d59da5323202d869a4d93a1038bcd377044`, em worktree próprio. Nenhuma PR estava aberta na consulta inicial.
+- Branch `codex/limpeza-referencias-design`, baseada em `origin/main` `824a3d59da5323202d869a4d93a1038bcd377044`, em worktree próprio. Entrega material `1e6acda23734764c6b2c096c7692d4940b4dfac6`, [PR #88](https://github.com/renato-lucindo/base-do-basquete-next/pull/88). Nenhuma PR estava aberta na consulta inicial.
 - Retirados 170 arquivos de referências antigas de `docs/design/`; preservados em `historico/documentacao/design/`, com uso restrito a rastreabilidade e regressão técnica. Índices, comentários de proveniência, runners e caminhos de CI ajustados. ZIPs e seis fontes originais conferidos por hash.
 - Fontes vigentes: design system, catálogo aprovado, padrões comuns e da área. Legenda estatística explicitamente aberta. Escala anterior removida da orientação tipográfica. [Inventário e limites](design/LIMPEZA-REFERENCIAS.md).
-- Verificação observada: `npm run design:verify` PASS; 10 testes Chromium de compatibilidade histórica/controles/reflow PASS; 751 links Markdown conferidos, sem novos links quebrados. Gate consolidado PASS: 828 testes Vitest, 16 contratos SQL, 19 testes de transporte, 35 testes Worker e teste PDF/workerd. Pacote de arquitetura (67 verificações) e 141 regressões de skills PASS. CI remota ainda não publicada. O protótipo HTML desta conversa foi corrigido e suas verificações focais passaram.
-- Próximo passo: publicar a PR da unidade e conferir CI do SHA publicado. Merge permanece pendente.
+- Verificação observada: `npm run design:verify` PASS; 10 testes Chromium de compatibilidade histórica/controles/reflow PASS; 751 links Markdown conferidos, sem novos links quebrados. Gate consolidado PASS: 828 testes Vitest, 16 contratos SQL, 19 testes de transporte, 35 testes Worker e teste PDF/workerd. Pacote de arquitetura (67 verificações) e 141 regressões de skills PASS. A execução e o resultado remotos do SHA publicado ficam nos [checks da PR #88](https://github.com/renato-lucindo/base-do-basquete-next/pull/88/checks); não reutilizar o resultado da base. O protótipo HTML desta conversa foi corrigido e suas verificações focais passaram.
+- Próximo passo: conferir os checks atuais da PR #88 e revisar a integração. Merge permanece pendente.
 
 ## Main e serviços
 
 - Base real consultada: merge da PR #87 em `824a3d5`; PRs abertas: nenhuma. Não atribuir esse estado aos checkpoints anteriores.
 - Esta unidade não consultou a versão em serviço, aplicou migrations, publicou dados nem fez deploy. O último relato de cada serviço e as pendências anteriores estão no checkpoint arquivado; não são prova de nova execução.
-- Checkout original `sync/trabalho-casa` preservado, com edição humana de `CONTRIBUTING.md`, `skills-lock.json` e instalação local de `web-design-guidelines`. Outros worktrees não foram modificados.
+- Checkout original `sync/trabalho-casa` preservado, com edição humana de `CONTRIBUTING.md`, `skills-lock.json` e instalação local de `web-design-guidelines`. Outros worktrees não foram modificados. O protótipo HTML externo recebeu revisões concorrentes, preservadas; esta unidade alterou apenas a legenda e retirou sua captura de referência obsoleta.
 
 ## Continuidade
 
