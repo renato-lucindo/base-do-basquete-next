@@ -1,6 +1,6 @@
 # Padrões comuns de UI/UX
 
-Aplicam-se às áreas pública e administrativa da Base do Basquete Next. Leia também [PUBLICO.md](PUBLICO.md) ou [ADMIN.md](ADMIN.md); regras específicas dos protótipos de súmula e estatísticas permanecem em [INTEGRACAO.md](INTEGRACAO.md).
+Aplicam-se às áreas pública e administrativa da Base do Basquete Next. Leia também o [design system](DESIGN-SYSTEM.md) e [PUBLICO.md](PUBLICO.md) ou [ADMIN.md](ADMIN.md), conforme a área.
 
 ## Prioridade da primeira tela
 

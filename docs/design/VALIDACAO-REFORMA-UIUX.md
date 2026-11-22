@@ -1,6 +1,6 @@
 # Validação da reforma de UI/UX
 
-Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [Contrato e limites](REFORMA-UIUX.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
+Unidade `codex/reforma-uiux-piloto`, base `eff36fe0eda76962e6babbc4a9464a98c3dad478`, iniciada em 03/11/2026. [design system vigente](DESIGN-SYSTEM.md); SHA e CI no [checkpoint](../PROGRESSO.md) e na PR da unidade.
 
 ## Integração nas rotas reais — autorização de04/11
 
@@ -16,7 +16,7 @@ A súmula real mantém `PublicGameView` e sua folha de estilos. O ajuste de nave
 - Preview das rotas reais em5177 com fixtures declaradas: HTTP200,3 atuações/3 inscrições do atleta de exemplo e sem erro JavaScript; inspecionado em1366/390. Cache próprio do Vite evita interferir nos testes de5174. IDs de inscrição distintos por disputa fictícia; fonte e contratos validados, sem acesso ao banco.
 - Inspeção visual do autor: conquistas ao lado no desktop/abaixo no celular; tabela à esquerda com números à direita. A primeira inspeção mobile cortava os pontos recentes: data agrupada junto ao confronto, preservando placar/PTS na área visível. HTML offline do piloto inalterado,364501 bytes/SHA256 `782a247dbba5c27c2d6827325a7e4b7f7679698df836c979be5bd762bd7c49ee`; continua referência fictícia, não uma cópia offline do produto.
 
-Capturas da aplicação com fixtures de teste: [1366](evidencias/perfil-real/perfil-1366.png), [1920](evidencias/perfil-real/perfil-1920.png), [390](evidencias/perfil-real/perfil-390.png), [320](evidencias/perfil-real/perfil-320.png), [texto200%](evidencias/perfil-real/perfil-320-text200.png), [sem metadados opcionais/conquistas](evidencias/perfil-real/perfil-sem-metadados-390.png). As provas anteriores do piloto continuam abaixo, com limites próprios; não equivalem às rotas reais.
+Capturas da aplicação com fixtures de teste: 1366, 1920, 390, 320, texto200%, sem metadados opcionais/conquistas. As provas anteriores do piloto continuam abaixo, com limites próprios; não equivalem às rotas reais.
 
 Logs em `.preview-artifacts/`: `player-integration-gate.log` SHA256 `2e6f9e6fc58e9dafbcae1644247525c14131089ab0f709db14c8684efdf16b9a`; `player-integration-verified.log` SHA256 `ec9bf60c8645cfa5a057af6dff1d1d564ede38cc011d99ba9e797a7a6380b3d2`; `player-integration-regression.log` SHA256 `83a2fa1ffa2ccee9860e770d015f0d21b449ca5d96fb012dc3cb47b0aef56f2b`. SHA material/CI no checkpoint e descrição da PR, sem extrapolar os resultados de outro commit.
 
@@ -53,7 +53,7 @@ Revisão do autor com `ui-ux-pro-max` (busca `heading hierarchy --domain ux`, hi
 
 HTML autocontido: 364501 bytes, SHA256 `782a247dbba5c27c2d6827325a7e4b7f7679698df836c979be5bd762bd7c49ee`. HTTP local200, conteúdo idêntico ao arquivo. Logs locais: `design-perfil-continuo.log` e `gate-perfil-continuo.log` em `docs/design/.preview-artifacts/reforma-uiux/`; hashes/SHA no checkpoint.
 
-Capturas vigentes: [perfil desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [perfil celular](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [súmula desktop](prototipos/reforma-uiux/capturas/sumula-desktop.png), [súmula celular](prototipos/reforma-uiux/capturas/sumula-mobile.png), [componente atual com fixture desktop](prototipos/reforma-uiux/capturas/jogo-atual-referencia-1366.png), [componente atual com fixture celular](prototipos/reforma-uiux/capturas/jogo-atual-referencia-390.png). As capturas históricas nos mesmos caminhos foram substituídas; usar o SHA da seção antiga para reproduzi-las.
+Capturas vigentes: perfil desktop, perfil celular, súmula desktop, súmula celular, componente atual com fixture desktop, componente atual com fixture celular. As capturas históricas nos mesmos caminhos foram substituídas; usar o SHA da seção antiga para reproduzi-las.
 
 Fixtures apenas: nenhuma API, rota real, banco, publicação, deploy, boxscore, comparação ou recordes novos. As tabelas do catálogo ainda reutilizam cenários fictícios e não comprovam cobertura de todos os recortes. PR #51 permanece Draft.
 
@@ -76,7 +76,7 @@ Revisão do autor pelas skills: `ui-ux-pro-max`, consulta pertinente `data dense
 - `public-details.tsx:961` / `public-details.css`: datas sem ano na mesma linha e largura controlada do confronto preservam PTS no celular; a data completa permanece no elemento `time`.
 - `app.tsx:258` / `public-details.tsx:668`: retorno/contexto permanecem acessíveis; menos repetição no jogo, cabeçalho e abas próximos no perfil. Filtros, alternativas do gráfico e estados vazios preservados.
 
-Capturas para avaliar: [jogo desktop](prototipos/reforma-uiux/capturas/sumula-desktop.png), [jogo mobile](prototipos/reforma-uiux/capturas/sumula-mobile.png), [perfil desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [perfil mobile](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [jogo com nomes longos em 320 px](prototipos/reforma-uiux/capturas/sumula-nomes-longos-320.png), [perfil com nome longo em 320 px](prototipos/reforma-uiux/capturas/perfil-nome-longo-320.png).
+Capturas para avaliar: jogo desktop, jogo mobile, perfil desktop, perfil mobile, jogo com nomes longos em 320 px, perfil com nome longo em 320 px.
 
 Não é revisão independente, aceite humano ou comprovação de WCAG integral. Piloto/fixtures apenas; sem integração às rotas reais, banco, API, deploy ou dados humanos. PR permanece Draft aguardando nova avaliação.
 
@@ -88,7 +88,7 @@ A composição intermediária rejeitada foi refeita. A súmula tem confronto com
 
 `npm run design:verify` **PASS**, incluindo tipagem e **16 cenários/16 capturas** do piloto, referências originais e seus verificadores. Conferidos identidade e camisas únicas, somas por partida/período, ausência versus zero, registros sem scout, mínimos/checkboxes/ranking sem incluir ausentes, retorno/filtros/rolagem, teclado do gráfico e seletor após redimensionamento/recarga. Axe em nove telas, cinco abas do perfil, equipes/colunas/autocomplete e diálogos, em 390×844/1366×768/1920×1080; reflow320 e zoom CSS200 também nos novos detalhes. Sem violações selecionadas ou erros JavaScript. Não é prova de WCAG integral ou aceite humano.
 
-Capturas atuais: [súmula desktop completa](prototipos/reforma-uiux/capturas/sumula-desktop.png), [súmula mobile completa](prototipos/reforma-uiux/capturas/sumula-mobile.png), [resumo desktop](prototipos/reforma-uiux/capturas/perfil-resumo-desktop.png), [resumo mobile](prototipos/reforma-uiux/capturas/perfil-resumo-mobile.png), [estatísticas desktop](prototipos/reforma-uiux/capturas/perfil-estatisticas-desktop.png), [estatísticas mobile](prototipos/reforma-uiux/capturas/perfil-estatisticas-mobile.png). Inspeção visual do autor nas duas áreas; pelo menos seis atletas completos por equipe na primeira tela da súmula desktop, sem encolher a fonte para passar a medição.
+Capturas atuais: súmula desktop completa, súmula mobile completa, resumo desktop, resumo mobile, estatísticas desktop, estatísticas mobile. Inspeção visual do autor nas duas áreas; pelo menos seis atletas completos por equipe na primeira tela da súmula desktop, sem encolher a fonte para passar a medição.
 
 HTML autocontido: **334084 bytes**, SHA256 `d27c3a2c50fbbad372e007213d03c41da16b7f1b49f87fedfbac06102e34d67a`. Node24.18.0; Wrangler4.152.0 existente usado somente pelos comandos locais do gate. Logs/JSON em `docs/design/.preview-artifacts/reforma-uiux/`.
 
@@ -113,7 +113,7 @@ Implementados: largura intrínseca das tabelas com limite de identificação de 
 
 `node docs/design/prototipos/reforma-uiux/build.cjs` e `node docs/design/prototipos/reforma-uiux/verify.cjs`: **PASS**, tipagem e 11 cenários, dez capturas, incluindo geometria em 1366/1920, filtros múltiplos/vazio/busca/mínimo/retorno e cabeçalho em 320/390/1366/1920. Demais cenários de teclado/reflow/axe continuaram verdes. Primeira execução revelou seletor de colunas fora da tela em 320 px após a mudança de filtro; corrigidos flex/min-width e ancoragem antes da prova final.
 
-Inspeção visual do autor: [tabela desktop](prototipos/reforma-uiux/capturas/publico-desktop.png) e [jogo no celular](prototipos/reforma-uiux/capturas/jogo-cabecalho-390.png). HTML atual: 292785 bytes, SHA256 `08ecc6bf9ba960ff6b11666df06a29ff757d49ba62b42231b6a3e68eb433c142`.
+Inspeção visual do autor: tabela desktop e jogo no celular. HTML atual: 292785 bytes, SHA256 `08ecc6bf9ba960ff6b11666df06a29ff757d49ba62b42231b6a3e68eb433c142`.
 
 Revisão `web-design-guidelines`, [diretrizes atualizadas](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) consultadas em 03/11. Arquivos revisados: app.tsx, pilot.css, theme.css e TeamFilter reutilizado. `pilot.css:14`/regras mobile: painel de seleção com alvos de 44 px e rolagem interna; `theme.css:289`: largura proporcional e números tabulares preservados; `app.tsx:591`: controle semântico r6 com Escape/retorno de foco; `app.tsx:1813`: título e contexto legíveis e centralizados. Sem novo bloqueio encontrado neste recorte. Não é parecer independente. Recomendações da ui-ux-pro-max de navegação por teclado e rolagem interna foram consultadas no planejamento e aplicadas.
 
@@ -137,11 +137,11 @@ Gate local PASS: 689 unitários, transporte 7, banco isolado 13, Worker/HTTP 29 
 
 Capturas selecionadas da execução final:
 
-- [Jogadores no celular](prototipos/reforma-uiux/capturas/publico-mobile.png): identificação/equipe, J/PTS/PPJ e seletor de colunas; busca global visível.
-- [Autocomplete no celular](prototipos/reforma-uiux/capturas/busca-mobile.png): tipos, grupos e contexto, sem versões técnicas nas linhas.
-- [Jogos no desktop](prototipos/reforma-uiux/capturas/jogos-desktop.png): seis cabeçalhos ordenáveis e ações próximas.
-- [Informações no desktop](prototipos/reforma-uiux/capturas/informacoes-desktop.png): Categoria com 145 px em 1366, sem crescer para preencher a página.
-- [Equipes/elenco no desktop](prototipos/reforma-uiux/capturas/elenco-desktop.png): lista ao lado de 12 atletas, sem sobreposição.
+- Jogadores no celular: identificação/equipe, J/PTS/PPJ e seletor de colunas; busca global visível.
+- Autocomplete no celular: tipos, grupos e contexto, sem versões técnicas nas linhas.
+- Jogos no desktop: seis cabeçalhos ordenáveis e ações próximas.
+- Informações no desktop: Categoria com 145 px em 1366, sem crescer para preencher a página.
+- Equipes/elenco no desktop: lista ao lado de 12 atletas, sem sobreposição.
 
 O HTML servido localmente respondeu HTTP 200 e conferiu byte a byte com o arquivo commitado (288397 bytes, SHA256 `b27dc4e89f51a937dd66ea34fe5736add6c5b10999d18d43c895b05c8fbe927e`).
 

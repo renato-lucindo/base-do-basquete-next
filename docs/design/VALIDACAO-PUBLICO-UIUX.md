@@ -38,6 +38,6 @@ Nenhuma alteração de API, banco, DDL, deploy ou publicação de dados. O formu
 
 Fixtures locais identificadas nos testes; não são dados humanos. Algumas fixtures isoladas não fornecem catálogo e mostram contexto indisponível, preservando o estado real.
 
-- [Jogadores1366](evidencias/publico-uiux/jogadores-1366.png), [equipes1920](evidencias/publico-uiux/equipes-1920.png): largura excedente depois das colunas.
-- [Jogadores390](evidencias/publico-uiux/jogadores-390.png): nome longo, equipe agrupada e oito linhas visíveis.
-- [Jogos390](evidencias/publico-uiux/jogos-390.png): agenda sem placares inventados.
+- Jogadores1366, equipes1920: largura excedente depois das colunas.
+- Jogadores390: nome longo, equipe agrupada e oito linhas visíveis.
+- Jogos390: agenda sem placares inventados.

@@ -21,7 +21,7 @@ Contratos de identidade, dados privados, 0/00, atomicidade/recibos e publicaçã
 
 ## Aceite proporcional
 
-Decisão de 03/11/2026: reorganizar tarefas preservando as abas atuais, padronizar todas as telas para desktop e incluir o painel equipes/elenco 30/70. Jogos terá ordenação de uma coluna por vez sobre todos os registros; Informações terá campos proporcionais. Busca global permanece somente pública. O responsável escolheu validar um piloto navegável antes da expansão às rotas reais. Detalhes e limites em [REFORMA-UIUX.md](REFORMA-UIUX.md).
+Decisão de 03/11/2026: reorganizar tarefas preservando as abas atuais, padronizar todas as telas para desktop e incluir o painel equipes/elenco 30/70. Jogos terá ordenação de uma coluna por vez sobre todos os registros; Informações terá campos proporcionais. Busca global permanece somente pública. O responsável escolheu validar um piloto navegável antes da expansão às rotas reais. Detalhes e limites em [design system vigente](DESIGN-SYSTEM.md).
 
 Na súmula, a preparação mantém as vagas visíveis e a operação exibe 12 linhas por equipe. As parciais ficam ao lado do lançamento, e o histórico de ações rola dentro da tabela. **Salvar e publicar** e **Salvar e republicar** concluem a ação no painel de salvamento, com as estatísticas coletivas calculadas automaticamente. No fluxo legado, a revisão exige motivo de 10 a 500 caracteres. A escolha da súmula manual aparece quando ela precisa substituir a fonte PDF. O histórico de edição consulta versões publicadas. O acesso ao resultado aparece quando a rota pública pode servi-lo.
 

@@ -4,7 +4,7 @@ import { publishedSheet } from "./fixtures/published-game";
 import { publicationSheet } from "./fixtures/publication";
 
 for (const kind of ["estatisticas", "sumula"] as const) {
-  test(`${kind}: componentes reais conservam a apresentação aprovada`, async ({
+  test(`${kind}: apresentação real usa os tokens vigentes e legenda aberta`, async ({
     page,
   }, info) => {
     await page.setViewportSize(
@@ -12,46 +12,6 @@ for (const kind of ["estatisticas", "sumula"] as const) {
         ? { width: 1440, height: 900 }
         : { width: 390, height: 844 },
     );
-    const reference =
-      kind === "estatisticas"
-        ? "/docs/design/prototipos/estatisticas/Estatisticas%20de%20atletas.html"
-        : "/docs/design/prototipos/sumula/Sumula%20do%20jogo%20publicado.html";
-    const selectors =
-      kind === "estatisticas"
-        ? [
-            ".filters",
-            "#team-filter-toggle",
-            "#column-picker-toggle",
-            ".reference-explorer .statistics-table .reference-player",
-          ]
-        : [".game-context", ".period-table", ".roster-table .athlete-cell"];
-    const read = () =>
-      page.evaluate(
-        (items) =>
-          items.map((selector) => {
-            const node = document.querySelector(selector);
-            if (!node) return { selector, missing: true };
-            const s = getComputedStyle(node);
-            return {
-              selector,
-              font: s.fontFamily,
-              size: s.fontSize,
-              color: s.color,
-              background: s.backgroundColor,
-              width:
-                selector === ".header-inner.wrap"
-                  ? node.getBoundingClientRect().width
-                  : undefined,
-            };
-          }),
-        selectors,
-      );
-    await page.goto("http://127.0.0.1:5174" + reference);
-    await page
-      .locator(kind === "estatisticas" ? ".reference-player" : ".roster-table")
-      .first()
-      .waitFor();
-    const expected = await read();
     if (kind === "estatisticas") {
       const f = await statisticsBrowserFixture(page);
       await page.goto(f.url);
@@ -69,20 +29,44 @@ for (const kind of ["estatisticas", "sumula"] as const) {
         .first()
         .waitFor();
     }
-    // Shared navigation now follows the accepted reform pilot. Preserve the scoresheet body and reference controls;
-    // player names follow the explicit 14px legibility requirement.
-    const approved = expected.map((item) => ({
-      ...item,
-      size: item.selector.includes(".reference-player") ? "14px" : item.size,
-    }));
-    expect(await read()).toEqual(approved);
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
+    // Current design tokens and real components are the reference. Archived
+    // visual fixtures must not lock a superseded font size or composition.
+    const tokens = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement);
+      return ["--bb-blue", "--bb-danger", "--bb-success"].map((key) =>
+        style.getPropertyValue(key).trim().toLowerCase(),
+      );
+    });
+    expect(tokens).toEqual(["#075fca", "#e52207", "#008817"]);
+    const legend = page
+      .locator(kind === "estatisticas" ? ".reference-legend" : ".legend")
+      .first();
+    await expect(legend).toBeVisible();
+    await expect(legend.locator("dl")).toBeVisible();
+    expect(await legend.evaluate((node) => node.tagName)).toBe("SECTION");
+    await expect(legend.locator("summary")).toHaveCount(0);
+    const position = await page.evaluate(
+      (selector) => {
+        const legend = document.querySelector(selector);
+        const tables = [...document.querySelectorAll("table")];
+        const lastTable = tables.at(-1);
+        const tableRegion =
+          lastTable?.closest(".scrollable-table") ?? lastTable;
+        return {
+          legendTop: legend?.getBoundingClientRect().top ?? -1,
+          lastTableBottom: tableRegion?.getBoundingClientRect().bottom ?? 0,
+          pageWidth: document.documentElement.scrollWidth,
+          viewport: innerWidth,
+        };
+      },
+      kind === "estatisticas" ? ".reference-legend" : ".legend",
+    );
+    expect(position.legendTop).toBeGreaterThanOrEqual(
+      position.lastTableBottom - 1,
+    );
+    expect(position.pageWidth).toBeLessThanOrEqual(position.viewport);
     await page.screenshot({
-      path: `.preview-artifacts/fidelidade-${kind}-${info.project.name}.png`,
+      path: `.preview-artifacts/padroes-atuais-${kind}-${info.project.name}.png`,
       fullPage: false,
     });
   });

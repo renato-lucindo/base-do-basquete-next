@@ -1,5 +1,12 @@
 # Progresso atual
 
+## Limpeza de referências — 22/11/2026
+
+- Mesma branch `codex/limpeza-referencias-design` e [PR #88](https://github.com/renato-lucindo/base-do-basquete-next/pull/88), base `824a3d5`. Escopo reduzido por instrução do responsável: exclusão de 96 capturas anteriores ao padrão aprovado, quatro guias visuais superados e duas evidências auxiliares sem uso, sem arquivamento nem reorganização de pastas.
+- Revertidos os ajustes extras de CI, geradores, comentários em `src/` e relatórios novos. Fontes técnicas usadas pelos testes permanecem nos caminhos originais. Links afetados corrigidos; teste das telas reais consulta o padrão vigente, sem HTML antigo como baseline.
+- Verificação focal: 10 testes de navegador PASS, ESLint e formatação dos arquivos alterados PASS; 631 links locais sem destinos excluídos e scanner de segredos PASS. Resultado remoto do novo SHA fica nos checks da PR; provas de SHAs anteriores não validam esta revisão. Sem merge, deploy, banco ou publicação de dados. Alterações humanas do checkout original e revisões concorrentes do protótipo externo preservadas.
+- Próximo passo: conferir o diff reduzido e os checks atuais da mesma PR. Os registros abaixo são o contexto preexistente, não novas execuções desta unidade.
+
 ## Organizadores de campeonatos
 
 - Unidade `codex/organizadores`, a partir de `baa6ccd`. Organizador obrigatório em campeonato novo, salvo junto com a disputa. Campeonatos de teste usam **Admin** e aceitam apenas disputas de teste. Edição e lista refletem o vínculo compartilhado, com bloqueio após a primeira publicação.

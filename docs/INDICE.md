@@ -78,14 +78,14 @@ Este índice orienta agentes iniciando em novas sessões. Leia o documento que c
 
 1. [`docs/decisoes/009-sumula-persistida.md`](decisoes/009-sumula-persistida.md) — contrato de persistência da súmula
 2. [`docs/decisoes/016-estatisticas-de-snapshots-confirmados.md`](decisoes/016-estatisticas-de-snapshots-confirmados.md) — fonte das estatísticas
-3. [`docs/design/INTEGRACAO.md`](design/INTEGRACAO.md) — contrato dos protótipos de súmula e estatísticas (colunas, cálculos, UX)
+3. [design system vigente](design/DESIGN-SYSTEM.md) — design system e componentes vigentes
 4. [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) — evidências históricas e limites dos protótipos
 5. [`historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md`](../historico/documentacao/validacoes/VALIDACAO-SUMULA-DESKTOP.md) — evidência histórica de validação da súmula desktop real
 6. [`historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md`](../historico/documentacao/validacoes/VALIDACAO-ESTATISTICAS.md) — evidência histórica de validação das estatísticas
 7. `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` — fórmulas e regras esportivas
 
 > [!NOTE]
-> O diretório `docs/design/prototipos/` contém HTML navegável para referência de UX; **não** representa a implementação real. A implementação está em `src/games/` e `src/statistics/`.
+> Os protótipos permanecem apenas como fontes técnicas das verificações existentes. Para decisões de UI, usar o design system, o catálogo aprovado e os padrões vigentes.
 
 ### 3.8 Importação e gerenciamento de atletas/equipes
 
@@ -131,7 +131,7 @@ Estes documentos estão em `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/
 | [`docs/design/PADROES-ADMIN.md`](design/PADROES-ADMIN.md)                                                                           | Componentes, CRUD, formulários, modais, filtros, combobox, feedback                | Admin   |
 | [`docs/design/ADMIN.md`](design/ADMIN.md)                                                                                           | Percursos e aceite proporcional                                                    | Admin   |
 | [`docs/design/PUBLICO.md`](design/PUBLICO.md)                                                                                       | Fluxos, páginas de disputa e regras de publicação                                  | Público |
-| [`docs/design/INTEGRACAO.md`](design/INTEGRACAO.md)                                                                                 | Contrato dos protótipos de súmula e estatísticas                                   | Ambas   |
+| [design system vigente](design/DESIGN-SYSTEM.md)                                                                                    | Design system e componentes vigentes                                               | Ambas   |
 | [`docs/design/SKILLS.md`](design/SKILLS.md)                                                                                         | Origem, licença, hashes e uso das skills `ui-ux-pro-max` e `web-design-guidelines` | Ambas   |
 | [`historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md`](../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md) | Evidências históricas dos protótipos públicos (consulta pontual)                   | Público |
 
@@ -179,7 +179,6 @@ Preservados para consulta pontual. **Não substituem decisões vigentes.**
 | [`historico/progresso/`](../historico/progresso/README.md)                  | Checkpoints anteriores de progresso                                                              |
 | [`histórico de validações`](../historico/documentacao/README.md#validacoes) | Evidências de validação técnica (por percurso)                                                   |
 | [`docs/evidencias/`](evidencias/)                                           | Benchmarks, concorrência e capturas de testes                                                    |
-| [`docs/design/evidencias/`](design/evidencias/)                             | Evidências dos protótipos públicos                                                               |
 
 > [!NOTE]
 > `historico/documentacao/AJUSTES-DE-EXPERIENCIA.md` contém feedbacks de protótipo de 22–27/10. Regras permanentes aplicáveis foram absorvidas em `docs/design/`. Não tratar as orientações históricas como requisitos atuais sem verificar se foram incorporadas.
@@ -211,7 +210,7 @@ Persistindo uma contradição, registre as fontes conflitantes (caminho/seção,
 
 ### Editar um jogo (entrada de dados / súmula)
 
-Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `decisoes/009-sumula-persistida.md` → `design/INTEGRACAO.md` (seção Súmula) → evidência de súmula no histórico, se necessária → `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` (regras esportivas) → `design/PADROES-ADMIN.md` (formulários e feedback)
+Leia: `AGENTS.md` → `CONTRIBUTING.md` → `PROGRESSO.md` → `decisoes/009-sumula-persistida.md` → `design/DESIGN-SYSTEM.md` → `design/PUBLICO.md` (seção Partida) → evidência de súmula no histórico, se necessária → `especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/docs/CONTRATOS.md` (regras esportivas) → `design/PADROES-ADMIN.md` (formulários e feedback)
 
 ### Adicionar um atleta (cadastro / importação)
 

@@ -20,7 +20,7 @@ CSS restrito à listagem de súmula: largura intrínseca/centralização acima10
 
 Provas focais observadas:44testes de domínio de Equipes PASS antes do último caso de identidade;28cenários Chromium desktop/mobile PASS;4novos cenários de seleção999IDs/reload/perfil/POST e última resposta/máximos PASS. A revisão final acrescentou caso RED de busca pela identidade pública completa dentro de uma fase; validação final da composição ainda será registrada abaixo. Gate completo em execução; não declarar concluído antes de seu resultado real.
 
-[1366px](evidencias/equipes-refinamento/equipes-1366.png) · [1920px](evidencias/equipes-refinamento/equipes-1920.png) · [390px](evidencias/equipes-refinamento/equipes-390.png) · [320px](evidencias/equipes-refinamento/equipes-320.png). Fixtures sintéticas, com nomes longos; capturas serão renovadas após o ajuste final de largura da identificação no celular.
+1366px · 1920px · 390px · 320px. Fixtures sintéticas, com nomes longos; capturas serão renovadas após o ajuste final de largura da identificação no celular.
 
 ## Revisão e histórico
 
@@ -60,7 +60,7 @@ Revisão web-design-guidelines refeita pela fonte atual em05/11/2026: sem novos 
 
 Resultados finais locais incrementais:48unitários de Equipes PASS;20cenários Chromium PASS na rodada +2de armazenamento cheio PASS após corrigir a interação do teste (click, pois a aplicação rejeita a desmarcação quando não consegue guardar). WebKitWindows12PASS e2expectativas inválidas de foco após clique; Safari não dá foco de teclado ao botão por clique. O teste passa a focar/ativar por Enter e comprova a manutenção do foco:4cenários finais de armazenamento/bordas PASS. Os12anteriores são de produto inalterado, sem repetir por docs. Nenhum retry/skip/timeout adicional. CI macOS continua obrigatória para overscroll nativo.
 
-Capturas da composição final renovadas: desktop1366/1920,390/320, [zoom200%](evidencias/equipes-refinamento/zoom-200.png) e [texto200%](evidencias/equipes-refinamento/texto-200.png). Sem transbordamento da página; PTS/J acessíveis no celular, nomes com quebra controlada, Pos. vertical e nome horizontal fixos, scrollbars sincronizadas, blocos intrínsecos em1051+ e altura70vh. Barra superior reservada/oculta sem overflow, visível apenas quando há deslocamento horizontal. Preservada inércia/gestos/zoom nativos, sem handlers preventDefault para toque/roda. Testes não substituem celular físico.
+Capturas da composição final renovadas: desktop1366/1920,390/320, zoom200% e texto200%. Sem transbordamento da página; PTS/J acessíveis no celular, nomes com quebra controlada, Pos. vertical e nome horizontal fixos, scrollbars sincronizadas, blocos intrínsecos em1051+ e altura70vh. Barra superior reservada/oculta sem overflow, visível apenas quando há deslocamento horizontal. Preservada inércia/gestos/zoom nativos, sem handlers preventDefault para toque/roda. Testes não substituem celular físico.
 
 CI inicial da PR em42130603266 sobre6b41ac1 não valida os ajustes posteriores no próprio teste/relatório; consultar o último SHA. Integração e deploy ainda não executados. Configurações UIUX/principal e Access comparadas somente em leitura, sem alteração. Estado atual no checkpoint.
 

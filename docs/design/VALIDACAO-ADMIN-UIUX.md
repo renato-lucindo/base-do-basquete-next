@@ -35,7 +35,7 @@ Achados corrigidos: games/workspace.tsx (linhas antigas sob nova ordenação ap�
 
 ## Capturas
 
-[Equipes1366](evidencias/admin-uiux/admin-after-equipes-1366.png), [Jogos1920](evidencias/admin-uiux/admin-after-jogos-1920.png), [elenco390](evidencias/admin-uiux/admin-reform-equipes-390.png), [reflow320/texto200](evidencias/admin-uiux/admin-reform-equipes-320-text200.png), [Informações1920](evidencias/admin-uiux/admin-reform-informacoes-1920.png), [jogo com nomes longos1366](evidencias/admin-uiux/admin-reform-jogos-1366.png). São fixtures, sem aceite humano de produção ou prova de gravação remota.
+Equipes1366, Jogos1920, elenco390, reflow320/texto200, Informações1920, jogo com nomes longos1366. São fixtures, sem aceite humano de produção ou prova de gravação remota.
 
 Revisão por arquivo/linha: games/workspace.tsx:1095 (aria-sort), :189 (limpeza de coleção/cancelamento), :435 (restauração de foco/posição); teams/screen.tsx:710 (guardas da seleção), :781 (retorno com guarda); teams/screen.css:46 (30/70 e reflow), competition/compact.css:328 (campos proporcionais). Sem achado bloqueante aberto na revisão do autor; cobertura remota/autenticada e desempenho em volume real não foram comprovados.
 
@@ -53,6 +53,6 @@ A revisão automática externa `chatgpt-codex-connector` apontou P2 em `src/team
 
 O botão agora depende da seleção ativa, fora do conteúdo da linha filtrada. `mayLeave` continua protegendo o retorno; filtro, página e posição continuam preservados. Se a linha de origem existir, ela recebe o foco; se sair do filtro, o campo de busca recebe o foco e pode revelar a inscrição com o nome salvo. Sem alterar comandos, ACK, banco ou CSS.
 
-Regressão de equipes/layout/guardas: **27PASS/1skip prévio** (`.preview-artifacts/admin-return-green.log`). Caso final desktop/mobile com teclado Enter, foco, recuperação do filtro e axe: **2PASS**, sem skips (`.preview-artifacts/admin-return-keyboard-axe.log`). [Captura do retorno disponível](evidencias/admin-uiux/admin-return-outside-filter-mobile.png), inspecionada visualmente, com fixtures. Axe sem violações reportadas nesse estado, sem alegar WCAG integral.
+Regressão de equipes/layout/guardas: **27PASS/1skip prévio** (`.preview-artifacts/admin-return-green.log`). Caso final desktop/mobile com teclado Enter, foco, recuperação do filtro e axe: **2PASS**, sem skips (`.preview-artifacts/admin-return-keyboard-axe.log`). Captura do retorno disponível, inspecionada visualmente, com fixtures. Axe sem violações reportadas nesse estado, sem alegar WCAG integral.
 
 Revisão proporcional ui-ux-pro-max e web-design-guidelines, fonte atualizada consultada em04/11. `src/teams/screen.tsx:776` — retorno independente da linha; `:791` — foco alternativo na busca. Nenhum achado aberto na revisão do autor sobre esse diff. Revisão externa foi automática sobre commit anterior, sem parecer humano independente. Gate do código corrigido PASS, encerrado com código0:699unitários/145arquivos, transporte7, banco13, Workerd30, PDF1, lint/formato/tipos/build/fronteira cliente/segredos. Log `.preview-artifacts/admin-return-gate.log`. CI do novo HEAD ainda precisa ser conferida antes de integrar.
