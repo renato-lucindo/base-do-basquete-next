@@ -78,12 +78,16 @@ export function buildStatisticsPage(
 ) {
   const query = parseStatisticsQuery(serializeStatisticsQuery(requested)),
     selected = selectStatisticsFacts(input, query.scope, query.dataset),
-    labels = selected.registrationLabels,
-    all = aggregateConfirmedStatistics(selected.facts, {
-      mode: query.mode,
-      minimumSeconds: selected.minimumSeconds,
-      presentation: "public-leaderboard",
-    });
+    labels = selected.registrationLabels;
+  if (query.registrationId)
+    selected.facts = selected.facts.filter(
+      (f) => f.registration.registrationId === query.registrationId,
+    );
+  const all = aggregateConfirmedStatistics(selected.facts, {
+    mode: query.mode,
+    minimumSeconds: selected.minimumSeconds,
+    presentation: "public-leaderboard",
+  });
   const searched = all.filter(
     (r) =>
       (!query.search ||

@@ -8,6 +8,7 @@ import {
 } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 export type FilterOperator = ">=" | ">" | "<=" | "<" | "=";
 export interface StatisticsQuery {
+  registrationId?: string;
   dataset: "all" | "boxscore";
   mode: BoxscoreStatisticsMode;
   scope: BoxscoreGameScope;
@@ -98,6 +99,14 @@ export function parseStatisticsQuery(
     columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
     page = Number(params.get("page"));
   return {
+    ...(params.has("registrationId")
+      ? {
+          registrationId: z
+            .uuid()
+            .parse(params.get("registrationId"))
+            .toLowerCase(),
+        }
+      : {}),
     dataset: params.get("dataset") === "boxscore" ? "boxscore" : "all",
     mode,
     scope: parseBoxscoreGameScope(params.get("scope")),
@@ -157,6 +166,7 @@ export function serializeStatisticsQuery(
     columns: query.columns.join(","),
   });
   if (query.pageSize === 30) p.set("pageSize", "30");
+  if (query.registrationId) p.set("registrationId", query.registrationId);
   if (query.search) p.set("q", query.search);
   if (query.teams !== null)
     for (const id of query.teams.length ? query.teams : [""])

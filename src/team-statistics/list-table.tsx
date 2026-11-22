@@ -20,9 +20,11 @@ export function TeamsListTable({
   data: d,
   onSort,
   canNavigate = true,
+  highlightRegistrationId,
 }: {
   data: TeamsListPage;
   canNavigate?: boolean;
+  highlightRegistrationId?: string;
   onSort: (key: TeamsListPage["query"]["sort"]) => void;
 }) {
   const maxima = Object.fromEntries(
@@ -75,7 +77,12 @@ export function TeamsListTable({
               </thead>
               <tbody>
                 {d.rows.map((r) => (
-                  <tr key={r.registrationId}>
+                  <tr
+                    key={r.registrationId}
+                    data-profile-selected={
+                      highlightRegistrationId === r.registrationId || undefined
+                    }
+                  >
                     <td className="rank">{r.rank ?? "—"}</td>
                     <th scope="row">
                       <a

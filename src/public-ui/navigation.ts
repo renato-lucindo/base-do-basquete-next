@@ -32,6 +32,14 @@ export function safePublicReturn(
     u.search = "";
     return u.pathname + u.hash;
   }
+  if (
+    u.pathname === "/equipe.html" &&
+    !new URLSearchParams(search).has("disputeId") &&
+    z.uuid().safeParse(id).success
+  ) {
+    u.search = "";
+    return u.pathname + u.hash;
+  }
   const context = ["/equipe.html", "/atleta.html", "/resultado.html"].includes(
     u.pathname,
   )

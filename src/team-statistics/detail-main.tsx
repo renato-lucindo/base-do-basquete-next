@@ -1,9 +1,10 @@
 import "../ui-system/readability.css";
 import { createRoot } from "react-dom/client";
-import { TeamsPublicPage } from "./public-page";
+import { TeamProfilePage } from "../team-profile/public-page";
 import "../access/screen.css";
 import "../statistics/screen.css";
 import "./screen.css";
-createRoot(document.getElementById("root")!).render(
-  <TeamsPublicPage kind="detail" />,
-);
+import "../statistics/reference.css";
+import "../regulation/public-standings.css";
+import "../team-profile/screen.css";
+createRoot(document.getElementById("root")!).render(<TeamProfilePage />);

@@ -100,9 +100,11 @@ export function usePublicStandings(disputeId: string | null) {
 export function PublicStandingsTables({
   value,
   publishedRegistrationIds,
+  profile,
 }: {
   value: PublicStandings;
   publishedRegistrationIds?: ReadonlySet<string>;
+  profile?: { teamId: string; registrationId: string };
 }) {
   const params = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
   const { stage, phase, group, knockoutAvailable } = standingsSelection(
@@ -113,13 +115,13 @@ export function PublicStandingsTables({
   const phases = value.definition.groupPhases;
   const selectionLink = (phaseId?: string, groupId?: string) => {
     const query = new URLSearchParams(params);
-    query.set("secao", "classificacao");
+    if (!profile) query.set("secao", "classificacao");
     query.set("etapa", phaseId ? "classificatoria" : "eliminatoria");
     if (phaseId) query.set("fase", phaseId);
     else query.delete("fase");
     if (groupId) query.set("grupo", groupId);
     else query.delete("grupo");
-    return `#${value.disputeId}?${query}`;
+    return `#${profile?.teamId ?? value.disputeId}?${query}`;
   };
   const canonical =
     stage === "eliminatoria"
@@ -296,7 +298,13 @@ export function PublicStandingsTables({
                                     (b.position ?? Infinity),
                                 )
                                 .map((r) => (
-                                  <tr key={r.registrationId}>
+                                  <tr
+                                    key={r.registrationId}
+                                    data-profile-selected={
+                                      profile?.registrationId ===
+                                        r.registrationId || undefined
+                                    }
+                                  >
                                     <td>
                                       {r.position ?? "—"}
                                       {r.tied && r.position !== null
@@ -348,22 +356,24 @@ export function PublicStandingsTables({
                             </tbody>
                           </table>
                         </ScrollableTable>
-                        <section
-                          className="table-legend reference-legend"
-                          aria-label="Legenda da classificação"
-                        >
-                          <h2>Legenda</h2>
-                          <dl>
-                            {standingsColumns.map(([label, description]) =>
-                              description ? (
-                                <div key={label}>
-                                  <dt>{label}</dt>
-                                  <dd>{description}</dd>
-                                </div>
-                              ) : null,
-                            )}
-                          </dl>
-                        </section>
+                        {!profile && (
+                          <section
+                            className="table-legend reference-legend"
+                            aria-label="Legenda da classificação"
+                          >
+                            <h2>Legenda</h2>
+                            <dl>
+                              {standingsColumns.map(([label, description]) =>
+                                description ? (
+                                  <div key={label}>
+                                    <dt>{label}</dt>
+                                    <dd>{description}</dd>
+                                  </div>
+                                ) : null,
+                              )}
+                            </dl>
+                          </section>
+                        )}
                       </div>
                       {!!g.standings.tieSteps.length && (
                         <details>

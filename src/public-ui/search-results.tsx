@@ -18,9 +18,11 @@ import "./search.css";
 export function searchHitHref(hit: SearchHit, q: string) {
   return hit.kind === "players"
     ? publicDetailLink(`/atleta.html#${hit.id}`, hit.disputeId)
-    : hit.kind === "competitions" && hit.directDisputeId
-      ? disputeLink(hit.directDisputeId)
-      : searchHref(q, hit.kind, 1, hit.id);
+    : hit.kind === "teams"
+      ? publicDetailLink(`/equipe.html#${hit.id}`, null)
+      : hit.kind === "competitions" && hit.directDisputeId
+        ? disputeLink(hit.directDisputeId)
+        : searchHref(q, hit.kind, 1, hit.id);
 }
 export function searchHitDescription(hit: SearchHit) {
   if (hit.kind === "competitions" && hit.directDisputeId) {
@@ -50,7 +52,9 @@ function SearchEntity({ hit }: { hit: SearchHit }) {
     return (
       <details className="public-search-entity" open>
         <summary>
-          <strong>{hit.name}</strong>
+          <strong>
+            <a href={searchHitHref(hit, "")}>{hit.name}</a>
+          </strong>
           <small>{hit.participations.length} participações públicas</small>
         </summary>
         <ul>
