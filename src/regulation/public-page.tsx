@@ -130,9 +130,11 @@ export function PublicStandingsTables({
         ? selectionLink(active, group?.id)
         : null;
   useEffect(() => {
-    if (canonical && window.location.hash !== canonical)
+    if (canonical && window.location.hash !== canonical) {
       window.history.replaceState(window.history.state, "", canonical);
-  }, [canonical]);
+      if (profile) window.dispatchEvent(new HashChangeEvent("hashchange"));
+    }
+  }, [canonical, profile?.teamId]);
   const names = new Map(value.registrations.map((r) => [r.id, r.name]));
   const compactNames = new Map(
     value.registrations.map((r) => [

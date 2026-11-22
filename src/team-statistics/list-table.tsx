@@ -21,10 +21,12 @@ export function TeamsListTable({
   onSort,
   canNavigate = true,
   highlightRegistrationId,
+  showLegend = true,
 }: {
   data: TeamsListPage;
   canNavigate?: boolean;
   highlightRegistrationId?: string;
+  showLegend?: boolean;
   onSort: (key: TeamsListPage["query"]["sort"]) => void;
 }) {
   const maxima = Object.fromEntries(
@@ -142,20 +144,22 @@ export function TeamsListTable({
           Nenhuma inscrição neste recorte.
         </p>
       )}
-      <section
-        className="table-legend reference-legend"
-        aria-labelledby="team-legend"
-      >
-        <h2 id="team-legend">Legenda</h2>
-        <dl>
-          {d.query.columns.map((key) => (
-            <div key={key}>
-              <dt>{listMetric(key, d.scoresheet).label}</dt>
-              <dd>{listMetric(key, d.scoresheet).name}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {showLegend && (
+        <section
+          className="table-legend reference-legend"
+          aria-labelledby="team-legend"
+        >
+          <h2 id="team-legend">Legenda</h2>
+          <dl>
+            {d.query.columns.map((key) => (
+              <div key={key}>
+                <dt>{listMetric(key, d.scoresheet).label}</dt>
+                <dd>{listMetric(key, d.scoresheet).name}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
     </TooltipProvider>
   );
 }

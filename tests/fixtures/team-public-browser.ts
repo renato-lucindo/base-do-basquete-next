@@ -7,6 +7,10 @@ import { buildTeamsPage } from "../../src/team-statistics/domain";
 import { buildTeamDetail } from "../../src/team-statistics/detail";
 import { parseTeamsQuery } from "../../src/team-statistics/query-contract";
 import { parseTeamDetailQuery } from "../../src/team-statistics/detail-query";
+import {
+  buildStatisticsPage,
+  parseStatisticsQuery,
+} from "../../src/statistics/query";
 export async function teamPublicFixture(
   page: Page,
   options: { longList?: boolean; longDetail?: boolean } = {},
@@ -58,6 +62,85 @@ export async function teamPublicFixture(
     return route.fulfill({
       status: 401,
       json: { error: { message: "login" } },
+    });
+  });
+  await page.route("**/api/public/**", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname.endsWith("catalog"))
+      return route.fulfill({
+        json: {
+          games: source.games.map(({ snapshot: g }) => ({
+            id: g.id,
+            disputeId: g.disputeId,
+            context: g.context,
+            game: g.game,
+            score: {
+              home: g.facts.teams.home.points,
+              away: g.facts.teams.away.points,
+            },
+          })),
+          next: null,
+          disputes: [],
+        },
+      });
+    if (url.pathname.includes("discovery")) {
+      const id = url.searchParams.get("entityId") ?? pubId(9);
+      const identities = [
+        ...new Map(
+          source.games.flatMap(({ snapshot: g }) =>
+            [g.game.home, g.game.away]
+              .filter((r) => r.team.id === id)
+              .map((r) => [
+                r.registrationId,
+                { ...r, context: g.context, disputeId: g.disputeId },
+              ]),
+          ),
+        ).values(),
+      ];
+      return route.fulfill({
+        json: {
+          query: url.searchParams.get("q"),
+          type: "teams",
+          entityId: id,
+          page: 1,
+          totalPages: 1,
+          counts: { players: 0, teams: 1, competitions: 0 },
+          results: [
+            {
+              kind: "teams",
+              id,
+              name: identities[0].team.name,
+              abbreviation: identities[0].team.abbreviation,
+              participations: identities.map((r) => ({
+                disputeId: r.disputeId,
+                context: r.context,
+                registrationId: r.registrationId,
+                name: r.name,
+                hasResults: true,
+              })),
+            },
+          ],
+        },
+      });
+    }
+    if (url.pathname.includes("/statistics/")) {
+      const delay = state.delayNext;
+      state.delayNext = 0;
+      if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+      return route
+        .fulfill({
+          json: buildStatisticsPage(
+            source,
+            parseStatisticsQuery(url.searchParams),
+          ),
+        })
+        .catch(() => undefined);
+    }
+    if (url.pathname.includes("dispute-status"))
+      return route.fulfill({ json: "in_progress" });
+    return route.fulfill({
+      status: 404,
+      json: { message: "Ainda não publicado." },
     });
   });
   await page.route("**/api/public/teams/**", async (route) => {

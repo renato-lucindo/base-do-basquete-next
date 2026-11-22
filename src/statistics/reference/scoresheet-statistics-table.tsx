@@ -95,6 +95,7 @@ export function ScoresheetStatisticsTable({
   compare,
   onCompare,
   comparisonEnabled,
+  showJersey = false,
 }: {
   data: StatisticsPage;
   showTeam: boolean;
@@ -102,6 +103,7 @@ export function ScoresheetStatisticsTable({
   compare: StatisticsQuery["compare"];
   onCompare: (id: string, focusId: string) => void;
   comparisonEnabled: boolean;
+  showJersey?: boolean;
 }) {
   return (
     <div
@@ -120,6 +122,7 @@ export function ScoresheetStatisticsTable({
           <colgroup>
             <col className="column-position" />
             <col className="column-player" />
+            {showJersey && <col className="column-jersey" />}
             {showTeam && <col className="column-team" />}
             {data.columns.length > 0 && (
               <col span={data.columns.length} className="column-metric" />
@@ -133,6 +136,7 @@ export function ScoresheetStatisticsTable({
               <th scope="col" className="statistics-player">
                 Atleta
               </th>
+              {showJersey && <th scope="col">Camisa</th>}
               {showTeam && (
                 <th scope="col" className="team-column-header">
                   Equipe
@@ -187,17 +191,21 @@ export function ScoresheetStatisticsTable({
                     >
                       {publicPlayerHistoryName(row.names, row.nicknames)}
                     </a>{" "}
-                    <span
-                      className="player-jersey"
-                      aria-label={
-                        row.jerseys.length
-                          ? `Camisa ${row.jerseys.join(" / ")}`
-                          : "Camisa não informada"
-                      }
-                    >
-                      {row.jerseys.length ? `#${row.jerseys.join(" / ")}` : "—"}
-                    </span>
-                    {!showTeam && (
+                    {!showJersey && (
+                      <span
+                        className="player-jersey"
+                        aria-label={
+                          row.jerseys.length
+                            ? `Camisa ${row.jerseys.join(" / ")}`
+                            : "Camisa não informada"
+                        }
+                      >
+                        {row.jerseys.length
+                          ? `#${row.jerseys.join(" / ")}`
+                          : "—"}
+                      </span>
+                    )}
+                    {!showTeam && !showJersey && (
                       <span className="player-team-mobile">
                         {" "}
                         ·{" "}
@@ -213,6 +221,9 @@ export function ScoresheetStatisticsTable({
                     )}
                   </span>
                 </th>
+                {showJersey && (
+                  <td>{row.jerseys.length ? row.jerseys.join(" / ") : "—"}</td>
+                )}
                 {showTeam && (
                   <td className="team-name">
                     <a

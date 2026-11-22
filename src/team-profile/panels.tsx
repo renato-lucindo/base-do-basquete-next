@@ -12,7 +12,6 @@ import {
   type StatisticsMetric,
 } from "../statistics/metrics";
 import {
-  parseStatisticsQuery,
   serializeStatisticsQuery,
   type StatisticsQuery,
 } from "../statistics/query-contract";
@@ -25,6 +24,7 @@ import {
 import { TeamsListTable, listMetric } from "../team-statistics/list-table";
 import { ScrollableTable } from "../statistics/reference/scrollable-table";
 import type { TeamParticipation } from "./model";
+import { profilePlayerQuery, profileCollectiveQuery } from "./view-state";
 export const number = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 });
@@ -32,7 +32,6 @@ export const showNumber = (v: number | null | undefined) =>
   v == null ? "—" : number.format(v);
 export type LegendEntry = { label: string; name: string };
 export const campaignLegend: LegendEntry[] = [
-  { label: "Pos.", name: "Posição" },
   { label: "J", name: "Jogos" },
   { label: "V", name: "Vitórias" },
   { label: "D", name: "Derrotas" },
@@ -185,23 +184,24 @@ export function PlayersPanel({
   query: string;
   change: (query: string) => void;
 }) {
-  const q: StatisticsQuery = {
-    ...parseStatisticsQuery(new URLSearchParams(query), "all"),
-    registrationId: p.registrationId,
-    teams: null,
-    pageSize: 30,
-    compare: [],
-  };
+  const q = profilePlayerQuery(query, p.registrationId);
   const resource = useResource(
     `/api/public/statistics/${p.disputeId}?${serializeStatisticsQuery(q)}`,
     statisticsPageSchema,
   );
-  const data = resource.data;
+  const valid =
+    !resource.data ||
+    (resource.data.disputeId === p.disputeId &&
+      resource.data.rows.every((r) => r.registrationId === p.registrationId));
+  const data = valid ? resource.data : null;
   const available =
     data?.hasBoxscore === false
       ? sheetKeys
       : (Object.keys(STATISTICS_METRICS) as StatisticsMetric[]);
   const columns = q.columns.filter((k) => available.includes(k));
+  const visibleColumns = data
+    ? data.columns.filter((k) => columns.includes(k))
+    : [];
   const update = (patch: Partial<StatisticsQuery>) =>
     change(serializeStatisticsQuery({ ...q, ...patch }).toString());
   return (
@@ -236,15 +236,23 @@ export function PlayersPanel({
           onChange={(mode) => update({ mode, page: 1 })}
         />
       </div>
-      <ResourceMessage {...resource} />
+      <ResourceMessage
+        {...resource}
+        error={
+          valid
+            ? resource.error
+            : "As estatísticas retornaram outra inscrição. Tente novamente."
+        }
+      />
       {data && (
         <>
           <ScoresheetStatisticsTable
             data={{
               ...data,
-              columns: data.columns.filter((k) => columns.includes(k)),
+              columns: visibleColumns,
             }}
             showTeam={false}
+            showJersey
             onSort={(sort) =>
               update({
                 sort,
@@ -281,7 +289,7 @@ export function PlayersPanel({
           )}
         </>
       )}
-      <Legend entries={columns.map(referenceMetric)} />
+      <Legend entries={visibleColumns.map(referenceMetric)} />
     </>
   );
 }
@@ -298,12 +306,13 @@ export function CollectivePanel({
   after?: ReactNode;
   extraLegend?: LegendEntry[];
 }) {
-  const q = parseTeamsListQuery(new URLSearchParams(query));
+  const q = profileCollectiveQuery(query);
   const resource = useResource(
     `/api/public/teams/${p.disputeId}?${serializeTeamsListQuery(q)}`,
     teamsListPageSchema,
   );
-  const data = resource.data;
+  const valid = !resource.data || resource.data.disputeId === p.disputeId;
+  const data = valid ? resource.data : null;
   const update = (patch: Partial<TeamsListQuery>) =>
     change(serializeTeamsListQuery({ ...q, ...patch }).toString());
   return (
@@ -319,10 +328,18 @@ export function CollectivePanel({
             onChange={(scope) => update({ scope })}
           />
         </div>
-        <ResourceMessage {...resource} />
+        <ResourceMessage
+          {...resource}
+          error={
+            valid
+              ? resource.error
+              : "As estatísticas retornaram outra disputa. Tente novamente."
+          }
+        />
         {data && (
           <TeamsListTable
             data={data}
+            showLegend={false}
             highlightRegistrationId={p.registrationId}
             onSort={(sort) =>
               update({

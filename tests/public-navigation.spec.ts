@@ -111,7 +111,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   const source = page.url();
   await table.locator('a[href^="/equipe.html"]').first().click();
   await expect(
-    page.getByRole("navigation", { name: "Seções da equipe" }),
+    page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
   ).toBeVisible();
   await page.reload();
   await page.getByRole("link", { name: /^Voltar à origem/ }).click();
@@ -146,7 +146,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   for (const side of ["home", "away"]) {
     await row.locator(`.public-game-${side} a`).click();
     await expect(
-      page.getByRole("navigation", { name: "Seções da equipe" }),
+      page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
     ).toBeVisible();
     await page.getByRole("link", { name: /^Voltar à origem/ }).click();
     expect(page.url()).toBe(gamesSource);

@@ -1,24 +1,18 @@
 # Progresso atual
 
-Atualizado em 22/11/2026. Confira Git/PR/CI reais antes de retomar. O resumo anterior foi preservado integralmente em [histórico](../historico/progresso/2026-11-22-antes-perfis-equipes.md), incluindo as outras unidades e seus serviços.
+Atualizado em 22/11/2026. Estado anterior preservado no [histórico](../historico/progresso/2026-11-22-antes-perfis-equipes.md).
 
-## Perfis de equipes — WIP
+## Perfis de equipes
 
-- HTML revisado aceito e implementação autorizada em 22/11/2026. [Requisitos](design/PERFIS-EQUIPES.md), [HTML](design/prototipos/perfil-equipes-aceito.html), [plano](PLAN-PERFIS-EQUIPES.md).
-- Branch `codex/perfis-equipes`, base `824a3d59da5323202d869a4d93a1038bcd377044`; worktree `C:/Users/12405304716/.codex/worktrees/perfis-equipes/Base do Basquete-v1`. O commit WIP deste checkpoint é identificado por `git log -1`. Ainda sem PR desta unidade; criar uma única draft desta branch após conferir a composição na retomada.
-- Implementação inicial dos dois modos em `equipe.html`, composição de APIs públicas atuais, campanhas/jogos/pódios, tabelas embutidas e consulta de jogadores por inscrição. Busca global aponta ao perfil geral. Sem migration nova; dados fictícios só na referência e testes.
-- Evidências focais: `npx vitest run src/team-profile src/public-ui/navigation.test.ts`: **20 PASS**; `npx playwright test tests/team-profile.spec.ts --workers=1`: **2 PASS**, desktop/celular; `npx tsc --noEmit`: **PASS**. ESLint focal passou antes das últimas mudanças de navegação; Prettier executado nos arquivos alterados. Ajuste textual posterior corrigiu nome da competição nas conquistas e ainda precisa de conferência visual.
-- **Incompleto:** fixture do browser simula classificação ausente. Falta provar classificação completa/fase/grupo sem perder o ID da equipe, privacidade/prévia, erro/paginação, duas inscrições, busca/retorno e regressões da interface substituída. Faltam comparação visual, revisão final, gate e CI. Os testes iniciais não validam integralmente a entrega.
-- Conferir: entradas sem resultado ainda direcionam à lista; filtros entre abas e retorno; restauração de contexto do elenco no celular; legendas somente das colunas visíveis e sem duplicação. O novo parâmetro `registrationId` de estatísticas é aplicado antes da agregação e validado na rota.
+- HTML revisado aceito e implementação autorizada em 22/11. [Requisitos](design/PERFIS-EQUIPES.md), [plano](PLAN-PERFIS-EQUIPES.md), [validação](design/VALIDACAO-PERFIS-EQUIPES.md).
+- Branch `codex/perfis-equipes`, base `824a3d59da5323202d869a4d93a1038bcd377044`, worktree `C:/Users/12405304716/.codex/worktrees/perfis-equipes/Base do Basquete-v1`. Uma única PR para main será aberta com este código; conferir HEAD/PR reais na retomada.
+- Implementados os modos geral e por inscrição, classificação/coletivos completos, jogadores por inscrição, campanhas/status, recentes por ano, jogos sem Resultado, conquistas históricas e legenda expandida. Busca, aliases antigos, filtros e retorno preservados.
+- Gate completo local PASS em 22/11: 179 arquivos / 848 testes unitários, transportes, banco local, lint/formato/tipos, builds e runtime Worker/PDF, fronteira cliente e segredos. Código executável não mudou após esse gate; testes adicionais cobrem retorno mobile e larguras.
+- Browsers focais: perfil 10 PASS; equipes 14 PASS; busca/navegação 30 PASS; axe geral/jogadores sem violações. Regressão completa de 1004 casos e design:verify em execução. Primeiro ensaio interrompido por falta de disco durante banco local, espaço liberado automaticamente ao terminar o banco e reexecução iniciada. Não declarar os testes interrompidos aprovados.
+- CI desta branch ainda não executada. Próximo passo: concluir browsers/design, abrir/atualizar a PR única, acompanhar CI do HEAD e registrar resultados reais.
 
-## Pausa por cota
+## Autorizações e continuidade
 
-- Ferramenta oficial: **85% usados / 15% restantes** na janela de 5 h e **21% restante** na semanal. Reset Unix `1795372703`: 22/11/2026 às 15:38:23 de Brasília. Nenhum reset/crédito consumido.
-- Automação oficial **`retomar-perfis-de-equipes`**, ativa e confirmada por `automation_update view`, execução única hoje às **15:40:23 de Brasília**, reset + 2 min. A primeira criação com DTSTART foi recusada; a segunda sem DTSTART foi criada. Atualizar esta mesma automação se outra janela impedir; pausar ao concluir/cancelar.
-- Próximo passo: consultar cota, status/SHA e PRs neste worktree e continuar a mesma unidade. Priorizar fixture válida de classificação e regressões antes do gate/PR/CI.
-
-## Serviços e trabalho alheio
-
-- Sem deploy, migration, DDL ou publicação de dados nesta unidade. Versões dos serviços não consultadas. Nenhuma CI deste WIP executada ou declarada aprovada. PR #88 de limpeza de referências, em outra branch, preservada.
-- Checkout original `sync/trabalho-casa` preservado: `CONTRIBUTING.md` modificado, `.agents/skills/web-design-guidelines/` e `skills-lock.json` não rastreados. Não incorporados ao WIP. O resumo antigo desse checkout estava desatualizado; a implementação parte de `origin/main`.
-- CONTRIBUTING vigente exige avaliação da UI no Worker autorizado e novo aceite da implementação antes de integrar. Aceite do HTML não comprova deploy ou aceite do Worker. Conferir autorização concreta ao chegar a essas operações.
+- Sem deploy, migration, DDL ou publicação de dados nesta unidade. Serviços remotos não alterados. CONTRIBUTING exige avaliação no Worker autorizado e novo aceite visual antes do merge; alvo/autorização de deploy desta unidade ainda não definidos.
+- Automação existente `retomar-perfis-de-equipes` preservada, originalmente marcada para 22/11 às 15:40:23 de Brasília. Atualizar a mesma se for necessário aguardar CI ao encerrar; pausar quando restar somente ação humana. Última cota real consultada: 53% usados na janela 5h, reset Unix `1795385440`; não houve reset manual/créditos.
+- PR #88 de limpeza de referências em outra branch preservada. Checkout original `sync/trabalho-casa` mantém alterações humanas em CONTRIBUTING e skills locais, não incorporadas nesta unidade.

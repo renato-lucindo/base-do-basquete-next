@@ -15,13 +15,33 @@ import {
 import type { z } from "zod";
 const capacity = () =>
   new ApiFailure(413, "O histórico excede a capacidade desta consulta.");
+function validateCatalog(
+  page: z.infer<typeof catalogPageSchema>,
+  disputeId: string | null,
+  after: string | null,
+) {
+  let previous = after;
+  for (const game of page.games) {
+    if (
+      (previous && game.id <= previous) ||
+      (disputeId && game.disputeId !== disputeId)
+    )
+      throw new ApiFailure(503, "O catálogo mudou. Atualize o perfil.");
+    previous = game.id;
+  }
+  if (
+    page.disputes.some((d) => disputeId && d.disputeId !== disputeId) ||
+    (page.next && (!page.games.length || page.next !== previous))
+  )
+    throw new ApiFailure(503, "O catálogo mudou. Atualize o perfil.");
+}
 async function optional<T>(
   path: string,
   schema: z.ZodType<T>,
   signal: AbortSignal,
 ): Promise<T | null> {
   try {
-    return await api(path, schema, undefined, signal);
+    return await api(path, schema.nullable(), undefined, signal);
   } catch (error) {
     if (error instanceof ApiFailure && error.status === 404) return null;
     throw error;
@@ -42,6 +62,7 @@ async function catalog(disputeId: string | null, signal: AbortSignal) {
       signal,
     );
     first ??= page;
+    validateCatalog(page, disputeId, after);
     if (
       page.next &&
       (!page.games.length || page.next !== page.games.at(-1)?.id)
@@ -69,11 +90,12 @@ export async function loadTeamProfile(
   // The first catalog page contains the public dispute index; resolve identity
   // there before asking the identity-filtered search for the complete history.
   const first = await api(
-    `/api/public/catalog${scopeId ? `?disputeId=${scopeId}` : ""}`,
+    `/api/public/catalog?${scopeId ? `disputeId=${scopeId}` : ""}`,
     catalogPageSchema,
     undefined,
     signal,
   );
+  validateCatalog(first, scopeId, null);
   let known = first.disputes.flatMap((d) =>
     d.registrations
       .filter((r) => r.team.id === teamId)
@@ -124,6 +146,11 @@ export async function loadTeamProfile(
       undefined,
       signal,
     );
+    if (result.entityId !== teamId || result.type !== "teams")
+      throw new ApiFailure(
+        503,
+        "A identidade pública mudou. Atualize o perfil.",
+      );
     const team = result.results.find(
       (r) => r.kind === "teams" && r.id === teamId,
     );
@@ -198,6 +225,11 @@ export async function loadTeamProfile(
             .filter((r) => r.team.id === teamId)
             .map((r) => r.registrationId),
         ),
+        ...(awards?.placements.flatMap((p) =>
+          p.registrations
+            .filter((r) => r.teamId === teamId)
+            .map((r) => r.registrationId),
+        ) ?? []),
       ]);
       for (const p of identities.filter(
         (p) => p.disputeId === id && publicIds.has(p.registrationId),

@@ -1,9 +1,36 @@
 .team-profile-page {
+  --bb-font-body: 1rem;
+  --bb-font-section: 1.1875rem;
+  --bb-font-detail: 0.875rem;
   --team-blue: var(--bb-blue, #075fca);
   max-width: 1480px;
   width: calc(100% - 3.5rem);
   margin: 1.5rem auto 2rem;
   color: var(--public-text, #172b45);
+  min-width: 0;
+}
+.team-profile-page.public-site.statistics-public {
+  width: calc(100% - 3.5rem);
+  max-width: 1480px;
+  margin: 1.5rem auto 2rem;
+  padding: 0;
+  min-height: 0;
+  background: transparent;
+}
+.team-profile-page .standings-explorer {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+}
+.team-profile-page .team-profile-toolbar > label {
+  flex: 0 1 auto;
+  min-width: 7rem;
+}
+.team-profile-page .team-profile-toolbar > label.grow {
+  flex: 1;
+}
+.team-profile-page .team-profile-honors .team-profile-toolbar > label {
+  flex: 1;
   min-width: 0;
 }
 .team-profile-layout {
@@ -25,6 +52,10 @@
   align-items: center;
   gap: 1.2rem;
 }
+.team-profile-identity-row > div:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .team-profile-avatar {
   display: grid;
   place-items: center;
@@ -32,29 +63,29 @@
   border-radius: 5px 5px 22px 22px;
   color: white;
   font-weight: 750;
-  font-size: 1.5rem;
+  font-size: calc(1.5rem + 0.125rem);
   min-width: 4.5rem;
   height: 5rem;
   flex-shrink: 0;
   padding: 0.3rem;
 }
 .team-profile-page h1 {
-  font-size: 1.8rem;
+  font-size: calc(1.8rem + 0.125rem);
   letter-spacing: -0.04em;
   margin: 0.35rem 0;
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
 .team-profile-page h2 {
-  font-size: 1.1rem;
+  font-size: calc(1.1rem + 0.125rem);
   margin: 0;
 }
 .team-profile-page h3 {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem + 0.125rem);
   margin: 0;
 }
 .team-profile-eyebrow {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--public-muted);
@@ -62,7 +93,7 @@
   margin: 0;
 }
 .team-profile-subtitle {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem + 0.125rem);
   color: var(--public-muted);
   margin: 0.3rem 0 0;
 }
@@ -74,17 +105,17 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem + 0.125rem);
 }
 .team-profile-context small {
   display: block;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   margin-top: 0.2rem;
   color: var(--public-muted);
 }
 .team-profile-list-return {
   display: inline-block;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   margin-top: 0.8rem;
 }
 .team-profile-page a {
@@ -118,7 +149,7 @@
   max-width: 100%;
 }
 .team-profile-workspace > .bb-tabs button {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   padding: 1rem;
   min-height: 3.2rem;
   white-space: nowrap;
@@ -151,7 +182,7 @@
 }
 .team-profile-section-head p {
   margin: 0.3rem 0 0;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   color: var(--public-muted);
 }
 .team-profile-toolbar {
@@ -165,7 +196,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   min-width: 6rem;
 }
 .team-profile-page label.grow {
@@ -175,7 +206,7 @@
 .team-profile-page :is(input[type="search"], select) {
   width: 100%;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem + 0.125rem);
   background: #fff;
   color: var(--public-text);
   border: 1px solid #7b8796;
@@ -195,7 +226,7 @@
 }
 .team-profile-page .segmented button {
   padding: 0.55rem 0.8rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   min-height: 2.4rem;
   border: 0;
   background: white;
@@ -220,13 +251,13 @@
   padding: 0.75rem 0.6rem;
   white-space: nowrap;
   border-bottom: 1px solid var(--public-line);
-  font-size: 0.82rem;
+  font-size: calc(0.82rem + 0.125rem);
   text-align: right;
 }
 .team-profile-page .statistics-table thead th {
   background: #e9eff7;
   border-block: 1px solid #ccd7e5;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem + 0.125rem);
 }
 .team-profile-page .statistics-table th[scope="row"] {
   text-align: left;
@@ -235,7 +266,7 @@
 .team-profile-page .statistics-table small {
   display: block;
   white-space: normal;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
   font-weight: 400;
   color: var(--public-muted);
   margin-top: 0.25rem;
@@ -263,7 +294,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.73rem;
+  font-size: calc(0.73rem + 0.125rem);
   white-space: nowrap;
 }
 .team-profile-status:before {
@@ -274,16 +305,16 @@
   border-radius: 50%;
 }
 .team-profile-status[data-status="planned"]:before {
-  background: #2674ce;
+  background: var(--bb-status-planned);
 }
 .team-profile-status[data-status="in_progress"]:before {
-  background: #dc6b0b;
+  background: var(--bb-status-in-progress);
 }
 .team-profile-status[data-status="completed"]:before {
-  background: #008817;
+  background: var(--bb-status-completed);
 }
 .team-profile-status[data-status="cancelled"]:before {
-  background: #e52207;
+  background: var(--bb-status-cancelled);
 }
 .team-profile-games {
   table-layout: fixed;
@@ -301,7 +332,7 @@
   align-items: center;
   gap: 0.6rem;
   color: var(--public-text);
-  font-size: 0.85rem;
+  font-size: calc(0.85rem + 0.125rem);
 }
 .team-profile-match strong {
   color: #1557a4;
@@ -316,14 +347,14 @@
   padding-top: 1rem;
 }
 .team-profile-page .reference-legend h2 {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   margin: 0 0 0.65rem;
 }
 .team-profile-page .reference-legend dl {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem 1.1rem;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
 }
 .team-profile-honors {
   grid-column: 2;
@@ -336,7 +367,7 @@
   min-width: 0;
 }
 .team-profile-honors h2 {
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
   margin-bottom: 1rem;
 }
 .team-profile-honors .team-profile-toolbar {
@@ -347,7 +378,7 @@
   min-width: 0;
 }
 .team-profile-honors select {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   padding: 0.45rem;
 }
 .team-profile-honors-context {
@@ -355,12 +386,12 @@
   background: var(--bb-blue-soft, #eef5ff);
   border: 1px solid #d5e4f7;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   margin-bottom: 1rem;
 }
 .team-profile-honors-context small {
   display: block;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
   margin-top: 0.25rem;
   color: var(--public-muted);
 }
@@ -376,11 +407,11 @@
   display: flex;
   justify-content: space-between;
   gap: 0.4rem;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem + 0.125rem);
   margin: 0 0 0.4rem;
 }
 .team-profile-award h3 span {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
   font-weight: 400;
   color: var(--public-muted);
 }
@@ -404,7 +435,7 @@
 }
 .team-profile-award details {
   border-bottom: 1px solid var(--public-line);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .team-profile-award summary {
   padding: 0.65rem 0;
@@ -413,14 +444,14 @@
 }
 .team-profile-award summary span {
   color: var(--public-muted);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
 }
 .team-profile-award ul {
   list-style: none;
   margin: 0;
   padding: 0 0 0.5rem 0.6rem;
   border-left: 2px solid var(--public-line);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
 }
 .team-profile-award li {
   margin: 0.5rem 0;
@@ -438,7 +469,7 @@
 .team-profile-rosters > nav a {
   display: block;
   padding: 0.8rem 0.6rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   color: var(--public-text);
   margin-bottom: 0.3rem;
   border: 1px solid transparent;
@@ -451,7 +482,7 @@
 }
 .team-profile-rosters small {
   display: block;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem + 0.125rem);
   line-height: 1.5;
   margin-top: 0.3rem;
 }
@@ -460,7 +491,7 @@
   min-width: 0;
 }
 .team-profile-roster-detail > p {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   color: var(--public-muted);
 }
 .team-profile-mobile-back {
@@ -471,7 +502,7 @@
   gap: 1rem;
   align-items: center;
   justify-content: flex-end;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem + 0.125rem);
   margin-top: 1rem;
 }
 .team-profile-pager button {
@@ -492,7 +523,7 @@
   min-width: 0;
 }
 @media (max-width: 1050px) {
-  .team-profile-page {
+  .team-profile-page.public-site.statistics-public {
     width: calc(100% - 2rem);
   }
   .team-profile-layout {
@@ -532,9 +563,18 @@
   }
 }
 @media (max-width: 520px) {
-  .team-profile-page {
+  .team-profile-page.public-site.statistics-public {
     width: calc(100% - 1.5rem);
     margin-top: 1rem;
+  }
+  .team-profile-page .team-profile-toolbar > label {
+    flex-basis: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+  .team-profile-page .team-profile-honors .team-profile-toolbar > label {
+    flex: 1;
+    width: auto;
   }
   .team-profile-identity {
     padding: 1.1rem 0.9rem;
@@ -545,17 +585,17 @@
   .team-profile-avatar {
     min-width: 3.3rem;
     height: 4rem;
-    font-size: 1.15rem;
+    font-size: calc(1.15rem + 0.125rem);
   }
   .team-profile-page h1 {
-    font-size: 1.45rem;
+    font-size: calc(1.45rem + 0.125rem);
   }
   .team-profile-eyebrow {
-    font-size: 0.65rem;
+    font-size: calc(0.65rem + 0.125rem);
   }
   .team-profile-context {
     align-items: flex-start;
-    font-size: 0.8rem;
+    font-size: calc(0.8rem + 0.125rem);
     flex-wrap: wrap;
   }
   .team-profile-workspace > .bb-tabs {
@@ -563,7 +603,7 @@
     gap: 0;
   }
   .team-profile-workspace > .bb-tabs button {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem + 0.125rem);
     padding: 0.8rem 0.65rem;
   }
   .team-profile-workspace > [role="tabpanel"] {
@@ -582,7 +622,7 @@
   .team-profile-page .team-profile-match {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
     gap: 0.4rem;
   }
   .team-profile-match span:last-child {
@@ -595,7 +635,7 @@
     padding: 0.8rem 0.4rem;
   }
   .team-profile-games small {
-    font-size: 0.65rem;
+    font-size: calc(0.65rem + 0.125rem);
   }
   .team-profile-rosters {
     display: block;
@@ -629,6 +669,6 @@
     padding: 1.2rem;
   }
   .team-profile-page .reference-legend dl {
-    font-size: 0.68rem;
+    font-size: calc(0.68rem + 0.125rem);
   }
 }

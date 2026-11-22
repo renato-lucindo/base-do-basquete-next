@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { publicDetailLink, safePublicReturn } from "../public-ui/navigation";
 import { siteDisputeId } from "../public-ui/site";
 import { previewDisputeId } from "../public-ui/preview";
-import { contextLabel } from "../public-ui/catalog-contract";
 import { SectionTabs, TabPanel } from "../ui-system/components";
 import { TooltipProvider } from "../statistics/reference/tooltip";
+import { standingsSelection } from "../regulation/public-bracket-model";
 import { PublicStandingsTables } from "../regulation/public-page";
 import { recentGroupResults } from "../regulation/recent-results";
 import { RecentResultsCell } from "../regulation/recent-results-cell";
@@ -17,6 +17,7 @@ import {
   DISPUTE_TABS,
   readTeamProfileLocation,
   teamProfileHref,
+  generalTeamReturn,
 } from "./view-state";
 import {
   initialTeamYear,
@@ -290,6 +291,7 @@ function Honors({
             <section className="team-profile-award" key={position}>
               <div
                 className={`team-profile-medal medal-${position}`}
+                role="img"
                 aria-label={`${position}º lugar`}
               >
                 <svg
@@ -358,6 +360,10 @@ export function TeamProfilePage() {
     readTeamProfileLocation(window.location.hash),
   );
   const [attempt, retry] = useState(0);
+  const rosterNav = useRef<HTMLElement>(null);
+  const rosterReturn = useRef<{ y: number; top: number; id: string } | null>(
+    null,
+  );
   const [loaded, setLoaded] = useState<{
     teamId: string;
     scope: string | null;
@@ -408,7 +414,13 @@ export function TeamProfilePage() {
       if (v === null || v === "") params.delete(k);
       else params.set(k, v);
     }
-    window.history.pushState(null, "", teamProfileHref(view.teamId!, params));
+    const target = new URL(window.location.href);
+    target.hash = teamProfileHref(view.teamId!, params).split("#")[1];
+    window.history.pushState(
+      null,
+      "",
+      target.pathname + target.search + target.hash,
+    );
     setView(readTeamProfileLocation(window.location.hash));
   };
   const contextParts =
@@ -419,6 +431,22 @@ export function TeamProfilePage() {
     (contextParts.length === 1 && !view.registrationId
       ? contextParts[0]
       : null);
+  const localHref = (params: URLSearchParams) => {
+    const target = new URL(window.location.href);
+    target.hash = teamProfileHref(view.teamId!, params).split("#")[1];
+    return target.pathname + target.search + target.hash;
+  };
+  const selectedRoster = view.params.get("elenco");
+  useLayoutEffect(() => {
+    const saved = rosterReturn.current;
+    if (selectedRoster || !saved || !rosterNav.current) return;
+    rosterNav.current.scrollTop = saved.top;
+    rosterNav.current
+      .querySelector<HTMLAnchorElement>(`[data-registration="${saved.id}"]`)
+      ?.focus({ preventScroll: true });
+    window.scrollTo(0, saved.y);
+    rosterReturn.current = null;
+  }, [selectedRoster]);
   const contextualLink = (p: { disputeId: string; registrationId: string }) => {
     const params = new URLSearchParams({
       disputeId: p.disputeId,
@@ -468,8 +496,7 @@ export function TeamProfilePage() {
       <div className="team-profile-section-head">
         <h2>Últimos jogos{!contextual && year ? ` · ${year}` : ""}</h2>
         <a
-          href={teamProfileHref(
-            view.teamId!,
+          href={localHref(
             new URLSearchParams({
               ...Object.fromEntries(view.params),
               secao: "jogos",
@@ -525,6 +552,16 @@ export function TeamProfilePage() {
   );
   return (
     <TooltipProvider>
+      <a
+        className="access-skip"
+        href="#team-profile"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("team-profile")?.focus();
+        }}
+      >
+        Pular para o perfil
+      </a>
       <PublicHeader
         disputeId={view.disputeId}
         section="equipes"
@@ -589,17 +626,23 @@ export function TeamProfilePage() {
                         <strong>
                           {selected.context.name} · {selected.context.year}
                         </strong>
-                        <small>{contextLabel(selected.context)}</small>
+                        <small>
+                          {gender(selected.context.gender)} ·{" "}
+                          {selected.context.category}
+                          {selected.context.division
+                            ? ` · ${selected.context.division}`
+                            : ""}
+                        </small>
                       </>
                     )}
                   </div>
                   <a
-                    href={teamProfileHref(
+                    href={generalTeamReturn(
+                      new URLSearchParams(window.location.search).get(
+                        "returnTo",
+                      ),
                       profile.teamId,
-                      new URLSearchParams({
-                        secao: "resumo",
-                        ...(year ? { ano: String(year) } : {}),
-                      }),
+                      year,
                     )}
                   >
                     Ver perfil geral
@@ -698,7 +741,16 @@ export function TeamProfilePage() {
                         query={view.params.get("coletivos") ?? ""}
                         change={(q) => update({ coletivos: q })}
                         after={lastGames}
-                        extraLegend={campaignLegend}
+                        extraLegend={
+                          selected.standings &&
+                          standingsSelection(selected.standings, view.params)
+                            .stage === "classificatoria"
+                            ? [
+                                { label: "Pos.", name: "Posição" },
+                                ...campaignLegend,
+                              ]
+                            : []
+                        }
                       />
                     </>
                   ) : (
@@ -772,17 +824,34 @@ export function TeamProfilePage() {
                     <div
                       className={`team-profile-rosters ${view.params.has("elenco") ? "has-selection" : ""}`}
                     >
-                      <nav aria-label="Participações para consultar jogadores">
+                      <nav
+                        ref={rosterNav}
+                        aria-label="Participações para consultar jogadores"
+                      >
                         {yearRows.map((p) => (
                           <a
                             key={`${p.disputeId}/${p.registrationId}`}
+                            data-registration={p.registrationId}
+                            onClick={(e) => {
+                              if (
+                                e.button === 0 &&
+                                !e.ctrlKey &&
+                                !e.metaKey &&
+                                !e.shiftKey &&
+                                !e.altKey
+                              )
+                                rosterReturn.current = {
+                                  y: window.scrollY,
+                                  top: rosterNav.current?.scrollTop ?? 0,
+                                  id: p.registrationId,
+                                };
+                            }}
                             aria-current={
                               view.params.get("elenco") === p.registrationId
                                 ? "true"
                                 : undefined
                             }
-                            href={teamProfileHref(
-                              profile.teamId,
+                            href={localHref(
                               new URLSearchParams({
                                 ...Object.fromEntries(view.params),
                                 elenco: p.registrationId,

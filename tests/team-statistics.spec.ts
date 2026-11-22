@@ -66,97 +66,90 @@ test("busca/ordem/página da lista reaparecem no retorno do detalhe", async ({
     }),
   ).toHaveValue("Inscrição 25");
 });
-test("ambiguidade exige inscrição e navegação conserva URL, foco e histórico", async ({
+test("ambiguidade exige inscrição e abas conservam foco e histórico", async ({
   page,
 }) => {
   const f = await teamPublicFixture(page);
   await page.goto(f.detailUrl.replace(`&registrationId=${pubId(5)}`, ""));
   await expect(
-    page.getByRole("heading", { name: "Escolha a inscrição", exact: true }),
+    page.getByRole("heading", { name: "Inscrições da equipe", exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Lobos B", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Lobos B", exact: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(new RegExp("registrationId=" + pubId(6)));
-  for (const name of ["Participantes", "Jogos", "Resumo"]) {
-    await page
-      .getByRole("navigation", { name: "Seções da equipe" })
-      .getByRole("link", { name, exact: true })
-      .focus();
+  for (const name of ["Jogadores", "Jogos", "Visão geral"]) {
+    const tab = page.getByRole("tab", { name, exact: true });
+    await tab.focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("heading", { name, exact: true })).toHaveClass(
-      /sr-only/,
-    );
-    await expect(
-      page.getByRole("heading", { name, exact: true }).locator(".."),
-    ).toBeFocused();
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+    await expect(tab).toBeFocused();
   }
   await page.goBack();
   await expect(
-    page.getByRole("heading", { name: "Jogos", exact: true }),
-  ).toBeVisible();
+    page.getByRole("tab", { name: "Jogos", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "Jogos", exact: true }),
-  ).toBeVisible();
+    page.getByRole("tab", { name: "Jogos", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
 });
-test("participantes históricos separam homônimos, camisas0/00 e DNP de zero", async ({
+test("estatísticas completas separam homônimos, camisas 0/00 e DNP de zero", async ({
   page,
 }) => {
   const f = await teamPublicFixture(page);
   await page.goto(f.detailUrl + "&section=participantes&mode=total");
   const table = page.getByRole("table", {
-    name: "Participantes em jogos publicados",
+    name: "Estatísticas dos atletas",
     exact: true,
   });
   await expect(table.getByRole("row")).toHaveCount(7);
-  await expect(
-    table.getByRole("cell", { name: "0", exact: true }),
-  ).not.toHaveCount(0);
   await expect(
     table.getByRole("cell", { name: "00", exact: true }),
   ).toHaveCount(1);
   const dnp = table.getByRole("row").filter({
     has: page.locator(`a[href^="/atleta.html"][href*="#${pubId(7)}?"]`),
   });
-  await expect(dnp).toContainText("Não participou");
-  await expect(
-    dnp.getByRole("cell", { name: "—", exact: true }),
-  ).not.toHaveCount(0);
+  await expect(dnp.locator('[data-public-metric="games"]')).toHaveText("0");
+  await expect(dnp.locator('[data-public-metric="points"]')).toHaveText("—");
+  expect(await table.locator('a[href^="/atleta.html"]').count()).toBe(6);
   expect(
-    await table.locator('a[href^="/atleta.html"][href*="#"]').count(),
-  ).toBe(6);
+    await table.locator('[data-public-metric="technicalFouls"]').count(),
+  ).toBe(7);
 });
-test("paginação de jogos/participantes não reduz resumo e preserva filtros", async ({
+test("paginação de jogadores mantém totais completos e filtros ao voltar à visão geral", async ({
   page,
 }) => {
   const f = await teamPublicFixture(page, { longDetail: true });
   await page.goto(
     f.detailUrl + "&section=participantes&mode=total&rosterPage=2&page=2",
   );
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  await expect(table.getByRole("row")).toHaveCount(31);
   await expect(
-    page
-      .getByRole("table", {
-        name: "Participantes em jogos publicados",
-        exact: true,
-      })
-      .getByRole("row"),
-  ).toHaveCount(21);
-  await page
-    .getByRole("navigation", { name: "Seções da equipe" })
-    .getByRole("link", { name: "Jogos", exact: true })
-    .click();
+    page.getByRole("navigation", { name: "Páginas de jogadores" }),
+  ).toContainText("Página 2 de 5");
+  await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+  await expect(page.locator(".team-profile-games tbody tr")).toHaveCount(25);
+  await page.getByRole("tab", { name: "Visão geral", exact: true }).click();
+  const collective = page.getByRole("table", {
+    name: "Estatísticas das equipes",
+    exact: true,
+  });
   await expect(
-    page
-      .getByRole("table", { name: "Jogos da inscrição", exact: true })
-      .getByRole("row"),
-  ).toHaveCount(6);
-  await page.getByRole("link", { name: "Resumo", exact: true }).click();
-  await expect(
-    page.getByText("25 partidas publicadas", { exact: true }),
+    collective
+      .getByRole("row")
+      .filter({ has: page.getByRole("link", { name: "Lobos", exact: true }) })
+      .locator('[data-team-value="games"]'),
   ).toBeVisible();
-  await expect(page).toHaveURL(/rosterPage=2/);
+  await page.getByRole("tab", { name: "Jogadores", exact: true }).click();
+  await expect(
+    page.getByRole("navigation", { name: "Páginas de jogadores" }),
+  ).toContainText("Página 2 de 5");
 });
 test("escopo vazio, erro e contaminação têm estados próprios sem placar fictício", async ({
   page,
@@ -179,7 +172,7 @@ test("escopo vazio, erro e contaminação têm estados próprios sem placar fict
     .click();
   await expect(page.getByRole("table")).toBeVisible();
 });
-test("resposta atrasada e320px/texto200% preservam rota/foco/controles", async ({
+test("resposta atrasada e 320px/texto200% preservam rota e controles", async ({
   page,
 }, info) => {
   const f = await teamPublicFixture(page);
@@ -189,23 +182,18 @@ test("resposta atrasada e320px/texto200% preservam rota/foco/controles", async (
     page.getByRole("heading", { name: "Lobos", exact: true }),
   ).toBeVisible();
   f.state.delayNext = 300;
-  await page
-    .getByRole("navigation", { name: "Seções da equipe" })
-    .getByRole("link", { name: "Jogos", exact: true })
-    .click();
-  await page.getByRole("link", { name: "Participantes", exact: true }).click();
+  await page.getByRole("tab", { name: "Jogadores", exact: true }).click();
+  await page.getByRole("tab", { name: "Jogos", exact: true }).click();
+  await expect(page.locator(".team-profile-games")).toBeVisible();
   await expect(
-    page
-      .getByRole("heading", { name: "Participantes", exact: true })
-      .locator(".."),
-  ).toBeFocused();
+    page.getByRole("table", { name: "Estatísticas dos atletas", exact: true }),
+  ).toHaveCount(0);
   await page
-    .getByRole("link", { name: "Pular para o conteúdo", exact: true })
+    .getByRole("link", { name: "Pular para o perfil", exact: true })
     .focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(
-    new RegExp(pubId(9) + ".*section=participantes"),
-  );
+  await expect(page.locator("#team-profile")).toBeFocused();
+  await expect(page).toHaveURL(new RegExp(pubId(9) + ".*secao=jogos"));
   await page.evaluate(() => {
     document.documentElement.style.fontSize = "200%";
   });
