@@ -13,7 +13,9 @@ Atualizado em 22/11/2026. Estado anterior preservado no [histórico](../historic
 
 ## Próximo passo e autorizações
 
-- **Aguarda definição/autorização do Worker de avaliação, publicação do SHA e novo aceite visual antes do merge**, conforme CONTRIBUTING. A configuração `wrangler.jsonc` associa o Worker chamado preview também ao domínio público; não presumir que esse alvo é uma avaliação isolada.
+- Responsável autorizou **novo preview separado** em 22/11. Alvo preparado: `base-do-basquete-perfis-equipes-preview.renato-lucindo-jr.workers.dev`, SHA `fc701f8`. Build e dry-run PASS, 41 assets. Transporte local de avaliação somente leitura, sem DO/migration, em `.preview-artifacts/perfis-equipes/`; não integra o código do produto. Ainda **não publicado**.
+- Bloqueio real: app Cloudflare pede reautenticação. Wrangler local autenticado lê Access, mas POST de criação da aplicação de proteção retorna **403 / auth.forbidden**; nenhuma proteção/Worker criada. Não publicar sem proteção. Solicitada reconexão do app Cloudflare. Depois, criar Access restrito ao responsável, verificar política, publicar no novo alvo, testar APIs/tela e enviar link para aceite visual. Autorização não cobre alterar serviços atuais ou merge.
+- CI do HEAD `fc701f8`: [45053481697](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45053481697) PASS nos sete checks. Fontes executáveis continuam idênticas a `cfee448`.
 - Sem deploy, migration, DDL ou publicação de dados nesta unidade; serviços remotos não alterados. Não integrar ou publicar por causa do aceite do HTML, da CI ou desta retomada.
 - Heartbeat existente `retomar-perfis-de-equipes`: pausar quando restar somente ação humana. Se a CI do checkpoint documental ainda estiver pendente ao encerrar, atualizar a mesma automação para conferir a PR/HEAD reais; não criar duplicata. Última cota real: 73% usados/27% restantes na janela 5h, reset Unix `1795385440`; nenhum reset manual/crédito consumido.
 - PR #88 em outra branch e checkout original `sync/trabalho-casa` preservados. As alterações humanas em CONTRIBUTING e skills locais não foram incorporadas nesta unidade.
