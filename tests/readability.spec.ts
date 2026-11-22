@@ -61,17 +61,16 @@ test("perfil da equipe mostra somente a inscrição e foca a seção visível", 
   await expect(
     page.getByText("Equipe: Lobos Clube · inscrição: Lobos.", { exact: true }),
   ).toHaveCount(0);
-  const tab = page
-    .getByRole("navigation", { name: "Seções da equipe" })
-    .getByRole("link", { name: "Jogos", exact: true });
+  const tab = page.getByRole("tab", { name: "Jogos", exact: true });
   await tab.click();
   const title = page.getByRole("heading", {
     level: 2,
-    name: "Jogos",
+    name: "Jogos da equipe",
     exact: true,
   });
-  await expect(title).toHaveClass(/sr-only/);
-  await expect(title.locator("..")).toBeFocused();
+  await expect(title).toBeVisible();
+  await expect(tab).toBeFocused();
+  await expect(tab).toHaveAttribute("aria-selected", "true");
 });
 
 test("filtro apresenta somente a inscrição e preserva a pesquisa pelo nome global", async ({

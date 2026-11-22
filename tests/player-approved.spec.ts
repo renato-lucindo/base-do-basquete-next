@@ -239,7 +239,9 @@ test("v9: confronto inteiro abre a partida; equipe fora dele abre a equipe", asy
     expect(page.url()).toContain("anoPerfil=2026");
   }
   await page.locator(".player-current-team a").click();
-  await expect(page.locator(".team-public-page").first()).toBeVisible();
+  await expect(
+    page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
+  ).toBeVisible();
   await page.getByRole("link", { name: /^Voltar à origem/ }).click();
   await page.getByRole("tab", { name: "Carreira", exact: true }).click();
   const knownId = f.source.participations[0].fact.gameId;

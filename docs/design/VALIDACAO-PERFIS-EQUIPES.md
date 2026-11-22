@@ -13,9 +13,11 @@ Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd3
 ## Verificações locais
 
 - `npm run gate`: PASS. 179 arquivos / 848 testes Vitest; 11 testes de plano de CI; 19 de transportes; 16 de banco local. Também lint, formato, tipos, builds público/admin/Worker, rotas em workerd, PDF real, fronteira cliente e segredos aprovados.
-- Browsers focais anteriores: 10 testes do perfil, 14 regressões de equipes e 30 de busca/navegação aprovados em desktop/celular. Após o último refinamento de reflow, os dois casos visuais foram repetidos e aprovados. A regressão completa está em execução, incluindo os casos adicionais de retorno do elenco e 1366/1920 px; resultado final será registrado antes da entrega.
-- Primeiro ensaio completo de browsers/design interrompido por `ENOSPC` durante a execução simultânea dos testes de banco local. O espaço temporário foi liberado ao terminar o banco. Reexecução iniciada; não é evidência de aprovação nem justificativa para ignorar falhas.
-- `design:build` passou. `design:verify` em reexecução após o impedimento de disco; sem alteração das referências geradas no diff final.
+- Browsers finais do perfil: 10 PASS, incluindo retorno com foco no elenco mobile e larguras 1366/1920 px. Regressões focais anteriores: equipes 14 PASS e busca/navegação 30 PASS.
+- Revisão das suítes antigas: 72 casos passaram, dois falharam por seletor antigo/área de toque e foram corrigidos. Reexecução focal desses dois casos: 4 PASS (desktop/mobile). Fixtures corrigidas para respeitar a disputa, paginação de 100 jogos e consultas de outras páginas; regressões correspondentes: 7 PASS / 1 skip preexistente na matriz explícita de tipografia. Não foram desativados testes nem ampliados timeouts.
+- `design:build` e `design:verify`: PASS; referências geradas não integram o diff final.
+- Primeiro ensaio geral interrompido por `ENOSPC` durante banco local simultâneo com browsers; espaço liberado ao terminar o banco. Execução geral local seguinte interrompida após encontrar falhas da navegação antiga e problemas das fixtures. Não declarar esses ensaios como regressão completa aprovada.
+- CI inicial [45050998992](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45050998992), código `bf214f0`: checks e design passaram; Chromium/WebKit detectaram seletores antigos, alvos pequenos e fixtures incompatíveis. Correções comprovadas focalmente acima. A CI completa da revisão deve passar antes de integrar; resultado atual é conferido na PR #89.
 
 ## Revisão da interface
 
@@ -23,9 +25,9 @@ Guia aplicado: [cores e situação](catalogo/guia-completo-autonomo.html#cores),
 
 Reaproveitados PublicHeader/Footer, SectionTabs/TabPanel, ScrollableTable, classificação, RecentResultsCell, tabelas de jogadores/equipes, ColumnPicker, tooltips e catálogo de métricas. Variação necessária: composição geral/contextual e painel lateral de conquistas do HTML aceito. A coluna de camisa é optativa no componente compartilhado, preservando os outros consumidores.
 
-Inspeção das capturas reais em 1440 px e 390 px: conquistas à direita/abaixo; classificação com três equipes, coletivos com todas as inscrições, inscrição destacada, jogos em duas colunas, jogadores completos com rolagem interna. Tabelas seguem largura pelo conteúdo, alinhadas aos blocos, sem forçar colunas vazias. Corrigidos controle Fase estreito no celular e reflow do título em 320 px com texto a 200%.
+Inspeção das capturas reais em 1440 px e 390 px: conquistas à direita/abaixo; classificação com três equipes, coletivos com todas as inscrições, inscrição destacada, jogos em duas colunas, jogadores completos com rolagem interna. Tabelas seguem largura pelo conteúdo, alinhadas aos blocos, sem forçar colunas vazias. Corrigidos controle Fase estreito no celular, reflow do título em 320 px com texto a 200% e área de toque dos links de escolha da inscrição (mínimo de 44 px).
 
-Axe com WCAG 2/2.1/2.2 A/AA: zero violações nas abas Visão geral e Jogadores, desktop/celular. Teclado entre abas, foco visível, skip link, paginação, recarga e preservação do grupo conferidos nos testes. Erro de outra inscrição não exibe tabela; nova tentativa recupera. Catálogo contaminado e publicação recolhida são recusados.
+Axe com WCAG 2/2.1/2.2 A/AA: zero violações nas abas Visão geral e Jogadores e na escolha de inscrição, desktop/celular. Teclado entre abas, foco visível, skip link, paginação, recarga e preservação do grupo conferidos nos testes. Erro de outra inscrição não exibe tabela; nova tentativa recupera. Catálogo contaminado e publicação recolhida são recusados.
 
 Textos conferidos nas legendas e cabeçalhos: `J` = **Jogos**, `PP%` = **Participação nos Pontos**, `5F` = **Exclusões por cinco faltas**. A legenda reúne apenas colunas presentes, fica expandida depois de tabelas/recentes/paginação e antes do rodapé; não se repete na classificação/coletivos embutidos. Cabeçalhos completos não receberam ajuda adicional. Ausências conservam —, sem zero presumido. Situação tem texto além do acento de cor.
 

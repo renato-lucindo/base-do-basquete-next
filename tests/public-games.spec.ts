@@ -47,7 +47,11 @@ test("agenda real abre placar e perfis, sem inventar detalhe para jogo futuro", 
     organizationPendingGameIds: source.games.map((g) => g.id),
   });
   await page.route("**/api/public/standings/**", (route) =>
-    route.fulfill({ json: value }),
+    route.fulfill({
+      json: new URL(route.request().url()).pathname.endsWith(source.disputeId)
+        ? value
+        : null,
+    }),
   );
   await page.goto(
     `http://127.0.0.1:5174/publico.html#${source.disputeId}?secao=jogos`,
@@ -80,7 +84,7 @@ test("agenda real abre placar e perfis, sem inventar detalhe para jogo futuro", 
   for (const side of ["home", "away"]) {
     await row.locator(`.public-game-${side} a`).click();
     await expect(
-      page.getByRole("navigation", { name: "Seções da equipe" }),
+      page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
     ).toBeVisible();
     await page.getByRole("link", { name: /^Voltar à origem/ }).click();
     expect(page.url()).toBe(from);

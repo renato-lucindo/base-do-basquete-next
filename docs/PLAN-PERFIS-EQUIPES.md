@@ -30,4 +30,4 @@
 - Ruling: compor APIs públicas existentes em vez de criar uma nova API/migration — os contratos existentes já cobrem a entrega; evita duplicar autorização e domínio. Custo: mais requisições, limitadas por concorrência e capacidade explícitas.
 - Execução e revisão final pelo agente principal; não há ferramenta de subagente disponível nesta sessão. Não declarar parecer independente.
 
-- Implementação e revisão focal concluídas. Gate completo local aprovado (848 testes unitários, banco local, transportes, builds, Worker/PDF, fronteira cliente e segredos). Regressão completa de browsers e design em execução; CI ainda não executada. [Evidência](design/VALIDACAO-PERFIS-EQUIPES.md).
+- Implementação e revisão focal concluídas. Gate completo local aprovado (848 testes unitários, banco local, transportes, builds, Worker/PDF, fronteira cliente e segredos). Design verificado. Primeira CI executada; correções de acessibilidade e fixtures comprovadas focalmente. Exigir CI completa da revisão, sem tratar ensaios interrompidos como aprovação. [Evidência](design/VALIDACAO-PERFIS-EQUIPES.md).

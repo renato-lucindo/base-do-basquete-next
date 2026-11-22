@@ -66,25 +66,38 @@ export async function teamPublicFixture(
   });
   await page.route("**/api/public/**", async (route) => {
     const url = new URL(route.request().url());
-    if (url.pathname.endsWith("catalog"))
+    if (url.pathname.endsWith("catalog")) {
+      const scope = url.searchParams.get("disputeId");
+      if (scope && !source.games.some((g) => g.snapshot.disputeId === scope))
+        return route.fallback();
+      const after = url.searchParams.get("after");
+      const games = source.games
+        .filter((g) => !scope || g.snapshot.disputeId === scope)
+        .map(({ snapshot: g }) => ({
+          id: g.id,
+          disputeId: g.disputeId,
+          context: g.context,
+          game: g.game,
+          score: {
+            home: g.facts.teams.home.points,
+            away: g.facts.teams.away.points,
+          },
+        }))
+        .sort((a, b) => a.id.localeCompare(b.id))
+        .filter((g) => !after || g.id > after);
+      const current = games.slice(0, 100);
       return route.fulfill({
         json: {
-          games: source.games.map(({ snapshot: g }) => ({
-            id: g.id,
-            disputeId: g.disputeId,
-            context: g.context,
-            game: g.game,
-            score: {
-              home: g.facts.teams.home.points,
-              away: g.facts.teams.away.points,
-            },
-          })),
-          next: null,
+          games: current,
+          next: games.length > 100 ? current.at(-1)!.id : null,
           disputes: [],
         },
       });
+    }
     if (url.pathname.includes("discovery")) {
-      const id = url.searchParams.get("entityId") ?? pubId(9);
+      const id = url.searchParams.get("entityId");
+      if (!id || url.searchParams.get("type") !== "teams")
+        return route.fallback();
       const identities = [
         ...new Map(
           source.games.flatMap(({ snapshot: g }) =>
@@ -97,6 +110,7 @@ export async function teamPublicFixture(
           ),
         ).values(),
       ];
+      if (!identities.length) return route.fallback();
       return route.fulfill({
         json: {
           query: url.searchParams.get("q"),
@@ -124,6 +138,7 @@ export async function teamPublicFixture(
       });
     }
     if (url.pathname.includes("/statistics/")) {
+      if (!url.pathname.endsWith(source.disputeId)) return route.fallback();
       const delay = state.delayNext;
       state.delayNext = 0;
       if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
@@ -136,6 +151,8 @@ export async function teamPublicFixture(
         })
         .catch(() => undefined);
     }
+    if (!source.games.some((g) => url.pathname.endsWith(g.snapshot.disputeId)))
+      return route.fallback();
     if (url.pathname.includes("dispute-status"))
       return route.fulfill({ json: "in_progress" });
     return route.fulfill({

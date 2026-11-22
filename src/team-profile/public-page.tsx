@@ -702,7 +702,7 @@ export function TeamProfilePage() {
                         ? "Escolha a inscrição para consultar esta disputa."
                         : "Esta inscrição não possui participação pública nesta disputa."}
                     </p>
-                    <ul>
+                    <ul className="team-profile-registration-choices">
                       {contextParts.map((p) => (
                         <li key={p.registrationId}>
                           <a href={contextualLink(p)}>{p.name}</a>

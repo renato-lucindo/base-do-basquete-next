@@ -118,6 +118,12 @@
   font-size: calc(0.8rem + 0.125rem);
   margin-top: 0.8rem;
 }
+.team-profile-registration-choices a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.25rem;
+}
 .team-profile-page a {
   color: var(--team-blue);
   text-decoration: none;
