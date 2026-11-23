@@ -4,8 +4,11 @@
   "account_id": "16b4a5e0a99a031d28051ebadb4811cc",
   "compatibility_date": "2026-10-23",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  "workers_dev": false,
   "preview_urls": false,
+  "routes": [
+    { "pattern": "admin.basedobasquete.com.br", "custom_domain": true },
+  ],
   "assets": {
     "directory": "dist-foundation",
     "binding": "ASSETS",
@@ -14,7 +17,7 @@
   },
   "vars": {
     "FLEXIBLE_COMPETITION": "false",
-    "APP_ORIGIN": "https://base-do-basquete-admin.renato-lucindo-jr.workers.dev",
+    "APP_ORIGIN": "https://admin.basedobasquete.com.br",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
   },
   "secrets": {
