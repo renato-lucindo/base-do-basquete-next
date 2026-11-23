@@ -1,5 +1,5 @@
 {
-  "name": "base-do-basquete-admin",
+  "name": "admin",
   "main": "src/server/admin-worker.ts",
   "account_id": "16b4a5e0a99a031d28051ebadb4811cc",
   "compatibility_date": "2026-10-23",
@@ -17,7 +17,7 @@
   },
   "vars": {
     "FLEXIBLE_COMPETITION": "false",
-    "APP_ORIGIN": "https://base-do-basquete-admin.renato-lucindo-jr.workers.dev",
+    "APP_ORIGIN": "https://admin.renato-lucindo-jr.workers.dev",
     "APP_ALIAS": "https://admin.basedobasquete.com.br",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
   },

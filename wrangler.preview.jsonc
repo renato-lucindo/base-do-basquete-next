@@ -1,5 +1,5 @@
 {
-  "name": "base-do-basquete-perfis-equipes-preview",
+  "name": "preview",
   "account_id": "16b4a5e0a99a031d28051ebadb4811cc",
   "main": "src/server/public-preview-worker.ts",
   "compatibility_date": "2026-10-23",
@@ -16,9 +16,9 @@
     "run_worker_first": true,
   },
   "vars": {
-    "APP_ORIGIN": "https://base-do-basquete-perfis-equipes-preview.renato-lucindo-jr.workers.dev",
+    "APP_ORIGIN": "https://preview.renato-lucindo-jr.workers.dev",
     "APP_ALIAS": "https://preview.basedobasquete.com.br",
-    "ADMIN_ORIGIN": "https://base-do-basquete-admin.renato-lucindo-jr.workers.dev",
+    "ADMIN_ORIGIN": "https://admin.renato-lucindo-jr.workers.dev",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
     "FLEXIBLE_COMPETITION": "false",
   },

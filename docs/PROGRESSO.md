@@ -49,4 +49,18 @@ Atualizado em 22/11/2026. Estado anterior preservado no [histórico](../historic
 
 - Após confirmar funcionamento na rede doméstica e bloqueio corporativo do domínio, responsável escolheu usar workers.dev. Autorizado reativar **somente admin e preview atual**; outros10Workers e URLs de versões permanecem desativados.
 - Origens canônicas voltam para `base-do-basquete-admin.renato-lucindo-jr.workers.dev` e `base-do-basquete-perfis-equipes-preview.renato-lucindo-jr.workers.dev`, ambos com a aplicação atual desta branch. Subdomínios próprios ficam como atalhos de navegação GET/HEAD, com caminho/consulta preservados; escrita por alias não é redirecionada. Preview continua somente leitura e sem Access, com link para admin atualizado. Nenhum dado, namespace de sessão ou segredo alterado.
-  -5testes de segurança/redirecionamento, lint e tipagem app/Worker PASS. CI anterior896c80a/45097158175 PASS. Próximo passo: publicar revisão nos dois Workers, conferir login/health/perfil9J6V3D e somente os2endereços ativos, acompanhar CI da revisão sem polling repetido. Merge não autorizado.
+- 5testes de segurança/redirecionamento, lint e tipagem app/Worker PASS. CI anterior896c80a/45097158175 PASS. Próximo passo: publicar revisão nos dois Workers, conferir login/health/perfil9J6V3D e somente os2endereços ativos, acompanhar CI da revisão sem polling repetido. Merge não autorizado.
+
+## Workers.dev atuais — publicados
+
+- Código `b88671385b3980dc82cadb4121c18401ef322a38`, mesma PR89. [Admin](https://base-do-basquete-admin.renato-lucindo-jr.workers.dev/) atualizado: versão `03456b20-5952-428d-8898-61277a22a087`, deployment `c90536e4-80a5-4ec4-895f-df1d60b5c44d`. [Preview LUSB](https://base-do-basquete-perfis-equipes-preview.renato-lucindo-jr.workers.dev/equipe.html#743dac4d-de4c-493a-ac28-5bc621aea526): versão `4d288481-332b-4c23-84e5-a9667309d7a1`, deployment `5555a4db-d988-4bbb-a201-d2ae7f467dce`.
+- Conector ativou as versões e só estas2URLs; outros10Workers permanecem desativados e URLs de versões continuam off. Leitura imediata do inventário mostrou estado antigo do preview por propagação; nova consulta confirmou os2enabled=true/previews_enabled=false. Health200 de ambos identifica o SHA atual; raiz200; admin/api/competitions401 sem sessão, preview/api/competitions403. Namespace admin e nomes dos segredos existentes preservados. Sem merge, escrita de dados ou migration.
+- CI completa [45098405934](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45098405934) deste SHA **PASS nos sete checks, incluindo validate**, conferida em22/11 às23h25 de Brasília. CI896c80a anterior também aprovada. Sem novo commit apenas para polling.
+
+- Conferência final no navegador: admin abre tela de acesso/entrada; preview mostra LUSB9J/6V/3D/66,7%/575PP/439PC/136SLD e cinco recentes, sem alertas, origem identifica b886713. CI45098405934/b886713 confirmada aprovada em22/11 às23h25. Automação `verificar-ci-dos-dom-nios` encerrada; aguarda somente avaliação humana, sem polling.
+
+## Nomes curtos — pedido de23/11
+
+- Responsável pediu somente prefixos admin e preview. Destinos: `admin.renato-lucindo-jr.workers.dev` e `preview.renato-lucindo-jr.workers.dev`. Renomear os Workers existentes via API Workers/Edit Worker, preservando IDs imutáveis, bindings e histórico; não criar cópias nem novos DOs.
+- IDs conferidos: admin `bc902b39122a4806bd0b794523d8deb8`; preview `3b1231990bca4e9f83ee6ea44ae28172`. Nomes admin/preview livres. Configs alteram apenas nomes/origens e destino do atalho administrativo; código executável e assets inalterados da revisão b886713 cuja CI passou.
+- Próximo passo: publicar configurações revisadas, renomear os dois Workers, validar novos URLs/login/9J6V3D e manter demais10fechados. Sem Access, merge, migrations ou dados alterados.
