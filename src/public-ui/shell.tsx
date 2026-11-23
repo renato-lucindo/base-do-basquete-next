@@ -125,6 +125,11 @@ function DisputeNavigation({
   const trigger = useRef<HTMLButtonElement>(null);
   const c =
     context ?? catalog.disputes[0]?.context ?? catalog.games[0]?.context;
+  const statusBadge = status && (
+    <span className="public-dispute-status" data-status={status}>
+      {disputeStatusLabels[status]}
+    </span>
+  );
   return (
     <div
       className="public-context wrap"
@@ -152,6 +157,7 @@ function DisputeNavigation({
               <span aria-hidden="true"> ⌄</span>
             </button>
             <span>{contextLabel(c).slice(c.name.length)}</span>
+            {statusBadge}
           </p>
         ) : (
           <p>
@@ -160,9 +166,9 @@ function DisputeNavigation({
               : catalog.loading
                 ? "Carregando disputa…"
                 : "Disputa sem contexto público disponível"}
+            {statusBadge}
           </p>
         )}
-        {status && <span>{disputeStatusLabels[status]}</span>}
         {selecting && c && (
           <EditionDisputes
             id={panelId}

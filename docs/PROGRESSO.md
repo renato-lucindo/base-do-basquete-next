@@ -1,32 +1,25 @@
 # Progresso atual
 
-Atualizado em23/11/2026. Contexto anterior preservado no [histórico](../historico/progresso/2026-11-23-antes-nomes-curtos.md).
+Atualizado em23/11/2026. [Histórico anterior](../historico/progresso/2026-11-23-antes-status-avg.md).
 
-## Perfis de equipes e serviços de avaliação
+## Unidade e autorizações
 
-- Uma unidade: branch `codex/perfis-equipes`, base `824a3d5`, [PR89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), HEAD `74dd49dd6ce732fac687e54003ef4c567412b256`. Worktree `C:/Users/12405304716/.codex/worktrees/perfis-equipes/Base do Basquete-v1`. Sem merge autorizado.
-- Perfis geral/contextual implementados conforme HTML aceito. Resultados publicados complementam classificação vazia sem sobrescrever decisões oficiais; LUSB9J/6V/3D/66,7%/575PP/439PC, sequência5e cinco recentes confirmados no navegador. Classificação pública CopaES/Sub15 continua sem fases, sem posição inventada. [Requisitos](design/PERFIS-EQUIPES.md) e [validação](design/VALIDACAO-PERFIS-EQUIPES.md).
-- CI `b886713` [45098405934](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45098405934) PASS nos7checks. HEAD74dd49d altera somente configs de nome/origem e checkpoint; código/assets inalterados. [CI74dd49d45162546283](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45162546283) **PASS nos sete checks, incluindo validate**, conferida em23/11 às08h30. Provas de fontes inalteradas reutilizadas, sem suítes locais repetidas.
+- Branch codex/perfis-equipes, base824a3d5, [PR89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), HEAD326fd1991592470a4a6ee0d25d69422377aa104f. Uma unidade; sem merge autorizado. Alterações humanas do checkout original preservadas; PR88 integrada separadamente.
+- Perfis geral/contextual conforme HTML aceito; conquistas, campanhas, cinco recentes, classificação/coletivos completos, jogadores por inscrição e legendas. [Requisitos](design/PERFIS-EQUIPES.md) e [validação](design/VALIDACAO-PERFIS-EQUIPES.md).
+- Responsável autorizou restaurar Formato e classificação da PR75, atualizar mesma PR e Workers. FLEXIBLE_COMPETITION=true em admin/preview. Classificação da CopaES/Sub15 voltou a ter seis equipes/uma fase pela configuração existente, sem escrita de dados.
+- PTS após Equipe. AVG=PP/PC, SLD/desempates preservados; divisor zero/cobertura ausente usa travessão. Legenda única preserva os significados distintos de PTS em classificação e coletivos.
 
-## Endereços vigentes — nomes curtos
+## Serviços publicados
 
-Responsável pediu somente prefixos admin e preview em23/11. Workers **renomeados via Edit Worker**, sem cópias, preservando IDs imutáveis, segredos, versões e referências dos domínios.
+- [Admin](https://admin.renato-lucindo-jr.workers.dev/): versãof760368e-3988-40e3-aac6-fc7163e4b559, deployment6deadb23-9936-42ed-ac62-8b514896cc55.
+- [Preview](https://preview.renato-lucindo-jr.workers.dev/): versão0b0ba9fd-9bc9-4171-98cc-f3c1eada60f4, deployment0a93c30a-713e-443a-a3d6-13a95978a07e.
+- Fonte326fd19 confirmada nos dois serviços (admin X-Bdb-Source, preview X-Preview-Source), health/root200, admin com metadado true, API privada401sem sessão/403no preview.11assets de entrada idênticos ao build por SHA256. LUSB9J/6V/3D/15PTS/575PP/439PC; legenda real com ambos significados de PTS e sem alertas.
+- Somente admin/preview ativos; demais10Workers e URLs de versões fechados. Namespace de sessão597c612fd69c447e81547f16d5dcca41 e segredos preservados. Sem Access no preview, sem migrations/DML/merge. Domínios admin/preview.basedobasquete.com.br seguem como aliases; bloqueio corporativo já confirmado, não repetir testes de rede. Raiz/www não publicados.
+- [CI326fd19/45178312096](https://github.com/renato-lucindo/base-do-basquete-next/actions/runs/45178312096) PASS nos sete checks, incluindo validate. Automação anterior excluída após conclusão. Provas detalhadas no histórico.
 
-| Serviço | Endereço                                       | Worker ID                        | Versão                               | Deployment                           |
-| ------- | ---------------------------------------------- | -------------------------------- | ------------------------------------ | ------------------------------------ |
-| Admin   | https://admin.renato-lucindo-jr.workers.dev/   | bc902b39122a4806bd0b794523d8deb8 | dd805f10-372c-4d31-8c7a-44345928b058 | 2354a608-bd44-4487-bd2e-8388b6b83cee |
-| Preview | https://preview.renato-lucindo-jr.workers.dev/ | 3b1231990bca4e9f83ee6ea44ae28172 | 07a6b2a6-49a1-4c0b-aaf7-23f3b09892c9 | 861099ac-7241-49e8-bad7-7f2797978ca1 |
+## Ajuste atual — status e AVG
 
-- API confirma12Workers, somente admin/preview ativos, URLs de versões off; nomes longos antigos não existem mais. Demais10Workers preservados e desativados. Admin namespace `597c612fd69c447e81547f16d5dcca41` e dois segredos preservados; preview somente leitura pública, sem Access.
-- Smoke real novos nomes: health/root200ambos, header74dd49d; admin/api/competitions401sem sessão, preview403. Atalho preview/foundation.html termina em admin.workers.dev/admin com200.
-- Domínios admin/preview.basedobasquete.com.br continuam vinculados aos Workers renomeados e redirecionam navegação ao endereço canônico; responsáveis confirmaram funcionar na rede doméstica, porém rede corporativa bloqueia esses domínios. Não repetir testes ou alterar políticas de rede. Raiz/www não publicados.
-- Configs versionadas `wrangler.admin.jsonc` e `wrangler.preview.jsonc` correspondem aos nomes/origens atuais. Wrangler enviou versões nos nomes anteriores antes da renomeação; conector renomeou e ativou as versões. Nenhum DO novo, migration, escrita de dados ou mudança em serviços alheios.
-
-## Próximo passo
-
-- Em23/11 o responsável confirmou a demonstração da PR75 e autorizou restaurar Formato e classificação, atualizar a mesma PR89 e os Workers. Causa confirmada por GET remoto/header74dd49d: código presente, mas FLEXIBLE_COMPETITION=false. Configs admin/preview agora true, incluindo leitores e finalização automática; serviço principal antigo continua desativado.
-- PTS após Equipe usa leaguePoints das regras existentes. AVG na última coluna é PP/PC, três decimais, travessão sem cobertura/divisor zero; responsável confirmou explicitamente manter SLD e desempates. Tabelas pública/embutida e conferência administrativa atualizadas. [Plano](PLAN-CLASSIFICACAO-PTS-AVG.md).
-- Focal atual:24unitários e54browsers desktop/mobile PASS; lint/formatação/types gerados PASS no gate parcial; tipagem app/Worker PASS com heap2048MB. Gate completo local interrompido por falta de memória, sem declaração de PASS; primeira execução browser teve asserções posicionais antigas corrigidas e a rodada posterior sofreu esgotamento local. Rodada final54PASS em2min/um worker. Captura `.preview-artifacts/standings-columns-after-desktop.png` conferida; sem alterações de ordenação, DML ou migrations.
-- Fonte6495c4d publicada nos dois Workers pelo conector: admin versão7746307f-42e9-47d3-af64-5323d2d96baa/deployment66155336-b2f5-4bd5-ad8d-67db6c198ba2; preview versão5536cdb7-08f8-4abe-8d7c-2e5a3c3180f2/deploymentbcd9e5b9-a4f0-4487-bb89-41c283b4039a. Health/root200com fonte esperada (admin X-Bdb-Source; preview X-Preview-Source), metadado true no admin, API privada401/403,11assets públicos idênticos ao build por SHA256. Navegador: seis equipes/uma fase, LUSB15PTS/AVG1,310, sem alertas/transbordamento. Sessão e segredos preservados.
-- Conferência real detectou PTS da classificação sobrescrito pelo significado de PTS dos coletivos na legenda embutida. Deduplicação agora usa sigla e significado, preservando ambas as definições na seção única. Regressão reproduzida RED e rodada final de perfil12PASS desktop/mobile; eslint e build repetidos PASS. Demais fontes/provas focais inalteradas reutilizadas. CI6495c4d45177621764 cancelada por substituição, não por resultado de produto. Próximo: publicar a correção na mesma PR/Workers, CI do novo SHA e confirmação remota da legenda. Sem merge autorizado.
-- Checkpoint e histórico desta conclusão permanecem locais para não criar outro SHA só por registrar execução. Alterações humanas do checkout original e PR88 preservadas.
+- Pedido de23/11: aproximar Em andamento da identificação da disputa; mover AVG para após SLD, antes de Últimos jogos; usar duas casas decimais. PTS permanece após Equipe.
+- Implementação local: selo textual/indicador junto ao contexto, com tokens de situação aprovados; formatador compartilhado de AVG com duas casas na classificação pública/embutida e administrativa. [Plano atualizado](PLAN-CLASSIFICACAO-PTS-AVG.md), guia nas seções Navegação/Estados/Dados; componentes existentes reaproveitados.
+- Teste da precisão reproduzido RED e corrigido;2unitários PASS. gate:ui PASS (lint/formato/tipagem/builds/fronteira/segredos). Browsers:55PASS na rodada de56; um caso falhou somente no fechamento por ENOSPC ao gravar trace e passou na repetição isolada sem trace, sem alteração de asserções. Capturas desktop/mobile conferidas; reflow320/390/1366/1920px e zoom200% incluídos. Não repetir provas de fontes inalteradas.
+- Próximo: atualizar mesma PR89 e publicar SHA novo nos dois Workers autorizados. CI do novo SHA precisa de conferência; manter checkpoint local ao registrar resultado final para evitar commit apenas de polling. Nenhuma automação ativa agora.

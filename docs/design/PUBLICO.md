@@ -181,3 +181,7 @@ A página de resultados da busca mostra até 20 itens de cada tipo por página, 
 ### Ficha do atleta
 
 Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre parênteses, altura em cm e peso em kg, posição, cidade e UF. Exemplo: **17 anos (2009)**, **188cm, 90kg**, **Ala-Pivô / Pivô**, **São Mateus - ES**. Renderizar os valores confirmados disponíveis e ocultar linhas vazias. Data completa, mão dominante, biografia e registro federativo ficam no cadastro privado.
+
+### Classificação e situação — ajuste de23/11/2026
+
+Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica junto à identificação da disputa, em selo discreto com indicador e os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.

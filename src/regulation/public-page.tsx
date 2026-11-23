@@ -32,8 +32,8 @@ const standingsColumns = [
   ["PP", "Pontos pró"],
   ["PC", "Pontos contra"],
   ["SLD", "Saldo de pontos"],
-  ["Últimos jogos", null],
   [standingsMetricLegend[1].label, standingsMetricLegend[1].name],
+  ["Últimos jogos", null],
 ] as const;
 
 function StandingsHeader({
@@ -348,6 +348,12 @@ export function PublicStandingsTables({
                                     <td>{r.pointsAgainst ?? "—"}</td>
                                     <td>{r.difference ?? "—"}</td>
                                     <td>
+                                      {basketAverage(
+                                        r.pointsFor,
+                                        r.pointsAgainst,
+                                      )}
+                                    </td>
+                                    <td>
                                       <RecentResultsCell
                                         results={
                                           recent.get(r.registrationId) ?? []
@@ -356,12 +362,6 @@ export function PublicStandingsTables({
                                         label={label}
                                         compactLabel={compactLabel}
                                       />
-                                    </td>
-                                    <td>
-                                      {basketAverage(
-                                        r.pointsFor,
-                                        r.pointsAgainst,
-                                      )}
                                     </td>
                                   </tr>
                                 ))}

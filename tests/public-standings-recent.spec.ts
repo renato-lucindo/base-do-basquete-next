@@ -348,8 +348,8 @@ for (const viewport of [
       "PP",
       "PC",
       "SLD",
-      "Últimos jogos",
       "AVG",
+      "Últimos jogos",
     ]);
     expect(
       await page

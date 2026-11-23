@@ -1,6 +1,6 @@
 const averageNumber = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 3,
-  maximumFractionDigits: 3,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
 
 export function basketAverage(

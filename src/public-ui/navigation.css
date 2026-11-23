@@ -72,6 +72,37 @@
   font-weight: 600;
   overflow-wrap: anywhere;
 }
+.public-dispute-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-inline-start: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--bb-line);
+  border-radius: var(--bb-radius);
+  background: var(--bb-background);
+  color: var(--bb-text);
+  font-size: 0.875rem;
+  font-weight: 400;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.public-dispute-status::before {
+  content: "";
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: var(--bb-status-planned);
+}
+.public-dispute-status[data-status="in_progress"]::before {
+  background: var(--bb-status-in-progress);
+}
+.public-dispute-status[data-status="completed"]::before {
+  background: var(--bb-status-completed);
+}
+.public-dispute-status[data-status="cancelled"]::before {
+  background: var(--bb-status-cancelled);
+}
 .public-header .public-context-line > a {
   flex-shrink: 0;
   font-size: 0.875rem;

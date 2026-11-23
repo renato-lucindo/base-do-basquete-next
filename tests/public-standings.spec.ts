@@ -31,9 +31,12 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
   const table = page.getByRole("table", {
     name: "Classificação por resultados confirmados",
   });
+  await expect(
+    page.locator(".public-context-line > p .public-dispute-status"),
+  ).toHaveText("Em andamento");
   const winner = table.locator("tbody tr").filter({ hasText: "Lobos" });
   await expect(winner.getByRole("cell").nth(1)).toHaveText("5");
-  await expect(winner.getByRole("cell").last()).toHaveText("1,143");
+  await expect(winner.getByRole("cell").nth(9)).toHaveText("1,14");
   await expect(winner.getByRole("cell").nth(5)).toHaveText("100%");
   await expect(table.getByRole("columnheader")).toHaveText([
     "Pos.",
@@ -46,8 +49,8 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     "PP",
     "PC",
     "SLD",
-    "Últimos jogos",
     "AVG",
+    "Últimos jogos",
   ]);
   await page.screenshot({
     path: `.preview-artifacts/standings-columns-after-${info.project.name}.png`,
@@ -131,8 +134,8 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     "PP",
     "PC",
     "SLD",
-    "Últimos jogos",
     "AVG",
+    "Últimos jogos",
   ]);
   await expect(
     table.getByRole("row").nth(1).getByRole("cell").nth(5),
