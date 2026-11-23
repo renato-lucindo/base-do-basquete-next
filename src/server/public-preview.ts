@@ -1,11 +1,20 @@
+import { originAliasRedirect } from "./origin-alias";
+
 export async function publicPreviewResponse(
   request: Request,
-  env: { APP_ORIGIN: string; BDB_SOURCE?: string; ADMIN_ORIGIN?: string },
+  env: {
+    APP_ORIGIN: string;
+    BDB_SOURCE?: string;
+    ADMIN_ORIGIN?: string;
+    APP_ALIAS?: string;
+  },
   readPublic: (request: Request) => Promise<Response>,
 ) {
   const url = new URL(request.url);
+  const alias = originAliasRedirect(request, env);
   let response: Response;
-  if (url.origin !== env.APP_ORIGIN)
+  if (alias) response = alias;
+  else if (url.origin !== env.APP_ORIGIN)
     response = new Response(null, { status: 421 });
   else if (!["GET", "HEAD"].includes(request.method))
     response = new Response(null, {
