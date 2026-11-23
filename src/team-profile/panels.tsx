@@ -45,8 +45,10 @@ export function Legend({ entries }: { entries: LegendEntry[] }) {
     <section className="table-legend reference-legend" aria-label="Legenda">
       <h2>Legenda</h2>
       <dl>
-        {[...new Map(entries.map((m) => [m.label, m])).values()].map((m) => (
-          <div key={m.label}>
+        {[
+          ...new Map(entries.map((m) => [`${m.label}: ${m.name}`, m])).values(),
+        ].map((m) => (
+          <div key={`${m.label}: ${m.name}`}>
             <dt>{m.label}</dt>
             <dd>{m.name}</dd>
           </div>

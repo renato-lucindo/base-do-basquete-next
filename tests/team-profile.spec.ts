@@ -348,6 +348,13 @@ test("classificação completa embutida mantém equipe, inscrição e grupo apó
     page.getByRole("table", { name: "Estatísticas das equipes", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".table-legend")).toHaveCount(1);
+  const pointsMeanings = page.locator(".table-legend dl div").filter({
+    has: page.locator("dt").filter({ hasText: /^PTS$/ }),
+  });
+  await expect(pointsMeanings.locator("dd")).toHaveText([
+    "Pontos de classificação",
+    "Pontos marcados",
+  ]);
   await page
     .getByRole("combobox", { name: "Grupo", exact: true })
     .selectOption(f.groupB);
