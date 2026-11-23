@@ -14,6 +14,7 @@ import { recentGroupResults } from "./recent-results";
 import { RecentResultsCell } from "./recent-results-cell";
 import { standingsSelection } from "./public-bracket-model";
 import { PublicBracket } from "./public-bracket";
+import { basketAverage, standingsMetricLegend } from "./standings-metrics";
 import "../statistics/reference.css";
 import "./public-standings.css";
 
@@ -23,6 +24,7 @@ const standingsNumber = new Intl.NumberFormat("pt-BR", {
 const standingsColumns = [
   ["Pos.", "Posição"],
   ["Equipe", null],
+  [standingsMetricLegend[0].label, standingsMetricLegend[0].name],
   ["J", "Jogos"],
   ["V", "Vitórias"],
   ["D", "Derrotas"],
@@ -31,6 +33,7 @@ const standingsColumns = [
   ["PC", "Pontos contra"],
   ["SLD", "Saldo de pontos"],
   ["Últimos jogos", null],
+  [standingsMetricLegend[1].label, standingsMetricLegend[1].name],
 ] as const;
 
 function StandingsHeader({
@@ -332,6 +335,7 @@ export function PublicStandingsTables({
                                         label(r.registrationId)
                                       )}
                                     </th>
+                                    <td>{r.leaguePoints}</td>
                                     <td>{r.games}</td>
                                     <td>{r.wins}</td>
                                     <td>{r.losses}</td>
@@ -352,6 +356,12 @@ export function PublicStandingsTables({
                                         label={label}
                                         compactLabel={compactLabel}
                                       />
+                                    </td>
+                                    <td>
+                                      {basketAverage(
+                                        r.pointsFor,
+                                        r.pointsAgainst,
+                                      )}
                                     </td>
                                   </tr>
                                 ))}

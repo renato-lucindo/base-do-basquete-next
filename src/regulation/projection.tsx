@@ -2,6 +2,7 @@ import type { RegulationDefinition } from "./persistence-contract";
 import type { z } from "zod";
 import type { regulationProjectionSchema } from "./view-contract";
 import { criteriaLabels } from "./definition-editor";
+import { basketAverage } from "./standings-metrics";
 type Projection = z.infer<typeof regulationProjectionSchema>;
 export function RegulationProjection({
   value,
@@ -58,10 +59,11 @@ export function RegulationProjection({
                     <tr>
                       <th scope="col">Posição</th>
                       <th scope="col">Inscrição</th>
+                      <th scope="col">PTS</th>
                       <th scope="col">Resultados</th>
                       <th scope="col">Vitórias</th>
-                      <th scope="col">Pontos</th>
                       <th scope="col">Saldo</th>
+                      <th scope="col">AVG</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -72,6 +74,7 @@ export function RegulationProjection({
                           {r.tied && r.position !== null ? " (empate)" : ""}
                         </td>
                         <th scope="row">{label(r.registrationId)}</th>
+                        <td>{r.leaguePoints}</td>
                         <td>
                           {r.games}
                           <small>
@@ -81,8 +84,8 @@ export function RegulationProjection({
                           </small>
                         </td>
                         <td>{r.wins}</td>
-                        <td>{r.leaguePoints}</td>
                         <td>{r.difference ?? "—"}</td>
+                        <td>{basketAverage(r.pointsFor, r.pointsAgainst)}</td>
                       </tr>
                     ))}
                   </tbody>

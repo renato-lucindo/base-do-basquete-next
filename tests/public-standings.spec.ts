@@ -32,10 +32,13 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     name: "Classificação por resultados confirmados",
   });
   const winner = table.locator("tbody tr").filter({ hasText: "Lobos" });
-  await expect(winner.getByRole("cell").nth(4)).toHaveText("100%");
+  await expect(winner.getByRole("cell").nth(1)).toHaveText("5");
+  await expect(winner.getByRole("cell").last()).toHaveText("1,143");
+  await expect(winner.getByRole("cell").nth(5)).toHaveText("100%");
   await expect(table.getByRole("columnheader")).toHaveText([
     "Pos.",
     "Equipe",
+    "PTS",
     "J",
     "V",
     "D",
@@ -44,6 +47,7 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     "PC",
     "SLD",
     "Últimos jogos",
+    "AVG",
   ]);
   await page.screenshot({
     path: `.preview-artifacts/standings-columns-after-${info.project.name}.png`,
@@ -119,6 +123,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await expect(table.getByRole("columnheader")).toHaveText([
     "Pos.",
     "Equipe",
+    "PTS",
     "J",
     "V",
     "D",
@@ -127,9 +132,10 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     "PC",
     "SLD",
     "Últimos jogos",
+    "AVG",
   ]);
   await expect(
-    table.getByRole("row").nth(1).getByRole("cell").nth(4),
+    table.getByRole("row").nth(1).getByRole("cell").nth(5),
   ).toHaveText("—");
   await expect(table.getByRole("link")).toHaveCount(0);
   for (const r of s.registrations)
@@ -141,7 +147,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
         .first(),
     ).toHaveText("—");
   await expect(
-    table.getByRole("row").nth(1).getByRole("cell").nth(1),
+    table.getByRole("row").nth(1).getByRole("cell").nth(2),
   ).toHaveText("0");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({
@@ -215,7 +221,7 @@ test("correção publicada altera a tabela e fases mantêm confrontos em revisã
       .getByRole("row")
       .filter({ hasText: "Lobos" })
       .getByRole("cell")
-      .nth(5),
+      .nth(6),
   ).toHaveText("95");
   await page.getByRole("link", { name: "Eliminatórias", exact: true }).click();
   await expect(

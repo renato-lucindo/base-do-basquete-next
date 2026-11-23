@@ -20,7 +20,7 @@
     "APP_ALIAS": "https://preview.basedobasquete.com.br",
     "ADMIN_ORIGIN": "https://admin.renato-lucindo-jr.workers.dev",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
-    "FLEXIBLE_COMPETITION": "false",
+    "FLEXIBLE_COMPETITION": "true",
   },
   "secrets": { "required": ["SUPABASE_PUBLISHABLE_KEY"] },
   "observability": {

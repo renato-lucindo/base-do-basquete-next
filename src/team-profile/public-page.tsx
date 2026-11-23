@@ -7,6 +7,7 @@ import { SectionTabs, TabPanel } from "../ui-system/components";
 import { TooltipProvider } from "../statistics/reference/tooltip";
 import { standingsSelection } from "../regulation/public-bracket-model";
 import { PublicStandingsTables } from "../regulation/public-page";
+import { standingsMetricLegend } from "../regulation/standings-metrics";
 import { recentGroupResults } from "../regulation/recent-results";
 import { RecentResultsCell } from "../regulation/recent-results-cell";
 import { disputeStatusLabels } from "../competition/administration-contract";
@@ -757,7 +758,9 @@ export function TeamProfilePage() {
                             .stage === "classificatoria"
                             ? [
                                 { label: "Pos.", name: "Posição" },
+                                standingsMetricLegend[0],
                                 ...campaignLegend,
+                                standingsMetricLegend[1],
                               ]
                             : []
                         }

@@ -16,7 +16,7 @@
     "run_worker_first": true,
   },
   "vars": {
-    "FLEXIBLE_COMPETITION": "false",
+    "FLEXIBLE_COMPETITION": "true",
     "APP_ORIGIN": "https://admin.renato-lucindo-jr.workers.dev",
     "APP_ALIAS": "https://admin.basedobasquete.com.br",
     "SUPABASE_URL": "https://nizmasjddyrhmevvfviz.supabase.co",
