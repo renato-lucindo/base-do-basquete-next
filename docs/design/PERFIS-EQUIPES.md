@@ -13,3 +13,7 @@ O responsável aceitou o HTML e autorizou implementar em 22/11/2026. A referênc
 - Preservar design system, escala vigente, privacidade, identidades e duas inscrições da mesma equipe; entradas da busca levam ao geral e inscrições ao contexto. Estado na URL e retorno preservados.
 
 Aceite de protótipo e autorização de implementação não constituem deploy nem aceite do Worker implementado.
+
+## Revisão autorizada em24/11/2026
+
+Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, contornos, nomes e seleção. Na aba Jogadores, usar ordem/seletor da página da disputa e preservar a tabela durante ordenação; eliminar títulos visuais que repetem as abas em todo o perfil. Classificação e jogadores centralizam pelo conteúdo; coletivos somente ajustam o contorno. Placar central estável entre nomes de tamanhos diferentes. Estado vazio específico para eliminatórias, sem apagar confrontos definidos. Regressões devem verificar comportamento e tela renderizada, não somente presença de regra nos documentos.

@@ -20,7 +20,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-block: 0.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .public-standings.public-site.statistics-public
   .standings-group-control
@@ -195,6 +195,6 @@
   .public-standings.public-site.statistics-public
     .standings-group-control
     select {
-    font-size: 1rem;
+    font-size: calc(1rem + 0.125rem);
   }
 }

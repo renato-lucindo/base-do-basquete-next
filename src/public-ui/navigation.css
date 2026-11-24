@@ -68,7 +68,7 @@
 }
 .public-context-line p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -82,7 +82,7 @@
   border-radius: var(--bb-radius);
   background: var(--bb-background);
   color: var(--bb-text);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   font-weight: 400;
   white-space: nowrap;
   vertical-align: middle;
@@ -105,7 +105,7 @@
 }
 .public-header .public-context-line > a {
   flex-shrink: 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   padding-block: 0.75rem;
 }
 .dispute-navigation {
@@ -130,14 +130,14 @@
   background: #edf5ff;
 }
 .public-header .public-return {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   margin: 0;
 }
 .public-header .breadcrumb {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   padding: 0.25rem 0;
   color: #526176;
   grid-column: 1 / -1;
@@ -158,7 +158,7 @@
 }
 .public-home {
   min-height: 100vh;
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
   line-height: 1.5;
 }
 .public-home .public-main {
@@ -166,18 +166,18 @@
   min-height: 60vh;
 }
 .public-home h1 {
-  font-size: 1.625rem;
+  font-size: calc(1.625rem + 0.125rem);
   margin: 0.5rem 0 1.25rem;
 }
 .public-home h2 {
-  font-size: 1.1875rem;
+  font-size: calc(1.1875rem + 0.125rem);
   margin: 1.25rem 0 0.75rem;
 }
 .public-home .breadcrumb {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   color: #526176;
 }
 .public-home .footer {
@@ -188,7 +188,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   color: #526176;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-search {
   max-width: 50rem;
@@ -239,7 +239,7 @@
 }
 .gender-columns :is(h3, h4) {
   color: #526176;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   margin: 0.5rem 0;
 }
 .gender-columns a {
@@ -296,7 +296,7 @@
   overflow-wrap: anywhere;
 }
 .public-games time {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-empty {
   border-block: 1px solid var(--public-line);
@@ -366,7 +366,7 @@
   padding: 1.25rem 0;
   border-top: 1px solid var(--public-line);
   color: #526176;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .access-main.statistics-page.team-public-page,
 .access-main.statistics-page.player-page {
@@ -395,7 +395,7 @@
   }
   .public-header .dispute-navigation a {
     padding: 0.5rem 0.125rem;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .dispute-navigation {
     display: grid;
@@ -438,7 +438,7 @@
 .public-standings-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   font-variant-numeric: tabular-nums;
 }
 .public-standings-table caption {
@@ -464,7 +464,7 @@
 }
 .public-source,
 .public-table-legend {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   color: #46566a;
 }
 .public-series {
@@ -497,7 +497,7 @@
 }
 .public-header.site-header {
   font:
-    0.875rem/1.5 Inter,
+    calc(0.875rem + 0.125rem)/1.5 Inter,
     "Segoe UI",
     Arial,
     sans-serif;
@@ -514,7 +514,7 @@
   padding-block: 0.625rem;
 }
 .public-header.site-header .header-inner .brand {
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
   letter-spacing: 0;
   margin: 0;
   gap: 0.625rem;
@@ -522,7 +522,7 @@
 .public-header.site-header .header-inner .brand-mark {
   width: 1.875rem;
   height: 1.875rem;
-  font-size: 1.125rem;
+  font-size: calc(1.125rem + 0.125rem);
   padding: 0;
 }
 .public-header.site-header .public-header-search {
@@ -580,14 +580,14 @@
   text-decoration: none;
 }
 .public-home {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-home h1 {
-  font-size: 1.3125rem;
+  font-size: calc(1.3125rem + 0.125rem);
   margin-bottom: 0.875rem;
 }
 .public-home h2 {
-  font-size: 1.0625rem;
+  font-size: calc(1.0625rem + 0.125rem);
 }
 .public-home .public-main {
   max-width: 100rem;
@@ -619,7 +619,7 @@
   }
   .public-header.site-header .public-header-search input {
     min-height: 2.75rem;
-    font-size: 1rem;
+    font-size: calc(1rem + 0.125rem);
   }
   .public-header.site-header .public-header-search button {
     min-height: 2.75rem;
@@ -646,7 +646,7 @@
 .public-games-tools label {
   display: grid;
   gap: 0.25rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   width: min(20rem, 100%);
 }
 .public-games-tools input {
@@ -666,7 +666,7 @@
 .public-table-scroll table {
   width: max-content;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   font-variant-numeric: tabular-nums;
 }
 .public-table-scroll :is(th, td) {
@@ -679,7 +679,7 @@
   color: #42556c;
   background: #f1f5fa;
   font-weight: 600;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .public-table-scroll tbody th {
   font-weight: 500;
@@ -703,7 +703,7 @@
   display: block;
   color: #526176;
   font-weight: 400;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .public-games-pager {
   display: flex;
@@ -722,7 +722,7 @@
   }
   .public-games-tools input {
     min-height: 2.75rem;
-    font-size: 1rem;
+    font-size: calc(1rem + 0.125rem);
   }
 }
 
@@ -731,7 +731,7 @@
     padding-block: 0.3125rem;
   }
   .public-header.site-header .public-context-line p {
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem + 0.125rem);
     font-weight: 500;
   }
   .public-header.site-header .dispute-navigation a {
@@ -787,7 +787,7 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
   border: 1px solid var(--public-line);
   border-radius: 0.3125rem;
   padding-inline: 0.625rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .public-header .public-return.wrap {
   width: calc(100% - 2rem);
@@ -803,4 +803,114 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
 .public-table-scroll thead th {
   background: var(--public-blue-soft);
   color: var(--public-text);
+}
+
+/* Public identity follows the hierarchy; only the active dispute is current. */
+.public-header .public-context-line {
+  justify-content: flex-start;
+}
+.public-dispute-identity {
+  min-width: 0;
+}
+.public-dispute-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.public-dispute-breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.public-dispute-breadcrumb li + li::before {
+  content: "›";
+  margin-inline: 0.5rem;
+  color: var(--public-muted);
+}
+.public-header.site-header
+  .public-dispute-breadcrumb
+  .public-competition-trigger {
+  font-size: 1rem;
+  color: var(--public-text);
+}
+.public-dispute-breadcrumb [aria-current="page"] {
+  font-weight: 600;
+}
+.public-dispute-identity > .public-dispute-status {
+  margin: 0.125rem 0 0.5rem;
+}
+.public-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.public-footer .public-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: inherit;
+  text-decoration: none;
+}
+.public-footer .brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  background: var(--bb-blue);
+  color: white;
+  border-radius: var(--bb-radius);
+  font-weight: 700;
+}
+.public-header,
+.public-footer,
+.public-site {
+  --bb-font-body: 1rem;
+  --bb-font-detail: 0.875rem;
+  --bb-font-heading: 1.4375rem;
+  --bb-font-section: 1.1875rem;
+}
+.public-site a:is(.team-name-link),
+.public-site .standings-team a,
+.public-site .team-list-explorer th[scope="row"] > a {
+  color: inherit;
+  text-decoration: none;
+}
+.public-site .standings-team a:is(:hover, :focus-visible),
+.public-site
+  .team-list-explorer
+  th[scope="row"]
+  > a:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  .standings-team
+  a,
+.public-site.statistics-public
+  .team-list-explorer
+  .statistics-table
+  th[scope="row"]
+  > a {
+  color: inherit;
+  text-decoration: none;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  .standings-team
+  a:is(:hover, :focus-visible),
+.public-site.statistics-public
+  .team-list-explorer
+  .statistics-table
+  th[scope="row"]
+  > a:is(:hover, :focus-visible) {
+  text-decoration: underline;
 }

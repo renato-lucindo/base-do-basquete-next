@@ -258,8 +258,23 @@ export function PublicBracket({ value }: { value: PublicStandings }) {
         : "smooth",
     });
   };
+  if (!model.columns.length)
+    return (
+      <p role="status">Ainda não há jogos disponíveis na fase eliminatória.</p>
+    );
   return (
     <div className="public-knockout">
+      {!value.games.some(
+        (g) =>
+          g.stageKind === "knockout" ||
+          value.definition.series.some((s) =>
+            s.games.some((slot) => slot.gameId === g.id),
+          ),
+      ) && (
+        <p role="status">
+          Ainda não há jogos disponíveis na fase eliminatória.
+        </p>
+      )}
       <div className="knockout-controls">
         <button
           type="button"

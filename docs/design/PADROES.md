@@ -8,6 +8,8 @@ A escala compartilhada segue a fonte padrão do navegador em qualquer largura, n
 
 Títulos que apenas repetem a aba ativa permanecem semânticos, sem reservar altura. Contexto, entidades e tarefas/diálogos continuam visíveis. Foco deve ir para contêineres identificáveis, sem deslocamento para títulos ocultos.
 
+Aplicação obrigatória: na aba **Jogadores**, não mostrar “Jogadores na disputa”; na aba **Jogos**, não mostrar “Jogos da equipe”. A mesma regra vale para variações como “Participações em competições” na aba Competições e “Estatísticas por participação” na aba Estatísticas. Preservar o título semântico com a classe compartilhada sr-only, sem espaço reservado. Um título que distingue seções simultâneas da Visão geral (Classificação, Estatísticas coletivas, Últimos jogos) continua visível. Verificar as abas renderizadas e manter testes de regressão: a existência desta regra no documento não substitui sua aplicação no consumidor.
+
 - Identifique a principal tarefa e o primeiro dado útil antes de projetar. Contexto, filtros e controles devem ajudar a encontrá-lo.
 - Tema claro, azul como destaque, linguagem visual sóbria, tabelas, listas, divisores e alinhamento consistente. Consulte tokens e componentes reais; sugestões externas não substituem identidade aprovada.
 - Use a largura desktop conforme a tarefa. Dimensione tabelas e colunas pelo conteúdo e aproveite o espaço ao lado para dados e ações relacionados. Reserve a largura inteira para tabelas que precisem dela. Evite cards enormes, cabeçalhos redundantes e repetição do que já está no breadcrumb. Preserve título semanticamente acessível.

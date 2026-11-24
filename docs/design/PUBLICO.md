@@ -184,4 +184,15 @@ Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre 
 
 ### Classificação e situação — ajuste de23/11/2026
 
-Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica junto à identificação da disputa, em selo discreto com indicador e os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.
+Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica abaixo do breadcrumb hierárquico da disputa, em selo discreto com indicador e os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.
+
+### Consistência pública —24/11/2026
+
+- Cabeçalho da disputa: campeonato › ano › naipe › categoria e divisão quando houver. Os três primeiros níveis abrem seleção contextual de opções públicas; a categoria identifica a disputa atual. Conservar aba ao trocar de disputa e retorno nos perfis. Status abaixo do caminho. Não reproduzir o título ou os comentários explicativos do print de referência.
+- Jogadores do perfil e da disputa compartilham ordem das métricas e apresentação do seletor, respeitando fonte/colunas escolhidas. Ordenação preserva tabela, altura, foco e rolagem durante a consulta; mudar de identidade remove os dados anteriores. Erros e ausência não equivalem a carregamento.
+- Sem jogos públicos na eliminatória: “Ainda não há jogos disponíveis na fase eliminatória.” Havendo jogos sem estatísticas: informar a ausência específica, preservando confrontos definidos.
+- Contorno acompanha a tabela até a última coluna. Classificação e jogadores centralizados quando couberem; coletivos alinhados à esquerda. Rolagem permanece interna quando necessário.
+- Equipe selecionada: mesmo negrito e fundo azul suave em Classificação e Estatísticas coletivas, sem faixa lateral. Nomes de equipes conservam navegação, cor normal e sem sublinhado permanente; foco e interação permanecem visíveis.
+- Confrontos usam áreas equivalentes para mandante/visitante e área estável para o placar, com quebra dos nomes. O centro do placar não depende da extensão dos nomes.
+- Rodapé compartilhado: ícone da marca e Base do Basquete à esquerda; Dados a partir de 2026 à direita, adaptando ao celular.
+- Completar o aumento anterior de2px em toda a área pública; não somar novamente nas regras já ajustadas. O administrativo fica fora desta revisão. Conferir tamanhos efetivos, inclusive sobrescritas de tabelas, controles e legendas.

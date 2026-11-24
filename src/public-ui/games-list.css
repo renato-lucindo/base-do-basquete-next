@@ -16,7 +16,7 @@
 }
 .public-game-search-controls input {
   min-height: 2.75rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   border-color: #7b8796;
 }
 .public-game-search-controls button {
@@ -32,7 +32,7 @@
 .public-game-row {
   padding-inline: 0.75rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   overflow-wrap: anywhere;
 }
 .public-game-meta {
@@ -46,7 +46,7 @@
 .public-game-phase,
 .public-game-venue {
   color: #667085;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   line-height: 1.5;
 }
 .public-game-matchup {
@@ -65,7 +65,7 @@
   justify-content: center;
   align-items: baseline;
   gap: 0.375rem;
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
   font-weight: 650;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -128,7 +128,7 @@
     width: 100%;
   }
   .public-game-search-controls input {
-    font-size: 1rem;
+    font-size: calc(1rem + 0.125rem);
   }
 }
 
@@ -142,7 +142,7 @@
   padding: 0.375rem 0.5rem;
 }
 .public-game-score:not(.has-score) {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   font-weight: 400;
   white-space: normal;
 }

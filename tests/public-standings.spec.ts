@@ -32,7 +32,7 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     name: "Classificação por resultados confirmados",
   });
   await expect(
-    page.locator(".public-context-line > p .public-dispute-status"),
+    page.locator(".public-dispute-identity > .public-dispute-status"),
   ).toHaveText("Em andamento");
   const winner = table.locator("tbody tr").filter({ hasText: "Lobos" });
   await expect(winner.getByRole("cell").nth(1)).toHaveText("5");

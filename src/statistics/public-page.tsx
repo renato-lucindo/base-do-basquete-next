@@ -24,24 +24,12 @@ import {
   serializeStatisticsQuery,
   updateStatisticsQuery,
   STATISTICS_COLUMN_PRESETS,
+  SCORESHEET_PLAYER_COLUMNS,
   type StatisticsQuery,
 } from "./query-contract";
 
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
-const scoreKeys: StatisticsMetric[] = [
-  "games",
-  "points",
-  "pointsPerGame",
-  "pointsShare",
-  "twoMade",
-  "threeMade",
-  "freeMade",
-  "foulsCommitted",
-  "technicalFouls",
-  "unsportsmanlikeFouls",
-  "fiveFouls",
-  "disqualifications",
-];
+const scoreKeys = SCORESHEET_PLAYER_COLUMNS;
 const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const display = (values: string[]) =>
   values.length === 1 ? values[0] : "var.";

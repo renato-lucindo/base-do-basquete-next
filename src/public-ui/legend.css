@@ -4,7 +4,7 @@
   color: var(--public-muted);
 }
 :is(.public-site.statistics-public, .player-page) .reference-legend h2 {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   font-weight: 600;
   margin: 0 0 0.625rem;
   color: var(--public-text);
@@ -14,7 +14,7 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
   gap: 0.5rem 1.125rem;
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: calc(0.6875rem + 0.125rem);
 }
 .reference-legend dl > div {
   display: flex;
@@ -35,6 +35,6 @@
 }
 @media (max-width: 639px) {
   .reference-legend dl {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
 }

@@ -678,3 +678,101 @@
     font-size: calc(0.68rem + 0.125rem);
   }
 }
+
+/* The profile reuses the dispute table; its controls must not override the popup. */
+.team-profile-page.public-site.statistics-public .column-options label {
+  flex-direction: row;
+  min-width: 0;
+  flex: none;
+  align-items: center;
+  font-size: calc(0.8125rem + 0.125rem);
+}
+.team-profile-page .team-profile-query-status {
+  min-height: 1.75rem;
+}
+.team-profile-query-status p {
+  margin: 0;
+}
+.team-profile-page .team-profile-player-results {
+  min-width: 0;
+}
+.team-profile-page.public-site.statistics-public
+  .reference-explorer
+  .statistics-table {
+  min-width: 0;
+  width: max-content;
+}
+.team-profile-page.public-site.statistics-public .standings-explorer {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+.team-profile-page.public-site.statistics-public
+  .team-profile-player-results
+  > .scrollable-table {
+  margin-inline: auto;
+}
+.team-profile-page.public-site.statistics-public
+  :is(.scrollable-table, .statistics-table-wrap) {
+  width: max-content;
+  max-width: 100%;
+}
+.team-profile-page.public-site.statistics-public .scrollable-table-top {
+  contain: inline-size;
+}
+.team-profile-page.public-site.statistics-public
+  .team-profile-collective
+  .scrollable-table {
+  margin-inline: 0;
+}
+.team-profile-page.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  tr[data-profile-selected="true"]
+  > :is(th, td) {
+  background: var(--bb-blue-soft);
+  color: inherit;
+  font-weight: 700;
+  box-shadow: none;
+}
+.team-profile-page.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  tr[data-profile-selected="true"]
+  > th
+  a {
+  font-weight: inherit;
+  color: inherit;
+}
+.team-profile-page.public-site.statistics-public .team-profile-match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.75rem minmax(0, 1fr);
+  align-items: center;
+}
+.team-profile-page.public-site.statistics-public
+  .team-profile-match
+  > span:first-child {
+  text-align: right;
+}
+.team-profile-page.public-site.statistics-public .team-profile-match > strong {
+  text-align: center;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.team-profile-page.public-site.statistics-public
+  .team-profile-match
+  > span:last-child {
+  text-align: left;
+}
+
+/* Preserve the adopted profile scale where shared table rules are more specific. */
+.team-profile-page.public-site.statistics-public
+  :is(.team-profile-toolbar > label, .team-profile-honors label) {
+  font-size: calc(0.75rem + 0.125rem);
+}
+.team-profile-page.public-site.statistics-public .reference-legend h2 {
+  font-size: calc(0.75rem + 0.125rem);
+}
+.team-profile-page.public-site.statistics-public .reference-legend dl {
+  font-size: calc(0.7rem + 0.125rem);
+}

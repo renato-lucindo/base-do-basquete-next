@@ -31,7 +31,7 @@ export interface StatisticsQuery {
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
 const isMetric = (value: string): value is StatisticsMetric =>
   Object.hasOwn(STATISTICS_METRICS, value);
-const essentials: StatisticsMetric[] = [
+export const SCORESHEET_PLAYER_COLUMNS: StatisticsMetric[] = [
   "games",
   "points",
   "pointsPerGame",
@@ -49,7 +49,7 @@ export const STATISTICS_COLUMN_PRESETS: Record<
   "essentials" | "simple" | "all",
   StatisticsMetric[]
 > = {
-  essentials,
+  essentials: SCORESHEET_PLAYER_COLUMNS,
   simple: [
     "games",
     "points",

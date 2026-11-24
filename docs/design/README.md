@@ -30,6 +30,7 @@ Em UI/UX, compare o protótipo aprovado para a tela com os padrões comuns e da 
 
 Antes de entregar qualquer tela nova ou alterada, pública ou administrativa, conferir os [padrões de apresentação](PADROES.md#textos-de-apresentação) e registrar o resultado na revisão/evidência da PR. Os itens são critérios de entrega do agente, sem acrescentar confirmações ao percurso do usuário.
 
+- [ ] Nenhum título visível repete a aba ativa (por exemplo, Jogadores/Jogadores na disputa ou Jogos/Jogos da equipe). Títulos semânticos não reservam altura; conferir também Competições, Elencos e Estatísticas. Testes cobrem as abas alteradas.
 - [ ] Textos auxiliares comunicam somente ações necessárias ou estados concretos; não há avisos genéricos, repetições ou explicações do funcionamento normal.
 - [ ] Cabeçalhos completos não têm tooltip nem botão exclusivamente de ajuda; nas abreviações, o tooltip contém apenas o significado aprovado, consistente com os demais controles.
 - [ ] Tooltips de registros/ícones usam somente o conteúdo aprovado para sua finalidade, sem ampliar explicações por iniciativa da implementação.

@@ -226,7 +226,7 @@ test("painel da edição atual preserva cada aba e o histórico", async ({
   page,
 }, info) => {
   const f = await publicNavigationFixture(page);
-  const toggle = page.locator(".public-competition-trigger");
+  const toggle = page.locator(".public-competition-trigger").nth(2);
   const panel = page.getByRole("navigation", { name: "Disputas da edição" });
   const nav = page.getByRole("navigation", { name: "Seções da disputa" });
   const alternative = f.games.find((g) => g.context.category === "Sub-14")!;
@@ -363,7 +363,7 @@ test("axe, foco visível, reflow 320px e zoom 200%", async ({ page }, info) => {
     .analyze();
   expect(scan.violations).toEqual([]);
   await page.goto(origin + disputeLink(f.source.disputeId));
-  await page.locator(".public-competition-trigger").click();
+  await page.locator(".public-competition-trigger").first().click();
   const catalogLink = page.getByRole("link", {
     name: "Ver todos os campeonatos",
   });

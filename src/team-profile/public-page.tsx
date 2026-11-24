@@ -792,7 +792,7 @@ export function TeamProfilePage() {
                 ) : view.section === "competicoes" ? (
                   <>
                     <div className="team-profile-section-head">
-                      <h2>Participações em competições</h2>
+                      <h2 className="sr-only">Participações em competições</h2>
                     </div>
                     {filters}
                     <Select
@@ -815,7 +815,7 @@ export function TeamProfilePage() {
                   </>
                 ) : view.section === "jogadores" && selected ? (
                   <>
-                    <h2>Jogadores na disputa</h2>
+                    <h2 className="sr-only">Jogadores</h2>
                     <PlayersPanel
                       key={selected.registrationId}
                       participation={selected}
@@ -826,7 +826,7 @@ export function TeamProfilePage() {
                 ) : view.section === "elencos" ? (
                   <>
                     <div className="team-profile-section-head">
-                      <h2>Elencos por participação</h2>
+                      <h2 className="sr-only">Elencos por participação</h2>
                       <Select
                         label="Ano"
                         value={String(year ?? "")}
@@ -916,7 +916,7 @@ export function TeamProfilePage() {
                 ) : view.section === "estatisticas" ? (
                   <>
                     <div className="team-profile-section-head">
-                      <h2>Estatísticas por participação</h2>
+                      <h2 className="sr-only">Estatísticas por participação</h2>
                       <ModeButtons
                         value={view.params.get("mode") ?? "per-game"}
                         onChange={(mode) => update({ mode })}
@@ -942,7 +942,7 @@ export function TeamProfilePage() {
                 ) : view.section === "jogos" ? (
                   <>
                     <div className="team-profile-section-head">
-                      <h2>Jogos da equipe</h2>
+                      <h2 className="sr-only">Jogos</h2>
                       {!contextual && (
                         <Select
                           label="Ano"

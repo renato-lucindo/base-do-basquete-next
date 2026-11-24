@@ -14,6 +14,7 @@ import {
 import {
   serializeStatisticsQuery,
   type StatisticsQuery,
+  SCORESHEET_PLAYER_COLUMNS,
 } from "../statistics/query-contract";
 import { teamsListPageSchema } from "../team-statistics/list-contract";
 import {
@@ -57,26 +58,34 @@ export function Legend({ entries }: { entries: LegendEntry[] }) {
     </section>
   ) : null;
 }
-function useResource<T>(path: string, schema: z.ZodType<T>) {
+function useResource<T>(path: string, schema: z.ZodType<T>, identity: string) {
   const [attempt, retry] = useState(0);
   const [state, setState] = useState<{
     key: string;
+    identity: string;
     data: T | null;
     error: string;
     loading: boolean;
-  }>({ key: "", data: null, error: "", loading: true });
+  }>({ key: "", identity: "", data: null, error: "", loading: true });
   useEffect(() => {
     const c = new AbortController();
-    setState({ key: path, data: null, error: "", loading: true });
+    setState((previous) => ({
+      key: path,
+      identity,
+      data: previous.identity === identity ? previous.data : null,
+      error: "",
+      loading: true,
+    }));
     void api(path, schema, undefined, c.signal)
       .then((data) => {
         if (!c.signal.aborted)
-          setState({ key: path, data, error: "", loading: false });
+          setState({ key: path, identity, data, error: "", loading: false });
       })
       .catch((error) => {
         if (!c.signal.aborted)
           setState({
             key: path,
+            identity,
             data: null,
             error:
               error instanceof ApiFailure && error.status === 404
@@ -86,9 +95,15 @@ function useResource<T>(path: string, schema: z.ZodType<T>) {
           });
       });
     return () => c.abort();
-  }, [path, schema, attempt]);
+  }, [path, schema, attempt, identity]);
   const current =
-    state.key === path ? state : { data: null, error: "", loading: true };
+    state.key === path
+      ? state
+      : {
+          data: state.identity === identity ? state.data : null,
+          error: "",
+          loading: true,
+        };
   return {
     data: current.data,
     error: current.error,
@@ -163,20 +178,23 @@ function ScopeSelect({
     </label>
   );
 }
-const sheetKeys: StatisticsMetric[] = [
-  "games",
-  "points",
-  "pointsPerGame",
-  "pointsShare",
-  "twoMade",
-  "threeMade",
-  "freeMade",
-  "foulsCommitted",
-  "technicalFouls",
-  "unsportsmanlikeFouls",
-  "fiveFouls",
-  "disqualifications",
-];
+const sheetKeys = SCORESHEET_PLAYER_COLUMNS;
+function noPlayoffGames(p: TeamParticipation) {
+  if (!p.standings) return false;
+  const assigned = new Set(
+    p.standings.definition.series.flatMap((s) => s.games.map((g) => g.gameId)),
+  );
+  return !p.standings.games.some(
+    (g) => g.stageKind === "knockout" || assigned.has(g.id),
+  );
+}
+function emptyStatistics(p: TeamParticipation, scope: string) {
+  return scope === "playoffs" && noPlayoffGames(p)
+    ? "Ainda não há jogos disponíveis na fase eliminatória."
+    : scope === "playoffs"
+      ? "Ainda não há estatísticas disponíveis na fase eliminatória."
+      : "Nenhum jogador encontrado neste recorte.";
+}
 export function PlayersPanel({
   participation: p,
   query,
@@ -190,6 +208,7 @@ export function PlayersPanel({
   const resource = useResource(
     `/api/public/statistics/${p.disputeId}?${serializeStatisticsQuery(q)}`,
     statisticsPageSchema,
+    `${p.disputeId}/${p.registrationId}`,
   );
   const valid =
     !resource.data ||
@@ -202,13 +221,15 @@ export function PlayersPanel({
       : (Object.keys(STATISTICS_METRICS) as StatisticsMetric[]);
   const columns = q.columns.filter((k) => available.includes(k));
   const visibleColumns = data
-    ? data.columns.filter((k) => columns.includes(k))
+    ? (data.hasBoxscore === false ? sheetKeys : data.columns).filter((k) =>
+        columns.includes(k),
+      )
     : [];
   const update = (patch: Partial<StatisticsQuery>) =>
     change(serializeStatisticsQuery({ ...q, ...patch }).toString());
   return (
     <>
-      <div className="team-profile-toolbar">
+      <div className="team-profile-toolbar team-profile-player-controls">
         <label className="grow">
           Jogador
           <input
@@ -238,59 +259,74 @@ export function PlayersPanel({
           onChange={(mode) => update({ mode, page: 1 })}
         />
       </div>
-      <ResourceMessage
-        {...resource}
-        error={
-          valid
-            ? resource.error
-            : "As estatísticas retornaram outra inscrição. Tente novamente."
-        }
-      />
-      {data && (
-        <>
-          <ScoresheetStatisticsTable
-            data={{
-              ...data,
-              columns: visibleColumns,
-            }}
-            showTeam={false}
-            showJersey
-            onSort={(sort) =>
-              update({
-                sort,
-                direction:
-                  q.sort === sort && q.direction === "desc" ? "asc" : "desc",
-                page: 1,
-              })
-            }
-            compare={[]}
-            comparisonEnabled={false}
-            onCompare={() => undefined}
-          />
-          {data.totalPages > 1 && (
-            <nav
-              className="team-profile-pager"
-              aria-label="Páginas de jogadores"
-            >
-              <button
-                disabled={data.page <= 1}
-                onClick={() => update({ page: data.page - 1 })}
+      <div className="team-profile-query-status" aria-live="polite">
+        <ResourceMessage
+          {...resource}
+          error={
+            valid
+              ? resource.error
+              : "As estatísticas retornaram outra inscrição. Tente novamente."
+          }
+        />
+      </div>
+      <section
+        className="team-profile-player-results reference-explorer"
+        aria-label="Resultado da consulta"
+        aria-busy={resource.loading}
+      >
+        {data && (
+          <>
+            {data.total === 0 && (
+              <p role="status">
+                {q.search || q.filters.length
+                  ? "Nenhum jogador encontrado neste recorte."
+                  : emptyStatistics(p, q.scope)}
+              </p>
+            )}
+            <ScoresheetStatisticsTable
+              data={{
+                ...data,
+                columns: visibleColumns,
+              }}
+              showTeam={false}
+              showJersey
+              onSort={(sort) =>
+                update({
+                  sort,
+                  direction:
+                    q.sort === sort && q.direction === "desc" ? "asc" : "desc",
+                  page: 1,
+                })
+              }
+              compare={[]}
+              comparisonEnabled={false}
+              onCompare={() => undefined}
+            />
+            {data.totalPages > 1 && (
+              <nav
+                className="team-profile-pager"
+                aria-label="Páginas de jogadores"
               >
-                Anterior
-              </button>
-              <span>
-                Página {data.page} de {data.totalPages}
-              </span>
-              <button
-                disabled={data.page >= data.totalPages}
-                onClick={() => update({ page: data.page + 1 })}
-              >
-                Próxima
-              </button>
-            </nav>
-          )}
-        </>
-      )}
+                <button
+                  disabled={data.page <= 1}
+                  onClick={() => update({ page: data.page - 1 })}
+                >
+                  Anterior
+                </button>
+                <span>
+                  Página {data.page} de {data.totalPages}
+                </span>
+                <button
+                  disabled={data.page >= data.totalPages}
+                  onClick={() => update({ page: data.page + 1 })}
+                >
+                  Próxima
+                </button>
+              </nav>
+            )}
+          </>
+        )}
+      </section>
       <Legend entries={visibleColumns.map(referenceMetric)} />
     </>
   );
@@ -312,6 +348,7 @@ export function CollectivePanel({
   const resource = useResource(
     `/api/public/teams/${p.disputeId}?${serializeTeamsListQuery(q)}`,
     teamsListPageSchema,
+    p.disputeId,
   );
   const valid = !resource.data || resource.data.disputeId === p.disputeId;
   const data = valid ? resource.data : null;
@@ -319,7 +356,7 @@ export function CollectivePanel({
     change(serializeTeamsListQuery({ ...q, ...patch }).toString());
   return (
     <>
-      <section className="team-profile-section">
+      <section className="team-profile-section team-profile-collective">
         <div className="team-profile-section-head">
           <h2>Estatísticas coletivas</h2>
           <ModeButtons value={q.mode} onChange={(mode) => update({ mode })} />
@@ -338,6 +375,9 @@ export function CollectivePanel({
               : "As estatísticas retornaram outra disputa. Tente novamente."
           }
         />
+        {data?.total === 0 && q.scope === "playoffs" && (
+          <p role="status">{emptyStatistics(p, q.scope)}</p>
+        )}
         {data && (
           <TeamsListTable
             data={data}

@@ -6,7 +6,6 @@ import {
 } from "../competition/administration-contract";
 import { previewDisputeId } from "./preview";
 import {
-  contextLabel,
   disputeLink,
   publicSections,
   type PublicContext,
@@ -120,7 +119,9 @@ function DisputeNavigation({
       .catch(() => {});
     return () => controller.abort();
   }, [disputeId]);
-  const [selecting, setSelecting] = useState(false);
+  const [selecting, setSelecting] = useState<
+    "championship" | "edition" | "gender" | null
+  >(null);
   const panelId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
   const c =
@@ -137,36 +138,65 @@ function DisputeNavigation({
       onKeyDown={(e) => {
         if (selecting && e.key === "Escape") {
           e.preventDefault();
-          setSelecting(false);
+          setSelecting(null);
           trigger.current?.focus();
         }
       }}
     >
       <div className="public-context-line">
-        {c && !siteDisputeId ? (
-          <p>
-            <button
-              type="button"
-              className="public-competition-trigger"
-              ref={trigger}
-              aria-controls={selecting ? panelId : undefined}
-              aria-expanded={selecting}
-              onClick={() => setSelecting(!selecting)}
+        {c ? (
+          <div className="public-dispute-identity">
+            <nav
+              aria-label="Contexto da disputa"
+              className="public-dispute-breadcrumb"
             >
-              {c.name}
-              <span aria-hidden="true"> ⌄</span>
-            </button>
-            <span>{contextLabel(c).slice(c.name.length)}</span>
+              <ol>
+                {(
+                  [
+                    ["championship", c.name],
+                    ["edition", String(c.year)],
+                    [
+                      "gender",
+                      c.gender === "masculino" ? "Masculino" : "Feminino",
+                    ],
+                  ] as const
+                ).map(([level, label]) => (
+                  <li key={level}>
+                    {!siteDisputeId ? (
+                      <button
+                        type="button"
+                        className="public-competition-trigger"
+                        aria-expanded={selecting === level}
+                        aria-controls={
+                          selecting === level ? panelId : undefined
+                        }
+                        onClick={(event) => {
+                          trigger.current = event.currentTarget;
+                          setSelecting(selecting === level ? null : level);
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ) : (
+                      <span>{label}</span>
+                    )}
+                  </li>
+                ))}
+                <li aria-current="page">
+                  <span>
+                    {c.category}
+                    {c.division ? ` · ${c.division}` : ""}
+                  </span>
+                </li>
+              </ol>
+            </nav>
             {statusBadge}
-          </p>
+          </div>
         ) : (
           <p>
-            {c
-              ? contextLabel(c)
-              : catalog.loading
-                ? "Carregando disputa…"
-                : "Disputa sem contexto público disponível"}
-            {statusBadge}
+            {catalog.loading
+              ? "Carregando disputa…"
+              : "Disputa sem contexto público disponível"}
           </p>
         )}
         {selecting && c && (
@@ -175,8 +205,9 @@ function DisputeNavigation({
             context={c}
             section={section}
             currentId={disputeId}
+            level={selecting}
             onClose={() => {
-              setSelecting(false);
+              setSelecting(null);
               trigger.current?.focus();
             }}
           />
@@ -214,7 +245,9 @@ function EditionDisputes({
   section,
   currentId,
   onClose,
+  level,
 }: {
+  level: "championship" | "edition" | "gender";
   id: string;
   context: PublicContext;
   section: PublicSection;
@@ -224,8 +257,9 @@ function EditionDisputes({
   const catalog = usePublicCatalog();
   const disputes = publicDisputes(catalog.games, catalog.disputes).filter(
     (d) =>
-      d.context.championshipId === context.championshipId &&
-      d.context.year === context.year,
+      level === "championship" ||
+      (d.context.championshipId === context.championshipId &&
+        (level === "edition" || d.context.year === context.year)),
   );
   return (
     <nav
@@ -243,17 +277,42 @@ function EditionDisputes({
         </p>
       )}
       {!catalog.loading && !catalog.error && (
-        <DisputeLinks
-          disputes={
-            disputes.length ? disputes : [{ disputeId: currentId, context }]
-          }
-          headingLevel="h3"
-          section={section}
-          currentId={currentId}
-          onSelect={(e) => {
-            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) onClose();
-          }}
-        />
+        <>
+          {[
+            ...new Map(
+              (disputes.length
+                ? disputes
+                : [{ disputeId: currentId, context }]
+              ).map((d) => [
+                `${d.context.championshipId}/${d.context.year}`,
+                d.context,
+              ]),
+            ).entries(),
+          ].map(([key, group]) => (
+            <section key={key}>
+              <h3>
+                {group.name} · {group.year}
+              </h3>
+              <DisputeLinks
+                disputes={(disputes.length
+                  ? disputes
+                  : [{ disputeId: currentId, context }]
+                ).filter(
+                  (d) =>
+                    d.context.championshipId === group.championshipId &&
+                    d.context.year === group.year,
+                )}
+                headingLevel="h4"
+                section={section}
+                currentId={currentId}
+                onSelect={(e) => {
+                  if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey)
+                    onClose();
+                }}
+              />
+            </section>
+          ))}
+        </>
       )}
       <a href="/publico.html">Ver todos os campeonatos</a>
     </nav>
@@ -286,8 +345,13 @@ export function PublicBreadcrumb({
 export function PublicFooter() {
   return (
     <footer className="wrap footer public-footer">
-      <span>{siteTitle}</span>
-      <span>Resultados publicados</span>
+      <a href={siteHome} className="brand public-footer-brand">
+        <span className="brand-mark" aria-hidden="true">
+          b.
+        </span>
+        <span>Base do Basquete</span>
+      </a>
+      <span>Dados a partir de 2026</span>
     </footer>
   );
 }

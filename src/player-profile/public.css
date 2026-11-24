@@ -35,12 +35,12 @@
   white-space: nowrap;
 }
 .player-page h2 {
-  font-size: 1.0625rem;
+  font-size: calc(1.0625rem + 0.125rem);
   line-height: 1.3;
   margin: 0 0 1rem;
 }
 .player-page h3 {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .player-intro {
   padding: 1.25rem;
@@ -52,7 +52,7 @@
   min-width: 0;
 }
 .player-identity h1 {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem + 0.125rem);
   line-height: 1.12;
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
@@ -108,7 +108,7 @@
   overflow-wrap: anywhere;
   min-width: 0;
   min-height: 48px;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   line-height: 1.25;
   white-space: normal;
   padding: 0.75rem 0.2rem;
@@ -180,7 +180,7 @@
   padding-block: 0;
   color: var(--bb-muted);
   background: var(--bb-blue-soft);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-summary th:first-child {
   text-align: left;
@@ -225,12 +225,12 @@
   color: var(--bb-muted);
   background: var(--bb-blue-soft);
   padding: 0 0.15rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-games-table td {
   text-align: center;
   padding: 0 0.15rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-games-table td:first-child {
   white-space: nowrap;
@@ -275,7 +275,7 @@
   min-width: 0;
   font-weight: 600;
   overflow-wrap: anywhere;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   line-height: 1.3;
 }
 .player-match-team:first-child {
@@ -291,13 +291,13 @@
   white-space: nowrap;
   color: var(--bb-text);
   font-weight: 700;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   text-align: center;
 }
 .player-game-context {
   display: block;
   color: var(--bb-muted);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   line-height: 1.35;
   text-align: center;
   overflow-wrap: anywhere;
@@ -341,11 +341,11 @@
   border: 0;
 }
 .player-record-preview strong {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem + 0.125rem);
 }
 .player-record-preview span {
   color: var(--bb-muted);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .player-toolbar {
   display: flex;
@@ -359,7 +359,7 @@
   border: 1px solid var(--bb-line);
   border-radius: 0.25rem;
   padding: 0.35rem 0.6rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   background: white;
 }
 .player-segmented {
@@ -371,7 +371,7 @@
   max-width: 100%;
 }
 .player-segmented button {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   padding: 0.25rem 0.6875rem;
   border-radius: 0.25rem;
   line-height: 1.375rem;
@@ -397,7 +397,7 @@
   text-align: right;
   white-space: nowrap;
   min-width: 3.5rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .player-stats-table thead {
   background: var(--bb-blue-soft);
@@ -429,7 +429,7 @@
 }
 .player-stats-table small {
   display: block;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   font-weight: 400;
   line-height: 1.4;
   margin-top: 0.2rem;
@@ -456,14 +456,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .player-filter-fields :is(select, input:not([type="checkbox"])) {
   width: 100%;
   min-width: 0;
   min-height: 44px;
   font: inherit;
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
   color: #17293d;
   background: white;
   border: 1px solid #aebdcd;
@@ -508,14 +508,14 @@
 }
 .player-games-count {
   color: var(--bb-muted);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .player-active-filters {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   margin-bottom: 0.5rem;
 }
 .player-pager {
@@ -525,7 +525,7 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-top: 0.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
 }
 .player-pager button {
   padding: 0.4rem 0.65rem;
@@ -535,10 +535,10 @@
 .player-empty {
   color: var(--bb-muted);
   padding: 0.75rem 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .player-honors h2 {
-  font-size: 1rem;
+  font-size: calc(1rem + 0.125rem);
 }
 .player-award-columns {
   overflow-wrap: anywhere;
@@ -560,7 +560,7 @@
   min-height: 44px;
   padding: 0.65rem 0;
   border-bottom: 1px solid var(--bb-line);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   overflow-wrap: anywhere;
   cursor: pointer;
 }
@@ -577,7 +577,7 @@
 }
 .player-honors li {
   padding: 0.5rem 0;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   border-bottom: 1px solid var(--bb-line);
   overflow-wrap: anywhere;
 }
@@ -599,7 +599,7 @@
   justify-content: center;
   height: 44px;
   padding-top: 0.5rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-medal svg {
   width: 1.1rem;
@@ -642,7 +642,7 @@
 .player-records td {
   text-align: center;
   padding: 0.35rem 0.15rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-records thead {
   background: var(--bb-blue-soft);
@@ -654,7 +654,7 @@
 .player-records .player-record-value {
   color: var(--bb-blue);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: calc(1.125rem + 0.125rem);
 }
 .player-record-value a {
   display: inline-flex;
@@ -682,20 +682,20 @@
 }
 .player-record-game .player-match-team,
 .player-record-game .player-match-score {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-records button {
   min-height: 44px;
   width: 100%;
   padding: 0.25rem 0.1rem;
   color: var(--bb-blue);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .player-record-ranking {
   background: #f5f8fc;
 }
 .player-record-ranking .player-record-value {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   font-weight: 500;
 }
 .player-record-empty {
@@ -757,7 +757,7 @@
 }
 .player-trajectory time {
   color: var(--bb-muted);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -766,7 +766,7 @@
   overflow-wrap: anywhere;
   color: var(--bb-text);
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   padding-block: 0.25rem;
 }
 @container (max-width: 16rem) {
@@ -841,7 +841,7 @@ body:has(.player-page) #metric-tooltip[hidden] {
     pointer-events: none;
   }
   .player-tabs-shell .bb-tabs button {
-    font-size: 0.875rem;
+    font-size: calc(0.875rem + 0.125rem);
   }
   .player-tab-panel:not([hidden]) {
     min-height: var(--player-panel-space, 0px);
@@ -905,20 +905,20 @@ body:has(.player-page) #metric-tooltip[hidden] {
     width: 2rem;
   }
   .player-games-table td {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .player-games-table .player-match-team {
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem + 0.125rem);
     font-weight: 500;
   }
   .player-games-table .player-match-score {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .player-games-table .player-game-context {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .player-games-table .player-game-points {
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem + 0.125rem);
   }
   .player-record-metric-col {
     width: 2rem;
@@ -934,10 +934,10 @@ body:has(.player-page) #metric-tooltip[hidden] {
   }
   .player-records th,
   .player-records td {
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem + 0.125rem);
   }
   .player-records .player-record-value {
-    font-size: 1.25rem;
+    font-size: calc(1.25rem + 0.125rem);
   }
   .player-record-game .player-matchup {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -947,6 +947,6 @@ body:has(.player-page) #metric-tooltip[hidden] {
   }
   .player-record-game .player-match-team,
   .player-record-game .player-match-score {
-    font-size: 0.875rem;
+    font-size: calc(0.875rem + 0.125rem);
   }
 }
