@@ -12,6 +12,17 @@ test("perfil mantém tabela durante ordenação, ordem canônica e títulos sem 
     exact: true,
   });
   await expect(table).toBeVisible();
+  const centering = await table.evaluate((el) => {
+    const area = el
+      .closest(".team-profile-player-results")!
+      .getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    return {
+      fits: rect.width < area.width,
+      delta: Math.abs(rect.left + rect.width / 2 - area.left - area.width / 2),
+    };
+  });
+  if (centering.fits) expect(centering.delta).toBeLessThan(2);
   const columns = await table.locator("thead th").allTextContents();
   expect(columns.indexOf("PPJ")).toBeLessThan(columns.indexOf("PP%"));
   expect(columns.indexOf("2P")).toBeLessThan(columns.indexOf("F"));
@@ -26,6 +37,9 @@ test("perfil mantém tabela durante ordenação, ordem canônica e títulos sem 
     await held;
     await route.fallback();
   });
+  const pageHeight = await page.evaluate(
+    () => document.documentElement.scrollHeight,
+  );
   const height = await table.evaluate(
     (el) => el.getBoundingClientRect().height,
   );
@@ -41,6 +55,9 @@ test("perfil mantém tabela durante ordenação, ordem canônica e títulos sem 
   await expect(table).toBeVisible();
   expect(await table.evaluate((el) => el.getBoundingClientRect().height)).toBe(
     height,
+  );
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(
+    pageHeight,
   );
   release();
   await page.getByRole("tab", { name: "Jogos", exact: true }).click();
@@ -73,6 +90,15 @@ test("breadcrumb, destaque equivalente e contornos seguem o conteúdo", async ({
   );
   expect(styles[0]).toEqual(styles[1]);
   expect(Number(styles[0].weight)).toBeGreaterThanOrEqual(600);
+  for (const link of await selected.locator('th[scope="row"] a').all()) {
+    const appearance = await link.evaluate((el) => ({
+      color: getComputedStyle(el).color,
+      parent: getComputedStyle(el.parentElement!).color,
+      decoration: getComputedStyle(el).textDecorationLine,
+    }));
+    expect(appearance.color).toBe(appearance.parent);
+    expect(appearance.decoration).toBe("none");
+  }
   for (const region of await page
     .locator(".team-profile-page .statistics-table-wrap")
     .all()) {

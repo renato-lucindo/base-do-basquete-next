@@ -383,7 +383,7 @@
 }
 .player-clear {
   color: var(--bb-blue) !important;
-  font-size: 0.75rem !important;
+  font-size: calc(0.75rem + 0.125rem) !important;
 }
 .player-scroll {
   width: 100%;

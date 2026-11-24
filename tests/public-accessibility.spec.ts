@@ -155,8 +155,8 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   const team = await teamPublicFixture(page, { longDetail: true });
   await page.goto(team.detailUrl + "&section=jogos");
   await expect(
-    page.getByRole("heading", { name: "Jogos da equipe", exact: true }),
-  ).toBeVisible();
+    page.getByRole("heading", { name: "Jogos", exact: true }),
+  ).toHaveClass(/sr-only/);
   await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),

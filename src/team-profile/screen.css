@@ -709,7 +709,7 @@
 }
 .team-profile-page.public-site.statistics-public
   .team-profile-player-results
-  > .scrollable-table {
+  .scrollable-table {
   margin-inline: auto;
 }
 .team-profile-page.public-site.statistics-public
