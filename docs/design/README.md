@@ -7,7 +7,6 @@
 - [PADROES-ADMIN.md](PADROES-ADMIN.md): componentes, CRUD, formulários, tabelas, filtros, combobox, modais, feedback e preservação de contexto (admin).
 - [PUBLICO.md](PUBLICO.md): descoberta, classificação, jogos, equipes, jogadores e estatísticas.
 - [ADMIN.md](ADMIN.md): percursos administrativos e aceite proporcional; componentes e comportamentos ficam em PADROES-ADMIN.
-- [INTEGRACAO.md](INTEGRACAO.md): contratos dos protótipos de súmula/estatísticas.
 - Evidência histórica, somente se necessária: [VALIDACAO-DESIGN-PUBLICO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md), com evidências e limites dos protótipos.
 
 ## Hierarquia de decisões
@@ -42,59 +41,8 @@ Antes de entregar qualquer tela nova ou alterada, pública ou administrativa, co
 
 Registrar evidências proporcionais ao que mudou e indicar os itens não aplicáveis. Mudança exclusivamente documental pede revisão do texto, links e conflitos; não declarar uma conferência visual ou de interação que não foi executada. Novas decisões substituem os trechos conflitantes nos documentos de referência; pendências de implementação ficam no plano da unidade e no checkpoint, separadas do padrão aprovado.
 
----
+## Referências visuais
 
-## Reforma de UI/UX — piloto de 03/11/2026
+Use somente o design system, o catálogo aprovado e os padrões vigentes. Capturas antigas e os guias de reforma/integração superados foram excluídos. Fontes de protótipos, ZIPs e fixtures exigidos pelos testes permanecem nos caminhos originais exclusivamente para uso técnico; não orientam telas novas.
 
-Direção aprovada: **público primeiro no celular, administração no desktop**, tema claro e azul, tabelas e formulários compactos. As decisões e os limites estão em [REFORMA-UIUX.md](REFORMA-UIUX.md).
-
-- [Abrir o piloto navegável](prototipos/reforma-uiux/Piloto%20UIUX.html): jogadores, busca global, perfil contínuo de carreira com conquistas/resumo/três recentes/campeonatos, súmula com a composição atual e parciais/elencos/faltas, Jogos, Informações e equipes/elenco lado a lado. Dados fictícios; nenhum acesso ao banco.
-- Para servir localmente: `node docs/design/prototipos/reforma-uiux/server.cjs`, depois abrir [o piloto local](http://127.0.0.1:4189/).
-- Fontes compartilhadas em `src/ui-system/`; a tabela passou a ser utilizada também no perfil real após autorização de 04/11. Build e verificação do piloto incluídos em `npm run design:build` e `npm run design:verify`.
-- Em 04/11 o responsável autorizou implementar na mesma PR #51 o último plano de perfil/jogo. Perfil integrado à rota real e súmula vigente preservada; o piloto foi aceito e o responsável autorizou a sequência público real → busca no servidor → administração → preparação da liberação. Estado de cada unidade e CI no checkpoint, sem inferir deploy/DDL. Uma unidade/PR por vez, sem pilha dependente.
-
-## Protótipos públicos para implementação
-
-Esta unidade reúne duas referências navegáveis com dados fictícios: a súmula pública revisada e a página de estatísticas r6 enviada pelo responsável, com cabeçalho e controles compactados. A implementação nas rotas reais será uma unidade posterior.
-
-## Abrir
-
-- [Súmula do jogo](prototipos/sumula/Sumula%20do%20jogo%20publicado.html).
-- [Estatísticas de atletas](prototipos/estatisticas/Estatisticas%20de%20atletas.html).
-
-Baixe e abra os HTMLs no navegador; ambos são autocontidos. O GitHub exibe o código, não executa esses arquivos. Não há dependência de API, conta, banco ou conexão de rede.
-
-Para servir a súmula localmente: `node docs/design/prototipos/sumula/server.cjs`, depois abra http://127.0.0.1:4187/. O servidor só responde no loopback e serve uma lista explícita de arquivos.
-
-## Fontes e validação
-
-Na raiz do repositório, com Node24+:
-
-```powershell
-npm ci --ignore-scripts
-npx playwright install chromium
-npm run design:build
-npm run design:verify
-```
-
-As dependências vêm do lockfile do projeto. O build da súmula incorpora HTML, CSS, fixtures e renderer em um arquivo. O build de estatísticas usa React e os componentes adaptados do pacote r6, confere hashes de seis fontes originais e gera seu HTML. `esbuild` usa a versão já presente no lockfile do projeto.
-
-Os verificadores cobrem cálculos, ausência versus zero, filtros/ordenação, quartos, faltas, painéis, teclado, toque, rolagem interna e axe. A verificação de hierarquia mede a primeira linha útil e as linhas visíveis nas duas larguras. A CI executa esse conjunto junto com o gate existente quando houver alterações executáveis.
-
-As capturas e os relatórios de cada execução são gerados localmente; as provas selecionadas desta entrega estão em [VALIDACAO.md](../../historico/documentacao/validacoes/VALIDACAO-DESIGN-PUBLICO.md).
-
-## Origem e adaptações
-
-O [ZIP r6 original](referencias/pagina-estatisticas-react-r6.zip) foi preservado byte a byte. SHA256: `3ad8e05c9244dda6b879363a26b11f9e743e9356208573a8ad20440439709878`. As instruções internas foram tratadas como referência técnica, sem substituir o pedido do responsável.
-
-A cópia extraída contém as fontes necessárias à reprodução, o arquivo legado de fixtures usado pelo gerador, licenças e a referência de componentes. Os scripts de build/tipagem/verificação foram ajustados para caminhos portáveis e dependências do repositório. As fontes próprias foram formatadas; os seis arquivos em `upstream/` continuam intactos. A interface de estatísticas recebeu apenas a revisão de hierarquia descrita acima, preservando o comportamento r6. O pacote original também preserva sua documentação e capturas históricas.
-
-Em estatísticas, `react-prototype/prepare.cjs` regenera os adaptadores a partir de `upstream/` e das fixtures legadas. Caso esses componentes sejam alterados, atualize o gerador correspondente e formate o resultado. O build normal usa os adaptadores já versionados.
-
-Consulte [os padrões permanentes](PADROES.md) e [o contrato de integração](INTEGRACAO.md) antes de implementar.
-
-## Administração real e preparação da liberação
-
-O padrão aceito foi incorporado às rotas reais: Jogos com ordenação no servidor antes da paginação, Informações com campos proporcionais e equipes/elencos em dois painéis, preservando os componentes de edição existentes. [Provas, capturas e limites](VALIDACAO-ADMIN-UIUX.md). Estado da PR/CI e autorização da migration em [PROGRESSO.md](../PROGRESSO.md); implementação local não representa aplicação de banco ou deploy.
-
-[Validação final, pacote local e plano de liberação/rollback](PREPARACAO-LIBERACAO-UIUX.md). A preparação não executa deploy nem publicação de dados; fonte do pacote, evidências e limites estão identificados no relatório.
+Para consultar o catálogo atual, execute `node docs/design/catalogo/build.cjs` e abra `docs/design/.preview-artifacts/catalogo/guia-completo-autonomo.html`.

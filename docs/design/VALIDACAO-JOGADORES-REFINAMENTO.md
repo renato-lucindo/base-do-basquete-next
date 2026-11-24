@@ -30,6 +30,6 @@ Fixtures de testes avançados passaram a incluir um boxscore real de teste: corr
 
 ## Entrega e limites
 
-Capturas usam fixtures interceptadas, não dados humanos. [1366](evidencias/jogadores-refinamento/jogadores-1366.png), [1920](evidencias/jogadores-refinamento/jogadores-1920.png), [390](evidencias/jogadores-refinamento/jogadores-390.png), [320](evidencias/jogadores-refinamento/jogadores-320.png), [texto200%](evidencias/jogadores-refinamento/texto-200.png) e [viewport equivalente a zoom200%](evidencias/jogadores-refinamento/zoom-200.png).
+Capturas usam fixtures interceptadas, não dados humanos. 1366, 1920, 390, 320, texto200% e viewport equivalente a zoom200%.
 
 Autorização de publicação restrita ao Worker independente **base-do-basquete-next-uiux**. Domínio principal, Worker canônico, Access, banco e dados humanos preservados. Não alegar deploy até existir versão/fonte e prova remota no checkpoint. Sem novo boxscore, comparação ou recordes; os recursos já existentes são apenas preservados.
