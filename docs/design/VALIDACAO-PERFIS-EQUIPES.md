@@ -90,6 +90,16 @@ Guia: Navegação/localização, Tabelas/dados, Estados e Acessibilidade. Fluxo 
 
 ### Diagnóstico do timeout de CI
 
-CI push45444517462 passou; execução de PR45444529563 falhou em uma prova fria de conquistas. Reprodução local da suíte:856PASS/1falha; prova zero levou31,756s com quatro workers, acima dos30s existentes. Isolada, a mesma fonte passou nos dois modos (36,73s somados). Prova inclui capacidade10000/10001 identidades e inicialização PostgreSQL/WASM. `vite.config.ts` limita concorrência a dois workers para reduzir disputa de CPU/memória; nenhuma asserção, SQL, limite de capacidade ou timeout alterado. Resultado da revalidação completa, SHA/CI e publicação devem ser conferidos no checkpoint e PR.
+CI manual45444517462 passou; execução de PR45444529563 falhou em uma prova fria de conquistas. Reprodução local da suíte:856PASS/1falha; prova zero levou31,756s com quatro workers, acima dos30s existentes. Isolada, a mesma fonte passou nos dois modos (36,73s somados). Prova inclui capacidade10000/10001 identidades e inicialização PostgreSQL/WASM. `vite.config.ts` limita concorrência a dois workers para reduzir disputa de CPU/memória; nenhuma asserção, SQL, limite de capacidade ou timeout alterado. Resultado da revalidação completa, SHA/CI e publicação devem ser conferidos no checkpoint e PR.
 
 Sem migrations, dados humanos, Access ou alteração de contrato esportivo. Aceite humano do Worker e merge continuam pendentes.
+
+### Fechamento da revisão
+
+Fonte executável39fe76c2b145d1c1c06cc0c63e1fc7fd6827b1c3. `npm run gate` completo PASS:182arquivos/857unitários, transporte, banco local, builds, fronteira, Workers e segredos. O limite de dois workers resolveu a reprodução da prova fria sem mudar seu timeout; suíte completa338,33s. `npm run design:verify` completo PASS e catálogo WebKit PASS. Lint e formato focais finais PASS após extração da folha compartilhada do confronto. Rechecagem de navegação/perfil28PASS; regressão final jogador/axe50PASS. Os102casos inalterados da rodada ampliada e a matriz20PASS conservam suas provas; não foi adicionada dispensa.
+
+Artefato técnico Piloto UIUX.html regenerado por design:verify foi mantido com seus bytes originais (estava limpo antes da rodada), sem incorporar bundle alheio nesta unidade. A implementação usa o guia vigente, não esse artefato.
+
+Publicação pelo conector Cloudflare, com preparo/upload dos assets pelo Wrangler: admin versão86bf8a3a-2e30-4b14-b4c4-a81e9737c8d1/deployment9da50d48-736f-463e-97d2-f0bd86b2f082; preview versão4f516000-a1d0-4244-9824-da1b0db9f50f/deploymenta64b253b-eed1-4ac4-a27e-7728c9360c28,100% cada. Namespace/sessões, segredos, flag e identidades preservados; sem Access. Smoke200/headers39fe76c nos dois serviços, APIs privadas401/403,11assets comparados por SHA256 ao build. A primeira leitura do preview ainda mostrou3fdb4b9 durante propagação; repetição confirmou a nova fonte antes de declarar publicação verificada.
+
+Navegador remoto real: geral com ano77,78px, Participação central e legenda grid; disputa com status14px/borda0, legenda grid e navegação imóvel ao abrir seleção. LUSB manteve9J/6V/3D/15PTS/575PP/439PC/136SLD/AVG1,31. Capturas design-live-general-1366.png e design-live-dispute-1366.png inspecionadas. Conferência remota somente de leitura. A CI da PR e o aceite humano são etapas distintas e ficam com estado real no checkpoint.

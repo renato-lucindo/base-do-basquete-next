@@ -36,6 +36,6 @@ O responsável aceitou expressamente o plano consolidado e pediu sua implementa�
 
 ### Estado observado na retomada
 
-HEAD3fdb4b97c1bd6dbba3bb9a1ead3adfdd454b97a8, PR89 aberta. CI de push45444517462 terminou SUCCESS; CI de pull_request45444529563 terminou FAILURE por timeout30000ms em src/achievements/context-database.test.ts, com856unitários PASS e1falha. Browsers/design/WebKit passaram nas duas execuções. A automação anterior de checagem foi excluída após as execuções terminarem. A nova revisão ainda não está implementada; Workers permanecem no3fdb4b9.
+HEAD3fdb4b97c1bd6dbba3bb9a1ead3adfdd454b97a8, PR89 aberta. CI manual45444517462 terminou SUCCESS; CI de pull_request45444529563 terminou FAILURE por timeout30000ms em src/achievements/context-database.test.ts, com856unitários PASS e1falha. Browsers/design/WebKit passaram nas duas execuções. A automação anterior de checagem foi excluída após as execuções terminarem. A nova revisão ainda não está implementada; Workers permanecem no3fdb4b9.
 
 Inspeção de leitura no preview geral confirmou Ano com1102px de largura, contorno computado0px e Participação à direita; diferenças já registradas no plano. Fonte do problema a corrigir: seletores de ano repetidos por aba em public-page.tsx; ParticipationStatistics não usa os mesmos estilos de contorno/alinhamento de reference-explorer; screen.css troca a grade de legendas por flex; EditionDisputes expande no fluxo. Não reaproveitar capturas anteriores como prova desses ajustes novos.
