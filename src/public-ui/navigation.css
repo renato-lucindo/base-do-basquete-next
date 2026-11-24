@@ -15,6 +15,7 @@
   overflow-wrap: anywhere;
 }
 .public-header {
+  font-size: 1rem;
   border-bottom: 1px solid var(--public-line);
 }
 .public-header *,

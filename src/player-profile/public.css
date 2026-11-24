@@ -1,4 +1,6 @@
 .player-page.bb-ui {
+  --bb-font-body: 1rem;
+  --bb-font-detail: 0.875rem;
   position: relative;
   --bb-blue: var(--public-blue);
   --bb-blue-soft: var(--public-blue-soft);
@@ -785,7 +787,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
-@container (max-width: 17rem) {
+@container (max-width: 19rem) {
   .player-tabs-shell .bb-tabs {
     display: flex;
     overflow-x: auto;
