@@ -66,3 +66,30 @@ CI45438050865/2ee3ed8: scope/WebKit/design/checks aprovados; shard mobile encont
 O job desktop da mesma CI concluiu com499PASS/7falhas; somado ao mobile são878PASS/9falhas e125dispensas existentes. Além do overflow320px, identificadas reserva de altura inicial e posição de atletas na primeira tela. Mantidas as asserções: reserva dimensionada a três linhas, adoção do corpo16px no perfil, e compactação somente dos intervalos desktop da súmula. Medições após correção: viewport320px sem overflow nas quatro abas, painel456,875px estável nas quatro abas desktop e primeiro atleta y394 (<400). Rodada ampliada e gate novos registrados no checkpoint/PR ao concluir.
 
 Rechecagem final:112browsers PASS/8dispensas preexistentes nas seis suítes dos perfis e consumidores públicos, cobrindo todos os nove casos da CI anterior; asserções/timeouts preservados. Tipagem, formato e lint focal PASS. Build e gate consolidado registrados no checkpoint; nova CI deve confirmar o SHA final antes de integração.
+
+## Conformidade de design — 24/11/2026
+
+Plano consolidado explicitamente aceito; matriz de conformidade registrada antes das alterações em PLAN-CONSISTENCIA-PUBLICA.md. A decisão desta revisão substitui a centralização da classificação descrita na revisão inicial acima. Ano nas abas e Participação central foram aprovados como padrões permanentes específicos do perfil geral; rótulos laterais continuam piloto restrito ao perfil.
+
+### Referências e adoção
+
+Guia: Navegação/localização, Tabelas/dados, Estados e Acessibilidade. Fluxo em README de design; hierarquia e consulta ao responsável no INDICE. Matriz antes de editar, decisões classificadas, revisão dos consumidores e distinção entre teste, inspeção e aceite viraram critérios explícitos de entrega. AGENTS e modelo da PR apontam para essas fontes. Guia autônomo e catálogo interativo foram reconciliados; o catálogo usa SectionTabs, ModeButtons, Legend e ProfileMatch reais.
+
+- Grade única `.reference-legend`, pares em trilhas de sigla/significado. Eliminada a sobrescrita flex do perfil; geral, Elencos e disputa usam a mesma grade. PTS mantém os dois significados quando ambos aparecem.
+- Confronto extraído do perfil do jogador para ProfileMatch, compartilhado por recentes/lista da equipe e pelo jogador. Siglas no celular com nome completo acessível; data/contexto, placar central, resultado ausente sem zero presumido. Sem pontos individuais na equipe.
+- Um ano compacto ao lado das abas, fora de tablist, sem alterar recortes de URL. Participação central com contorno ajustado; modos depois dos filtros. Classificação à esquerda, jogadores conservam sua centralização. Fase/modo alinhados; margens herdadas de campos foram neutralizadas no perfil.
+- Status textual14px/anel sem badge no cabeçalho; breadcrumb16px. Painel usa top layer do navegador e posição limitada ao viewport; não empurra o conteúdo. Escape/clique externo e troca de nível retornam foco; recortes públicos, seção e histórico preservados.
+
+### Evidências observadas
+
+- Matriz browser:20PASS em desktop/toque, oito abas nas larguras320/390/639/640/1366/1920, texto200%, legenda alinhada, controles/contornos, popover sem deslocamento, foco e vazios. Sem novos skips nem timeouts maiores.
+- Perfil de jogador/acessibilidade:50PASS; inclui recentes, nomes longos, quatro abas,320px e axe nos consumidores públicos. Catálogo Chromium e WebKit:PASS nas seis larguras, zoom200%, interações e axe. Provas do catálogo não extrapoladas para a aplicação.
+- Capturas inspecionadas: `.preview-artifacts/design-overview-1366.png`, `design-dispute-1366.png`, `design-general-1366.png`, `design-general-390.png`; capturadas também overview/disputa/Elencos em390/1366. Dados sintéticos. Imagens locais não são a referência normativa.
+- Regressão ampliada inicial:102PASS/4falhas. Duas expectativas antigas exigiam que o painel deslocasse as abas, substituídas pela igualdade de posição aprovada. Duas falhas foram artefatos ENOENT causados por rodadas Playwright concorrentes no mesmo diretório; rodada de repetição usa saída própria. Não mascaradas por retries/timeouts/skips.
+- Achado de acessibilidade no catálogo: aria-label em span genérico corrigido por nome completo semanticamente disponível. Revisão direta da fonte atual de web-interface-guidelines, sem instalação local da skill alegada; foco, semântica e nomes longos comparados nos arquivos alterados. Revisão autoral, sem parecer independente declarado.
+
+### Diagnóstico do timeout de CI
+
+CI push45444517462 passou; execução de PR45444529563 falhou em uma prova fria de conquistas. Reprodução local da suíte:856PASS/1falha; prova zero levou31,756s com quatro workers, acima dos30s existentes. Isolada, a mesma fonte passou nos dois modos (36,73s somados). Prova inclui capacidade10000/10001 identidades e inicialização PostgreSQL/WASM. `vite.config.ts` limita concorrência a dois workers para reduzir disputa de CPU/memória; nenhuma asserção, SQL, limite de capacidade ou timeout alterado. Resultado da revalidação completa, SHA/CI e publicação devem ser conferidos no checkpoint e PR.
+
+Sem migrations, dados humanos, Access ou alteração de contrato esportivo. Aceite humano do Worker e merge continuam pendentes.

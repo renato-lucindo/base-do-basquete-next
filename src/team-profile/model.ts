@@ -33,6 +33,8 @@ export type TeamGame = PublicGameRow & {
   context: PublicContext;
   registrationId: string;
   counted: boolean;
+  homeAbbreviation?: string | null;
+  awayAbbreviation?: string | null;
 };
 export function initialTeamYear(years: number[], current: number) {
   return years.includes(current)
@@ -78,6 +80,12 @@ export function participationGames(p: TeamParticipation): TeamGame[] {
         })
         .map((g) => ({
           ...g,
+          homeAbbreviation: p.standings?.registrations.find(
+            (r) => r.id === byId.get(g.id)!.homeRegistrationId,
+          )?.team.abbreviation,
+          awayAbbreviation: p.standings?.registrations.find(
+            (r) => r.id === byId.get(g.id)!.awayRegistrationId,
+          )?.team.abbreviation,
           context: p.context,
           registrationId: p.registrationId,
           counted: ["played", "awarded"].includes(byId.get(g.id)!.state),
@@ -101,6 +109,8 @@ export function participationGames(p: TeamParticipation): TeamGame[] {
         number: g.game.number,
         home: g.game.home.name,
         away: g.game.away.name,
+        homeAbbreviation: g.game.home.team.abbreviation,
+        awayAbbreviation: g.game.away.team.abbreviation,
         homeProfile: {
           teamId: g.game.home.team.id,
           registrationId: g.game.home.registrationId,

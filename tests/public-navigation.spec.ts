@@ -252,7 +252,7 @@ test("painel da edição atual preserva cada aba e o histórico", async ({
     await expect(
       panel.getByRole("link", { name: "Ver todos os campeonatos" }),
     ).toHaveAttribute("href", "/publico.html");
-    expect((await nav.boundingBox())!.y).toBeGreaterThan(before!.y);
+    expect((await nav.boundingBox())!.y).toBe(before!.y);
     const link = panel.getByRole("link", { name: "Sub-14", exact: true });
     await link.focus();
     await page.keyboard.press("Escape");

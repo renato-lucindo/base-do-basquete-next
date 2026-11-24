@@ -265,37 +265,6 @@
 .player-games-table tbody tr:hover {
   background: #f5f8fc;
 }
-.player-matchup {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 0.25rem;
-  width: 100%;
-  min-width: 0;
-}
-.player-match-team {
-  min-width: 0;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-  font-size: calc(0.8125rem + 0.125rem);
-  line-height: 1.3;
-}
-.player-match-team:first-child {
-  text-align: right;
-}
-.player-match-team:last-child {
-  text-align: left;
-}
-.player-team-full {
-  display: none;
-}
-.player-match-score {
-  white-space: nowrap;
-  color: var(--bb-text);
-  font-weight: 700;
-  font-size: calc(0.8125rem + 0.125rem);
-  text-align: center;
-}
 .player-game-context {
   display: block;
   color: var(--bb-muted);
@@ -893,12 +862,6 @@ body:has(.player-page) #metric-tooltip[hidden] {
     border: 0;
     padding: 0;
     margin: 0;
-  }
-  .player-team-short {
-    display: none;
-  }
-  .player-team-full {
-    display: inline;
   }
   .player-games-table .player-game-date-col {
     width: 4.5rem;

@@ -359,13 +359,13 @@ export function CollectivePanel({
       <section className="team-profile-section team-profile-collective">
         <div className="team-profile-section-head">
           <h2>Estatísticas coletivas</h2>
-          <ModeButtons value={q.mode} onChange={(mode) => update({ mode })} />
         </div>
-        <div className="team-profile-toolbar">
+        <div className="team-profile-toolbar team-profile-mode-toolbar">
           <ScopeSelect
             value={q.scope}
             onChange={(scope) => update({ scope })}
           />
+          <ModeButtons value={q.mode} onChange={(mode) => update({ mode })} />
         </div>
         <ResourceMessage
           {...resource}
@@ -498,7 +498,7 @@ export function ParticipationStatistics({
       />
       {result.key === key && !result.error && (
         <ScrollableTable label="Estatísticas por participação">
-          <table className="statistics-table">
+          <table className="statistics-table team-profile-participation-table">
             <thead>
               <tr>
                 <th scope="col">Participação</th>

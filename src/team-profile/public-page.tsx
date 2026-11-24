@@ -1,3 +1,4 @@
+import { ProfileMatch } from "../public-ui/profile-match";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
 import { publicDetailLink, safePublicReturn } from "../public-ui/navigation";
@@ -183,7 +184,11 @@ function Campaigns({
 function GamesTable({ games }: { games: TeamGame[] }) {
   return games.length ? (
     <ScrollableTable label="Jogos da equipe">
-      <table className="statistics-table team-profile-games">
+      <table className="profile-games-table team-profile-games">
+        <colgroup>
+          <col className="player-game-date-col" />
+          <col />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col">Data</th>
@@ -194,14 +199,16 @@ function GamesTable({ games }: { games: TeamGame[] }) {
           {games.map((g) => {
             const match = (
               <>
-                <span className="team-profile-match">
-                  <span>{g.home}</span>
-                  <strong>
-                    {showNumber(g.score?.home)} × {showNumber(g.score?.away)}
-                  </strong>
-                  <span>{g.away}</span>
-                </span>
-                <small>
+                <ProfileMatch
+                  home={{ name: g.home, abbreviation: g.homeAbbreviation }}
+                  away={{ name: g.away, abbreviation: g.awayAbbreviation }}
+                  score={
+                    g.score
+                      ? `${showNumber(g.score.home)} × ${showNumber(g.score.away)}`
+                      : "—"
+                  }
+                />
+                <small className="player-game-context">
                   {g.context.name} · {g.context.year} · {g.context.category} ·{" "}
                   {gender(g.context.gender)}
                   {g.context.division ? ` · ${g.context.division}` : ""}
@@ -224,6 +231,7 @@ function GamesTable({ games }: { games: TeamGame[] }) {
                 <td>
                   {g.published ? (
                     <a
+                      className="player-game-link"
                       href={publicDetailLink(
                         `/resultado.html#${g.id}`,
                         g.disputeId,
@@ -232,7 +240,7 @@ function GamesTable({ games }: { games: TeamGame[] }) {
                       {match}
                     </a>
                   ) : (
-                    match
+                    <span className="player-game-link">{match}</span>
                   )}
                 </td>
               </tr>
@@ -695,15 +703,41 @@ export function TeamProfilePage() {
               link={contextualLink}
             />
             <div className="team-profile-workspace">
-              <SectionTabs
-                id="team-profile-tabs"
-                label="Seções do perfil da equipe"
-                items={tabs}
-                active={view.section}
-                onChange={(section) =>
-                  update({ secao: section, section: null })
-                }
-              />
+              <div className="team-profile-tabbar">
+                <SectionTabs
+                  id="team-profile-tabs"
+                  label="Seções do perfil da equipe"
+                  items={tabs}
+                  active={view.section}
+                  onChange={(section) =>
+                    update({ secao: section, section: null })
+                  }
+                />
+                {!contextual && (
+                  <Select
+                    label="Ano"
+                    value={
+                      view.section === "competicoes"
+                        ? (view.params.get("anoHistorico") ?? "")
+                        : String(year ?? "")
+                    }
+                    values={years}
+                    all={view.section === "competicoes" ? "Todos" : undefined}
+                    onChange={(v) =>
+                      update(
+                        view.section === "competicoes"
+                          ? { anoHistorico: v }
+                          : {
+                              ano: v,
+                              ...(view.section === "elencos"
+                                ? { elenco: null }
+                                : {}),
+                            },
+                      )
+                    }
+                  />
+                )}
+              </div>
               <TabPanel id="team-profile-tabs" active={view.section}>
                 {contextual && !selected ? (
                   <section>
@@ -776,12 +810,6 @@ export function TeamProfilePage() {
                               {yearRows.length} disputas em {year}
                             </p>
                           </div>
-                          <Select
-                            label="Ano"
-                            value={String(year ?? "")}
-                            values={years}
-                            onChange={(v) => update({ ano: v })}
-                          />
                         </div>
                         <Campaigns rows={yearRows} link={contextualLink} />
                       </section>
@@ -795,13 +823,6 @@ export function TeamProfilePage() {
                       <h2 className="sr-only">Participações em competições</h2>
                     </div>
                     {filters}
-                    <Select
-                      label="Ano"
-                      value={view.params.get("anoHistorico") ?? ""}
-                      values={years}
-                      all="Todos"
-                      onChange={(v) => update({ anoHistorico: v })}
-                    />
                     <Campaigns
                       rows={filter(profile.participations).filter(
                         (p) =>
@@ -827,12 +848,6 @@ export function TeamProfilePage() {
                   <>
                     <div className="team-profile-section-head">
                       <h2 className="sr-only">Elencos por participação</h2>
-                      <Select
-                        label="Ano"
-                        value={String(year ?? "")}
-                        values={years}
-                        onChange={(v) => update({ ano: v, elenco: null })}
-                      />
                     </div>
                     <div
                       className={`team-profile-rosters ${view.params.has("elenco") ? "has-selection" : ""}`}
@@ -917,18 +932,14 @@ export function TeamProfilePage() {
                   <>
                     <div className="team-profile-section-head">
                       <h2 className="sr-only">Estatísticas por participação</h2>
+                    </div>
+                    {filters}
+                    <div className="team-profile-mode-toolbar">
                       <ModeButtons
                         value={view.params.get("mode") ?? "per-game"}
                         onChange={(mode) => update({ mode })}
                       />
                     </div>
-                    <Select
-                      label="Ano"
-                      value={String(year ?? "")}
-                      values={years}
-                      onChange={(v) => update({ ano: v })}
-                    />
-                    {filters}
                     <ParticipationStatistics
                       participations={filter(yearRows)}
                       mode={
@@ -943,14 +954,6 @@ export function TeamProfilePage() {
                   <>
                     <div className="team-profile-section-head">
                       <h2 className="sr-only">Jogos</h2>
-                      {!contextual && (
-                        <Select
-                          label="Ano"
-                          value={String(year ?? "")}
-                          values={years}
-                          onChange={(v) => update({ ano: v })}
-                        />
-                      )}
                     </div>
                     {!contextual && filters}
                     <div className="team-profile-toolbar">

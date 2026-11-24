@@ -1,3 +1,4 @@
+import { ProfileMatch } from "../public-ui/profile-match";
 import { useEffect, useState } from "react";
 import type { PublicCareer } from "./public-model";
 import type { ConfirmedPlayerGame } from "./participation-contract";
@@ -99,20 +100,18 @@ export function MatchTeams({
   game: ConfirmedPlayerGame;
   score?: string;
 }) {
-  const name = (side: "home" | "away") => (
-    <span className="player-match-team">
-      <span className="player-team-short">
-        {game.game[side].team.abbreviation || game.game[side].name}
-      </span>
-      <span className="player-team-full">{game.game[side].name}</span>
-    </span>
-  );
   return (
-    <span className="player-matchup">
-      {name("home")}
-      <span className="player-match-score">{score ?? "—"}</span>
-      {name("away")}
-    </span>
+    <ProfileMatch
+      home={{
+        name: game.game.home.name,
+        abbreviation: game.game.home.team.abbreviation,
+      }}
+      away={{
+        name: game.game.away.name,
+        abbreviation: game.game.away.team.abbreviation,
+      }}
+      score={score ?? "—"}
+    />
   );
 }
 export function GameContext({ game }: { game: ConfirmedPlayerGame }) {
@@ -145,7 +144,10 @@ export function ProfileGames({
       aria-label={label}
       tabIndex={0}
     >
-      <table className="player-games-table" aria-label={label}>
+      <table
+        className="player-games-table profile-games-table"
+        aria-label={label}
+      >
         <colgroup>
           <col className="player-game-date-col" />
           <col />

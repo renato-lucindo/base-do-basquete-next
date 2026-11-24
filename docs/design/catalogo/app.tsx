@@ -1,3 +1,4 @@
+import { ProfilePatterns } from "./profile-patterns";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AdminDialog } from "../../../src/competition/admin-dialog";
@@ -367,6 +368,7 @@ function Catalog() {
         </div>
         <Foundations />
         <PublicExample />
+        <ProfilePatterns />
         <AdminExample />
         <FeedbackExamples />
       </main>

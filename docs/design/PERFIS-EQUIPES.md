@@ -16,4 +16,14 @@ Aceite de protótipo e autorização de implementação não constituem deploy n
 
 ## Revisão autorizada em24/11/2026
 
-Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, contornos, nomes e seleção. Na aba Jogadores, usar ordem/seletor da página da disputa e preservar a tabela durante ordenação; eliminar títulos visuais que repetem as abas em todo o perfil. Classificação e jogadores centralizam pelo conteúdo; coletivos somente ajustam o contorno. Placar central estável entre nomes de tamanhos diferentes. Estado vazio específico para eliminatórias, sem apagar confrontos definidos. Regressões devem verificar comportamento e tela renderizada, não somente presença de regra nos documentos.
+Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, contornos, nomes e seleção. Na aba Jogadores, usar ordem/seletor da página da disputa e preservar a tabela durante ordenação; eliminar títulos visuais que repetem as abas em todo o perfil. Jogadores centralizam pelo conteúdo; classificação e coletivos alinham à esquerda, com contorno até a última coluna. Esta decisão substitui a centralização anterior da classificação. Placar central estável entre nomes de tamanhos diferentes. Estado vazio específico para eliminatórias, sem apagar confrontos definidos. Regressões devem verificar comportamento e tela renderizada, não somente presença de regra nos documentos.
+
+## Refinamento permanente aprovado em 24/11/2026
+
+- **Geral:** um seletor compacto de ano no canto direito da barra das abas, fora de `tablist`; abas com rolagem interna quando necessário. Competições mantém Todos e seu recorte histórico, demais abas usam o ano selecionado. Trocar ano em Elencos limpa a inscrição incompatível.
+- **Estatísticas gerais:** contorno na largura da tabela; cabeçalho e conteúdo de Participação centralizados, como padrão específico deste perfil. Métricas conservam alinhamento numérico. Totais/Por jogo fica depois dos filtros, imediatamente acima da tabela.
+- **Visão geral da disputa:** Fase e Totais/Por jogo na mesma linha acima dos coletivos; adaptação organizada quando não couber. Classificação à esquerda, jogadores permanecem centralizados.
+- **Jogos:** apresentação compartilhada com o perfil do jogador para data/confronto/placar/contexto, sem pontos individuais. Nomes completos no desktop e siglas cadastradas no celular, com alternativa acessível do nome completo. Cinco recentes por data no recorte, reunindo categorias no geral. Lista completa usa o mesmo confronto.
+- **Legendas:** seguir a grade comum em todas as abas, inclusive Elencos, uma vez ao final do conteúdo ativo. Não criar sobrescrita flex local.
+- **Filtros:** piloto restrito ao perfil, rótulos laterais a partir de640px e acima abaixo disso, persistentes e associados. Não estender automaticamente a outros formulários.
+- **Contexto da disputa:** seguir seleção por nível e status textual de PUBLICO.md. Conferir as cinco abas gerais e as três da disputa, vazio e seletores abertos, além dos consumidores compartilhados.

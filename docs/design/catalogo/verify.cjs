@@ -73,7 +73,9 @@ async function checkExamples(page) {
   await expect(stats.getByRole("columnheader", { name: "Jogos" })).toHaveCount(
     0,
   );
-  const legend = page.getByRole("region", { name: "Legenda" });
+  const legend = page
+    .locator(".catalog-statistics")
+    .getByRole("region", { name: "Legenda" });
   await expect(legend).toHaveCount(1);
   await expect(legend.getByText("Jogos", { exact: true })).toHaveCount(0);
   await expect(legend.getByText("Pontos", { exact: true })).toBeVisible();
@@ -270,6 +272,48 @@ async function checkApprovedGuide(page, prefix) {
   ).toBeVisible();
 }
 
+async function checkProfilePatterns(page) {
+  const sample = page.locator("#perfis");
+  const year = sample.getByRole("combobox", { name: "Ano", exact: true });
+  await expect(year).toHaveCount(1);
+  assert.equal(
+    await year.evaluate((el) => el.closest('[role="tablist"]') === null),
+    true,
+  );
+  await expect(sample.locator(".public-dispute-status")).toHaveCSS(
+    "font-size",
+    "14px",
+  );
+  const bar = sample.locator(".team-profile-tabbar");
+  const before = await bar.evaluate(
+    (el) => el.getBoundingClientRect().top + window.scrollY,
+  );
+  const trigger = sample.getByRole("button", { name: "Copa ES", exact: true });
+  await trigger.click();
+  await expect(
+    sample.getByRole("navigation", { name: "Seleção de exemplo" }),
+  ).toBeVisible();
+  assert.equal(
+    await bar.evaluate((el) => el.getBoundingClientRect().top + window.scrollY),
+    before,
+  );
+  await page.keyboard.press("Escape");
+  await expect(trigger).toBeFocused();
+  await year.selectOption("2025");
+  await sample.getByRole("tab", { name: "Estatísticas", exact: true }).click();
+  await sample.getByRole("button", { name: "Por jogo", exact: true }).click();
+  await expect(
+    sample.getByRole("cell", { name: "60", exact: true }),
+  ).toBeVisible();
+  await expect(sample.locator(".reference-legend dl")).toHaveCSS(
+    "display",
+    "grid",
+  );
+  await expect(
+    sample.getByRole("columnheader", { name: "Participação", exact: true }),
+  ).toHaveCSS("text-align", "center");
+}
+
 async function main() {
   const engine = process.argv.includes("--webkit") ? webkit : chromium;
   const browser = await engine.launch();
@@ -306,6 +350,7 @@ async function main() {
       }
     }
 
+    await checkProfilePatterns(page);
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.evaluate(() => {
       document.body.style.zoom = "2";

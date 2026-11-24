@@ -196,3 +196,11 @@ Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo ap�
 - Confrontos usam áreas equivalentes para mandante/visitante e área estável para o placar, com quebra dos nomes. O centro do placar não depende da extensão dos nomes.
 - Rodapé compartilhado: ícone da marca e Base do Basquete à esquerda; Dados a partir de 2026 à direita, adaptando ao celular.
 - Completar o aumento anterior de2px em toda a área pública; não somar novamente nas regras já ajustadas. O administrativo fica fora desta revisão. Conferir tamanhos efetivos, inclusive sobrescritas de tabelas, controles e legendas.
+
+## Contexto de disputa — refinamento de 24/11/2026
+
+Breadcrumb na ordem Campeonato › Ano › Naipe › Categoria · Divisão, somente com níveis existentes. Campeonato, ano e naipe abrem seleção por nível em sobreposição; categoria/divisão identifica a atual. Campeonato consulta o catálogo público; ano restringe ao campeonato; naipe restringe à edição. Um painel por vez, sem deslocar a navegação nem a página; limitar ao viewport com rolagem interna. Preservar seção atual, destinos reais, Escape, clique externo e retorno de foco. Sites restritos a uma disputa não oferecem troca de contexto.
+
+Situação abaixo da hierarquia, sem badge, fundo ou borda: texto de14px, menor que breadcrumb16px, acompanhado de ponto com anel externo e cor semântica. Cor não substitui o texto. Estes refinamentos substituem o painel expandido no fluxo e o status em badge do cabeçalho; não alteram badges administrativos.
+
+O perfil geral e o da disputa seguem [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md#refinamento-permanente-aprovado-em-24112026). Ano na barra de abas e Participação central são padrões específicos do perfil geral; identificação textual de outras tabelas continua à esquerda.

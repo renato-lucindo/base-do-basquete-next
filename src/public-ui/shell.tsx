@@ -1,4 +1,12 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { api } from "../competition/api";
 import {
   disputeStatusLabels,
@@ -124,9 +132,49 @@ function DisputeNavigation({
   >(null);
   const panelId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const element = panel.current;
+    const anchor = trigger.current;
+    if (!selecting || !element || !anchor) return;
+    const place = () => {
+      const rect = anchor.getBoundingClientRect();
+      element.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - element.offsetWidth - 8))}px`;
+      const top = Math.max(
+        8,
+        Math.min(rect.bottom + 4, window.innerHeight - 96),
+      );
+      element.style.top = `${top}px`;
+      element.style.maxHeight = `${Math.max(80, window.innerHeight - top - 8)}px`;
+    };
+    element.showPopover();
+    place();
+    element
+      .querySelector<HTMLElement>('a[aria-current="true"], a, button')
+      ?.focus({ preventScroll: true });
+    const outside = (event: PointerEvent) => {
+      if (
+        !(event.target instanceof Node) ||
+        element.contains(event.target) ||
+        (event.target instanceof Element &&
+          event.target.closest(".public-competition-trigger"))
+      )
+        return;
+      setSelecting(null);
+      requestAnimationFrame(() => anchor.focus({ preventScroll: true }));
+    };
+    document.addEventListener("pointerdown", outside);
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [selecting]);
   const c =
     context ?? catalog.disputes[0]?.context ?? catalog.games[0]?.context;
-  const statusBadge = status && (
+  const statusText = status && (
     <span className="public-dispute-status" data-status={status}>
       {disputeStatusLabels[status]}
     </span>
@@ -190,7 +238,7 @@ function DisputeNavigation({
                 </li>
               </ol>
             </nav>
-            {statusBadge}
+            {statusText}
           </div>
         ) : (
           <p>
@@ -201,6 +249,7 @@ function DisputeNavigation({
         )}
         {selecting && c && (
           <EditionDisputes
+            panelRef={panel}
             id={panelId}
             context={c}
             section={section}
@@ -246,7 +295,9 @@ function EditionDisputes({
   currentId,
   onClose,
   level,
+  panelRef,
 }: {
+  panelRef: RefObject<HTMLElement | null>;
   level: "championship" | "edition" | "gender";
   id: string;
   context: PublicContext;
@@ -263,6 +314,8 @@ function EditionDisputes({
   );
   return (
     <nav
+      ref={panelRef}
+      popover="manual"
       id={id}
       className="public-selector-panel"
       aria-label="Disputas da edição"

@@ -1,6 +1,152 @@
 import { test, expect } from "@playwright/test";
 import { teamProfileBrowserFixture } from "./fixtures/team-profile";
 
+test("seleção por nível sobrepõe sem mover conteúdo e devolve foco", async ({
+  page,
+}) => {
+  const f = await teamProfileBrowserFixture(page);
+  await page.goto(f.url);
+  const status = page.locator(".public-dispute-status");
+  await expect(status).toHaveCSS("font-size", "14px");
+  await expect(status).toHaveCSS("border-top-width", "0px");
+  const nav = page.getByRole("navigation", { name: "Seções da disputa" });
+  const before = await nav.boundingBox();
+  const levels = page.locator(".public-dispute-breadcrumb button");
+  for (const trigger of await levels.all()) {
+    await trigger.click();
+    const panel = page.getByRole("navigation", { name: "Disputas da edição" });
+    await expect(panel).toBeVisible();
+    expect((await nav.boundingBox())!.y).toBe(before!.y);
+    const bounds = await panel.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(
+      page.viewportSize()!.width,
+    );
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+  }
+  await levels.first().click();
+  await levels.nth(1).click();
+  await expect(levels.nth(1)).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".public-selector-panel")).toHaveCount(1);
+  await page
+    .getByRole("heading", { name: "Classificação", exact: true })
+    .click();
+  await expect(page.locator(".public-selector-panel")).toHaveCount(0);
+  await expect(levels.nth(1)).toBeFocused();
+});
+
+for (const width of [320, 390, 639, 640, 1366, 1920]) {
+  test(`oito abas seguem legenda, contorno e controles em ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const f = await teamProfileBrowserFixture(page);
+    await page.goto(f.url);
+    await expect(page.locator(".team-profile-games")).toBeVisible();
+    const standings = page.locator(".standings-explorer");
+    expect(
+      await standings.evaluate((el) =>
+        Math.abs(
+          el.getBoundingClientRect().left -
+            el.parentElement!.getBoundingClientRect().left,
+        ),
+      ),
+    ).toBeLessThan(3);
+    const mode = page.locator(".team-profile-collective .segmented");
+    const phase = page.locator(".team-profile-collective select");
+    if (width >= 640) {
+      const m = (await mode.boundingBox())!,
+        p = (await phase.boundingBox())!;
+      expect(Math.abs(m.y + m.height / 2 - p.y - p.height / 2)).toBeLessThan(3);
+    }
+    const check = async () => {
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+        ),
+      ).toBe(true);
+      const legend = page.locator(".team-profile-workspace .reference-legend");
+      expect(await legend.count()).toBeLessThanOrEqual(1);
+      if (await legend.count()) {
+        await expect(legend.locator("dl")).toHaveCSS("display", "grid");
+        const pairs = await legend.locator("dl > div").evaluateAll((items) =>
+          items.map((el) => {
+            const dt = el.querySelector("dt")!.getBoundingClientRect(),
+              dd = el.querySelector("dd")!.getBoundingClientRect();
+            return { offset: dd.left - dt.left, top: dd.top - dt.top };
+          }),
+        );
+        expect(
+          Math.max(...pairs.map((p) => p.offset)) -
+            Math.min(...pairs.map((p) => p.offset)),
+        ).toBeLessThan(1);
+        expect(Math.max(...pairs.map((p) => Math.abs(p.top)))).toBeLessThan(3);
+      }
+    };
+    await check();
+    for (const name of ["Jogadores", "Jogos"]) {
+      await page.getByRole("tab", { name, exact: true }).click();
+      await expect(
+        page.locator(".team-profile-workspace table").first(),
+      ).toBeVisible();
+      await check();
+    }
+    await page
+      .getByRole("link", { name: "Ver perfil geral", exact: true })
+      .click();
+    for (const name of [
+      "Visão geral",
+      "Competições",
+      "Elencos",
+      "Jogos",
+      "Estatísticas",
+    ]) {
+      await page.getByRole("tab", { name, exact: true }).click();
+      const year = page.getByRole("combobox", { name: "Ano", exact: true });
+      await expect(year).toHaveCount(1);
+      expect(
+        await year.evaluate((el) => el.closest('[role="tablist"]') === null),
+      ).toBe(true);
+      const rect = (await year.boundingBox())!,
+        bar = (await page.locator(".team-profile-tabbar").boundingBox())!;
+      expect(rect.width).toBeLessThan(120);
+      expect(rect.x + rect.width).toBeGreaterThan(bar.x + bar.width - 30);
+      if (name === "Competições") await expect(year).toHaveValue("");
+      if (name === "Elencos" && width < 640) {
+        await page.locator(".team-profile-rosters > nav a").first().click();
+      }
+      await expect(
+        page.locator(".team-profile-workspace table").first(),
+      ).toBeVisible();
+      if (name === "Estatísticas") {
+        const table = page.locator(".team-profile-participation-table");
+        await expect(table.locator("th").first()).toHaveCSS(
+          "text-align",
+          "center",
+        );
+        await expect(table.locator('th[scope="row"]').first()).toHaveCSS(
+          "text-align",
+          "center",
+        );
+        await expect(
+          page.getByRole("region", { name: "Estatísticas por participação" }),
+        ).toHaveCSS("border-top-width", "1px");
+        const modeBox = (await page
+            .locator(".team-profile-workspace .segmented")
+            .boundingBox())!,
+          tableBox = (await table.boundingBox())!;
+        expect(tableBox.y - modeBox.y - modeBox.height).toBeLessThan(40);
+      }
+      await check();
+    }
+    // Text enlargement must preserve the tabbar and visible, associated fields.
+    await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+    await check();
+  });
+}
+
 test("perfil mantém tabela durante ordenação, ordem canônica e títulos sem repetição", async ({
   page,
 }) => {

@@ -192,7 +192,7 @@ Quando houver contradição entre documentos, resolva pela precedência abaixo. 
 1. **Restrições obrigatórias:** segurança, privacidade e acessibilidade (WCAG 2.2 AA)
 2. **Instruções atuais do responsável:** decisões explícitas e diretas, independente do canal
 3. **Especificações e regras de negócio vigentes:** `docs/decisoes/`, `CONTRATOS.md`, `ESCOPO.md`
-4. **Padrões permanentes do projeto:** `docs/design/PADROES.md`, `PADROES-ADMIN.md`, `ADMIN.md`, `PUBLICO.md`
+4. **Padrões permanentes do projeto:** [guia visual aprovado](design/catalogo/guia-completo-autonomo.html), `docs/design/DESIGN-SYSTEM.md`, `PADROES.md`, `PADROES-ADMIN.md`, `ADMIN.md`, `PUBLICO.md`. O guia mostra a referência visual; padrões específicos delimitam sua aplicação e decisões posteriores aprovadas.
 5. **Recomendações das skills:** `ui-ux-pro-max`, `web-design-guidelines` — técnicas, não substituem identidade ou decisões do projeto
 6. **Preferências genéricas dos agentes**
 
@@ -203,6 +203,8 @@ Entre documentos de mesma prioridade, aplique a regra mais específica ao escopo
 PRs abertas, protótipos e documentos históricos não substituem automaticamente decisões vigentes. Aprovação de um protótipo vale para seu escopo explicitamente aprovado; sua existência ou implementação não autoriza mudanças adicionais de produto. Código e testes demonstram o comportamento implementado, mas não constituem, por si só, autorização para alterar regras de negócio.
 
 Persistindo uma contradição, registre as fontes conflitantes (caminho/seção, versão e escopo), o ponto de discordância e solicite decisão humana. Suspenda apenas as ações dependentes dessa decisão e prossiga com atividades independentes dentro do escopo autorizado.
+
+**Decisões de design — instrução de 24/11/2026:** antes de implementar pedido que fuja do padrão ou não esteja contemplado, informe a regra ou lacuna, proponha o alcance concreto e pergunte se deve ser **novo padrão** ou **exceção**. Não inferir essa classificação da simples solicitação de uma aparência. Registre a resposta, seu escopo e o que substitui; atualize a fonte vigente e o exemplo pertinente para padrão novo, ou registre a exceção com seu alcance sem generalizá-la. Decisões já explicitamente aprovadas não exigem nova confirmação. Aplique correções independentes enquanto aguarda. O procedimento de execução e evidência fica no [fluxo de design](design/README.md#fluxo-de-trabalho-dos-agentes).
 
 ---
 
