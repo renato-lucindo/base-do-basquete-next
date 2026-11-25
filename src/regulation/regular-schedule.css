@@ -1,0 +1,70 @@
+.regular-schedule {
+  margin-top: 0.75rem;
+  min-width: 0;
+}
+.competition-setup label.regular-schedule-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.regular-schedule-toggle input {
+  flex-shrink: 0;
+}
+.regular-schedule-controls,
+.regular-schedule-footer {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-block: 0.5rem;
+}
+.regular-schedule-controls .setup-field {
+  max-width: 12rem;
+}
+.regular-schedule-list {
+  max-height: 25rem;
+  overflow: auto;
+  border: 1px solid var(--bb-control-line);
+  border-radius: 0.3125rem;
+}
+.regular-schedule-list table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.875rem;
+}
+.regular-schedule-list th,
+.regular-schedule-list td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--bb-line);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.regular-schedule-list th {
+  position: sticky;
+  top: 0;
+  background: var(--bb-surface);
+  z-index: 1;
+}
+.regular-schedule-list td > span {
+  display: block;
+}
+.regular-schedule-pages {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-block: 0.5rem;
+  flex-wrap: wrap;
+}
+.regular-schedule-footer {
+  align-items: center;
+  justify-content: space-between;
+}
+@media (max-width: 40rem) {
+  .regular-schedule-list table {
+    min-width: 32rem;
+  }
+}

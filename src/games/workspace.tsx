@@ -938,6 +938,47 @@ export function GamesWorkspace(props: Props) {
               }
             >
               <legend>Confronto</legend>
+              <div className="game-swap-row">
+                {editor.version > 0 && (
+                  <button
+                    type="button"
+                    className="game-add-registration game-swap-mando"
+                    disabled={
+                      !editor.game.homeRegistrationId ||
+                      !editor.game.awayRegistrationId
+                    }
+                    onClick={() => {
+                      if (
+                        busy ||
+                        uncertain ||
+                        conflict ||
+                        decisionLocked ||
+                        savedGame?.state === "finished"
+                      )
+                        return;
+                      setEditor((current) =>
+                        current
+                          ? {
+                              ...current,
+                              game: {
+                                ...current.game,
+                                homeRegistrationId:
+                                  current.game.awayRegistrationId,
+                                awayRegistrationId:
+                                  current.game.homeRegistrationId,
+                              },
+                            }
+                          : current,
+                      );
+                      setFieldErrors({});
+                      setError("");
+                      setStatus("");
+                    }}
+                  >
+                    Trocar mando
+                  </button>
+                )}
+              </div>
               <div className="game-opponents">
                 {(["homeRegistrationId", "awayRegistrationId"] as const).map(
                   (key, i) => (
