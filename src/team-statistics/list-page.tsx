@@ -270,7 +270,7 @@ export function TeamsListPublicPage() {
                     label="Modo"
                     value={q.mode}
                     options={[
-                      ["total", "Totais"],
+                      ["total", "Total"],
                       ["per-game", "Por jogo"],
                     ]}
                     onChange={(mode) => change({ mode })}

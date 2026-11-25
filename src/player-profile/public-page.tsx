@@ -657,6 +657,10 @@ export function PlayerPublicPage() {
                                 style={metricColumnStyle(
                                   [...summaries.values()].map((row) => ({
                                     value: row?.metrics[m].value ?? null,
+                                    averageDivisor: STATISTICS_METRICS[m]
+                                      .normalizable
+                                      ? row?.gamesPlayed
+                                      : undefined,
                                     totalFactor:
                                       view.mode === "per-game" &&
                                       STATISTICS_METRICS[m].normalizable

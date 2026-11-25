@@ -126,7 +126,7 @@ A legenda contém somente definições das siglas ou abreviações das colunas v
 
 Nas disputas exclusivamente de súmula, Jogadores oferece13opções de coluna: Equipe e as12métricas de súmula. Essa capacidade da fonte limita também a seleção recebida da URL/sessão e as colunas renderizadas; o padrão mobile de todas as métricas não acrescenta estatísticas de boxscore. Seleções válidas, inclusive nenhuma coluna, permanecem. Disputas com boxscore conservam as opções completas.
 
-Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Totais/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20linhas e o formato anterior; a página atual solicita `pageSize=30` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
+Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Total/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20linhas e o formato anterior; a página atual solicita `pageSize=30` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
 
 Correção de bordas de05/11/2026: manter a rolagem interna nos dois eixos, altura limitada e identificação/cabeçalho fixos, incluindo “Pos.” na fixação vertical. Ao atingir uma das quatro bordas, bloquear o efeito elástico somente na tabela de Jogadores e sua barra superior, sem alterar gestos/zoom nem a página externa. A sincronização usa deslocamentos válidos de cada contêiner e não reescreve posições equivalentes; a barra superior deve alcançar a mesma última coluna quando houver scrollbar vertical. [Validação e limites por navegador](VALIDACAO-BORDAS-MOBILE.md).
 
@@ -172,7 +172,7 @@ Preservar separadamente, na identificação acessível dos ícones, vitória/der
 
 ## Ajustes de 13/11/2026
 
-A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo de Equipes fica à esquerda e Totais/Por jogo fica à direita, inclusive se a largura exigir quebra de linha. Cabeçalhos preenchidos de tabela e da agenda pública têm contorno. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
+A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo de Equipes fica à esquerda e Total/Por jogo fica à direita, inclusive se a largura exigir quebra de linha. Cabeçalhos preenchidos de tabela e da agenda pública têm contorno. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
 
 O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
 

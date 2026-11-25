@@ -150,6 +150,12 @@ export function SimpleStatisticsPageView() {
             : metricColumnStyle(
                 (data?.rows ?? []).map((row) => ({
                   value: row.metrics[key as StatisticsMetric].value,
+                  averageDivisor:
+                    key !== "points" &&
+                    (STATISTICS_METRICS[key as StatisticsMetric].normalizable ||
+                      ["minutes", "plusMinus"].includes(key))
+                      ? metricSampleSize(row, key as StatisticsMetric)
+                      : undefined,
                   totalFactor:
                     route.query.mode === "per-game" &&
                     key !== "points" &&

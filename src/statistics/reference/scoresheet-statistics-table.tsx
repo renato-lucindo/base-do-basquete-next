@@ -90,6 +90,12 @@ function SortHeader({
       style={metricColumnStyle(
         [...data.rows, ...data.compared].map((row) => ({
           value: row.metrics[metric].value,
+          averageDivisor:
+            metric !== "points" &&
+            (STATISTICS_METRICS[metric].normalizable ||
+              ["minutes", "plusMinus"].includes(metric))
+              ? metricSampleSize(row, metric)
+              : undefined,
           totalFactor:
             data.mode === "per-game" &&
             metric !== "points" &&
@@ -99,6 +105,7 @@ function SortHeader({
               : 1,
         })),
         playerMetric(metric).label.includes("%"),
+        metric === "pointsShare" || metric === "pointsPerGame",
       )}
     />
   );

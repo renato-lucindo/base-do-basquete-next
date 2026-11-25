@@ -130,6 +130,15 @@ function Campaigns({
   return rows.length ? (
     <ScrollableTable label="Campanhas por disputa">
       <table className="statistics-table team-profile-campaigns">
+        <colgroup>
+          <col className="campaign-context" />
+          <col className="campaign-status" />
+          <col className="campaign-stage" />
+          <col span={3} className="campaign-count" />
+          <col className="campaign-percentage" />
+          <col span={3} className="campaign-score" />
+          <col className="campaign-recent" />
+        </colgroup>
         <thead>
           <tr>
             <th scope="col">Disputa</th>

@@ -1,14 +1,23 @@
-/* Numeric reserves are shared by total/average views; text keeps its own width. */
+/* One compact column geometry for both modes and all numeric cells. */
 .bb-metric-column {
-  --bb-number-width: 8ch;
-  min-inline-size: calc(var(--bb-number-width) + 2rem);
+  --bb-header-width: 2ch;
+  min-inline-size: calc(var(--bb-header-width) + 0.75rem);
   font-variant-numeric: tabular-nums;
 }
-.bb-metric-column[data-metric-kind="percent"] {
-  --bb-number-width: 7ch;
-}
-.bb-metric-column[data-metric-kind="signed"] {
-  --bb-number-width: 9ch;
+/* An invisible, zero-height sample participates in the native table width.
+   Use the largest real display format and the strongest numeric body weight. */
+th.bb-metric-column::after {
+  content: var(--bb-number-reserve, "");
+  display: block;
+  inline-size: max-content;
+  margin-inline: auto;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 table thead th.bb-metric-column {
   /* Explicit metric ownership overrides legacy positional table rules. */
@@ -16,7 +25,7 @@ table thead th.bb-metric-column {
 }
 th.bb-metric-column > :is(button, .statistics-sort) {
   display: grid;
-  grid-template-columns: 1em minmax(0, 1fr) 1em;
+  grid-template-columns: 0.45em minmax(0, 1fr) 0.45em;
   align-items: center;
   width: 100%;
   justify-content: stretch;
@@ -28,7 +37,7 @@ th.bb-metric-column > :is(button, .statistics-sort) > span:first-child {
 }
 th.bb-metric-column .sort-arrow {
   grid-column: 3;
-  width: 1em;
+  width: 0.45em;
   margin: 0;
 }
 

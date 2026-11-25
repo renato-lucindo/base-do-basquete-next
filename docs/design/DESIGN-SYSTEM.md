@@ -102,7 +102,7 @@ Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado
 
 - [SearchInput](../../src/ui-system/query-controls.tsx) e [estilos de consulta](../../src/ui-system/query-controls.css): input nativo com lupa decorativa; label oculto explícito nos consumidores, preservando ref e teclado. Não aplicar a ocultação globalmente a todos os labels.
 - [QueryTableLayout](../../src/ui-system/query-table-layout.tsx): mede a tabela visível e limita os blocos associados à sua largura, com quebra dos controles. A região rolável continua sendo o limite quando a tabela excede a tela.
-- [StatisticsSortHeader](../../src/statistics/reference/sort-header.tsx), [reserva numérica](../../src/ui-system/metric-layout.ts) e [folha de métricas](../../src/ui-system/metric-layout.css): precisão/sinal/percentual e seta preservados; variantes usam a cobertura já recebida na projeção, sem alterar cálculos ou contratos.
+- [StatisticsSortHeader](../../src/statistics/reference/sort-header.tsx), [reserva numérica](../../src/ui-system/metric-layout.ts) e [folha de métricas](../../src/ui-system/metric-layout.css): reserva compacta pelo maior formato real entre Total e Por jogo, sem mínimos amplos; cabeçalho e valores compartilham coluna e seta tem espaço próprio; variantes usam a cobertura já recebida na projeção, sem alterar cálculos ou contratos.
 - [RecentResultsCell](../../src/regulation/recent-results-cell.tsx) e sua [folha compartilhada](../../src/regulation/recent-results.css): campanhas e classificação usam a mesma decoração e interação.
 
 As regras ficam em [PADROES](PADROES.md#consultas-e-métricas--padrão-de-25112026); estes links identificam as implementações para reutilização.

@@ -147,7 +147,7 @@ export function ModeButtons({
         aria-pressed={value === "total"}
         onClick={() => onChange("total")}
       >
-        Totais
+        Total
       </button>
       <button
         type="button"
@@ -516,6 +516,9 @@ export function ParticipationStatistics({
                     style={metricColumnStyle(
                       result.rows.map((row) => ({
                         value: row.values?.statistics[k].value ?? null,
+                        averageDivisor: listMetric(k).normalizable
+                          ? row.values?.metricCoverage[k]
+                          : undefined,
                         totalFactor:
                           mode === "per-game" && listMetric(k).normalizable
                             ? row.values?.metricCoverage[k]

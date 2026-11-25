@@ -1,6 +1,96 @@
 import { test, expect } from "@playwright/test";
 import { teamProfileBrowserFixture } from "./fixtures/team-profile";
 
+for (const width of [1366, 1920]) {
+  test(`tabelas compactas compartilham colunas e campanhas cabem em ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const f = await teamProfileBrowserFixture(page);
+    const check = async () => {
+      const table = page.getByRole("table", {
+        name: "Estatísticas dos atletas",
+        exact: true,
+      });
+      await expect(table.locator("tbody tr").first()).toBeVisible();
+      const modes = page.getByRole("button", { name: "Total", exact: true });
+      await modes.click();
+      const measure = () =>
+        table.locator("thead th").evaluateAll((cells) =>
+          cells.map((cell) => ({
+            x: cell.getBoundingClientRect().x,
+            width: cell.getBoundingClientRect().width,
+          })),
+        );
+      const total = await measure();
+      expect((await table.boundingBox())!.width).toBeLessThan(1100);
+      for (const value of await table
+        .locator("thead th.bb-metric-column")
+        .evaluateAll((cells) =>
+          cells.map((cell) => cell.getBoundingClientRect().width),
+        ))
+        expect(value).toBeLessThan(80);
+      await page.getByRole("button", { name: "Por jogo", exact: true }).click();
+      const perGame = await measure();
+      perGame.forEach((cell, index) => {
+        expect(Math.abs(cell.width - total[index].width)).toBeLessThan(1);
+        expect(Math.abs(cell.x - total[index].x)).toBeLessThan(1);
+      });
+      const region = table.locator("..");
+      for (const scroll of [0, 10000]) {
+        await region.evaluate((el, left) => {
+          el.scrollLeft = left;
+        }, scroll);
+        const differences = await table.evaluate((el) => {
+          const headers = [...el.querySelectorAll("thead th")],
+            cells = [...el.querySelector("tbody tr")!.children];
+          return headers.map((header, index) => {
+            const h = header.getBoundingClientRect(),
+              c = cells[index].getBoundingClientRect();
+            return Math.max(
+              Math.abs(h.left - c.left),
+              Math.abs(h.right - c.right),
+            );
+          });
+        });
+        for (const difference of differences)
+          expect(difference).toBeLessThan(1);
+      }
+      await region.evaluate((el) => {
+        el.scrollLeft = 0;
+      });
+    };
+    await page.goto(
+      `http://127.0.0.1:5174/estatisticas.html#${f.source.disputeId}`,
+    );
+    await check();
+    await page.goto(f.url);
+    await page.getByRole("tab", { name: "Jogadores", exact: true }).click();
+    await check();
+    await page
+      .getByRole("link", { name: "Ver perfil geral", exact: true })
+      .click();
+    await page.getByRole("tab", { name: "Elencos", exact: true }).click();
+    await check();
+    await page.getByRole("tab", { name: "Competições", exact: true }).click();
+    const campaigns = page.locator(".team-profile-campaigns");
+    await expect(campaigns).toBeVisible();
+    const bounds = await campaigns.evaluate((table) => ({
+      width: table.getBoundingClientRect().width,
+      region: table.parentElement!.clientWidth,
+      scroll: table.parentElement!.scrollWidth,
+    }));
+    expect(Math.abs(bounds.width - bounds.region)).toBeLessThan(2);
+    expect(bounds.scroll - bounds.region).toBeLessThanOrEqual(1);
+    const screenshot = info.outputPath(`campanhas-${width}.png`);
+    await page.screenshot({ path: screenshot, fullPage: true });
+    await info.attach("campanhas-desktop", {
+      path: screenshot,
+      contentType: "image/png",
+    });
+  });
+}
+
 test("campanhas compartilham resultados coloridos e filtros seguem a tabela", async ({
   page,
 }) => {
@@ -13,9 +103,12 @@ test("campanhas compartilham resultados coloridos e filtros seguem a tabela", as
       .first()
       .evaluate((el) => ({
         background: getComputedStyle(el).backgroundColor,
-        color: getComputedStyle(el.parentElement!).color,
+        stroke: getComputedStyle(el.querySelector("svg")!).stroke,
+        outline: getComputedStyle(el).outlineColor,
       }));
   const expected = await decoration();
+  expect(expected.background).toBe("rgb(24, 115, 59)");
+  expect(expected.stroke).toBe("rgb(255, 255, 255)");
   await page
     .getByRole("link", { name: "Ver perfil geral", exact: true })
     .click();

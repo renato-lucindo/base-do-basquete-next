@@ -527,3 +527,7 @@
   th[data-team-metric="name"]:not(.active-column) {
   background: #f3f6fa;
 }
+
+.team-list-page .team-list-segments > fieldset:last-child {
+  margin-inline-start: auto;
+}

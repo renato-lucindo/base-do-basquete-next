@@ -101,7 +101,7 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
   await expect(
     table.locator('[data-team-metric="technicalFouls"]'),
   ).toHaveAttribute("aria-sort", "descending");
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
+  await page.getByRole("button", { name: "Total", exact: true }).click();
   await expect(row().locator("td")).toHaveText([
     "1",
     "2",
@@ -189,7 +189,7 @@ test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", a
   ).toHaveAttribute("aria-sort", "descending");
   await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect(cell()).toHaveText("100");
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
+  await page.getByRole("button", { name: "Total", exact: true }).click();
   await expect(cell()).toHaveText("100");
   await page.reload();
   await expect(cell()).toHaveText("100");

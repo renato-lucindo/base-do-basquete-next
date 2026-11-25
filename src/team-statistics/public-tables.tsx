@@ -133,6 +133,9 @@ export function TeamsTable({
                         style={metricColumnStyle(
                           d.rows.map((row) => ({
                             value: row.statistics[metric].value,
+                            averageDivisor: TEAM_METRICS[metric].normalizable
+                              ? row.metricCoverage[metric]
+                              : undefined,
                             totalFactor:
                               d.query.mode === "per-game" &&
                               TEAM_METRICS[metric].normalizable

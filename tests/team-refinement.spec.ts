@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { teamPublicFixture } from "./fixtures/team-public-browser";
-test("Equipes alinha Totais/Por jogo à direita em qualquer largura", async ({
+test("Equipes alinha Total/Por jogo à direita em qualquer largura", async ({
   page,
 }, info) => {
   const f = await teamPublicFixture(page);
@@ -232,7 +232,7 @@ test("Equipes: consulta explícita e retorno do perfil conservam seleção e rol
   const table = page.getByRole("table", { name: "Estatísticas das equipes" });
   await expect(table.locator("tbody tr")).toHaveCount(26);
   await expect(
-    page.getByRole("button", { name: "Totais", exact: true }),
+    page.getByRole("button", { name: "Total", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   const region = page.getByRole("region", {
     name: "Tabela de equipes",
@@ -359,7 +359,7 @@ test("Equipes: última resposta prevalece e máximos positivos preservam empates
   await expect(table.locator("tbody tr")).toHaveCount(1);
   await expect(table).toContainText("Inscrição 24");
   await expect(search).toBeFocused();
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
+  await page.getByRole("button", { name: "Total", exact: true }).click();
   await expect(table).toContainText("Inscrição 24");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
@@ -379,7 +379,7 @@ test("Equipes: armazenamento indisponível preserva consultas curtas e foco", as
   await page.goto(f.listUrl);
   const table = page.getByRole("table", { name: "Estatísticas das equipes" });
   await expect(table.locator("tbody tr")).toHaveCount(2);
-  const totals = page.getByRole("button", { name: "Totais", exact: true });
+  const totals = page.getByRole("button", { name: "Total", exact: true });
   await totals.focus();
   await page.keyboard.press("Enter");
   await expect(totals).toBeFocused();

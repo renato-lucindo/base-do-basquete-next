@@ -1,29 +1,42 @@
 import type { CSSProperties } from "react";
 
-const decimal = new Intl.NumberFormat("pt-BR", {
+const integer = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+const average = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 1,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 1,
 });
-/** Reserve both formats from the unformatted projection, including large totals. */
+/** Reserve the actual two display formats; no hypothetical signs or extra decimals. */
 export function metricColumnStyle(
-  samples: { value: number | null; totalFactor?: number }[],
+  samples: {
+    value: number | null;
+    totalFactor?: number;
+    averageDivisor?: number;
+  }[],
   percent = false,
+  forceDecimal = false,
 ): CSSProperties {
-  const characters = Math.max(
-    percent ? 7 : 8,
-    ...samples.map(({ value, totalFactor = 1 }) => {
-      if (value === null) return 0;
-      const total = Math.abs(value) * Math.max(1, totalFactor);
-      // Reserve a sign as well as the longest localized total/decimal representation.
-      return (
-        Math.max(
-          decimal.format(Math.abs(value)).length,
-          decimal.format(total).length,
-        ) +
-        1 +
-        (percent ? 1 : 0)
-      );
-    }),
+  const width = (text: string) =>
+    [...text].reduce(
+      (sum, char) =>
+        sum + (char === "." || char === "," ? 0.5 : char === "-" ? 0.6 : 1),
+      0,
+    );
+  const formats = samples.flatMap(
+    ({ value, totalFactor = 1, averageDivisor }) => {
+      if (value === null) return [];
+      const total = value * Math.max(1, totalFactor);
+      const values = [(forceDecimal ? average : integer).format(total)];
+      if (averageDivisor !== undefined)
+        values.push(average.format(total / Math.max(1, averageDivisor)));
+      return values.map((text) => text + (percent ? "%" : ""));
+    },
   );
-  return { "--bb-number-width": `${characters}ch` } as CSSProperties;
+  const reserve = formats.reduce(
+    (longest, text) => (width(text) > width(longest) ? text : longest),
+    "",
+  );
+  return {
+    "--bb-number-reserve": JSON.stringify(reserve),
+    "--bb-reserve-units": width(reserve),
+  } as CSSProperties;
 }

@@ -127,3 +127,24 @@ O smoke publicado detectou cabeçalhos do perfil geral ainda sobrescritos por re
 Publicação e SHA final estão no checkpoint e na PR. Sem API, schema, migration, DML/DDL, regra esportiva, Access ou novo Worker. Merge continua aguardando aceite explícito.
 
 Fonte publicada final6c08a024a7ef46154df7f52e3dbeff9196c88920. Smoke200 e12assets por SHA256 nos dois serviços; APIs privadas401/403. Navegador remoto verificou siglas centrais e valores direitos na participação real da LUSB, sem escrita. Versões/deployments no checkpoint; o HEAD documental posterior preserva a mesma fonte executável. CI da PR permanece etapa distinta.
+
+## Correção compacta — 25/11/2026
+
+Plano aprovado e matriz em PLAN-TABELAS-FILTROS.md. Corrigida a interpretação anterior que reservava96px por métrica. Agora a reserva usa os valores reais formatados nos dois modos e participa da largura nativa da coluna, incluindo o maior peso tipográfico. Cabeçalho/célula compartilham limites, números permanecem à direita e siglas centrais; a ordenação preserva a maior reserva observada. Não muda valores, cobertura, cálculos, precisão ou API. Total substitui Totais apenas nos seletores; o plural do parser de PDFs permanece intacto.
+
+RecentResultsCell mantém SVG, verde/vermelho e anel originais; a correção explícita da herança de cor conserva check/X brancos também no perfil da equipe. Campanhas preenchem a região desktop com colunas numéricas compactas e quebra nas três identificações. Guias PADROES/DESIGN-SYSTEM/PUBLICO/PERFIS-EQUIPES e catálogo reconciliados. Revisão autoral das [telas reais com fixtures](evidencias/2026-11-25-correcao-compacta/README.md) e das diretrizes atuais de interface; sem parecer independente ou aceite humano alegado.
+
+### Provas executadas
+
+- Gate completo PASS:182arquivos/857unitários em243,54s;11contratos de CI,19transporte,16banco local,35acesso/navegação/busca,1PDF, lint, formato, tipos, builds, fronteira e segredos. Sem novas dispensas ou aumento de timeout.
+- Contratos de largura com valores grandes/negativos, percentuais, zeros e ausentes:4PASS. Comparação modo/ordem e todos os limites de cabeçalho/célula em campeonato, disputa e Elencos, campanhas em1366/1920px e restauração de colunas:6PASS.
+- Regressão Chromium:132PASS/8falhas exclusivamente nas expectativas antigas de padding uniforme. Atualizadas para6px nas métricas, mantendo14/10px nas identificações; os8casos passaram na repetição. A rodada focal seguinte teve14PASS/1falha/1dispensa preexistente: reproduziu a sobreposição de entradas na preparação da súmula mobile. Corrigida empilhando cartões de equipes abaixo de1000px em qualquer ponteiro. Repetição final:5PASS/1dispensa preexistente nos três fluxos de súmula.
+- Matriz dos perfis cobre320/390/639/640/1366/1920px, texto200%, oito abas e estados aplicáveis. Focais mantêm axe, teclado/toque e contenção. design:verify completo e catálogo WebKit PASS. WebKit dos tooltips PP%/5F:2PASS; rodada completa local42PASS/2falhas de overscroll: WebKit Windows retorna propriedade vazia, limitação já documentada em playwright.webkit.config.ts. As mesmas asserções permanecem obrigatórias na CI macOS; não adicionada dispensa.
+
+### Diagnóstico da CI anterior
+
+Run45629988602 não teve falha no gate completo nem no design:verify: esses jobs falharam no upload por armazenamento. Browsers também tiveram falhas reais e expectativas superadas: limpar inexistente no estado inicial, restaurar colunas indevidamente por limpar, cor do SVG, alinhamento do modo, comparação do rótulo oculto com formulário, sobreposição de entradas da súmula e toque no tooltip5F. Cada correção foi reproduzida focalmente; não foram desativadas verificações para contornar o problema.
+
+Limpeza expressamente autorizada substituiu o arquivamento integral:1286artefatos superados/18.682.097.105bytes removidos,8preservados/38.306.023bytes confirmados por consulta final. IDs, autorização e auditoria individual local em C:\Users\12405304716\.codex\artifact-archives\base-do-basquete-next\2026-11-25. Capturas versionadas preservadas. O resultado de upload no novo SHA será conferido sem alterar cobrança ou tornar o upload opcional.
+
+Publicação nos mesmos Workers e CI do SHA atual permanecem pendentes até confirmação registrada na PR/checkpoint. Nenhuma API, dado humano, schema, regra esportiva ou Access alterado. Merge depende de aceite explícito.

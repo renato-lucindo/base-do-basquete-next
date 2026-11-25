@@ -21,8 +21,8 @@ Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, co
 ## Refinamento permanente aprovado em 24/11/2026
 
 - **Geral:** um seletor compacto de ano no canto direito da barra das abas, fora de `tablist`; abas com rolagem interna quando necessário. Competições mantém Todos e seu recorte histórico, demais abas usam o ano selecionado. Trocar ano em Elencos limpa a inscrição incompatível.
-- **Estatísticas gerais:** contorno na largura da tabela; cabeçalho e conteúdo de Participação centralizados, como padrão específico deste perfil. Métricas conservam alinhamento numérico. Totais/Por jogo fica depois dos filtros, imediatamente acima da tabela.
-- **Visão geral da disputa:** Fase e Totais/Por jogo na mesma linha acima dos coletivos; adaptação organizada quando não couber. Classificação à esquerda, jogadores permanecem centralizados.
+- **Estatísticas gerais:** contorno na largura da tabela; cabeçalho e conteúdo de Participação centralizados, como padrão específico deste perfil. Métricas conservam alinhamento numérico. Total/Por jogo fica depois dos filtros, imediatamente acima da tabela.
+- **Visão geral da disputa:** Fase e Total/Por jogo na mesma linha acima dos coletivos; adaptação organizada quando não couber. Classificação à esquerda, jogadores permanecem centralizados.
 - **Jogos:** apresentação compartilhada com o perfil do jogador para data/confronto/placar/contexto, sem pontos individuais. Nomes completos no desktop e siglas cadastradas no celular, com alternativa acessível do nome completo. Cinco recentes por data no recorte, reunindo categorias no geral. Lista completa usa o mesmo confronto.
 - **Legendas:** seguir a grade comum em todas as abas, inclusive Elencos, uma vez ao final do conteúdo ativo. Não criar sobrescrita flex local.
 - **Filtros:** o piloto lateral de24/11 foi substituído pelo padrão compartilhado de25/11 em PADROES: identificação interna/label acessível oculto, lupa e limpeza condicional. Entrada de dados em formulários continua com rótulo visível.

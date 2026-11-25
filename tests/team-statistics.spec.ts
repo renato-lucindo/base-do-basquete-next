@@ -25,7 +25,7 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   await expect(
     table.getByRole("link", { name: "Lobos B", exact: true }),
   ).toBeVisible();
-  const totals = page.getByRole("button", { name: "Totais", exact: true });
+  const totals = page.getByRole("button", { name: "Total", exact: true });
   await totals.focus();
   await page.keyboard.press("Enter");
   await expect(totals).toBeFocused();

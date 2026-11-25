@@ -66,8 +66,14 @@ for (const withBoxscore of [false, true]) {
     const after = await measure();
     expect(after.length).toBe(before.length);
     after.forEach((value, index) => {
-      expect(Math.abs(value.width - before[index].width)).toBeLessThan(1);
-      expect(Math.abs(value.x - before[index].x)).toBeLessThan(1);
+      expect(
+        Math.abs(value.width - before[index].width),
+        `mode width column ${index}`,
+      ).toBeLessThan(1);
+      expect(
+        Math.abs(value.x - before[index].x),
+        `mode x column ${index}`,
+      ).toBeLessThan(1);
     });
     for (const th of await table.locator("th.bb-metric-column").all()) {
       await expect(th).toHaveCSS("text-align", "center");

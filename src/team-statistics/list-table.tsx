@@ -73,6 +73,10 @@ export function TeamsListTable({
                       style={metricColumnStyle(
                         d.rows.map((row) => ({
                           value: row.statistics[key].value,
+                          averageDivisor: listMetric(key, d.scoresheet)
+                            .normalizable
+                            ? row.metricCoverage[key]
+                            : undefined,
                           totalFactor:
                             d.query.mode === "per-game" &&
                             listMetric(key, d.scoresheet).normalizable

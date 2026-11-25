@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { useNameTooltip } from "./tooltip";
 
 export function StatisticsSortHeader({
@@ -19,10 +19,25 @@ export function StatisticsSortHeader({
   metricAttribute?: "data-public-metric" | "data-team-metric";
 }) {
   const tooltip = useNameTooltip(definition.name);
+  // Retain the largest real format already seen while this column is mounted.
+  // Sorting/pagination must not shrink a column when the next page has zeros.
+  const [reserve, setReserve] = useState(style);
+  const units = (value: CSSProperties | undefined) =>
+    Number(
+      (value as Record<string, unknown> | undefined)?.["--bb-reserve-units"] ??
+        0,
+    );
+  if (units(style) > units(reserve)) setReserve(style);
   return (
     <th
       scope="col"
-      style={style}
+      style={
+        {
+          "--bb-header-width": `${definition.label.length * 0.8 + 1.5}ch`,
+          ...style,
+          ...reserve,
+        } as CSSProperties
+      }
       {...{ [metricAttribute]: metricKey }}
       aria-label={definition.name}
       aria-sort={

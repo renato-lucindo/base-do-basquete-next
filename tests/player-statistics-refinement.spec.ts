@@ -360,7 +360,10 @@ for (const width of [1366, 1920, 390, 320])
     await expect(table.locator("tbody tr")).toHaveCount(30);
     const geometry = await table.evaluate((el) => ({
       padding: [...el.querySelectorAll("tbody tr:first-child :is(th,td)")].map(
-        (c) => getComputedStyle(c).paddingLeft,
+        (c) => ({
+          value: getComputedStyle(c).paddingLeft,
+          metric: c.matches("td[data-public-metric]"),
+        }),
       ),
       spare:
         el.closest(".statistics-table-wrap")!.getBoundingClientRect().right -
@@ -387,7 +390,9 @@ for (const width of [1366, 1920, 390, 320])
         .slice(0, 15),
     }));
     expect(
-      geometry.padding.every((p) => p === (width > 600 ? "14px" : "10px")),
+      geometry.padding.every(
+        (p) => p.value === (p.metric ? "6px" : width > 600 ? "14px" : "10px"),
+      ),
     ).toBe(true);
     expect(
       geometry.documentOverflow,

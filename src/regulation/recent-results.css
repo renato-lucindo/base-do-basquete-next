@@ -25,6 +25,7 @@
   height: 1rem;
   border-radius: 50%;
   background: var(--result-color);
+  color: #fff;
 }
 .standings-result:hover .standings-result-circle {
   box-shadow: 0 0 0 0.125rem #17203326;

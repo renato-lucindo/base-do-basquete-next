@@ -901,3 +901,47 @@
   color: var(--bb-muted);
   font-size: 0.875rem;
 }
+
+/* Campaigns fill the desktop panel; text columns wrap before numeric data overflows. */
+@media (min-width: 1051px) {
+  .team-profile-page.public-site.statistics-public .team-profile-campaigns {
+    width: 100%;
+    table-layout: fixed;
+  }
+  .team-profile-page .team-profile-campaigns :is(th, td) {
+    padding-inline: 0.375rem;
+    min-inline-size: 0;
+  }
+  .team-profile-page .team-profile-campaigns :is(th, td):nth-child(-n + 3) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+  .team-profile-campaigns .team-profile-status {
+    white-space: normal;
+  }
+  .team-profile-campaigns col.campaign-context {
+    width: 20%;
+  }
+  .team-profile-campaigns col.campaign-status {
+    width: 13%;
+  }
+  .team-profile-campaigns col.campaign-stage {
+    width: 15%;
+  }
+  .team-profile-campaigns col.campaign-count {
+    width: 3.5%;
+  }
+  .team-profile-campaigns col.campaign-percentage {
+    width: 7%;
+  }
+  .team-profile-campaigns col.campaign-score {
+    width: 6%;
+  }
+  .team-profile-campaigns col.campaign-recent {
+    width: 16.5%;
+  }
+  .team-profile-campaigns th:last-child {
+    white-space: normal;
+  }
+}

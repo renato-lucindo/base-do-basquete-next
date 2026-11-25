@@ -59,7 +59,7 @@ async function checkExamples(page) {
   );
   for (const header of await stats.locator("th.bb-metric-column").all())
     await expect(header).toHaveCSS("text-align", "center");
-  await example.getByRole("button", { name: "Totais", exact: true }).click();
+  await example.getByRole("button", { name: "Total", exact: true }).click();
   await games.focus();
   await expect(page.getByRole("tooltip")).toHaveText("Jogos");
   await games.press("Enter");

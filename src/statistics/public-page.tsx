@@ -503,7 +503,7 @@ export function StatisticsPageView() {
                                 quickChange({ mode: "total", page: 1 })
                               }
                             >
-                              Totais
+                              Total
                             </button>
                             <button
                               type="button"

@@ -140,6 +140,15 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   expect(
     await sort.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
   ).toBeGreaterThanOrEqual(font * 2);
+  await expect(
+    page.getByRole("button", { name: "Limpar filtros", exact: true }),
+  ).toHaveCount(0);
+  const search = page.getByRole("searchbox", {
+    name: "Buscar atleta ou equipe",
+    exact: true,
+  });
+  await search.fill("Atleta");
+  await search.press("Enter");
   const searchAction = page
     .getByRole("button", { name: "Limpar filtros", exact: true })
     .first();
