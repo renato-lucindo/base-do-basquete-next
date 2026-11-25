@@ -1,3 +1,4 @@
+import "../ui-system/query-controls.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../ui-system/components";
 import {
@@ -89,8 +90,8 @@ export function SheetActionHistory({
       </h4>
       <fieldset disabled={disabled} className="sheet-history-filters">
         <legend className="sr-only">Filtrar ações</legend>
-        <label>
-          Equipe
+        <label className="bb-query-field">
+          <span className="bb-query-label">Equipe</span>
           <select
             aria-label="Filtrar ações por equipe"
             value={side}
@@ -98,13 +99,13 @@ export function SheetActionHistory({
               setSide(e.target.value);
             }}
           >
-            <option value="">Todas</option>
+            <option value="">Todas as equipes</option>
             <option value="home">Equipe A</option>
             <option value="away">Equipe B</option>
           </select>
         </label>
-        <label>
-          Período
+        <label className="bb-query-field">
+          <span className="bb-query-label">Período</span>
           <select
             aria-label="Filtrar ações por período"
             value={selectedPeriod}
@@ -120,8 +121,8 @@ export function SheetActionHistory({
             ))}
           </select>
         </label>
-        <label>
-          Tipo
+        <label className="bb-query-field">
+          <span className="bb-query-label">Tipo</span>
           <select
             aria-label="Filtrar ações por tipo"
             value={kind}
@@ -137,8 +138,8 @@ export function SheetActionHistory({
             ))}
           </select>
         </label>
-        <label>
-          Ordem das ações
+        <label className="bb-query-field">
+          <span className="bb-query-label">Ordem das ações</span>
           <select
             aria-label="Ordem das ações"
             value={order}

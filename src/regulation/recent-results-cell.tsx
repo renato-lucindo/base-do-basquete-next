@@ -1,3 +1,4 @@
+import "./recent-results.css";
 import { useNameTooltip } from "../statistics/reference/tooltip";
 import type { RecentResult } from "./recent-results";
 

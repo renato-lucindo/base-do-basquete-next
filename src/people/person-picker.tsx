@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useId, useRef, useState, useEffect, type RefObject } from "react";
 import type { z } from "zod";
 import type { personListingSchema } from "./contract";
@@ -49,9 +50,12 @@ export function PersonPicker({
         if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
       }}
     >
-      <label htmlFor={id}>Buscar pessoa</label>
-      <input
+      <label htmlFor={id} className="bb-query-label">
+        Buscar pessoa
+      </label>
+      <SearchInput
         id={id}
+        placeholder="Nome da pessoa"
         ref={inputRef}
         role="combobox"
         autoComplete="off"

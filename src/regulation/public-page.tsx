@@ -1,3 +1,4 @@
+import "../ui-system/query-controls.css";
 import { useEffect, useState } from "react";
 import { PublicGamesTable } from "../public-ui/games-table";
 import { publicScheduleRows } from "../public-ui/games-model";
@@ -51,7 +52,7 @@ function StandingsHeader({
       aria-label={`${label}: ${description}`}
       {...tip}
     >
-      {label}
+      <span>{label}</span>
     </button>
   );
 }
@@ -191,8 +192,8 @@ export function PublicStandingsTables({
                 {phases.find((n) => n.phaseId === p.phaseId)?.name}
               </h2>
               {phase && (phase.groups.length > 1 || phases.length > 1) && (
-                <label className="standings-group-control">
-                  Grupo
+                <label className="standings-group-control bb-query-field">
+                  <span className="bb-query-label">Grupo</span>
                   <select
                     name="grupo"
                     value={group?.id}
@@ -279,7 +280,7 @@ export function PublicStandingsTables({
                                           ? "standings-team"
                                           : label === "Últimos jogos"
                                             ? "standings-recent"
-                                            : undefined
+                                            : "bb-metric-column"
                                       }
                                     >
                                       {description ? (

@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useState, useRef } from "react";
 import { useAnchoredOptions } from "../competition/anchored-options";
 import { api, isSessionFailure } from "../competition/api";
@@ -98,7 +99,7 @@ export function VenuePicker({
       }}
     >
       <label htmlFor={id}>Local</label>
-      <input
+      <SearchInput
         ref={input}
         id={id}
         role="combobox"

@@ -1,3 +1,4 @@
+import { metricColumnStyle } from "../ui-system/metric-layout";
 import {
   publicPlayerHistoryAccessibleName,
   publicPlayerHistoryName,
@@ -129,6 +130,17 @@ export function TeamsTable({
                         direction={d.query.direction}
                         onSort={() => onSort(metric)}
                         metricKey={metric}
+                        style={metricColumnStyle(
+                          d.rows.map((row) => ({
+                            value: row.statistics[metric].value,
+                            totalFactor:
+                              d.query.mode === "per-game" &&
+                              TEAM_METRICS[metric].normalizable
+                                ? row.metricCoverage[metric]
+                                : 1,
+                          })),
+                          TEAM_METRICS[metric].label.includes("%"),
+                        )}
                         metricAttribute="data-team-metric"
                       />
                     ))}
@@ -226,7 +238,11 @@ export function TeamParticipants({
                 ...metrics.map(([, v]) => v),
                 "Datas de jogos",
               ].map((t) => (
-                <th scope="col" key={t}>
+                <th
+                  scope="col"
+                  key={t}
+                  className={t.length <= 4 ? "bb-metric-column" : undefined}
+                >
                   {t}
                 </th>
               ))}

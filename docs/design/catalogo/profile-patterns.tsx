@@ -82,7 +82,7 @@ export function ProfilePatterns() {
             onChange={setTab}
           />
           <label>
-            Ano
+            <span className="bb-query-label">Ano</span>
             <select
               value={year}
               onChange={(event) => setYear(event.target.value)}
@@ -95,9 +95,9 @@ export function ProfilePatterns() {
         <TabPanel id="catalog-profile-tabs" active={tab}>
           <div className="team-profile-mode-toolbar">
             <label>
-              Fase{" "}
+              <span className="bb-query-label">Fase</span>
               <select>
-                <option>Todas</option>
+                <option>Todas as fases</option>
                 <option>Classificatória</option>
               </select>
             </label>
@@ -113,8 +113,8 @@ export function ProfilePatterns() {
                 <thead>
                   <tr>
                     <th>Participação</th>
-                    <th>J</th>
-                    <th>PTS</th>
+                    <th className="bb-metric-column">J</th>
+                    <th className="bb-metric-column">PTS</th>
                   </tr>
                 </thead>
                 <tbody>

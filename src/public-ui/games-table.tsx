@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState } from "react";
 import { selectPublicGames, type PublicGameRow } from "./games-model";
 import { publicDetailLink } from "./navigation";
@@ -51,9 +52,11 @@ export function PublicGamesTable({ games }: { games: PublicGameRow[] }) {
     <section className="public-games-block" aria-label="Jogos da disputa">
       <div className="public-games-tools public-games-search">
         <div className="public-game-search-field">
-          <label htmlFor={inputId}>Buscar jogo</label>
+          <label htmlFor={inputId} className="bb-query-label">
+            Buscar jogo
+          </label>
           <div className="public-game-search-controls">
-            <input
+            <SearchInput
               id={inputId}
               ref={inputRef}
               name="buscaJogos"

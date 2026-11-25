@@ -1,3 +1,7 @@
+import "../ui-system/query-controls.css";
+import { metricColumnStyle } from "../ui-system/metric-layout";
+import { QueryTableLayout } from "../ui-system/query-table-layout";
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useState, type ReactNode } from "react";
 import type { z } from "zod";
 import { api, ApiFailure } from "../competition/api";
@@ -163,15 +167,15 @@ function ScopeSelect({
   onChange: (scope: "all" | "regular" | "playoffs") => void;
 }) {
   return (
-    <label>
-      Fase
+    <label className="bb-query-field">
+      <span className="bb-query-label">Fase</span>
       <select
         value={value}
         onChange={(e) =>
           onChange(e.target.value as "all" | "regular" | "playoffs")
         }
       >
-        <option value="all">Todas</option>
+        <option value="all">Todas as fases</option>
         <option value="regular">Classificatória</option>
         <option value="playoffs">Eliminatórias</option>
       </select>
@@ -230,9 +234,9 @@ export function PlayersPanel({
   return (
     <>
       <div className="team-profile-toolbar team-profile-player-controls">
-        <label className="grow">
-          Jogador
-          <input
+        <label className="grow bb-query-field">
+          <span className="bb-query-label">Jogador</span>
+          <SearchInput
             type="search"
             value={q.search}
             placeholder="Buscar jogador…"
@@ -357,41 +361,43 @@ export function CollectivePanel({
   return (
     <>
       <section className="team-profile-section team-profile-collective">
-        <div className="team-profile-section-head">
-          <h2>Estatísticas coletivas</h2>
-        </div>
-        <div className="team-profile-toolbar team-profile-mode-toolbar">
-          <ScopeSelect
-            value={q.scope}
-            onChange={(scope) => update({ scope })}
-          />
-          <ModeButtons value={q.mode} onChange={(mode) => update({ mode })} />
-        </div>
-        <ResourceMessage
-          {...resource}
-          error={
-            valid
-              ? resource.error
-              : "As estatísticas retornaram outra disputa. Tente novamente."
-          }
-        />
-        {data?.total === 0 && q.scope === "playoffs" && (
-          <p role="status">{emptyStatistics(p, q.scope)}</p>
-        )}
-        {data && (
-          <TeamsListTable
-            data={data}
-            showLegend={false}
-            highlightRegistrationId={p.registrationId}
-            onSort={(sort) =>
-              update({
-                sort,
-                direction:
-                  q.sort === sort && q.direction === "desc" ? "asc" : "desc",
-              })
+        <QueryTableLayout>
+          <div className="team-profile-section-head">
+            <h2>Estatísticas coletivas</h2>
+          </div>
+          <div className="team-profile-toolbar team-profile-mode-toolbar">
+            <ScopeSelect
+              value={q.scope}
+              onChange={(scope) => update({ scope })}
+            />
+            <ModeButtons value={q.mode} onChange={(mode) => update({ mode })} />
+          </div>
+          <ResourceMessage
+            {...resource}
+            error={
+              valid
+                ? resource.error
+                : "As estatísticas retornaram outra disputa. Tente novamente."
             }
           />
-        )}
+          {data?.total === 0 && q.scope === "playoffs" && (
+            <p role="status">{emptyStatistics(p, q.scope)}</p>
+          )}
+          {data && (
+            <TeamsListTable
+              data={data}
+              showLegend={false}
+              highlightRegistrationId={p.registrationId}
+              onSort={(sort) =>
+                update({
+                  sort,
+                  direction:
+                    q.sort === sort && q.direction === "desc" ? "asc" : "desc",
+                })
+              }
+            />
+          )}
+        </QueryTableLayout>
       </section>
       {after}
       <Legend
@@ -503,7 +509,21 @@ export function ParticipationStatistics({
               <tr>
                 <th scope="col">Participação</th>
                 {globalColumns.map((k) => (
-                  <th scope="col" key={k}>
+                  <th
+                    scope="col"
+                    key={k}
+                    className="bb-metric-column"
+                    style={metricColumnStyle(
+                      result.rows.map((row) => ({
+                        value: row.values?.statistics[k].value ?? null,
+                        totalFactor:
+                          mode === "per-game" && listMetric(k).normalizable
+                            ? row.values?.metricCoverage[k]
+                            : 1,
+                      })),
+                      listMetric(k).label.includes("%"),
+                    )}
+                  >
                     {listMetric(k).label}
                   </th>
                 ))}

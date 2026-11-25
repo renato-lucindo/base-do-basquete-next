@@ -311,9 +311,7 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                         <th
                           key={m.key}
                           scope="col"
-                          className={
-                            m.key === "points" ? "points-cell" : undefined
-                          }
+                          className={`bb-metric-column ${m.key === "points" ? "points-cell" : ""}`}
                         >
                           <GameHint
                             className="game-header-tip"

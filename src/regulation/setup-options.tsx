@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useState } from "react";
 import type { CompetitionSetup } from "./format";
 import type { CompetitionSetupView } from "./setup-contract";
@@ -99,9 +100,10 @@ export function SetupOptions({
               </label>
             ))}
           </div>
-          <label className="setup-field">
-            Buscar equipe
-            <input
+          <label className="setup-field bb-query-field">
+            <span className="bb-query-label">Buscar equipe</span>
+            <SearchInput
+              placeholder="Nome da equipe"
               type="search"
               value={teamQuery}
               onChange={(e) => {
@@ -242,9 +244,10 @@ export function SetupOptions({
         <p className="setup-hint">
           Resultados ficam disponíveis mesmo sem grupo ou confronto definido.
         </p>
-        <label className="setup-field">
-          Buscar jogo
-          <input
+        <label className="setup-field bb-query-field">
+          <span className="bb-query-label">Buscar jogo</span>
+          <SearchInput
+            placeholder="Buscar jogo…"
             type="search"
             value={gameQuery}
             onChange={(e) => {

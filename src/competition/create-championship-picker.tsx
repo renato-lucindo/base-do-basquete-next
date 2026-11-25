@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { Icon } from "../ui-system/components";
 import { useAnchoredOptions } from "./anchored-options";
@@ -84,7 +85,7 @@ export function CreateChampionshipPicker({
       ) : creating ? null : (
         <>
           <label htmlFor={id}>Campeonato</label>
-          <input
+          <SearchInput
             ref={input}
             id={id}
             type="search"

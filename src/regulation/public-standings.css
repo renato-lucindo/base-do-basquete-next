@@ -104,51 +104,11 @@
   font: inherit;
   white-space: nowrap;
 }
-.standings-results {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.25rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.public-standings.public-site.statistics-public .standings-result {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: #fff;
-  --result-color: #18733b;
-}
-.public-standings.public-site.statistics-public
-  .standings-result[data-result="loss"] {
-  --result-color: #b42332;
-}
-.standings-result-circle {
-  display: flex;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: var(--result-color);
-}
-.public-standings .standings-result:hover .standings-result-circle {
-  box-shadow: 0 0 0 0.125rem #17203326;
-}
 .public-standings .standings-header-help:hover {
   text-decoration: underline;
 }
 .public-standings :is(button, select) {
   touch-action: manipulation;
-}
-.standings-result-circle svg {
-  width: 100%;
-  height: 100%;
-}
-.standings-result[data-latest] .standings-result-circle {
-  outline: 0.0625rem solid var(--result-color);
-  outline-offset: 0.125rem;
 }
 @media (max-width: 1050px) {
   .public-standings .statistics-table-wrap {

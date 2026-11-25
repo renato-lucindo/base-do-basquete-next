@@ -25,5 +25,5 @@ Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, co
 - **Visão geral da disputa:** Fase e Totais/Por jogo na mesma linha acima dos coletivos; adaptação organizada quando não couber. Classificação à esquerda, jogadores permanecem centralizados.
 - **Jogos:** apresentação compartilhada com o perfil do jogador para data/confronto/placar/contexto, sem pontos individuais. Nomes completos no desktop e siglas cadastradas no celular, com alternativa acessível do nome completo. Cinco recentes por data no recorte, reunindo categorias no geral. Lista completa usa o mesmo confronto.
 - **Legendas:** seguir a grade comum em todas as abas, inclusive Elencos, uma vez ao final do conteúdo ativo. Não criar sobrescrita flex local.
-- **Filtros:** piloto restrito ao perfil, rótulos laterais a partir de640px e acima abaixo disso, persistentes e associados. Não estender automaticamente a outros formulários.
+- **Filtros:** o piloto lateral de24/11 foi substituído pelo padrão compartilhado de25/11 em PADROES: identificação interna/label acessível oculto, lupa e limpeza condicional. Entrada de dados em formulários continua com rótulo visível.
 - **Contexto da disputa:** seguir seleção por nível e status textual de PUBLICO.md. Conferir as cinco abas gerais e as três da disputa, vazio e seletores abertos, além dos consumidores compartilhados.

@@ -1,6 +1,49 @@
 import { test, expect } from "@playwright/test";
 import { teamProfileBrowserFixture } from "./fixtures/team-profile";
 
+test("campanhas compartilham resultados coloridos e filtros seguem a tabela", async ({
+  page,
+}) => {
+  const f = await teamProfileBrowserFixture(page);
+  await page.goto(f.url);
+  await expect(page.locator(".standings-results").first()).toBeVisible();
+  const decoration = () =>
+    page
+      .locator('.standings-result[data-result="win"] .standings-result-circle')
+      .first()
+      .evaluate((el) => ({
+        background: getComputedStyle(el).backgroundColor,
+        color: getComputedStyle(el.parentElement!).color,
+      }));
+  const expected = await decoration();
+  await page
+    .getByRole("link", { name: "Ver perfil geral", exact: true })
+    .click();
+  expect(await decoration()).toEqual(expected);
+  await expect(
+    page
+      .locator(".team-profile-campaigns .standings-result[data-latest]")
+      .first()
+      .locator(".standings-result-circle"),
+  ).toHaveCSS("outline-style", "solid");
+  await page.getByRole("tab", { name: "Competições", exact: true }).click();
+  await expect(page.locator(".team-profile-campaigns")).toBeVisible();
+  await expect
+    .poll(async () => {
+      const table = (await page
+          .locator(".team-profile-campaigns")
+          .boundingBox())!,
+        filters = (await page
+          .locator(".team-profile-workspace .team-profile-toolbar")
+          .boundingBox())!;
+      return filters.x + filters.width <= table.x + table.width + 2;
+    })
+    .toBe(true);
+  await expect(
+    page.getByRole("combobox", { name: "Categoria", exact: true }).last(),
+  ).toContainText("Todas as categorias");
+});
+
 test("seleção por nível sobrepõe sem mover conteúdo e devolve foco", async ({
   page,
 }) => {
@@ -40,7 +83,7 @@ test("seleção por nível sobrepõe sem mover conteúdo e devolve foco", async 
 for (const width of [320, 390, 639, 640, 1366, 1920]) {
   test(`oito abas seguem legenda, contorno e controles em ${width}px`, async ({
     page,
-  }) => {
+  }, info) => {
     await page.setViewportSize({ width, height: 1000 });
     const f = await teamProfileBrowserFixture(page);
     await page.goto(f.url);
@@ -122,6 +165,21 @@ for (const width of [320, 390, 639, 640, 1366, 1920]) {
       ).toBeVisible();
       if (name === "Estatísticas") {
         const table = page.locator(".team-profile-participation-table");
+        const widths = () =>
+          table
+            .locator("thead th")
+            .evaluateAll((items) =>
+              items.map((el) => el.getBoundingClientRect().width),
+            );
+        const totalWidths = await widths();
+        await page
+          .locator(".team-profile-workspace")
+          .getByRole("button", { name: "Por jogo", exact: true })
+          .click();
+        const averageWidths = await widths();
+        averageWidths.forEach((value, index) =>
+          expect(Math.abs(value - totalWidths[index])).toBeLessThan(1),
+        );
         await expect(table.locator("th").first()).toHaveCSS(
           "text-align",
           "center",
@@ -141,6 +199,12 @@ for (const width of [320, 390, 639, 640, 1366, 1920]) {
       }
       await check();
     }
+    const screenshot = info.outputPath("consulta.png");
+    await page.screenshot({ path: screenshot, fullPage: true });
+    await info.attach(`perfil-estatisticas-${width}`, {
+      path: screenshot,
+      contentType: "image/png",
+    });
     // Text enlargement must preserve the tabbar and visible, associated fields.
     await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
     await check();

@@ -1,3 +1,4 @@
+import { metricColumnStyle } from "../ui-system/metric-layout";
 import { profileCardLines } from "./profile-card";
 import { useEffect, useRef, useState } from "react";
 import { ApiFailure } from "../competition/api";
@@ -650,6 +651,17 @@ export function PlayerPublicPage() {
                             </th>
                             {(["games", ...view.columns] as const).map((m) => (
                               <th
+                                className="bb-metric-column"
+                                style={metricColumnStyle(
+                                  [...summaries.values()].map((row) => ({
+                                    value: row?.metrics[m].value ?? null,
+                                    totalFactor:
+                                      view.mode === "per-game" &&
+                                      STATISTICS_METRICS[m].normalizable
+                                        ? row?.gamesPlayed
+                                        : 1,
+                                  })),
+                                )}
                                 key={m}
                                 scope="col"
                                 aria-sort={
@@ -763,7 +775,7 @@ export function PlayerPublicPage() {
                     {(view.gameYear ||
                       view.gameChampionship ||
                       view.gameTeam ||
-                      view.opponent) && (
+                      view.opponent.trim()) && (
                       <div className="player-active-filters">
                         {[
                           view.gameYear,

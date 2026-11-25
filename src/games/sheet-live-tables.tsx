@@ -48,7 +48,9 @@ export function SheetPartials({
                 {periodLabel(i + 1)}
               </th>
             ))}
-            <th scope="col">Total</th>
+            <th scope="col" className="bb-metric-column">
+              Total
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -162,14 +164,14 @@ export function SheetLiveTables({
                     <th
                       scope="col"
                       key={q}
-                      className={
-                        i % 2 === 0 ? "sheet-ink-red" : "sheet-ink-blue"
-                      }
+                      className={`bb-metric-column ${i % 2 === 0 ? "sheet-ink-red" : "sheet-ink-blue"}`}
                     >
                       {q}
                     </th>
                   ))}
-                  <th scope="col">Total</th>
+                  <th scope="col" className="bb-metric-column">
+                    Total
+                  </th>
                   <th scope="col" colSpan={5}>
                     Faltas
                   </th>
@@ -222,9 +224,7 @@ export function SheetLiveTables({
                       {r.pointsByQuarter.map((points, i) => (
                         <td
                           key={i}
-                          className={
-                            i % 2 === 0 ? "sheet-ink-red" : "sheet-ink-blue"
-                          }
+                          className={`bb-metric-column ${i % 2 === 0 ? "sheet-ink-red" : "sheet-ink-blue"}`}
                         >
                           {identity.played ? points : "—"}
                         </td>

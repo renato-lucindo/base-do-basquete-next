@@ -1,3 +1,4 @@
+import { metricColumnStyle } from "../ui-system/metric-layout";
 import type { TeamsListPage } from "./list-contract";
 import { LIST_METRICS, type ListMetric } from "./list-query";
 import { sheetTeamMetric, TEAM_METRICS } from "./metrics";
@@ -69,6 +70,17 @@ export function TeamsListTable({
                       key={key}
                       definition={listMetric(key, d.scoresheet)}
                       metricKey={key}
+                      style={metricColumnStyle(
+                        d.rows.map((row) => ({
+                          value: row.statistics[key].value,
+                          totalFactor:
+                            d.query.mode === "per-game" &&
+                            listMetric(key, d.scoresheet).normalizable
+                              ? row.metricCoverage[key]
+                              : 1,
+                        })),
+                        listMetric(key, d.scoresheet).label.includes("%"),
+                      )}
                       metricAttribute="data-team-metric"
                       active={d.query.sort === key}
                       direction={d.query.direction}

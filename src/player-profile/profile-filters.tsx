@@ -1,3 +1,5 @@
+import "../ui-system/query-controls.css";
+import { SearchInput } from "../ui-system/query-controls";
 import { useState } from "react";
 import { Modal } from "../ui-system/components";
 import { PROFILE_METRICS, metricLabel } from "./public-model";
@@ -29,14 +31,22 @@ export function ProfileFilters({
     key: "year" | "championship" | "gameYear" | "gameChampionship" | "gameTeam",
     options: Option[],
   ) => (
-    <label>
-      {label}
+    <label className="bb-query-field">
+      <span className="bb-query-label">{label}</span>
       <select
         name={key}
         value={draft[key]}
         onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
       >
-        <option value="">{label === "Equipe" ? "Todas" : "Todos"}</option>
+        <option value="">
+          {
+            {
+              Ano: "Todos os anos",
+              Campeonato: "Todos os campeonatos",
+              Equipe: "Todas as equipes",
+            }[label]
+          }
+        </option>
         {options.map((o) => (
           <option key={o.id} value={o.id}>
             {o.name}
@@ -52,30 +62,43 @@ export function ProfileFilters({
       onClose={onClose}
       actions={
         <>
-          <button
-            type="button"
-            onClick={() =>
-              setDraft({
-                ...view,
-                ...(games
-                  ? {
-                      gameYear: "",
-                      gameChampionship: "",
-                      gameTeam: "",
-                      opponent: "",
-                    }
-                  : {
-                      year: "",
-                      championship: "",
-                      teams: null,
-                      scope: "all",
-                      columns: [...PROFILE_METRICS],
-                    }),
-              })
-            }
-          >
-            Limpar
-          </button>
+          {(games
+            ? !!(
+                draft.gameYear ||
+                draft.gameChampionship ||
+                draft.gameTeam ||
+                draft.opponent.trim()
+              )
+            : !!(
+                draft.year ||
+                draft.championship ||
+                draft.teams !== null ||
+                draft.scope !== "all"
+              )) && (
+            <button
+              type="button"
+              onClick={() =>
+                setDraft({
+                  ...draft,
+                  ...(games
+                    ? {
+                        gameYear: "",
+                        gameChampionship: "",
+                        gameTeam: "",
+                        opponent: "",
+                      }
+                    : {
+                        year: "",
+                        championship: "",
+                        teams: null,
+                        scope: "all",
+                      }),
+                })
+              }
+            >
+              Limpar
+            </button>
+          )}
           <button type="button" onClick={onClose}>
             Cancelar
           </button>
@@ -133,9 +156,10 @@ export function ProfileFilters({
         {games ? (
           <>
             {select("Equipe", "gameTeam", teams)}
-            <label>
-              Buscar adversário
-              <input
+            <label className="bb-query-field">
+              <span className="bb-query-label">Buscar adversário</span>
+              <SearchInput
+                placeholder="Buscar adversário…"
                 name="adversario"
                 type="search"
                 maxLength={120}
@@ -183,14 +207,14 @@ export function ProfileFilters({
                 </label>
               ))}
             </fieldset>
-            <label>
-              Fase
+            <label className="bb-query-field">
+              <span className="bb-query-label">Fase</span>
               <select
                 name="scope"
                 value={draft.scope}
                 onChange={(e) => setDraft({ ...draft, scope: e.target.value })}
               >
-                <option value="all">Todas</option>
+                <option value="all">Todas as fases</option>
                 <option value="regular">Regular</option>
                 <option value="playoffs">Eliminatórias</option>
               </select>

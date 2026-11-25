@@ -44,6 +44,22 @@ async function checkExamples(page) {
     "right",
   );
   const games = stats.getByRole("button", { name: "Ordenar por J (Jogos)" });
+  const metricWidths = () =>
+    stats
+      .locator("th.bb-metric-column")
+      .evaluateAll((items) =>
+        items.map((el) => el.getBoundingClientRect().width),
+      );
+  const totalWidths = await metricWidths();
+  const example = page.locator(".catalog-statistics");
+  await example.getByRole("button", { name: "Por jogo", exact: true }).click();
+  const averageWidths = await metricWidths();
+  averageWidths.forEach((width, index) =>
+    assert.ok(Math.abs(width - totalWidths[index]) < 1),
+  );
+  for (const header of await stats.locator("th.bb-metric-column").all())
+    await expect(header).toHaveCSS("text-align", "center");
+  await example.getByRole("button", { name: "Totais", exact: true }).click();
   await games.focus();
   await expect(page.getByRole("tooltip")).toHaveText("Jogos");
   await games.press("Enter");

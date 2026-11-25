@@ -1,3 +1,5 @@
+import { metricColumnStyle } from "../../ui-system/metric-layout";
+import { metricSampleSize } from "./metric-layout";
 import {
   publicPlayerHistoryAccessibleName,
   publicPlayerHistoryName,
@@ -85,6 +87,19 @@ function SortHeader({
       direction={data.direction}
       onSort={() => onSort(metric)}
       metricKey={metric}
+      style={metricColumnStyle(
+        [...data.rows, ...data.compared].map((row) => ({
+          value: row.metrics[metric].value,
+          totalFactor:
+            data.mode === "per-game" &&
+            metric !== "points" &&
+            (STATISTICS_METRICS[metric].normalizable ||
+              ["minutes", "plusMinus"].includes(metric))
+              ? metricSampleSize(row, metric)
+              : 1,
+        })),
+        playerMetric(metric).label.includes("%"),
+      )}
     />
   );
 }

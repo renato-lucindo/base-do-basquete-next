@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useId, useState } from "react";
 type Option = { value: string; label: string };
 const normalize = (v: string) =>
@@ -52,7 +53,7 @@ export function SetupPicker({
     <div className="setup-picker">
       <label htmlFor={id}>{label}</label>
       <div className="setup-picker-input">
-        <input
+        <SearchInput
           id={id}
           role="combobox"
           aria-expanded={open}

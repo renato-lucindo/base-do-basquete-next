@@ -1,3 +1,6 @@
+import "../ui-system/query-controls.css";
+import { QueryTableLayout } from "../ui-system/query-table-layout";
+import { SearchInput } from "../ui-system/query-controls";
 import { ProfileMatch } from "../public-ui/profile-match";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
@@ -66,10 +69,19 @@ function Select({
   all?: string;
 }) {
   return (
-    <label>
-      {label}
+    <label className="bb-query-field">
+      <span className="bb-query-label">{label}</span>
       <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {all && <option value="">{all}</option>}
+        {all && (
+          <option value="">
+            {{
+              Ano: "Todos os anos",
+              Categoria: "Todas as categorias",
+              Naipe: "Todos os naipes",
+              Fase: "Todas as fases",
+            }[label] ?? all}
+          </option>
+        )}
         {values.map((v) => (
           <option value={v} key={v}>
             {v === "masculino" || v === "feminino" ? gender(String(v)) : v}
@@ -125,7 +137,13 @@ function Campaigns({
             <th scope="col">Colocação / etapa</th>
             {["J", "V", "D", "Aprov.", "PP", "PC", "SLD", "Últimos jogos"].map(
               (k) => (
-                <th scope="col" key={k}>
+                <th
+                  scope="col"
+                  key={k}
+                  className={
+                    k === "Últimos jogos" ? undefined : "bb-metric-column"
+                  }
+                >
                   {k}
                 </th>
               ),
@@ -546,13 +564,13 @@ export function TeamProfilePage() {
         onChange={(v) => update({ naipe: v })}
         all="Todos"
       />
-      <label className="grow">
-        Competição
+      <label className="grow bb-query-field">
+        <span className="bb-query-label">Competição</span>
         <select
           value={competition}
           onChange={(e) => update({ competicao: e.target.value })}
         >
-          <option value="">Todas</option>
+          <option value="">Todas as competições</option>
           {[
             ...new Map(
               profile.participations.map((p) => [
@@ -739,269 +757,280 @@ export function TeamProfilePage() {
                 )}
               </div>
               <TabPanel id="team-profile-tabs" active={view.section}>
-                {contextual && !selected ? (
-                  <section>
-                    <h2>Inscrições da equipe</h2>
-                    <p>
-                      {contextParts.length
-                        ? "Escolha a inscrição para consultar esta disputa."
-                        : "Esta inscrição não possui participação pública nesta disputa."}
-                    </p>
-                    <ul className="team-profile-registration-choices">
-                      {contextParts.map((p) => (
-                        <li key={p.registrationId}>
-                          <a href={contextualLink(p)}>{p.name}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ) : view.section === "resumo" ? (
-                  contextual && selected ? (
+                <QueryTableLayout>
+                  {contextual && !selected ? (
+                    <section>
+                      <h2>Inscrições da equipe</h2>
+                      <p>
+                        {contextParts.length
+                          ? "Escolha a inscrição para consultar esta disputa."
+                          : "Esta inscrição não possui participação pública nesta disputa."}
+                      </p>
+                      <ul className="team-profile-registration-choices">
+                        {contextParts.map((p) => (
+                          <li key={p.registrationId}>
+                            <a href={contextualLink(p)}>{p.name}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : view.section === "resumo" ? (
+                    contextual && selected ? (
+                      <>
+                        <QueryTableLayout>
+                          <div className="team-profile-section-head">
+                            <h2>Classificação</h2>
+                            <Status p={selected} />
+                          </div>
+                          {selected.standings ? (
+                            <PublicStandingsTables
+                              value={selected.standings}
+                              profile={{
+                                teamId: profile.teamId,
+                                registrationId: selected.registrationId,
+                              }}
+                              publishedRegistrationIds={
+                                new Set(
+                                  selected.catalog.flatMap((g) => [
+                                    g.game.home.registrationId,
+                                    g.game.away.registrationId,
+                                  ]),
+                                )
+                              }
+                            />
+                          ) : (
+                            <p>
+                              Classificação ainda indisponível nesta disputa.
+                            </p>
+                          )}
+                        </QueryTableLayout>
+                        <CollectivePanel
+                          participation={selected}
+                          query={view.params.get("coletivos") ?? ""}
+                          change={(q) => update({ coletivos: q })}
+                          after={lastGames}
+                          extraLegend={
+                            selected.standings &&
+                            standingsSelection(selected.standings, view.params)
+                              .stage === "classificatoria"
+                              ? [
+                                  { label: "Pos.", name: "Posição" },
+                                  standingsMetricLegend[0],
+                                  ...campaignLegend,
+                                  standingsMetricLegend[1],
+                                ]
+                              : []
+                          }
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <section>
+                          <div className="team-profile-section-head">
+                            <div>
+                              <h2>Campanhas</h2>
+                              <p>
+                                {yearRows.length} disputas em {year}
+                              </p>
+                            </div>
+                          </div>
+                          <Campaigns rows={yearRows} link={contextualLink} />
+                        </section>
+                        {lastGames}
+                        <Legend entries={campaignLegend} />
+                      </>
+                    )
+                  ) : view.section === "competicoes" ? (
                     <>
                       <div className="team-profile-section-head">
-                        <h2>Classificação</h2>
-                        <Status p={selected} />
+                        <h2 className="sr-only">
+                          Participações em competições
+                        </h2>
                       </div>
-                      {selected.standings ? (
-                        <PublicStandingsTables
-                          value={selected.standings}
-                          profile={{
-                            teamId: profile.teamId,
-                            registrationId: selected.registrationId,
-                          }}
-                          publishedRegistrationIds={
-                            new Set(
-                              selected.catalog.flatMap((g) => [
-                                g.game.home.registrationId,
-                                g.game.away.registrationId,
-                              ]),
-                            )
-                          }
-                        />
-                      ) : (
-                        <p>Classificação ainda indisponível nesta disputa.</p>
-                      )}
-                      <CollectivePanel
-                        participation={selected}
-                        query={view.params.get("coletivos") ?? ""}
-                        change={(q) => update({ coletivos: q })}
-                        after={lastGames}
-                        extraLegend={
-                          selected.standings &&
-                          standingsSelection(selected.standings, view.params)
-                            .stage === "classificatoria"
-                            ? [
-                                { label: "Pos.", name: "Posição" },
-                                standingsMetricLegend[0],
-                                ...campaignLegend,
-                                standingsMetricLegend[1],
-                              ]
-                            : []
-                        }
+                      {filters}
+                      <Campaigns
+                        rows={filter(profile.participations).filter(
+                          (p) =>
+                            !view.params.get("anoHistorico") ||
+                            String(p.context.year) ===
+                              view.params.get("anoHistorico"),
+                        )}
+                        link={contextualLink}
                       />
-                    </>
-                  ) : (
-                    <>
-                      <section>
-                        <div className="team-profile-section-head">
-                          <div>
-                            <h2>Campanhas</h2>
-                            <p>
-                              {yearRows.length} disputas em {year}
-                            </p>
-                          </div>
-                        </div>
-                        <Campaigns rows={yearRows} link={contextualLink} />
-                      </section>
-                      {lastGames}
                       <Legend entries={campaignLegend} />
                     </>
-                  )
-                ) : view.section === "competicoes" ? (
-                  <>
-                    <div className="team-profile-section-head">
-                      <h2 className="sr-only">Participações em competições</h2>
-                    </div>
-                    {filters}
-                    <Campaigns
-                      rows={filter(profile.participations).filter(
-                        (p) =>
-                          !view.params.get("anoHistorico") ||
-                          String(p.context.year) ===
-                            view.params.get("anoHistorico"),
-                      )}
-                      link={contextualLink}
-                    />
-                    <Legend entries={campaignLegend} />
-                  </>
-                ) : view.section === "jogadores" && selected ? (
-                  <>
-                    <h2 className="sr-only">Jogadores</h2>
-                    <PlayersPanel
-                      key={selected.registrationId}
-                      participation={selected}
-                      query={view.params.get("jogadores") ?? ""}
-                      change={(q) => update({ jogadores: q })}
-                    />
-                  </>
-                ) : view.section === "elencos" ? (
-                  <>
-                    <div className="team-profile-section-head">
-                      <h2 className="sr-only">Elencos por participação</h2>
-                    </div>
-                    <div
-                      className={`team-profile-rosters ${view.params.has("elenco") ? "has-selection" : ""}`}
-                    >
-                      <nav
-                        ref={rosterNav}
-                        aria-label="Participações para consultar jogadores"
-                      >
-                        {yearRows.map((p) => (
-                          <a
-                            key={`${p.disputeId}/${p.registrationId}`}
-                            data-registration={p.registrationId}
-                            onClick={(e) => {
-                              if (
-                                e.button === 0 &&
-                                !e.ctrlKey &&
-                                !e.metaKey &&
-                                !e.shiftKey &&
-                                !e.altKey
-                              )
-                                rosterReturn.current = {
-                                  y: window.scrollY,
-                                  top: rosterNav.current?.scrollTop ?? 0,
-                                  id: p.registrationId,
-                                };
-                            }}
-                            aria-current={
-                              view.params.get("elenco") === p.registrationId
-                                ? "true"
-                                : undefined
-                            }
-                            href={localHref(
-                              new URLSearchParams({
-                                ...Object.fromEntries(view.params),
-                                elenco: p.registrationId,
-                              }),
-                            )}
-                          >
-                            <strong>{p.context.name}</strong>
-                            <small>
-                              {p.context.category} · {gender(p.context.gender)}{" "}
-                              · {p.name}
-                            </small>
-                          </a>
-                        ))}
-                      </nav>
-                      <div className="team-profile-roster-detail">
-                        {(() => {
-                          const p =
-                            yearRows.find(
-                              (p) =>
-                                p.registrationId === view.params.get("elenco"),
-                            ) ?? yearRows[0];
-                          return p ? (
-                            <>
-                              <button
-                                className="team-profile-mobile-back"
-                                onClick={() => update({ elenco: null })}
-                              >
-                                Voltar às participações
-                              </button>
-                              <h3>{p.context.name}</h3>
-                              <p>
-                                {p.context.year} · {p.context.category} ·{" "}
-                                {gender(p.context.gender)}
-                              </p>
-                              <PlayersPanel
-                                key={p.registrationId}
-                                participation={p}
-                                query={view.params.get("jogadores") ?? ""}
-                                change={(q) => update({ jogadores: q })}
-                              />
-                            </>
-                          ) : (
-                            <p>Nenhum participante publicado.</p>
-                          );
-                        })()}
+                  ) : view.section === "jogadores" && selected ? (
+                    <>
+                      <h2 className="sr-only">Jogadores</h2>
+                      <PlayersPanel
+                        key={selected.registrationId}
+                        participation={selected}
+                        query={view.params.get("jogadores") ?? ""}
+                        change={(q) => update({ jogadores: q })}
+                      />
+                    </>
+                  ) : view.section === "elencos" ? (
+                    <>
+                      <div className="team-profile-section-head">
+                        <h2 className="sr-only">Elencos por participação</h2>
                       </div>
-                    </div>
-                  </>
-                ) : view.section === "estatisticas" ? (
-                  <>
-                    <div className="team-profile-section-head">
-                      <h2 className="sr-only">Estatísticas por participação</h2>
-                    </div>
-                    {filters}
-                    <div className="team-profile-mode-toolbar">
-                      <ModeButtons
-                        value={view.params.get("mode") ?? "per-game"}
-                        onChange={(mode) => update({ mode })}
-                      />
-                    </div>
-                    <ParticipationStatistics
-                      participations={filter(yearRows)}
-                      mode={
-                        view.params.get("mode") === "total"
-                          ? "total"
-                          : "per-game"
-                      }
-                      link={contextualLink}
-                    />
-                  </>
-                ) : view.section === "jogos" ? (
-                  <>
-                    <div className="team-profile-section-head">
-                      <h2 className="sr-only">Jogos</h2>
-                    </div>
-                    {!contextual && filters}
-                    <div className="team-profile-toolbar">
-                      <Select
-                        label="Exibir"
-                        value={view.params.get("tipoJogos") ?? ""}
-                        values={["Resultados", "Agenda"]}
-                        all="Resultados e agenda"
-                        onChange={(v) => update({ tipoJogos: v })}
-                      />
-                      <label className="grow">
-                        Adversário
-                        <input
-                          type="search"
-                          value={view.params.get("adversario") ?? ""}
-                          placeholder="Buscar adversário…"
-                          onChange={(e) =>
-                            update({ adversario: e.target.value })
-                          }
+                      <div
+                        className={`team-profile-rosters ${view.params.has("elenco") ? "has-selection" : ""}`}
+                      >
+                        <nav
+                          ref={rosterNav}
+                          aria-label="Participações para consultar jogadores"
+                        >
+                          {yearRows.map((p) => (
+                            <a
+                              key={`${p.disputeId}/${p.registrationId}`}
+                              data-registration={p.registrationId}
+                              onClick={(e) => {
+                                if (
+                                  e.button === 0 &&
+                                  !e.ctrlKey &&
+                                  !e.metaKey &&
+                                  !e.shiftKey &&
+                                  !e.altKey
+                                )
+                                  rosterReturn.current = {
+                                    y: window.scrollY,
+                                    top: rosterNav.current?.scrollTop ?? 0,
+                                    id: p.registrationId,
+                                  };
+                              }}
+                              aria-current={
+                                view.params.get("elenco") === p.registrationId
+                                  ? "true"
+                                  : undefined
+                              }
+                              href={localHref(
+                                new URLSearchParams({
+                                  ...Object.fromEntries(view.params),
+                                  elenco: p.registrationId,
+                                }),
+                              )}
+                            >
+                              <strong>{p.context.name}</strong>
+                              <small>
+                                {p.context.category} ·{" "}
+                                {gender(p.context.gender)} · {p.name}
+                              </small>
+                            </a>
+                          ))}
+                        </nav>
+                        <div className="team-profile-roster-detail">
+                          {(() => {
+                            const p =
+                              yearRows.find(
+                                (p) =>
+                                  p.registrationId ===
+                                  view.params.get("elenco"),
+                              ) ?? yearRows[0];
+                            return p ? (
+                              <>
+                                <button
+                                  className="team-profile-mobile-back"
+                                  onClick={() => update({ elenco: null })}
+                                >
+                                  Voltar às participações
+                                </button>
+                                <h3>{p.context.name}</h3>
+                                <p>
+                                  {p.context.year} · {p.context.category} ·{" "}
+                                  {gender(p.context.gender)}
+                                </p>
+                                <PlayersPanel
+                                  key={p.registrationId}
+                                  participation={p}
+                                  query={view.params.get("jogadores") ?? ""}
+                                  change={(q) => update({ jogadores: q })}
+                                />
+                              </>
+                            ) : (
+                              <p>Nenhum participante publicado.</p>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </>
+                  ) : view.section === "estatisticas" ? (
+                    <>
+                      <div className="team-profile-section-head">
+                        <h2 className="sr-only">
+                          Estatísticas por participação
+                        </h2>
+                      </div>
+                      {filters}
+                      <div className="team-profile-mode-toolbar">
+                        <ModeButtons
+                          value={view.params.get("mode") ?? "per-game"}
+                          onChange={(mode) => update({ mode })}
                         />
-                      </label>
-                    </div>
-                    <GamesTable
-                      games={currentGames.filter((g) => {
-                        const text = (view.params.get("adversario") ?? "")
-                          .normalize("NFD")
-                          .replace(/\p{M}/gu, "")
-                          .toLowerCase();
-                        const names = `${g.home} ${g.away}`
-                          .normalize("NFD")
-                          .replace(/\p{M}/gu, "")
-                          .toLowerCase();
-                        return (
-                          names.includes(text) &&
-                          (!view.params.get("tipoJogos") ||
-                            (view.params.get("tipoJogos") === "Resultados"
-                              ? !!g.score
-                              : !g.score)) &&
-                          (contextual ||
-                            ((!category || g.context.category === category) &&
-                              (!naipe || g.context.gender === naipe) &&
-                              (!competition ||
-                                g.context.championshipId === competition)))
-                        );
-                      })}
-                    />
-                  </>
-                ) : null}
+                      </div>
+                      <ParticipationStatistics
+                        participations={filter(yearRows)}
+                        mode={
+                          view.params.get("mode") === "total"
+                            ? "total"
+                            : "per-game"
+                        }
+                        link={contextualLink}
+                      />
+                    </>
+                  ) : view.section === "jogos" ? (
+                    <>
+                      <div className="team-profile-section-head">
+                        <h2 className="sr-only">Jogos</h2>
+                      </div>
+                      {!contextual && filters}
+                      <div className="team-profile-toolbar">
+                        <Select
+                          label="Exibir"
+                          value={view.params.get("tipoJogos") ?? ""}
+                          values={["Resultados", "Agenda"]}
+                          all="Resultados e agenda"
+                          onChange={(v) => update({ tipoJogos: v })}
+                        />
+                        <label className="grow bb-query-field">
+                          <span className="bb-query-label">Adversário</span>
+                          <SearchInput
+                            type="search"
+                            value={view.params.get("adversario") ?? ""}
+                            placeholder="Buscar adversário…"
+                            onChange={(e) =>
+                              update({ adversario: e.target.value })
+                            }
+                          />
+                        </label>
+                      </div>
+                      <GamesTable
+                        games={currentGames.filter((g) => {
+                          const text = (view.params.get("adversario") ?? "")
+                            .normalize("NFD")
+                            .replace(/\p{M}/gu, "")
+                            .toLowerCase();
+                          const names = `${g.home} ${g.away}`
+                            .normalize("NFD")
+                            .replace(/\p{M}/gu, "")
+                            .toLowerCase();
+                          return (
+                            names.includes(text) &&
+                            (!view.params.get("tipoJogos") ||
+                              (view.params.get("tipoJogos") === "Resultados"
+                                ? !!g.score
+                                : !g.score)) &&
+                            (contextual ||
+                              ((!category || g.context.category === category) &&
+                                (!naipe || g.context.gender === naipe) &&
+                                (!competition ||
+                                  g.context.championshipId === competition)))
+                          );
+                        })}
+                      />
+                    </>
+                  ) : null}
+                </QueryTableLayout>
               </TabPanel>
             </div>
           </div>

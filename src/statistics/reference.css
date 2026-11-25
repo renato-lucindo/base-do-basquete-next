@@ -1919,3 +1919,60 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
 .public-site.statistics-public .statistics-table thead th:last-child {
   border-inline-end: 1px solid var(--public-line);
 }
+
+/* Metric headers own their reserve; local table selectors cannot shrink it. */
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  thead
+  th.bb-metric-column {
+  min-inline-size: calc(var(--bb-number-width, 8ch) + 2rem);
+  text-align: center;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  th.bb-metric-column
+  > button {
+  display: grid;
+  grid-template-columns: 1em minmax(0, 1fr) 1em;
+  justify-content: stretch;
+  gap: 0;
+}
+
+/* Identity reserves keep the same geometry when another page leads the ranking. */
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(.reference-player, .statistics-player) {
+  min-width: 14.25rem;
+  width: 14.25rem;
+  max-width: 14.25rem;
+}
+.public-site.statistics-public .reference-explorer .reference-player .player {
+  width: 12.5rem;
+  max-width: 12.5rem;
+  overflow-wrap: anywhere;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table
+  :is(.team-name, .team-column-header) {
+  min-width: 10rem;
+  width: 10rem;
+  max-width: 10rem;
+}
+@media (max-width: 600px) {
+  .public-site.statistics-public
+    .reference-explorer
+    .statistics-table
+    :is(.reference-player, .statistics-player) {
+    min-width: 11.875rem;
+    width: 11.875rem;
+    max-width: 11.875rem;
+  }
+  .public-site.statistics-public .reference-explorer .reference-player .player {
+    width: 10.125rem;
+    max-width: 10.125rem;
+  }
+}

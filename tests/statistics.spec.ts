@@ -2,6 +2,139 @@ import { test, expect } from "@playwright/test";
 import { statisticsBrowserFixture } from "./fixtures/statistics-browser";
 import { regulationBrowserFixture } from "./fixtures/regulation-browser";
 import { tid } from "./fixtures/text-import";
+import {
+  buildStatisticsPage,
+  parseStatisticsQuery,
+} from "../src/statistics/query";
+
+for (const withBoxscore of [false, true]) {
+  test(`colunas estáveis, siglas centrais e filtros acessíveis: boxscore=${withBoxscore}`, async ({
+    page,
+  }, info) => {
+    const f = await statisticsBrowserFixture(page, { withBoxscore });
+    await page.route("**/api/public/statistics/**", async (route) => {
+      const query = parseStatisticsQuery(
+        new URL(route.request().url()).searchParams,
+      );
+      const data = buildStatisticsPage(f.source, query);
+      for (const row of data.rows) {
+        if (withBoxscore)
+          row.metrics.plusMinus = {
+            status: "available",
+            value:
+              query.mode === "per-game"
+                ? -12345678 / Math.max(row.coverage.plusMinusGames, 1)
+                : -12345678,
+          };
+        row.metrics.points = { status: "available", value: 12345678 };
+        row.metrics.twoMade = {
+          status: "available",
+          value:
+            query.mode === "per-game"
+              ? 12345678 / Math.max(row.gamesPlayed, 1)
+              : 12345678,
+        };
+      }
+      await route.fulfill({ json: data });
+    });
+    await page.goto(
+      f.url + "&mode=total" + (withBoxscore ? "&preset=all" : ""),
+    );
+    const table = page.getByRole("table", {
+      name: "Estatísticas dos atletas",
+      exact: true,
+    });
+    await expect(table).toBeVisible();
+    const clear = page.getByRole("button", {
+      name: "Limpar filtros",
+      exact: true,
+    });
+    await expect(clear).toHaveCount(0);
+    const measure = () =>
+      table.locator("thead th").evaluateAll((items) =>
+        items.map((el) => ({
+          x: el.getBoundingClientRect().x,
+          width: el.getBoundingClientRect().width,
+        })),
+      );
+    const before = await measure();
+    await page.getByRole("button", { name: "Por jogo", exact: true }).click();
+    await expect(
+      page.locator('[aria-label="Resultado da consulta"]'),
+    ).toHaveAttribute("aria-busy", "false");
+    await expect(table.locator("tbody")).toContainText("12.345.678");
+    const after = await measure();
+    expect(after.length).toBe(before.length);
+    after.forEach((value, index) => {
+      expect(Math.abs(value.width - before[index].width)).toBeLessThan(1);
+      expect(Math.abs(value.x - before[index].x)).toBeLessThan(1);
+    });
+    for (const th of await table.locator("th.bb-metric-column").all()) {
+      await expect(th).toHaveCSS("text-align", "center");
+      const delta = await th.evaluate((el) => {
+        const label = el
+            .querySelector("button > span")!
+            .getBoundingClientRect(),
+          cell = el.getBoundingClientRect();
+        return Math.abs(label.x + label.width / 2 - cell.x - cell.width / 2);
+      });
+      expect(delta).toBeLessThan(2);
+    }
+    await expect(clear).toHaveCount(0);
+    await table
+      .getByRole("button", { name: "Ordenar por J (Jogos)", exact: true })
+      .click();
+    await expect(
+      table.getByRole("columnheader", { name: "Jogos", exact: true }),
+    ).toHaveAttribute("aria-sort", "descending");
+    const sorted = await measure();
+    sorted.forEach((value, index) => {
+      expect(Math.abs(value.width - after[index].width)).toBeLessThan(1);
+      expect(Math.abs(value.x - after[index].x)).toBeLessThan(1);
+    });
+    await expect(clear).toHaveCount(0);
+    const columnPicker = page.locator(".column-picker");
+    await columnPicker.getByRole("button", { name: /Colunas/ }).click();
+    await columnPicker
+      .getByRole("checkbox", { name: "GD · Desqualificações", exact: true })
+      .uncheck();
+    await page.keyboard.press("Escape");
+    await expect(
+      table.locator('th[data-public-metric="disqualifications"]'),
+    ).toHaveCount(0);
+    await expect(clear).toHaveCount(0);
+    const search = page.getByRole("searchbox", {
+      name: "Buscar atleta ou equipe",
+    });
+    await expect(search).toHaveAttribute("placeholder", "Nome do atleta");
+    await expect(page.locator(".search-field svg").first()).toBeVisible();
+    await expect(page.locator(".local-search-label").locator("..")).toHaveCSS(
+      "position",
+      "absolute",
+    );
+    await search.fill("inexistente");
+    await search.press("Enter");
+    await expect(clear.first()).toBeVisible();
+    await clear.first().click();
+    await expect(search).toHaveValue("");
+    await expect(clear).toHaveCount(0);
+    await expect(
+      table.locator('th[data-public-metric="disqualifications"]'),
+    ).toHaveCount(0);
+    await expect(
+      table.getByRole("columnheader", { name: "Jogos", exact: true }),
+    ).toHaveAttribute("aria-sort", "descending");
+    await expect(
+      page.getByRole("button", { name: "Por jogo", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    const screenshot = info.outputPath("consulta.png");
+    await page.screenshot({ path: screenshot, fullPage: true });
+    await info.attach("consulta-estatisticas", {
+      path: screenshot,
+      contentType: "image/png",
+    });
+  });
+}
 
 test("nome corrigido é único na tabela e tooltip; células e equipes não têm tooltip", async ({
   page,

@@ -184,7 +184,7 @@ Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre 
 
 ### Classificação e situação — ajuste de23/11/2026
 
-Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica abaixo do breadcrumb hierárquico da disputa, em selo discreto com indicador e os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.
+Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica abaixo do breadcrumb hierárquico da disputa, em texto de14px com ponto e anel, sem badge, usando os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.
 
 ### Consistência pública —24/11/2026
 
@@ -204,3 +204,5 @@ Breadcrumb na ordem Campeonato › Ano › Naipe › Categoria · Divisão, some
 Situação abaixo da hierarquia, sem badge, fundo ou borda: texto de14px, menor que breadcrumb16px, acompanhado de ponto com anel externo e cor semântica. Cor não substitui o texto. Estes refinamentos substituem o painel expandido no fluxo e o status em badge do cabeçalho; não alteram badges administrativos.
 
 O perfil geral e o da disputa seguem [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md#refinamento-permanente-aprovado-em-24112026). Ano na barra de abas e Participação central são padrões específicos do perfil geral; identificação textual de outras tabelas continua à esquerda.
+
+Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado em25/11/2026](PADROES.md#consultas-e-métricas--padrão-de-25112026). Esta decisão substitui a apresentação lateral anterior dos filtros; formulários de entrada de dados preservam rótulos visíveis.

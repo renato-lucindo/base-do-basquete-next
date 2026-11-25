@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useState, useId, useEffect } from "react";
 import { changeSheetJersey } from "./sheet-identity";
 import type {
@@ -108,7 +109,7 @@ function AthletePicker({
   };
   return (
     <div className="sheet-athlete-picker">
-      <input
+      <SearchInput
         role="combobox"
         aria-label={label}
         aria-autocomplete="list"

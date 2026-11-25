@@ -1,0 +1,32 @@
+/* Numeric reserves are shared by total/average views; text keeps its own width. */
+.bb-metric-column {
+  --bb-number-width: 8ch;
+  min-inline-size: calc(var(--bb-number-width) + 2rem);
+  font-variant-numeric: tabular-nums;
+}
+.bb-metric-column[data-metric-kind="percent"] {
+  --bb-number-width: 7ch;
+}
+.bb-metric-column[data-metric-kind="signed"] {
+  --bb-number-width: 9ch;
+}
+table thead th.bb-metric-column {
+  text-align: center;
+}
+th.bb-metric-column > :is(button, .statistics-sort) {
+  display: grid;
+  grid-template-columns: 1em minmax(0, 1fr) 1em;
+  align-items: center;
+  width: 100%;
+  justify-content: stretch;
+  text-align: center;
+  gap: 0;
+}
+th.bb-metric-column > :is(button, .statistics-sort) > span:first-child {
+  grid-column: 2;
+}
+th.bb-metric-column .sort-arrow {
+  grid-column: 3;
+  width: 1em;
+  margin: 0;
+}

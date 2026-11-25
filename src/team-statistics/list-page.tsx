@@ -1,3 +1,6 @@
+import "../ui-system/query-controls.css";
+import { QueryTableLayout } from "../ui-system/query-table-layout";
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure } from "../competition/api";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
@@ -218,248 +221,281 @@ export function TeamsListPublicPage() {
         <h1 className="sr-only">Equipes</h1>
         {id && (
           <div className="public-site statistics-public">
-            <div className="team-list-filters">
-              <label className="search-field">
-                Buscar equipe ou inscrição
-                <input
-                  type="search"
-                  name="q"
-                  autoComplete="off"
-                  maxLength={80}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </label>
-              <TeamFilter
-                options={options.map((o) => ({
-                  id: o.registrationId,
-                  name: o.name,
-                }))}
-                value={selected}
-                onChange={(ids) =>
-                  change({
-                    selection:
-                      ids.length === options.length
-                        ? "all"
-                        : ids.length
-                          ? "custom"
-                          : "none",
-                    registrationIds: ids.length === options.length ? [] : ids,
-                  })
-                }
-              />
-              <div className="team-list-segments">
-                <Segments
-                  label="Escopo"
-                  value={q.scope}
-                  options={[
-                    ["all", "Todos"],
-                    ["regular", "Fase regular"],
-                    ["playoffs", "Eliminatórias"],
-                  ]}
-                  onChange={(scope) => change({ scope })}
-                />
-                <Segments
-                  label="Modo"
-                  value={q.mode}
-                  options={[
-                    ["total", "Totais"],
-                    ["per-game", "Por jogo"],
-                  ]}
-                  onChange={(mode) => change({ mode })}
-                />
-              </div>
-              {data?.hasBoxscore && (
-                <label>
-                  Dados
-                  <select
-                    value={q.dataset}
-                    onChange={(e) =>
-                      change({
-                        dataset: e.target.value as TeamsListQuery["dataset"],
-                      })
-                    }
-                  >
-                    <option value="all">Todos os resultados</option>
-                    <option value="boxscore">Boxscores com estatísticas</option>
-                  </select>
+            <QueryTableLayout>
+              <div className="team-list-filters">
+                <label className="search-field bb-query-field">
+                  <span className="bb-query-label">
+                    Buscar equipe ou inscrição
+                  </span>
+                  <SearchInput
+                    placeholder="Buscar equipe ou inscrição…"
+                    type="search"
+                    name="q"
+                    autoComplete="off"
+                    maxLength={80}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
                 </label>
+                <TeamFilter
+                  options={options.map((o) => ({
+                    id: o.registrationId,
+                    name: o.name,
+                  }))}
+                  value={selected}
+                  onChange={(ids) =>
+                    change({
+                      selection:
+                        ids.length === options.length
+                          ? "all"
+                          : ids.length
+                            ? "custom"
+                            : "none",
+                      registrationIds: ids.length === options.length ? [] : ids,
+                    })
+                  }
+                />
+                <div className="team-list-segments">
+                  <Segments
+                    label="Escopo"
+                    value={q.scope}
+                    options={[
+                      ["all", "Todos"],
+                      ["regular", "Fase regular"],
+                      ["playoffs", "Eliminatórias"],
+                    ]}
+                    onChange={(scope) => change({ scope })}
+                  />
+                  <Segments
+                    label="Modo"
+                    value={q.mode}
+                    options={[
+                      ["total", "Totais"],
+                      ["per-game", "Por jogo"],
+                    ]}
+                    onChange={(mode) => change({ mode })}
+                  />
+                </div>
+                {data?.hasBoxscore && (
+                  <label className="bb-query-field">
+                    <span className="bb-query-label">Dados</span>
+                    <select
+                      value={q.dataset}
+                      onChange={(e) =>
+                        change({
+                          dataset: e.target.value as TeamsListQuery["dataset"],
+                        })
+                      }
+                    >
+                      <option value="all">Todos os resultados</option>
+                      <option value="boxscore">
+                        Boxscores com estatísticas
+                      </option>
+                    </select>
+                  </label>
+                )}
+                {data?.hasBoxscore && (
+                  <details
+                    className="team-advanced-controls"
+                    open={advanced}
+                    onToggle={(e) => {
+                      const open = e.currentTarget.open;
+                      setAdvanced(open);
+                      try {
+                        sessionStorage.setItem(
+                          "team-advanced-open",
+                          String(open),
+                        );
+                      } catch {
+                        /* Panel still works. */
+                      }
+                    }}
+                  >
+                    <summary>Mais opções</summary>
+                    <label className="bb-query-field">
+                      <span className="bb-query-label">Colunas</span>
+                      <select
+                        value={q.preset}
+                        onChange={(e) => {
+                          const preset = e.target
+                            .value as TeamsListQuery["preset"];
+                          change({
+                            preset,
+                            columns:
+                              preset === "all"
+                                ? [...LIST_METRIC_KEYS]
+                                : [
+                                    ...TEAM_COLUMN_PRESETS[
+                                      preset === "custom"
+                                        ? "essentials"
+                                        : preset
+                                    ],
+                                  ],
+                          });
+                        }}
+                      >
+                        <option value="essentials">Essenciais</option>
+                        <option value="boxscore">Boxscore</option>
+                        <option value="all">Todas as colunas</option>
+                        <option value="custom">Personalizadas</option>
+                      </select>
+                    </label>
+                    <label className="bb-query-field">
+                      <span className="bb-query-label">Ordenar por</span>
+                      <select
+                        value={q.sort}
+                        onChange={(e) =>
+                          change({
+                            sort: e.target.value as TeamsListQuery["sort"],
+                          })
+                        }
+                      >
+                        <option value="name">Inscrição</option>
+                        <option value="pointsFor">Pontos a favor</option>
+                        {LIST_METRIC_KEYS.map((key) => (
+                          <option key={key} value={key}>
+                            {listMetric(key).name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="bb-query-field">
+                      <span className="bb-query-label">Direção</span>
+                      <select
+                        value={q.direction}
+                        onChange={(e) =>
+                          change({
+                            direction: e.target
+                              .value as TeamsListQuery["direction"],
+                          })
+                        }
+                      >
+                        <option value="asc">Crescente</option>
+                        <option value="desc">Decrescente</option>
+                      </select>
+                    </label>
+                  </details>
+                )}
+              </div>
+              {(route.local || notice) && (
+                <p className="team-list-notice" role="status">
+                  {notice ||
+                    "Esta seleção está guardada neste navegador e não está integralmente representada no link."}
+                </p>
               )}
-              {data?.hasBoxscore && (
-                <details
-                  className="team-advanced-controls"
-                  open={advanced}
-                  onToggle={(e) => {
-                    const open = e.currentTarget.open;
-                    setAdvanced(open);
-                    try {
-                      sessionStorage.setItem(
-                        "team-advanced-open",
-                        String(open),
-                      );
-                    } catch {
-                      /* Panel still works. */
-                    }
+              {withoutResults ? (
+                <section aria-label="Equipes confirmadas">
+                  <h2>Participantes confirmados</h2>
+                  <ul className="public-results">
+                    {options
+                      .filter(
+                        (o) =>
+                          selected.includes(o.registrationId) &&
+                          o.name
+                            .normalize("NFD")
+                            .replace(/\p{M}/gu, "")
+                            .toLocaleLowerCase("pt-BR")
+                            .includes(
+                              q.search
+                                .normalize("NFD")
+                                .replace(/\p{M}/gu, "")
+                                .toLocaleLowerCase("pt-BR"),
+                            ),
+                      )
+                      .map((o) => (
+                        <li key={o.registrationId}>{o.name}</li>
+                      ))}
+                  </ul>
+                  <p>Nenhum resultado estatístico publicado nesta disputa.</p>
+                </section>
+              ) : (
+                error && (
+                  <div role="alert">
+                    <p>{error}</p>
+                    <button
+                      type="button"
+                      onClick={() => setRetry((n) => n + 1)}
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
+                )
+              )}
+              {(q.search.trim() ||
+                q.selection !== "all" ||
+                q.scope !== "all" ||
+                q.dataset !== "all") && (
+                <button
+                  type="button"
+                  className="clear-button"
+                  onClick={() => {
+                    setSearch("");
+                    change({
+                      search: "",
+                      selection: "all",
+                      registrationIds: [],
+                      scope: "all",
+                      dataset: "all",
+                    });
                   }}
                 >
-                  <summary>Mais opções</summary>
-                  <label>
-                    Colunas
-                    <select
-                      value={q.preset}
-                      onChange={(e) => {
-                        const preset = e.target
-                          .value as TeamsListQuery["preset"];
+                  Limpar filtros
+                </button>
+              )}
+              <div
+                className="statistics-results-block team-list-results"
+                data-sheet-only={data?.scoresheet || undefined}
+              >
+                <span className="sr-only" role="status">
+                  {loading
+                    ? "Consultando…"
+                    : data
+                      ? `${data.total} inscrições`
+                      : ""}
+                </span>
+                {data?.hasBoxscore && (
+                  <div className="table-toolbar">
+                    <ColumnPicker
+                      options={LIST_METRIC_KEYS.map((key) => ({
+                        key,
+                        ...listMetric(key),
+                      }))}
+                      value={q.columns}
+                      identityNote="A equipe e a posição estatística ficam sempre visíveis."
+                      onChange={(columns) =>
                         change({
-                          preset,
-                          columns:
-                            preset === "all"
-                              ? [...LIST_METRIC_KEYS]
-                              : [
-                                  ...TEAM_COLUMN_PRESETS[
-                                    preset === "custom" ? "essentials" : preset
-                                  ],
-                                ],
-                        });
-                      }}
-                    >
-                      <option value="essentials">Essenciais</option>
-                      <option value="boxscore">Boxscore</option>
-                      <option value="all">Todas</option>
-                      <option value="custom">Personalizadas</option>
-                    </select>
-                  </label>
-                  <label>
-                    Ordenar por
-                    <select
-                      value={q.sort}
-                      onChange={(e) =>
-                        change({
-                          sort: e.target.value as TeamsListQuery["sort"],
+                          columns: columns as TeamsListQuery["columns"],
+                          preset: "custom",
                         })
                       }
-                    >
-                      <option value="name">Inscrição</option>
-                      <option value="pointsFor">Pontos a favor</option>
-                      {LIST_METRIC_KEYS.map((key) => (
-                        <option key={key} value={key}>
-                          {listMetric(key).name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    Direção
-                    <select
-                      value={q.direction}
-                      onChange={(e) =>
+                    />
+                  </div>
+                )}
+                {data && (
+                  <div aria-busy={loading}>
+                    <TeamsListTable
+                      canNavigate={!notice || key.length <= 1800}
+                      data={data}
+                      onSort={(sort) =>
                         change({
-                          direction: e.target
-                            .value as TeamsListQuery["direction"],
+                          sort,
+                          direction:
+                            sort === q.sort
+                              ? q.direction === "asc"
+                                ? "desc"
+                                : "asc"
+                              : sort === "name" ||
+                                  (sort !== "pointsFor" &&
+                                    listMetric(sort).lowerIsBetter)
+                                ? "asc"
+                                : "desc",
                         })
                       }
-                    >
-                      <option value="asc">Crescente</option>
-                      <option value="desc">Decrescente</option>
-                    </select>
-                  </label>
-                </details>
-              )}
-            </div>
-            {(route.local || notice) && (
-              <p className="team-list-notice" role="status">
-                {notice ||
-                  "Esta seleção está guardada neste navegador e não está integralmente representada no link."}
-              </p>
-            )}
-            {withoutResults ? (
-              <section aria-label="Equipes confirmadas">
-                <h2>Participantes confirmados</h2>
-                <ul className="public-results">
-                  {options
-                    .filter(
-                      (o) =>
-                        selected.includes(o.registrationId) &&
-                        o.name
-                          .normalize("NFD")
-                          .replace(/\p{M}/gu, "")
-                          .toLocaleLowerCase("pt-BR")
-                          .includes(
-                            q.search
-                              .normalize("NFD")
-                              .replace(/\p{M}/gu, "")
-                              .toLocaleLowerCase("pt-BR"),
-                          ),
-                    )
-                    .map((o) => (
-                      <li key={o.registrationId}>{o.name}</li>
-                    ))}
-                </ul>
-                <p>Nenhum resultado estatístico publicado nesta disputa.</p>
-              </section>
-            ) : (
-              error && (
-                <div role="alert">
-                  <p>{error}</p>
-                  <button type="button" onClick={() => setRetry((n) => n + 1)}>
-                    Tentar novamente
-                  </button>
-                </div>
-              )
-            )}
-            <div
-              className="statistics-results-block team-list-results"
-              data-sheet-only={data?.scoresheet || undefined}
-            >
-              <span className="sr-only" role="status">
-                {loading
-                  ? "Consultando…"
-                  : data
-                    ? `${data.total} inscrições`
-                    : ""}
-              </span>
-              {data?.hasBoxscore && (
-                <div className="table-toolbar">
-                  <ColumnPicker
-                    options={LIST_METRIC_KEYS.map((key) => ({
-                      key,
-                      ...listMetric(key),
-                    }))}
-                    value={q.columns}
-                    identityNote="A equipe e a posição estatística ficam sempre visíveis."
-                    onChange={(columns) =>
-                      change({
-                        columns: columns as TeamsListQuery["columns"],
-                        preset: "custom",
-                      })
-                    }
-                  />
-                </div>
-              )}
-              {data && (
-                <div aria-busy={loading}>
-                  <TeamsListTable
-                    canNavigate={!notice || key.length <= 1800}
-                    data={data}
-                    onSort={(sort) =>
-                      change({
-                        sort,
-                        direction:
-                          sort === q.sort
-                            ? q.direction === "asc"
-                              ? "desc"
-                              : "asc"
-                            : sort === "name" ||
-                                (sort !== "pointsFor" &&
-                                  listMetric(sort).lowerIsBetter)
-                              ? "asc"
-                              : "desc",
-                      })
-                    }
-                  />
-                </div>
-              )}
-            </div>
+                    />
+                  </div>
+                )}
+              </div>
+            </QueryTableLayout>
           </div>
         )}
         {!id && <p role="alert">{route.error}</p>}

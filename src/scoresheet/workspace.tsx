@@ -409,8 +409,8 @@ export function ScoresheetWorkspace({
                       <th>Atleta</th>
                       <th>Titular</th>
                       <th>Jogou</th>
-                      <th>PTS</th>
-                      <th>FC</th>
+                      <th className="bb-metric-column">PTS</th>
+                      <th className="bb-metric-column">FC</th>
                       <th>Situação</th>
                     </tr>
                   </thead>

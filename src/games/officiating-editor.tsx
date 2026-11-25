@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState } from "react";
 import { api, isSessionFailure } from "../competition/api";
 import { useAnchoredOptions } from "../competition/anchored-options";
@@ -243,7 +244,7 @@ function OfficialPicker({
     >
       <label htmlFor={id}>{label}</label>
       <div className="official-input">
-        <input
+        <SearchInput
           ref={anchor}
           id={id}
           name={label}

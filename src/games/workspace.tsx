@@ -1,3 +1,5 @@
+import "../ui-system/query-controls.css";
+import { SearchInput } from "../ui-system/query-controls";
 import { GameFormatAssignment } from "./format-assignment";
 import { GameVisibilityPanel } from "./visibility-panel";
 import { flexibleCompetitionEnabled } from "../competition/features";
@@ -702,23 +704,24 @@ export function GamesWorkspace(props: Props) {
               role="group"
               aria-label="Filtros dos jogos"
             >
-              <label>
-                Buscar jogo
-                <input
+              <label className="bb-query-field">
+                <span className="bb-query-label">Buscar jogo</span>
+                <SearchInput
+                  placeholder="Buscar jogo…"
                   maxLength={120}
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                 />
               </label>
-              <label>
-                Equipe
+              <label className="bb-query-field">
+                <span className="bb-query-label">Equipe</span>
                 <select
                   value={filters.teamId ?? ""}
                   onChange={(e) =>
                     changeListFilters({ teamId: e.target.value || null })
                   }
                 >
-                  <option value="">Todas</option>
+                  <option value="">Todas as equipes</option>
                   {teams.map((team) => (
                     <option key={team.id} value={team.id}>
                       {team.name}
@@ -726,8 +729,8 @@ export function GamesWorkspace(props: Props) {
                   ))}
                 </select>
               </label>
-              <label>
-                Situação
+              <label className="bb-query-field">
+                <span className="bb-query-label">Situação</span>
                 <select
                   value={filters.state ?? ""}
                   onChange={(e) => {
@@ -740,14 +743,15 @@ export function GamesWorkspace(props: Props) {
                     });
                   }}
                 >
-                  <option value="">Todas</option>
+                  <option value="">Todas as situações</option>
                   <option value="finished">Resultado registrado</option>
                   <option value="scheduled">Sem resultado</option>
                 </select>
               </label>
-              <label>
-                Data
+              <label className="bb-query-field">
+                <span className="bb-query-label">Data</span>
                 <input
+                  placeholder="Data…"
                   type="date"
                   min="0001-01-01"
                   max="9999-12-31"

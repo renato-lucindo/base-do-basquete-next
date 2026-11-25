@@ -11,6 +11,14 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
     exact: true,
   });
   await expect(table.getByRole("row")).toHaveCount(3);
+  const columns = () =>
+    table.locator("thead th").evaluateAll((items) =>
+      items.map((el) => ({
+        x: el.getBoundingClientRect().x,
+        width: el.getBoundingClientRect().width,
+      })),
+    );
+  const average = await columns();
   await expect(
     table.getByRole("link", { name: "Lobos", exact: true }),
   ).toBeVisible();
@@ -21,6 +29,11 @@ test("tabela por inscrição preserva duas linhas e alterna totais/médias por t
   await totals.focus();
   await page.keyboard.press("Enter");
   await expect(totals).toBeFocused();
+  const total = await columns();
+  total.forEach((value, index) => {
+    expect(Math.abs(value.width - average[index].width)).toBeLessThan(1);
+    expect(Math.abs(value.x - average[index].x)).toBeLessThan(1);
+  });
   const lobos = table
     .getByRole("row")
     .filter({ has: page.getByRole("link", { name: "Lobos", exact: true }) });

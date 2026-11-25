@@ -89,7 +89,7 @@ export function MetricTerm({
           : `${metric === "games" ? "J" : metricLabel(metric)}: ${name}`
       }
     >
-      {metric === "games" ? "J" : metricLabel(metric)}
+      <span>{metric === "games" ? "J" : metricLabel(metric)}</span>
     </button>
   );
 }

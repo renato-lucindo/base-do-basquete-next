@@ -298,8 +298,13 @@ body {
 
 .catalog-statistics.public-site.statistics-public
   .catalog-metrics
-  :is(th:not(:first-child), td:not([colspan])) {
+  td:not([colspan]) {
   text-align: right;
+}
+.catalog-statistics.public-site.statistics-public
+  .catalog-metrics
+  th.bb-metric-column {
+  text-align: center;
 }
 
 .catalog-statistics.public-site.statistics-public .catalog-metrics td[colspan] {

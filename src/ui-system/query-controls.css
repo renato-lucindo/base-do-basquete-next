@@ -1,0 +1,86 @@
+/* Query-only presentation. Data-entry forms retain their visible labels. */
+.bb-query-label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.bb-query-field {
+  min-width: 0;
+}
+.bb-query-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+.bb-query-search > svg {
+  position: absolute;
+  inset-inline-start: 0.625rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--bb-muted);
+  pointer-events: none;
+}
+.bb-query-search > input {
+  width: 100%;
+  min-width: 0;
+  padding-inline-start: 2.25rem !important;
+  box-sizing: border-box;
+}
+.bb-query-field > :is(select, input, .bb-query-search),
+.bb-query-field > .bb-query-search > input {
+  margin-block: 0;
+}
+
+.bb-query-layout {
+  min-width: 0;
+  max-width: 100%;
+}
+.bb-query-layout[data-query-measured]
+  :is(
+    .filters,
+    .catalog-filter-bar,
+    .table-toolbar,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .team-profile-section-head,
+    .team-profile-mode-toolbar,
+    .standings-controls,
+    .public-phase-navigation
+  ) {
+  box-sizing: border-box;
+  width: min(100%, var(--bb-query-width));
+  max-width: 100%;
+  margin-inline: 0;
+}
+.bb-query-layout .bb-query-layout {
+  --bb-query-width: 100%;
+  --bb-query-offset: 0px;
+}
+.bb-query-field > select {
+  max-width: 100%;
+}
+
+.bb-query-layout[data-query-measured][data-query-alignment="center"]
+  > :is(
+    .filters,
+    .catalog-filter-bar,
+    .table-toolbar,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .team-profile-section-head,
+    .team-profile-mode-toolbar
+  ) {
+  margin-inline: auto;
+}
+.bb-query-layout :is(.team-profile-toolbar, .team-list-filters) > label {
+  min-width: 0;
+}
