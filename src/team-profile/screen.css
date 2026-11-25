@@ -807,6 +807,7 @@
   .team-profile-participation-table
   :is(th, td):first-child {
   text-align: center;
+  min-width: 12rem;
 }
 .team-profile-mode-toolbar {
   display: flex;

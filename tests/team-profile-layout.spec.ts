@@ -165,6 +165,10 @@ for (const width of [320, 390, 639, 640, 1366, 1920]) {
       ).toBeVisible();
       if (name === "Estatísticas") {
         const table = page.locator(".team-profile-participation-table");
+        for (const header of await table
+          .locator("thead th.bb-metric-column")
+          .all())
+          await expect(header).toHaveCSS("text-align", "center");
         const widths = () =>
           table
             .locator("thead th")

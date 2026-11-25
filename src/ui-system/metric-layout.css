@@ -11,7 +11,8 @@
   --bb-number-width: 9ch;
 }
 table thead th.bb-metric-column {
-  text-align: center;
+  /* Explicit metric ownership overrides legacy positional table rules. */
+  text-align: center !important;
 }
 th.bb-metric-column > :is(button, .statistics-sort) {
   display: grid;
