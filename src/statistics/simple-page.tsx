@@ -1,5 +1,9 @@
 import "../ui-system/query-controls.css";
-import { metricColumnStyle } from "../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import { metricSampleSize } from "./reference/metric-layout";
 import { QueryTableLayout } from "../ui-system/query-table-layout";
 import { SearchInput } from "../ui-system/query-controls";
@@ -20,7 +24,6 @@ import {
 } from "./query-contract";
 import { simpleStatisticsQuery } from "./simple-query";
 
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const title = (metric: StatisticsMetric) =>
   metric === "foulsCommitted" ? "F" : STATISTICS_METRICS[metric].label;
 const display = (names: string[]) =>
@@ -417,7 +420,17 @@ export function SimpleStatisticsPageView() {
                                   }
                                 >
                                   {r.metrics[key].status === "available"
-                                    ? number.format(r.metrics[key].value)
+                                    ? formatStatistic(
+                                        r.metrics[key].value,
+                                        columnHasDecimal(
+                                          data.rows.map(
+                                            (row) => row.metrics[key].value,
+                                          ),
+                                        ) ||
+                                          (data.mode === "per-game" &&
+                                            STATISTICS_METRICS[key]
+                                              .normalizable),
+                                      )
                                     : "—"}
                                 </td>
                               ))}

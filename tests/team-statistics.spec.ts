@@ -67,17 +67,24 @@ test("busca/ordem/página da lista reaparecem no retorno do detalhe", async ({
     .click();
   await expect(page).toHaveURL(/sort=name/);
   await expect(table.getByRole("row")).toHaveCount(27);
-  await page
-    .getByRole("searchbox", { name: "Buscar equipe ou inscrição", exact: true })
-    .fill("Inscrição 25");
-  await expect(table.getByRole("row")).toHaveCount(2);
-  await page.reload();
   await expect(
     page.getByRole("searchbox", {
       name: "Buscar equipe ou inscrição",
       exact: true,
     }),
-  ).toHaveValue("Inscrição 25");
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
+  await page
+    .getByRole("button", { name: "Não selecionar nenhuma equipe" })
+    .click();
+  await page
+    .getByRole("checkbox", { name: "Inscrição 25", exact: true })
+    .check();
+  await page.keyboard.press("Escape");
+  await expect(table.getByRole("row")).toHaveCount(2);
+  await page.reload();
+  await expect(table.getByRole("row")).toHaveCount(2);
+  await expect(table).toContainText("Inscrição 25");
 });
 test("ambiguidade exige inscrição e abas conservam foco e histórico", async ({
   page,
@@ -142,10 +149,10 @@ test("paginação de jogadores mantém totais completos e filtros ao voltar à v
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.getByRole("row")).toHaveCount(31);
+  await expect(table.getByRole("row")).toHaveCount(51);
   await expect(
     page.getByRole("navigation", { name: "Páginas de jogadores" }),
-  ).toContainText("Página 2 de 5");
+  ).toContainText("Página 2 de 2");
   await page.getByRole("tab", { name: "Jogos", exact: true }).click();
   await expect(page.locator(".team-profile-games tbody tr")).toHaveCount(25);
   await page.getByRole("tab", { name: "Visão geral", exact: true }).click();
@@ -162,7 +169,7 @@ test("paginação de jogadores mantém totais completos e filtros ao voltar à v
   await page.getByRole("tab", { name: "Jogadores", exact: true }).click();
   await expect(
     page.getByRole("navigation", { name: "Páginas de jogadores" }),
-  ).toContainText("Página 2 de 5");
+  ).toContainText("Página 2 de 2");
 });
 test("escopo vazio, erro e contaminação têm estados próprios sem placar fictício", async ({
   page,

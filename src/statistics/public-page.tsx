@@ -1,3 +1,4 @@
+import { columnHasDecimal, formatStatistic } from "../ui-system/metric-layout";
 import "../ui-system/query-controls.css";
 import { QueryTableLayout } from "../ui-system/query-table-layout";
 import { SearchInput } from "../ui-system/query-controls";
@@ -33,13 +34,18 @@ import {
 
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
 const scoreKeys = SCORESHEET_PLAYER_COLUMNS;
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const display = (values: string[]) =>
   values.length === 1 ? values[0] : "var.";
 type Row = StatisticsPage["rows"][number];
-function Cell({ value }: { value: Row["metrics"][StatisticsMetric] }) {
+function Cell({
+  value,
+  decimalColumn = false,
+}: {
+  value: Row["metrics"][StatisticsMetric];
+  decimalColumn?: boolean;
+}) {
   return value.status === "available" ? (
-    <>{number.format(value.value)}</>
+    <>{formatStatistic(value.value, decimalColumn)}</>
   ) : value.status === "insufficient-sample" ? (
     <span className="statistics-insufficient" aria-label="Amostra insuficiente">
       -
@@ -53,7 +59,7 @@ function location() {
   const params = new URLSearchParams(search);
   if (params.get("view") === "boxscore") params.set("dataset", "boxscore");
   if (!params.has("mode")) params.set("mode", "total");
-  params.set("pageSize", "30");
+  params.set("pageSize", "100");
   // Mobile starts with all metrics enabled; explicit URLs and saved choices win.
   const query = parseStatisticsQuery(
     params,
@@ -347,30 +353,18 @@ export function StatisticsPageView() {
                           Buscar atleta
                         </span>
                       </span>
-                      <div className="search-field">
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.7"
-                        >
-                          <circle cx="10.5" cy="10.5" r="6.5" />
-                          <path d="m16 16 4.5 4.5" />
-                        </svg>
-                        <input
-                          id="search"
-                          type="search"
-                          aria-label="Buscar atleta ou equipe"
-                          placeholder="Nome do atleta"
-                          autoComplete="off"
-                          maxLength={80}
-                          value={draft.search}
-                          onChange={(e) =>
-                            setDraft({ ...draft, search: e.target.value })
-                          }
-                        />
-                      </div>
+                      <SearchInput
+                        id="search"
+                        type="search"
+                        aria-label="Buscar atleta ou equipe"
+                        placeholder="Nome do atleta"
+                        autoComplete="off"
+                        maxLength={80}
+                        value={draft.search}
+                        onChange={(e) =>
+                          setDraft({ ...draft, search: e.target.value })
+                        }
+                      />
                     </label>
                     <TeamFilter
                       options={(data?.teams ?? []).map((t) => ({
@@ -705,9 +699,22 @@ export function StatisticsPageView() {
                                           <td
                                             key={s.personId}
                                             className={`statistics-comparison-${state}`}
-                                            aria-label={`${description}: ${cell.status === "available" ? number.format(cell.value) : cell.status === "insufficient-sample" ? "-" : "—"}`}
+                                            aria-label={`${description}: ${cell.status === "available" ? formatStatistic(cell.value, columnHasDecimal(data.comparisonSummaries.map((row) => row.metrics[key].value)) || (data.mode === "per-game" && STATISTICS_METRICS[key].normalizable)) : cell.status === "insufficient-sample" ? "-" : "—"}`}
                                           >
-                                            <Cell value={cell} />
+                                            <Cell
+                                              value={cell}
+                                              decimalColumn={
+                                                columnHasDecimal(
+                                                  data.comparisonSummaries.map(
+                                                    (row) =>
+                                                      row.metrics[key].value,
+                                                  ),
+                                                ) ||
+                                                (data.mode === "per-game" &&
+                                                  STATISTICS_METRICS[key]
+                                                    .normalizable)
+                                              }
+                                            />
                                             <small aria-hidden="true">
                                               {description}
                                             </small>
@@ -803,7 +810,20 @@ export function StatisticsPageView() {
                                       </td>
                                       {data.columns.map((key) => (
                                         <td key={key}>
-                                          <Cell value={r.metrics[key]} />
+                                          <Cell
+                                            value={r.metrics[key]}
+                                            decimalColumn={
+                                              columnHasDecimal(
+                                                data.compared.map(
+                                                  (row) =>
+                                                    row.metrics[key].value,
+                                                ),
+                                              ) ||
+                                              (data.mode === "per-game" &&
+                                                STATISTICS_METRICS[key]
+                                                  .normalizable)
+                                            }
+                                          />
                                         </td>
                                       ))}
                                     </tr>

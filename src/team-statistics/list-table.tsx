@@ -1,4 +1,8 @@
-import { metricColumnStyle } from "../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import type { TeamsListPage } from "./list-contract";
 import { LIST_METRICS, type ListMetric } from "./list-query";
 import { sheetTeamMetric, TEAM_METRICS } from "./metrics";
@@ -12,11 +16,6 @@ export const listMetric = (key: ListMetric, scoresheet = false) =>
     : key === "foulsReceived" && !scoresheet
       ? TEAM_METRICS[key]
       : sheetTeamMetric(key);
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const decimal = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-});
 export function TeamsListTable({
   data: d,
   onSort,
@@ -30,6 +29,16 @@ export function TeamsListTable({
   showLegend?: boolean;
   onSort: (key: TeamsListPage["query"]["sort"]) => void;
 }) {
+  const decimalColumns = new Set(
+    d.query.columns.filter(
+      (key) =>
+        (d.query.mode === "per-game" &&
+          key !== "games" &&
+          !key.endsWith("Percentage") &&
+          !key.endsWith("Share")) ||
+        columnHasDecimal(d.rows.map((row) => row.statistics[key].value)),
+    ),
+  );
   const maxima = Object.fromEntries(
     d.query.columns.map((key) => [
       key,
@@ -137,14 +146,7 @@ export function TeamsListTable({
                               —
                             </span>
                           ) : (
-                            (cell.value !== 0 &&
-                            d.query.mode === "per-game" &&
-                            key !== "games" &&
-                            !key.endsWith("Percentage") &&
-                            !key.endsWith("Share")
-                              ? decimal
-                              : number
-                            ).format(cell.value)
+                            formatStatistic(cell.value, decimalColumns.has(key))
                           )}
                         </td>
                       );

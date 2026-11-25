@@ -26,13 +26,13 @@ for (const width of [1366, 1920]) {
           })),
         );
       const total = await measure();
-      expect((await table.boundingBox())!.width).toBeLessThan(1100);
+      expect((await table.boundingBox())!.width).toBeLessThan(1300);
       for (const value of await table
         .locator("thead th.bb-metric-column")
         .evaluateAll((cells) =>
           cells.map((cell) => cell.getBoundingClientRect().width),
         ))
-        expect(value).toBeLessThan(80);
+        expect(value).toBeLessThan(96);
       await page.getByRole("button", { name: "Por jogo", exact: true }).click();
       await expect(
         page.locator('[aria-label="Resultado da consulta"]'),

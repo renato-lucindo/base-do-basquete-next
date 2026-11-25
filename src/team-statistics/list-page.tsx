@@ -1,6 +1,5 @@
 import "../ui-system/query-controls.css";
 import { QueryTableLayout } from "../ui-system/query-table-layout";
-import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiFailure } from "../competition/api";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
@@ -71,7 +70,6 @@ export function TeamsListPublicPage() {
     }
   });
   const [route, setRoute] = useState(initial),
-    [search, setSearch] = useState(route.query.search),
     [response, setResponse] = useState<TeamsListPage | null>(null),
     [loading, setLoading] = useState(false),
     [sourceMissing, setSourceMissing] = useState(false),
@@ -103,7 +101,6 @@ export function TeamsListPublicPage() {
     const read = () => {
       const next = initial();
       setRoute(next);
-      setSearch(next.query.search);
       setError(next.error);
     };
     window.addEventListener("hashchange", read);
@@ -114,7 +111,7 @@ export function TeamsListPublicPage() {
     if (!current.disputeId) return;
     const next = {
       ...current,
-      query: { ...current.query, search, ...patch, page: 1 },
+      query: { ...current.query, ...patch, page: 1 },
     };
     try {
       const hash = serializeTeamsListRoute(current.disputeId, next.query);
@@ -130,11 +127,6 @@ export function TeamsListPublicPage() {
     routeRef.current = next;
     setRoute(next);
   }
-  useEffect(() => {
-    if (search === route.query.search) return;
-    const timer = setTimeout(() => change({ search }), 300);
-    return () => clearTimeout(timer);
-  });
   useEffect(() => {
     if (!id) return;
     const controller = new AbortController();
@@ -223,20 +215,6 @@ export function TeamsListPublicPage() {
           <div className="public-site statistics-public">
             <QueryTableLayout>
               <div className="team-list-filters">
-                <label className="search-field bb-query-field">
-                  <span className="bb-query-label">
-                    Buscar equipe ou inscrição
-                  </span>
-                  <SearchInput
-                    placeholder="Buscar equipe ou inscrição…"
-                    type="search"
-                    name="q"
-                    autoComplete="off"
-                    maxLength={80}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </label>
                 <TeamFilter
                   options={options.map((o) => ({
                     id: o.registrationId,
@@ -429,7 +407,6 @@ export function TeamsListPublicPage() {
                   type="button"
                   className="clear-button"
                   onClick={() => {
-                    setSearch("");
                     change({
                       search: "",
                       selection: "all",

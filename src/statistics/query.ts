@@ -196,7 +196,7 @@ export function buildStatisticsPage(
     page,
     pageSize: query.pageSize,
     // Opt-in metadata: legacy clients use a strict DTO with 20-row pages.
-    ...(query.pageSize === 30 ? { hasBoxscore: selected.hasBoxscore } : {}),
+    ...(query.pageSize >= 30 ? { hasBoxscore: selected.hasBoxscore } : {}),
     total: sorted.length,
     totalPages,
     rows: ranked

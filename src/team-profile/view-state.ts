@@ -92,7 +92,7 @@ export function profilePlayerQuery(raw: string, registrationId: string) {
     ...parseStatisticsQuery(params, "all"),
     registrationId,
     teams: null,
-    pageSize: 30 as const,
+    pageSize: 100 as const,
     compare: [],
   };
 }

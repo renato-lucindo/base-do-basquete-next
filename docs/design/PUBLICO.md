@@ -116,7 +116,7 @@ Versões e datas técnicas saem das linhas públicas; cobertura, siglas e distin
 
 ## Refinamento de Jogadores — decisão de05/11/2026
 
-Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. A página de Jogadores usa fundo branco em toda a área. A tabela usa 30 linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
+Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. A página de Jogadores usa fundo branco em toda a área. A tabela usa 100 linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Métricas têm padding horizontal de10px por lado; identificações mantêm14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
 
 Em F/T/U/5F/GD, o negrito identifica o maior valor positivo da consulta filtrada inteira, incluindo empates; zeros e ausências não recebem destaque. Não representa desempenho melhor: a comparação continua considerando menos faltas como melhor valor.
 
@@ -126,7 +126,7 @@ A legenda contém somente definições das siglas ou abreviações das colunas v
 
 Nas disputas exclusivamente de súmula, Jogadores oferece13opções de coluna: Equipe e as12métricas de súmula. Essa capacidade da fonte limita também a seleção recebida da URL/sessão e as colunas renderizadas; o padrão mobile de todas as métricas não acrescenta estatísticas de boxscore. Seleções válidas, inclusive nenhuma coluna, permanecem. Disputas com boxscore conservam as opções completas.
 
-Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Total/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20linhas e o formato anterior; a página atual solicita `pageSize=30` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
+Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Total/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20ou30linhas e o formato anterior; a página atual solicita `pageSize=100` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
 
 Correção de bordas de05/11/2026: manter a rolagem interna nos dois eixos, altura limitada e identificação/cabeçalho fixos, incluindo “Pos.” na fixação vertical. Ao atingir uma das quatro bordas, bloquear o efeito elástico somente na tabela de Jogadores e sua barra superior, sem alterar gestos/zoom nem a página externa. A sincronização usa deslocamentos válidos de cada contêiner e não reescreve posições equivalentes; a barra superior deve alcançar a mesma última coluna quando houver scrollbar vertical. [Validação e limites por navegador](VALIDACAO-BORDAS-MOBILE.md).
 

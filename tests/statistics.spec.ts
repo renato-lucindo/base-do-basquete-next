@@ -120,7 +120,7 @@ for (const withBoxscore of [false, true]) {
       name: "Buscar atleta ou equipe",
     });
     await expect(search).toHaveAttribute("placeholder", "Nome do atleta");
-    await expect(page.locator(".search-field svg").first()).toBeVisible();
+    await expect(page.locator(".bb-query-search svg").first()).toBeVisible();
     await expect(page.locator(".local-search-label").locator("..")).toHaveCSS(
       "position",
       "absolute",
@@ -328,7 +328,10 @@ test("atalho para conteúdo preserva URL da consulta e permite foco por teclado"
 test("consulta estatística pagina, compartilha URL e restaura recorte ao recarregar", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page, { withBoxscore: true });
+  const f = await statisticsBrowserFixture(page, {
+    withBoxscore: true,
+    largeList: true,
+  });
   await page.goto(f.url + "&preset=simple&mode=total");
   await expect(
     page.getByRole("heading", {
@@ -340,7 +343,7 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.getByRole("row")).toHaveCount(31);
+  await expect(table.getByRole("row")).toHaveCount(101);
   await expect(
     page.getByRole("status").filter({
       hasText: `${f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0)} registros por equipe`,
@@ -351,14 +354,14 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
     .click();
   await expect(table.getByRole("row")).toHaveCount(
     f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0) -
-      30 +
+      100 +
       1,
   );
   await expect(page).toHaveURL(/page=2/u);
   await page.reload();
   await expect(table.getByRole("row")).toHaveCount(
     f.source.games.reduce((n, g) => n + g.snapshot.facts.players.length, 0) -
-      30 +
+      100 +
       1,
   );
   // Reload can leave headless Chromium without compositor frames for click's
@@ -376,7 +379,7 @@ test("consulta estatística pagina, compartilha URL e restaura recorte ao recarr
     .selectOption("regular");
   await expect(page).toHaveURL(/page=1/u);
   await expect(
-    page.getByRole("status").filter({ hasText: "11 registros por equipe" }),
+    page.getByRole("status").filter({ hasText: "88 registros por equipe" }),
   ).toBeVisible();
   await expect(
     page.getByRole("combobox", { name: "Escopo", exact: true }),
@@ -618,4 +621,115 @@ test("filtro em edição resiste à confirmação tardia da navegação de busca
   await expect(
     page.getByText("Nenhuma participação atende à consulta.", { exact: true }),
   ).toBeVisible();
+});
+
+for (const width of [320, 390, 639, 640, 1366, 1920]) {
+  test(`controles uniformes e100jogadores na rolagem em${width}px`, async ({
+    page,
+  }, info) => {
+    const f = await statisticsBrowserFixture(page, { largeList: true });
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(f.url);
+    const table = page.getByRole("table", {
+      name: "Estatísticas dos atletas",
+      exact: true,
+    });
+    await expect(table.locator("tbody tr")).toHaveCount(100);
+    await expect(
+      page.locator('[aria-label="Resultado da consulta"]'),
+    ).toHaveAttribute("aria-busy", "false");
+    const controls = await page
+      .locator(
+        ".filters input,.filters #team-filter-toggle,.table-toolbar .column-picker > button,.table-toolbar .segmented",
+      )
+      .evaluateAll((es) =>
+        es.map((e) => ({
+          height: e.getBoundingClientRect().height,
+          font: getComputedStyle(e).fontSize,
+        })),
+      );
+    expect(controls.length).toBeGreaterThanOrEqual(5);
+    for (const control of controls) {
+      expect(Math.abs(control.height - 44)).toBeLessThan(1);
+    }
+    for (const field of await page.locator(".filters input").all())
+      await expect(field).toHaveCSS("font-size", "16px");
+    const iconDelta = await page
+      .locator(".filters .bb-query-search")
+      .evaluate((e) => {
+        const icon = e.querySelector("svg")!.getBoundingClientRect(),
+          input = e.querySelector("input")!.getBoundingClientRect();
+        return Math.abs(icon.y + icon.height / 2 - input.y - input.height / 2);
+      });
+    expect(iconDelta).toBeLessThan(1);
+    const playerWidth = (await table
+      .locator("thead th.statistics-player")
+      .boundingBox())!.width;
+    expect(playerWidth).toBeGreaterThanOrEqual(width <= 600 ? 240 : 288);
+    for (const cell of await table
+      .locator("tbody tr:first-child td.bb-metric-value")
+      .all())
+      await expect(cell).toHaveCSS("padding-left", "10px");
+    const region = page.getByRole("region", {
+      name: "Tabela estatística rolável",
+      exact: true,
+    });
+    expect(await region.evaluate((e) => e.scrollHeight > e.clientHeight)).toBe(
+      true,
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (width === 390 || width === 1366) {
+      const screenshot = info.outputPath(`controles-${width}.png`);
+      await page.screenshot({ path: screenshot, fullPage: true });
+      await info.attach("controles", {
+        path: screenshot,
+        contentType: "image/png",
+      });
+    }
+    await page
+      .getByRole("button", { name: "Próxima página", exact: true })
+      .click();
+    await expect(table.locator("tbody tr")).toHaveCount(10);
+    await expect(page.getByRole("status")).toContainText("Página 2 de 2");
+    await page.reload();
+    await expect(table.locator("tbody tr")).toHaveCount(10);
+  });
+}
+
+test("coluna decimal mantém inteiros, zeros, percentuais e ausências coerentes", async ({
+  page,
+}) => {
+  const f = await statisticsBrowserFixture(page);
+  await page.route("**/api/public/statistics/**", async (route) => {
+    const data = buildStatisticsPage(
+      f.source,
+      parseStatisticsQuery(new URL(route.request().url()).searchParams),
+    );
+    for (const [index, value] of [1, 1.5, null, 0].entries())
+      data.rows[index].metrics.twoMade =
+        value === null
+          ? { status: "unavailable", value: null }
+          : { status: "available", value };
+    data.rows[0].metrics.pointsShare = { status: "available", value: 100 };
+    data.rows[1].metrics.pointsShare = { status: "available", value: 12.5 };
+    await route.fulfill({ json: data });
+  });
+  await page.goto(f.url + "&mode=total");
+  const table = page.getByRole("table", {
+    name: "Estatísticas dos atletas",
+    exact: true,
+  });
+  await expect(table).toBeVisible();
+  const values = table.locator('tbody td[data-public-metric="twoMade"]');
+  await expect(values.nth(0)).toHaveText("1,0");
+  await expect(values.nth(1)).toHaveText("1,5");
+  await expect(values.nth(2)).toHaveText("—");
+  await expect(values.nth(3)).toHaveText("0,0");
+  await expect(
+    table.locator('tbody td[data-public-metric="pointsShare"]').first(),
+  ).toHaveText("100,0%");
 });

@@ -21,7 +21,7 @@ test("Equipes alinha Total/Por jogo à direita em qualquer largura", async ({
       .boundingBox())!;
     expect(Math.abs(scope.x - bar.x)).toBeLessThan(1);
     expect(Math.abs(mode.x + mode.width - bar.x - bar.width)).toBeLessThan(1);
-    if (width >= 390) {
+    if (width >= 640) {
       expect(
         Math.abs(scope.y + scope.height / 2 - mode.y - mode.height / 2),
       ).toBeLessThan(1);
@@ -59,21 +59,15 @@ test("Equipes abre completa, filtra sem tirar foco e mantém opções e retorno"
   await expect(
     page.getByRole("button", { name: /Próxima página de inscrições/ }),
   ).toHaveCount(0);
-  const search = page.getByRole("searchbox", {
-    name: "Buscar equipe ou inscrição",
-  });
-  await search.fill("inexistente");
   await expect(
-    page.getByText("Nenhuma inscrição neste recorte."),
-  ).toBeVisible();
-  await expect(search).toBeFocused();
+    page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
   await expect(page.getByRole("checkbox")).toHaveCount(26);
   await page
     .getByRole("button", { name: "Não selecionar nenhuma equipe" })
     .click();
   await page.keyboard.press("Escape");
-  await search.fill("");
   await expect(
     page.getByText("Nenhuma inscrição neste recorte."),
   ).toBeVisible();
@@ -253,7 +247,8 @@ test("Equipes: consulta explícita e retorno do perfil conservam seleção e rol
   await expect(table.locator("tbody tr")).toHaveCount(26);
   await expect(
     page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
-  ).toHaveValue("Inscrição");
+  ).toHaveCount(0);
+  await expect(page).toHaveURL(/q=Inscri/);
   await expect(page).toHaveURL(/direction=desc/);
   await expect
     .poll(() => region.evaluate((el) => el.scrollLeft))
@@ -310,10 +305,6 @@ test("Equipes: seleção extensa usa referência local e consulta POST sem corta
   ).toBe(true);
   await page.reload();
   await expect(table.locator("tbody tr")).toHaveCount(999);
-  await page
-    .getByRole("searchbox", { name: "Buscar equipe ou inscrição" })
-    .fill("Inscrição 000");
-  await expect(table.locator("tbody tr")).toHaveCount(1);
   await table.getByRole("link", { name: "Inscrição 000", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Inscrição 000", exact: true }),
@@ -321,7 +312,7 @@ test("Equipes: seleção extensa usa referência local e consulta POST sem corta
   await page
     .getByRole("link", { name: "Voltar às equipes", exact: true })
     .click();
-  await expect(table.locator("tbody tr")).toHaveCount(1);
+  await expect(table.locator("tbody tr")).toHaveCount(999);
   await expect(page).toHaveURL(/stateRef=/);
 });
 
@@ -348,19 +339,16 @@ test("Equipes: última resposta prevalece e máximos positivos preservam empates
       .evaluate((el) => getComputedStyle(el).fontWeight),
   ).toBe("400");
   f.state.delayNext = 700;
-  const search = page.getByRole("searchbox", {
-    name: "Buscar equipe ou inscrição",
-  });
-  await search.fill("Inscrição 01");
+  await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect
-    .poll(() => f.state.queries.some((q) => q.includes("01")))
+    .poll(() => f.state.queries.some((q) => q.includes("scope=regular")))
     .toBe(true);
-  await search.fill("Inscrição 24");
-  await expect(table.locator("tbody tr")).toHaveCount(1);
-  await expect(table).toContainText("Inscrição 24");
-  await expect(search).toBeFocused();
+  await page.getByRole("button", { name: "Todos", exact: true }).click();
+  await expect(table.locator("tbody tr")).toHaveCount(26);
   await page.getByRole("button", { name: "Total", exact: true }).click();
-  await expect(table).toContainText("Inscrição 24");
+  await expect(
+    page.getByRole("button", { name: "Total", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 

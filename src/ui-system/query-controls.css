@@ -28,6 +28,8 @@
   height: 1.125rem;
   color: var(--bb-muted);
   pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .bb-query-search > input {
   width: 100%;
@@ -83,4 +85,78 @@
 }
 .bb-query-layout :is(.team-profile-toolbar, .team-list-filters) > label {
   min-width: 0;
+}
+
+/* Query controls share the same44px reference height and16px type. */
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    #team-filter-toggle,
+    .column-picker > button
+  ) {
+  box-sizing: border-box;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  font-size: 1rem !important;
+  line-height: 1.25;
+  margin-block: 0;
+}
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  .segmented {
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding: 0.1875rem;
+  align-items: stretch;
+}
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  .segmented
+  button {
+  box-sizing: border-box;
+  min-height: 2.375rem;
+  height: auto;
+  font-size: 1rem;
+  line-height: 1.25;
+  padding-block: 0.375rem;
+}
+.public-site.statistics-public .bb-query-search {
+  align-self: stretch;
+  min-height: 2.75rem;
+}
+.public-site.statistics-public .bb-query-search > input {
+  margin-block: 0 !important;
+  font-size: 1rem !important;
+}
+
+/* Shared query labels are explicit; data-entry forms are outside this rule. */
+.bb-query-field :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  font-size: 1rem;
+}
+
+.public-site.statistics-public .bb-query-search > svg {
+  top: 50%;
+  transform: translateY(-50%);
 }

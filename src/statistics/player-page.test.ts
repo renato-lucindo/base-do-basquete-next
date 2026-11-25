@@ -102,6 +102,15 @@ it("preserva DTO legado de20 e valida30 linhas, última página incompleta e tam
   expect(first.rows).toHaveLength(30);
   expect(first.totalPages).toBe(2);
   expect(first.hasBoxscore).toBe(false);
+  const hundred = query("pageSize=100&sort=player&dir=asc");
+  expect(parseStatisticsQuery(serializeStatisticsQuery(hundred))).toEqual(
+    hundred,
+  );
+  const full = buildStatisticsPage(source, hundred);
+  expect(full.pageSize).toBe(100);
+  expect(full.rows).toHaveLength(40);
+  expect(full.totalPages).toBe(1);
+  expect(statisticsPageSchema.parse(full)).toEqual(full);
   const last = buildStatisticsPage(source, { ...requested, page: 99 });
   expect(last.page).toBe(2);
   expect(last.rows).toHaveLength(10);

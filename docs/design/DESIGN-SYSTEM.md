@@ -106,3 +106,5 @@ Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado
 - [RecentResultsCell](../../src/regulation/recent-results-cell.tsx) e sua [folha compartilhada](../../src/regulation/recent-results.css): campanhas e classificação usam a mesma decoração e interação.
 
 As regras ficam em [PADROES](PADROES.md#consultas-e-métricas--padrão-de-25112026); estes links identificam as implementações para reutilização.
+
+Referências de espaçamento, altura/tipografia de controles,100registros e decimal uniforme estão em [PADROES — Consultas e métricas](PADROES.md#consultas-e-métricas--padrão-de-25112026); substituem o padding6px e inteiros misturados em colunas decimais.

@@ -9,7 +9,9 @@ test("arrastes diagonais e prolongados param nas quatro bordas", async ({
   await page.setViewportSize({ width: 390, height: 844 });
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   const region = page.getByRole("region", {
     name: "Tabela estatística rolável",
   });

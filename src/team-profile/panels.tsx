@@ -1,5 +1,9 @@
 import "../ui-system/query-controls.css";
-import { metricColumnStyle } from "../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import { QueryTableLayout } from "../ui-system/query-table-layout";
 import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useState, type ReactNode } from "react";
@@ -545,7 +549,15 @@ export function ParticipationStatistics({
                   </th>
                   {globalColumns.map((k) => (
                     <td key={k} className="bb-metric-value">
-                      {showNumber(values?.statistics[k].value)}
+                      {formatStatistic(
+                        values?.statistics[k].value,
+                        (mode === "per-game" && listMetric(k).normalizable) ||
+                          columnHasDecimal(
+                            result.rows.map(
+                              (row) => row.values?.statistics[k].value,
+                            ),
+                          ),
+                      )}
                       {values?.statistics[k].value != null &&
                       k === "freeThrowPercentage"
                         ? "%"

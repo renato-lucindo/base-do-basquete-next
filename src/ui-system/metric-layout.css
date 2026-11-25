@@ -1,7 +1,7 @@
 /* One compact column geometry for both modes and all numeric cells. */
 .bb-metric-column {
   --bb-header-width: 2ch;
-  min-inline-size: calc(var(--bb-header-width) + 0.75rem);
+  min-inline-size: calc(var(--bb-header-width) + 1.25rem);
   font-variant-numeric: tabular-nums;
 }
 /* An invisible, zero-height sample participates in the native table width.
@@ -48,4 +48,9 @@ th.bb-metric-column .sort-arrow {
 }
 th.bb-metric-column {
   left: auto !important;
+}
+
+/* The same breathing room surrounds every numeric metric, in every consumer. */
+table :is(th.bb-metric-column, td.bb-metric-value) {
+  padding-inline: 0.625rem !important;
 }

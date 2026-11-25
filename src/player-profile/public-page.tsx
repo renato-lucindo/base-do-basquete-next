@@ -1,4 +1,8 @@
-import { metricColumnStyle } from "../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import { profileCardLines } from "./profile-card";
 import { useEffect, useRef, useState } from "react";
 import { ApiFailure } from "../competition/api";
@@ -37,7 +41,6 @@ import {
 import { ProfileFilters } from "./profile-filters";
 import { useProfilePanelSpace } from "./panel-space";
 
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const readLocation = () => readProfileLocation(window.location.hash);
 const normalize = (value: string) =>
   value
@@ -47,9 +50,12 @@ const normalize = (value: string) =>
 function value(
   summary: ReturnType<typeof careerStatistics>,
   metric: ProfileMetric,
+  decimalColumn = false,
 ) {
   const c = summary?.metrics[metric];
-  return c?.status === "available" ? number.format(c.value) : "—";
+  return c?.status === "available"
+    ? formatStatistic(c.value, decimalColumn)
+    : "—";
 }
 export function PlayerPublicPage() {
   const [route, setRoute] = useState(readLocation),
@@ -733,7 +739,17 @@ export function PlayerPublicPage() {
                                 </td>
                                 {view.columns.map((m) => (
                                   <td key={m} className="bb-metric-value">
-                                    {value(summaries.get(g.key) ?? null, m)}
+                                    {value(
+                                      summaries.get(g.key) ?? null,
+                                      m,
+                                      (view.mode === "per-game" &&
+                                        STATISTICS_METRICS[m].normalizable) ||
+                                        columnHasDecimal(
+                                          [...summaries.values()].map(
+                                            (row) => row?.metrics[m].value,
+                                          ),
+                                        ),
+                                    )}
                                   </td>
                                 ))}
                               </tr>

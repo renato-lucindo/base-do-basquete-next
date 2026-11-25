@@ -1725,7 +1725,7 @@
   .team-name
   a {
   display: block;
-  max-width: 11.875rem;
+  max-width: 15rem;
   overflow-wrap: anywhere;
 }
 @media (max-width: 600px) {
@@ -1734,7 +1734,7 @@
     .statistics-table
     .reference-player {
     min-width: 9.375rem;
-    max-width: 11.875rem;
+    max-width: 15rem;
   }
   .public-site.statistics-public .reference-explorer .reference-player .player {
     max-width: 11.25rem;
@@ -1926,8 +1926,8 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   .statistics-table
   thead
   th.bb-metric-column {
-  min-inline-size: calc(var(--bb-header-width, 2ch) + 0.75rem);
-  padding-inline: 0.375rem;
+  min-inline-size: calc(var(--bb-header-width, 2ch) + 1.25rem);
+  padding-inline: 0.625rem;
   text-align: center;
 }
 .public-site.statistics-public
@@ -1946,13 +1946,13 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   .reference-explorer
   .statistics-table
   :is(.reference-player, .statistics-player) {
-  min-width: 14.25rem;
-  width: 14.25rem;
-  max-width: 14.25rem;
+  min-width: 18rem;
+  width: 18rem;
+  max-width: 18rem;
 }
 .public-site.statistics-public .reference-explorer .reference-player .player {
-  width: 12.5rem;
-  max-width: 12.5rem;
+  width: 16.25rem;
+  max-width: 16.25rem;
   overflow-wrap: anywhere;
 }
 .public-site.statistics-public
@@ -1968,13 +1968,13 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
     .reference-explorer
     .statistics-table
     :is(.reference-player, .statistics-player) {
-    min-width: 11.875rem;
-    width: 11.875rem;
-    max-width: 11.875rem;
+    min-width: 15rem;
+    width: 15rem;
+    max-width: 15rem;
   }
   .public-site.statistics-public .reference-explorer .reference-player .player {
-    width: 10.125rem;
-    max-width: 10.125rem;
+    width: 13.25rem;
+    max-width: 13.25rem;
   }
 }
 
@@ -1989,5 +1989,5 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   .statistics-table
   tbody
   td.bb-metric-value {
-  padding-inline: 0.375rem;
+  padding-inline: 0.625rem;
 }

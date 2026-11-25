@@ -36,7 +36,7 @@ for (const width of [1366, 1920])
       name: "Estatísticas dos atletas",
       exact: true,
     });
-    await expect(table.locator("tbody tr")).toHaveCount(30);
+    await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
     const geometry = await table.evaluate((el) => {
       const region = el.closest(".statistics-table-wrap")!;
       const player = el.querySelector("tbody .reference-player")!;
@@ -163,7 +163,7 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   const region = page.getByRole("region", {
     name: "Tabela estatística rolável",
     exact: true,
@@ -187,7 +187,7 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
     }),
   ).toBeVisible();
   await page.getByRole("link", { name: /^Voltar à origem/ }).click();
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await expect
     .poll(() =>
       region.evaluate((el) => ({
@@ -199,17 +199,17 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
     .toEqual(before);
 });
 
-test("perfil retorna à última página de30 preservando a consulta", async ({
+test("perfil retorna à última página de100 preservando a consulta", async ({
   page,
 }) => {
   await publicNavigationFixture(page);
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { largeList: true });
   await page.goto(f.url + "&page=2&sort=player&dir=asc");
   const table = page.getByRole("table", {
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(table.locator("tbody tr")).toHaveCount(10);
   const origin = page.url();
   await table.locator('a[href^="/atleta.html"]').last().click();
   await expect(
@@ -219,6 +219,6 @@ test("perfil retorna à última página de30 preservando a consulta", async ({
     }),
   ).toBeVisible();
   await page.getByRole("link", { name: /^Voltar à origem/ }).click();
-  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(table.locator("tbody tr")).toHaveCount(10);
   await expect(page).toHaveURL(origin);
 });

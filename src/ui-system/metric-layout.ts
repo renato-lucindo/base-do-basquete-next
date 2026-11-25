@@ -15,6 +15,8 @@ export function metricColumnStyle(
   percent = false,
   forceDecimal = false,
 ): CSSProperties {
+  const decimalColumn =
+    forceDecimal || columnHasDecimal(samples.map((sample) => sample.value));
   const width = (text: string) =>
     [...text].reduce(
       (sum, char) =>
@@ -25,7 +27,7 @@ export function metricColumnStyle(
     ({ value, totalFactor = 1, averageDivisor }) => {
       if (value === null) return [];
       const total = value * Math.max(1, totalFactor);
-      const values = [(forceDecimal ? average : integer).format(total)];
+      const values = [(decimalColumn ? average : integer).format(total)];
       if (averageDivisor !== undefined)
         values.push(average.format(total / Math.max(1, averageDivisor)));
       return values.map((text) => text + (percent ? "%" : ""));
@@ -39,4 +41,19 @@ export function metricColumnStyle(
     "--bb-number-reserve": JSON.stringify(reserve),
     "--bb-reserve-units": width(reserve),
   } as CSSProperties;
+}
+
+/** A whole column keeps one precision; missing data never turns into zero. */
+export function columnHasDecimal(values: (number | null | undefined)[]) {
+  return values.some(
+    (value) => value != null && !Number.isInteger(Math.round(value * 10) / 10),
+  );
+}
+export function formatStatistic(
+  value: number | null | undefined,
+  decimalColumn = false,
+) {
+  return value == null
+    ? "—"
+    : (decimalColumn ? average : integer).format(value);
 }

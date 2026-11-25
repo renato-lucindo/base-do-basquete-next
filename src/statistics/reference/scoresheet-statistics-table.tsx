@@ -1,4 +1,7 @@
-import { metricColumnStyle } from "../../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  metricColumnStyle,
+} from "../../ui-system/metric-layout";
 import { metricSampleSize } from "./metric-layout";
 import {
   publicPlayerHistoryAccessibleName,
@@ -127,6 +130,13 @@ export function ScoresheetStatisticsTable({
   comparisonEnabled: boolean;
   showJersey?: boolean;
 }) {
+  const decimalColumns = new Set(
+    data.columns.filter((key) =>
+      columnHasDecimal(
+        [...data.rows, ...data.compared].map((row) => row.metrics[key].value),
+      ),
+    ),
+  );
   return (
     <div
       className="reference-explorer statistics-explorer"
@@ -281,6 +291,7 @@ export function ScoresheetStatisticsTable({
                       metric={key}
                       mode={data.mode}
                       value={row.metrics[key]}
+                      forceDecimal={decimalColumns.has(key)}
                     />
                   </td>
                 ))}

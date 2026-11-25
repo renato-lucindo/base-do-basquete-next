@@ -1,4 +1,8 @@
-import { metricColumnStyle } from "../ui-system/metric-layout";
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import {
   publicPlayerHistoryAccessibleName,
   publicPlayerHistoryName,
@@ -71,11 +75,20 @@ export function TeamsTable({
   onSort: (key: TeamsPage["query"]["sort"]) => void;
 }) {
   if (!d.total)
-    return (
-      <p className="statistics-empty">
-        Nenhuma inscrição com resultados confirmados neste recorte.
-      </p>
+    const decimalColumns = new Set(
+      d.query.columns.filter(
+        (metric) =>
+          (d.query.mode === "per-game" &&
+            metric !== "games" &&
+            !metric.endsWith("Percentage")) ||
+          columnHasDecimal(d.rows.map((row) => row.statistics[metric].value)),
+      ),
     );
+  return (
+    <p className="statistics-empty">
+      Nenhuma inscrição com resultados confirmados neste recorte.
+    </p>
+  );
   return (
     <>
       <TooltipProvider>
@@ -182,12 +195,7 @@ export function TeamsTable({
                                 : metric
                             }
                             mode={d.query.mode}
-                            forceDecimal={
-                              d.scoresheet &&
-                              d.query.mode === "per-game" &&
-                              metric !== "games" &&
-                              !metric.endsWith("Percentage")
-                            }
+                            forceDecimal={decimalColumns.has(metric)}
                           />
                         </td>
                       ))}
@@ -289,7 +297,14 @@ export function TeamParticipants({
                       }
                     >
                       {c?.status === "available" ? (
-                        teamNumber.format(c.value)
+                        formatStatistic(
+                          c.value,
+                          columnHasDecimal(
+                            d.roster.items.map(
+                              (row) => row.statistics?.metrics[key].value,
+                            ),
+                          ),
+                        )
                       ) : (
                         <span title="Não informado para este cálculo">—</span>
                       )}

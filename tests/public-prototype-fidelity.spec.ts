@@ -81,7 +81,7 @@ test("seletores aprovados preservam escolhas, teclado e consulta real", async ({
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   const teams = page.getByRole("button", {
     name: "Equipe Todas as equipes",
     exact: true,
@@ -99,7 +99,7 @@ test("seletores aprovados preservam escolhas, teclado e consulta real", async ({
   await page
     .getByRole("button", { name: "Selecionar todas as equipes", exact: true })
     .click();
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await page.keyboard.press("Escape");
   await expect(teams).toBeFocused();
   const picker = page.getByRole("button", { name: /^Colunas ·/u });

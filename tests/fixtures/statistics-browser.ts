@@ -13,6 +13,7 @@ export async function statisticsBrowserFixture(
     insufficient?: boolean;
     empty?: boolean;
     withBoxscore?: boolean;
+    largeList?: boolean;
   } = {},
 ) {
   const source = statisticsSourceSchema.parse(
@@ -43,6 +44,28 @@ export async function statisticsBrowserFixture(
     for (const p of snapshot.facts.players)
       p.person.name = `Atleta do boxscore ${p.jersey}`;
     source.games.push({ snapshot, phase: null });
+  }
+  if (options.largeList) {
+    for (let i = 0; i < 7; i++) {
+      const game = structuredClone(source.games[0]);
+      game.snapshot.id = `f9300000-0000-4000-8000-${String(8000 + i).padStart(12, "0")}`;
+      game.snapshot.facts.players.forEach((player, index) => {
+        player.person.id = `f9300000-0000-4000-8000-${String(9000 + i * 20 + index).padStart(12, "0")}`;
+        player.person.name = `Atleta extra ${i}-${index}`;
+      });
+      for (const side of ["home", "away"] as const) {
+        const captain = game.snapshot.facts.players.find(
+          (p) => p.side === side && p.captain,
+        )!.person;
+        game.snapshot.staff[side] = {
+          captain,
+          coach: captain,
+          assistant: null,
+          captainIsCoach: true,
+        };
+      }
+      source.games.push(game);
+    }
   }
   const state = {
     failNext: false,
@@ -92,6 +115,10 @@ export async function statisticsBrowserFixture(
   });
   return {
     source,
+    pageRowCount: buildStatisticsPage(
+      source,
+      parseStatisticsQuery(new URLSearchParams("scope=all&pageSize=100")),
+    ).rows.length,
     state,
     url: `http://127.0.0.1:5174/estatisticas.html#${source.disputeId}?scope=all`,
   };

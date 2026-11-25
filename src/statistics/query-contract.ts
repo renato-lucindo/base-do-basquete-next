@@ -22,7 +22,7 @@ export interface StatisticsQuery {
     value: number;
   }[];
   page: number;
-  pageSize: 20 | 30;
+  pageSize: 20 | 30 | 100;
   compare: string[];
   preset: "essentials" | "simple" | "all" | "custom";
   /** Remembered preference: MIN is hidden, not removed, in per-30. */
@@ -137,7 +137,12 @@ export function parseStatisticsQuery(
       Number.isSafeInteger(page)
         ? page
         : 1,
-    pageSize: params.get("pageSize") === "30" ? 30 : 20,
+    pageSize:
+      params.get("pageSize") === "100"
+        ? 100
+        : params.get("pageSize") === "30"
+          ? 30
+          : 20,
     compare: unique(
       (params.get("compare") ?? "").split(",").flatMap(uuid),
     ).slice(0, 2),
@@ -165,7 +170,7 @@ export function serializeStatisticsQuery(
     preset: query.preset,
     columns: query.columns.join(","),
   });
-  if (query.pageSize === 30) p.set("pageSize", "30");
+  if (query.pageSize !== 20) p.set("pageSize", String(query.pageSize));
   if (query.registrationId) p.set("registrationId", query.registrationId);
   if (query.search) p.set("q", query.search);
   if (query.teams !== null)
