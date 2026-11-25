@@ -1,27 +1,15 @@
 # Progresso atual
 
-Atualizado em24/11/2026. [Checkpoint anterior](../historico/progresso/2026-11-24-antes-conformidade-design.md). Histórico de reflow anterior preservado em historico/progresso/2026-11-24-antes-reflow-jogador.md.
+Atualizado em25/11/2026. [Checkpoint anterior preservado](../historico/progresso/2026-11-25-antes-tabelas-filtros.md).
 
-## Unidade e resultado
+## Unidade e evidências
 
-- Mesma branch codex/perfis-equipes/[PR89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), fonte executável39fe76c2b145d1c1c06cc0c63e1fc7fd6827b1c3. Base original824a3d5; main/PR88 incorporada emd6c70e0. Sem merge autorizado. Checkout humano original e alterações preexistentes preservados; nenhuma PR empilhada.
-- Plano consolidado de conformidade aceito e implementado, com [matriz anterior à edição](PLAN-CONSISTENCIA-PUBLICA.md) e [provas/limites](design/VALIDACAO-PERFIS-EQUIPES.md#conformidade-de-design--24112026). Fluxo/índice/AGENTS/modelo PR exigem classificação das decisões e consulta somente para novas lacunas/conflitos. Guia e catálogo reconciliados. Novos padrões de ano nas abas e Participação central limitados ao perfil; rótulos laterais são piloto.
-- Geral e disputa: legendas em grade, confronto compartilhado com jogador, ano compacto fora tablist, modos junto da tabela, contornos, classificação à esquerda, status textual com anel e seleção por nível sobreposta. PTS após Equipe/AVG após SLD com duas casas, ordem/estabilidade das estatísticas, seleção e títulos sem redundância preservados. Sem mudanças de APIs/regras esportivas/banco.
+- Mesma branch codex/perfis-equipes/[PR89](https://github.com/renato-lucindo/base-do-basquete-next/pull/89), fonte executável6c08a024a7ef46154df7f52e3dbeff9196c88920. Implementação99d606e, correções visuais a1cefc9/6c08a02. Sem merge autorizado, API, schema, regra esportiva ou dados humanos alterados; checkpoint local anterior e mudanças preexistentes preservados.
+- [Plano/matriz anterior à edição](PLAN-TABELAS-FILTROS.md), [validação e limites](design/VALIDACAO-PERFIS-EQUIPES.md#tabelas-filtros-e-buscas--25112026), [capturas](design/evidencias/2026-11-25-consultas/README.md). Padrões compartilhados de consultas substituem rótulos laterais. Formulários mantêm labels visíveis; métricas reservam formatos, cabeçalhos centrais/valores direitos, limpeza não apaga preferências; campanhas e classificação compartilham resultados coloridos.
+- Gate completo PASS:182arquivos/857unitários,323,53s;19transporte/16banco local/35acesso/1PDF e builds/fronteira/segredos PASS. Gate:ui final PASS. Matriz final18PASS em seis larguras/zoom200%, incluindo todos os cabeçalhos e valores. Regressão adicional112PASS/32dispensas preexistentes. Catálogo Chromium/WebKit e design:verify completo PASS; detalhes de falhas/correções e reaproveitamento de provas no relatório. Sem novos skips ou limites de tempo maiores.
 
-## Verificação
+## Publicação e próximo passo
 
-- Gate completo PASS:182arquivos/857unitários; transporte/banco local/builds/Workers/fronteira/segredos PASS. Design:verify completo e catálogo Chromium/WebKit PASS. Matriz20PASS nas oito abas e seis larguras/zoom200%; navegação/perfis28PASS; regressão final jogador/axe50PASS.102casos inalterados da rodada ampliada reaproveitados; duas expectativas antigas de deslocamento corrigidas e duas falhas de artefato concorrente repetidas com saída isolada. Sem novos skips ou timeout maior.
-- Timeout de conquistas reproduzido com quatro workers (856PASS/1fail, prova fria31,756s). Concorrência limitada a dois; suíte857PASS em338,33s. Prova10000/10001 e limite30s preservados. CI antiga45444517462 era **workflow_dispatch**, não push, e passou; pull_request45444529563 falhou. Não confundir resultados/eventos.
-- Inspeção visual autoral de geral/Elencos/disputa e estatísticas em390/1366, nomes longos, foco/teclado/toque/vazios. Provas do catálogo não extrapoladas para consumidores; sem revisão independente ou aceite humano alegado.
-
-## Publicação
-
-- Fonte39fe76c ativa nos mesmos admin/preview. Admin versão86bf8a3a-2e30-4b14-b4c4-a81e9737c8d1/deployment9da50d48-736f-463e-97d2-f0bd86b2f082; preview versão4f516000-a1d0-4244-9824-da1b0db9f50f/deploymenta64b253b-eed1-4ac4-a27e-7728c9360c28,100% cada. Upload Wrangler, ativação pelo conector reconectado.
-- Smoke200/header correto, APIs privadas401admin/403preview e11assets públicos iguais por SHA256. Navegador real confirma ano77,78px, Participação central, legenda grid, status14px sem borda e popover sem deslocamento. LUSB AVG1,31/15PTS preservados. URLs admin.renato-lucindo-jr.workers.dev e preview.renato-lucindo-jr.workers.dev.
-- Namespace597c612fd69c447e81547f16d5dcca41/sessões/segredos preservados; preview sem Access, demais10Workers/versionURLs fechados. Sem DML/DDL/migrations, rascunhos publicados ou alterações de domínio/raiz/www. Bloqueio corporativo já confirmado, não repetir diagnóstico.
-
-## Próximo passo
-
-- CI45457833267 iniciou na fonte39fe76c (scopePASS, demais jobs pendentes na última leitura). Atualização final somente documental registra estas provas; conferir HEAD/run reais após push. Código publicado permanece39fe76c e suas provas não são invalidadas por documentação.
-- Retomada por cota retomar-conformidade-de-design excluída na retomada manual após ferramenta real mostrar99% disponível; sem crédito/reset consumido pelo agente. Ao aguardar CI final, manter uma única checagem oficial, registrar ID/run/SHA e excluir quando terminar; não acompanhar esperando aceite.
-- PR89 deve permanecer aberta para avaliação visual do Worker. Sem merge para main autorizado. Próxima ação: confirmar CI do HEAD final e corrigir falhas no mesmo escopo, se houver.
+- Fonte6c08a02 nos mesmos Workers: admin versãoaad50e1b-efcc-4ea5-8fbf-b3142bd816e5/deploymentd015f560-9ec7-43fa-b830-30ac66a97ee9; preview versãod221f8b7-a14d-446f-bab2-f0dc0881f7a0/deploymentf821801b-ab10-43c1-b9cf-dc521881ada8. Upload Wrangler e ativação pelo conector Cloudflare; namespace597c612fd69c447e81547f16d5dcca41, segredos e flag preservados. Sem Access, novo Worker ou alteração de domínio/raiz/www.
+- Smoke200/fonte correta, privadas401admin/403preview e12assets iguais ao build por SHA256. Navegador remoto confirmou todas as siglas centrais, valores direitos, labels ocultos nas consultas e E-mail/Senha visíveis no login. Consulta remota apenas de leitura; operação autenticada validada com fixtures. A primeira publicação revelou sobrescritas legadas, corrigidas e revalidadas antes do fechamento.
+- Serviços: https://admin.renato-lucindo-jr.workers.dev/ e https://preview.renato-lucindo-jr.workers.dev/. CI do HEAD documental de fechamento pendente; conferir o HEAD real e resultado obrigatório validate. Sem repetir suítes materiais por documentação. Atualizar a mesma PR89 e acompanhar a CI pela checagem oficial; encerrar a checagem quando terminar, sem esperar aceite humano. Merge depende de avaliação visual e aceite explícito do responsável.
