@@ -13,7 +13,7 @@ Alternativas: uma nova API de lote exigiria persistência e migration sem necess
 - [x] Testar e implementar gerador determinístico de todos contra todos, folgas para número ímpar, dois turnos, grupos e deduplicação por par.
 - [x] Acrescentar checkbox, quantidade e prévia compacta paginada. Troca de mando somente no diálogo Editar jogo, preservando os campos e os contratos existentes.
 - [x] Salvar somente após o formato estar salvo. Conservar IDs/comandos em falha incerta, não repetir itens confirmados, bloquear edição durante envio e avisar ao sair com pendências.
-- [ ] Cobrir o percurso com fixtures de navegador: geração, edição, salvamento, repetição de envio e grupos inválidos; conferir desktop, celular, foco e reflow.
+- [x] Cobrir o percurso com fixtures de navegador: geração, edição, salvamento, repetição de envio e grupos inválidos; conferir desktop, celular, foco e reflow.
 - [ ] Executar gate consolidado, revisão do diff e CI do SHA da PR. Atualizar checkpoint e entregar somente o link da PR, sem merge/deploy.
 
 ## Pontos de revisão
