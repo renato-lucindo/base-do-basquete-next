@@ -36,8 +36,24 @@ const patterns = [
   ],
   ["supabase-secret", new RegExp("sb_" + "secret_[A-Za-z0-9_-]{20,}")],
 ];
-const configSecret =
-  /(?:^|[\s,{])["']?(?:CLOUDFLARE_API_TOKEN|CF_API_TOKEN|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_ACCESS_TOKEN|SESSION_ENCRYPTION_KEY|ADMIN_PASSWORD)["']?\s*[:=]\s*(?:"[^"\r\n]{12,}"|'[^'\r\n]{12,}'|[A-Za-z0-9_+/=-]{20,}(?=\s|$))/im;
+const configSecretNames = [
+  "CLOUDFLARE_API_TOKEN",
+  "CF_API_TOKEN",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_ACCESS_TOKEN",
+  "SESSION_ENCRYPTION_KEY",
+  "ADMIN_PASSWORD",
+];
+const configSecret = new RegExp(
+  [
+    String.raw`(?:^|[\s,{])["']?(?:`,
+    configSecretNames.join("|"),
+    String.raw`)["']?\s*[:=]\s*(?:`,
+    String.raw`"[^"\r\n]{12,}"|'[^'\r\n]{12,}'|`,
+    String.raw`[A-Za-z0-9_+/=-]{20,}(?=\s|$))`,
+  ].join(""),
+  "im",
+);
 const failures = [];
 for (const path of new Set(files)) {
   if (
@@ -46,10 +62,8 @@ for (const path of new Set(files)) {
   )
     continue;
   const text = readFileSync(path, "utf8");
-  if (
-    /\.(?:jsonc?|toml|ya?ml|env|vars)$/.test(path) &&
-    configSecret.test(text)
-  )
+  const configuration = /\.(?:jsonc?|toml|ya?ml|env|vars)$/.test(path);
+  if (configuration && configSecret.test(text))
     failures.push(`${path}: padrão config-secret-literal`);
   for (const [name, pattern] of patterns)
     if (pattern.test(text)) failures.push(`${path}: padrão ${name}`);
