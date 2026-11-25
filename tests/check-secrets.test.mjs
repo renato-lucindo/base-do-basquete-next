@@ -65,3 +65,17 @@ test("full scan includes ignored build artifacts", () =>
     assert.equal(result.status, 1);
     assert.match(result.stderr, /bundle.js: padrão github-token/);
   }));
+
+test("scan includes JSONC and rejects configured literal secrets without printing them", () =>
+  fixture((directory, scan) => {
+    const value = "sample-" + "x".repeat(24);
+    const name = ["CLOUDFLARE", "API", "TOKEN"].join("_");
+    writeFileSync(
+      join(directory, "worker.jsonc"),
+      JSON.stringify({ [name]: value }),
+    );
+    const result = scan(["--source-only"]);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /worker.jsonc: padrão config-secret-literal/);
+    assert.equal(result.stderr.includes(value), false);
+  }));
