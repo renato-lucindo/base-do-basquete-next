@@ -15,6 +15,9 @@ for (const width of [1366, 1920]) {
       await expect(table.locator("tbody tr").first()).toBeVisible();
       const modes = page.getByRole("button", { name: "Total", exact: true });
       await modes.click();
+      await expect(
+        page.locator('[aria-label="Resultado da consulta"]'),
+      ).toHaveAttribute("aria-busy", "false");
       const measure = () =>
         table.locator("thead th").evaluateAll((cells) =>
           cells.map((cell) => ({
@@ -31,6 +34,9 @@ for (const width of [1366, 1920]) {
         ))
         expect(value).toBeLessThan(80);
       await page.getByRole("button", { name: "Por jogo", exact: true }).click();
+      await expect(
+        page.locator('[aria-label="Resultado da consulta"]'),
+      ).toHaveAttribute("aria-busy", "false");
       const perGame = await measure();
       perGame.forEach((cell, index) => {
         expect(Math.abs(cell.width - total[index].width)).toBeLessThan(1);
