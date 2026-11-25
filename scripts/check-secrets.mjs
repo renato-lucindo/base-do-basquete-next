@@ -36,14 +36,37 @@ const patterns = [
   ],
   ["supabase-secret", new RegExp("sb_" + "secret_[A-Za-z0-9_-]{20,}")],
 ];
+const configSecretNames = [
+  "CLOUDFLARE_API_TOKEN",
+  "CF_API_TOKEN",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_ACCESS_TOKEN",
+  "SESSION_ENCRYPTION_KEY",
+  "ADMIN_PASSWORD",
+];
+const configSecret = new RegExp(
+  [
+    String.raw`(?:^|[\s,{])["']?(?:`,
+    configSecretNames.join("|"),
+    String.raw`)["']?\s*[:=]\s*(?:`,
+    String.raw`"[^"\r\n]{12,}"|'[^'\r\n]{12,}'|`,
+    String.raw`[A-Za-z0-9_+/=-]{20,}(?=\s|$))`,
+  ].join(""),
+  "im",
+);
+const sourceExtensions = /\.(?:[cm]?[jt]sx?|jsonc?|md|html|ya?ml|toml|sql)$/;
+const extraExtensions = /\.(?:env|vars|txt|csv|sh|ps1|py)$/;
 const failures = [];
 for (const path of new Set(files)) {
-  if (
-    !/\.(?:[cm]?[jt]sx?|json|md|html|ya?ml|toml|sql|env|vars)$/.test(path) ||
-    statSync(path).size > 3_000_000
-  )
+  const supported = sourceExtensions.test(path) || extraExtensions.test(path);
+  if (!supported || statSync(path).size > 3_000_000) {
     continue;
+  }
   const text = readFileSync(path, "utf8");
+  const configuration = /\.(?:jsonc?|toml|ya?ml|env|vars)$/.test(path);
+  if (configuration && configSecret.test(text)) {
+    failures.push(`${path}: padrão config-secret-literal`);
+  }
   for (const [name, pattern] of patterns)
     if (pattern.test(text)) failures.push(`${path}: padrão ${name}`);
 }

@@ -69,6 +69,7 @@ jobs:
         if: success() && needs.scope.outputs.scope != 'docs'
         with:
           name: prototipo-${{ github.sha }}
+          retention-days: 7
           path: dist
 
   browsers:
@@ -97,6 +98,7 @@ jobs:
         if: always()
         with:
           name: browser-evidence-${{ matrix.shard }}-${{ github.sha }}
+          retention-days: 7
           path: |
             test-results
             .preview-artifacts/bordas*.png
@@ -122,6 +124,7 @@ jobs:
         if: always()
         with:
           name: design-publico-${{ github.sha }}
+          retention-days: 7
           path: |
             docs/design/.preview-artifacts/
             docs/design/prototipos/sumula/*.png
@@ -147,6 +150,7 @@ jobs:
         if: failure()
         with:
           name: webkit-boundaries-evidence
+          retention-days: 7
           path: test-results
 
   validate:
