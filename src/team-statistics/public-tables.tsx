@@ -74,21 +74,21 @@ export function TeamsTable({
   onPage: (p: number) => void;
   onSort: (key: TeamsPage["query"]["sort"]) => void;
 }) {
-  if (!d.total)
-    const decimalColumns = new Set(
-      d.query.columns.filter(
-        (metric) =>
-          (d.query.mode === "per-game" &&
-            metric !== "games" &&
-            !metric.endsWith("Percentage")) ||
-          columnHasDecimal(d.rows.map((row) => row.statistics[metric].value)),
-      ),
-    );
-  return (
-    <p className="statistics-empty">
-      Nenhuma inscrição com resultados confirmados neste recorte.
-    </p>
+  const decimalColumns = new Set(
+    d.query.columns.filter(
+      (metric) =>
+        (d.query.mode === "per-game" &&
+          metric !== "games" &&
+          !metric.endsWith("Percentage")) ||
+        columnHasDecimal(d.rows.map((row) => row.statistics[metric].value)),
+    ),
   );
+  if (!d.total)
+    return (
+      <p className="statistics-empty">
+        Nenhuma inscrição com resultados confirmados neste recorte.
+      </p>
+    );
   return (
     <>
       <TooltipProvider>
