@@ -314,6 +314,20 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
     if (info.project.use.hasTouch) await button.tap();
     else await button.hover();
     await expect(page.getByRole("tooltip")).toHaveText(name);
+    // A delayed scroll event must not revive the tip dismissed by Escape.
+    await button.evaluate((el) => {
+      el.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      );
+      el.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    if (info.project.use.hasTouch) await button.tap();
+    else {
+      await page.mouse.move(0, 0);
+      await button.hover();
+    }
+    await expect(page.getByRole("tooltip")).toHaveText(name);
     const entry = legend.locator("dl > div").filter({
       has: page.locator("dt").filter({ hasText: new RegExp(`^${label}$`) }),
     });

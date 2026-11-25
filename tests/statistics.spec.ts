@@ -58,7 +58,13 @@ for (const withBoxscore of [false, true]) {
         })),
       );
     const before = await measure();
+    const modeResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/public/statistics/") &&
+        new URL(response.url()).searchParams.get("mode") === "per-game",
+    );
     await page.getByRole("button", { name: "Por jogo", exact: true }).click();
+    await modeResponse;
     await expect(
       page.locator('[aria-label="Resultado da consulta"]'),
     ).toHaveAttribute("aria-busy", "false");

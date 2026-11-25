@@ -12,6 +12,18 @@ test("Equipes alinha Total/Por jogo à direita em qualquer largura", async ({
       page.getByRole("table", { name: "Estatísticas das equipes" }),
     ).toBeVisible();
     const group = page.locator(".team-list-segments");
+    // Table measurement runs in ResizeObserver after the query renders.
+    await expect
+      .poll(() =>
+        group.evaluate((el) => {
+          const bar = el.getBoundingClientRect();
+          const mode = el
+            .querySelector('[aria-label="Modo"]')!
+            .getBoundingClientRect();
+          return Math.abs(mode.right - bar.right);
+        }),
+      )
+      .toBeLessThan(1);
     const bar = (await group.boundingBox())!;
     const scope = (await group
       .getByRole("group", { name: "Escopo" })

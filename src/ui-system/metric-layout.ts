@@ -16,7 +16,12 @@ export function metricColumnStyle(
   forceDecimal = false,
 ): CSSProperties {
   const decimalColumn =
-    forceDecimal || columnHasDecimal(samples.map((sample) => sample.value));
+    forceDecimal ||
+    columnHasDecimal(
+      samples.map(({ value, totalFactor = 1 }) =>
+        value === null ? null : value * Math.max(1, totalFactor),
+      ),
+    );
   const width = (text: string) =>
     [...text].reduce(
       (sum, char) =>

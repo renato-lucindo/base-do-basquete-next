@@ -28,16 +28,19 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
   current.current = tip;
   const hide = () => {
     clearTimeout(timer.current);
+    current.current = null;
     setTip(null);
   };
   const show = (anchor: HTMLElement, text: string) => {
     clearTimeout(timer.current);
-    setTip({ anchor, text });
+    const next = { anchor, text };
+    current.current = next;
+    setTip(next);
   };
   const leave = () => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      if (current.current?.anchor !== document.activeElement) setTip(null);
+      if (current.current?.anchor !== document.activeElement) hide();
     }, 160);
   };
   useLayoutEffect(() => {
