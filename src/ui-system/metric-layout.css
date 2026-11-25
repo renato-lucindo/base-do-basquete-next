@@ -31,3 +31,12 @@ th.bb-metric-column .sort-arrow {
   width: 1em;
   margin: 0;
 }
+
+/* Metric values own alignment, including the second column of compact tables. */
+.bb-metric-value {
+  text-align: right !important;
+  position: static !important;
+}
+th.bb-metric-column {
+  left: auto !important;
+}

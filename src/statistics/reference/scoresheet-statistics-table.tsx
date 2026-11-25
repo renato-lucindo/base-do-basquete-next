@@ -259,8 +259,8 @@ export function ScoresheetStatisticsTable({
                     data-public-metric={key}
                     className={
                       data.sort === key
-                        ? "reference-sorted active-column"
-                        : undefined
+                        ? "bb-metric-value reference-sorted active-column"
+                        : "bb-metric-value"
                     }
                     data-leader={
                       data.leaders[key]?.some(

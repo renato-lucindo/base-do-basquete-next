@@ -169,6 +169,8 @@ for (const width of [320, 390, 639, 640, 1366, 1920]) {
           .locator("thead th.bb-metric-column")
           .all())
           await expect(header).toHaveCSS("text-align", "center");
+        for (const cell of await table.locator("tbody td").all())
+          await expect(cell).toHaveCSS("text-align", "right");
         const widths = () =>
           table
             .locator("thead th")

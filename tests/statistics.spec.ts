@@ -93,6 +93,13 @@ for (const withBoxscore of [false, true]) {
       expect(Math.abs(value.x - after[index].x)).toBeLessThan(1);
     });
     await expect(clear).toHaveCount(0);
+    expect(
+      await table
+        .locator("tbody td[data-public-metric]")
+        .evaluateAll((cells) => [
+          ...new Set(cells.map((cell) => getComputedStyle(cell).textAlign)),
+        ]),
+    ).toEqual(["right"]);
     const columnPicker = page.locator(".column-picker");
     await columnPicker.getByRole("button", { name: /Colunas/ }).click();
     await columnPicker

@@ -541,7 +541,7 @@ export function ParticipationStatistics({
                     </small>
                   </th>
                   {globalColumns.map((k) => (
-                    <td key={k}>
+                    <td key={k} className="bb-metric-value">
                       {showNumber(values?.statistics[k].value)}
                       {values?.statistics[k].value != null &&
                       k === "freeThrowPercentage"

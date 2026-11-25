@@ -539,7 +539,9 @@ export function PlayerPublicPage() {
                                   }
                                 </td>
                                 {RECORD_METRICS.map((m) => (
-                                  <td key={m}>{value(summary, m)}</td>
+                                  <td key={m} className="bb-metric-value">
+                                    {value(summary, m)}
+                                  </td>
                                 ))}
                               </tr>
                             );
@@ -726,7 +728,7 @@ export function PlayerPublicPage() {
                                   {g.games.filter((p) => p.fact.played).length}
                                 </td>
                                 {view.columns.map((m) => (
-                                  <td key={m}>
+                                  <td key={m} className="bb-metric-value">
                                     {value(summaries.get(g.key) ?? null, m)}
                                   </td>
                                 ))}

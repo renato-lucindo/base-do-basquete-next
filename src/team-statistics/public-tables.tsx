@@ -167,6 +167,7 @@ export function TeamsTable({
                       {d.query.columns.map((metric: TeamMetric) => (
                         <td
                           key={metric}
+                          className="bb-metric-value"
                           title={`${TEAM_METRICS[metric].name}. Cobertura: ${r.metricCoverage[metric]} de ${r.gamesPlayed} jogos publicados.`}
                         >
                           <MetricCell

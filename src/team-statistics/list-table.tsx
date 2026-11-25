@@ -123,7 +123,7 @@ export function TeamsListTable({
                         <td
                           key={key}
                           data-team-value={key}
-                          className={positive ? "team-list-maximum" : undefined}
+                          className={`bb-metric-value ${positive ? "team-list-maximum" : ""}`}
                         >
                           {cell.value === null ? (
                             <span
