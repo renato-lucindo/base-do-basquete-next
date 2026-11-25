@@ -9,7 +9,7 @@ Fundação publicada em https://base-do-basquete-next-preview.renato-lucindo-jr.
 Procedimento de criação usado (histórico; não repetir):
 
 1. Abra [Users do projeto novo](https://supabase.com/dashboard/project/nizmasjddyrhmevvfviz/auth/users?new=true). O formulário “Create a new user” foi deixado aberto no Chrome desta máquina.
-2. Informe `renato.lucindo.jr@gmail.com` e uma senha própria de pelo menos 12 caracteres, diretamente no painel. Mantenha “Auto confirm user?” marcado e conclua em “Create user”. Esse caminho não envia convite nem e-mail de confirmação.
+2. Informe o e-mail administrativo definido pelo responsável e uma senha própria de pelo menos 12 caracteres, diretamente no painel. Mantenha “Auto confirm user?” marcado e conclua em “Create user”. Esse caminho não envia convite nem e-mail de confirmação.
 3. Informe nesta conversa somente **“conta criada”**. Nunca envie a senha, tokens ou captura contendo credenciais.
 
 A ferramenta de navegador exige intervenção humana para inserir e concluir novas credenciais. Nenhuma senha foi preenchida pelo agente; o formulário foi preparado para essa intervenção. Evidência local, ignorada pelo Git: `.preview-artifacts/admin-user-handoff.png`.
