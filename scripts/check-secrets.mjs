@@ -54,17 +54,19 @@ const configSecret = new RegExp(
   ].join(""),
   "im",
 );
+const sourceExtensions = /\.(?:[cm]?[jt]sx?|jsonc?|md|html|ya?ml|toml|sql)$/;
+const extraExtensions = /\.(?:env|vars|txt|csv|sh|ps1|py)$/;
 const failures = [];
 for (const path of new Set(files)) {
-  if (
-    !/\.(?:[cm]?[jt]sx?|jsonc?|md|html|ya?ml|toml|sql|env|vars|txt|csv|sh|ps1|py)$/.test(path) ||
-    statSync(path).size > 3_000_000
-  )
+  const supported = sourceExtensions.test(path) || extraExtensions.test(path);
+  if (!supported || statSync(path).size > 3_000_000) {
     continue;
+  }
   const text = readFileSync(path, "utf8");
   const configuration = /\.(?:jsonc?|toml|ya?ml|env|vars)$/.test(path);
-  if (configuration && configSecret.test(text))
+  if (configuration && configSecret.test(text)) {
     failures.push(`${path}: padrão config-secret-literal`);
+  }
   for (const [name, pattern] of patterns)
     if (pattern.test(text)) failures.push(`${path}: padrão ${name}`);
 }
