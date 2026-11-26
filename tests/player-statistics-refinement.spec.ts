@@ -310,8 +310,25 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
     await expect(button).toBeFocused();
     await expect(page.getByRole("tooltip")).toHaveText(name);
     await page.keyboard.press("Escape");
+    // Query completion may restore focus after dismissal; it is not a new intent.
+    await button.evaluate((el) => {
+      el.blur();
+      el.focus({ preventScroll: true });
+    });
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Shift+Tab");
+    await expect(button).toBeFocused();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    await page.keyboard.press("Escape");
     await expect(page.getByRole("tooltip")).toBeHidden();
     // Safari may activate a button without assigning focus to it.
+    f.state.delayNext = 100;
+    const sortedResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/public/statistics/") &&
+        new URL(response.url()).searchParams.get("sort") === key,
+    );
     await button.evaluate((el) => {
       el.blur();
       (el as HTMLButtonElement).click();
@@ -320,6 +337,10 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
     await expect(button).toBeFocused();
     await expect(page.getByRole("tooltip")).toHaveText(name);
     await page.keyboard.press("Escape");
+    await sortedResponse;
+    await expect(
+      page.locator('[aria-label="Resultado da consulta"]'),
+    ).toHaveAttribute("aria-busy", "false");
     await expect(page.getByRole("tooltip")).toBeHidden();
     if (info.project.use.hasTouch) await button.tap();
     else await button.hover();

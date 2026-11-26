@@ -9,12 +9,17 @@ import {
   type ReactNode,
   type RefObject,
   type SyntheticEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { createPortal } from "react-dom";
 type Tip = { anchor: HTMLElement; text: string };
 type TipContext = {
   tip: Tip | null;
-  show: (anchor: HTMLElement, text: string) => void;
+  show: (
+    anchor: HTMLElement,
+    text: string,
+    explicitActivation?: boolean,
+  ) => void;
   hide: () => void;
   leave: () => void;
 };
@@ -24,6 +29,7 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
   const [position, setPosition] = useState({ left: 12, top: 12 });
   const tipRef = useRef<HTMLDivElement>(null);
   const current = useRef<Tip | null>(null);
+  const dismissed = useRef<HTMLElement | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   current.current = tip;
   const hide = () => {
@@ -31,7 +37,13 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     current.current = null;
     setTip(null);
   };
-  const show = (anchor: HTMLElement, text: string) => {
+  const show = (
+    anchor: HTMLElement,
+    text: string,
+    explicitActivation = false,
+  ) => {
+    if (dismissed.current === anchor && !explicitActivation) return;
+    dismissed.current = null;
     clearTimeout(timer.current);
     const next = { anchor, text };
     current.current = next;
@@ -60,7 +72,10 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
   }, [tip]);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") hide();
+      if (e.key === "Escape") {
+        dismissed.current = current.current?.anchor ?? dismissed.current;
+        hide();
+      } else if (e.key === "Tab") dismissed.current = null;
     };
     const outside = (e: PointerEvent) => {
       if (!current.current?.anchor.contains(e.target as Node)) hide();
@@ -85,7 +100,11 @@ export function TooltipProvider({ children }: { children: ReactNode }) {
     document.addEventListener("pointermove", move);
     const scroll = () => {
       const active = current.current;
-      if (active && active.anchor === document.activeElement)
+      if (
+        active &&
+        active.anchor === document.activeElement &&
+        active.anchor !== dismissed.current
+      )
         setTip({ ...active });
       else hide();
     };
@@ -128,14 +147,16 @@ export function useNameTooltip(text: string) {
     ref: ref as RefObject<HTMLButtonElement>,
     "aria-describedby":
       tip?.anchor === ref.current ? "metric-tooltip" : undefined,
-    onPointerEnter: activate,
+    onPointerEnter: (event: ReactPointerEvent<HTMLElement>) => {
+      if (event.pointerType !== "touch") show(event.currentTarget, text, true);
+    },
     onPointerLeave: leave,
     onFocus: activate,
     onBlur: hide,
     onClick: (event: SyntheticEvent<HTMLElement>) => {
       // Safari does not consistently focus buttons activated by touch.
       event.currentTarget.focus({ preventScroll: true });
-      activate(event);
+      show(event.currentTarget, text, true);
     },
   };
 }
