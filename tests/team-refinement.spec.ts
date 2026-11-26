@@ -12,35 +12,40 @@ test("Equipes alinha Total/Por jogo à direita em qualquer largura", async ({
       page.getByRole("table", { name: "Estatísticas das equipes" }),
     ).toBeVisible();
     const group = page.locator(".team-list-segments");
-    // Table measurement runs in ResizeObserver after the query renders.
+    // A resize can settle between protocol calls. Read every rectangle in one
+    // browser task, then wait for the complete layout contract together.
     await expect
       .poll(() =>
-        group.evaluate((el) => {
+        group.evaluate((el, width) => {
           const bar = el.getBoundingClientRect();
+          const scope = el
+            .querySelector('[aria-label="Escopo"]')!
+            .getBoundingClientRect();
           const mode = el
             .querySelector('[aria-label="Modo"]')!
             .getBoundingClientRect();
-          return Math.abs(mode.right - bar.right);
-        }),
+          return {
+            leftAligned: Math.abs(scope.left - bar.left) < 1,
+            rightAligned: Math.abs(mode.right - bar.right) < 1,
+            desktopRow:
+              width < 640 ||
+              (Math.abs(
+                scope.top + scope.height / 2 - mode.top - mode.height / 2,
+              ) < 1 &&
+                mode.left > scope.right),
+            wrappedRow:
+              width >= 640 ||
+              mode.top <= scope.top + 1 ||
+              mode.top >= scope.bottom,
+          };
+        }, width),
       )
-      .toBeLessThan(1);
-    const bar = (await group.boundingBox())!;
-    const scope = (await group
-      .getByRole("group", { name: "Escopo" })
-      .boundingBox())!;
-    const mode = (await group
-      .getByRole("group", { name: "Modo" })
-      .boundingBox())!;
-    expect(Math.abs(scope.x - bar.x)).toBeLessThan(1);
-    expect(Math.abs(mode.x + mode.width - bar.x - bar.width)).toBeLessThan(1);
-    if (width >= 640) {
-      expect(
-        Math.abs(scope.y + scope.height / 2 - mode.y - mode.height / 2),
-      ).toBeLessThan(1);
-      expect(mode.x - scope.x - scope.width).toBeGreaterThan(0);
-    } else if (mode.y > scope.y + 1) {
-      expect(mode.y).toBeGreaterThanOrEqual(scope.y + scope.height);
-    }
+      .toEqual({
+        leftAligned: true,
+        rightAligned: true,
+        desktopRow: true,
+        wrappedRow: true,
+      });
     await expect(group).toBeVisible();
     await expect(page.locator(".team-list-page .statistics-public")).toHaveCSS(
       "background-color",
