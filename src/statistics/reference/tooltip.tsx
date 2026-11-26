@@ -132,6 +132,10 @@ export function useNameTooltip(text: string) {
     onPointerLeave: leave,
     onFocus: activate,
     onBlur: hide,
-    onClick: activate,
+    onClick: (event: SyntheticEvent<HTMLElement>) => {
+      // Safari does not consistently focus buttons activated by touch.
+      event.currentTarget.focus({ preventScroll: true });
+      activate(event);
+    },
   };
 }

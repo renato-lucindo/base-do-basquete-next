@@ -311,6 +311,16 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
     await expect(page.getByRole("tooltip")).toHaveText(name);
     await page.keyboard.press("Escape");
     await expect(page.getByRole("tooltip")).toBeHidden();
+    // Safari may activate a button without assigning focus to it.
+    await button.evaluate((el) => {
+      el.blur();
+      (el as HTMLButtonElement).click();
+      el.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await expect(button).toBeFocused();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("tooltip")).toBeHidden();
     if (info.project.use.hasTouch) await button.tap();
     else await button.hover();
     await expect(page.getByRole("tooltip")).toHaveText(name);
