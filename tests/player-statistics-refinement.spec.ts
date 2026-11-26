@@ -291,6 +291,11 @@ test("súmula:100linhas, paginação antes da legenda e controles sem formulári
 test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
   page,
 }, info) => {
+  // Native Safari traversal on macOS: microsoft/playwright#5609.
+  const tab =
+    info.project.use.browserName === "webkit" && process.platform === "darwin"
+      ? "Alt+Tab"
+      : "Tab";
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url + "&preset=custom&columns=pointsShare,fiveFouls");
   const table = page.getByRole("table", {
@@ -316,8 +321,8 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
       el.focus({ preventScroll: true });
     });
     await expect(page.getByRole("tooltip")).toBeHidden();
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press(tab);
+    await page.keyboard.press(`Shift+${tab}`);
     await expect(button).toBeFocused();
     await expect(page.getByRole("tooltip")).toHaveText(name);
     await page.keyboard.press("Escape");
