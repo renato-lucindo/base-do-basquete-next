@@ -18,6 +18,7 @@ import { SetupOptions } from "./setup-options";
 import { TiePanel } from "./tie-panel";
 import { RegulationProjection } from "./projection";
 import { LegacySetupEditor } from "./setup-legacy-editor";
+import { RegularScheduleEditor } from "./regular-schedule-editor";
 import "./setup.css";
 export const seriesFormatLabels = {
   single: "Jogo único",
@@ -60,11 +61,13 @@ export function CompetitionSetupWorkspace(props: Props) {
     [needsReload, setNeedsReload] = useState(false),
     [perRound, setPerRound] = useState(false),
     [draftLocked, setDraftLocked] = useState(false),
+    [scheduleLocked, setScheduleLocked] = useState(false),
     [tieEditing, setTieEditing] = useState(false),
     [customGroups, setCustomGroups] = useState(false);
   const pending = useRef<SaveCompetitionSetup | null>(null),
     alive = useRef(true),
     draftGuard = useRef(() => true),
+    scheduleGuard = useRef(() => true),
     errorRef = useRef<HTMLParagraphElement>(null),
     path = `/api/competition-setups/${props.disputeId}`;
   const dirty = !!document && definitionKey(document) !== baseline,
@@ -128,6 +131,7 @@ export function CompetitionSetupWorkspace(props: Props) {
   useEffect(() => {
     props.guard.current = () =>
       !busy &&
+      scheduleGuard.current() &&
       draftGuard.current() &&
       (!(dirty || uncertain) ||
         window.confirm(
@@ -202,7 +206,8 @@ export function CompetitionSetupWorkspace(props: Props) {
       conflict ||
       needsReload ||
       tieEditing ||
-      draftLocked
+      draftLocked ||
+      scheduleLocked
     )
       return;
     if (!pending.current) {
@@ -418,6 +423,19 @@ export function CompetitionSetupWorkspace(props: Props) {
                   As equipes cadastradas entram no grupo automaticamente.
                 </p>
               )}
+              <RegularScheduleEditor
+                setup={document}
+                view={view}
+                dirty={dirty}
+                disabled={locked || custom || draftLocked}
+                guard={scheduleGuard}
+                onLock={setScheduleLocked}
+                onSessionLost={props.onSessionLost}
+                onSaved={async () => {
+                  props.onSaved();
+                  await reload();
+                }}
+              />
               {document.groupCount > 1 && document.knockoutSize > 0 && (
                 <div className="setup-vacancies">
                   <label className="setup-field">
@@ -796,6 +814,7 @@ export function CompetitionSetupWorkspace(props: Props) {
                 conflict ||
                 tieEditing ||
                 draftLocked ||
+                scheduleLocked ||
                 !props.enabled ||
                 (!dirty && !uncertain)
               }

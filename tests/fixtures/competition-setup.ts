@@ -12,7 +12,10 @@ import {
   type CompetitionSetupView,
 } from "../../src/regulation/setup-contract";
 import type { CompetitionSetup } from "../../src/regulation/format";
-export async function competitionSetupFixture(page: Page) {
+export async function competitionSetupFixture(
+  page: Page,
+  options: { emptyGames?: boolean } = {},
+) {
   const f = await gamesFixture(page),
     raw = JSON.stringify(regulationFixture())
       .replaceAll(regulationId(90), tid(3))
@@ -20,6 +23,10 @@ export async function competitionSetupFixture(page: Page) {
       .replaceAll(regulationId(2), tid(6))
       .replaceAll(regulationId(100), tid(8)),
     context = JSON.parse(raw).context;
+  if (options.emptyGames) {
+    context.games = [];
+    context.publishedGames = [];
+  }
   let document: CompetitionSetup | null = null,
     version = 0,
     loseAck = false;

@@ -110,7 +110,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
   margin: 0.5625rem 0 1.1875rem;
+}
+.game-editor-dialog .game-swap-row {
+  display: flex;
+  justify-content: flex-end;
 }
 .game-editor-dialog .game-registration-tools p {
   color: var(--bb-muted);
