@@ -55,7 +55,7 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 
 ## Estatísticas e publicação
 
-Pedido de 03/11/2026: a classificação usa exatamente **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD**, nessa ordem. Aprov. é V/J × 100 e permanece indefinido antes do primeiro jogo; não é pontuação do campeonato nem critério novo de desempate. O perfil recebe a inscrição explícita. Preservar grupos, fases, decisões e empates do domínio.
+Apresentação vigente em 26/11/2026: a classificação usa **Pos., Equipe, PTS, J, V, D, Aprov., PP, PC, SLD, AVG, Últimos jogos**, nessa ordem. Aprov. é V/J × 100 e permanece indefinido antes do primeiro jogo; não é pontuação do campeonato nem critério novo de desempate. O perfil recebe a inscrição explícita. Preservar grupos, fases, decisões e empates do domínio.
 
 Equipes reutiliza métricas, siglas, precisão, controles e tabelas de Jogadores quando a fonte coletiva for suficiente. LL% é adicional na súmula e usa soma de `freeMade`/soma de `freeTaken`; o boxscore conserva uma única coluna de LL%. Tentativas zero e cobertura incompleta são ausência, não 0%. Uma linha por inscrição, com ordenação, busca, fases publicadas, totais/médias, escolha de colunas e estado na URL. Não completar coletivos a partir de somas parciais de atletas, nem somar MIN, +/− ou participação individual em pontos como medida coletiva. Cobertura e fonte permanecem nos contratos técnicos; a apresentação de ausência segue os padrões comuns, sem parágrafos preventivos na interface.
 
@@ -156,7 +156,7 @@ Usar inscrição publicada, `A definir` para participante desconhecido e `—` p
 
 Apresentação atualizada por decisão de08/11/2026. A documentação foi consolidada antes das mudanças de tela. Execução, verificações e preview ficam no [plano da unidade](../PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026) e no checkpoint; padrão aprovado não constitui evidência de deploy ou aceite humano.
 
-Uma tabela por vez, na ordem **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD, Últimos jogos**. O cabeçalho **Últimos jogos** é centralizado; o limite continua sendo cinco resultados. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada baseada na fonte padrão do navegador. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
+Uma tabela por vez, na ordem **Pos., Equipe, PTS, J, V, D, Aprov., PP, PC, SLD, AVG, Últimos jogos**. O cabeçalho **Últimos jogos** é centralizado; o limite continua sendo cinco resultados. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada baseada na fonte padrão do navegador. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
 
 Não inserir o bloco fixo “Classificação provisória” nem o parágrafo genérico “Resultados publicados atualizam esta consulta. Empates e pendências não confirmam colocações finais.”. Erros, ausência de resultados e pendências concretas continuam sendo comunicados quando aplicáveis. Cabeçalhos e legenda seguem os [padrões comuns](PADROES.md#textos-de-apresentação): **Equipe** e **Últimos jogos** não têm tooltip/botão de ajuda; abreviações recebem somente seu significado curto; legenda reutiliza a apresentação de Jogadores e Equipes, sem explicações adicionais.
 
@@ -174,7 +174,7 @@ Preservar separadamente, na identificação acessível dos ícones, vitória/der
 
 A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo de Equipes fica à esquerda e Total/Por jogo fica à direita, inclusive se a largura exigir quebra de linha. Cabeçalhos preenchidos de tabela e da agenda pública têm contorno. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
 
-O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
+O nome do campeonato abre em sobreposição a seleção pública por nível, com a disputa atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
 
 A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.
 

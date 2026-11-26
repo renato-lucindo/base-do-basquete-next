@@ -41,17 +41,42 @@ no contexto, mantendo alvos e sobreposição. Critérios/legenda receberam espa�
 
 ## Gates, CI e publicação
 
-**Gate local completo PASS**:865unitários/183arquivos,19transportes,16banco local,
-35acesso/Worker e1PDF runtime; tipos/lint/formato, builds, fronteira cliente e segredos PASS.
-**Browsers novos finais:26Chromium +26WebKit PASS**, com as nove larguras,
-zoom/reflow, estados, retornos e Autocomplete. Catálogo final Chromium PASS.
-Regressão adicional dos consumidores antigos do retorno segue em execução, sem
-alterar suas asserções de destino/filtros/rolagem. CI e publicação aguardam o SHA
-final. O gate interrompido por falta de espaço no C: não é prova.
-`servicos-antes.json` registra o estado observado antes de qualquer publicação.
+Fonte executável final **805fc5b98584ae86d1c912e221bb1f535373b616**.
+O encerramento seguinte atualiza somente documentação, catálogo de referência e capturas;
+nenhum código/teste/runtime adicional ou republicação por documentação.
 
-Admin-publicacao está na versão7c5830cf da PR #91; essa versão atual, suas sessões e
-configurações devem permanecer intactas. Não restaurar a versão antiga do checkpoint anterior.
+- Gate completo local em73dbbe8:865 unitários/183 arquivos,19 transportes,16 banco local,
+  35 Worker/acesso,1 PDF runtime; lint/formato/tipos, builds, fronteira e segredos PASS.
+- CI inicial [45889835643](https://github.com/renato-lucindo/next/actions/runs/45889835643):
+  gate, catálogo e70 WebKit/macOS PASS. Chromium:951 PASS/125 SKIP preexistentes/2 FAIL,
+  ambos no mesmo teste geométrico da súmula (desktop406 contra400; mobile468 contra460).
+- Reproduzido localmente antes de corrigir. Em805fc5b, retirar padding do retorno
+  compartilhado restaurou desktop394 e mobile502−46=456, sem alterar o teste, seus limites
+  ou o alvo anterior de28px. Build foundation e **30 Chromium +26 WebKit finais PASS**.
+  [Registro da regressão e correção](evidencias/2026-11-26-navegacao-classificacao/regressao-ci.json).
+  -96 testes adicionais de consumidores do retorno PASS; mantidas asserções de origem,
+  URL, filtros, paginação e rolagem. Catálogo final Chromium PASS após reconciliar exemplos.
+- Fonte final publicada: **108 combinações reais** (seis páginas × nove larguras × Chromium/WebKit),
+  sem overflow de página; identificação textual à esquerda e números da classificação centrais.
+  [Medições publicadas](evidencias/2026-11-26-navegacao-classificacao/paginas-reais-publicadas.json).
+  As24capturas desta pasta representam a fonte805fc5b, incluindo os perfis com retorno compacto.
+
+**CI do HEAD de entrega:** [checks da PR #89](https://github.com/renato-lucindo/next/pull/89/checks).
+O agente confere o resultado real antes de entregar e o registra na descrição da mesma PR.
+Este link acompanha o HEAD documental; não atribuir aprovação ao run inicial reprovado.
+
+[Preview](https://preview.renato-lucindo-jr.workers.dev/publico.html#b5433b13-a8f9-4baa-b4d9-08066ebf3e96) e
+[admin](https://admin.renato-lucindo-jr.workers.dev/) publicados na fonte805fc5b.
+Admin versão4b9e492a-91c2-419e-97a2-c93ce33d9c64/deploymentc9840f29-5715-44d9-b66f-3c3ea24ce78e;
+preview versãoda9db656-e8de-41de-a756-4dd22ba12c15/deployment389d106d-bce7-416d-9a7c-7e65cca47f8d.
+Health/raiz200, APIs privadas401/403 e76assets comparados porSHA256.
+[HTTP/assets](evidencias/2026-11-26-navegacao-classificacao/publicacao-http.json) e
+[versões/configurações](evidencias/2026-11-26-navegacao-classificacao/servicos-publicados.json).
+Vínculos, namespace de sessões, aliases e configurações existentes conservados.
+
+Admin-publicacao permaneceu exatamente na versão7c5830cf da PR #91, com fonte
+pr91-53e177d-on-039d78a, deployment e configurações intactos. Nenhum teste com login
+humano ou escrita de dados remotos; sem alegar aceite de sessão humana.
 
 ## Revisão e limites
 

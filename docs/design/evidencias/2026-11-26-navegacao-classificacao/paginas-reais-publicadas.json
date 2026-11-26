@@ -1,0 +1,932 @@
+{
+  "source": "Published preview PR89",
+  "sha": "805fc5b98584ae86d1c912e221bb1f535373b616",
+  "requests": [
+    {
+      "path": "/api/public/dispute-status/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "status": 200
+    },
+    {
+      "path": "/api/public/catalog?disputeId=b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "status": 200
+    },
+    {
+      "path": "/api/public/teams/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?mode=per-game&scope=all&sort=points&direction=desc&dataset=all&preset=essentials&columns=games%2Cpoints%2CpointsPerGame%2CtwoMade%2CthreeMade%2CfreeMade%2CfoulsCommitted%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2Cdisqualifications%2CfreeThrowPercentage%2CpointsAgainst%2Cdifference&pageSize=all&selection=all",
+      "status": 200
+    },
+    {
+      "path": "/api/public/statistics/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?dataset=all&mode=total&scope=all&sort=points&dir=desc&page=1&preset=essentials&columns=games%2Cpoints%2CpointsPerGame%2CpointsShare%2CtwoMade%2CthreeMade%2CfreeMade%2CfoulsCommitted%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2Cdisqualifications&pageSize=100",
+      "status": 200
+    },
+    {
+      "path": "/api/public/standings/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "status": 200
+    },
+    {
+      "path": "/api/public/statistics/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?dataset=all&mode=total&scope=all&sort=points&dir=desc&page=1&preset=all&columns=games%2Cminutes%2Cpoints%2Crebounds%2CoffensiveRebounds%2CdefensiveRebounds%2Cassists%2Cturnovers%2Cblocks%2Csteals%2CfoulsCommitted%2CfoulsReceived%2CfieldGoalsMade%2CfieldGoalsAttempted%2CthreePointersMade%2CthreePointersAttempted%2CfreeThrowsMade%2CfreeThrowsAttempted%2Cefficiency%2CplusMinus%2CfieldGoalPercentage%2CthreePointPercentage%2CfreeThrowPercentage%2CpointsShare%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2CpointsPerGame%2Cdisqualifications%2CtwoMade%2CthreeMade%2CfreeMade&pageSize=100",
+      "status": 200
+    },
+    {
+      "path": "/api/public/catalog",
+      "status": 200
+    },
+    {
+      "path": "/api/public/discovery?q=Instituto+Viva+Vida+-+Cetaf&type=teams&entityId=21c478ec-3523-4a8b-8a7d-eac0ce2ab467",
+      "status": 200
+    },
+    {
+      "path": "/api/public/achievements/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "status": 404
+    },
+    {
+      "path": "/api/public/players/5196652e-d387-414f-a0e3-f978e9a90e4a?secao=resumo&mode=per-game&scope=all&age=1",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/fb45e799-25a7-4d34-8d56-7eb1289bd0c5",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/a4a0c11d-dd7c-407a-ab30-1e2f58cc17da",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/293a0bc1-55a1-45af-91b9-6d48d6b18ae7",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/84e74597-a99b-4cf9-9f29-ec8bbc56a693",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/34873ca3-fe2f-47d8-9eb8-1b274f18c6e3",
+      "status": 200
+    }
+  ],
+  "results": [
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 288,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 288,
+      "overflow": 0,
+      "height": 3755,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 296,
+      "overflow": 0,
+      "height": 995.609375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 288,
+      "overflow": 0,
+      "height": 1411.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 296,
+      "overflow": 0,
+      "height": 2696.15625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 288,
+      "overflow": 0,
+      "height": 1829.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 343,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 343,
+      "overflow": 0,
+      "height": 3572,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 351,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 343,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 351,
+      "overflow": 0,
+      "height": 2507.90625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 343,
+      "overflow": 0,
+      "height": 1462.765625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 358,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 358,
+      "overflow": 0,
+      "height": 3572,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 366,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 358,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 366,
+      "overflow": 0,
+      "height": 2507.90625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 358,
+      "overflow": 0,
+      "height": 1407.875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 398,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 398,
+      "overflow": 0,
+      "height": 3536,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 406,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 398,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 406,
+      "overflow": 0,
+      "height": 2507.90625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 398,
+      "overflow": 0,
+      "height": 1349.375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 607,
+      "overflow": 0,
+      "height": 562.703125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 607,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 615,
+      "overflow": 0,
+      "height": 723.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 591,
+      "overflow": 0,
+      "height": 1057.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 607,
+      "overflow": 0,
+      "height": 2156.734375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 607,
+      "overflow": 0,
+      "height": 1240.921875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 608,
+      "overflow": 0,
+      "height": 554.734375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 608,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 616,
+      "overflow": 0,
+      "height": 712.328125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 592,
+      "overflow": 0,
+      "height": 994.375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 608,
+      "overflow": 0,
+      "height": 2156.734375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 608,
+      "overflow": 0,
+      "height": 1236.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 736,
+      "overflow": 0,
+      "height": 525.9375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 736,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 720,
+      "overflow": 0,
+      "height": 656.328125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 720,
+      "overflow": 0,
+      "height": 936.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 736,
+      "overflow": 0,
+      "height": 2156.734375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 736,
+      "overflow": 0,
+      "height": 1236.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 1318,
+      "overflow": 0,
+      "height": 555,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 1318,
+      "overflow": 0,
+      "height": 3402,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 1318,
+      "overflow": 0,
+      "height": 566.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 1206,
+      "overflow": 0,
+      "height": 900.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 1310,
+      "overflow": 0,
+      "height": 1811.15625,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 1260,
+      "overflow": 0,
+      "height": 851.859375,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "classificacao",
+      "width": 1600,
+      "overflow": 0,
+      "height": 867,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogos",
+      "width": 1600,
+      "overflow": 0,
+      "height": 3402,
+      "legendCount": 0
+    },
+    {
+      "browser": "chromium",
+      "kind": "equipes",
+      "width": 1600,
+      "overflow": 0,
+      "height": 867,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "jogadores",
+      "width": 1280,
+      "overflow": 0,
+      "height": 1119.1875,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-equipe",
+      "width": 1480,
+      "overflow": 0,
+      "height": 1774.03125,
+      "legendCount": 1
+    },
+    {
+      "browser": "chromium",
+      "kind": "perfil-jogador",
+      "width": 1260,
+      "overflow": 0,
+      "height": 851.859375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 288,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 288,
+      "overflow": 0,
+      "height": 3755,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 296,
+      "overflow": 0,
+      "height": 995.609375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 288,
+      "overflow": 0,
+      "height": 1411.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 296,
+      "overflow": 0,
+      "height": 2695.890625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 288,
+      "overflow": 0,
+      "height": 1810.15625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 343,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 343,
+      "overflow": 0,
+      "height": 3572,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 351,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 343,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 351,
+      "overflow": 0,
+      "height": 2507.640625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 343,
+      "overflow": 0,
+      "height": 1462.765625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 358,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 358,
+      "overflow": 0,
+      "height": 3572,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 366,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 358,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 366,
+      "overflow": 0,
+      "height": 1898.421875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 358,
+      "overflow": 0,
+      "height": 1407.875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 398,
+      "overflow": 0,
+      "height": 714.65625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 398,
+      "overflow": 0,
+      "height": 3536,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 406,
+      "overflow": 0,
+      "height": 973.21875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 398,
+      "overflow": 0,
+      "height": 1307.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 406,
+      "overflow": 0,
+      "height": 1898.421875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 398,
+      "overflow": 0,
+      "height": 1349.375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 607,
+      "overflow": 0,
+      "height": 562.703125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 607,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 615,
+      "overflow": 0,
+      "height": 723.484375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 591,
+      "overflow": 0,
+      "height": 1057.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 607,
+      "overflow": 0,
+      "height": 1722.171875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 607,
+      "overflow": 0,
+      "height": 1240.921875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 608,
+      "overflow": 0,
+      "height": 554.734375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 608,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 616,
+      "overflow": 0,
+      "height": 712.328125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 592,
+      "overflow": 0,
+      "height": 994.375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 608,
+      "overflow": 0,
+      "height": 2156.828125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 608,
+      "overflow": 0,
+      "height": 1236.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 736,
+      "overflow": 0,
+      "height": 525.9375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 736,
+      "overflow": 0,
+      "height": 3446,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 720,
+      "overflow": 0,
+      "height": 656.328125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 720,
+      "overflow": 0,
+      "height": 936.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 736,
+      "overflow": 0,
+      "height": 1722.171875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 736,
+      "overflow": 0,
+      "height": 1236.140625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 1318,
+      "overflow": 0,
+      "height": 555,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 1318,
+      "overflow": 0,
+      "height": 3402,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 1318,
+      "overflow": 0,
+      "height": 566.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 1206,
+      "overflow": 0,
+      "height": 900.78125,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 1310,
+      "overflow": 0,
+      "height": 1464.015625,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 1260,
+      "overflow": 0,
+      "height": 851.859375,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "classificacao",
+      "width": 1600,
+      "overflow": 0,
+      "height": 867,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogos",
+      "width": 1600,
+      "overflow": 0,
+      "height": 3402,
+      "legendCount": 0
+    },
+    {
+      "browser": "webkit",
+      "kind": "equipes",
+      "width": 1600,
+      "overflow": 0,
+      "height": 867,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "jogadores",
+      "width": 1280,
+      "overflow": 0,
+      "height": 1119.1875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-equipe",
+      "width": 1480,
+      "overflow": 0,
+      "height": 1434.921875,
+      "legendCount": 1
+    },
+    {
+      "browser": "webkit",
+      "kind": "perfil-jogador",
+      "width": 1260,
+      "overflow": 0,
+      "height": 851.859375,
+      "legendCount": 1
+    }
+  ]
+}

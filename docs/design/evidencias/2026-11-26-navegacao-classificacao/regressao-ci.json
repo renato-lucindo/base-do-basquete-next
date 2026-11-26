@@ -1,0 +1,39 @@
+{
+  "source": "73dbbe85f12e919aa22d290d15a137971f971991",
+  "run": "https://github.com/renato-lucindo/next/actions/runs/45889835643",
+  "checks": "success",
+  "unitTests": 865,
+  "webkit": {
+    "result": "success",
+    "passed": 70
+  },
+  "chromiumShard2": {
+    "result": "failure",
+    "passed": 413,
+    "skipped": 125,
+    "failed": 1,
+    "test": "public-implementation-visual.spec.ts: súmula real mantém atletas na primeira tela e detalhes acessíveis / mobile",
+    "firstRowMinusSearchHeight": 468,
+    "requiredLessThan": 460
+  },
+  "correction": {
+    "source": "805fc5b98584ae86d1c912e221bb1f535373b616",
+    "change": "Remove vertical padding from the shared contextual return; preserves its existing 28px link target",
+    "testUnchanged": true,
+    "mobileFirstRow": 502,
+    "mobileSearchHeight": 46,
+    "mobileAdjustedFirstRow": 456,
+    "desktopFirstRow": 394,
+    "localChromiumPassed": 30,
+    "localWebkitPassed": 26
+  },
+  "validate": "failure",
+  "chromiumShard1": {
+    "result": "failure",
+    "passed": 538,
+    "failed": 1,
+    "test": "public-implementation-visual.spec.ts / desktop",
+    "firstRow": 406,
+    "requiredLessThan": 400
+  }
+}

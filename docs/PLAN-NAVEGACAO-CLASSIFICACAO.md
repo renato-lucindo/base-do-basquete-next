@@ -31,11 +31,11 @@ Preservar admin-publicacao, sessões, configurações, dados e alterações alhe
       perfil à esquerda e páginas curtas/longas; ajustar composição/CSS restrito.
 - [x] 4. Atualizar padrões e catálogo conflitantes. Revisar UI com
       ui-ux-pro-max e web-design-guidelines; comparar páginas reais renderizadas.
-- [ ] 5. Conferir320/375/390/430/639/640/768/1366/1920px e200%; executar focais,
+- [x] 5. Conferir320/375/390/430/639/640/768/1366/1920px e200%; executar focais,
       gate e Chromium/WebKit aplicáveis; corrigir regressões sem afrouxar critérios.
-- [ ] 6. Commit/push na mesma PR, CI real do HEAD, publicar admin/preview,
-      conferir versão/assets/privados e admin-publicacao intacto; atualizar evidências
-      e checkpoint. Sem aceite humano presumido.
+- 6. Encerramento na mesma PR: CI real do HEAD nos checks, publicar admin/preview,
+     conferir versão/assets/privados e admin-publicacao intacto; atualizar evidências
+     e checkpoint. Sem aceite humano presumido.
 
 ## Atenção na revisão
 
@@ -79,3 +79,12 @@ sugestões genéricas de placeholder e virtualização. Sem subagente disponíve
 revisão de diff feita pelo implementador, sem alegar parecer independente.
 
 Gate consolidado final PASS (865unitários/183arquivos,19transportes,16banco,35Worker,1PDF, builds/fronteira/segredos).26Chromium +26WebKit finais PASS, sem novas dispensas. Regressão adicional de retornos antigos em execução; CI/publicação pendentes.
+
+Encerramento: fonte805fc5b publicada em admin/preview, configurações e serviço fixo
+intactos. Health/raiz200, privados401/403 e76assetsSHA256;108combinações de páginas
+publicadas conferidas. CI inicial73dbbe8 aprovou gate/design/70WebKit, mas encontrou
+2falhas da súmula por12px extras do retorno. Correção mínima reproduzida e validada:
+desktop394<400, mobile456<460;30Chromium+26WebKit PASS, teste/limites intactos.
+Regressão adicional96/96PASS. Evidência da CI final acompanha os checks do HEAD
+na PR e seu resumo final; o run inicial não é prova de aprovação. Os commits de
+encerramento não alteram runtime. Aguardar aceite explícito antes de qualquer merge.
