@@ -1,8 +1,20 @@
 # Validação dos perfis de equipes
 
-Unidade `codex/perfis-equipes`, iniciada em `824a3d59da5323202d869a4d93a1038bcd377044`. Requisitos e HTML aceitos em [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md). Evidência de 22/11/2026. Código executável `cfee448fdd36cd288dd4a7861c643abb6a07d442`; atualização posterior somente documental, sem invalidar os artefatos verificados.
+Este relatório preserva a rodada inicial de22/11/2026 e as revisões posteriores por fonte. As pendências descritas nas rodadas históricas se referem àquele SHA; o resultado vigente está consolidado abaixo. Requisitos em [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md).
 
-## Resultado implementado
+## Resultado consolidado — 26/11/2026 UTC
+
+[CI45731786815](https://github.com/renato-lucindo/next/actions/runs/45731786815), SHA7f18cae1a86cf617af962f5a2fc7ba55903e8c30: todos os jobs SUCCESS, inclusive validate. Gate completo859unitários/183arquivos,927Chromium (526+401),44WebKit/macOS e catálogo aprovados;125dispensas mobile preexistentes, sem novos skips, tolerâncias ampliadas ou timeout aumentado. Artefatos enviados normalmente. A navegação nativa Option+Tab confirmou o contrato no macOS.
+
+Admin/preview atendem a fonte5bdb298246d557607f366f69b6faa6af956d7293, com código executável idêntico ao SHA validado (diferença somente em teste/documentação). Health/raiz200, privados401/403,12assetsSHA256 e deployments rechecados. admin-publicacao continua fixo na versão3f2a6cf6-d1dc-4dec-91e6-db2c1f9132b4. [Capturas, medidas e registro final](evidencias/2026-11-25-legibilidade/README.md#resultado-consolidado) vinculam fontes e versões; provas visuais da apresentação inalterada foram reutilizadas. Inspeção real e testes automatizados são evidências distintas; sem aceite humano ou revisão independente alegados.
+
+Revisão entregue para avaliação: nomes288/240px,10px laterais nas métricas,100jogadores na rolagem preservada, controles44px/fonte16px/lupa central, seleção de equipes sem busca externa, decimal uniforme permanente e AVG2casas. Variação0px entre Total/Por jogo em campeonato/Elencos/Jogadores da disputa, oito abas e campanhas desktop conferidas. Tooltip conserva Escape após foco restaurado e consulta atrasada; nova interação reabre normalmente. Sem mudanças de cálculos esportivos, banco, dados humanos ou contratos fora da paginação100aditiva já testada.
+
+A decisão sobre abertura Todos/Fase regular e Limpar filtros permanece aguardando resposta à pergunta já enviada. Merge depende de aceite explícito. A CI do encerramento documental aparece no [check do HEAD da PR](https://github.com/renato-lucindo/next/pull/89/checks); não altera o runtime ou invalida essas provas.
+
+## Resultado implementado na rodada inicial — 22/11/2026
+
+Unidade iniciada em824a3d59da5323202d869a4d93a1038bcd377044. Código executável daquela rodada:cfee448fdd36cd288dd4a7861c643abb6a07d442, seguido de atualização somente documental. Este registro histórico não substitui a fonte vigente consolidada acima.
 
 - Perfil geral com cinco abas e perfil da inscrição com três. Busca leva ao geral; inscrições mantêm disputa e inscrição. URL conserva aba, ano, filtros, ordenação, fase/grupo e retorno.
 - Campanhas, sequência de cinco resultados por inscrição e recentes do ano escolhido, reunindo categorias por data. Situação usa o estado oficial. Resultados publicados preenchem jogos, campanha e sequência mesmo antes da organização da classificação. Um estado explícito da projeção prevalece para o mesmo jogo (inclusive exclusão/pendência); agenda não conta como resultado.

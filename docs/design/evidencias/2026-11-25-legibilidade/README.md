@@ -18,3 +18,7 @@ Fonte `a88d42ded657b6303dff971e8b629a001c16b80f`, Copa ES Sub-15/2026, consultas
 Capturas inspecionadas pelo agente. Círculos verde/vermelho, check/X branco e anel original preservados; AVG apósSLD com duas casas. São evidências de execução, não referência de design. Nenhum aceite humano ou revisão independente é alegado.
 
 Observação encontrada na inspeção: o acesso direto de Jogadores herda a fase regular do parser antigo, enquanto Limpar filtros considera Todos o inicial. A decisão sobre a abertura foi apresentada ao responsável; a correção dependente aguarda resposta e não altera os cálculos.
+
+## Resultado consolidado
+
+[CI45731786815](https://github.com/renato-lucindo/next/actions/runs/45731786815), SHA7f18cae1a86cf617af962f5a2fc7ba55903e8c30: SUCCESS em todos os jobs, incluindo validate;859unitários,927Chromium e44WebKit, com125dispensas mobile preexistentes. [Registro final](verificacao-final.json) vincula fonte, versões, smoke e teste remoto. O código executável é idêntico ao runtime5bdb298 dos Workers; a diferença é teste/documentação. Rechecados health200, proteção401/403,12assets porSHA256 e deployments dos três Workers, incluindo o fixo preservado. Encerramento documental não requer republicar UI nem repetir inspeções de artefatos inalterados.
