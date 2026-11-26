@@ -4,7 +4,6 @@ import {
   useId,
   useRef,
   useState,
-  type ReactNode,
   type RefObject,
 } from "react";
 import { api } from "../competition/api";
@@ -20,7 +19,7 @@ import {
   type PublicSection,
 } from "./catalog-contract";
 import { DisputeLinks, publicDisputes, usePublicCatalog } from "./catalog";
-import { safePublicReturn, sectionReturn } from "./navigation";
+import { safePublicReturn, publicReturnLabel } from "./navigation";
 import { PublicSearchForm } from "./search-form";
 
 import "../ui-system/theme.css";
@@ -39,6 +38,20 @@ export function PublicHeader({
   context?: PublicContext | null;
   detail?: string;
 } = {}) {
+  const source = new URLSearchParams(window.location.search).get("returnTo");
+  const listState = new URLSearchParams(
+    window.location.hash.split("?")[1] ?? "",
+  ).get("listState");
+  const returnHref =
+    safePublicReturn(source, disputeId ?? null) ??
+    (disputeId && section
+      ? section === "equipes" && listState
+        ? (safePublicReturn(
+            `/equipes.html#${disputeId}?${listState}`,
+            disputeId,
+          ) ?? disputeLink(disputeId, section))
+        : disputeLink(disputeId, section)
+      : siteHome);
   return (
     <header className="site-header public-header">
       {previewDisputeId() && (
@@ -72,23 +85,11 @@ export function PublicHeader({
           disputeId={disputeId}
           section={section}
           context={context}
-          detail={detail}
         />
       )}
-      {!disputeId && detail && (
-        <nav className="public-return wrap" aria-label="Localização">
-          <a
-            href={
-              safePublicReturn(
-                new URLSearchParams(window.location.search).get("returnTo"),
-                null,
-              ) ?? "/publico.html"
-            }
-          >
-            Voltar à origem
-          </a>
-          <span aria-hidden="true"> / </span>
-          <span aria-current="page">{detail}</span>
+      {detail && (
+        <nav className="public-return wrap" aria-label="Retorno contextual">
+          <a href={returnHref}>{publicReturnLabel(returnHref)}</a>
         </nav>
       )}
     </header>
@@ -98,12 +99,10 @@ function DisputeNavigation({
   disputeId,
   section,
   context,
-  detail,
 }: {
   disputeId: string;
   section: PublicSection;
   context?: PublicContext | null;
-  detail?: string;
 }) {
   const catalog = usePublicCatalog(disputeId);
   const [publicState, setPublicState] = useState<{
@@ -201,8 +200,8 @@ function DisputeNavigation({
               <ol>
                 {(
                   [
-                    ["championship", c.name],
                     ["edition", String(c.year)],
+                    ["championship", c.name],
                     [
                       "gender",
                       c.gender === "masculino" ? "Masculino" : "Feminino",
@@ -230,12 +229,16 @@ function DisputeNavigation({
                     )}
                   </li>
                 ))}
-                <li aria-current="page">
-                  <span>
-                    {c.category}
-                    {c.division ? ` · ${c.division}` : ""}
-                  </span>
-                </li>
+                {c.category && (
+                  <li aria-current={c.division ? undefined : "page"}>
+                    <span>{c.category}</span>
+                  </li>
+                )}
+                {c.division && (
+                  <li aria-current="page">
+                    <span>{c.division}</span>
+                  </li>
+                )}
               </ol>
             </nav>
             {statusText}
@@ -273,18 +276,6 @@ function DisputeNavigation({
           </a>
         ))}
       </nav>
-      {detail && (
-        <nav className="public-return" aria-label="Localização">
-          <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
-          <span aria-hidden="true"> / </span>
-          <a href={sectionReturn(disputeId, section)}>
-            <span className="public-visually-hidden">Voltar à origem: </span>
-            {publicSections.find((s) => s.id === section)?.label}
-          </a>
-          <span aria-hidden="true"> / </span>
-          <span aria-current="page">{detail}</span>
-        </nav>
-      )}
     </div>
   );
 }
@@ -372,29 +363,6 @@ function EditionDisputes({
   );
 }
 
-export function PublicBreadcrumb({
-  context,
-  page,
-  href,
-}: {
-  context?: ReactNode;
-  page: string;
-  href?: string;
-}) {
-  return (
-    <nav className="breadcrumb" aria-label="Localização">
-      <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
-      <span aria-hidden="true">/</span>
-      {context && (
-        <>
-          {href ? <a href={href}>{context}</a> : <span>{context}</span>}
-          <span aria-hidden="true">/</span>
-        </>
-      )}
-      <span aria-current="page">{page}</span>
-    </nav>
-  );
-}
 export function PublicFooter() {
   return (
     <footer className="wrap footer public-footer">

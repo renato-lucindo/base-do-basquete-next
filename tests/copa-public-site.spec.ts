@@ -72,7 +72,7 @@ test("site exclusivo mantém as quatro seções e os detalhes na mesma disputa",
       .first(),
   ).toBeVisible();
   await onlyCopa();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await page
     .getByRole("navigation", { name: "Seções da disputa" })
     .getByRole("link", { name: "Jogadores", exact: true })

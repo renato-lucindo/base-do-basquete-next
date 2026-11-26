@@ -135,26 +135,75 @@
     max-width: 6.875rem;
   }
 }
-@media (min-width: 1051px) {
-  .public-standings .standings-explorer {
-    width: fit-content;
-    max-width: 100%;
-    margin-inline: auto;
-  }
-  .public-standings .standings-explorer .statistics-table-wrap {
-    width: max-content;
-    max-width: 100%;
-  }
-  .public-standings
-    .standings-explorer
-    :is(.scrollable-table-top, .table-legend) {
-    contain: inline-size;
-  }
-}
 @media (max-width: 600px) {
   .public-standings.public-site.statistics-public
     .standings-group-control
     select {
     font-size: calc(1rem + 0.125rem);
   }
+}
+
+/* Only the main standings page centers the natural-width composition. */
+.public-standings .standings-explorer {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: 0;
+}
+.public-main[data-standings] .standings-explorer {
+  margin-inline: auto;
+}
+.public-standings
+  .standings-explorer
+  :is(.scrollable-table, .statistics-table-wrap) {
+  width: max-content;
+  max-width: 100%;
+}
+.public-standings
+  .standings-explorer
+  :is(.scrollable-table-top, .table-legend, .standings-tiebreaks) {
+  contain: inline-size;
+}
+.public-standings .standings-explorer .standings-tiebreaks {
+  margin-top: 0.25rem;
+  font-size: var(--bb-font-detail);
+  overflow-wrap: anywhere;
+}
+.public-standings .standings-tiebreaks summary {
+  width: fit-content;
+  min-height: 2rem;
+  align-content: center;
+  cursor: pointer;
+}
+.public-standings .standings-tiebreaks ol {
+  margin-block: 0.25rem 0.5rem;
+  padding-left: 1.5rem;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .table-legend {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  :is(th, td):not(.standings-team):not(:last-child) {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  tbody
+  .standings-team {
+  font-weight: 600;
+}
+.public-standings.public-site.statistics-public
+  .standings-explorer
+  .statistics-table
+  tbody
+  td:nth-child(3) {
+  font-weight: 700;
 }

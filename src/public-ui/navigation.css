@@ -847,7 +847,8 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
   font-weight: 600;
 }
 .public-dispute-identity > .public-dispute-status {
-  margin: 0.125rem 0 0.5rem;
+  display: flex;
+  margin: 0 0 0.25rem;
 }
 .public-footer {
   display: flex;
@@ -919,4 +920,51 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
   th[scope="row"]
   > a:is(:hover, :focus-visible) {
   text-decoration: underline;
+}
+
+/* Public shells keep the footer in normal flow, below short and long content. */
+#root:has(> .public-header),
+#root > :has(> .public-header) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+#root:has(> .public-header) > main,
+#root > :has(> .public-header) > main {
+  flex: 1 0 auto;
+}
+.public-home .public-main {
+  min-height: 0;
+  padding-bottom: 1rem;
+}
+.public-footer {
+  margin-top: auto;
+}
+.public-header.site-header
+  .public-dispute-breadcrumb
+  .public-competition-trigger {
+  display: flex;
+  align-items: flex-end;
+  min-height: 2.75rem;
+  padding-block: 0 0.125rem;
+  line-height: 1.25;
+}
+.public-dispute-breadcrumb ol,
+.public-dispute-breadcrumb li {
+  align-items: flex-end;
+}
+.public-dispute-breadcrumb {
+  line-height: 1.25;
+}
+.public-dispute-breadcrumb li > span,
+.public-dispute-breadcrumb li + li::before {
+  padding-bottom: 0.125rem;
+}
+@media (max-width: 639px) {
+  .public-header.site-header .public-header-search > button[type="submit"] {
+    display: none;
+  }
+  .public-header.site-header .public-header-search input {
+    font-size: 1rem;
+  }
 }

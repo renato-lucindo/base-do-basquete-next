@@ -27,3 +27,5 @@ Aplicar os padrões públicos vigentes de breadcrumb/status, fontes, rodapé, co
 - **Legendas:** seguir a grade comum em todas as abas, inclusive Elencos, uma vez ao final do conteúdo ativo. Não criar sobrescrita flex local.
 - **Filtros:** o piloto lateral de24/11 foi substituído pelo padrão compartilhado de25/11 em PADROES: identificação interna/label acessível oculto, lupa e limpeza condicional. Entrada de dados em formulários continua com rótulo visível.
 - **Contexto da disputa:** seguir seleção por nível e status textual de PUBLICO.md. Conferir as cinco abas gerais e as três da disputa, vazio e seletores abertos, além dos consumidores compartilhados.
+
+Refinamento de26/11/2026: o contexto começa pelo ano e o retorno contextual substitui o caminho secundário, sem repetir equipe no breadcrumb. A classificação do perfil mantém seu bloco à esquerda; dentro dela, siglas e valores numéricos centrais, identificação textual à esquerda e nomes destacados, conforme PUBLICO.md. Demais estatísticas conservam alinhamento numérico à direita.

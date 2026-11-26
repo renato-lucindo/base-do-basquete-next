@@ -258,9 +258,7 @@ test("Equipes: consulta explícita e retorno do perfil conservam seleção e rol
   await expect(
     page.getByRole("heading", { name: "Inscrição 20", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(table.locator("tbody tr")).toHaveCount(26);
   await expect(
     page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
@@ -326,9 +324,7 @@ test("Equipes: seleção extensa usa referência local e consulta POST sem corta
   await expect(
     page.getByRole("heading", { name: "Inscrição 000", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(table.locator("tbody tr")).toHaveCount(999);
   await expect(page).toHaveURL(/stateRef=/);
 });

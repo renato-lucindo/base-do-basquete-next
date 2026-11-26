@@ -312,7 +312,7 @@ test("retorno de outra disputa mantém aba, filtros e origem", async ({
   await expect(
     page.getByRole("region", { name: "Parciais e placar final", exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(
     page.getByRole("tab", { name: "Ver jogos", exact: true }),
   ).toHaveAttribute("aria-selected", "true");

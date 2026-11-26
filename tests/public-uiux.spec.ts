@@ -186,7 +186,7 @@ test("retorno do perfil preserva página e rolagem interna da tabela", async ({
       exact: true,
     }),
   ).toBeVisible();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await expect
     .poll(() =>
@@ -218,7 +218,7 @@ test("perfil retorna à última página de100 preservando a consulta", async ({
       exact: true,
     }),
   ).toBeVisible();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(table.locator("tbody tr")).toHaveCount(10);
   await expect(page).toHaveURL(origin);
 });

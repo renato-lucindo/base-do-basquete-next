@@ -49,7 +49,11 @@ export function safePublicReturn(
   u.search = "";
   return u.pathname + u.hash;
 }
-export function publicDetailLink(href: string, disputeId: string | null) {
+export function publicDetailLink(
+  href: string,
+  disputeId: string | null,
+  returnTo?: string,
+) {
   const target = new URL(href, "https://public.example");
   const [id, search = ""] = target.hash.slice(1).split("?", 2);
   const p = new URLSearchParams(search);
@@ -57,12 +61,28 @@ export function publicDetailLink(href: string, disputeId: string | null) {
   target.hash = `${id}${p.size ? `?${p}` : ""}`;
   if (typeof window !== "undefined") {
     const from = safePublicReturn(
-      window.location.pathname + window.location.hash,
+      returnTo ?? window.location.pathname + window.location.hash,
       disputeId,
     );
     if (from) target.searchParams.set("returnTo", from);
   }
   return target.pathname + target.search + target.hash;
+}
+export function publicReturnLabel(href: string) {
+  const url = new URL(href, "https://public.example");
+  if (url.pathname === "/estatisticas.html") return "← Voltar aos jogadores";
+  if (url.pathname === "/equipes.html") return "← Voltar às equipes";
+  if (url.pathname === "/equipe.html") return "← Voltar à equipe";
+  if (url.pathname === "/atleta.html") return "← Voltar ao jogador";
+  if (url.pathname === "/resultado.html") return "← Voltar ao jogo";
+  if (url.hash.startsWith("#?")) return "← Voltar à busca";
+  if (url.hash) {
+    const params = new URLSearchParams(url.hash.split("?")[1] ?? "");
+    return params.get("secao") === "jogos"
+      ? "← Voltar aos jogos"
+      : "← Voltar à classificação";
+  }
+  return "← Voltar aos campeonatos";
 }
 export function readPublicDispute(hash: string) {
   const [id = "", search = ""] = hash.replace(/^#/u, "").split("?", 2);

@@ -1,23 +1,35 @@
 # Progresso atual
 
-Atualizado em25/11/2026 (26/11UTC). [Histórico preservado](../historico/progresso/2026-11-25-pausa-legibilidade-resolvida.md).
+Atualizado em26/11/2026. [Histórico anterior](../historico/progresso/2026-11-26-antes-refinamento-navegacao.md).
 
-## Unidade validada para avaliação
+## PR #89 — navegação e classificação pública
 
-Branch `codex/perfis-equipes`, [PR #89](https://github.com/renato-lucindo/next/pull/89). Fonte executável5bdb298246d557607f366f69b6faa6af956d7293; fonte de código/testes validada7f18cae1a86cf617af962f5a2fc7ba55903e8c30, sem diferença de runtime. Este encerramento altera somente documentação. [Matriz](PLAN-TABELAS-FILTROS.md#legibilidade-e-controles--revisão-aprovada-em25112026), [resultado consolidado](design/VALIDACAO-PERFIS-EQUIPES.md#resultado-consolidado--26112026-utc), [provas/versões](design/evidencias/2026-11-25-legibilidade/verificacao-final.json).
+Mesma branch `codex/perfis-equipes`, HEAD de partida `517c14039d5d1e496db7f26289292de08ce53d98`, base `0af33e3`.
+[Plano/matriz](PLAN-NAVEGACAO-CLASSIFICACAO.md) e [evidência](design/VALIDACAO-NAVEGACAO-CLASSIFICACAO.md).
+Implementados caminho iniciado pelo ano, retorno contextual único, busca mobile compacta,
+composição tabela → critérios → legenda, números centrais somente na classificação e rodapé em fluxo normal.
+Perfis mantêm classificação à esquerda e Últimos jogos permanece inalterado.
 
-Nomes288/240px, métricas10px,100jogadores por página na rolagem preservada, campos44px/fonte16px/lupa central, Equipes sem busca externa, decimal uniforme permanente (AVG2casas/ausências preservadas). Consulta real:0px entre modos no campeonato/Elencos/Jogadores, oito abas sem erro/transbordamento e campanhas930px preenchendo painel930px; ícones originais preservados. Tooltip dispensa até nova interação, incluindo foco posterior e consulta atrasada. Capturas inspecionadas; sem aceite humano/parecer independente.
+18unitários focais PASS;22browsers iniciais nas nove larguras e10retentativas focais PASS.
+Inspeção de108combinações de páginas reais Chromium/WebKit, com dados públicos GET.
+Gate completo PASS:865unitários,19transportes,16banco,35Worker,1PDF e builds/checks. Browsers novos finais26Chromium +26WebKit PASS; catálogo Chromium PASS. CI do novo HEAD/publicação ainda pendentes; não declarar aceite humano.
+WebKit revelou blur prematuro ao selecionar entidade no Autocomplete; corrigido,4focais PASS.
+Falhas locais por ENOSPC/interferência entre diretórios de rastros estão registradas no plano.
 
-[CI45731786815](https://github.com/renato-lucindo/next/actions/runs/45731786815) SUCCESS no SHA7f18cae:859unitários/183arquivos,927Chromium,44WebKit/macOS, catálogo evalidate PASS;125dispensas mobile preexistentes, sem novas dispensas/timeouts maiores. Navegação macOS usaOption+Tab conforme Apple/Playwright; mesmas asserções. Gate localUI,24contratos nas seis larguras,20repetições da medição e12contratos do tooltip PASS. Timeout local antigo de premiações não se repetiu nas CIs limpas; causa local não provada. Artefatos enviados normalmente.
+## Serviços e preservação
 
-## Serviços publicados
+Admin/preview ainda na fonte `5bdb298`; publicação do novo código aguarda validação.
+Estado anterior foi conferido pela API Cloudflare e está em `servicos-antes.json` nas evidências.
+Somente esses dois Workers têm atualização autorizada nesta unidade.
 
-Somente admin/preview atualizados pelo conector Cloudflare, fonte5bdb298. Admin versãofb9fb0eb-3d7d-4a1f-9347-177daf39ece3/deployment0110497b-0484-4f70-bf66-8d5ac142e368; preview versão01a51499-d940-4e47-8438-09ca271cc88b/deploymente48fdb31-66d9-4b19-b0a0-dc10b5b5bfc0. Rechecados health/raiz200, privados401/403,12assetsSHA256 e versões. Sessões/segredos/aliases/semAccess preservados; adminnamespace597c612fd69c447e81547f16d5dcca41. Sem escrita humana, mudanças de banco/cálculos ou cobrança. Não republicar por encerramento documental.
+**admin-publicacao preservado:** fonte `pr91-53e177d-on-039d78a`, versão
+`7c5830cf-6770-4cc6-84a2-7c47b1cdeb5f`, deployment `0550af8b-8e47-45ef-9d7d-5714a14e1ba9`.
+Não publicar, reverter ou reconfigurar esse Worker. Sessões e demais vínculos permanecem.
+Sem banco, migrations, regras esportivas, escrita de dados ou merge autorizado nesta entrega.
 
-**Não atualizar/excluir admin-publicacao.** https://admin-publicacao.renato-lucindo-jr.workers.dev/admin, fonte039d78a, versão3f2a6cf6-d1dc-4dec-91e6-db2c1f9132b4/deployment513f2d14-5bd5-4b0a-af28-b3e4c8b32425, reconferido intacto. Namespace isolado2f3752c7b23049e0a4dec04ba7b05e8f; mesmo banco compartilhado de desenvolvimento.
+Checkout humano `sync/trabalho-casa`, CONTRIBUTING/skills locais, PR #91 e outros worktrees preservados.
+A escolha anterior Todos/Fase regular em Jogadores não integra este pedido; não presumida.
 
-## Próximo passo e limites
-
-- [CI obrigatória do HEAD documental e resultado atual](https://github.com/renato-lucindo/next/pull/89/checks). Encerrar a checagem oficial `conferir-legibilidade-da-pr89` após seu resultado, sem novos commits de polling; reaproveitar provas do runtime inalterado.
-- Resposta de design pendente à pergunta já enviada: Jogadores abre Fase regular pelo parser, enquanto Limpar assumeTodos. Aguardar escolha, sem repetir pergunta ou alterar recorte por suposição. A implementação independente já está publicada/validada.
-- Merge continua condicionado ao aceite explícito do responsável. Nenhuma alteração alheia observada; preservar outro worktree de confrontos-fase-regular e seus processos. Não consumir reset/crédito; cota real aos15%restante exige checkpoint e agendamento reset+2min.
+Próximo passo: concluir gate/browsers, commit/push na mesma PR, verificar CI do HEAD,
+publicar admin/preview, conferir versões/assets/privados e atualizar evidências/checkpoint.
+Merge depende do aceite explícito do responsável; sem aceite humano ou revisão independente declarados.

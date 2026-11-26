@@ -369,6 +369,39 @@ export function PublicStandingsTables({
                             </tbody>
                           </table>
                         </ScrollableTable>
+                        {!!g.standings.tieSteps.length && (
+                          <details className="standings-tiebreaks">
+                            <summary>Critérios de desempate aplicados</summary>
+                            <ol>
+                              {g.standings.tieSteps.map((s, i) => (
+                                <li key={i}>
+                                  {
+                                    {
+                                      wins: "Vitórias",
+                                      point_difference: "Saldo de pontos",
+                                      points_for: "Pontos a favor",
+                                      head_to_head_points:
+                                        "Pontos nos confrontos diretos",
+                                      head_to_head_difference:
+                                        "Saldo nos confrontos diretos",
+                                      head_to_head_for:
+                                        "Pontos a favor nos confrontos diretos",
+                                    }[s.criterion]
+                                  }
+                                  :{" "}
+                                  {s.values
+                                    .map(
+                                      (v) =>
+                                        `${label(v.registrationId)}: ${v.value ?? "não informado"}`,
+                                    )
+                                    .join("; ")}
+                                  {s.blocked &&
+                                    ". Cobertura insuficiente para resolver o empate."}
+                                </li>
+                              ))}
+                            </ol>
+                          </details>
+                        )}
                         {!profile && (
                           <section
                             className="table-legend reference-legend"
@@ -388,39 +421,6 @@ export function PublicStandingsTables({
                           </section>
                         )}
                       </div>
-                      {!!g.standings.tieSteps.length && (
-                        <details>
-                          <summary>Critérios de desempate aplicados</summary>
-                          <ol>
-                            {g.standings.tieSteps.map((s, i) => (
-                              <li key={i}>
-                                {
-                                  {
-                                    wins: "Vitórias",
-                                    point_difference: "Saldo de pontos",
-                                    points_for: "Pontos a favor",
-                                    head_to_head_points:
-                                      "Pontos nos confrontos diretos",
-                                    head_to_head_difference:
-                                      "Saldo nos confrontos diretos",
-                                    head_to_head_for:
-                                      "Pontos a favor nos confrontos diretos",
-                                  }[s.criterion]
-                                }
-                                :{" "}
-                                {s.values
-                                  .map(
-                                    (v) =>
-                                      `${label(v.registrationId)}: ${v.value ?? "não informado"}`,
-                                  )
-                                  .join("; ")}
-                                {s.blocked &&
-                                  ". Cobertura insuficiente para resolver o empate."}
-                              </li>
-                            ))}
-                          </ol>
-                        </details>
-                      )}
                     </section>
                   );
                 })}

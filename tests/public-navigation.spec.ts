@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { publicNavigationFixture } from "./fixtures/public-navigation";
+import {
+  publicNavigationFixture,
+  submitPublicSearch,
+} from "./fixtures/public-navigation";
 import { disputeLink, publicSections } from "../src/public-ui/catalog-contract";
 const origin = "http://127.0.0.1:5174";
 
@@ -52,9 +55,7 @@ test("descoberta hierárquica, teclado e quatro seções preservam a disputa", a
     fullPage: true,
   });
   await page.getByRole("combobox", { name: /Buscar competições/ }).fill(c.name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   const target = page.locator(
     `.public-search-entity a[href="${disputeLink(f.source.disputeId)}"]`,
   );
@@ -106,7 +107,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
   ).toBeVisible();
   await expect(page).toHaveURL(/returnTo=/);
   await page.reload();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(table).toBeVisible();
   const source = page.url();
   await table.locator('a[href^="/equipe.html"]').first().click();
@@ -114,7 +115,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
   ).toBeVisible();
   await page.reload();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   expect(page.url()).toBe(source);
   await page.goto(origin + disputeLink(f.source.disputeId, "jogos"));
   await expect(
@@ -135,7 +136,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     fullPage: false,
   });
   await page.reload();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(
     page.getByRole("heading", { name: "Jogos publicados", exact: true }),
   ).toBeVisible();
@@ -148,7 +149,7 @@ test("detalhes de atletas, equipes e jogos retornam à consulta compartilhável"
     await expect(
       page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
     ).toBeVisible();
-    await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+    await page.locator(".public-return a").click();
     expect(page.url()).toBe(gamesSource);
   }
 });
@@ -170,16 +171,13 @@ test("busca pública repete o mesmo termo após falha transitória", async ({
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
-  const submit = page.getByRole("button", {
-    name: "Buscar na base",
-    exact: true,
-  });
-  await submit.click();
+  const submit = () => submitPublicSearch(page);
+  await submit();
   await expect(page.getByRole("alert")).toContainText(
     "Não foi possível buscar agora",
   );
   const failedUrl = page.url();
-  await submit.click();
+  await submit();
   await expect(
     page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
@@ -195,9 +193,7 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await expect(
     page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
@@ -211,9 +207,7 @@ test("busca global encontra equipes e jogadores sem buscar jogos", async ({
   await page
     .getByRole("combobox", { name: /Buscar competições/ })
     .fill(f.games[0].game.home.name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await expect(
     page.locator('.public-search-entity-list a[href^="/equipe.html"]').first(),
   ).toBeVisible();
@@ -291,17 +285,13 @@ test("vazio, erro e contexto inválido oferecem recuperação sem bloquear outra
   await page
     .getByRole("combobox", { name: /Buscar competições/ })
     .fill(f.source.games[0].snapshot.facts.players[0].person.name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await expect(
     page.locator('.public-search-entity-list a[href^="/atleta.html"]').first(),
   ).toBeVisible();
   f.state.failed = false;
   await page.getByRole("combobox", { name: /Buscar competições/ }).fill("");
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await page.getByRole("button", { name: "Tentar novamente" }).click();
   await expect(page.locator(".competition-catalog")).toBeVisible();
   f.state.missing = true;
@@ -330,9 +320,7 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
   await page.goto(origin + "/publico.html");
   const name = f.source.games[0].snapshot.facts.players[0].person.name;
   await page.getByRole("combobox", { name: /Buscar competições/ }).fill(name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await page
     .locator('.public-search-entity-list a[href^="/atleta.html"]')
     .first()
@@ -344,7 +332,7 @@ test("perfil independente pode ser descoberto e retornar à busca sem catálogo 
     page.getByRole("navigation", { name: "Seções da disputa" }),
   ).toHaveCount(0);
   await page.reload();
-  await page.getByRole("link", { name: /^Voltar à origem/ }).click();
+  await page.locator(".public-return a").click();
   await expect(
     page.getByRole("combobox", { name: /Buscar competições/ }),
   ).toHaveValue(name);

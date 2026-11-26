@@ -195,3 +195,16 @@ export async function publicNavigationFixture(page: Page) {
   );
   return { ...f, games, confirmed, state, discovery };
 }
+
+/** Desktop keeps its submit action; mobile submits through the native search field. */
+export async function submitPublicSearch(page: Page) {
+  const button = page.getByRole("button", {
+    name: "Buscar na base",
+    exact: true,
+  });
+  if (await button.isVisible()) await button.click();
+  else
+    await page
+      .getByRole("combobox", { name: /Buscar competições/ })
+      .press("Enter");
+}

@@ -3,11 +3,22 @@ import {
   publicDetailLink,
   safePublicReturn,
   readPublicDispute,
+  publicReturnLabel,
 } from "./navigation";
 import { disputeLink } from "./catalog-contract";
 import { pubId } from "../../tests/fixtures/publication";
 const id = pubId(3);
 describe("public context URLs", () => {
+  it.each([
+    ["/publico.html#?q=Ana&type=players&page=2", "← Voltar à busca"],
+    [`/estatisticas.html#${id}?q=Ana&page=2`, "← Voltar aos jogadores"],
+    [`/equipes.html#${id}`, "← Voltar às equipes"],
+    [`/publico.html#${id}?secao=jogos&q=Lobos`, "← Voltar aos jogos"],
+    [`/publico.html#${id}?secao=classificacao`, "← Voltar à classificação"],
+    ["/publico.html", "← Voltar aos campeonatos"],
+  ])("identifica o destino público %s", (href, label) => {
+    expect(publicReturnLabel(href)).toBe(label);
+  });
   it("opens standings by default and preserves existing HTML entries", () => {
     expect(disputeLink(id)).toBe(`/publico.html#${id}?secao=classificacao`);
     expect(disputeLink(id, "jogadores")).toBe(

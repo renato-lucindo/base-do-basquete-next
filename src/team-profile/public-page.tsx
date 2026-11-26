@@ -4,7 +4,7 @@ import { SearchInput } from "../ui-system/query-controls";
 import { ProfileMatch } from "../public-ui/profile-match";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { PublicHeader, PublicFooter } from "../public-ui/shell";
-import { publicDetailLink, safePublicReturn } from "../public-ui/navigation";
+import { publicDetailLink } from "../public-ui/navigation";
 import { siteDisputeId } from "../public-ui/site";
 import { previewDisputeId } from "../public-ui/preview";
 import { SectionTabs, TabPanel } from "../ui-system/components";
@@ -694,22 +694,6 @@ export function TeamProfilePage() {
                     Ver perfil geral
                   </a>
                 </div>
-              )}
-              {contextual && (
-                <a
-                  className="team-profile-list-return"
-                  href={
-                    safePublicReturn(
-                      new URLSearchParams(window.location.search).get(
-                        "returnTo",
-                      ),
-                      view.disputeId,
-                    ) ??
-                    `/equipes.html#${view.disputeId}${view.params.get("listState") ? `?${view.params.get("listState")}` : ""}`
-                  }
-                >
-                  Voltar às equipes
-                </a>
               )}
             </header>
             <Honors

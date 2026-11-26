@@ -13,6 +13,7 @@ import {
   readSearch,
 } from "./search-state";
 import { searchHitHref, searchHitDescription } from "./search-results";
+import { Icon } from "../ui-system/components";
 import "./search.css";
 export { PUBLIC_SEARCH_EVENT } from "./search-state";
 const current = () =>
@@ -23,6 +24,15 @@ export function PublicSearchForm() {
   const id = useId(),
     form = useRef<HTMLFormElement>(null),
     input = useRef<HTMLInputElement>(null);
+  const [compact, setCompact] = useState(
+    () => window.matchMedia("(max-width: 639px)").matches,
+  );
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 639px)");
+    const update = () => setCompact(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const [query, setQuery] = useState(() => current().q),
     [type, setType] = useState<SearchType>(() => {
       const t = current().type;
@@ -129,25 +139,14 @@ export function PublicSearchForm() {
           setActive(e.key === "Home" ? 0 : hits.length - 1);
         } else if (e.key === "Enter" && open && active >= 0 && hits[active]) {
           e.preventDefault();
-          location.assign(searchHitHref(hits[active], query.trim()));
+          location.assign(searchHitHref(hits[active], query.trim(), type));
         }
       }}
     >
       <label className="public-visually-hidden" htmlFor={id}>
-        Buscar competições, disputas, equipes ou jogadores
+        Buscar competições e campeonatos, equipes ou jogadores
       </label>
-      <svg
-        aria-hidden="true"
-        width="1.125rem"
-        height="1.125rem"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      >
-        <circle cx="10.5" cy="10.5" r="6.5" />
-        <path d="m16 16 5 5" />
-      </svg>
+      <Icon name="search" />
       <input
         ref={input}
         id={id}
@@ -160,7 +159,9 @@ export function PublicSearchForm() {
         type="search"
         maxLength={120}
         autoComplete="off"
-        placeholder="Jogadores, equipes ou campeonatos"
+        placeholder={
+          compact ? "Buscar na base" : "Jogadores, equipes ou campeonatos"
+        }
         value={query}
         onFocus={() => setOpen(true)}
         onChange={(e) => {
@@ -180,9 +181,11 @@ export function PublicSearchForm() {
                 type="button"
                 key={t}
                 aria-pressed={type === t}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   setType(t);
                   setActive(-1);
+                  setOpen(true);
                   input.current?.focus();
                 }}
               >
@@ -239,7 +242,7 @@ export function PublicSearchForm() {
                         id={`${id}-option-${index}`}
                         key={hit.id}
                         tabIndex={-1}
-                        href={searchHitHref(hit, query.trim())}
+                        href={searchHitHref(hit, query.trim(), type)}
                         onPointerMove={() => setActive(index)}
                         onMouseDown={(e) => e.preventDefault()}
                       >

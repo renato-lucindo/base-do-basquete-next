@@ -321,9 +321,22 @@ async function checkProfilePatterns(page) {
   await expect(
     sample.getByRole("cell", { name: "60", exact: true }),
   ).toBeVisible();
-  await expect(sample.locator(".reference-legend dl")).toHaveCSS(
-    "display",
-    "grid",
+  for (const legend of await sample.locator(".reference-legend dl").all())
+    await expect(legend).toHaveCSS("display", "grid");
+  await expect(
+    sample.locator(".public-dispute-breadcrumb li").first(),
+  ).toHaveText("2025");
+  const standings = sample.getByRole("table", {
+    name: "Classificação com números centrais",
+  });
+  for (const cell of await standings.locator("tbody td:not(:last-child)").all())
+    await expect(cell).toHaveCSS("text-align", "center");
+  await expect(standings.getByRole("rowheader").first()).toHaveCSS(
+    "text-align",
+    "left",
+  );
+  await expect(sample.locator(".standings-explorer > :last-child")).toHaveClass(
+    /reference-legend/,
   );
   await expect(
     sample.getByRole("columnheader", { name: "Participação", exact: true }),

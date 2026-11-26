@@ -226,9 +226,7 @@ test("colunas de boxscore mantêm LL% único e retorno do perfil preserva contro
     table.locator("tbody tr").first().locator("td").first(),
   ).toHaveText("1");
   await table.getByRole("link", { name: "Lobos", exact: true }).click();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(page).toHaveURL(/dataset=boxscore/);
   await expect(
     page.getByRole("combobox", { name: "Colunas", exact: true }),

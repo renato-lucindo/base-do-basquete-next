@@ -62,9 +62,7 @@ test("busca/ordem/página da lista reaparecem no retorno do detalhe", async ({
   await expect(
     page.getByRole("heading", { name: "Inscrição 20", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(page).toHaveURL(/sort=name/);
   await expect(table.getByRole("row")).toHaveCount(27);
   await expect(

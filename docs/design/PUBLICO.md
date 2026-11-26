@@ -188,10 +188,10 @@ Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo ap�
 
 ### Consistência pública —24/11/2026
 
-- Cabeçalho da disputa: campeonato › ano › naipe › categoria e divisão quando houver. Os três primeiros níveis abrem seleção contextual de opções públicas; a categoria identifica a disputa atual. Conservar aba ao trocar de disputa e retorno nos perfis. Status abaixo do caminho. Não reproduzir o título ou os comentários explicativos do print de referência.
+- Cabeçalho da disputa: ano › campeonato › naipe › categoria › divisão quando houver. Os três primeiros níveis abrem seleção contextual de opções públicas; a categoria identifica a disputa atual. Conservar aba ao trocar de disputa e retorno nos perfis. Status abaixo do caminho. Não reproduzir o título ou os comentários explicativos do print de referência.
 - Jogadores do perfil e da disputa compartilham ordem das métricas e apresentação do seletor, respeitando fonte/colunas escolhidas. Ordenação preserva tabela, altura, foco e rolagem durante a consulta; mudar de identidade remove os dados anteriores. Erros e ausência não equivalem a carregamento.
 - Sem jogos públicos na eliminatória: “Ainda não há jogos disponíveis na fase eliminatória.” Havendo jogos sem estatísticas: informar a ausência específica, preservando confrontos definidos.
-- Contorno acompanha a tabela até a última coluna. Classificação e jogadores centralizados quando couberem; coletivos alinhados à esquerda. Rolagem permanece interna quando necessário.
+- Contorno acompanha a tabela até a última coluna. Classificação principal e jogadores centralizados quando couberem; classificação nos perfis e coletivos alinhados à esquerda. Rolagem permanece interna quando necessário.
 - Equipe selecionada: mesmo negrito e fundo azul suave em Classificação e Estatísticas coletivas, sem faixa lateral. Nomes de equipes conservam navegação, cor normal e sem sublinhado permanente; foco e interação permanecem visíveis.
 - Confrontos usam áreas equivalentes para mandante/visitante e área estável para o placar, com quebra dos nomes. O centro do placar não depende da extensão dos nomes.
 - Rodapé compartilhado: ícone da marca e Base do Basquete à esquerda; Dados a partir de 2026 à direita, adaptando ao celular.
@@ -199,10 +199,41 @@ Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo ap�
 
 ## Contexto de disputa — refinamento de 24/11/2026
 
-Breadcrumb na ordem Campeonato › Ano › Naipe › Categoria · Divisão, somente com níveis existentes. Campeonato, ano e naipe abrem seleção por nível em sobreposição; categoria/divisão identifica a atual. Campeonato consulta o catálogo público; ano restringe ao campeonato; naipe restringe à edição. Um painel por vez, sem deslocar a navegação nem a página; limitar ao viewport com rolagem interna. Preservar seção atual, destinos reais, Escape, clique externo e retorno de foco. Sites restritos a uma disputa não oferecem troca de contexto.
+Breadcrumb na ordem Ano › Campeonato › Naipe › Categoria › Divisão, somente com níveis existentes. Campeonato, ano e naipe abrem seleção por nível em sobreposição; categoria/divisão identifica a atual. Campeonato consulta o catálogo público; ano restringe ao campeonato; naipe restringe à edição. Um painel por vez, sem deslocar a navegação nem a página; limitar ao viewport com rolagem interna. Preservar seção atual, destinos reais, Escape, clique externo e retorno de foco. Sites restritos a uma disputa não oferecem troca de contexto.
 
 Situação abaixo da hierarquia, sem badge, fundo ou borda: texto de14px, menor que breadcrumb16px, acompanhado de ponto com anel externo e cor semântica. Cor não substitui o texto. Estes refinamentos substituem o painel expandido no fluxo e o status em badge do cabeçalho; não alteram badges administrativos.
 
 O perfil geral e o da disputa seguem [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md#refinamento-permanente-aprovado-em-24112026). Ano na barra de abas e Participação central são padrões específicos do perfil geral; identificação textual de outras tabelas continua à esquerda.
 
 Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado em25/11/2026](PADROES.md#consultas-e-métricas--padrão-de-25112026). Esta decisão substitui a apresentação lateral anterior dos filtros; formulários de entrada de dados preservam rótulos visíveis.
+
+## Navegação e classificação — refinamento aprovado em26/11/2026
+
+O contexto começa pelo ano: **Ano → Campeonato → Naipe → Categoria → Divisão**,
+omitindo níveis ausentes. O cabeçalho reúne caminho, situação textual logo abaixo
+e abas; os seletores continuam em sobreposição. Perfis e detalhes usam um único
+link de retorno contextual, sem repetir seu nome no caminho: ← Voltar aos jogadores,
+← Voltar à busca, ← Voltar às equipes ou destino equivalente. A URL preserva filtros,
+ordem e página; acesso direto tem destino público válido. Perfil geral não inventa disputa.
+
+A busca global mantém Autocomplete, lupa compartilhada e nome acessível completo
+para jogadores, equipes e campeonatos. Até639px usa placeholder **Buscar na base**
+e oculta somente o botão textual Buscar. A partir de640px preserva o botão e o
+placeholder desktop. Enter seleciona a sugestão ativa ou submete a pesquisa uma vez.
+
+Na classificação principal, **tabela → critérios de desempate expansíveis → legenda
+aberta** formam um único bloco centralizado, de largura natural quando couber e
+limitado à região visível quando rolar. As três bordas esquerdas coincidem, com
+espaçamentos compactos. Nos perfis de equipes, o bloco continua à esquerda.
+A legenda é única e final, com a grade compartilhada de siglas/significados.
+
+No componente de classificação, **siglas e valores numéricos são centralizados**;
+identificação textual (Equipe) fica à esquerda, com nome em peso600 e PTS em700.
+Números tabulares, ordem/precisão/AVG e indicadores de Últimos jogos são preservados.
+Este padrão substitui o alinhamento numérico à direita somente na classificação;
+as demais tabelas estatísticas mantêm suas regras. Não há ordenação manual na
+classificação; cabeçalhos ordenáveis de estatísticas preservam sua reserva de seta.
+
+O rodapé fica próximo à base em páginas curtas e depois do conteúdo em páginas
+longas, por fluxo flex normal, conservando marca e Dados a partir de2026. O espaço
+para o rodapé não amplia os afastamentos entre tabela, critérios e legenda.

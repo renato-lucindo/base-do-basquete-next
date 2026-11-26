@@ -4,7 +4,10 @@ import {
   publicSearchFixture,
   searchFixtureHits,
 } from "./fixtures/public-search";
-import { publicNavigationFixture } from "./fixtures/public-navigation";
+import {
+  publicNavigationFixture,
+  submitPublicSearch,
+} from "./fixtures/public-navigation";
 import {
   publicRegulationFixture,
   publicKnockoutFixture,
@@ -108,9 +111,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await page
     .getByRole("combobox", { name: /Buscar competições/ })
     .fill(s.context.name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await page
     .locator(
       `.public-search-entity a[href="/publico.html#${s.disputeId}?secao=classificacao"]`,
