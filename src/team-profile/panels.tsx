@@ -297,7 +297,7 @@ export function PlayersPanel({
                 columns: visibleColumns,
               }}
               showTeam={false}
-              showJersey
+              teamProfile
               onSort={(sort) =>
                 update({
                   sort,

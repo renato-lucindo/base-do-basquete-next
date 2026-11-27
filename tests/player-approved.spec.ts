@@ -110,7 +110,7 @@ test("v9: recordes independentes, somente 2º–5º e restauração de expansão
       .locator(".player-record-value")
       .first()
       .evaluate((e) => getComputedStyle(e).color),
-  ).toBe("rgb(37, 99, 166)");
+  ).toBe("rgb(7, 95, 202)");
   for (const label of ["PTS", "2P"])
     await table
       .getByRole("button", { name: `Ver top 5 de ${label}`, exact: true })
@@ -245,15 +245,12 @@ test("v9: confronto inteiro abre a partida; equipe fora dele abre a equipe", asy
   await page.locator(".public-return a").click();
   await page.getByRole("tab", { name: "Carreira", exact: true }).click();
   const knownId = f.source.participations[0].fact.gameId;
-  if (
-    !(await page.locator(`.player-record-value a[href*="${knownId}"]`).count())
-  )
+  const markSelector = `.player-record-value a[href*="${knownId}"], a.player-record-game[href*="${knownId}"]:has(.player-record-value)`;
+  if (!(await page.locator(markSelector).count()))
     await page
       .getByRole("button", { name: "Ver top 5 de PTS", exact: true })
       .click();
-  const mark = page
-      .locator(`.player-record-value a[href*="${knownId}"]`)
-      .first(),
+  const mark = page.locator(markSelector).first(),
     match = mark.locator("xpath=ancestor::tr").locator(".player-record-game");
   expect(await mark.getAttribute("href")).toBe(
     await match.getAttribute("href"),
@@ -330,10 +327,8 @@ for (const width of [320, 390, 1366, 1920])
       const a = await page.locator(".player-desktop-honors").boundingBox(),
         b = await recent.boundingBox();
       expect(Math.abs(a!.x - b!.x)).toBeLessThan(1);
-    } else
-      await expect(
-        recent.locator(".player-team-full").first(),
-      ).not.toBeVisible();
+    } else if (width < 640)
+      await expect(recent.locator(".player-team-full").first()).toBeVisible();
     await page.getByRole("tab", { name: "Estatísticas", exact: true }).click();
     await expect(page.locator(".player-age")).toHaveCount(21);
     expect(
@@ -358,20 +353,24 @@ for (const width of [320, 390, 1366, 1920])
         [...e.children].map((c) => c.getBoundingClientRect().toJSON()),
       ),
     }));
-    for (const row of geometry.rows)
-      for (const [h, c] of [
-        [1, 2],
-        [2, 3],
-        [3, 4],
-      ])
-        expect(
-          Math.abs(
-            geometry.head[h].x +
-              geometry.head[h].width / 2 -
-              row[c].x -
-              row[c].width / 2,
-          ),
-        ).toBeLessThan(1);
+    if (width < 640) {
+      for (const row of geometry.rows) expect(row).toHaveLength(1);
+      await expect(table.locator(".profile-match-row").first()).toBeVisible();
+    } else
+      for (const row of geometry.rows)
+        for (const [h, c] of [
+          [1, 2],
+          [2, 3],
+          [3, 4],
+        ])
+          expect(
+            Math.abs(
+              geometry.head[h].x +
+                geometry.head[h].width / 2 -
+                row[c].x -
+                row[c].width / 2,
+            ),
+          ).toBeLessThan(1);
     expect(
       await page.evaluate(
         () =>

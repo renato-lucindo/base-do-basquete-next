@@ -237,3 +237,15 @@ classificação; cabeçalhos ordenáveis de estatísticas preservam sua reserva 
 O rodapé fica próximo à base em páginas curtas e depois do conteúdo em páginas
 longas, por fluxo flex normal, conservando marca e Dados a partir de2026. O espaço
 para o rodapé não amplia os afastamentos entre tabela, critérios e legenda.
+
+## Tabelas e identidade pública — correção de27/11/2026
+
+A cor principal pública é **#075FCA**, compartilhada pelo design system; hover **#064DA3** e superfície suave **#EEF5FF**. Não usar o antigo #2563A6 como cor de ação. Cores semânticas de situação, vitória/derrota e períodos continuam específicas.
+
+Em Jogadores e Elencos do perfil da equipe, Atleta reúne nome e camisa secundária (`Nome #23`), sem coluna Camisa. Ausente: apenas nome. Zero e00 são preservados como cadastrados. A coluna acompanha o maior conteúdo exibido, limitada à região visível; nomes quebram entre palavras e a camisa fica junto ao último trecho do nome. Estatísticas excedentes rolam na região da tabela, sem alargar a página. O seletor conta somente as métricas disponíveis.
+
+Nos últimos jogos, Ver jogos e recordes do atleta, até639px, utilizar a linha compacta compartilhada. Data e PTS ocupam a primeira linha dos jogos; posição, marca e data ocupam a primeira linha dos recordes. Em seguida, nomes completos do mandante e visitante em espaços iguais, placar central sem quebra, campeonato/categoria secundários abaixo. Quebra apenas entre palavras; preservar nomes como IVV/Cetaf. A partir de640px manter as tabelas desktop. No mobile, Ver top5/Recolher fica no cabeçalho de cada grupo; a marca principal usa maior peso/destaque sem cartão adicional. Não duplicar controles focáveis entre apresentações.
+
+O retorno contextual, incluindo Voltar à equipe, segue a ação discreta da seção05 do catálogo: sem sublinhado permanente ou no hover, azul principal, hover suave, foco visível, destino e contexto preservados.
+
+Todas as prorrogações usam tinta azul, independentemente da quantidade. Vermelho/azul alternam somente nos quatro quartos regulamentares. Reutilizar a função compartilhada de cor, sem alterar validação, pontuação ou estatísticas.

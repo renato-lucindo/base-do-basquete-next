@@ -134,7 +134,11 @@ test("perfil geral e disputa preservam identidade e apresentam as tabelas aceita
     exact: true,
   });
   await expect(athletes).toBeVisible();
-  await expect(athletes.locator("thead th")).toHaveCount(15);
+  await expect(athletes.locator("thead th")).toHaveCount(14);
+  await expect(
+    athletes.getByRole("columnheader", { name: "Camisa", exact: true }),
+  ).toHaveCount(0);
+  await expect(athletes.locator(".player-jersey").first()).toHaveText(/^#/);
   await expect(page.getByRole("button", { name: /Colunas/ })).toBeVisible();
   await expect(page.locator(".table-legend")).toBeVisible();
   await page.getByRole("tab", { name: "Jogos", exact: true }).click();

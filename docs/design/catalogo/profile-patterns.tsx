@@ -1,11 +1,15 @@
 import { useId, useRef, useState } from "react";
 import { SectionTabs, TabPanel } from "../../../src/ui-system/components";
-import { ProfileMatch } from "../../../src/public-ui/profile-match";
+import {
+  ProfileMatch,
+  ProfileMatchRow,
+} from "../../../src/public-ui/profile-match";
 import { Legend, ModeButtons } from "../../../src/team-profile/panels";
 import { ScrollableTable } from "../../../src/statistics/reference/scrollable-table";
 import "../../../src/regulation/public-standings.css";
 import "../../../src/public-ui/navigation.css";
 import "../../../src/team-profile/screen.css";
+import "../../../src/player-profile/public.css";
 
 /** Approved profile patterns, using the same components as the real consumers. */
 export function ProfilePatterns() {
@@ -160,6 +164,25 @@ export function ProfilePatterns() {
             ]}
           />
         </TabPanel>
+      </div>
+      <div className="player-page bb-ui">
+        <h3>Confronto compacto do atleta</h3>
+        <ProfileMatchRow
+          metadata={
+            <>
+              <span>27/11/2026</span>
+              <strong>23 PTS</strong>
+            </>
+          }
+          context="Copa ES · Adulto"
+        >
+          <ProfileMatch
+            home={{ name: "GS Nice de Paula", abbreviation: "NICE" }}
+            away={{ name: "IVV/Cetaf", abbreviation: "IVV" }}
+            score="102 × 99"
+            fullNames
+          />
+        </ProfileMatchRow>
       </div>
       <h3>Classificação principal</h3>
       <div className="public-main" data-standings="true">

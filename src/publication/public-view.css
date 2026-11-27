@@ -21,7 +21,7 @@
   color: #172033;
   background: #fff;
   font-synthesis: none;
-  --blue: #075fca;
+  --blue: var(--public-blue, #075fca);
   --muted: #526176;
   --line: #dce4ee;
   --surface: #f4f8fd;
@@ -475,13 +475,13 @@
   background: #f8fafd;
 }
 .public-site.scoresheet-public .roster-table .points-cell {
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
   background: var(--active);
   font-weight: 600;
 }
 .public-site.scoresheet-public .roster-table thead .points-cell {
   background: #eaf2fd;
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
 }
 .public-site.scoresheet-public .roster-table tbody tr:hover > .points-cell {
   background: #eaf2fd;
@@ -1097,7 +1097,7 @@
 }
 .public-site.scoresheet-public .period-table .selected-period {
   background: #eaf2fd;
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
 }
 @media (max-width: 600px) {
   .public-site.scoresheet-public .teams-heading {

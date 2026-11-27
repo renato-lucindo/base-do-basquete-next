@@ -341,7 +341,7 @@
   font-size: calc(0.85rem + 0.125rem);
 }
 .team-profile-match strong {
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
   white-space: nowrap;
 }
 .team-profile-match span {

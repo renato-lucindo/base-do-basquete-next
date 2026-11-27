@@ -95,3 +95,42 @@
     display: inline;
   }
 }
+
+/* Compact rows keep native table semantics and share confrontation geometry. */
+.profile-match-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  width: 100%;
+}
+.profile-match-metadata {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.profile-match-context {
+  color: var(--bb-muted);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: center;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.profile-match-context .player-game-context {
+  overflow-wrap: normal;
+}
+.profile-match-full .player-team-short {
+  display: none;
+}
+.profile-match-full .player-team-full {
+  display: inline;
+}
+.profile-match-row .player-match-team,
+.profile-match-row .player-match-team span {
+  overflow-wrap: normal;
+  word-break: normal;
+}

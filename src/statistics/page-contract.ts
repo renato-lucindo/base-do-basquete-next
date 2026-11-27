@@ -104,7 +104,7 @@ export const statisticsPageSchema = z
     rows: z
       .array(
         statisticsRowSchema.safeExtend({
-          jerseys: statisticsRowSchema.shape.jerseys.min(0),
+          jerseys: z.array(statisticsRowSchema.shape.jerseys.element).max(101),
         }),
       )
       .max(100),

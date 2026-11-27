@@ -1,3 +1,4 @@
+import { periodColor } from "../domain/scoresheet";
 import {
   publicPlayerAccessibleName,
   publicPlayerName,
@@ -637,11 +638,7 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                           return (
                             <li
                               key={i}
-                              className={
-                                e.period <= 4 && e.period % 2
-                                  ? "quarter-red"
-                                  : "quarter-blue"
-                              }
+                              className={`quarter-${periodColor(e.period)}`}
                             >
                               <GameHint
                                 className="event-tip"

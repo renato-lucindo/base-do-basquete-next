@@ -21,7 +21,7 @@
   color: #172033;
   background: var(--public-background, #f3f6fa);
   font-synthesis: none;
-  --blue: var(--public-blue);
+  --blue: var(--public-blue, #075fca);
   --muted: #526176;
   --line: #dce4ee;
   --surface: #f6f8fb;
@@ -369,7 +369,7 @@
 }
 .public-site.statistics-public .active-column {
   background: #f1f6fd;
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
 }
 .public-site.statistics-public .player {
   display: flex;
@@ -1379,7 +1379,7 @@
   .statistics-table
   tbody
   td.reference-sorted {
-  color: #1557a4;
+  color: var(--public-blue, #075fca);
 }
 .public-site.statistics-public
   .reference-explorer
@@ -1990,4 +1990,30 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   tbody
   td.bb-metric-value {
   padding-inline: 0.625rem;
+}
+
+/* Team rosters size identity from displayed names, rather than ranking reserves. */
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table-team-profile
+  :is(.reference-player, .statistics-player) {
+  min-width: 0;
+  width: auto;
+  max-width: none;
+  white-space: normal;
+}
+.public-site.statistics-public
+  .reference-explorer
+  .statistics-table-team-profile
+  .reference-player
+  .player {
+  width: max-content;
+  max-width: calc(100vw - 6rem);
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.public-site.statistics-public
+  .statistics-table-team-profile
+  .player-name-tail {
+  white-space: nowrap;
 }

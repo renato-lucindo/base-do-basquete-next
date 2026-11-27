@@ -120,7 +120,7 @@ export function ScoresheetStatisticsTable({
   compare,
   onCompare,
   comparisonEnabled,
-  showJersey = false,
+  teamProfile = false,
 }: {
   data: StatisticsPage;
   showTeam: boolean;
@@ -128,7 +128,7 @@ export function ScoresheetStatisticsTable({
   compare: StatisticsQuery["compare"];
   onCompare: (id: string, focusId: string) => void;
   comparisonEnabled: boolean;
-  showJersey?: boolean;
+  teamProfile?: boolean;
 }) {
   const decimalColumns = new Set(
     data.columns.filter((key) =>
@@ -145,7 +145,7 @@ export function ScoresheetStatisticsTable({
       <ScrollableTable label="Tabela estatística rolável">
         <table
           aria-label="Estatísticas dos atletas"
-          className="statistics-table statistics-table-scoresheet"
+          className={`statistics-table statistics-table-scoresheet${teamProfile ? " statistics-table-team-profile" : ""}`}
         >
           <caption className="sr-only">
             Estatísticas publicadas. Selecione um cabeçalho para ordenar.
@@ -154,7 +154,6 @@ export function ScoresheetStatisticsTable({
           <colgroup>
             <col className="column-position" />
             <col className="column-player" />
-            {showJersey && <col className="column-jersey" />}
             {showTeam && <col className="column-team" />}
             {data.columns.length > 0 && (
               <col span={data.columns.length} className="column-metric" />
@@ -168,7 +167,6 @@ export function ScoresheetStatisticsTable({
               <th scope="col" className="statistics-player">
                 Atleta
               </th>
-              {showJersey && <th scope="col">Camisa</th>}
               {showTeam && (
                 <th scope="col" className="team-column-header">
                   Equipe
@@ -212,18 +210,25 @@ export function ScoresheetStatisticsTable({
                     <a
                       className="player-name"
                       title={row.names.join(" / ")}
-                      aria-label={publicPlayerHistoryAccessibleName(
-                        row.names,
-                        row.nicknames,
-                      )}
+                      aria-label={`${publicPlayerHistoryAccessibleName(row.names, row.nicknames)}${teamProfile && row.jerseys.length ? `, camisa ${row.jerseys.join(" / ")}` : ""}`}
                       href={publicDetailLink(
                         `/atleta.html#${row.personId}`,
                         data.disputeId,
                       )}
                     >
-                      {publicPlayerHistoryName(row.names, row.nicknames)}
+                      {teamProfile ? (
+                        <TeamPlayerName
+                          name={publicPlayerHistoryName(
+                            row.names,
+                            row.nicknames,
+                          )}
+                          jerseys={row.jerseys}
+                        />
+                      ) : (
+                        publicPlayerHistoryName(row.names, row.nicknames)
+                      )}
                     </a>{" "}
-                    {!showJersey && (
+                    {!teamProfile && (
                       <span
                         className="player-jersey"
                         aria-label={
@@ -237,7 +242,7 @@ export function ScoresheetStatisticsTable({
                           : "—"}
                       </span>
                     )}
-                    {!showTeam && !showJersey && (
+                    {!showTeam && !teamProfile && (
                       <span className="player-team-mobile">
                         {" "}
                         ·{" "}
@@ -253,9 +258,6 @@ export function ScoresheetStatisticsTable({
                     )}
                   </span>
                 </th>
-                {showJersey && (
-                  <td>{row.jerseys.length ? row.jerseys.join(" / ") : "—"}</td>
-                )}
                 {showTeam && (
                   <td className="team-name">
                     <a
@@ -320,5 +322,30 @@ export function StatisticsLegend({ columns }: { columns: StatisticsMetric[] }) {
         ))}
       </dl>
     </section>
+  );
+}
+
+function TeamPlayerName({
+  name,
+  jerseys,
+}: {
+  name: string;
+  jerseys: string[];
+}) {
+  if (!jerseys.length) return <>{name}</>;
+  const boundary = name.lastIndexOf(" ");
+  return (
+    <>
+      {boundary < 0 ? null : name.slice(0, boundary + 1)}
+      <span className="player-name-tail">
+        {name.slice(boundary + 1)}
+        <span
+          className="player-jersey"
+          aria-label={`Camisa ${jerseys.join(" / ")}`}
+        >
+          {jerseys.map((jersey) => `#${jersey}`).join(" / ")}
+        </span>
+      </span>
+    </>
   );
 }

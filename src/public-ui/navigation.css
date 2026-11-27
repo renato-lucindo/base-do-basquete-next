@@ -1,6 +1,6 @@
 :root {
-  --public-blue: #2563a6;
-  --public-blue-soft: #eaf2fc;
+  --public-blue: var(--bb-blue, #075fca);
+  --public-blue-soft: var(--bb-blue-soft, #eef5ff);
   --public-text: #142d4e;
   --public-muted: #526176;
   --public-background: #f3f6fa;
@@ -967,4 +967,18 @@ body:has(:is(.team-list-page, .public-main[data-standings])) {
   .public-header.site-header .public-header-search input {
     font-size: 1rem;
   }
+}
+
+/* Catalogue 05: contextual return is a discreet navigation action. */
+.public-header .public-return a {
+  gap: 0.5rem;
+  padding-inline: 0.375rem;
+  border-radius: var(--bb-radius);
+  font-weight: 700;
+  text-decoration: none;
+}
+.public-header .public-return a:hover {
+  color: var(--bb-blue-hover);
+  background: var(--public-blue-soft);
+  text-decoration: none;
 }

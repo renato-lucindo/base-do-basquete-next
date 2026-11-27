@@ -2,8 +2,6 @@
   --bb-font-body: 1rem;
   --bb-font-detail: 0.875rem;
   position: relative;
-  --bb-blue: var(--public-blue);
-  --bb-blue-soft: var(--public-blue-soft);
   --bb-line: var(--public-line);
   --bb-text: var(--public-text);
   --bb-muted: var(--public-muted);
@@ -19,10 +17,10 @@
   text-decoration: none;
 }
 .player-page a:hover {
-  color: #103e74;
+  color: var(--bb-blue-hover);
 }
 .player-page :is(button, a, summary, input, select, [tabindex]):focus-visible {
-  outline: 3px solid #1557a4;
+  outline: 3px solid var(--public-blue, #075fca);
   outline-offset: 3px;
 }
 .player-page :is(button, summary) {
@@ -914,4 +912,56 @@ body:has(.player-page) #metric-tooltip[hidden] {
   .player-record-game .player-match-score {
     font-size: calc(0.875rem + 0.125rem);
   }
+}
+
+/* Only athlete compact rows adopt the new match layout; team games are unchanged. */
+.player-page .profile-match-row .player-matchup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+  gap: 0.5rem;
+}
+.player-page .profile-match-row .player-match-score,
+.player-page .profile-match-row .player-match-team {
+  font-size: 0.9375rem;
+  line-height: 1.3;
+}
+.player-page .profile-games-compact td {
+  padding: 0;
+  white-space: normal;
+}
+.player-page .profile-games-compact .player-game-link {
+  padding: 0.5rem 0.25rem;
+  min-height: 0;
+}
+.player-records-compact table {
+  width: 100%;
+}
+.player-records-compact td {
+  padding: 0;
+}
+.player-records-compact .player-record-group-heading th {
+  padding: 0 0.25rem;
+  text-align: left;
+  background: var(--bb-blue-soft);
+  color: var(--bb-text);
+  line-height: 44px;
+}
+.player-records-compact .player-record-group-heading button {
+  float: right;
+  width: auto;
+  padding-inline: 0.5rem;
+  line-height: 1.3;
+}
+.player-records-compact .player-record-game {
+  padding: 0.5rem 0.25rem;
+  min-height: 0;
+}
+.player-records-compact .player-record-value {
+  font-size: 1rem;
+}
+.player-records-compact .player-record-main .player-record-value {
+  font-size: 1.125rem;
+}
+.player-records-compact .player-record-empty {
+  padding: 0.5rem 0.25rem;
 }

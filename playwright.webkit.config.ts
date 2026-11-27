@@ -9,13 +9,13 @@ export default defineConfig({
     {
       name: "webkit-desktop",
       testMatch:
-        /(?:public-navigation-refinement|player-statistics-(boundaries|refinement|desktop)|team-refinement|public-game-detail)\.spec\.ts/,
+        /(?:public-mobile-tables|public-navigation-refinement|player-statistics-(boundaries|refinement|desktop)|team-refinement|public-game-detail)\.spec\.ts/,
       use: { browserName: "webkit", viewport: { width: 1366, height: 768 } },
     },
     {
       name: "webkit-mobile",
       testMatch:
-        /(?:public-navigation-refinement|player-statistics-refinement|team-refinement|public-game-detail)\.spec\.ts/,
+        /(?:public-mobile-tables|public-navigation-refinement|player-statistics-refinement|team-refinement|public-game-detail)\.spec\.ts/,
       use: {
         browserName: "webkit",
         viewport: { width: 390, height: 844 },

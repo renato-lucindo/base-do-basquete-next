@@ -38,3 +38,21 @@ it("não aceita ausência como zero, métrica faltando nem número não finito",
   Reflect.deleteProperty(missing.rows[0].metrics, "points");
   expect(statisticsPageSchema.safeParse(missing).success).toBe(false);
 });
+
+it("aceita camisa ausente nas linhas públicas sem aceitar camisas inválidas", () => {
+  const value = page();
+  for (const jerseys of [[], ["0"], ["00"], ["0", "23"]]) {
+    value.rows[0].jerseys = jerseys;
+    expect(statisticsPageSchema.safeParse(value).success).toBe(true);
+  }
+  for (const jerseys of [
+    ["000"],
+    ["-1"],
+    ["100"],
+    [""],
+    Array(102).fill("0"),
+  ]) {
+    value.rows[0].jerseys = jerseys;
+    expect(statisticsPageSchema.safeParse(value).success).toBe(false);
+  }
+});

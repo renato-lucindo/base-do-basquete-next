@@ -347,7 +347,7 @@ export function SheetLiveTables({
                             {marks.map((mark, index) => (
                               <span
                                 key={mark.id + mark.code}
-                                className={`sheet-foul-mark ${mark.period % 2 === 1 && mark.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(mark.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
+                                className={`sheet-foul-mark ${`sheet-ink-${periodColor(mark.period)}`} ${firstHalfClass(mark.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
                                 title={`${periodLabel(mark.period)}${mark.consequence ? " · B2 vinculada à desqualificação do assistente" : ""}`}
                               >
                                 {mark.code.replace(/C$/u, "c")}
@@ -385,7 +385,7 @@ export function SheetLiveTables({
                     .map((e, index, marks) => (
                       <span
                         key={e.id}
-                        className={`sheet-foul-mark ${e.period % 2 === 1 && e.period <= 4 ? "sheet-ink-red" : "sheet-ink-blue"} ${firstHalfClass(e.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
+                        className={`sheet-foul-mark ${`sheet-ink-${periodColor(e.period)}`} ${firstHalfClass(e.period, marks[index - 1]?.period, marks[index + 1]?.period)}`}
                         title={`${periodLabel(e.period)} · ${e.target === "B" ? "Banco legado" : "Técnico"}`}
                       >
                         {e.code.replace(/C$/u, "c")}

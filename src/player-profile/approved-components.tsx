@@ -1,4 +1,8 @@
-import { ProfileMatch } from "../public-ui/profile-match";
+import {
+  ProfileMatch,
+  ProfileMatchRow,
+  useCompactProfileGames,
+} from "../public-ui/profile-match";
 import { useEffect, useState } from "react";
 import type { PublicCareer } from "./public-model";
 import type { ConfirmedPlayerGame } from "./participation-contract";
@@ -96,9 +100,11 @@ export function MetricTerm({
 export function MatchTeams({
   game,
   score,
+  fullNames = false,
 }: {
   game: ConfirmedPlayerGame;
   score?: string;
+  fullNames?: boolean;
 }) {
   return (
     <ProfileMatch
@@ -111,6 +117,7 @@ export function MatchTeams({
         abbreviation: game.game.away.team.abbreviation,
       }}
       score={score ?? "—"}
+      fullNames={fullNames}
     />
   );
 }
@@ -135,6 +142,7 @@ export function ProfileGames({
   label: string;
   matchupHeading?: string;
 }) {
+  const compact = useCompactProfileGames();
   if (!games.length)
     return <p className="player-empty">Nenhum jogo encontrado.</p>;
   return (
@@ -145,37 +153,79 @@ export function ProfileGames({
       tabIndex={0}
     >
       <table
-        className="player-games-table profile-games-table"
+        className={`player-games-table profile-games-table${compact ? " profile-games-compact" : ""}`}
         aria-label={label}
       >
-        <colgroup>
-          <col className="player-game-date-col" />
-          <col />
-          <col className="player-game-points-col" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th scope="col">Data</th>
-            <th scope="col">{matchupHeading}</th>
-            <th scope="col">
-              <MetricTerm metric="points" />
-            </th>
-          </tr>
+        {!compact && (
+          <colgroup>
+            <col className="player-game-date-col" />
+            <col />
+            <col className="player-game-points-col" />
+          </colgroup>
+        )}
+        <thead className={compact ? "player-sr-only" : undefined}>
+          {compact ? (
+            <tr>
+              <th scope="col">Jogo e pontos do atleta</th>
+            </tr>
+          ) : (
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">{matchupHeading}</th>
+              <th scope="col">
+                <MetricTerm metric="points" />
+              </th>
+            </tr>
+          )}
         </thead>
         <tbody>
           {games.map((g) => (
             <tr key={g.fact.gameId} data-game={g.fact.gameId}>
-              <td>{profileDate(g.game.date)}</td>
-              <td>
-                <a className="player-game-link" href={gameHref(g)}>
-                  <MatchTeams game={g} score={scores[scoreKey(g)]} />
-                  <GameContext game={g} />
-                  {!g.fact.played && <small>Não participou</small>}
-                </a>
-              </td>
-              <td className="player-game-points">
-                {g.fact.played ? (g.fact.scoring?.points ?? "—") : "—"}
-              </td>
+              {compact ? (
+                <td>
+                  <a className="player-game-link" href={gameHref(g)}>
+                    <ProfileMatchRow
+                      metadata={
+                        <>
+                          <span>{profileDate(g.game.date)}</span>
+                          <span className="player-game-points">
+                            {g.fact.played
+                              ? (g.fact.scoring?.points ?? "—")
+                              : "—"}{" "}
+                            PTS
+                          </span>
+                        </>
+                      }
+                      context={
+                        <>
+                          <GameContext game={g} />
+                          {!g.fact.played && <small>Não participou</small>}
+                        </>
+                      }
+                    >
+                      <MatchTeams
+                        game={g}
+                        score={scores[scoreKey(g)]}
+                        fullNames
+                      />
+                    </ProfileMatchRow>
+                  </a>
+                </td>
+              ) : (
+                <>
+                  <td>{profileDate(g.game.date)}</td>
+                  <td>
+                    <a className="player-game-link" href={gameHref(g)}>
+                      <MatchTeams game={g} score={scores[scoreKey(g)]} />
+                      <GameContext game={g} />
+                      {!g.fact.played && <small>Não participou</small>}
+                    </a>
+                  </td>
+                  <td className="player-game-points">
+                    {g.fact.played ? (g.fact.scoring?.points ?? "—") : "—"}
+                  </td>
+                </>
+              )}
             </tr>
           ))}
         </tbody>
@@ -347,28 +397,41 @@ export function CareerRecords({
   expanded: RecordMetric[];
   onChange: (expanded: RecordMetric[]) => void;
 }) {
+  const compact = useCompactProfileGames();
   return (
-    <section className="player-records" aria-labelledby="recordes" tabIndex={0}>
+    <section
+      className={`player-records${compact ? " player-records-compact" : ""}`}
+      aria-labelledby="recordes"
+      tabIndex={0}
+    >
       <h2 id="recordes">Recordes da carreira</h2>
       <table aria-label="Recordes da carreira">
-        <colgroup>
-          <col className="player-record-metric-col" />
-          <col className="player-record-value-col" />
-          <col className="player-record-date-col" />
-          <col />
-          <col className="player-record-action-col" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th colSpan={2} scope="colgroup">
-              Marca
-            </th>
-            <th scope="col">Data</th>
-            <th scope="col">Confronto</th>
-            <th scope="col">
-              <span className="player-sr-only">Ações</span>
-            </th>
-          </tr>
+        {!compact && (
+          <colgroup>
+            <col className="player-record-metric-col" />
+            <col className="player-record-value-col" />
+            <col className="player-record-date-col" />
+            <col />
+            <col className="player-record-action-col" />
+          </colgroup>
+        )}
+        <thead className={compact ? "player-sr-only" : undefined}>
+          {compact ? (
+            <tr>
+              <th scope="col">Marca, data e confronto</th>
+            </tr>
+          ) : (
+            <tr>
+              <th colSpan={2} scope="colgroup">
+                Marca
+              </th>
+              <th scope="col">Data</th>
+              <th scope="col">Confronto</th>
+              <th scope="col">
+                <span className="player-sr-only">Ações</span>
+              </th>
+            </tr>
+          )}
         </thead>
         {RECORD_METRICS.map((metric) => {
           const covered = rankCareerGames(career.games, metric),
@@ -377,7 +440,77 @@ export function CareerRecords({
             label = metricLabel(metric);
           return (
             <tbody key={metric} data-metric={metric}>
-              {!ranking.length ? (
+              {compact ? (
+                <>
+                  <tr className="player-record-group-heading">
+                    <th scope="rowgroup">
+                      <span>{label}</span>
+                      {ranking.length > 1 && (
+                        <button
+                          type="button"
+                          aria-expanded={open}
+                          aria-label={`${open ? "Recolher" : "Ver"} top 5 de ${label}`}
+                          onClick={() =>
+                            onChange(
+                              open
+                                ? expanded.filter((m) => m !== metric)
+                                : [...expanded, metric],
+                            )
+                          }
+                        >
+                          {open ? "Recolher" : "Ver top 5"}
+                        </button>
+                      )}
+                    </th>
+                  </tr>
+                  {!ranking.length ? (
+                    <tr>
+                      <td className="player-record-empty">
+                        {covered.length
+                          ? "Nenhuma marca positiva."
+                          : "Nenhuma marca registrada."}
+                      </td>
+                    </tr>
+                  ) : (
+                    (open ? ranking : ranking.slice(0, 1)).map((g, i) => (
+                      <tr
+                        key={g.fact.gameId}
+                        data-game={g.fact.gameId}
+                        className={
+                          i === 0
+                            ? "player-record-main"
+                            : "player-record-ranking"
+                        }
+                      >
+                        <td>
+                          <a href={gameHref(g)} className="player-record-game">
+                            <ProfileMatchRow
+                              metadata={
+                                <>
+                                  <span>{i + 1}º</span>
+                                  <span className="player-record-value">
+                                    {g.fact.scoring![metric]} {label}
+                                  </span>
+                                  <span className="player-record-date">
+                                    {profileDate(g.game.date)}
+                                  </span>
+                                </>
+                              }
+                              context={<GameContext game={g} />}
+                            >
+                              <MatchTeams
+                                game={g}
+                                score={scores[scoreKey(g)]}
+                                fullNames
+                              />
+                            </ProfileMatchRow>
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </>
+              ) : !ranking.length ? (
                 <tr>
                   <th scope="row">{label}</th>
                   <td>—</td>

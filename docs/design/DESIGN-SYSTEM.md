@@ -108,3 +108,9 @@ Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado
 As regras ficam em [PADROES](PADROES.md#consultas-e-métricas--padrão-de-25112026); estes links identificam as implementações para reutilização.
 
 Referências de espaçamento, altura/tipografia de controles,100registros e decimal uniforme estão em [PADROES — Consultas e métricas](PADROES.md#consultas-e-métricas--padrão-de-25112026); substituem o padding6px e inteiros misturados em colunas decimais.
+
+### Confronto compacto e cor pública —27/11/2026
+
+`ProfileMatchRow` organiza metadados, `ProfileMatch` e contexto secundário nos últimos jogos, histórico e recordes do atleta. A opção `fullNames` conserva a apresentação já existente nos demais consumidores. `useCompactProfileGames` seleciona uma única apresentação em639/640px; as tabelas nativas mantêm sua semântica.
+
+A variante `teamProfile` de `ScoresheetStatisticsTable` mostra camisa inline, omite equipe redundante e dimensiona Atleta pelo conteúdo. A configuração padrão das tabelas do campeonato permanece. A cor pública principal referencia `--bb-blue` (#075FCA), com os tokens existentes de hover e superfície suave. A matriz e evidências estão em [PLAN-TABELAS-MOBILE.md](../PLAN-TABELAS-MOBILE.md).
