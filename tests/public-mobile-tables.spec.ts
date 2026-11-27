@@ -179,6 +179,14 @@ for (const width of [320, 375, 390, 430, 639, 640, 768, 1366]) {
     await expect(
       table.locator("tbody tr").first().locator(".player-team-mobile"),
     ).toHaveCount(0);
+    await expect(table.locator(".player-name").first()).toHaveCSS(
+      "overflow-wrap",
+      "normal",
+    );
+    await expect(table.locator(".player-name").first()).toHaveCSS(
+      "word-break",
+      "normal",
+    );
     await expect(page.locator(".public-header .brand-mark")).toHaveCSS(
       "background-color",
       "rgb(7, 95, 202)",

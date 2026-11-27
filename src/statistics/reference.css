@@ -2017,3 +2017,8 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   .player-name-tail {
   white-space: nowrap;
 }
+
+.public-site.statistics-public .statistics-table-team-profile .player-name {
+  overflow-wrap: normal;
+  word-break: normal;
+}
