@@ -33,3 +33,5 @@ Não alterar contratos, schema, pontuação, rankings ou validação esportiva. 
 - Provas focais:43 testes unitários;62 consumidores Chromium e teste mobile de links final aprovados. Matriz final após fallback de tokens:16Chromium +16WebKit (oito larguras). Matriz anterior de toque WebKit32PASS. Catálogo/design completo PASS com axe.
 - Gate local: lint/formato/tipos gerados aprovados; retomado após corrigir variável document sombreada no teste. Suíte unitária completa e transportes aprovados; restantes em execução. CI e publicação ainda pendentes.
 - Catálogo isolado: o azul antigo fixo não dependia de tokens. Os novos aliases precisam de fallback canônico #075FCA onde a amostra carrega CSS sem cabeçalho público; contraste revalidado, sem afrouxar axe.
+
+- Fechamento local: gate completo aprovado (867/19/16/35/1); design/catálogo/axe aprovados. Fonte1d6ce17 publicada emadmin/preview;76assets e108páginas/seções-larguras-engines reais conferidos; configurações eadmin-publicacao preservados. [Validação detalhada](design/VALIDACAO-TABELAS-MOBILE.md). CI obrigatória do HEAD vinculada naPR, sem merge.
