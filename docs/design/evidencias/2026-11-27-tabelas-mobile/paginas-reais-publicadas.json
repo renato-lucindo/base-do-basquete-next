@@ -1,17 +1,17 @@
 {
   "source": "Published preview PR89",
-  "sha": "1d6ce178dedc7b317cf17acf93fa12c7f185167a",
+  "sha": "917015bb1bd38494b5c4b47832efaf1a40b2112d",
   "requests": [
     {
       "path": "/api/public/dispute-status/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
       "status": 200
     },
     {
-      "path": "/api/public/teams/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?mode=per-game&scope=all&sort=points&direction=desc&dataset=all&preset=essentials&columns=games%2Cpoints%2CpointsPerGame%2CtwoMade%2CthreeMade%2CfreeMade%2CfoulsCommitted%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2Cdisqualifications%2CfreeThrowPercentage%2CpointsAgainst%2Cdifference&pageSize=all&selection=all",
+      "path": "/api/public/catalog?disputeId=b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
       "status": 200
     },
     {
-      "path": "/api/public/catalog?disputeId=b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "path": "/api/public/teams/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?mode=per-game&scope=all&sort=points&direction=desc&dataset=all&preset=essentials&columns=games%2Cpoints%2CpointsPerGame%2CtwoMade%2CthreeMade%2CfreeMade%2CfoulsCommitted%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2Cdisqualifications%2CfreeThrowPercentage%2CpointsAgainst%2Cdifference&pageSize=all&selection=all",
       "status": 200
     },
     {
@@ -47,11 +47,11 @@
       "status": 200
     },
     {
-      "path": "/api/public/games/293a0bc1-55a1-45af-91b9-6d48d6b18ae7",
+      "path": "/api/public/games/a4a0c11d-dd7c-407a-ab30-1e2f58cc17da",
       "status": 200
     },
     {
-      "path": "/api/public/games/a4a0c11d-dd7c-407a-ab30-1e2f58cc17da",
+      "path": "/api/public/games/293a0bc1-55a1-45af-91b9-6d48d6b18ae7",
       "status": 200
     },
     {
@@ -59,19 +59,15 @@
       "status": 200
     },
     {
-      "path": "/api/public/games/84e74597-a99b-4cf9-9f29-ec8bbc56a693",
-      "status": 200
-    },
-    {
       "path": "/api/public/games/34873ca3-fe2f-47d8-9eb8-1b274f18c6e3",
       "status": 200
     },
     {
-      "path": "/api/public/games/005a42ea-f0c4-4e12-b155-e5e599a49c00",
+      "path": "/api/public/games/84e74597-a99b-4cf9-9f29-ec8bbc56a693",
       "status": 200
     },
     {
-      "path": "/api/public/games/1f26961c-05c1-482a-be28-e85b858c35d6",
+      "path": "/api/public/games/005a42ea-f0c4-4e12-b155-e5e599a49c00",
       "status": 200
     },
     {
@@ -80,6 +76,10 @@
     },
     {
       "path": "/api/public/games/17f17d84-5711-4e24-93ee-89cf33a892e1",
+      "status": 200
+    },
+    {
+      "path": "/api/public/games/1f26961c-05c1-482a-be28-e85b858c35d6",
       "status": 200
     }
   ],
@@ -553,7 +553,7 @@
       "kind": "perfil-equipe",
       "width": 296,
       "overflow": 0,
-      "height": 2086.671875,
+      "height": 2695.890625,
       "legendCount": 1
     },
     {
@@ -561,7 +561,7 @@
       "kind": "perfil-jogador",
       "width": 288,
       "overflow": 0,
-      "height": 1398.140625,
+      "height": 1417.640625,
       "legendCount": 1
     },
     {
@@ -649,7 +649,7 @@
       "kind": "jogador-historico",
       "width": 343,
       "overflow": 0,
-      "height": 1180.046875,
+      "height": 1199.546875,
       "legendCount": 1
     },
     {
@@ -705,7 +705,7 @@
       "kind": "perfil-jogador",
       "width": 358,
       "overflow": 0,
-      "height": 1359.140625,
+      "height": 1378.640625,
       "legendCount": 1
     },
     {
@@ -841,7 +841,7 @@
       "kind": "perfil-equipe",
       "width": 736,
       "overflow": 0,
-      "height": 2156.828125,
+      "height": 1722.171875,
       "legendCount": 1
     },
     {
