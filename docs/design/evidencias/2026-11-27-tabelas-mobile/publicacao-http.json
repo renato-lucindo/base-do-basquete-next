@@ -1,48 +1,48 @@
 {
-  "sha": "917015bb1bd38494b5c4b47832efaf1a40b2112d",
+  "sha": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
   "checks": [
     {
       "name": "admin",
       "path": "/api/health",
       "status": 200,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     },
     {
       "name": "admin",
       "path": "/",
       "status": 200,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     },
     {
       "name": "admin",
       "path": "/api/competitions",
       "status": 401,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     },
     {
       "name": "preview",
       "path": "/api/health",
       "status": 200,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     },
     {
       "name": "preview",
       "path": "/",
       "status": 200,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     },
     {
       "name": "preview",
       "path": "/api/competitions",
       "status": 403,
-      "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d"
+      "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
     }
   ],
   "assets": [
     {
       "name": "admin",
-      "path": "/assets/publico-Cg7YOwHD.js",
-      "sha256": "692f5622df13b068c8f521a55183364b59e655be5f1ca386b62045aea624b76a"
+      "path": "/assets/publico-Cg0yluKW.js",
+      "sha256": "782b5458e1a7372408bdff09f6345ff43ab251de9b600dcfe5db81436b596bdb"
     },
     {
       "name": "admin",
@@ -56,7 +56,7 @@
     },
     {
       "name": "admin",
-      "path": "/assets/reference-CsW4ek1n.js",
+      "path": "/assets/reference-DxBglcIc.js",
       "sha256": "d02a84f2df6ced63f961cb30cb89fc6c59045253e2158c0de53d7ef180b4e89a"
     },
     {
@@ -71,8 +71,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/public-page-CA4mG8zq.js",
-      "sha256": "2b7cb89411c6dab37ead6df0733d80b1b13af6a1274eb39fbf188b46f7020006"
+      "path": "/assets/public-page-CeO5KhYp.js",
+      "sha256": "b1450550d58540de976c225848245d960be1f9e7d32e355ded1d9284a5a4e10e"
     },
     {
       "name": "admin",
@@ -86,8 +86,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/reference-CN1RjWxI.css",
-      "sha256": "becef306caa0c9a385667d47e053b5285833b6aa0f9d5e7f48da17ae3fe68584"
+      "path": "/assets/reference-CljPwhh_.css",
+      "sha256": "741c1e39664ab109719883d4bc478eb65192d3364254d66628ef10a2f721c67a"
     },
     {
       "name": "admin",
@@ -101,8 +101,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/estatisticas-B4jU7Lpf.js",
-      "sha256": "485a19bb8a3691a1a7da28851f301a4e51de3ce218d7e1f2dd3dd689b6f551ae"
+      "path": "/assets/estatisticas-BD9GuPsp.js",
+      "sha256": "aba8b397dedcfb42352cca60d30a6e096c6a3779b819242087e6eac92ba1ae47"
     },
     {
       "name": "admin",
@@ -121,8 +121,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/scoresheet-statistics-table-CGOW3WWI.js",
-      "sha256": "01aa3a98028023ad4960edd958bb3b2e7681400aeaff6f6c1bf76ace4c275768"
+      "path": "/assets/scoresheet-statistics-table-B5r5V2jQ.js",
+      "sha256": "43f3a0117b803b1948c60f27dff8e5a7f44bd4fff154cb8985ad22904f28571c"
     },
     {
       "name": "admin",
@@ -136,13 +136,13 @@
     },
     {
       "name": "admin",
-      "path": "/assets/equipes-BEObResV.js",
-      "sha256": "2acfb2f519f00eb0babeb8d687165b59d3ebb8915bd22fcb9733714259925344"
+      "path": "/assets/equipes-Cc8mlN62.js",
+      "sha256": "2dd081c40c0bb5e9d19db680b8e3dae2da4c51c5f0b8c9467ba18e0f0eeab59e"
     },
     {
       "name": "admin",
-      "path": "/assets/screen-BcmwPxJq.js",
-      "sha256": "aa5ac316915559e347f0dd036b1b09835095177afa6fe5b2c7131465fe0e420f"
+      "path": "/assets/screen-Di_60C9s.js",
+      "sha256": "ee0a05d403a18363c53e94cf027afbad92cc210188231578b343fcc9241d05ed"
     },
     {
       "name": "admin",
@@ -161,8 +161,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/equipe-Kp5fGqij.js",
-      "sha256": "14e67be26a18638285f0f43151879fd1394948815f3687eac638a89d8f52cff5"
+      "path": "/assets/equipe-Dv4VJGDV.js",
+      "sha256": "74bd100fb8d9684ef0bcccf7367bbc1e48ffbe15227e369b20f14f670744f27e"
     },
     {
       "name": "admin",
@@ -186,8 +186,8 @@
     },
     {
       "name": "admin",
-      "path": "/assets/atleta-BWQhJW-C.js",
-      "sha256": "c78bab95a1b8d0f1bcefe4887f15ba22cb91f2f9df97bd8444ecb840b9a76e19"
+      "path": "/assets/atleta-BBO2Ghaa.js",
+      "sha256": "a265caa38b74bc47b61278c5c5b081e319aa79632dae1a8a5065b7072ba7066e"
     },
     {
       "name": "admin",
@@ -231,8 +231,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/publico-Cg7YOwHD.js",
-      "sha256": "692f5622df13b068c8f521a55183364b59e655be5f1ca386b62045aea624b76a"
+      "path": "/assets/publico-Cg0yluKW.js",
+      "sha256": "782b5458e1a7372408bdff09f6345ff43ab251de9b600dcfe5db81436b596bdb"
     },
     {
       "name": "preview",
@@ -246,7 +246,7 @@
     },
     {
       "name": "preview",
-      "path": "/assets/reference-CsW4ek1n.js",
+      "path": "/assets/reference-DxBglcIc.js",
       "sha256": "d02a84f2df6ced63f961cb30cb89fc6c59045253e2158c0de53d7ef180b4e89a"
     },
     {
@@ -261,8 +261,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/public-page-CA4mG8zq.js",
-      "sha256": "2b7cb89411c6dab37ead6df0733d80b1b13af6a1274eb39fbf188b46f7020006"
+      "path": "/assets/public-page-CeO5KhYp.js",
+      "sha256": "b1450550d58540de976c225848245d960be1f9e7d32e355ded1d9284a5a4e10e"
     },
     {
       "name": "preview",
@@ -276,8 +276,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/reference-CN1RjWxI.css",
-      "sha256": "becef306caa0c9a385667d47e053b5285833b6aa0f9d5e7f48da17ae3fe68584"
+      "path": "/assets/reference-CljPwhh_.css",
+      "sha256": "741c1e39664ab109719883d4bc478eb65192d3364254d66628ef10a2f721c67a"
     },
     {
       "name": "preview",
@@ -291,8 +291,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/estatisticas-B4jU7Lpf.js",
-      "sha256": "485a19bb8a3691a1a7da28851f301a4e51de3ce218d7e1f2dd3dd689b6f551ae"
+      "path": "/assets/estatisticas-BD9GuPsp.js",
+      "sha256": "aba8b397dedcfb42352cca60d30a6e096c6a3779b819242087e6eac92ba1ae47"
     },
     {
       "name": "preview",
@@ -311,8 +311,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/scoresheet-statistics-table-CGOW3WWI.js",
-      "sha256": "01aa3a98028023ad4960edd958bb3b2e7681400aeaff6f6c1bf76ace4c275768"
+      "path": "/assets/scoresheet-statistics-table-B5r5V2jQ.js",
+      "sha256": "43f3a0117b803b1948c60f27dff8e5a7f44bd4fff154cb8985ad22904f28571c"
     },
     {
       "name": "preview",
@@ -326,13 +326,13 @@
     },
     {
       "name": "preview",
-      "path": "/assets/equipes-BEObResV.js",
-      "sha256": "2acfb2f519f00eb0babeb8d687165b59d3ebb8915bd22fcb9733714259925344"
+      "path": "/assets/equipes-Cc8mlN62.js",
+      "sha256": "2dd081c40c0bb5e9d19db680b8e3dae2da4c51c5f0b8c9467ba18e0f0eeab59e"
     },
     {
       "name": "preview",
-      "path": "/assets/screen-BcmwPxJq.js",
-      "sha256": "aa5ac316915559e347f0dd036b1b09835095177afa6fe5b2c7131465fe0e420f"
+      "path": "/assets/screen-Di_60C9s.js",
+      "sha256": "ee0a05d403a18363c53e94cf027afbad92cc210188231578b343fcc9241d05ed"
     },
     {
       "name": "preview",
@@ -351,8 +351,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/equipe-Kp5fGqij.js",
-      "sha256": "14e67be26a18638285f0f43151879fd1394948815f3687eac638a89d8f52cff5"
+      "path": "/assets/equipe-Dv4VJGDV.js",
+      "sha256": "74bd100fb8d9684ef0bcccf7367bbc1e48ffbe15227e369b20f14f670744f27e"
     },
     {
       "name": "preview",
@@ -376,8 +376,8 @@
     },
     {
       "name": "preview",
-      "path": "/assets/atleta-BWQhJW-C.js",
-      "sha256": "c78bab95a1b8d0f1bcefe4887f15ba22cb91f2f9df97bd8444ecb840b9a76e19"
+      "path": "/assets/atleta-BBO2Ghaa.js",
+      "sha256": "a265caa38b74bc47b61278c5c5b081e319aa79632dae1a8a5065b7072ba7066e"
     },
     {
       "name": "preview",

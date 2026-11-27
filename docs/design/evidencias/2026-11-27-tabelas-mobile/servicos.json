@@ -2,18 +2,18 @@
   {
     "name": "admin",
     "settingsPreserved": true,
-    "deployment": "4763e3f4-2d94-4b57-9273-56a1da74e3f4",
-    "version": "3323ac61-aee2-468a-b1a8-f8c8752d1a80",
-    "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d",
+    "deployment": "fa4fff45-59aa-48cb-88aa-27a360910ee1",
+    "version": "bdaf4cad-994f-4a9f-90bb-ebfc7234c6e0",
+    "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
     "fixedDeploymentPreserved": true,
     "allowedChanges": ["source", "version annotations", "assets/code"]
   },
   {
     "name": "preview",
     "settingsPreserved": true,
-    "deployment": "743b8950-e8d3-4b92-bfdd-81bae5c946b1",
-    "version": "096bfd65-dbac-400e-adf5-3a1ebd68258f",
-    "source": "917015bb1bd38494b5c4b47832efaf1a40b2112d",
+    "deployment": "29d2c9d7-22af-49bd-af55-3df5640dd90a",
+    "version": "5fdeddce-37b1-4d6d-a3c1-1a662522309c",
+    "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
     "fixedDeploymentPreserved": true,
     "allowedChanges": ["source", "version annotations", "assets/code"]
   },

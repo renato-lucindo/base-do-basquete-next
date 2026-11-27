@@ -1,13 +1,13 @@
 {
   "source": "Published preview PR89",
-  "sha": "917015bb1bd38494b5c4b47832efaf1a40b2112d",
+  "sha": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
   "requests": [
     {
-      "path": "/api/public/dispute-status/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "path": "/api/public/catalog?disputeId=b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
       "status": 200
     },
     {
-      "path": "/api/public/catalog?disputeId=b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
+      "path": "/api/public/dispute-status/b5433b13-a8f9-4baa-b4d9-08066ebf3e96",
       "status": 200
     },
     {
@@ -51,11 +51,11 @@
       "status": 200
     },
     {
-      "path": "/api/public/games/293a0bc1-55a1-45af-91b9-6d48d6b18ae7",
+      "path": "/api/public/games/84e74597-a99b-4cf9-9f29-ec8bbc56a693",
       "status": 200
     },
     {
-      "path": "/api/public/statistics/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?dataset=all&mode=per-game&scope=regular&sort=points&dir=desc&page=1&preset=all&columns=games%2Cminutes%2Cpoints%2Crebounds%2CoffensiveRebounds%2CdefensiveRebounds%2Cassists%2Cturnovers%2Cblocks%2Csteals%2CfoulsCommitted%2CfoulsReceived%2CfieldGoalsMade%2CfieldGoalsAttempted%2CthreePointersMade%2CthreePointersAttempted%2CfreeThrowsMade%2CfreeThrowsAttempted%2Cefficiency%2CplusMinus%2CfieldGoalPercentage%2CthreePointPercentage%2CfreeThrowPercentage%2CpointsShare%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2CpointsPerGame%2Cdisqualifications%2CtwoMade%2CthreeMade%2CfreeMade&pageSize=100&registrationId=49d02a08-17af-4bf7-b7f7-5ae1ee55eb2c",
+      "path": "/api/public/games/293a0bc1-55a1-45af-91b9-6d48d6b18ae7",
       "status": 200
     },
     {
@@ -63,7 +63,7 @@
       "status": 200
     },
     {
-      "path": "/api/public/games/84e74597-a99b-4cf9-9f29-ec8bbc56a693",
+      "path": "/api/public/statistics/b5433b13-a8f9-4baa-b4d9-08066ebf3e96?dataset=all&mode=per-game&scope=regular&sort=points&dir=desc&page=1&preset=all&columns=games%2Cminutes%2Cpoints%2Crebounds%2CoffensiveRebounds%2CdefensiveRebounds%2Cassists%2Cturnovers%2Cblocks%2Csteals%2CfoulsCommitted%2CfoulsReceived%2CfieldGoalsMade%2CfieldGoalsAttempted%2CthreePointersMade%2CthreePointersAttempted%2CfreeThrowsMade%2CfreeThrowsAttempted%2Cefficiency%2CplusMinus%2CfieldGoalPercentage%2CthreePointPercentage%2CfreeThrowPercentage%2CpointsShare%2CtechnicalFouls%2CunsportsmanlikeFouls%2CfiveFouls%2CpointsPerGame%2Cdisqualifications%2CtwoMade%2CthreeMade%2CfreeMade&pageSize=100&registrationId=49d02a08-17af-4bf7-b7f7-5ae1ee55eb2c",
       "status": 200
     },
     {
@@ -75,11 +75,11 @@
       "status": 200
     },
     {
-      "path": "/api/public/games/17f17d84-5711-4e24-93ee-89cf33a892e1",
+      "path": "/api/public/games/1f26961c-05c1-482a-be28-e85b858c35d6",
       "status": 200
     },
     {
-      "path": "/api/public/games/1f26961c-05c1-482a-be28-e85b858c35d6",
+      "path": "/api/public/games/17f17d84-5711-4e24-93ee-89cf33a892e1",
       "status": 200
     }
   ],
@@ -129,7 +129,7 @@
       "kind": "perfil-jogador",
       "width": 288,
       "overflow": 0,
-      "height": 1398.140625,
+      "height": 1417.640625,
       "legendCount": 1
     },
     {
@@ -145,7 +145,7 @@
       "kind": "jogador-historico",
       "width": 288,
       "overflow": 0,
-      "height": 1307.296875,
+      "height": 1326.796875,
       "legendCount": 1
     },
     {
@@ -217,7 +217,7 @@
       "kind": "jogador-historico",
       "width": 343,
       "overflow": 0,
-      "height": 1199.546875,
+      "height": 1219.046875,
       "legendCount": 1
     },
     {
@@ -577,7 +577,7 @@
       "kind": "jogador-historico",
       "width": 288,
       "overflow": 0,
-      "height": 1307.296875,
+      "height": 1326.796875,
       "legendCount": 1
     },
     {
@@ -625,7 +625,7 @@
       "kind": "perfil-equipe",
       "width": 351,
       "overflow": 0,
-      "height": 1898.421875,
+      "height": 2507.640625,
       "legendCount": 1
     },
     {
@@ -649,7 +649,7 @@
       "kind": "jogador-historico",
       "width": 343,
       "overflow": 0,
-      "height": 1199.546875,
+      "height": 1219.046875,
       "legendCount": 1
     },
     {
@@ -697,7 +697,7 @@
       "kind": "perfil-equipe",
       "width": 366,
       "overflow": 0,
-      "height": 1898.421875,
+      "height": 2507.640625,
       "legendCount": 1
     },
     {
@@ -721,7 +721,7 @@
       "kind": "jogador-historico",
       "width": 358,
       "overflow": 0,
-      "height": 1180.046875,
+      "height": 1219.046875,
       "legendCount": 1
     },
     {
@@ -769,7 +769,7 @@
       "kind": "perfil-equipe",
       "width": 406,
       "overflow": 0,
-      "height": 1898.421875,
+      "height": 2507.640625,
       "legendCount": 1
     },
     {
@@ -841,7 +841,7 @@
       "kind": "perfil-equipe",
       "width": 736,
       "overflow": 0,
-      "height": 1722.171875,
+      "height": 2156.828125,
       "legendCount": 1
     },
     {
@@ -913,7 +913,7 @@
       "kind": "perfil-equipe",
       "width": 1310,
       "overflow": 0,
-      "height": 1464.015625,
+      "height": 1811.390625,
       "legendCount": 1
     },
     {
