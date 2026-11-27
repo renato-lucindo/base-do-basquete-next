@@ -1,3 +1,5 @@
+import { SearchInput } from "../../../src/ui-system/query-controls";
+import { ProfilePatterns } from "./profile-patterns";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AdminDialog } from "../../../src/competition/admin-dialog";
@@ -176,8 +178,11 @@ function PublicExample() {
           <div hidden={tab !== "classificacao"}>
             <TabPanel id="liga" active="classificacao">
               <div className="catalog-search">
-                <label htmlFor="busca-equipes">Buscar equipe</label>
-                <input
+                <label htmlFor="busca-equipes" className="bb-query-label">
+                  Buscar equipe
+                </label>
+                <SearchInput
+                  placeholder="Nome da equipe"
                   type="search"
                   id="busca-equipes"
                   name="equipe"
@@ -367,6 +372,7 @@ function Catalog() {
         </div>
         <Foundations />
         <PublicExample />
+        <ProfilePatterns />
         <AdminExample />
         <FeedbackExamples />
       </main>

@@ -1,0 +1,149 @@
+{
+  "sha": "a88d42ded657b6303dff971e8b629a001c16b80f",
+  "jogadores": {
+    "rows": 100,
+    "maxModeDelta": 0,
+    "fields": [
+      {
+        "text": "Nome do atleta",
+        "height": 44,
+        "font": "16px"
+      },
+      {
+        "text": "Todas as equipes⌄",
+        "height": 44,
+        "font": "16px"
+      },
+      {
+        "text": "Mínimo de jogos",
+        "height": 44,
+        "font": "16px"
+      }
+    ],
+    "nameWidth": 288,
+    "teamSearch": 0
+  },
+  "perfis": [
+    {
+      "section": "resumo",
+      "context": false,
+      "tables": [
+        {
+          "name": null,
+          "width": 930,
+          "rows": 1
+        },
+        {
+          "name": null,
+          "width": 930,
+          "rows": 5
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    },
+    {
+      "section": "competicoes",
+      "context": false,
+      "tables": [
+        {
+          "name": null,
+          "width": 930,
+          "rows": 1
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    },
+    {
+      "section": "elencos",
+      "context": false,
+      "tables": [
+        {
+          "name": "Estatísticas dos atletas",
+          "width": 1009.703125,
+          "rows": 15
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false,
+      "modeDelta": 0
+    },
+    {
+      "section": "jogos",
+      "context": false,
+      "tables": [
+        {
+          "name": null,
+          "width": 930,
+          "rows": 9
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    },
+    {
+      "section": "estatisticas",
+      "context": false,
+      "tables": [
+        {
+          "name": null,
+          "width": 640.65625,
+          "rows": 1
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    },
+    {
+      "section": "resumo",
+      "context": true,
+      "tables": [
+        {
+          "name": null,
+          "width": 879.5625,
+          "rows": 6
+        },
+        {
+          "name": "Estatísticas das equipes",
+          "width": 992.375,
+          "rows": 6
+        },
+        {
+          "name": null,
+          "width": 930,
+          "rows": 5
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    },
+    {
+      "section": "jogadores",
+      "context": true,
+      "tables": [
+        {
+          "name": "Estatísticas dos atletas",
+          "width": 1009.703125,
+          "rows": 15
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false,
+      "modeDelta": 0
+    },
+    {
+      "section": "jogos",
+      "context": true,
+      "tables": [
+        {
+          "name": null,
+          "width": 930,
+          "rows": 9
+        }
+      ],
+      "alerts": [],
+      "pageOverflow": false
+    }
+  ]
+}

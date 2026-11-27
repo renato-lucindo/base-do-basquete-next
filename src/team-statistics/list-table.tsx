@@ -1,3 +1,8 @@
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import type { TeamsListPage } from "./list-contract";
 import { LIST_METRICS, type ListMetric } from "./list-query";
 import { sheetTeamMetric, TEAM_METRICS } from "./metrics";
@@ -11,20 +16,29 @@ export const listMetric = (key: ListMetric, scoresheet = false) =>
     : key === "foulsReceived" && !scoresheet
       ? TEAM_METRICS[key]
       : sheetTeamMetric(key);
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
-const decimal = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-});
 export function TeamsListTable({
   data: d,
   onSort,
   canNavigate = true,
+  highlightRegistrationId,
+  showLegend = true,
 }: {
   data: TeamsListPage;
   canNavigate?: boolean;
+  highlightRegistrationId?: string;
+  showLegend?: boolean;
   onSort: (key: TeamsListPage["query"]["sort"]) => void;
 }) {
+  const decimalColumns = new Set(
+    d.query.columns.filter(
+      (key) =>
+        (d.query.mode === "per-game" &&
+          key !== "games" &&
+          !key.endsWith("Percentage") &&
+          !key.endsWith("Share")) ||
+        columnHasDecimal(d.rows.map((row) => row.statistics[key].value)),
+    ),
+  );
   const maxima = Object.fromEntries(
     d.query.columns.map((key) => [
       key,
@@ -65,6 +79,21 @@ export function TeamsListTable({
                       key={key}
                       definition={listMetric(key, d.scoresheet)}
                       metricKey={key}
+                      style={metricColumnStyle(
+                        d.rows.map((row) => ({
+                          value: row.statistics[key].value,
+                          averageDivisor: listMetric(key, d.scoresheet)
+                            .normalizable
+                            ? row.metricCoverage[key]
+                            : undefined,
+                          totalFactor:
+                            d.query.mode === "per-game" &&
+                            listMetric(key, d.scoresheet).normalizable
+                              ? row.metricCoverage[key]
+                              : 1,
+                        })),
+                        listMetric(key, d.scoresheet).label.includes("%"),
+                      )}
                       metricAttribute="data-team-metric"
                       active={d.query.sort === key}
                       direction={d.query.direction}
@@ -75,7 +104,12 @@ export function TeamsListTable({
               </thead>
               <tbody>
                 {d.rows.map((r) => (
-                  <tr key={r.registrationId}>
+                  <tr
+                    key={r.registrationId}
+                    data-profile-selected={
+                      highlightRegistrationId === r.registrationId || undefined
+                    }
+                  >
                     <td className="rank">{r.rank ?? "—"}</td>
                     <th scope="row">
                       <a
@@ -102,7 +136,7 @@ export function TeamsListTable({
                         <td
                           key={key}
                           data-team-value={key}
-                          className={positive ? "team-list-maximum" : undefined}
+                          className={`bb-metric-value ${positive ? "team-list-maximum" : ""}`}
                         >
                           {cell.value === null ? (
                             <span
@@ -112,14 +146,7 @@ export function TeamsListTable({
                               —
                             </span>
                           ) : (
-                            (cell.value !== 0 &&
-                            d.query.mode === "per-game" &&
-                            key !== "games" &&
-                            !key.endsWith("Percentage") &&
-                            !key.endsWith("Share")
-                              ? decimal
-                              : number
-                            ).format(cell.value)
+                            formatStatistic(cell.value, decimalColumns.has(key))
                           )}
                         </td>
                       );
@@ -135,20 +162,22 @@ export function TeamsListTable({
           Nenhuma inscrição neste recorte.
         </p>
       )}
-      <section
-        className="table-legend reference-legend"
-        aria-labelledby="team-legend"
-      >
-        <h2 id="team-legend">Legenda</h2>
-        <dl>
-          {d.query.columns.map((key) => (
-            <div key={key}>
-              <dt>{listMetric(key, d.scoresheet).label}</dt>
-              <dd>{listMetric(key, d.scoresheet).name}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      {showLegend && (
+        <section
+          className="table-legend reference-legend"
+          aria-labelledby="team-legend"
+        >
+          <h2 id="team-legend">Legenda</h2>
+          <dl>
+            {d.query.columns.map((key) => (
+              <div key={key}>
+                <dt>{listMetric(key, d.scoresheet).label}</dt>
+                <dd>{listMetric(key, d.scoresheet).name}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
     </TooltipProvider>
   );
 }

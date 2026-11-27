@@ -1,0 +1,37 @@
+{
+  "run": "https://github.com/renato-lucindo/next/actions/runs/45998870054",
+  "head": "450d45873c0c5b81e6350fe4bb7eb3430400a3f1",
+  "result": "failure",
+  "gate": "PASS",
+  "webkitMacOS": {
+    "passed": 102
+  },
+  "chromium": {
+    "passed": 978,
+    "failed": 7,
+    "skippedPreexisting": 125
+  },
+  "causes": [
+    "Nome acessível do atleta não incluía texto visível #camisa (desktop e mobile).",
+    "Expectativas antigas de célula Camisa independente (desktop e mobile).",
+    "Seletor de data apontava para a célula inteira compacta (mobile).",
+    "Classe do valor de pontos incluía o rótulo PTS no mobile.",
+    "Teste de tempos ainda esperava prorrogação vermelha (desktop)."
+  ],
+  "fixes": [
+    "Nome acessível começa por nome visível + #camisa e conserva nome completo quando há apelido; espaço real antes da camisa.",
+    "Seletores conferem camisa inline e data identificada em ambas as apresentações.",
+    "Classe do valor contém somente o número, mantendo PTS como rótulo adjacente.",
+    "Teste da súmula verifica três prorrogações azuis, persistência, limites e teclado."
+  ],
+  "verification": {
+    "focusedChromium": 8,
+    "broadChromium": 138,
+    "broadSkippedPreexisting": 8,
+    "webkitFinal": 16,
+    "timeoutThreeOvertimes": 1,
+    "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe"
+  },
+  "limitsChanged": false,
+  "newSkips": false
+}

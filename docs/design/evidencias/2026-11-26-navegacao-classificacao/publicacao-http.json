@@ -1,0 +1,427 @@
+{
+  "sha": "805fc5b98584ae86d1c912e221bb1f535373b616",
+  "checks": [
+    {
+      "name": "admin",
+      "path": "/api/health",
+      "status": 200,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    },
+    {
+      "name": "admin",
+      "path": "/",
+      "status": 200,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    },
+    {
+      "name": "admin",
+      "path": "/api/competitions",
+      "status": 401,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    },
+    {
+      "name": "preview",
+      "path": "/api/health",
+      "status": 200,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    },
+    {
+      "name": "preview",
+      "path": "/",
+      "status": 200,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    },
+    {
+      "name": "preview",
+      "path": "/api/competitions",
+      "status": 403,
+      "source": "805fc5b98584ae86d1c912e221bb1f535373b616"
+    }
+  ],
+  "assets": [
+    {
+      "name": "admin",
+      "path": "/assets/publico-B57mfc9M.js",
+      "sha256": "f04b73e59536edb585548b8b25982c3ca95d4e3f7e4908152f5b903bd5ca653e"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/shell-CMrfBMmA.js",
+      "sha256": "89a6062511aac947615239e65c43e0670110d35156cb769dc06f6c948d1bb7eb"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/boxscore-statistics-contract-DHDu9m73.js",
+      "sha256": "e9cf334ca0e21658f2f6a7a362aa9bfe2a1948641aa0c05cd1d97d4141591dc2"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/reference-C46P8ZZf.js",
+      "sha256": "fae5dd9ca04ff009d06a13c8198d3bf6939649827b04fa331d37376d7edc62e9"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/tooltip-COjIR5Vn.js",
+      "sha256": "c601630a9586b12982ecc5c3e47a52a7c9765e945452b4aceb16ff5741ff1669"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/standings-metrics-BI3t5g_P.js",
+      "sha256": "6554386dccd8b7b3e9e3069e6addca57ac50e13d7f647fc80ec35b0b15ee4d06"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/public-page-cHz0eK71.js",
+      "sha256": "8f6eea1c7c29e63ce55085015e4ab6554725378130f817669bb5c3c5c9f5d675"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/shell-D2eGn2tH.css",
+      "sha256": "44e761971af9e161f47c147b9a035fe35cdc3afb0a7847a6f614937002db991a"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/boxscore-statistics-contract-BbrQQ_-n.css",
+      "sha256": "755596ec1fdf161f8ea3004f7c060a18a0450f0cda63bec87ffcc56f8a2cfc4f"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/reference-CdsN-KWn.css",
+      "sha256": "20358ae90416df69e8200c439d97796cb2ffc9bbbdb62723dddbf6bbbb4a7843"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/public-page-DRx_dD2q.css",
+      "sha256": "a4672130894a63c3700159c0d3ba239252466bfbfe2985bca930a4c640817e4d"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/legacy-BbYuMgc3.css",
+      "sha256": "8f837dcdca5050fe9c99233103786d4f13d27f9b4e2fe86d13867a0a7d87ee19"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/estatisticas-Bw9dAxWz.js",
+      "sha256": "6eb2f606beb5e7b76274f6587969e4bc0003193bb602f1e1b3951b81e5293d73"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/player-name-DSieFT_I.js",
+      "sha256": "48b0bc17fb13bd906d6ed76c6dfcbf0d2e421d825280dabb9cf25240ebdff4c9"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/metric-layout-C4V-pthu.js",
+      "sha256": "156c13ed5717e5541049d2bb2e7e7b237b84df532aca06769283f610b094c055"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/sort-header-t6MUJ2VP.js",
+      "sha256": "343ade19f5575b706ade54e6f44ef47369434314bb952e86756172443366ac70"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/scoresheet-statistics-table-0DNWuiOp.js",
+      "sha256": "7704fdbb113a2159742949aa1f0f3d29c4748d57db9645bdced0c27e2b6d5083"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/team-filter-Cap-gUhs.js",
+      "sha256": "6da5572ff7859e8f90b5e289f7f914540580fe1e621e9c52339c6eb9cbe7bf39"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/estatisticas-CP_Wi8g3.css",
+      "sha256": "aa13ab042e2870dc43aa3994b0f4f9fac2883a78d42c415aea9de291cc538d97"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/equipes-DkYjrRIq.js",
+      "sha256": "8a0f9c734e822294b6bbe034483e5fc4580ee451a5e636a825c3ab3e368317ce"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/screen-E4Gb7hbP.js",
+      "sha256": "24829b1cfce024fad3744e5f0a4960d884694d3d12c9f9b540b2273ddf505459"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/screen-DjcYvYfr.css",
+      "sha256": "d8fbc552ced5367fb124bdf57efbc0e2231d00c1ef6e181d5040850f2c5b4c06"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/screen-CCnY_p4Y.css",
+      "sha256": "865ded88ba1837015d9eb030f0970a2184d11bad36306649ac985d55dbc57060"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/screen-yCG7UjWL.css",
+      "sha256": "8e46cb0430bfb6720a777a454566a72d644b4e701171d19fd3e79f628950db28"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/equipe-C4vHyUaZ.js",
+      "sha256": "2b08d8f59e46c5ea2e27711e11c772886cd8125757c427ade0c4ba295e5c217d"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/publication-contract-FtQjPRt3.js",
+      "sha256": "b5400ff29d7a63a9433dc8d270a1c8dbf4a62ce2d4d9d5d01ac421884ba3603d"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/profile-match-IWjuZ0f_.js",
+      "sha256": "4201b82b64133067a24e213d8e28df26936362224e68ed3c7c528659041d537e"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/profile-match-B9lsuSYx.css",
+      "sha256": "dbbcf9d15263dd554ef8bc7f4fb833bb324fd9d0bd4ab81ad17a2f17d43df9c7"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/equipe-CRhHBcE5.css",
+      "sha256": "0f9fca4a583154b42856b2cd518f517ea28987dc8582adfcb6d42e44f2ccfec8"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/atleta-B4GNYTAZ.js",
+      "sha256": "e713d37b33b73e58e4c97ac2be19a775122fd0a111ba94972d0e04557f3de737"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/jersey-fLbim3OG.js",
+      "sha256": "a51dc658524fa09753c547321107c37531bacb2c4bafd9e3799829ac2a2d7405"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/profile-card-D5ZF-vL2.js",
+      "sha256": "bc8718251c8f87930db91b8b5431fdba596da045cf2d5c296ba911fdb417aa4e"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/atleta-BZv3_q1U.css",
+      "sha256": "87f0ca73ac03276a81736c4edc84b2ae760085c476fbd9c2b3e0a988ee2414ff"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/resultado-BgiKayl1.js",
+      "sha256": "caa602c38bbb73da952f9563cc33666e5cf61b8904e574f67ac9ebcf2fa2412c"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/public-view-BDbPfanz.js",
+      "sha256": "a4d1950db31f4ec2d5f2e8ed9607697a46b91908b929c24167aaa6d3b3743812"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/public-view-Dbaeftj6.css",
+      "sha256": "09594d3698e226ccc5f5f6a0796f4f2565794b666eb6776d5f10ddcdbe87bd88"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/foundation-q2TBPR4C.js",
+      "sha256": "e0fd0fc8929aa39174aa683c883ee8b4c75e0b0edc4821224a7556c21cffc5bb"
+    },
+    {
+      "name": "admin",
+      "path": "/assets/foundation-Dyoomr7N.css",
+      "sha256": "2a8f1fcd7ff1f562b8572bda8d8290b4b7c5f24db7992e804279e4999101524d"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/publico-B57mfc9M.js",
+      "sha256": "f04b73e59536edb585548b8b25982c3ca95d4e3f7e4908152f5b903bd5ca653e"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/shell-CMrfBMmA.js",
+      "sha256": "89a6062511aac947615239e65c43e0670110d35156cb769dc06f6c948d1bb7eb"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/boxscore-statistics-contract-DHDu9m73.js",
+      "sha256": "e9cf334ca0e21658f2f6a7a362aa9bfe2a1948641aa0c05cd1d97d4141591dc2"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/reference-C46P8ZZf.js",
+      "sha256": "fae5dd9ca04ff009d06a13c8198d3bf6939649827b04fa331d37376d7edc62e9"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/tooltip-COjIR5Vn.js",
+      "sha256": "c601630a9586b12982ecc5c3e47a52a7c9765e945452b4aceb16ff5741ff1669"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/standings-metrics-BI3t5g_P.js",
+      "sha256": "6554386dccd8b7b3e9e3069e6addca57ac50e13d7f647fc80ec35b0b15ee4d06"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/public-page-cHz0eK71.js",
+      "sha256": "8f6eea1c7c29e63ce55085015e4ab6554725378130f817669bb5c3c5c9f5d675"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/shell-D2eGn2tH.css",
+      "sha256": "44e761971af9e161f47c147b9a035fe35cdc3afb0a7847a6f614937002db991a"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/boxscore-statistics-contract-BbrQQ_-n.css",
+      "sha256": "755596ec1fdf161f8ea3004f7c060a18a0450f0cda63bec87ffcc56f8a2cfc4f"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/reference-CdsN-KWn.css",
+      "sha256": "20358ae90416df69e8200c439d97796cb2ffc9bbbdb62723dddbf6bbbb4a7843"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/public-page-DRx_dD2q.css",
+      "sha256": "a4672130894a63c3700159c0d3ba239252466bfbfe2985bca930a4c640817e4d"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/legacy-BbYuMgc3.css",
+      "sha256": "8f837dcdca5050fe9c99233103786d4f13d27f9b4e2fe86d13867a0a7d87ee19"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/estatisticas-Bw9dAxWz.js",
+      "sha256": "6eb2f606beb5e7b76274f6587969e4bc0003193bb602f1e1b3951b81e5293d73"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/player-name-DSieFT_I.js",
+      "sha256": "48b0bc17fb13bd906d6ed76c6dfcbf0d2e421d825280dabb9cf25240ebdff4c9"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/metric-layout-C4V-pthu.js",
+      "sha256": "156c13ed5717e5541049d2bb2e7e7b237b84df532aca06769283f610b094c055"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/sort-header-t6MUJ2VP.js",
+      "sha256": "343ade19f5575b706ade54e6f44ef47369434314bb952e86756172443366ac70"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/scoresheet-statistics-table-0DNWuiOp.js",
+      "sha256": "7704fdbb113a2159742949aa1f0f3d29c4748d57db9645bdced0c27e2b6d5083"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/team-filter-Cap-gUhs.js",
+      "sha256": "6da5572ff7859e8f90b5e289f7f914540580fe1e621e9c52339c6eb9cbe7bf39"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/estatisticas-CP_Wi8g3.css",
+      "sha256": "aa13ab042e2870dc43aa3994b0f4f9fac2883a78d42c415aea9de291cc538d97"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/equipes-DkYjrRIq.js",
+      "sha256": "8a0f9c734e822294b6bbe034483e5fc4580ee451a5e636a825c3ab3e368317ce"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/screen-E4Gb7hbP.js",
+      "sha256": "24829b1cfce024fad3744e5f0a4960d884694d3d12c9f9b540b2273ddf505459"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/screen-DjcYvYfr.css",
+      "sha256": "d8fbc552ced5367fb124bdf57efbc0e2231d00c1ef6e181d5040850f2c5b4c06"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/screen-CCnY_p4Y.css",
+      "sha256": "865ded88ba1837015d9eb030f0970a2184d11bad36306649ac985d55dbc57060"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/screen-yCG7UjWL.css",
+      "sha256": "8e46cb0430bfb6720a777a454566a72d644b4e701171d19fd3e79f628950db28"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/equipe-C4vHyUaZ.js",
+      "sha256": "2b08d8f59e46c5ea2e27711e11c772886cd8125757c427ade0c4ba295e5c217d"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/publication-contract-FtQjPRt3.js",
+      "sha256": "b5400ff29d7a63a9433dc8d270a1c8dbf4a62ce2d4d9d5d01ac421884ba3603d"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/profile-match-IWjuZ0f_.js",
+      "sha256": "4201b82b64133067a24e213d8e28df26936362224e68ed3c7c528659041d537e"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/profile-match-B9lsuSYx.css",
+      "sha256": "dbbcf9d15263dd554ef8bc7f4fb833bb324fd9d0bd4ab81ad17a2f17d43df9c7"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/equipe-CRhHBcE5.css",
+      "sha256": "0f9fca4a583154b42856b2cd518f517ea28987dc8582adfcb6d42e44f2ccfec8"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/atleta-B4GNYTAZ.js",
+      "sha256": "e713d37b33b73e58e4c97ac2be19a775122fd0a111ba94972d0e04557f3de737"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/jersey-fLbim3OG.js",
+      "sha256": "a51dc658524fa09753c547321107c37531bacb2c4bafd9e3799829ac2a2d7405"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/profile-card-D5ZF-vL2.js",
+      "sha256": "bc8718251c8f87930db91b8b5431fdba596da045cf2d5c296ba911fdb417aa4e"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/atleta-BZv3_q1U.css",
+      "sha256": "87f0ca73ac03276a81736c4edc84b2ae760085c476fbd9c2b3e0a988ee2414ff"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/resultado-BgiKayl1.js",
+      "sha256": "caa602c38bbb73da952f9563cc33666e5cf61b8904e574f67ac9ebcf2fa2412c"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/public-view-BDbPfanz.js",
+      "sha256": "a4d1950db31f4ec2d5f2e8ed9607697a46b91908b929c24167aaa6d3b3743812"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/public-view-Dbaeftj6.css",
+      "sha256": "09594d3698e226ccc5f5f6a0796f4f2565794b666eb6776d5f10ddcdbe87bd88"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/foundation-q2TBPR4C.js",
+      "sha256": "e0fd0fc8929aa39174aa683c883ee8b4c75e0b0edc4821224a7556c21cffc5bb"
+    },
+    {
+      "name": "preview",
+      "path": "/assets/foundation-Dyoomr7N.css",
+      "sha256": "2a8f1fcd7ff1f562b8572bda8d8290b4b7c5f24db7992e804279e4999101524d"
+    }
+  ],
+  "fixed": {
+    "status": 200,
+    "source": "pr91-53e177d-on-039d78a"
+  }
+}

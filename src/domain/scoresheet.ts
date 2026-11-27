@@ -91,7 +91,7 @@ export function periodLabel(period: number): string {
   return period <= 4 ? `Q${period}` : `PR${period - 4}`;
 }
 export function periodColor(period: number): "red" | "blue" {
-  return period % 2 === 1 ? "red" : "blue";
+  return period <= 4 && period % 2 === 1 ? "red" : "blue";
 }
 
 export interface PlayerTotal {

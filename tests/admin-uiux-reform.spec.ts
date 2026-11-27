@@ -65,7 +65,7 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
     exact: true,
   });
   await page
-    .getByRole("textbox", { name: "Buscar jogo", exact: true })
+    .getByRole("searchbox", { name: "Buscar jogo", exact: true })
     .fill("Local");
   await expect(
     table.getByRole("columnheader", { name: /Data/ }),
@@ -125,7 +125,7 @@ test("Jogos ordena no servidor, carrega ao rolar e preserva contexto na edição
     .toBeGreaterThan(0);
   await expect(rows).toHaveCount(35);
   await expect(
-    page.getByRole("textbox", { name: "Buscar jogo", exact: true }),
+    page.getByRole("searchbox", { name: "Buscar jogo", exact: true }),
   ).toHaveValue("Local");
   const sheet = rows
     .last()

@@ -3,7 +3,7 @@ import { PublicGamesTable } from "./games-table";
 import { usePublicPosition } from "./position";
 import { createRoot } from "react-dom/client";
 import { useEffect, useState } from "react";
-import { PublicHeader, PublicFooter, PublicBreadcrumb } from "./shell";
+import { PublicHeader, PublicFooter } from "./shell";
 import { PublicDiscovery, usePublicCatalog } from "./catalog";
 import { readPublicDispute } from "./navigation";
 import {
@@ -60,7 +60,6 @@ function PublicHome() {
         }
         tabIndex={-1}
       >
-        {!route.id && <PublicBreadcrumb page="Consulta pública" />}
         <h1 className={route.id ? "sr-only" : undefined}>
           {route.id
             ? route.section === "jogos"

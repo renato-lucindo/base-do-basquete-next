@@ -8,7 +8,9 @@ for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 844 });
     const f = await statisticsBrowserFixture(page);
     await page.goto(f.url);
-    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+      f.pageRowCount,
+    );
     const region = page.getByRole("region", {
       name: "Tabela estatística rolável",
     });
@@ -98,7 +100,9 @@ test("a barra superior alcança a última coluna e acompanha redução de coluna
   const f = await statisticsBrowserFixture(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   const region = page.locator(".statistics-table-wrap");
   const top = page.locator(".scrollable-table-top");
   await top.evaluate((el) => {

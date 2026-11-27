@@ -97,17 +97,17 @@ export const statisticsPageSchema = z
       .array(statisticsMetricSchema)
       .max(Object.keys(STATISTICS_METRICS).length),
     page: version,
-    pageSize: z.union([z.literal(20), z.literal(30)]),
+    pageSize: z.union([z.literal(20), z.literal(30), z.literal(100)]),
     hasBoxscore: z.boolean().optional(),
     total: count,
     totalPages: version,
     rows: z
       .array(
         statisticsRowSchema.safeExtend({
-          jerseys: statisticsRowSchema.shape.jerseys.min(0),
+          jerseys: z.array(statisticsRowSchema.shape.jerseys.element).max(101),
         }),
       )
-      .max(30),
+      .max(100),
     compared: z.array(statisticsRowSchema).max(2000),
     comparisonSummaries: z.array(statisticsSummarySchema).max(2),
     comparisonStates: z.record(
@@ -147,7 +147,7 @@ export const statisticsPageSchema = z
     )
       c.addIssue({ code: "custom", message: "Comparação fora do contexto." });
     if (
-      (p.pageSize === 30 && p.hasBoxscore === undefined) ||
+      (p.pageSize >= 30 && p.hasBoxscore === undefined) ||
       p.totalPages !== Math.max(1, Math.ceil(p.total / p.pageSize)) ||
       p.page > p.totalPages ||
       p.rows.length !==

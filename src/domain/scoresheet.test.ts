@@ -426,7 +426,7 @@ describe("keyboard transcription", () => {
     ).toThrow();
   });
 
-  it("validates multi-overtime scores and alternates colors by period", () => {
+  it("validates multi-overtime scores and keeps every overtime blue", () => {
     const sheet = {
       ...base,
       periods: 6,
@@ -439,12 +439,16 @@ describe("keyboard transcription", () => {
       ],
     };
     expect(() => validateSheet(sheet, true)).not.toThrow();
-    expect([1, 2, 3, 4, 5, 6].map(periodColor)).toEqual([
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(periodColor)).toEqual([
       "red",
       "blue",
       "red",
       "blue",
-      "red",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
       "blue",
     ]);
     expect(() =>

@@ -17,6 +17,12 @@ export async function publicStatisticsRoute(
     );
   const match = /^\/api\/public\/statistics\/([^/]+)$/u.exec(url.pathname),
     id = z.uuid().safeParse(match?.[1]);
+  if (
+    url.searchParams.has("registrationId") &&
+    (url.searchParams.getAll("registrationId").length !== 1 ||
+      !z.uuid().safeParse(url.searchParams.get("registrationId")).success)
+  )
+    throw new HttpError(400, "invalid_input", "Inscrição inválida.");
   if (!id.success)
     throw new HttpError(400, "invalid_input", "Disputa inválida.");
   const page = await new SupabaseStatistics(

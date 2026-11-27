@@ -1,3 +1,5 @@
+import "../ui-system/query-controls.css";
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState } from "react";
 import { api, ApiFailure, isSessionFailure } from "./api";
 import { AdminToast } from "../ui-system/admin-toast";
@@ -316,7 +318,18 @@ export function DisputeCatalog({
     });
   }
   function reset() {
-    setQuery(disputeListQuerySchema.parse({}));
+    setQuery(
+      disputeListQuerySchema.parse({
+        ...query,
+        q: "",
+        year: null,
+        gender: null,
+        status: null,
+        visibility: null,
+        championshipIds: [],
+        offset: 0,
+      }),
+    );
   }
   function add(target: DisputeFormTarget) {
     setCreate(target);
@@ -352,7 +365,7 @@ export function DisputeCatalog({
     ["visibility", "Visibilidade"],
   ] as const;
   const filtered = !!(
-    query.q ||
+    query.q.trim() ||
     query.year ||
     query.gender ||
     query.status ||
@@ -375,9 +388,9 @@ export function DisputeCatalog({
         </button>
       </div>
       <div className="dispute-list-filters">
-        <label className="dispute-search">
-          Buscar
-          <input
+        <label className="dispute-search bb-query-field">
+          <span className="bb-query-label">Buscar</span>
+          <SearchInput
             name="dispute-search"
             autoComplete="off"
             placeholder="Nome ou categoria…"
@@ -387,7 +400,7 @@ export function DisputeCatalog({
           />
         </label>
         <div className="dispute-championship-filter">
-          <span>Campeonatos</span>
+          <span className="bb-query-label">Campeonatos</span>
           <details
             onBlur={(event) => {
               if (!event.currentTarget.contains(event.relatedTarget))
@@ -401,10 +414,16 @@ export function DisputeCatalog({
               }
             }}
           >
-            <summary aria-label="Filtrar campeonatos">
+            <summary
+              aria-label={
+                query.championshipIds.length
+                  ? `Campeonatos: ${query.championshipIds.length} selecionados`
+                  : "Todos os campeonatos"
+              }
+            >
               {query.championshipIds.length
                 ? query.championshipIds.length + " selecionados"
-                : "Todos"}
+                : "Todos os campeonatos"}
               <Icon name="chevronDown" />
             </summary>
             <fieldset className="dispute-championship-options">
@@ -433,8 +452,8 @@ export function DisputeCatalog({
             </fieldset>
           </details>
         </div>
-        <label>
-          Ano
+        <label className="bb-query-field">
+          <span className="bb-query-label">Ano</span>
           <select
             name="year-filter"
             aria-label="Ano"
@@ -443,7 +462,7 @@ export function DisputeCatalog({
               filter({ year: e.target.value ? Number(e.target.value) : null })
             }
           >
-            <option value="">Todos</option>
+            <option value="">Todos os anos</option>
             {page.years.map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -451,8 +470,8 @@ export function DisputeCatalog({
             ))}
           </select>
         </label>
-        <label>
-          Naipe
+        <label className="bb-query-field">
+          <span className="bb-query-label">Naipe</span>
           <select
             name="gender-filter"
             aria-label="Naipe"
@@ -463,13 +482,13 @@ export function DisputeCatalog({
               })
             }
           >
-            <option value="">Todos</option>
+            <option value="">Todos os naipes</option>
             <option value="masculino">Masculino</option>
             <option value="feminino">Feminino</option>
           </select>
         </label>
-        <label>
-          Situação
+        <label className="bb-query-field">
+          <span className="bb-query-label">Situação</span>
           <select
             name="status-filter"
             aria-label="Situação"
@@ -480,7 +499,7 @@ export function DisputeCatalog({
               })
             }
           >
-            <option value="">Todas</option>
+            <option value="">Todas as situações</option>
             {Object.entries(disputeStatusLabels).map(([value, label]) => (
               <option value={value} key={value}>
                 {label}
@@ -488,8 +507,8 @@ export function DisputeCatalog({
             ))}
           </select>
         </label>
-        <label>
-          Visibilidade
+        <label className="bb-query-field">
+          <span className="bb-query-label">Visibilidade</span>
           <select
             name="visibility-filter"
             aria-label="Visibilidade"
@@ -501,7 +520,7 @@ export function DisputeCatalog({
               })
             }
           >
-            <option value="">Todas</option>
+            <option value="">Todas as visibilidades</option>
             <option value="public">Pública</option>
             <option value="private">Privada</option>
             <option value="test">Teste</option>

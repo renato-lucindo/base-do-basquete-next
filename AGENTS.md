@@ -22,6 +22,8 @@ Toda alteração de interface ou protótipo segue o [guia visual aprovado em 18/
 
 Confira a tela atual e use os tokens, componentes e textos aprovados que atendam ao pedido. Preserve as decisões vigentes ao adaptar uma tela ou um protótipo. Antes de entregar, verifique a tela alterada e registre na PR a seção do guia que foi aplicada, o que foi reaproveitado ou por que foi necessária uma variação e o resultado das conferências aplicáveis. Siga o [fluxo de revisão de UI/UX](docs/design/README.md#fluxo-de-trabalho-dos-agentes).
 
+Antes de editar UI, registre a matriz de conformidade no plano da unidade e confira todos os consumidores afetados. Para pedidos novos ou conflitantes, siga a [consulta obrigatória de design](docs/INDICE.md#8-hierarquia-de-decisões): perguntar se integra o padrão ou é exceção, sem repetir decisões já aprovadas. Não entregar com divergência conhecida ou conferência aplicável sem evidência; testes do catálogo não substituem a tela real.
+
 Para identificar quais documentos ler em cada tipo de tarefa, consulte [`docs/INDICE.md`](docs/INDICE.md). Leitura seletiva e obrigatória — não leia toda a documentação em todas as tarefas.
 
 Referências visuais: use somente o design system, o catálogo aprovado e os padrões vigentes. Não usar protótipos, capturas de evidência, pacotes de origem ou arquivos históricos como fallback de UI, mesmo quando alguma suíte os mantém para regressão técnica. A legenda estatística fica aberta ao final do conteúdo ativo; expansões de filtros/conquistas seguem suas regras próprias.

@@ -47,7 +47,7 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(
       page.getByRole("button", { name: "Novo jogo", exact: true }),
     ).toBeHidden();
-    await page.getByLabel("Períodos da súmula").selectOption("5");
+    await page.getByLabel("Períodos da súmula").selectOption("7");
     const add = async (period: number, minute: string) => {
       await page
         .getByLabel("Quarto ou prorrogação", { exact: true })
@@ -63,6 +63,8 @@ test.describe("desktop scoresheet MVP", () => {
     await add(4, "9");
     await add(4, "2");
     await add(5, "4");
+    await add(6, "1");
+    await add(7, "3");
     const times = page.getByLabel("Tempos debitados da equipe A");
     await expect(times.locator("..")).toHaveClass(/sheet-staff-line/);
     await expect(
@@ -79,8 +81,14 @@ test.describe("desktop scoresheet MVP", () => {
       await expect(times).toContainText("Q2 8′");
       await expect(times).toContainText("Q4 2′, 9′");
       await expect(times).toContainText("PR1 4′");
-      await expect(times.locator(".sheet-ink-red")).toHaveCount(3);
-      await expect(times.locator(".sheet-ink-blue")).toHaveCount(3);
+      await expect(times.locator(".sheet-ink-red")).toHaveCount(2);
+      await expect(times.locator(".sheet-ink-blue")).toHaveCount(6);
+      for (const label of ["PR1", "PR2", "PR3"]) {
+        const extra = times
+          .locator(".sheet-timeout-item")
+          .filter({ hasText: label });
+        await expect(extra.locator("strong")).toHaveClass("sheet-ink-blue");
+      }
     }
     await add(2, "7");
     await expect(page.getByRole("alert")).toContainText(
@@ -93,7 +101,7 @@ test.describe("desktop scoresheet MVP", () => {
     await page.getByRole("button", { name: "Salvar rascunho" }).click();
     expect(
       fixture.snapshot()?.document.events.filter((e) => e.target === "TO"),
-    ).toHaveLength(6);
+    ).toHaveLength(8);
     await page.reload();
     await page
       .getByRole("button", { name: "Editar jogo Lobos × Lobos B" })
@@ -102,6 +110,15 @@ test.describe("desktop scoresheet MVP", () => {
     await expect(page.getByLabel("Tempos debitados da equipe A")).toContainText(
       "PR1 4′",
     );
+    for (const label of ["PR1", "PR2", "PR3"]) {
+      await expect(
+        page
+          .getByLabel("Tempos debitados da equipe A")
+          .locator(".sheet-timeout-item")
+          .filter({ hasText: label })
+          .locator("strong"),
+      ).toHaveClass("sheet-ink-blue");
+    }
   });
   test("desktop action history uses a numbered table at both requested viewports", async ({
     page,

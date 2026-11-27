@@ -1,3 +1,8 @@
+import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
 import { profileCardLines } from "./profile-card";
 import { useEffect, useRef, useState } from "react";
 import { ApiFailure } from "../competition/api";
@@ -36,7 +41,6 @@ import {
 import { ProfileFilters } from "./profile-filters";
 import { useProfilePanelSpace } from "./panel-space";
 
-const number = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
 const readLocation = () => readProfileLocation(window.location.hash);
 const normalize = (value: string) =>
   value
@@ -46,9 +50,12 @@ const normalize = (value: string) =>
 function value(
   summary: ReturnType<typeof careerStatistics>,
   metric: ProfileMetric,
+  decimalColumn = false,
 ) {
   const c = summary?.metrics[metric];
-  return c?.status === "available" ? number.format(c.value) : "—";
+  return c?.status === "available"
+    ? formatStatistic(c.value, decimalColumn)
+    : "—";
 }
 export function PlayerPublicPage() {
   const [route, setRoute] = useState(readLocation),
@@ -538,7 +545,9 @@ export function PlayerPublicPage() {
                                   }
                                 </td>
                                 {RECORD_METRICS.map((m) => (
-                                  <td key={m}>{value(summary, m)}</td>
+                                  <td key={m} className="bb-metric-value">
+                                    {value(summary, m)}
+                                  </td>
                                 ))}
                               </tr>
                             );
@@ -650,6 +659,21 @@ export function PlayerPublicPage() {
                             </th>
                             {(["games", ...view.columns] as const).map((m) => (
                               <th
+                                className="bb-metric-column"
+                                style={metricColumnStyle(
+                                  [...summaries.values()].map((row) => ({
+                                    value: row?.metrics[m].value ?? null,
+                                    averageDivisor: STATISTICS_METRICS[m]
+                                      .normalizable
+                                      ? row?.gamesPlayed
+                                      : undefined,
+                                    totalFactor:
+                                      view.mode === "per-game" &&
+                                      STATISTICS_METRICS[m].normalizable
+                                        ? row?.gamesPlayed
+                                        : 1,
+                                  })),
+                                )}
                                 key={m}
                                 scope="col"
                                 aria-sort={
@@ -714,8 +738,18 @@ export function PlayerPublicPage() {
                                   {g.games.filter((p) => p.fact.played).length}
                                 </td>
                                 {view.columns.map((m) => (
-                                  <td key={m}>
-                                    {value(summaries.get(g.key) ?? null, m)}
+                                  <td key={m} className="bb-metric-value">
+                                    {value(
+                                      summaries.get(g.key) ?? null,
+                                      m,
+                                      (view.mode === "per-game" &&
+                                        STATISTICS_METRICS[m].normalizable) ||
+                                        columnHasDecimal(
+                                          [...summaries.values()].map(
+                                            (row) => row?.metrics[m].value,
+                                          ),
+                                        ),
+                                    )}
                                   </td>
                                 ))}
                               </tr>
@@ -763,7 +797,7 @@ export function PlayerPublicPage() {
                     {(view.gameYear ||
                       view.gameChampionship ||
                       view.gameTeam ||
-                      view.opponent) && (
+                      view.opponent.trim()) && (
                       <div className="player-active-filters">
                         {[
                           view.gameYear,

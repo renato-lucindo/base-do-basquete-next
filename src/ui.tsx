@@ -1,3 +1,4 @@
+import "./ui-system/query-controls.css";
 import type { ReactNode } from "react";
 import type { Prototype } from "./prototype/model";
 
@@ -24,7 +25,12 @@ export function Field({
 }) {
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
+      <label
+        htmlFor={id}
+        className={label.startsWith("Buscar") ? "bb-query-label" : undefined}
+      >
+        {label}
+      </label>
       {children}
       {hint && <small id={`${id}-hint`}>{hint}</small>}
     </div>

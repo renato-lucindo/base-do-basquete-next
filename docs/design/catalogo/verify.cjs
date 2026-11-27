@@ -44,6 +44,22 @@ async function checkExamples(page) {
     "right",
   );
   const games = stats.getByRole("button", { name: "Ordenar por J (Jogos)" });
+  const metricWidths = () =>
+    stats
+      .locator("th.bb-metric-column")
+      .evaluateAll((items) =>
+        items.map((el) => el.getBoundingClientRect().width),
+      );
+  const totalWidths = await metricWidths();
+  const example = page.locator(".catalog-statistics");
+  await example.getByRole("button", { name: "Por jogo", exact: true }).click();
+  const averageWidths = await metricWidths();
+  averageWidths.forEach((width, index) =>
+    assert.ok(Math.abs(width - totalWidths[index]) < 1),
+  );
+  for (const header of await stats.locator("th.bb-metric-column").all())
+    await expect(header).toHaveCSS("text-align", "center");
+  await example.getByRole("button", { name: "Total", exact: true }).click();
   await games.focus();
   await expect(page.getByRole("tooltip")).toHaveText("Jogos");
   await games.press("Enter");
@@ -73,7 +89,9 @@ async function checkExamples(page) {
   await expect(stats.getByRole("columnheader", { name: "Jogos" })).toHaveCount(
     0,
   );
-  const legend = page.getByRole("region", { name: "Legenda" });
+  const legend = page
+    .locator(".catalog-statistics")
+    .getByRole("region", { name: "Legenda" });
   await expect(legend).toHaveCount(1);
   await expect(legend.getByText("Jogos", { exact: true })).toHaveCount(0);
   await expect(legend.getByText("Pontos", { exact: true })).toBeVisible();
@@ -270,6 +288,61 @@ async function checkApprovedGuide(page, prefix) {
   ).toBeVisible();
 }
 
+async function checkProfilePatterns(page) {
+  const sample = page.locator("#perfis");
+  const year = sample.getByRole("combobox", { name: "Ano", exact: true });
+  await expect(year).toHaveCount(1);
+  assert.equal(
+    await year.evaluate((el) => el.closest('[role="tablist"]') === null),
+    true,
+  );
+  await expect(sample.locator(".public-dispute-status")).toHaveCSS(
+    "font-size",
+    "14px",
+  );
+  const bar = sample.locator(".team-profile-tabbar");
+  const before = await bar.evaluate(
+    (el) => el.getBoundingClientRect().top + window.scrollY,
+  );
+  const trigger = sample.getByRole("button", { name: "Copa ES", exact: true });
+  await trigger.click();
+  await expect(
+    sample.getByRole("navigation", { name: "Seleção de exemplo" }),
+  ).toBeVisible();
+  assert.equal(
+    await bar.evaluate((el) => el.getBoundingClientRect().top + window.scrollY),
+    before,
+  );
+  await page.keyboard.press("Escape");
+  await expect(trigger).toBeFocused();
+  await year.selectOption("2025");
+  await sample.getByRole("tab", { name: "Estatísticas", exact: true }).click();
+  await sample.getByRole("button", { name: "Por jogo", exact: true }).click();
+  await expect(
+    sample.getByRole("cell", { name: "60", exact: true }),
+  ).toBeVisible();
+  for (const legend of await sample.locator(".reference-legend dl").all())
+    await expect(legend).toHaveCSS("display", "grid");
+  await expect(
+    sample.locator(".public-dispute-breadcrumb li").first(),
+  ).toHaveText("2025");
+  const standings = sample.getByRole("table", {
+    name: "Classificação com números centrais",
+  });
+  for (const cell of await standings.locator("tbody td:not(:last-child)").all())
+    await expect(cell).toHaveCSS("text-align", "center");
+  await expect(standings.getByRole("rowheader").first()).toHaveCSS(
+    "text-align",
+    "left",
+  );
+  await expect(sample.locator(".standings-explorer > :last-child")).toHaveClass(
+    /reference-legend/,
+  );
+  await expect(
+    sample.getByRole("columnheader", { name: "Participação", exact: true }),
+  ).toHaveCSS("text-align", "center");
+}
+
 async function main() {
   const engine = process.argv.includes("--webkit") ? webkit : chromium;
   const browser = await engine.launch();
@@ -306,6 +379,7 @@ async function main() {
       }
     }
 
+    await checkProfilePatterns(page);
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.evaluate(() => {
       document.body.style.zoom = "2";

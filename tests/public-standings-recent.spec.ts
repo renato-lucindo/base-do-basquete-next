@@ -92,7 +92,7 @@ test("cinco resultados em ordem, anel recente e decisão administrativa sem plac
   await expect(page.getByRole("tooltip")).toHaveText(
     "LOB — x — Águias - 17/11",
   );
-  await expect(row.getByRole("cell").nth(1)).toHaveText("8");
+  await expect(row.getByRole("cell").nth(2)).toHaveText("8");
   s.publishedGames.find((g) => g.gameId === id(116))!.homePoints = 50;
   s.publishedGames.find((g) => g.gameId === id(116))!.publicationVersion++;
   await page.reload();
@@ -109,7 +109,7 @@ test("cinco resultados em ordem, anel recente e decisão administrativa sem plac
     /Derrota.*16\/11\/2026.*mais recente/,
   );
   await expect(icons.last()).not.toHaveAccessibleName(/administrativo/);
-  await expect(row.getByRole("cell").nth(1)).toHaveText("7");
+  await expect(row.getByRole("cell").nth(2)).toHaveText("7");
 });
 
 test("grupo e fase na URL, recarga, voltar e seleção inválida preservam uma única tabela", async ({
@@ -234,6 +234,7 @@ test("cabeçalhos e legenda usam apenas significados curtos e dispensam avisos g
   }
   const meanings = [
     ["Pos.", "Posição"],
+    ["PTS", "Pontos de classificação"],
     ["J", "Jogos"],
     ["V", "Vitórias"],
     ["D", "Derrotas"],
@@ -241,6 +242,7 @@ test("cabeçalhos e legenda usam apenas significados curtos e dispensam avisos g
     ["PP", "Pontos pró"],
     ["PC", "Pontos contra"],
     ["SLD", "Saldo de pontos"],
+    ["AVG", "Cesta average"],
   ];
   for (const [label, meaning] of meanings) {
     const help = table
@@ -338,6 +340,7 @@ for (const viewport of [
     await expect(table.getByRole("columnheader")).toHaveText([
       "Pos.",
       "Equipe",
+      "PTS",
       "J",
       "V",
       "D",
@@ -345,6 +348,7 @@ for (const viewport of [
       "PP",
       "PC",
       "SLD",
+      "AVG",
       "Últimos jogos",
     ]);
     expect(
@@ -358,10 +362,9 @@ for (const viewport of [
       ),
     ).toBe(true);
     const identity = table.locator("thead th").nth(1);
-    await expect(table.getByRole("columnheader").last()).toHaveCSS(
-      "text-align",
-      "center",
-    );
+    await expect(
+      table.getByRole("columnheader", { name: "Últimos jogos", exact: true }),
+    ).toHaveCSS("text-align", "center");
     await region.evaluate((el) => {
       el.scrollLeft = 500;
       el.scrollTop = 300;

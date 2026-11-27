@@ -21,7 +21,7 @@ Defina primeiro o percurso e o aceite em [ADMIN.md](ADMIN.md). Use as regras aba
 - A camisa é contextual; distinguir vazio, `0` e `00`, sem convertê-los em identidade global.
 - Campos curtos (altura, peso, camisa, ano) ficam em linha com outros campos curtos — não em linha inteira.
 - Grade em duas colunas quando houver simetria natural (nome e sigla, nome e e-mail, data e local).
-- Rótulos persistentes acima do campo; nunca somente placeholder.
+- Na entrada de dados de cadastro/edição/login, rótulos persistentes acima do campo; nunca somente placeholder. Filtros e buscas de consulta seguem a regra específica de PADROES, com label acessível oculto e identificação dentro do controle.
 - Erro associado ao campo afetado, não apenas no topo do formulário.
 
 ### Campos opcionais
@@ -51,9 +51,11 @@ Defina primeiro o percurso e o aceite em [ADMIN.md](ADMIN.md). Use as regras aba
 
 ### Filtros e busca
 
+Aplicar o [padrão compartilhado de consultas e métricas](PADROES.md#consultas-e-métricas--padrão-de-25112026), incluindo identificação interna, lupa, largura, cabeçalhos de siglas e limpeza condicional. Formulários de entrada de dados preservam rótulos visíveis.
+
 - Filtros e busca próximos dos dados, não no topo remoto da página.
 - Busca com pesquisa incremental; não exigir Enter para iniciar a filtragem quando o resultado é instantâneo.
-- Estado vazio com mensagem útil ("Nenhuma equipe encontrada para 'Fênix'") e ação de limpar filtro.
+- Estado vazio com mensagem útil ("Nenhuma equipe encontrada para 'Fênix'"); ação de limpar somente quando houver filtro ativo.
 - Filtros múltiplos: exibir quais estão ativos; permitir remover individualmente.
 - Preservar filtros e posição na lista ao retornar de um detalhe (via URL quando sem dados privados).
 

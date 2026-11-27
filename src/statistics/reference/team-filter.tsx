@@ -1,3 +1,4 @@
+import "../../ui-system/query-controls.css";
 // Fonte: docs/design/prototipos/estatisticas/react-prototype/adapted/team-filter.tsx
 // Team-filter fieldset extracted from upstream/boxscore-statistics-explorer.tsx.
 // Local adapter replaces URL mutations with a controlled array; original choices and actions retained.
@@ -63,7 +64,7 @@ export function TeamFilter({
           setOpen(false);
       }}
     >
-      <span id="team-filter-label" className="filter-label">
+      <span id="team-filter-label" className="filter-label bb-query-label">
         Equipe
       </span>
       <button

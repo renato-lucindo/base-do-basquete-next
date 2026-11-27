@@ -2,6 +2,8 @@ import { publicSearchFixture, searchFixtureHits } from "./public-search";
 import type { Page } from "@playwright/test";
 import { statisticsBrowserFixture } from "./statistics-browser";
 import { catalogGameSchema } from "../../src/public-ui/catalog-contract";
+import { buildTeamsList } from "../../src/team-statistics/list-domain";
+import { parseTeamsListQuery } from "../../src/team-statistics/list-query";
 import { buildTeamsPage } from "../../src/team-statistics/domain";
 import { buildTeamDetail } from "../../src/team-statistics/detail";
 import { parseTeamsQuery } from "../../src/team-statistics/query-contract";
@@ -92,6 +94,12 @@ export async function publicNavigationFixture(page: Page) {
   await page.route("**/api/public/standings/**", (route) =>
     route.fulfill({ json: null }),
   );
+  await page.route("**/api/public/dispute-status/**", (route) =>
+    route.fulfill({ json: "in_progress" }),
+  );
+  await page.route("**/api/public/achievements/**", (route) =>
+    route.fulfill({ status: 404, json: { message: "Ainda não publicado." } }),
+  );
   await page.route("**/api/public/teams/**", (route) => {
     const u = new URL(route.request().url()),
       parts = u.pathname.split("/");
@@ -103,7 +111,9 @@ export async function publicNavigationFixture(page: Page) {
             u.searchParams.get("registrationId"),
             parseTeamDetailQuery(u.searchParams),
           )
-        : buildTeamsPage(f.source, parseTeamsQuery(u.searchParams)),
+        : u.searchParams.get("pageSize") === "all"
+          ? buildTeamsList(f.source, parseTeamsListQuery(u.searchParams))
+          : buildTeamsPage(f.source, parseTeamsQuery(u.searchParams)),
     });
   });
   await page.route("**/api/public/games/**", (route) => {
@@ -184,4 +194,17 @@ export async function publicNavigationFixture(page: Page) {
     ),
   );
   return { ...f, games, confirmed, state, discovery };
+}
+
+/** Desktop keeps its submit action; mobile submits through the native search field. */
+export async function submitPublicSearch(page: Page) {
+  const button = page.getByRole("button", {
+    name: "Buscar na base",
+    exact: true,
+  });
+  if (await button.isVisible()) await button.click();
+  else
+    await page
+      .getByRole("combobox", { name: /Buscar competições/ })
+      .press("Enter");
 }

@@ -7,9 +7,11 @@ for (const width of [1366, 1920]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width === 1366 ? 768 : 1080 });
-    const f = await statisticsBrowserFixture(page);
+    const f = await statisticsBrowserFixture(page, { largeList: true });
     await page.goto(f.url);
-    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+      f.pageRowCount,
+    );
     await expect(page.getByRole("status")).toContainText("Página 1 de 2");
     const geometry = await page
       .locator(".statistics-table-wrap")
@@ -50,9 +52,11 @@ test("súmula desktop: colunas reduzidas, paginação e estados vazios não alar
   page,
 }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { largeList: true });
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   const block = page.locator(".statistics-results-block");
   const full = (await block.boundingBox())!.width;
   await page.getByRole("button", { name: /^Colunas ·/ }).click();
@@ -96,7 +100,7 @@ test("súmula desktop: colunas reduzidas, paginação e estados vazios não alar
   await page
     .getByRole("button", { name: "Próxima página", exact: true })
     .click();
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(3);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(10);
   await page
     .getByRole("searchbox", { name: "Buscar atleta ou equipe" })
     .fill("sem-correspondencia");
@@ -112,7 +116,9 @@ test("súmula desktop: colunas reduzidas, paginação e estados vazios não alar
     .getByRole("button", { name: "Limpar filtros", exact: true })
     .first()
     .click();
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   await page.getByRole("button", { name: /^Colunas ·/ }).click();
   await page.getByRole("button", { name: "Nenhuma", exact: true }).click();
   await expect(page.locator(".statistics-table thead th")).toHaveCount(2);
@@ -128,11 +134,13 @@ test("súmula desktop: colunas reduzidas, paginação e estados vazios não alar
 test("súmula desktop: limite de 1050px, conteúdo largo e zoom preservam rolagem", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { largeList: true });
   for (const width of [1050, 1051]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(f.url);
-    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+    await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+      f.pageRowCount,
+    );
     const result = await page
       .locator(".statistics-results-block")
       .evaluate((el) => ({
@@ -180,7 +188,9 @@ test("boxscore conserva a largura anterior no desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
   const f = await statisticsBrowserFixture(page, { withBoxscore: true });
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   await expect(page.locator(".statistics-results-block")).not.toHaveAttribute(
     "data-compact-desktop",
   );

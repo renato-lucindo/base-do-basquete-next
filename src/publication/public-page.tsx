@@ -1,3 +1,4 @@
+import { periodColor } from "../domain/scoresheet";
 import {
   publicPlayerAccessibleName,
   publicPlayerName,
@@ -311,9 +312,7 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                         <th
                           key={m.key}
                           scope="col"
-                          className={
-                            m.key === "points" ? "points-cell" : undefined
-                          }
+                          className={`bb-metric-column ${m.key === "points" ? "points-cell" : ""}`}
                         >
                           <GameHint
                             className="game-header-tip"
@@ -639,11 +638,7 @@ export function PublicGameView({ result: r }: { result: PublicResult }) {
                           return (
                             <li
                               key={i}
-                              className={
-                                e.period <= 4 && e.period % 2
-                                  ? "quarter-red"
-                                  : "quarter-blue"
-                              }
+                              className={`quarter-${periodColor(e.period)}`}
                             >
                               <GameHint
                                 className="event-tip"

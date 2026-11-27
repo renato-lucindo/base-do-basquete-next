@@ -1,3 +1,4 @@
+import "../ui-system/query-controls.css";
 import { useEffect, useState } from "react";
 import { PublicGamesTable } from "../public-ui/games-table";
 import { publicScheduleRows } from "../public-ui/games-model";
@@ -14,6 +15,7 @@ import { recentGroupResults } from "./recent-results";
 import { RecentResultsCell } from "./recent-results-cell";
 import { standingsSelection } from "./public-bracket-model";
 import { PublicBracket } from "./public-bracket";
+import { basketAverage, standingsMetricLegend } from "./standings-metrics";
 import "../statistics/reference.css";
 import "./public-standings.css";
 
@@ -23,6 +25,7 @@ const standingsNumber = new Intl.NumberFormat("pt-BR", {
 const standingsColumns = [
   ["Pos.", "Posição"],
   ["Equipe", null],
+  [standingsMetricLegend[0].label, standingsMetricLegend[0].name],
   ["J", "Jogos"],
   ["V", "Vitórias"],
   ["D", "Derrotas"],
@@ -30,6 +33,7 @@ const standingsColumns = [
   ["PP", "Pontos pró"],
   ["PC", "Pontos contra"],
   ["SLD", "Saldo de pontos"],
+  [standingsMetricLegend[1].label, standingsMetricLegend[1].name],
   ["Últimos jogos", null],
 ] as const;
 
@@ -48,7 +52,7 @@ function StandingsHeader({
       aria-label={`${label}: ${description}`}
       {...tip}
     >
-      {label}
+      <span>{label}</span>
     </button>
   );
 }
@@ -100,9 +104,11 @@ export function usePublicStandings(disputeId: string | null) {
 export function PublicStandingsTables({
   value,
   publishedRegistrationIds,
+  profile,
 }: {
   value: PublicStandings;
   publishedRegistrationIds?: ReadonlySet<string>;
+  profile?: { teamId: string; registrationId: string };
 }) {
   const params = new URLSearchParams(window.location.hash.split("?")[1] ?? "");
   const { stage, phase, group, knockoutAvailable } = standingsSelection(
@@ -113,13 +119,13 @@ export function PublicStandingsTables({
   const phases = value.definition.groupPhases;
   const selectionLink = (phaseId?: string, groupId?: string) => {
     const query = new URLSearchParams(params);
-    query.set("secao", "classificacao");
+    if (!profile) query.set("secao", "classificacao");
     query.set("etapa", phaseId ? "classificatoria" : "eliminatoria");
     if (phaseId) query.set("fase", phaseId);
     else query.delete("fase");
     if (groupId) query.set("grupo", groupId);
     else query.delete("grupo");
-    return `#${value.disputeId}?${query}`;
+    return `#${profile?.teamId ?? value.disputeId}?${query}`;
   };
   const canonical =
     stage === "eliminatoria"
@@ -128,9 +134,11 @@ export function PublicStandingsTables({
         ? selectionLink(active, group?.id)
         : null;
   useEffect(() => {
-    if (canonical && window.location.hash !== canonical)
+    if (canonical && window.location.hash !== canonical) {
       window.history.replaceState(window.history.state, "", canonical);
-  }, [canonical]);
+      if (profile) window.dispatchEvent(new HashChangeEvent("hashchange"));
+    }
+  }, [canonical, profile?.teamId]);
   const names = new Map(value.registrations.map((r) => [r.id, r.name]));
   const compactNames = new Map(
     value.registrations.map((r) => [
@@ -184,8 +192,8 @@ export function PublicStandingsTables({
                 {phases.find((n) => n.phaseId === p.phaseId)?.name}
               </h2>
               {phase && (phase.groups.length > 1 || phases.length > 1) && (
-                <label className="standings-group-control">
-                  Grupo
+                <label className="standings-group-control bb-query-field">
+                  <span className="bb-query-label">Grupo</span>
                   <select
                     name="grupo"
                     value={group?.id}
@@ -272,7 +280,7 @@ export function PublicStandingsTables({
                                           ? "standings-team"
                                           : label === "Últimos jogos"
                                             ? "standings-recent"
-                                            : undefined
+                                            : "bb-metric-column"
                                       }
                                     >
                                       {description ? (
@@ -296,7 +304,13 @@ export function PublicStandingsTables({
                                     (b.position ?? Infinity),
                                 )
                                 .map((r) => (
-                                  <tr key={r.registrationId}>
+                                  <tr
+                                    key={r.registrationId}
+                                    data-profile-selected={
+                                      profile?.registrationId ===
+                                        r.registrationId || undefined
+                                    }
+                                  >
                                     <td>
                                       {r.position ?? "—"}
                                       {r.tied && r.position !== null
@@ -322,6 +336,7 @@ export function PublicStandingsTables({
                                         label(r.registrationId)
                                       )}
                                     </th>
+                                    <td>{r.leaguePoints}</td>
                                     <td>{r.games}</td>
                                     <td>{r.wins}</td>
                                     <td>{r.losses}</td>
@@ -333,6 +348,12 @@ export function PublicStandingsTables({
                                     <td>{r.pointsFor ?? "—"}</td>
                                     <td>{r.pointsAgainst ?? "—"}</td>
                                     <td>{r.difference ?? "—"}</td>
+                                    <td>
+                                      {basketAverage(
+                                        r.pointsFor,
+                                        r.pointsAgainst,
+                                      )}
+                                    </td>
                                     <td>
                                       <RecentResultsCell
                                         results={
@@ -348,56 +369,58 @@ export function PublicStandingsTables({
                             </tbody>
                           </table>
                         </ScrollableTable>
-                        <section
-                          className="table-legend reference-legend"
-                          aria-label="Legenda da classificação"
-                        >
-                          <h2>Legenda</h2>
-                          <dl>
-                            {standingsColumns.map(([label, description]) =>
-                              description ? (
-                                <div key={label}>
-                                  <dt>{label}</dt>
-                                  <dd>{description}</dd>
-                                </div>
-                              ) : null,
-                            )}
-                          </dl>
-                        </section>
-                      </div>
-                      {!!g.standings.tieSteps.length && (
-                        <details>
-                          <summary>Critérios de desempate aplicados</summary>
-                          <ol>
-                            {g.standings.tieSteps.map((s, i) => (
-                              <li key={i}>
-                                {
+                        {!!g.standings.tieSteps.length && (
+                          <details className="standings-tiebreaks">
+                            <summary>Critérios de desempate aplicados</summary>
+                            <ol>
+                              {g.standings.tieSteps.map((s, i) => (
+                                <li key={i}>
                                   {
-                                    wins: "Vitórias",
-                                    point_difference: "Saldo de pontos",
-                                    points_for: "Pontos a favor",
-                                    head_to_head_points:
-                                      "Pontos nos confrontos diretos",
-                                    head_to_head_difference:
-                                      "Saldo nos confrontos diretos",
-                                    head_to_head_for:
-                                      "Pontos a favor nos confrontos diretos",
-                                  }[s.criterion]
-                                }
-                                :{" "}
-                                {s.values
-                                  .map(
-                                    (v) =>
-                                      `${label(v.registrationId)}: ${v.value ?? "não informado"}`,
-                                  )
-                                  .join("; ")}
-                                {s.blocked &&
-                                  ". Cobertura insuficiente para resolver o empate."}
-                              </li>
-                            ))}
-                          </ol>
-                        </details>
-                      )}
+                                    {
+                                      wins: "Vitórias",
+                                      point_difference: "Saldo de pontos",
+                                      points_for: "Pontos a favor",
+                                      head_to_head_points:
+                                        "Pontos nos confrontos diretos",
+                                      head_to_head_difference:
+                                        "Saldo nos confrontos diretos",
+                                      head_to_head_for:
+                                        "Pontos a favor nos confrontos diretos",
+                                    }[s.criterion]
+                                  }
+                                  :{" "}
+                                  {s.values
+                                    .map(
+                                      (v) =>
+                                        `${label(v.registrationId)}: ${v.value ?? "não informado"}`,
+                                    )
+                                    .join("; ")}
+                                  {s.blocked &&
+                                    ". Cobertura insuficiente para resolver o empate."}
+                                </li>
+                              ))}
+                            </ol>
+                          </details>
+                        )}
+                        {!profile && (
+                          <section
+                            className="table-legend reference-legend"
+                            aria-label="Legenda da classificação"
+                          >
+                            <h2>Legenda</h2>
+                            <dl>
+                              {standingsColumns.map(([label, description]) =>
+                                description ? (
+                                  <div key={label}>
+                                    <dt>{label}</dt>
+                                    <dd>{description}</dd>
+                                  </div>
+                                ) : null,
+                              )}
+                            </dl>
+                          </section>
+                        )}
+                      </div>
                     </section>
                   );
                 })}

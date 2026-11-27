@@ -17,7 +17,7 @@ async function setup(page: Parameters<typeof publicNavigationFixture>[0]) {
     nickname: null,
     disputeId: null,
   }));
-  const games = structuredClone(f.games);
+  const games = f.games;
   for (const g of games) {
     g.context.name = "Copa Álvares";
     g.game.home.team.name = "Álvares Cabral";
@@ -225,8 +225,13 @@ test("tipo, paginação e seleção da equipe preservam a URL e suas participaç
   ).toHaveCount(1);
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/entityId=/);
-  await expect(results.locator(".public-search-entity-list>li")).toHaveCount(1);
+  await expect(page).toHaveURL(/equipe\.html/);
+  await expect(
+    page.getByRole("tablist", { name: "Seções do perfil da equipe" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Álvares Cabral", exact: true }),
+  ).toBeVisible();
   await page.screenshot({
     path: `.preview-artifacts/search-team-choice-${info.project.name}.png`,
     fullPage: true,

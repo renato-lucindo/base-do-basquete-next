@@ -55,7 +55,7 @@ Nas tabelas e demais páginas públicas, a identificação visível prioriza o a
 
 ## Estatísticas e publicação
 
-Pedido de 03/11/2026: a classificação usa exatamente **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD**, nessa ordem. Aprov. é V/J × 100 e permanece indefinido antes do primeiro jogo; não é pontuação do campeonato nem critério novo de desempate. O perfil recebe a inscrição explícita. Preservar grupos, fases, decisões e empates do domínio.
+Apresentação vigente em 26/11/2026: a classificação usa **Pos., Equipe, PTS, J, V, D, Aprov., PP, PC, SLD, AVG, Últimos jogos**, nessa ordem. Aprov. é V/J × 100 e permanece indefinido antes do primeiro jogo; não é pontuação do campeonato nem critério novo de desempate. O perfil recebe a inscrição explícita. Preservar grupos, fases, decisões e empates do domínio.
 
 Equipes reutiliza métricas, siglas, precisão, controles e tabelas de Jogadores quando a fonte coletiva for suficiente. LL% é adicional na súmula e usa soma de `freeMade`/soma de `freeTaken`; o boxscore conserva uma única coluna de LL%. Tentativas zero e cobertura incompleta são ausência, não 0%. Uma linha por inscrição, com ordenação, busca, fases publicadas, totais/médias, escolha de colunas e estado na URL. Não completar coletivos a partir de somas parciais de atletas, nem somar MIN, +/− ou participação individual em pontos como medida coletiva. Cobertura e fonte permanecem nos contratos técnicos; a apresentação de ausência segue os padrões comuns, sem parágrafos preventivos na interface.
 
@@ -116,7 +116,7 @@ Versões e datas técnicas saem das linhas públicas; cobertura, siglas e distin
 
 ## Refinamento de Jogadores — decisão de05/11/2026
 
-Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. A página de Jogadores usa fundo branco em toda a área. A tabela usa 30 linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Células têm padding horizontal de14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
+Esta decisão substitui recomendações anteriores de exibir explicações extensas e painel de cobertura nessa página. Mínimo de jogos é opcional e o campo fica em branco quando o filtro estiver inativo. A página de Jogadores usa fundo branco em toda a área. A tabela usa 100 linhas por página, com paginação imediatamente depois da tabela e antes da legenda. Métricas têm padding horizontal de10px por lado; identificações mantêm14px no desktop e10px no celular, mantendo colunas pelo conteúdo, altura compacta, nomes longos e rolagem interna.
 
 Em F/T/U/5F/GD, o negrito identifica o maior valor positivo da consulta filtrada inteira, incluindo empates; zeros e ausências não recebem destaque. Não representa desempenho melhor: a comparação continua considerando menos faltas como melhor valor.
 
@@ -126,7 +126,7 @@ A legenda contém somente definições das siglas ou abreviações das colunas v
 
 Nas disputas exclusivamente de súmula, Jogadores oferece13opções de coluna: Equipe e as12métricas de súmula. Essa capacidade da fonte limita também a seleção recebida da URL/sessão e as colunas renderizadas; o padrão mobile de todas as métricas não acrescenta estatísticas de boxscore. Seleções válidas, inclusive nenhuma coluna, permanecem. Disputas com boxscore conservam as opções completas.
 
-Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Totais/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20linhas e o formato anterior; a página atual solicita `pageSize=30` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
+Disputas exclusivamente de súmula não exibem “Mais filtros e opções”. Busca, equipes por checkboxes, mínimo de jogos, colunas, Total/Por jogo e paginação funcionam independentemente desse formulário. A presença de boxscore é calculada na fonte pública inteira da disputa antes dos filtros/paginação. Clientes antigos conservam20ou30linhas e o formato anterior; a página atual solicita `pageSize=100` e recebe `hasBoxscore`. Sem migrations ou alterações nos cálculos. [Provas e limites](VALIDACAO-JOGADORES-REFINAMENTO.md).
 
 Correção de bordas de05/11/2026: manter a rolagem interna nos dois eixos, altura limitada e identificação/cabeçalho fixos, incluindo “Pos.” na fixação vertical. Ao atingir uma das quatro bordas, bloquear o efeito elástico somente na tabela de Jogadores e sua barra superior, sem alterar gestos/zoom nem a página externa. A sincronização usa deslocamentos válidos de cada contêiner e não reescreve posições equivalentes; a barra superior deve alcançar a mesma última coluna quando houver scrollbar vertical. [Validação e limites por navegador](VALIDACAO-BORDAS-MOBILE.md).
 
@@ -156,7 +156,7 @@ Usar inscrição publicada, `A definir` para participante desconhecido e `—` p
 
 Apresentação atualizada por decisão de08/11/2026. A documentação foi consolidada antes das mudanças de tela. Execução, verificações e preview ficam no [plano da unidade](../PLAN-CAMPEONATO-FLEXIVEL.md#refinamento-de-apresentação--08112026) e no checkpoint; padrão aprovado não constitui evidência de deploy ou aceite humano.
 
-Uma tabela por vez, na ordem **Pos., Equipe, J, V, D, Aprov., PP, PC, SLD, Últimos jogos**. O cabeçalho **Últimos jogos** é centralizado; o limite continua sendo cinco resultados. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada baseada na fonte padrão do navegador. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
+Uma tabela por vez, na ordem **Pos., Equipe, PTS, J, V, D, Aprov., PP, PC, SLD, AVG, Últimos jogos**. O cabeçalho **Últimos jogos** é centralizado; o limite continua sendo cinco resultados. Reutilizar a apresentação de Equipes: tipografia, cores, espaçamento, largura pelo conteúdo, rolagem interna e cabeçalho/equipe fixos. Manter a escala compartilhada baseada na fonte padrão do navegador. A aba identifica Classificação; título e contexto permanecem semanticamente acessíveis. Sem busca, ordenação manual, colunas configuráveis, paginação ou totais/médias. Cálculos, posições e desempates continuam vindo da projeção oficial.
 
 Não inserir o bloco fixo “Classificação provisória” nem o parágrafo genérico “Resultados publicados atualizam esta consulta. Empates e pendências não confirmam colocações finais.”. Erros, ausência de resultados e pendências concretas continuam sendo comunicados quando aplicáveis. Cabeçalhos e legenda seguem os [padrões comuns](PADROES.md#textos-de-apresentação): **Equipe** e **Últimos jogos** não têm tooltip/botão de ajuda; abreviações recebem somente seu significado curto; legenda reutiliza a apresentação de Jogadores e Equipes, sem explicações adicionais.
 
@@ -172,12 +172,80 @@ Preservar separadamente, na identificação acessível dos ícones, vitória/der
 
 ## Ajustes de 13/11/2026
 
-A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo de Equipes fica à esquerda e Totais/Por jogo fica à direita, inclusive se a largura exigir quebra de linha. Cabeçalhos preenchidos de tabela e da agenda pública têm contorno. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
+A navegação pública mantém o fundo da superfície e preenche somente a opção selecionada. Em Equipes e Classificação, a área de conteúdo fica branca, distinta dos cabeçalhos de tabela. Escopo de Equipes fica à esquerda e Total/Por jogo fica à direita, inclusive se a largura exigir quebra de linha. Cabeçalhos preenchidos de tabela e da agenda pública têm contorno. Valor de placar na lista permanece sem preenchimento de fundo, e o traço de faltas de quem não entrou fica centralizado na súmula.
 
-O nome do campeonato expande abaixo dele as disputas da mesma edição, com a atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
+O nome do campeonato abre em sobreposição a seleção pública por nível, com a disputa atual destacada e um link para todos os campeonatos. O catálogo abre Classificação e o painel mantém a aba atual. Escape fecha o painel e devolve o foco ao nome do campeonato. Sites de disputa única continuam sem seletor.
 
 A página de resultados da busca mostra até 20 itens de cada tipo por página, preservando as sugestões compactas do autocomplete. Cada jogador mostra nome completo, apelido quando houver e o nome da última equipe registrada em dados publicados, em uma linha própria. A ordem da última equipe segue data, horário e ID da partida, como no topo do perfil. Sem equipe publicada, omitir a linha.
 
 ### Ficha do atleta
 
 Na identificação, a ficha usa até quatro linhas, na ordem: idade e ano entre parênteses, altura em cm e peso em kg, posição, cidade e UF. Exemplo: **17 anos (2009)**, **188cm, 90kg**, **Ala-Pivô / Pivô**, **São Mateus - ES**. Renderizar os valores confirmados disponíveis e ocultar linhas vazias. Data completa, mão dominante, biografia e registro federativo ficam no cadastro privado.
+
+### Classificação e situação — ajuste de23/11/2026
+
+Na classificação, manter PTS após Equipe; AVG por divisão PP/PC vem logo após SLD, antes de Últimos jogos, com duas casas decimais. Ausência de cobertura ou divisor zero usa travessão. SLD e desempates permanecem. A situação (por exemplo, Em andamento) fica abaixo do breadcrumb hierárquico da disputa, em texto de14px com ponto e anel, sem badge, usando os tokens de situação aprovados, preservando rótulo textual e quebra responsiva.
+
+### Consistência pública —24/11/2026
+
+- Cabeçalho da disputa: ano › campeonato › naipe › categoria › divisão quando houver. Os três primeiros níveis abrem seleção contextual de opções públicas; a categoria identifica a disputa atual. Conservar aba ao trocar de disputa e retorno nos perfis. Status abaixo do caminho. Não reproduzir o título ou os comentários explicativos do print de referência.
+- Jogadores do perfil e da disputa compartilham ordem das métricas e apresentação do seletor, respeitando fonte/colunas escolhidas. Ordenação preserva tabela, altura, foco e rolagem durante a consulta; mudar de identidade remove os dados anteriores. Erros e ausência não equivalem a carregamento.
+- Sem jogos públicos na eliminatória: “Ainda não há jogos disponíveis na fase eliminatória.” Havendo jogos sem estatísticas: informar a ausência específica, preservando confrontos definidos.
+- Contorno acompanha a tabela até a última coluna. Classificação principal e jogadores centralizados quando couberem; classificação nos perfis e coletivos alinhados à esquerda. Rolagem permanece interna quando necessário.
+- Equipe selecionada: mesmo negrito e fundo azul suave em Classificação e Estatísticas coletivas, sem faixa lateral. Nomes de equipes conservam navegação, cor normal e sem sublinhado permanente; foco e interação permanecem visíveis.
+- Confrontos usam áreas equivalentes para mandante/visitante e área estável para o placar, com quebra dos nomes. O centro do placar não depende da extensão dos nomes.
+- Rodapé compartilhado: ícone da marca e Base do Basquete à esquerda; Dados a partir de 2026 à direita, adaptando ao celular.
+- Completar o aumento anterior de2px em toda a área pública; não somar novamente nas regras já ajustadas. O administrativo fica fora desta revisão. Conferir tamanhos efetivos, inclusive sobrescritas de tabelas, controles e legendas.
+
+## Contexto de disputa — refinamento de 24/11/2026
+
+Breadcrumb na ordem Ano › Campeonato › Naipe › Categoria › Divisão, somente com níveis existentes. Campeonato, ano e naipe abrem seleção por nível em sobreposição; categoria/divisão identifica a atual. Campeonato consulta o catálogo público; ano restringe ao campeonato; naipe restringe à edição. Um painel por vez, sem deslocar a navegação nem a página; limitar ao viewport com rolagem interna. Preservar seção atual, destinos reais, Escape, clique externo e retorno de foco. Sites restritos a uma disputa não oferecem troca de contexto.
+
+Situação abaixo da hierarquia, sem badge, fundo ou borda: texto de14px, menor que breadcrumb16px, acompanhado de ponto com anel externo e cor semântica. Cor não substitui o texto. Estes refinamentos substituem o painel expandido no fluxo e o status em badge do cabeçalho; não alteram badges administrativos.
+
+O perfil geral e o da disputa seguem [PERFIS-EQUIPES.md](PERFIS-EQUIPES.md#refinamento-permanente-aprovado-em-24112026). Ano na barra de abas e Participação central são padrões específicos do perfil geral; identificação textual de outras tabelas continua à esquerda.
+
+Filtros, buscas, métricas e resultados seguem o [padrão compartilhado aprovado em25/11/2026](PADROES.md#consultas-e-métricas--padrão-de-25112026). Esta decisão substitui a apresentação lateral anterior dos filtros; formulários de entrada de dados preservam rótulos visíveis.
+
+## Navegação e classificação — refinamento aprovado em26/11/2026
+
+O contexto começa pelo ano: **Ano → Campeonato → Naipe → Categoria → Divisão**,
+omitindo níveis ausentes. O cabeçalho reúne caminho, situação textual logo abaixo
+e abas; os seletores continuam em sobreposição. Perfis e detalhes usam um único
+link de retorno contextual, sem repetir seu nome no caminho: ← Voltar aos jogadores,
+← Voltar à busca, ← Voltar às equipes ou destino equivalente. A URL preserva filtros,
+ordem e página; acesso direto tem destino público válido. Perfil geral não inventa disputa.
+
+A busca global mantém Autocomplete, lupa compartilhada e nome acessível completo
+para jogadores, equipes e campeonatos. Até639px usa placeholder **Buscar na base**
+e oculta somente o botão textual Buscar. A partir de640px preserva o botão e o
+placeholder desktop. Enter seleciona a sugestão ativa ou submete a pesquisa uma vez.
+
+Na classificação principal, **tabela → critérios de desempate expansíveis → legenda
+aberta** formam um único bloco centralizado, de largura natural quando couber e
+limitado à região visível quando rolar. As três bordas esquerdas coincidem, com
+espaçamentos compactos. Nos perfis de equipes, o bloco continua à esquerda.
+A legenda é única e final, com a grade compartilhada de siglas/significados.
+
+No componente de classificação, **siglas e valores numéricos são centralizados**;
+identificação textual (Equipe) fica à esquerda, com nome em peso600 e PTS em700.
+Números tabulares, ordem/precisão/AVG e indicadores de Últimos jogos são preservados.
+Este padrão substitui o alinhamento numérico à direita somente na classificação;
+as demais tabelas estatísticas mantêm suas regras. Não há ordenação manual na
+classificação; cabeçalhos ordenáveis de estatísticas preservam sua reserva de seta.
+
+O rodapé fica próximo à base em páginas curtas e depois do conteúdo em páginas
+longas, por fluxo flex normal, conservando marca e Dados a partir de2026. O espaço
+para o rodapé não amplia os afastamentos entre tabela, critérios e legenda.
+
+## Tabelas e identidade pública — correção de27/11/2026
+
+A cor principal pública é **#075FCA**, compartilhada pelo design system; hover **#064DA3** e superfície suave **#EEF5FF**. Não usar o antigo #2563A6 como cor de ação. Cores semânticas de situação, vitória/derrota e períodos continuam específicas.
+
+Em Jogadores e Elencos do perfil da equipe, Atleta reúne nome e camisa secundária (`Nome #23`), sem coluna Camisa. Ausente: apenas nome. Zero e00 são preservados como cadastrados. A coluna acompanha o maior conteúdo exibido, limitada à região visível; nomes quebram entre palavras e a camisa fica junto ao último trecho do nome. Estatísticas excedentes rolam na região da tabela, sem alargar a página. O seletor conta somente as métricas disponíveis.
+
+Nos últimos jogos, Ver jogos e recordes do atleta, até639px, utilizar a linha compacta compartilhada. Data e PTS ocupam a primeira linha dos jogos; posição, marca e data ocupam a primeira linha dos recordes. Em seguida, nomes completos do mandante e visitante em espaços iguais, placar central sem quebra, campeonato/categoria secundários abaixo. Quebra apenas entre palavras; preservar nomes como IVV/Cetaf. A partir de640px manter as tabelas desktop. No mobile, Ver top5/Recolher fica no cabeçalho de cada grupo; a marca principal usa maior peso/destaque sem cartão adicional. Não duplicar controles focáveis entre apresentações.
+
+O retorno contextual, incluindo Voltar à equipe, segue a ação discreta da seção05 do catálogo: sem sublinhado permanente ou no hover, azul principal, hover suave, foco visível, destino e contexto preservados.
+
+Todas as prorrogações usam tinta azul, independentemente da quantidade. Vermelho/azul alternam somente nos quatro quartos regulamentares. Reutilizar a função compartilhada de cor, sem alterar validação, pontuação ou estatísticas.

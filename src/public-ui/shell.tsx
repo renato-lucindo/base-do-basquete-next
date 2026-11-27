@@ -1,4 +1,11 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useId,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import { api } from "../competition/api";
 import {
   disputeStatusLabels,
@@ -6,14 +13,13 @@ import {
 } from "../competition/administration-contract";
 import { previewDisputeId } from "./preview";
 import {
-  contextLabel,
   disputeLink,
   publicSections,
   type PublicContext,
   type PublicSection,
 } from "./catalog-contract";
 import { DisputeLinks, publicDisputes, usePublicCatalog } from "./catalog";
-import { safePublicReturn, sectionReturn } from "./navigation";
+import { safePublicReturn, publicReturnLabel } from "./navigation";
 import { PublicSearchForm } from "./search-form";
 
 import "../ui-system/theme.css";
@@ -32,6 +38,20 @@ export function PublicHeader({
   context?: PublicContext | null;
   detail?: string;
 } = {}) {
+  const source = new URLSearchParams(window.location.search).get("returnTo");
+  const listState = new URLSearchParams(
+    window.location.hash.split("?")[1] ?? "",
+  ).get("listState");
+  const returnHref =
+    safePublicReturn(source, disputeId ?? null) ??
+    (disputeId && section
+      ? section === "equipes" && listState
+        ? (safePublicReturn(
+            `/equipes.html#${disputeId}?${listState}`,
+            disputeId,
+          ) ?? disputeLink(disputeId, section))
+        : disputeLink(disputeId, section)
+      : siteHome);
   return (
     <header className="site-header public-header">
       {previewDisputeId() && (
@@ -65,23 +85,11 @@ export function PublicHeader({
           disputeId={disputeId}
           section={section}
           context={context}
-          detail={detail}
         />
       )}
-      {!disputeId && detail && (
-        <nav className="public-return wrap" aria-label="Localização">
-          <a
-            href={
-              safePublicReturn(
-                new URLSearchParams(window.location.search).get("returnTo"),
-                null,
-              ) ?? "/publico.html"
-            }
-          >
-            Voltar à origem
-          </a>
-          <span aria-hidden="true"> / </span>
-          <span aria-current="page">{detail}</span>
+      {detail && (
+        <nav className="public-return wrap" aria-label="Retorno contextual">
+          <a href={returnHref}>{publicReturnLabel(returnHref)}</a>
         </nav>
       )}
     </header>
@@ -91,12 +99,10 @@ function DisputeNavigation({
   disputeId,
   section,
   context,
-  detail,
 }: {
   disputeId: string;
   section: PublicSection;
   context?: PublicContext | null;
-  detail?: string;
 }) {
   const catalog = usePublicCatalog(disputeId);
   const [publicState, setPublicState] = useState<{
@@ -120,11 +126,58 @@ function DisputeNavigation({
       .catch(() => {});
     return () => controller.abort();
   }, [disputeId]);
-  const [selecting, setSelecting] = useState(false);
+  const [selecting, setSelecting] = useState<
+    "championship" | "edition" | "gender" | null
+  >(null);
   const panelId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const element = panel.current;
+    const anchor = trigger.current;
+    if (!selecting || !element || !anchor) return;
+    const place = () => {
+      const rect = anchor.getBoundingClientRect();
+      element.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - element.offsetWidth - 8))}px`;
+      const top = Math.max(
+        8,
+        Math.min(rect.bottom + 4, window.innerHeight - 96),
+      );
+      element.style.top = `${top}px`;
+      element.style.maxHeight = `${Math.max(80, window.innerHeight - top - 8)}px`;
+    };
+    element.showPopover();
+    place();
+    element
+      .querySelector<HTMLElement>('a[aria-current="true"], a, button')
+      ?.focus({ preventScroll: true });
+    const outside = (event: PointerEvent) => {
+      if (
+        !(event.target instanceof Node) ||
+        element.contains(event.target) ||
+        (event.target instanceof Element &&
+          event.target.closest(".public-competition-trigger"))
+      )
+        return;
+      setSelecting(null);
+      requestAnimationFrame(() => anchor.focus({ preventScroll: true }));
+    };
+    document.addEventListener("pointerdown", outside);
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [selecting]);
   const c =
     context ?? catalog.disputes[0]?.context ?? catalog.games[0]?.context;
+  const statusText = status && (
+    <span className="public-dispute-status" data-status={status}>
+      {disputeStatusLabels[status]}
+    </span>
+  );
   return (
     <div
       className="public-context wrap"
@@ -132,45 +185,81 @@ function DisputeNavigation({
       onKeyDown={(e) => {
         if (selecting && e.key === "Escape") {
           e.preventDefault();
-          setSelecting(false);
+          setSelecting(null);
           trigger.current?.focus();
         }
       }}
     >
       <div className="public-context-line">
-        {c && !siteDisputeId ? (
-          <p>
-            <button
-              type="button"
-              className="public-competition-trigger"
-              ref={trigger}
-              aria-controls={selecting ? panelId : undefined}
-              aria-expanded={selecting}
-              onClick={() => setSelecting(!selecting)}
+        {c ? (
+          <div className="public-dispute-identity">
+            <nav
+              aria-label="Contexto da disputa"
+              className="public-dispute-breadcrumb"
             >
-              {c.name}
-              <span aria-hidden="true"> ⌄</span>
-            </button>
-            <span>{contextLabel(c).slice(c.name.length)}</span>
-          </p>
+              <ol>
+                {(
+                  [
+                    ["edition", String(c.year)],
+                    ["championship", c.name],
+                    [
+                      "gender",
+                      c.gender === "masculino" ? "Masculino" : "Feminino",
+                    ],
+                  ] as const
+                ).map(([level, label]) => (
+                  <li key={level}>
+                    {!siteDisputeId ? (
+                      <button
+                        type="button"
+                        className="public-competition-trigger"
+                        aria-expanded={selecting === level}
+                        aria-controls={
+                          selecting === level ? panelId : undefined
+                        }
+                        onClick={(event) => {
+                          trigger.current = event.currentTarget;
+                          setSelecting(selecting === level ? null : level);
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ) : (
+                      <span>{label}</span>
+                    )}
+                  </li>
+                ))}
+                {c.category && (
+                  <li aria-current={c.division ? undefined : "page"}>
+                    <span>{c.category}</span>
+                  </li>
+                )}
+                {c.division && (
+                  <li aria-current="page">
+                    <span>{c.division}</span>
+                  </li>
+                )}
+              </ol>
+            </nav>
+            {statusText}
+          </div>
         ) : (
           <p>
-            {c
-              ? contextLabel(c)
-              : catalog.loading
-                ? "Carregando disputa…"
-                : "Disputa sem contexto público disponível"}
+            {catalog.loading
+              ? "Carregando disputa…"
+              : "Disputa sem contexto público disponível"}
           </p>
         )}
-        {status && <span>{disputeStatusLabels[status]}</span>}
         {selecting && c && (
           <EditionDisputes
+            panelRef={panel}
             id={panelId}
             context={c}
             section={section}
             currentId={disputeId}
+            level={selecting}
             onClose={() => {
-              setSelecting(false);
+              setSelecting(null);
               trigger.current?.focus();
             }}
           />
@@ -187,18 +276,6 @@ function DisputeNavigation({
           </a>
         ))}
       </nav>
-      {detail && (
-        <nav className="public-return" aria-label="Localização">
-          <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
-          <span aria-hidden="true"> / </span>
-          <a href={sectionReturn(disputeId, section)}>
-            <span className="public-visually-hidden">Voltar à origem: </span>
-            {publicSections.find((s) => s.id === section)?.label}
-          </a>
-          <span aria-hidden="true"> / </span>
-          <span aria-current="page">{detail}</span>
-        </nav>
-      )}
     </div>
   );
 }
@@ -208,7 +285,11 @@ function EditionDisputes({
   section,
   currentId,
   onClose,
+  level,
+  panelRef,
 }: {
+  panelRef: RefObject<HTMLElement | null>;
+  level: "championship" | "edition" | "gender";
   id: string;
   context: PublicContext;
   section: PublicSection;
@@ -218,11 +299,14 @@ function EditionDisputes({
   const catalog = usePublicCatalog();
   const disputes = publicDisputes(catalog.games, catalog.disputes).filter(
     (d) =>
-      d.context.championshipId === context.championshipId &&
-      d.context.year === context.year,
+      level === "championship" ||
+      (d.context.championshipId === context.championshipId &&
+        (level === "edition" || d.context.year === context.year)),
   );
   return (
     <nav
+      ref={panelRef}
+      popover="manual"
       id={id}
       className="public-selector-panel"
       aria-label="Disputas da edição"
@@ -237,51 +321,58 @@ function EditionDisputes({
         </p>
       )}
       {!catalog.loading && !catalog.error && (
-        <DisputeLinks
-          disputes={
-            disputes.length ? disputes : [{ disputeId: currentId, context }]
-          }
-          headingLevel="h3"
-          section={section}
-          currentId={currentId}
-          onSelect={(e) => {
-            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) onClose();
-          }}
-        />
+        <>
+          {[
+            ...new Map(
+              (disputes.length
+                ? disputes
+                : [{ disputeId: currentId, context }]
+              ).map((d) => [
+                `${d.context.championshipId}/${d.context.year}`,
+                d.context,
+              ]),
+            ).entries(),
+          ].map(([key, group]) => (
+            <section key={key}>
+              <h3>
+                {group.name} · {group.year}
+              </h3>
+              <DisputeLinks
+                disputes={(disputes.length
+                  ? disputes
+                  : [{ disputeId: currentId, context }]
+                ).filter(
+                  (d) =>
+                    d.context.championshipId === group.championshipId &&
+                    d.context.year === group.year,
+                )}
+                headingLevel="h4"
+                section={section}
+                currentId={currentId}
+                onSelect={(e) => {
+                  if (!e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey)
+                    onClose();
+                }}
+              />
+            </section>
+          ))}
+        </>
       )}
       <a href="/publico.html">Ver todos os campeonatos</a>
     </nav>
   );
 }
 
-export function PublicBreadcrumb({
-  context,
-  page,
-  href,
-}: {
-  context?: ReactNode;
-  page: string;
-  href?: string;
-}) {
-  return (
-    <nav className="breadcrumb" aria-label="Localização">
-      <a href={siteHome}>{siteDisputeId ? siteTitle : "Competições"}</a>
-      <span aria-hidden="true">/</span>
-      {context && (
-        <>
-          {href ? <a href={href}>{context}</a> : <span>{context}</span>}
-          <span aria-hidden="true">/</span>
-        </>
-      )}
-      <span aria-current="page">{page}</span>
-    </nav>
-  );
-}
 export function PublicFooter() {
   return (
     <footer className="wrap footer public-footer">
-      <span>{siteTitle}</span>
-      <span>Resultados publicados</span>
+      <a href={siteHome} className="brand public-footer-brand">
+        <span className="brand-mark" aria-hidden="true">
+          b.
+        </span>
+        <span>Base do Basquete</span>
+      </a>
+      <span>Dados a partir de 2026</span>
     </footer>
   );
 }

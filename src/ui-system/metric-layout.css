@@ -1,0 +1,56 @@
+/* One compact column geometry for both modes and all numeric cells. */
+.bb-metric-column {
+  --bb-header-width: 2ch;
+  min-inline-size: calc(var(--bb-header-width) + 1.25rem);
+  font-variant-numeric: tabular-nums;
+}
+/* An invisible, zero-height sample participates in the native table width.
+   Use the largest real display format and the strongest numeric body weight. */
+th.bb-metric-column::after {
+  content: var(--bb-number-reserve, "");
+  display: block;
+  inline-size: max-content;
+  margin-inline: auto;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+table thead th.bb-metric-column {
+  /* Explicit metric ownership overrides legacy positional table rules. */
+  text-align: center !important;
+}
+th.bb-metric-column > :is(button, .statistics-sort) {
+  display: grid;
+  grid-template-columns: 0.45em minmax(0, 1fr) 0.45em;
+  align-items: center;
+  width: 100%;
+  justify-content: stretch;
+  text-align: center;
+  gap: 0;
+}
+th.bb-metric-column > :is(button, .statistics-sort) > span:first-child {
+  grid-column: 2;
+}
+th.bb-metric-column .sort-arrow {
+  grid-column: 3;
+  width: 0.45em;
+  margin: 0;
+}
+
+/* Metric values own alignment, including the second column of compact tables. */
+.bb-metric-value {
+  text-align: right !important;
+  position: static !important;
+}
+th.bb-metric-column {
+  left: auto !important;
+}
+
+/* The same breathing room surrounds every numeric metric, in every consumer. */
+table :is(th.bb-metric-column, td.bb-metric-value) {
+  padding-inline: 0.625rem !important;
+}

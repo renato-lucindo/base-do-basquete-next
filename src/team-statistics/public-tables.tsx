@@ -1,4 +1,9 @@
 import {
+  columnHasDecimal,
+  formatStatistic,
+  metricColumnStyle,
+} from "../ui-system/metric-layout";
+import {
   publicPlayerHistoryAccessibleName,
   publicPlayerHistoryName,
 } from "../public-ui/player-name";
@@ -69,6 +74,15 @@ export function TeamsTable({
   onPage: (p: number) => void;
   onSort: (key: TeamsPage["query"]["sort"]) => void;
 }) {
+  const decimalColumns = new Set(
+    d.query.columns.filter(
+      (metric) =>
+        (d.query.mode === "per-game" &&
+          metric !== "games" &&
+          !metric.endsWith("Percentage")) ||
+        columnHasDecimal(d.rows.map((row) => row.statistics[metric].value)),
+    ),
+  );
   if (!d.total)
     return (
       <p className="statistics-empty">
@@ -129,6 +143,20 @@ export function TeamsTable({
                         direction={d.query.direction}
                         onSort={() => onSort(metric)}
                         metricKey={metric}
+                        style={metricColumnStyle(
+                          d.rows.map((row) => ({
+                            value: row.statistics[metric].value,
+                            averageDivisor: TEAM_METRICS[metric].normalizable
+                              ? row.metricCoverage[metric]
+                              : undefined,
+                            totalFactor:
+                              d.query.mode === "per-game" &&
+                              TEAM_METRICS[metric].normalizable
+                                ? row.metricCoverage[metric]
+                                : 1,
+                          })),
+                          TEAM_METRICS[metric].label.includes("%"),
+                        )}
                         metricAttribute="data-team-metric"
                       />
                     ))}
@@ -155,6 +183,7 @@ export function TeamsTable({
                       {d.query.columns.map((metric: TeamMetric) => (
                         <td
                           key={metric}
+                          className="bb-metric-value"
                           title={`${TEAM_METRICS[metric].name}. Cobertura: ${r.metricCoverage[metric]} de ${r.gamesPlayed} jogos publicados.`}
                         >
                           <MetricCell
@@ -166,12 +195,7 @@ export function TeamsTable({
                                 : metric
                             }
                             mode={d.query.mode}
-                            forceDecimal={
-                              d.scoresheet &&
-                              d.query.mode === "per-game" &&
-                              metric !== "games" &&
-                              !metric.endsWith("Percentage")
-                            }
+                            forceDecimal={decimalColumns.has(metric)}
                           />
                         </td>
                       ))}
@@ -226,7 +250,11 @@ export function TeamParticipants({
                 ...metrics.map(([, v]) => v),
                 "Datas de jogos",
               ].map((t) => (
-                <th scope="col" key={t}>
+                <th
+                  scope="col"
+                  key={t}
+                  className={t.length <= 4 ? "bb-metric-column" : undefined}
+                >
                   {t}
                 </th>
               ))}
@@ -269,7 +297,14 @@ export function TeamParticipants({
                       }
                     >
                       {c?.status === "available" ? (
-                        teamNumber.format(c.value)
+                        formatStatistic(
+                          c.value,
+                          columnHasDecimal(
+                            d.roster.items.map(
+                              (row) => row.statistics?.metrics[key].value,
+                            ),
+                          ),
+                        )
                       ) : (
                         <span title="Não informado para este cálculo">—</span>
                       )}

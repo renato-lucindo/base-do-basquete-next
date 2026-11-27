@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "version": "4b9e492a-91c2-419e-97a2-c93ce33d9c64",
+    "deployment": "c9840f29-5715-44d9-b66f-3c3ea24ce78e",
+    "source": "805fc5b98584ae86d1c912e221bb1f535373b616",
+    "sessionNamespace": "597c612fd69c447e81547f16d5dcca41",
+    "otherSettingsChanges": []
+  },
+  "preview": {
+    "version": "da9db656-e8de-41de-a756-4dd22ba12c15",
+    "deployment": "389d106d-bce7-416d-9a7c-7e65cca47f8d",
+    "source": "805fc5b98584ae86d1c912e221bb1f535373b616",
+    "otherSettingsChanges": []
+  },
+  "admin-publicacao": {
+    "version": "7c5830cf-6770-4cc6-84a2-7c47b1cdeb5f",
+    "deployment": "0550af8b-8e47-45ef-9d7d-5714a14e1ba9",
+    "source": "pr91-53e177d-on-039d78a",
+    "sessionNamespace": "2f3752c7b23049e0a4dec04ba7b05e8f",
+    "otherSettingsChanges": [],
+    "fixedUnchanged": true
+  }
+}

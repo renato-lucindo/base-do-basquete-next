@@ -111,7 +111,7 @@ test("refinamento: somente atuações confirmadas, incluindo zero, e trajetória
   await expect(page.locator(".player-team-history summary")).toHaveCount(0);
 });
 
-test("refinamento: limpar colunas restaura FC e reabrir mantém seleção e legenda", async ({
+test("refinamento: selecionar todas as colunas restaura FC e reabrir mantém seleção e legenda", async ({
   page,
 }) => {
   const f = await playerPublicFixture(page);
@@ -122,7 +122,14 @@ test("refinamento: limpar colunas restaura FC e reabrir mantém seleção e lege
   await expect(
     page.getByRole("checkbox", { name: "FC · Faltas cometidas", exact: true }),
   ).not.toBeChecked();
-  await page.getByRole("button", { name: "Limpar", exact: true }).click();
+  // Presentation-only changes do not activate query reset. Restore columns explicitly.
+  await expect(
+    page.getByRole("button", { name: "Limpar", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("group", { name: "Colunas", exact: true })
+    .getByRole("button", { name: "Todas", exact: true })
+    .click();
   await expect(
     page.getByRole("checkbox", { name: "FC · Faltas cometidas", exact: true }),
   ).toBeChecked();

@@ -1143,6 +1143,7 @@ test("manual publication confirms identities, keeps participation editable and r
       .boundingBox();
     const reason = await page
       .getByRole("textbox", { name: "Motivo da revisão da súmula" })
+      .locator("..") // data-entry label remains visible; filters have no external label
       .boundingBox();
     expect(historyTitle!.y).toBeCloseTo(saveTitle!.y, 0);
     expect(filter!.y).toBeCloseTo(reason!.y, 0);

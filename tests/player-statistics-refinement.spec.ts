@@ -33,7 +33,9 @@ for (const width of [390, 1366]) {
         );
       }
       await page.goto(f.url + (preference === "url" ? "&preset=all" : ""));
-      await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+      await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+        f.pageRowCount,
+      );
       await expect(
         page.getByRole("button", { name: /^Colunas · .* de 13/ }),
       ).toBeVisible();
@@ -109,7 +111,9 @@ test("bordas: tabela e barra superior contêm o deslocamento elástico", async (
 }) => {
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   const behavior = await page
     .locator(".scrollable-table-top, .statistics-table-wrap")
     .evaluateAll((elements) =>
@@ -131,7 +135,9 @@ test("bordas: sincronização não propaga offsets elásticos nem reescreve o me
   const f = await statisticsBrowserFixture(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(f.url);
-  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(30);
+  await expect(page.locator(".statistics-table tbody tr")).toHaveCount(
+    f.pageRowCount,
+  );
   const result = await page
     .locator(".scrollable-table")
     .evaluate(async (el) => {
@@ -176,16 +182,16 @@ test("bordas: sincronização não propaga offsets elásticos nem reescreve o me
   expect(result.final).toBe(result.maximum);
 });
 
-test("súmula:30linhas, paginação antes da legenda e controles sem formulário avançado", async ({
+test("súmula:100linhas, paginação antes da legenda e controles sem formulário avançado", async ({
   page,
 }) => {
-  const f = await statisticsBrowserFixture(page);
+  const f = await statisticsBrowserFixture(page, { largeList: true });
   await page.goto(f.url);
   const table = page.getByRole("table", {
     name: "Estatísticas dos atletas",
     exact: true,
   });
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await expect(
     page.getByText("Mais filtros e opções", { exact: true }),
   ).toHaveCount(0);
@@ -207,7 +213,7 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   ).toBe(true);
   await pager.getByRole("button", { name: "Próxima página" }).focus();
   await page.keyboard.press("Enter");
-  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(table.locator("tbody tr")).toHaveCount(10);
   await expect(page).toHaveURL(/page=2/);
   await expect(
     page
@@ -215,9 +221,9 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
       .last(),
   ).toBeFocused();
   await page.reload();
-  await expect(table.locator("tbody tr")).toHaveCount(3);
+  await expect(table.locator("tbody tr")).toHaveCount(10);
   await pager.getByRole("button", { name: "Página anterior" }).click();
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await table
     .getByRole("button", {
       name: "Ordenar por F (Faltas cometidas)",
@@ -249,7 +255,7 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
     .getByRole("button", { name: "Limpar filtros", exact: true })
     .first()
     .click();
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await page
     .getByRole("button", { name: "Equipe Todas as equipes", exact: true })
     .click();
@@ -262,7 +268,7 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   await page
     .getByRole("button", { name: "Selecionar todas as equipes" })
     .click();
-  await expect(table.locator("tbody tr")).toHaveCount(30);
+  await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
   await page.keyboard.press("Escape");
   await expect(
     page.getByRole("button", { name: "Equipe Todas as equipes", exact: true }),
@@ -279,12 +285,17 @@ test("súmula:30linhas, paginação antes da legenda e controles sem formulário
   );
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: /^Colunas ·/ })).toBeFocused();
-  expect(f.state.queries.every((q) => q.get("pageSize") === "30")).toBe(true);
+  expect(f.state.queries.every((q) => q.get("pageSize") === "100")).toBe(true);
 });
 
 test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
   page,
 }, info) => {
+  // Native Safari traversal on macOS: microsoft/playwright#5609.
+  const tab =
+    info.project.use.browserName === "webkit" && process.platform === "darwin"
+      ? "Alt+Tab"
+      : "Tab";
   const f = await statisticsBrowserFixture(page);
   await page.goto(f.url + "&preset=custom&columns=pointsShare,fiveFouls");
   const table = page.getByRole("table", {
@@ -304,9 +315,54 @@ test("rótulos PP% e5F coincidem no cabeçalho, tooltip e legenda", async ({
     await expect(button).toBeFocused();
     await expect(page.getByRole("tooltip")).toHaveText(name);
     await page.keyboard.press("Escape");
+    // Query completion may restore focus after dismissal; it is not a new intent.
+    await button.evaluate((el) => {
+      el.blur();
+      el.focus({ preventScroll: true });
+    });
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    await page.keyboard.press(tab);
+    await page.keyboard.press(`Shift+${tab}`);
+    await expect(button).toBeFocused();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    // Safari may activate a button without assigning focus to it.
+    f.state.delayNext = 100;
+    const sortedResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/public/statistics/") &&
+        new URL(response.url()).searchParams.get("sort") === key,
+    );
+    await button.evaluate((el) => {
+      el.blur();
+      (el as HTMLButtonElement).click();
+      el.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await expect(button).toBeFocused();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    await page.keyboard.press("Escape");
+    await sortedResponse;
+    await expect(
+      page.locator('[aria-label="Resultado da consulta"]'),
+    ).toHaveAttribute("aria-busy", "false");
     await expect(page.getByRole("tooltip")).toBeHidden();
     if (info.project.use.hasTouch) await button.tap();
     else await button.hover();
+    await expect(page.getByRole("tooltip")).toHaveText(name);
+    // A delayed scroll event must not revive the tip dismissed by Escape.
+    await button.evaluate((el) => {
+      el.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+      );
+      el.dispatchEvent(new Event("scroll", { bubbles: true }));
+    });
+    await expect(page.getByRole("tooltip")).toBeHidden();
+    if (info.project.use.hasTouch) await button.tap();
+    else {
+      await page.mouse.move(0, 0);
+      await button.hover();
+    }
     await expect(page.getByRole("tooltip")).toHaveText(name);
     const entry = legend.locator("dl > div").filter({
       has: page.locator("dt").filter({ hasText: new RegExp(`^${label}$`) }),
@@ -342,7 +398,7 @@ for (const width of [1366, 1920, 390, 320])
   test(`espaçamento, nomes longos, foco, contenção e axe em${width}px`, async ({
     page,
   }, info) => {
-    const f = await statisticsBrowserFixture(page);
+    const f = await statisticsBrowserFixture(page, { largeList: true });
     f.source.games[0].snapshot.facts.players[0].person.name =
       "José Antônio de Albuquerque e Vasconcelos Filho";
     await page.setViewportSize({
@@ -357,10 +413,13 @@ for (const width of [1366, 1920, 390, 320])
       name: "Estatísticas dos atletas",
       exact: true,
     });
-    await expect(table.locator("tbody tr")).toHaveCount(30);
+    await expect(table.locator("tbody tr")).toHaveCount(f.pageRowCount);
     const geometry = await table.evaluate((el) => ({
       padding: [...el.querySelectorAll("tbody tr:first-child :is(th,td)")].map(
-        (c) => getComputedStyle(c).paddingLeft,
+        (c) => ({
+          value: getComputedStyle(c).paddingLeft,
+          metric: c.matches("td[data-public-metric]"),
+        }),
       ),
       spare:
         el.closest(".statistics-table-wrap")!.getBoundingClientRect().right -
@@ -387,7 +446,9 @@ for (const width of [1366, 1920, 390, 320])
         .slice(0, 15),
     }));
     expect(
-      geometry.padding.every((p) => p === (width > 600 ? "14px" : "10px")),
+      geometry.padding.every(
+        (p) => p.value === (p.metric ? "10px" : width > 600 ? "14px" : "10px"),
+      ),
     ).toBe(true);
     expect(
       geometry.documentOverflow,

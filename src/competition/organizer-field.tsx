@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "../ui-system/components";
 import { api, isSessionFailure } from "./api";
@@ -187,7 +188,7 @@ export function OrganizerField({
               <Icon name="plus" /> Cadastrar organizador
             </button>
           </div>
-          <input
+          <SearchInput
             ref={input}
             id={id}
             type="search"

@@ -1,0 +1,29 @@
+[
+  {
+    "name": "admin",
+    "settingsPreserved": true,
+    "deployment": "fa4fff45-59aa-48cb-88aa-27a360910ee1",
+    "version": "bdaf4cad-994f-4a9f-90bb-ebfc7234c6e0",
+    "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
+    "fixedDeploymentPreserved": true,
+    "allowedChanges": ["source", "version annotations", "assets/code"]
+  },
+  {
+    "name": "preview",
+    "settingsPreserved": true,
+    "deployment": "29d2c9d7-22af-49bd-af55-3df5640dd90a",
+    "version": "5fdeddce-37b1-4d6d-a3c1-1a662522309c",
+    "source": "2d21f200c5e76694fc6db0e3a9ecab8543250bbe",
+    "fixedDeploymentPreserved": true,
+    "allowedChanges": ["source", "version annotations", "assets/code"]
+  },
+  {
+    "name": "admin-publicacao",
+    "settingsPreserved": true,
+    "deployment": "0550af8b-8e47-45ef-9d7d-5714a14e1ba9",
+    "version": "7c5830cf-6770-4cc6-84a2-7c47b1cdeb5f",
+    "source": "pr91-53e177d-on-039d78a",
+    "fixedDeploymentPreserved": true,
+    "allowedChanges": []
+  }
+]

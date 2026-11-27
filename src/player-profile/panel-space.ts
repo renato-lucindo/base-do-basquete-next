@@ -47,11 +47,13 @@ export function useProfilePanelSpace(ready: boolean, contentKey: string) {
           panel.firstElementChild!.getBoundingClientRect().height,
           overviewHeight,
         ) + panelSpacing;
-      // Leave room for two lines in a slightly taller tab, even when the
+      // Leave room for three lines in a slightly taller tab, even when the
       // panel's padding is smaller than the text.
       const allowance = Math.max(
         panelSpacing,
-        2 * (parseFloat(panelStyle.lineHeight) || 0),
+        3 *
+          (parseFloat(panelStyle.lineHeight) ||
+            parseFloat(panelStyle.fontSize) * 1.5),
       );
       if (footprint.current === 0)
         footprint.current = naturalHeight + legendHeight + allowance;

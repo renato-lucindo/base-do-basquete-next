@@ -67,14 +67,14 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
     "1",
     "2",
     "2,0",
-    "0",
+    "0,0",
     "0",
     "1,0",
-    "0",
+    "0,0",
     "3,0",
-    "0",
-    "0",
-    "0",
+    "0,0",
+    "0,0",
+    "0,0",
     "—",
     "5,0",
     "2,0",
@@ -101,7 +101,7 @@ test("súmula usa a ordem contratada, médias de toda a equipe e ranking; seleç
   await expect(
     table.locator('[data-team-metric="technicalFouls"]'),
   ).toHaveAttribute("aria-sort", "descending");
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
+  await page.getByRole("button", { name: "Total", exact: true }).click();
   await expect(row().locator("td")).toHaveText([
     "1",
     "2",
@@ -189,7 +189,7 @@ test("LL% ponderado, ordenação por cabeçalho e fase conservam fonte e URL", a
   ).toHaveAttribute("aria-sort", "descending");
   await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect(cell()).toHaveText("100");
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
+  await page.getByRole("button", { name: "Total", exact: true }).click();
   await expect(cell()).toHaveText("100");
   await page.reload();
   await expect(cell()).toHaveText("100");
@@ -226,9 +226,7 @@ test("colunas de boxscore mantêm LL% único e retorno do perfil preserva contro
     table.locator("tbody tr").first().locator("td").first(),
   ).toHaveText("1");
   await table.getByRole("link", { name: "Lobos", exact: true }).click();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(page).toHaveURL(/dataset=boxscore/);
   await expect(
     page.getByRole("combobox", { name: "Colunas", exact: true }),

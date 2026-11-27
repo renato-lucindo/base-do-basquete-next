@@ -1,0 +1,139 @@
+{
+  "admin": {
+    "deployment": "0110497b-0484-4f70-bf66-8d5ac142e368",
+    "version": "fb9fb0eb-3d7d-4a1f-9347-177daf39ece3",
+    "source": "5bdb298246d557607f366f69b6faa6af956d7293",
+    "sessionNamespace": "597c612fd69c447e81547f16d5dcca41",
+    "bindings": [
+      {
+        "name": "APP_ALIAS",
+        "type": "plain_text"
+      },
+      {
+        "name": "APP_ORIGIN",
+        "type": "plain_text"
+      },
+      {
+        "name": "ASSETS",
+        "type": "assets"
+      },
+      {
+        "name": "BDB_SOURCE",
+        "type": "plain_text"
+      },
+      {
+        "name": "FLEXIBLE_COMPETITION",
+        "type": "plain_text"
+      },
+      {
+        "name": "LOGIN_LIMITER",
+        "type": "ratelimit"
+      },
+      {
+        "name": "SESSION_ENCRYPTION_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "SESSIONS",
+        "type": "durable_object_namespace"
+      },
+      {
+        "name": "SUPABASE_PUBLISHABLE_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "SUPABASE_URL",
+        "type": "plain_text"
+      }
+    ],
+    "compatibilityDate": "2026-10-23",
+    "compatibilityFlags": ["nodejs_compat"]
+  },
+  "preview": {
+    "deployment": "e48fdb31-66d9-4b19-b0a0-dc10b5b5bfc0",
+    "version": "01a51499-d940-4e47-8438-09ca271cc88b",
+    "source": "5bdb298246d557607f366f69b6faa6af956d7293",
+    "bindings": [
+      {
+        "name": "ADMIN_ORIGIN",
+        "type": "plain_text"
+      },
+      {
+        "name": "APP_ALIAS",
+        "type": "plain_text"
+      },
+      {
+        "name": "APP_ORIGIN",
+        "type": "plain_text"
+      },
+      {
+        "name": "ASSETS",
+        "type": "assets"
+      },
+      {
+        "name": "BDB_SOURCE",
+        "type": "plain_text"
+      },
+      {
+        "name": "FLEXIBLE_COMPETITION",
+        "type": "plain_text"
+      },
+      {
+        "name": "SUPABASE_PUBLISHABLE_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "SUPABASE_URL",
+        "type": "plain_text"
+      }
+    ],
+    "compatibilityDate": "2026-10-23",
+    "compatibilityFlags": ["nodejs_compat"]
+  },
+  "admin-publicacao": {
+    "deployment": "0550af8b-8e47-45ef-9d7d-5714a14e1ba9",
+    "version": "7c5830cf-6770-4cc6-84a2-7c47b1cdeb5f",
+    "source": "pr91-53e177d-on-039d78a",
+    "sessionNamespace": "2f3752c7b23049e0a4dec04ba7b05e8f",
+    "bindings": [
+      {
+        "name": "APP_ORIGIN",
+        "type": "plain_text"
+      },
+      {
+        "name": "ASSETS",
+        "type": "assets"
+      },
+      {
+        "name": "BDB_SOURCE",
+        "type": "plain_text"
+      },
+      {
+        "name": "FLEXIBLE_COMPETITION",
+        "type": "plain_text"
+      },
+      {
+        "name": "LOGIN_LIMITER",
+        "type": "ratelimit"
+      },
+      {
+        "name": "SESSION_ENCRYPTION_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "SESSIONS",
+        "type": "durable_object_namespace"
+      },
+      {
+        "name": "SUPABASE_PUBLISHABLE_KEY",
+        "type": "secret_text"
+      },
+      {
+        "name": "SUPABASE_URL",
+        "type": "plain_text"
+      }
+    ],
+    "compatibilityDate": "2026-10-23",
+    "compatibilityFlags": ["nodejs_compat"]
+  }
+}

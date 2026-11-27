@@ -5,6 +5,7 @@ import { publicDetailLink } from "./navigation";
 import {
   discoveryPageSize,
   type SearchHit,
+  type SearchType,
   searchTypes,
 } from "./search-contract";
 import {
@@ -15,12 +16,26 @@ import {
   usePublicSearch,
 } from "./search-state";
 import "./search.css";
-export function searchHitHref(hit: SearchHit, q: string) {
+export function searchHitHref(
+  hit: SearchHit,
+  q: string,
+  type: SearchType = "all",
+) {
+  const returnTo =
+    typeof location !== "undefined" &&
+    location.pathname === "/publico.html" &&
+    location.hash.startsWith("#?")
+      ? undefined
+      : q
+        ? searchHref(q, type)
+        : undefined;
   return hit.kind === "players"
-    ? publicDetailLink(`/atleta.html#${hit.id}`, hit.disputeId)
-    : hit.kind === "competitions" && hit.directDisputeId
-      ? disputeLink(hit.directDisputeId)
-      : searchHref(q, hit.kind, 1, hit.id);
+    ? publicDetailLink(`/atleta.html#${hit.id}`, hit.disputeId, returnTo)
+    : hit.kind === "teams"
+      ? publicDetailLink(`/equipe.html#${hit.id}`, null, returnTo)
+      : hit.kind === "competitions" && hit.directDisputeId
+        ? disputeLink(hit.directDisputeId)
+        : searchHref(q, hit.kind, 1, hit.id);
 }
 export function searchHitDescription(hit: SearchHit) {
   if (hit.kind === "competitions" && hit.directDisputeId) {
@@ -50,7 +65,9 @@ function SearchEntity({ hit }: { hit: SearchHit }) {
     return (
       <details className="public-search-entity" open>
         <summary>
-          <strong>{hit.name}</strong>
+          <strong>
+            <a href={searchHitHref(hit, "")}>{hit.name}</a>
+          </strong>
           <small>{hit.participations.length} participações públicas</small>
         </summary>
         <ul>

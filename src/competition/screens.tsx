@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useState } from "react";
 import {
   Badge,
@@ -63,7 +64,7 @@ export function Competitions({ data, go, openCompetition }: ScreenProps) {
           id="search-competitions"
           label="Buscar campeonato, ano ou categoria"
         >
-          <input
+          <SearchInput
             id="search-competitions"
             type="search"
             value={search}
@@ -750,7 +751,7 @@ export function TeamEditor({
       )}
       <div className="toolbar">
         <Field id="search-team" label="Buscar equipe inscrita">
-          <input
+          <SearchInput
             id="search-team"
             type="search"
             placeholder="Nome público da equipe"

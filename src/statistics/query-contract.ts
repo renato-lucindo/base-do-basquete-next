@@ -8,6 +8,7 @@ import {
 } from "../../especificacao/BASE-DO-BASQUETE-ARQUITETURA-20261022/modulos/source/app/modules/statistics/boxscore-statistics-contract";
 export type FilterOperator = ">=" | ">" | "<=" | "<" | "=";
 export interface StatisticsQuery {
+  registrationId?: string;
   dataset: "all" | "boxscore";
   mode: BoxscoreStatisticsMode;
   scope: BoxscoreGameScope;
@@ -21,7 +22,7 @@ export interface StatisticsQuery {
     value: number;
   }[];
   page: number;
-  pageSize: 20 | 30;
+  pageSize: 20 | 30 | 100;
   compare: string[];
   preset: "essentials" | "simple" | "all" | "custom";
   /** Remembered preference: MIN is hidden, not removed, in per-30. */
@@ -30,7 +31,7 @@ export interface StatisticsQuery {
 const metricKeys = Object.keys(STATISTICS_METRICS) as StatisticsMetric[];
 const isMetric = (value: string): value is StatisticsMetric =>
   Object.hasOwn(STATISTICS_METRICS, value);
-const essentials: StatisticsMetric[] = [
+export const SCORESHEET_PLAYER_COLUMNS: StatisticsMetric[] = [
   "games",
   "points",
   "pointsPerGame",
@@ -48,7 +49,7 @@ export const STATISTICS_COLUMN_PRESETS: Record<
   "essentials" | "simple" | "all",
   StatisticsMetric[]
 > = {
-  essentials,
+  essentials: SCORESHEET_PLAYER_COLUMNS,
   simple: [
     "games",
     "points",
@@ -98,6 +99,14 @@ export function parseStatisticsQuery(
     columns = unique((params.get("columns") ?? "").split(",").filter(isMetric)),
     page = Number(params.get("page"));
   return {
+    ...(params.has("registrationId")
+      ? {
+          registrationId: z
+            .uuid()
+            .parse(params.get("registrationId"))
+            .toLowerCase(),
+        }
+      : {}),
     dataset: params.get("dataset") === "boxscore" ? "boxscore" : "all",
     mode,
     scope: parseBoxscoreGameScope(params.get("scope")),
@@ -128,7 +137,12 @@ export function parseStatisticsQuery(
       Number.isSafeInteger(page)
         ? page
         : 1,
-    pageSize: params.get("pageSize") === "30" ? 30 : 20,
+    pageSize:
+      params.get("pageSize") === "100"
+        ? 100
+        : params.get("pageSize") === "30"
+          ? 30
+          : 20,
     compare: unique(
       (params.get("compare") ?? "").split(",").flatMap(uuid),
     ).slice(0, 2),
@@ -156,7 +170,8 @@ export function serializeStatisticsQuery(
     preset: query.preset,
     columns: query.columns.join(","),
   });
-  if (query.pageSize === 30) p.set("pageSize", "30");
+  if (query.pageSize !== 20) p.set("pageSize", String(query.pageSize));
+  if (query.registrationId) p.set("registrationId", query.registrationId);
   if (query.search) p.set("q", query.search);
   if (query.teams !== null)
     for (const id of query.teams.length ? query.teams : [""])

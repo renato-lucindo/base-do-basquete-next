@@ -1,0 +1,3122 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f8fb" />
+    <title>Serra Basquete · Perfil da equipe</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --blue: #075fca;
+        --ink: #172b45;
+        --muted: #53657a;
+        --line: #dbe3ed;
+        --soft: #eef5ff;
+        --bg: #f6f8fb;
+        --green: #008817;
+        --red: #d92d20;
+        --radius: 5px;
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+      button,
+      a,
+      summary {
+        touch-action: manipulation;
+      }
+      button,
+      select,
+      summary {
+        cursor: pointer;
+      }
+      button {
+        background: #fff;
+        border: 1px solid #7b8796;
+        border-radius: var(--radius);
+        min-height: 44px;
+        padding: 8px 13px;
+      }
+      button:hover {
+        background: var(--soft);
+      }
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      select:focus-visible,
+      input:focus-visible,
+      summary:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 3px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+      }
+      h1 {
+        font-size: 29px;
+        letter-spacing: -0.7px;
+        line-height: 1.2;
+      }
+      h2 {
+        font-size: 17px;
+        line-height: 1.4;
+      }
+      h3 {
+        font-size: 15px;
+      }
+      svg {
+        display: block;
+        flex-shrink: 0;
+      }
+      button svg,
+      a svg {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      small,
+      .muted {
+        color: var(--muted);
+      }
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      .skip {
+        position: fixed;
+        top: -80px;
+        left: 15px;
+        z-index: 50;
+        background: #fff;
+        padding: 12px;
+      }
+      .skip:focus {
+        top: 10px;
+      }
+      .site-header {
+        height: 65px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .header-inner {
+        height: 100%;
+        max-width: 1480px;
+        padding: 0 28px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+      .brandmark {
+        display: grid;
+        place-items: center;
+        background: var(--blue);
+        width: 31px;
+        height: 31px;
+        border-radius: 7px;
+        color: #fff;
+        font-weight: 800;
+        font-size: 22px;
+      }
+      .prototype {
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 4px 9px;
+      }
+      .shell {
+        max-width: 1480px;
+        margin: auto;
+        padding: 0 28px 28px;
+      }
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 51px;
+        font-size: 13px;
+        color: var(--muted);
+        flex-wrap: wrap;
+        padding: 12px 0;
+      }
+      .breadcrumb .sep {
+        color: #92a0b1;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 305px;
+        column-gap: 24px;
+        align-items: start;
+      }
+      .identity {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--blue);
+        border-radius: 5px 5px 0 0;
+        padding: 23px 24px 22px;
+        min-width: 0;
+      }
+      .identity-top {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+      }
+      .crest {
+        width: 75px;
+        height: 85px;
+        flex-shrink: 0;
+      }
+      .eyebrow {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .identity-name {
+        min-width: 0;
+      }
+      .identity .sub {
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .identity .meta {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 13px;
+      }
+      .identity .context {
+        margin-top: 17px;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      .context-label {
+        font-weight: 650;
+      }
+      .context-label small {
+        display: block;
+        font-weight: 400;
+        margin-top: 2px;
+      }
+      .text-link {
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        gap: 5px;
+        align-items: center;
+        min-height: 36px;
+      }
+      .scope-tag {
+        display: inline-block;
+        border: 1px solid #c6d7ed;
+        background: var(--soft);
+        color: #174b88;
+        border-radius: 4px;
+        font-size: 11px;
+        padding: 2px 7px;
+        white-space: nowrap;
+      }
+      .workspace {
+        grid-column: 1;
+        grid-row: 2;
+        min-width: 0;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 0;
+        border-radius: 0 0 5px 5px;
+      }
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+        padding: 0 16px;
+        gap: 5px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+      .tab {
+        border: 0;
+        border-radius: 0;
+        background: none;
+        white-space: nowrap;
+        min-height: 53px;
+        padding: 11px 15px;
+        border-bottom: 3px solid transparent;
+        font-size: 14px;
+        font-weight: 550;
+      }
+      .tab[aria-selected="true"] {
+        color: var(--blue);
+        background: var(--soft);
+        border-bottom-color: var(--blue);
+        font-weight: 700;
+      }
+      .panel {
+        padding: 23px 24px 20px;
+        min-height: 380px;
+      }
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+      .section-head .subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .section {
+        margin-top: 26px;
+      }
+      .section:first-child {
+        margin-top: 0;
+      }
+      .tools {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-bottom: 17px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 105px;
+      }
+      .field select,
+      .field input {
+        width: 100%;
+        min-height: 41px;
+        padding: 7px 32px 7px 10px;
+        border: 1px solid #7b8796;
+        border-radius: 4px;
+        background-color: #fff;
+        font-weight: 400;
+        font-size: 13px;
+      }
+      .field input {
+        padding-right: 10px;
+      }
+      .field.wide {
+        min-width: 185px;
+        flex: 1;
+      }
+      .field.grow {
+        flex: 1;
+      }
+      .field.compact {
+        min-width: 90px;
+      }
+      .head-year {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .head-year select {
+        min-height: 40px;
+        border: 1px solid #7b8796;
+        border-radius: 4px;
+        background: #fff;
+        padding: 6px 25px 6px 9px;
+        color: var(--ink);
+        font: inherit;
+      }
+      .count {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .scroll {
+        overflow-x: auto;
+        max-width: 100%;
+        scrollbar-width: thin;
+        border-bottom: 1px solid var(--line);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+      thead {
+        background: #e9eff7;
+      }
+      th {
+        text-align: right;
+        font-size: 12px;
+        white-space: nowrap;
+        font-weight: 650;
+        padding: 11px 9px;
+        border-block: 1px solid #ccd7e5;
+      }
+      th:first-child {
+        border-left: 1px solid #ccd7e5;
+      }
+      th:last-child {
+        border-right: 1px solid #ccd7e5;
+      }
+      td {
+        padding: 13px 9px;
+        border-bottom: 1px solid var(--line);
+        text-align: right;
+        white-space: nowrap;
+      }
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      tbody tr:hover {
+        background: #f8faff;
+      }
+      .left {
+        text-align: left;
+      }
+      .center {
+        text-align: center;
+      }
+      .name-cell {
+        white-space: normal;
+        min-width: 162px;
+        max-width: 240px;
+        text-align: left;
+      }
+      .name-cell a {
+        font-weight: 650;
+      }
+      .cell-sub {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+        font-weight: 400;
+      }
+      .cell-sub .division {
+        color: #65748a;
+      }
+      .position {
+        font-weight: 700;
+        color: var(--ink);
+        font-size: 14px;
+      }
+      .stage {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .status {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 11px;
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      .status:before {
+        content: "";
+        height: 7px;
+        width: 7px;
+        border-radius: 50%;
+        background: var(--status);
+      }
+      .status.in_progress {
+        --status: #dc6b0b;
+        color: #9b4b04;
+      }
+      .status.completed {
+        --status: #008817;
+        color: #006c13;
+      }
+      .status.planned {
+        --status: #2674ce;
+        color: #1859a3;
+      }
+      .status.cancelled {
+        --status: #d92d20;
+        color: #b4271a;
+      }
+      .recent-results {
+        display: flex;
+        gap: 1px;
+        justify-content: center;
+      }
+      .result {
+        border: 0;
+        background: none;
+        padding: 0;
+        width: 26px;
+        min-height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 4px;
+        position: relative;
+      }
+      .result span {
+        display: grid;
+        place-items: center;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1;
+      }
+      .result.win span {
+        background: var(--green);
+      }
+      .result.loss span {
+        background: var(--red);
+      }
+      .result.latest span {
+        outline: 1px solid currentColor;
+        outline-offset: 2px;
+      }
+      .result.latest.win {
+        color: var(--green);
+      }
+      .result.latest.loss {
+        color: var(--red);
+      }
+      .result:hover {
+        background: #e6edf5;
+      }
+      .legend {
+        margin-top: 23px;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .legend h2 {
+        min-height: 32px;
+        display: list-item;
+        font-weight: 600;
+      }
+      .legend dl {
+        display: flex;
+        gap: 8px 20px;
+        flex-wrap: wrap;
+        margin: 8px 0;
+      }
+      .legend dl div {
+        display: flex;
+        gap: 5px;
+      }
+      .legend dt {
+        font-weight: 650;
+      }
+      .legend dd {
+        margin: 0;
+      }
+      .empty {
+        padding: 35px 15px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .empty strong {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--ink);
+      }
+      .empty button {
+        margin-top: 14px;
+      }
+      .honors {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--blue);
+        border-radius: 5px;
+        padding: 20px 19px;
+        min-width: 0;
+      }
+      .honors-title {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .honors-title svg {
+        color: var(--blue);
+      }
+      .honors h2 {
+        font-size: 16px;
+      }
+      .honors .tools {
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+      .honors .field {
+        min-width: 0;
+        flex: 1;
+      }
+      .honors .field select {
+        font-size: 12px;
+        padding-left: 8px;
+        padding-right: 20px;
+      }
+      .honors-context {
+        background: var(--soft);
+        border: 1px solid #d5e4f7;
+        border-radius: 4px;
+        padding: 10px 12px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 650;
+      }
+      .honors-context small {
+        display: block;
+        font-weight: 400;
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .award-section {
+        display: grid;
+        grid-template-columns: 29px minmax(0, 1fr);
+        gap: 8px;
+        padding-top: 17px;
+        margin-top: 17px;
+        border-top: 1px solid var(--line);
+      }
+      .award-section.first {
+        margin-top: 0;
+        padding-top: 0;
+        border: 0;
+      }
+      .medal {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 31px;
+        border-radius: 4px;
+      }
+      .medal.gold {
+        color: #956a0a;
+        background: #fff5d8;
+      }
+      .medal.silver {
+        color: #65758c;
+        background: #eef1f5;
+      }
+      .medal.bronze {
+        color: #995c37;
+        background: #fcf0e8;
+      }
+      .award-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+        font-weight: 650;
+        font-size: 13px;
+        margin: 2px 0 7px;
+      }
+      .award-total {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .award details {
+        border-bottom: 1px solid #e8edf4;
+        padding: 4px 0;
+      }
+      .award details:last-child {
+        border: 0;
+      }
+      .award summary {
+        font-size: 12px;
+        min-height: 33px;
+        line-height: 1.5;
+        padding: 7px 0;
+      }
+      .award summary .number {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .award ul {
+        list-style: none;
+        padding: 0 0 5px 11px;
+        margin: 0;
+        border-left: 2px solid #e3eaf3;
+      }
+      .award li {
+        font-size: 11px;
+        margin: 7px 0;
+        line-height: 1.5;
+      }
+      .award li a {
+        display: block;
+      }
+      .award-footer {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 19px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+      .recent-table th:first-child,
+      .recent-table td:first-child {
+        text-align: left;
+        width: 75px;
+        padding-left: 13px;
+      }
+      .recent-table td:nth-child(2),
+      .recent-table th:nth-child(2) {
+        text-align: left;
+      }
+      .recent-table td {
+        padding: 13px;
+      }
+      .date-day {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .date-year {
+        font-size: 11px;
+        color: var(--muted);
+        display: block;
+      }
+      .match-link {
+        color: var(--ink);
+        display: block;
+        min-width: 245px;
+      }
+      .match-link:hover {
+        text-decoration: none;
+        color: var(--blue);
+      }
+      .matchline {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .matchscore {
+        color: #1557a4;
+        font-weight: 750;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .matchline .opp {
+        font-weight: 450;
+      }
+      .match-context {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .result-label {
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .result-label.won {
+        color: #007414;
+      }
+      .result-label.lost {
+        color: #bf2a1d;
+      }
+      .result-label.upcoming {
+        color: var(--muted);
+      }
+      .link-footer {
+        text-align: right;
+        margin-top: 12px;
+      }
+      .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        border-block: 1px solid var(--line);
+        margin-bottom: 25px;
+      }
+      .summary-stat {
+        padding: 15px 10px;
+        border-right: 1px solid var(--line);
+      }
+      .summary-stat:first-child {
+        padding-left: 0;
+      }
+      .summary-stat:last-child {
+        border: 0;
+      }
+      .summary-stat dt {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .summary-stat dd {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin: 4px 0 0;
+        font-variant-numeric: tabular-nums;
+      }
+      .summary-stat dd span {
+        font-size: 12px;
+        letter-spacing: 0;
+        font-weight: 400;
+        color: var(--muted);
+        margin-left: 5px;
+      }
+      .phase-box {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .phase-box .position {
+        font-size: 22px;
+      }
+      .phase-box small {
+        display: block;
+        font-size: 12px;
+      }
+      .segments {
+        display: flex;
+        border: 1px solid #7b8796;
+        border-radius: 4px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .segments button {
+        min-height: 37px;
+        border: 0;
+        border-radius: 0;
+        font-size: 12px;
+        padding: 7px 12px;
+      }
+      .segments button[aria-pressed="true"] {
+        color: var(--blue);
+        background: var(--soft);
+        font-weight: 650;
+      }
+      .segments button + button {
+        border-left: 1px solid var(--line);
+      }
+      .roster-layout {
+        display: grid;
+        grid-template-columns: 215px minmax(0, 1fr);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        min-width: 0;
+      }
+      .roster-list {
+        background: #f8faff;
+        border-right: 1px solid var(--line);
+        padding: 8px;
+        max-height: 510px;
+        overflow: auto;
+      }
+      .roster-item {
+        display: block;
+        padding: 12px 10px;
+        border-radius: 4px;
+        color: var(--ink);
+        font-size: 12px;
+        border: 1px solid transparent;
+        margin-bottom: 4px;
+      }
+      .roster-item strong {
+        display: block;
+        font-size: 13px;
+      }
+      .roster-item small {
+        display: block;
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .roster-item:hover {
+        text-decoration: none;
+        background: #edf3fb;
+      }
+      .roster-item.active {
+        background: #eaf2ff;
+        border-color: #bad1ee;
+        color: #0752a7;
+      }
+      .roster-body {
+        padding: 17px;
+        min-width: 0;
+      }
+      .roster-body h3 {
+        margin-bottom: 4px;
+      }
+      .roster-body .scroll {
+        margin-top: 15px;
+      }
+      .avatar {
+        display: inline-grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #edf2f8;
+        color: #53657a;
+        font-size: 10px;
+        margin-right: 8px;
+        vertical-align: middle;
+        font-weight: 650;
+      }
+      .roster-note {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .search {
+        position: relative;
+        min-width: 165px;
+      }
+      .mobile-roster-back {
+        display: none;
+      }
+      .footer {
+        max-width: 1480px;
+        margin: auto;
+        padding: 22px 28px 28px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 11px;
+        border-top: 1px solid var(--line);
+      }
+      .tooltip {
+        position: fixed;
+        z-index: 100;
+        pointer-events: none;
+        background: #172b45;
+        color: #fff;
+        font-size: 12px;
+        padding: 8px 11px;
+        border-radius: 4px;
+        box-shadow: 0 4px 15px #172b4520;
+        max-width: calc(100vw - 20px);
+      }
+      .tooltip[hidden] {
+        display: none;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--blue);
+        border-radius: 6px;
+        padding: 0;
+        max-width: min(620px, calc(100vw - 28px));
+        width: 620px;
+        color: var(--ink);
+        max-height: 85dvh;
+        overscroll-behavior: contain;
+        box-shadow: 0 15px 70px #172b4540;
+      }
+      dialog::backdrop {
+        background: #172b4566;
+      }
+      .dialog-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 18px 21px;
+        border-bottom: 1px solid var(--line);
+        align-items: center;
+      }
+      .dialog-head h2 {
+        font-size: 16px;
+      }
+      .dialog-head button {
+        width: 40px;
+        min-height: 40px;
+        font-size: 23px;
+        padding: 0;
+        border: 0;
+      }
+      .dialog-body {
+        padding: 24px;
+      }
+      .dialog-score {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 16px;
+        align-items: center;
+        text-align: center;
+        margin: 22px 0;
+      }
+      .dialog-score strong {
+        font-size: 16px;
+      }
+      .dialog-score .big-score {
+        font-size: 31px;
+        font-weight: 750;
+        color: #1557a4;
+        white-space: nowrap;
+      }
+      .dialog-caption {
+        font-size: 12px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .dialog-body .text-link {
+        margin-top: 16px;
+      }
+      .sort-button {
+        font: inherit;
+        font-weight: inherit;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        min-height: 25px;
+        color: inherit;
+      }
+      .sort-button:hover {
+        background: none;
+        color: var(--blue);
+      }
+      @media (min-width: 1600px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr) 330px;
+          gap: 28px;
+        }
+        td {
+          padding-block: 15px;
+        }
+        .panel {
+          padding: 25px 28px;
+        }
+      }
+      @media (max-width: 1100px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr) 270px;
+          gap: 16px;
+        }
+        .shell {
+          padding-inline: 18px;
+        }
+        .panel {
+          padding: 20px 16px;
+        }
+        .identity {
+          padding: 20px 18px;
+        }
+        .honors {
+          padding: 18px 15px;
+        }
+        .tab {
+          padding-inline: 11px;
+          font-size: 13px;
+        }
+        .roster-layout {
+          grid-template-columns: 175px minmax(0, 1fr);
+        }
+      }
+      @media (max-width: 820px) {
+        .layout {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+        .identity,
+        .workspace,
+        .honors {
+          width: 100%;
+        }
+        .honors {
+          order: 3;
+          margin-top: 20px;
+        }
+        .identity {
+          order: 1;
+        }
+        .workspace {
+          order: 2;
+        }
+        .honors .tools {
+          max-width: 400px;
+        }
+        .honors h2 {
+          font-size: 17px;
+        }
+        .award-section {
+          grid-template-columns: 32px minmax(0, 1fr);
+        }
+        .honors .award {
+          max-width: 580px;
+        }
+        .award summary {
+          font-size: 13px;
+        }
+        .award li {
+          font-size: 12px;
+        }
+        .honors .field select {
+          font-size: 13px;
+        }
+        .award-label {
+          font-size: 14px;
+        }
+        .footer {
+          padding-inline: 18px;
+        }
+      }
+      @media (max-width: 520px) {
+        body {
+          font-size: 14px;
+        }
+        .site-header {
+          height: 59px;
+        }
+        .header-inner {
+          padding-inline: 15px;
+        }
+        .brand {
+          font-size: 14px;
+          gap: 8px;
+        }
+        .prototype {
+          font-size: 10px;
+          padding: 3px 6px;
+        }
+        .shell {
+          padding-inline: 12px;
+          padding-bottom: 20px;
+        }
+        .breadcrumb {
+          font-size: 11px;
+          min-height: 45px;
+          gap: 6px;
+        }
+        .identity {
+          padding: 18px 15px;
+        }
+        .identity-top {
+          gap: 13px;
+          align-items: center;
+        }
+        .crest {
+          width: 54px;
+          height: 64px;
+        }
+        h1 {
+          font-size: 23px;
+          letter-spacing: -0.5px;
+        }
+        .eyebrow {
+          font-size: 10px;
+          letter-spacing: 0.9px;
+        }
+        .identity .sub {
+          font-size: 12px;
+        }
+        .identity .meta {
+          font-size: 11px;
+          gap: 5px;
+          margin-top: 7px;
+        }
+        .tabs {
+          padding: 0 5px;
+          gap: 0;
+        }
+        .tab {
+          padding: 12px 10px;
+          font-size: 12px;
+          min-height: 49px;
+        }
+        .panel {
+          padding: 20px 13px;
+        }
+        .section-head {
+          gap: 8px;
+        }
+        .section-head h2 {
+          font-size: 16px;
+        }
+        .head-year {
+          font-size: 12px;
+        }
+        .head-year select {
+          min-height: 39px;
+        }
+        .section {
+          margin-top: 24px;
+        }
+        .tools {
+          gap: 10px;
+        }
+        .field {
+          min-width: calc(50% - 5px);
+          flex: 1;
+        }
+        .field.wide {
+          min-width: 100%;
+        }
+        .field.grow {
+          min-width: 100%;
+        }
+        .name-cell {
+          min-width: 155px;
+        }
+        .recent-table td {
+          padding: 12px 9px;
+        }
+        .recent-table td:first-child {
+          padding-left: 9px;
+        }
+        .recent-table .match-link {
+          min-width: 207px;
+        }
+        .recent-table .matchline {
+          gap: 5px;
+          font-size: 12px;
+        }
+        .recent-table .match-context {
+          font-size: 10px;
+        }
+        .recent-table td:last-child {
+          padding-inline: 6px;
+        }
+        .recent-table .result-label {
+          font-size: 10px;
+        }
+        .summary-stat {
+          padding: 12px 8px;
+        }
+        .summary-stat dd {
+          font-size: 21px;
+        }
+        .summary-stat dd span {
+          display: block;
+          margin: 0;
+          font-size: 10px;
+        }
+        .summary-stat dt {
+          font-size: 11px;
+        }
+        .phase-box {
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .phase-box .position {
+          font-size: 19px;
+        }
+        .roster-layout {
+          display: block;
+          border: 0;
+        }
+        .roster-list {
+          border: 1px solid var(--line);
+          border-radius: 4px;
+          max-height: none;
+        }
+        .roster-body {
+          padding: 0;
+        }
+        .roster-layout.selected .roster-list {
+          display: none;
+        }
+        .roster-layout:not(.selected) .roster-body {
+          display: none;
+        }
+        .mobile-roster-back {
+          display: inline-flex;
+          margin-bottom: 15px;
+          align-items: center;
+          gap: 5px;
+        }
+        .roster-item {
+          min-height: 70px;
+        }
+        .dialog-score {
+          gap: 8px;
+        }
+        .dialog-score strong {
+          font-size: 13px;
+        }
+        .dialog-score .big-score {
+          font-size: 26px;
+        }
+        .footer {
+          flex-direction: column;
+          gap: 4px;
+          padding: 18px 14px;
+        }
+        .honors {
+          padding: 19px 17px;
+        }
+        .identity .context {
+          font-size: 13px;
+        }
+        .identity .context .text-link {
+          font-size: 12px;
+        }
+        .legend {
+          font-size: 10px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+        }
+      }
+      .result.latest.win span {
+        outline-color: var(--green);
+      }
+      .result.latest.loss span {
+        outline-color: var(--red);
+      }
+      .legend h2 {
+        display: block;
+        min-height: 0;
+        font-size: 13px;
+        color: var(--ink);
+        margin-bottom: 8px;
+      }
+
+      .legend h3 {
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .legend dl {
+        row-gap: 10px;
+      }
+      .full-table th[scope="row"] {
+        font-weight: 550;
+        white-space: nowrap;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+        font-size: 13px;
+        padding: 13px 10px;
+      }
+      .full-table tr:last-child th[scope="row"] {
+        border-bottom: 0;
+      }
+      .full-table .team-name,
+      .full-table .player-name {
+        min-width: 155px;
+        position: sticky;
+        left: 41px;
+        z-index: 1;
+        text-align: left;
+      }
+      .full-table thead .team-name,
+      .full-table thead .player-name {
+        background: #e9eff7;
+        z-index: 2;
+      }
+      .full-table tbody .player-name {
+        background: #fff;
+      }
+      .full-table .selected-team td,
+      .full-table .selected-team th[scope="row"] {
+        background: #edf5ff;
+        color: #124b8b;
+        font-weight: 650;
+      }
+      .full-table tr.selected-team td:first-child {
+        box-shadow: inset 3px 0 0 #075fca;
+      }
+      .full-table th:first-child,
+      .full-table td:first-child {
+        min-width: 41px;
+        width: 41px;
+        text-align: center;
+      }
+      .full-table th[scope="row"]:hover {
+        background: #f8faff;
+      }
+      .player-display-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .player-tools {
+        margin-top: 18px;
+      }
+      .player-tools .field.grow {
+        min-width: 140px;
+      }
+      .player-tools .field {
+        min-width: 110px;
+      }
+      .column-picker {
+        position: relative;
+      }
+      .column-picker > summary {
+        list-style: none;
+        border: 1px solid #7b8796;
+        border-radius: 4px;
+        padding: 8px 11px;
+        font-size: 12px;
+        min-height: 39px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .column-picker > summary::after {
+        content: "▾";
+        color: #53657a;
+      }
+      .column-popover {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 5px);
+        width: 315px;
+        max-width: calc(100vw - 60px);
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #a5b4c7;
+        border-radius: 5px;
+        box-shadow: 0 8px 24px #172b4520;
+        z-index: 10;
+      }
+      .column-actions {
+        display: flex;
+        gap: 7px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dbe3ed;
+      }
+      .column-actions button {
+        min-height: 34px;
+        font-size: 12px;
+      }
+      .column-options {
+        max-height: 275px;
+        overflow: auto;
+        margin-top: 6px;
+      }
+      .column-options label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-height: 37px;
+        font-size: 12px;
+        padding: 5px 2px;
+        cursor: pointer;
+      }
+      .column-options input {
+        accent-color: #075fca;
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+      }
+      .column-options strong {
+        font-weight: 600;
+      }
+      .roster-body .player-display-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .roster-body .player-tools .field {
+        flex: 1;
+      }
+      .full-table.player-full tbody td {
+        padding-block: 14px;
+      }
+      .recent-table th:last-child,
+      .recent-table td:last-child {
+        text-align: left;
+      }
+      .recent-table .match-link {
+        min-width: 0;
+      }
+      .recent-table .matchline {
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .recent-table {
+        table-layout: fixed;
+      }
+      .recent-table th:first-child {
+        width: 78px;
+      }
+      .match-context {
+        display: block;
+        white-space: normal;
+      }
+      .standings-table {
+        min-width: 750px;
+      }
+      .collective-full {
+        min-width: 950px;
+      }
+      .player-full {
+        min-width: 850px;
+      }
+      @media (max-width: 520px) {
+        .player-tools .field.grow {
+          min-width: 100%;
+        }
+        .player-tools .field {
+          min-width: 105px;
+        }
+        .player-display-controls {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .recent-table th:first-child {
+          width: 60px;
+        }
+        .recent-table .matchline {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          gap: 5px;
+          align-items: center;
+          font-size: 12px;
+        }
+        .recent-table .matchline > span:last-child {
+          text-align: right;
+        }
+        .recent-table .match-context {
+          font-size: 10px;
+          line-height: 1.5;
+        }
+        .recent-table td {
+          padding: 12px 7px;
+        }
+        .recent-table .match-link {
+          min-width: 0;
+        }
+        .column-popover {
+          left: 0;
+          right: auto;
+        }
+        .legend dl {
+          column-gap: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Pular para o perfil</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#perfil=geral"
+          ><span class="brandmark">b.</span>Base do Basquete</a
+        ><span class="prototype">Protótipo · dados fictícios</span>
+      </div>
+    </header>
+    <main id="main" class="shell" tabindex="-1"></main>
+    <footer class="footer">
+      <span>Base do Basquete</span
+      ><span>Perfil de equipes · estudo de navegação e apresentação</span>
+    </footer>
+    <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+    <dialog id="detail" aria-labelledby="dialog-title"></dialog>
+    <div id="announcement" class="sr" role="status" aria-live="polite"></div>
+    <script>
+      "use strict";
+      const TEAM = "Serra Basquete";
+      const PARTICIPATIONS = [
+        {
+          id: "copa26-s17m",
+          competition: "Copa do Litoral",
+          year: 2026,
+          category: "Sub-17",
+          gender: "Masculino",
+          division: "Ouro",
+          status: "in_progress",
+          position: 2,
+          group: "Grupo A",
+          stage: "Fase classificatória",
+          games: 10,
+          seed: 1,
+        },
+        {
+          id: "liga26-adm",
+          competition: "Liga Metropolitana",
+          year: 2026,
+          category: "Adulto",
+          gender: "Masculino",
+          division: "Ouro",
+          status: "in_progress",
+          position: null,
+          stage: "Semifinal",
+          games: 9,
+          seed: 2,
+        },
+        {
+          id: "copa26-s17f",
+          competition: "Copa do Litoral",
+          year: 2026,
+          category: "Sub-17",
+          gender: "Feminino",
+          division: "Ouro",
+          status: "in_progress",
+          position: 1,
+          group: "Grupo único",
+          stage: "Fase classificatória",
+          games: 8,
+          seed: 3,
+        },
+        {
+          id: "circuito26-s15m",
+          competition: "Circuito Capixaba",
+          year: 2026,
+          category: "Sub-15",
+          gender: "Masculino",
+          division: null,
+          status: "completed",
+          finalPosition: 1,
+          stage: "Final",
+          games: 8,
+          seed: 4,
+        },
+        {
+          id: "liga26-adf",
+          competition: "Liga Metropolitana",
+          year: 2026,
+          category: "Adulto",
+          gender: "Feminino",
+          division: "Prata",
+          status: "completed",
+          finalPosition: 2,
+          stage: "Final",
+          games: 7,
+          seed: 5,
+        },
+        {
+          id: "festival26-s13m",
+          competition: "Festival da Serra",
+          year: 2026,
+          category: "Sub-13",
+          gender: "Masculino",
+          division: null,
+          status: "planned",
+          stage: null,
+          games: 0,
+          seed: 6,
+        },
+        {
+          id: "regional26-s15f",
+          competition: "Torneio Regional",
+          year: 2026,
+          category: "Sub-15",
+          gender: "Feminino",
+          division: null,
+          status: "cancelled",
+          stage: null,
+          games: 2,
+          seed: 7,
+        },
+        {
+          id: "copa25-s17m",
+          competition: "Copa do Litoral",
+          year: 2025,
+          category: "Sub-17",
+          gender: "Masculino",
+          division: "Ouro",
+          status: "completed",
+          finalPosition: 1,
+          stage: "Final",
+          games: 11,
+          seed: 8,
+        },
+        {
+          id: "liga25-s17m",
+          competition: "Liga Metropolitana",
+          year: 2025,
+          category: "Sub-17",
+          gender: "Masculino",
+          division: "Prata",
+          status: "completed",
+          finalPosition: 3,
+          stage: "Disputa do bronze",
+          games: 8,
+          seed: 9,
+        },
+        {
+          id: "copa25-s17f",
+          competition: "Copa do Litoral",
+          year: 2025,
+          category: "Sub-17",
+          gender: "Feminino",
+          division: "Ouro",
+          status: "completed",
+          finalPosition: 2,
+          stage: "Final",
+          games: 9,
+          seed: 10,
+        },
+        {
+          id: "liga25-adm",
+          competition: "Liga Metropolitana",
+          year: 2025,
+          category: "Adulto",
+          gender: "Masculino",
+          division: "Ouro",
+          status: "completed",
+          finalPosition: 4,
+          stage: "Semifinal",
+          games: 10,
+          seed: 11,
+        },
+        {
+          id: "copa24-s17m",
+          competition: "Copa do Litoral",
+          year: 2024,
+          category: "Sub-17",
+          gender: "Masculino",
+          division: "Ouro",
+          status: "completed",
+          finalPosition: 2,
+          stage: "Final",
+          games: 9,
+          seed: 12,
+        },
+        {
+          id: "circuito24-s15m",
+          competition: "Circuito Capixaba",
+          year: 2024,
+          category: "Sub-15",
+          gender: "Masculino",
+          division: null,
+          status: "completed",
+          finalPosition: 1,
+          stage: "Final",
+          games: 8,
+          seed: 13,
+        },
+        {
+          id: "liga24-adf",
+          competition: "Liga Metropolitana",
+          year: 2024,
+          category: "Adulto",
+          gender: "Feminino",
+          division: "Prata",
+          status: "completed",
+          finalPosition: 3,
+          stage: "Disputa do bronze",
+          games: 8,
+          seed: 14,
+        },
+        {
+          id: "copa23-s17m",
+          competition: "Copa do Litoral",
+          year: 2023,
+          category: "Sub-17",
+          gender: "Masculino",
+          division: "Prata",
+          status: "completed",
+          finalPosition: 1,
+          stage: "Final",
+          games: 7,
+          seed: 15,
+        },
+      ];
+      const OPPONENTS = [
+        ["Vila do Sol", "VDS"],
+        ["Estrela do Vale", "EV"],
+        ["Náutico da Enseada", "CNE"],
+        ["União de Vitória", "UDV"],
+      ];
+      const GAMES = PARTICIPATIONS.flatMap((p) => {
+        const played = Array.from({ length: p.games }, (_, i) => {
+          const opp = OPPONENTS[(i + p.seed) % 4],
+            two = 18 + ((i + p.seed) % 9),
+            three = 5 + ((i * 3 + p.seed) % 7),
+            free = 8 + ((i + p.seed) % 9),
+            pf = two * 2 + three * 3 + free;
+          let won = (i + p.seed) % 4 !== 0;
+          if (i === p.games - 1 && p.finalPosition)
+            won = p.finalPosition === 1 || p.finalPosition === 3;
+          const pa = pf + (won ? -1 : 1) * (4 + ((i * 3 + p.seed) % 18)),
+            home = i % 2 === 0;
+          const date =
+            p.year === 2026
+              ? p.status === "completed"
+                ? `2026-09-${String(2 + i * 2).padStart(2, "0")}`
+                : p.status === "cancelled"
+                  ? `2026-05-${String(3 + i * 7).padStart(2, "0")}`
+                  : `2026-${i < p.games - 4 ? "10" : "11"}-${String(i < p.games - 4 ? 2 + i * 3 : 3 + (i - (p.games - 4)) * 5 + (p.seed % 3)).padStart(2, "0")}`
+              : `${p.year}-10-${String(2 + i * 2).padStart(2, "0")}`;
+          return {
+            id: p.id + "-g" + i,
+            pid: p.id,
+            date,
+            time: i % 3 === 0 ? "18:00" : "15:30",
+            opponent: opp[0],
+            abbr: opp[1],
+            home,
+            pf,
+            pa,
+            won,
+            played: true,
+            two,
+            three,
+            free,
+            fta: free + 5,
+            reb: 28 + (i % 11),
+            ast: 12 + (i % 8),
+            fc: 14 + (i % 9),
+            venue: home ? "Ginásio da Serra" : "Ginásio Municipal",
+            phase: i >= p.games - 2 && !p.group ? "playoffs" : "regular",
+          };
+        });
+        if (p.status === "in_progress" || p.status === "planned")
+          played.push({
+            id: p.id + "-next",
+            pid: p.id,
+            date: `2026-12-${String(2 + p.seed).padStart(2, "0")}`,
+            time: "18:30",
+            opponent: OPPONENTS[p.seed % 4][0],
+            abbr: OPPONENTS[p.seed % 4][1],
+            home: true,
+            pf: null,
+            pa: null,
+            played: false,
+            venue: "Ginásio da Serra",
+            phase: p.group ? "regular" : "playoffs",
+          });
+        return played;
+      });
+      const YEARS = [...new Set(PARTICIPATIONS.map((p) => p.year))].sort(
+        (a, b) => b - a,
+      );
+      const currentYear = new Date().getFullYear();
+      const INITIAL_YEAR = YEARS.includes(currentYear) ? currentYear : YEARS[0];
+      const LABELS = {
+        planned: "Planejada",
+        in_progress: "Em andamento",
+        completed: "Concluída",
+        cancelled: "Cancelada",
+      };
+      const num = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+      const esc = (v) =>
+        String(v ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const normalize = (v) =>
+        String(v)
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      const fmt = (v) => (v == null ? "—" : num.format(v));
+      const selectedP = (id) => PARTICIPATIONS.find((p) => p.id === id);
+      const played = (p) => GAMES.filter((g) => g.pid === p.id && g.played);
+      const chronological = (games) =>
+        [...games].sort(
+          (a, b) =>
+            (b.date ?? "").localeCompare(a.date ?? "") ||
+            (b.time ?? "").localeCompare(a.time ?? "") ||
+            b.id.localeCompare(a.id),
+        );
+      const date = (v, year = false) =>
+        v
+          ? new Intl.DateTimeFormat("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              ...(year ? { year: "numeric" } : {}),
+              timeZone: "UTC",
+            }).format(new Date(v + "T12:00:00Z"))
+          : "Data a definir";
+      const context = (p) =>
+        `${p.year} · ${p.gender} · ${p.category}${p.division ? " · " + p.division : ""}`;
+      const miniContext = (p) =>
+        `${p.category} · ${p.gender}${p.division ? " · " + p.division : ""}`;
+      function campaign(p) {
+        const gs = played(p),
+          j = gs.length,
+          v = gs.filter((g) => g.won).length,
+          pp = gs.reduce((n, g) => n + g.pf, 0),
+          pc = gs.reduce((n, g) => n + g.pa, 0);
+        return {
+          j,
+          v,
+          d: j - v,
+          pp,
+          pc,
+          sld: pp - pc,
+          aprov: j ? (v / j) * 100 : null,
+        };
+      }
+      const paths = {
+        arrow: "M5 12h14m-5-5 5 5-5 5",
+        back: "M19 12H5m5-5-5 5 5 5",
+        trophy:
+          "M8 3h8v7a4 4 0 0 1-8 0V3Zm0 2H4v3a4 4 0 0 0 5 4m7-7h4v3a4 4 0 0 1-5 4m-3 2v6m-4 0h8",
+        medal:
+          "M9 2 7 7m8-5 2 5M12 8a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 4v6m-3-3h6",
+        pin: "M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6",
+      };
+      const icon = (name, size = 18) =>
+        `<svg aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[name] || paths.arrow}"/></svg>`;
+      const crest = `<svg class="crest" viewBox="0 0 80 92" aria-hidden="true"><path d="M5 4h70v47c0 18-18 30-35 37C23 81 5 69 5 51Z" fill="#075fca"/><path d="M12 11h56v39c0 14-14 24-28 30-14-6-28-16-28-30Z" fill="none" stroke="#8db8eb"/><path d="m21 31 9-11 10 9 10-9 10 11" stroke="#fff" fill="none" stroke-width="2"/><text x="40" y="53" fill="#fff" font-family="Segoe UI,sans-serif" font-size="20" font-weight="750" text-anchor="middle">SB</text><path d="M29 66h22" stroke="#8db8eb" stroke-width="2"/></svg>`;
+      const PLAYER_METRICS = {
+        games: ["J", "Jogos"],
+        points: ["PTS", "Pontos"],
+        pointsPerGame: ["PPJ", "Pontos por jogo"],
+        pointsShare: ["PP%", "Participação nos Pontos"],
+        twoMade: ["2P", "Cestas de dois"],
+        threeMade: ["3P", "Cestas de três"],
+        freeMade: ["LL", "Lances livres"],
+        foulsCommitted: ["FC", "Faltas cometidas"],
+        technicalFouls: ["T", "Faltas técnicas"],
+        unsportsmanlikeFouls: ["U", "Faltas antidesportivas"],
+        fiveFouls: ["5F", "Exclusões por cinco faltas"],
+        disqualifications: ["GD", "Desqualificações"],
+        minutes: ["MIN", "Minutos"],
+        rebounds: ["REB", "Rebotes"],
+        offensiveRebounds: ["RO", "Rebotes ofensivos"],
+        defensiveRebounds: ["RD", "Rebotes defensivos"],
+        assists: ["AST", "Assistências"],
+        turnovers: ["ER", "Erros"],
+        blocks: ["TO", "Tocos"],
+        steals: ["BR", "Bolas recuperadas"],
+        foulsReceived: ["FR", "Faltas recebidas"],
+        fieldGoalsMade: ["AC", "Arremessos convertidos"],
+        fieldGoalsAttempted: ["AT", "Arremessos tentados"],
+        fieldGoalPercentage: ["AP", "Aproveitamento de arremessos"],
+        threePointersMade: ["3PC", "Cestas de três convertidas"],
+        threePointersAttempted: ["3PT", "Cestas de três tentadas"],
+        threePointPercentage: ["3P%", "Aproveitamento de três pontos"],
+        freeThrowsMade: ["LLC", "Lances livres convertidos"],
+        freeThrowsAttempted: ["LLT", "Lances livres tentados"],
+        freeThrowPercentage: ["LL%", "Aproveitamento de lances livres"],
+        efficiency: ["EF", "Eficiência"],
+        plusMinus: ["+/−", "Saldo em quadra"],
+      };
+      const SHEET_PLAYER_KEYS = Object.keys(PLAYER_METRICS).slice(0, 12);
+      const percentKeys = new Set([
+        "pointsShare",
+        "fieldGoalPercentage",
+        "threePointPercentage",
+        "freeThrowPercentage",
+      ]);
+      const fixedKeys = new Set([
+        "games",
+        "pointsPerGame",
+        "pointsShare",
+        "fiveFouls",
+        "disqualifications",
+        "plusMinus",
+        ...percentKeys,
+      ]);
+      function sourcePlayerKeys(p) {
+        return p.seed % 3 === 2
+          ? Object.keys(PLAYER_METRICS)
+          : SHEET_PLAYER_KEYS;
+      }
+      function visiblePlayerKeys(p) {
+        const available = sourcePlayerKeys(p);
+        if (state.playerColumns !== null)
+          return state.playerColumns
+            .split(",")
+            .filter((k) => available.includes(k));
+        return state.playerPreset === "principais"
+          ? available.filter((k) =>
+              [
+                "games",
+                "points",
+                "pointsPerGame",
+                "twoMade",
+                "threeMade",
+                "freeMade",
+                "rebounds",
+                "assists",
+                "foulsCommitted",
+              ].includes(k),
+            )
+          : available;
+      }
+      function expandedLegend(pairs) {
+        const unique = [...new Map(pairs.map((p) => [p[0], p])).values()];
+        return `<section class="legend" aria-label="Legenda"><h3>Legenda</h3><dl>${unique.map(([s, n]) => `<div><dt>${s}</dt><dd>${n}</dd></div>`).join("")}</dl></section>`;
+      }
+      function metricsLegend(keys) {
+        return expandedLegend(keys.map((k) => PLAYER_METRICS[k]));
+      }
+      function distribute(total, active, id) {
+        const weights = active.map((i) => 10 - i),
+          sum = weights.reduce((a, b) => a + b, 0);
+        const portions = weights.map((w) => Math.floor((total * w) / sum));
+        let remaining = total - portions.reduce((a, b) => a + b, 0);
+        for (let i = 0; i < remaining; i++) portions[i % portions.length]++;
+        return portions[active.indexOf(id)] ?? 0;
+      }
+      function completePlayers(p) {
+        const games = played(p).filter(
+          (g) => state.phase === "all" || g.phase === state.phase,
+        );
+        const names = p.gender === "Feminino" ? namesF : namesM;
+        return names.map((name, id) => {
+          const values = Object.fromEntries(
+            Object.keys(PLAYER_METRICS).map((k) => [k, 0]),
+          );
+          let teamPoints = 0;
+          games.forEach((g, gi) => {
+            const active = names
+              .map((_, i) => i)
+              .filter((i) => gi >= (i >= 6 ? i % 3 : 0));
+            if (!active.includes(id)) return;
+            const part = (n) => distribute(n, active, id);
+            values.games++;
+            values.minutes += 200 / active.length;
+            const two = part(g.two),
+              three = part(g.three),
+              free = part(g.free),
+              fc = part(g.fc),
+              reb = part(g.reb),
+              ro = part(Math.floor(g.reb * 0.3));
+            values.twoMade += two;
+            values.threeMade += three;
+            values.freeMade += free;
+            values.points += two * 2 + three * 3 + free;
+            values.foulsCommitted += fc;
+            values.rebounds += reb;
+            values.offensiveRebounds += ro;
+            values.defensiveRebounds += reb - ro;
+            values.assists += part(g.ast);
+            values.fieldGoalsMade += two + three;
+            values.fieldGoalsAttempted += two + three + part(20);
+            values.threePointersMade += three;
+            values.threePointersAttempted += three + part(8);
+            values.freeThrowsMade += free;
+            values.freeThrowsAttempted += free + part(g.fta - g.free);
+            values.turnovers += part(13 + (gi % 4));
+            values.blocks += part(3 + (gi % 5));
+            values.steals += part(8 + (gi % 4));
+            values.foulsReceived += part(18);
+            values.plusMinus += Math.round(((g.pf - g.pa) * 5) / active.length);
+            values.fiveFouls += fc >= 5 ? 1 : 0;
+            values.technicalFouls += (gi + id) % 23 === 0 ? 1 : 0;
+            values.unsportsmanlikeFouls += (gi + id) % 29 === 0 ? 1 : 0;
+            teamPoints += g.pf;
+          });
+          values.pointsPerGame = values.games
+            ? values.points / values.games
+            : null;
+          values.pointsShare = teamPoints
+            ? (values.points / teamPoints) * 100
+            : null;
+          for (const [metric, made, attempts] of [
+            ["fieldGoalPercentage", "fieldGoalsMade", "fieldGoalsAttempted"],
+            [
+              "threePointPercentage",
+              "threePointersMade",
+              "threePointersAttempted",
+            ],
+            ["freeThrowPercentage", "freeThrowsMade", "freeThrowsAttempted"],
+          ])
+            values[metric] = values[attempts]
+              ? (values[made] / values[attempts]) * 100
+              : null;
+          values.efficiency =
+            values.points +
+            values.rebounds +
+            values.assists +
+            values.steals +
+            values.blocks -
+            (values.fieldGoalsAttempted - values.fieldGoalsMade) -
+            (values.freeThrowsAttempted - values.freeThrowsMade) -
+            values.turnovers;
+          return {
+            name,
+            id,
+            jersey: [0, 4, 7, 10, 12, 15, 23, "00"][id],
+            games: values.games,
+            points: values.pointsPerGame,
+            values,
+          };
+        });
+      }
+      function playerValue(a, key) {
+        const total = a.values[key];
+        if (!a.games && key !== "games") return null;
+        return total == null
+          ? null
+          : state.playerMode === "total" || fixedKeys.has(key)
+            ? total
+            : total / a.games;
+      }
+      function playerControls(p) {
+        const keys = visiblePlayerKeys(p);
+        return `<div class="tools player-tools"><label class="field grow"><span>Jogador</span><input type="search" name="buscaAtleta" autocomplete="off" placeholder="Buscar jogador…" data-search="rosterSearch" value="${esc(state.rosterSearch)}"></label>${select(
+          "Fase",
+          "phase",
+          [
+            ["all", "Todas"],
+            ["regular", "Classificatória"],
+            ["playoffs", "Eliminatórias"],
+          ],
+          state.phase,
+        )}<div class="player-display-controls"><details class="column-picker"><summary>Colunas <span class="count">${keys.length}</span></summary><div class="column-popover"><div class="column-actions"><button data-playerpreset="principais">Principais</button><button data-playerpreset="todas">Todas</button></div><div class="column-options">${sourcePlayerKeys(
+          p,
+        )
+          .map(
+            (k) =>
+              `<label><input type="checkbox" data-playercolumn="${k}"${keys.includes(k) ? " checked" : ""}> <span><strong>${PLAYER_METRICS[k][0]}</strong> · ${PLAYER_METRICS[k][1]}</span></label>`,
+          )
+          .join(
+            "",
+          )}</div></div></details><div class="segments" role="group" aria-label="Valores dos jogadores"><button data-playermode="total" aria-pressed="${state.playerMode === "total"}">Totais</button><button data-playermode="media" aria-pressed="${state.playerMode === "media"}">Por jogo</button></div></div></div>`;
+      }
+      function tableHeader(key, label) {
+        const active = state.playerSort === key;
+        return `<th scope="col"${key === "name" ? ' class="left player-name"' : ""} aria-sort="${active ? (state.playerDirection === "asc" ? "ascending" : "descending") : "none"}"><button class="sort-button" data-playersort="${key}" ${PLAYER_METRICS[key] ? `data-tooltip="${PLAYER_METRICS[key][1]}"` : ""} aria-label="Ordenar por ${PLAYER_METRICS[key]?.[1] || label}">${label}${active ? " " + (state.playerDirection === "asc" ? "↑" : "↓") : ""}</button></th>`;
+      }
+      function fixtureTeamGames(p) {
+        const base = played(p).map((g) => ({
+          id: g.id,
+          date: g.date,
+          time: g.time,
+          home: g.home ? TEAM : g.opponent,
+          away: g.home ? g.opponent : TEAM,
+          homePoints: g.home ? g.pf : g.pa,
+          awayPoints: g.home ? g.pa : g.pf,
+          phase: g.phase,
+        }));
+        if (!p.games) return base;
+        for (let a = 0; a < OPPONENTS.length; a++)
+          for (let b = a + 1; b < OPPONENTS.length; b++)
+            for (let leg = 0; leg < 2; leg++) {
+              const homePoints = 61 + ((a * 7 + b * 5 + p.seed + leg * 3) % 26);
+              let awayPoints = 58 + ((b * 9 + a * 3 + p.seed + leg * 5) % 27);
+              if (homePoints === awayPoints) awayPoints++;
+              base.push({
+                id: `${p.id}-other-${a}-${b}-${leg}`,
+                date: `${p.year}-10-${String(5 + a * 3 + b + leg).padStart(2, "0")}`,
+                time: "17:00",
+                home: OPPONENTS[a][0],
+                away: OPPONENTS[b][0],
+                homePoints,
+                awayPoints,
+                phase: leg && p.stage === "Semifinal" ? "playoffs" : "regular",
+              });
+            }
+        return base;
+      }
+      function disputeTeams(p, phase = "all") {
+        const games = fixtureTeamGames(p).filter(
+          (g) => phase === "all" || g.phase === phase,
+        );
+        const rows = [TEAM, ...OPPONENTS.map((o) => o[0])]
+          .map((name, index) => {
+            const related = games.filter(
+                (g) => g.home === name || g.away === name,
+              ),
+              j = related.length;
+            const pp = related.reduce(
+                (n, g) => n + (g.home === name ? g.homePoints : g.awayPoints),
+                0,
+              ),
+              pc = related.reduce(
+                (n, g) => n + (g.home === name ? g.awayPoints : g.homePoints),
+                0,
+              ),
+              v = related.filter(
+                (g) =>
+                  (g.home === name ? g.homePoints : g.awayPoints) >
+                  (g.home === name ? g.awayPoints : g.homePoints),
+              ).length;
+            return {
+              name,
+              index,
+              j,
+              v,
+              d: j - v,
+              pp,
+              pc,
+              sld: pp - pc,
+              aprov: j ? (v / j) * 100 : null,
+              games: related,
+            };
+          })
+          .sort(
+            (a, b) =>
+              b.v - a.v || b.sld - a.sld || a.name.localeCompare(b.name),
+          );
+        if (p.status === "completed" && p.finalPosition) {
+          const own = rows.find((r) => r.name === TEAM);
+          const index = rows.indexOf(own);
+          rows.splice(index, 1);
+          rows.splice(Math.min(p.finalPosition - 1, rows.length), 0, own);
+        }
+        return rows.map((r, i) => ({ ...r, position: r.j ? i + 1 : null }));
+      }
+      function fixtureSequence(row) {
+        const games = chronological(row.games).slice(0, 5).reverse();
+        return games.length
+          ? `<div class="recent-results">${games
+              .map((g, i) => {
+                const won =
+                  (g.home === row.name ? g.homePoints : g.awayPoints) >
+                  (g.home === row.name ? g.awayPoints : g.homePoints);
+                const abbr = (name) =>
+                  name === TEAM
+                    ? "SB"
+                    : OPPONENTS.find((o) => o[0] === name)?.[1] || name;
+                const tip = `${abbr(g.home)} ${g.homePoints} x ${g.awayPoints} ${abbr(g.away)} - ${date(g.date)}`;
+                return `<button class="result ${won ? "win" : "loss"} ${i === games.length - 1 ? "latest" : ""}" data-tooltip="${esc(tip)}" aria-label="${won ? "Vitória" : "Derrota"}: ${esc(tip)}${i === games.length - 1 ? ", resultado mais recente" : ""}"><span aria-hidden="true">${won ? "✓" : "×"}</span></button>`;
+              })
+              .join("")}</div>`
+          : "—";
+      }
+      function fullStandings(p) {
+        const rows = disputeTeams(p);
+        return `<div class="scroll" role="region" aria-label="Classificação completa da disputa" tabindex="0"><table class="full-table standings-table"><thead><tr><th scope="col">Pos.</th><th scope="col" class="left team-name">Equipe</th>${["J", "V", "D", "Aprov.", "PP", "PC", "SLD"].map((m) => `<th scope="col">${m}</th>`).join("")}<th scope="col" class="center">Últimos jogos</th></tr></thead><tbody>${rows.map((r) => `<tr class="${r.name === TEAM ? "selected-team" : ""}"${r.name === TEAM ? ' aria-current="true"' : ""}><td>${r.position ?? "—"}</td><th scope="row" class="left team-name">${r.name}${r.name === TEAM ? '<span class="sr"> · equipe deste perfil</span>' : ""}</th><td>${r.j}</td><td>${r.v}</td><td>${r.d}</td><td>${r.aprov == null ? "—" : fmt(r.aprov) + "%"}</td><td>${r.j ? r.pp : "—"}</td><td>${r.j ? r.pc : "—"}</td><td>${r.j ? r.sld : "—"}</td><td>${fixtureSequence(r)}</td></tr>`).join("")}</tbody></table></div>`;
+      }
+      function fullCollectiveTable(p) {
+        const rows = disputeTeams(p, state.phase);
+        const keys =
+          p.seed % 3 === 2
+            ? [
+                "J",
+                "PTS",
+                "AC",
+                "AT",
+                "AP",
+                "3PC",
+                "3PT",
+                "3P%",
+                "LLC",
+                "LLT",
+                "LL%",
+                "REB",
+                "AST",
+                "BR",
+                "TO",
+                "ER",
+                "FC",
+                "PC",
+                "SLD",
+              ]
+            : [
+                "J",
+                "PTS",
+                "2P",
+                "3P",
+                "FC",
+                "FR",
+                "LLT",
+                "LLC",
+                "LL%",
+                "T",
+                "U",
+                "GD",
+                "PC",
+                "SLD",
+              ];
+        return `<div class="scroll" role="region" aria-label="Estatísticas coletivas de todas as equipes" tabindex="0"><table class="full-table collective-full"><thead><tr><th scope="col">Pos.</th><th scope="col" class="left team-name">Equipe</th>${keys.map((k) => `<th scope="col">${k}</th>`).join("")}</tr></thead><tbody>${[
+          ...rows,
+        ]
+          .sort(
+            (a, b) =>
+              (state.statsMode === "total"
+                ? b.pp - a.pp
+                : (b.j ? b.pp / b.j : -1) - (a.j ? a.pp / a.j : -1)) ||
+              a.name.localeCompare(b.name),
+          )
+          .map((r, i) => {
+            let metrics;
+            if (r.name === TEAM) {
+              const gs = played(p).filter(
+                (g) => state.phase === "all" || g.phase === state.phase,
+              );
+              const sum = (k) => gs.reduce((n, g) => n + g[k], 0);
+              metrics = {
+                J: gs.length,
+                PTS: sum("pf"),
+                "2P": sum("two"),
+                "3P": sum("three"),
+                FC: sum("fc"),
+                FR: sum("fc") + r.j,
+                LLT: sum("fta"),
+                LLC: sum("free"),
+                T: r.j ? 1 : 0,
+                U: 0,
+                GD: 0,
+                PC: r.pc,
+                SLD: r.sld,
+                REB: sum("reb"),
+                AST: sum("ast"),
+                BR: r.j * 8,
+                TO: r.j * 4,
+                ER: r.j * 13,
+              };
+            } else {
+              const threes = Math.floor((r.pp * 0.27) / 3);
+              let free = Math.floor(r.pp * 0.17);
+              if ((r.pp - threes * 3 - free) % 2) free++;
+              const twos = (r.pp - threes * 3 - free) / 2;
+              metrics = {
+                J: r.j,
+                PTS: r.pp,
+                "2P": twos,
+                "3P": threes,
+                FC: r.j * 18,
+                FR: r.j * 17,
+                LLT: free + Math.round(r.j * 5),
+                LLC: free,
+                T: r.j ? 1 : 0,
+                U: 0,
+                GD: 0,
+                PC: r.pc,
+                SLD: r.sld,
+                REB: r.j * (31 + r.index),
+                AST: r.j * (12 + r.index),
+                BR: r.j * 7,
+                TO: r.j * 3,
+                ER: r.j * 12,
+              };
+            }
+            metrics["LL%"] = metrics.LLT
+              ? (metrics.LLC / metrics.LLT) * 100
+              : null;
+            metrics.AC = metrics["2P"] + metrics["3P"];
+            metrics.AT = metrics.AC + r.j * 20;
+            metrics.AP = metrics.AT ? (metrics.AC / metrics.AT) * 100 : null;
+            metrics["3PC"] = metrics["3P"];
+            metrics["3PT"] = metrics["3P"] + r.j * 8;
+            metrics["3P%"] = metrics["3PT"]
+              ? (metrics["3PC"] / metrics["3PT"]) * 100
+              : null;
+            return `<tr class="${r.name === TEAM ? "selected-team" : ""}"><td>${r.j ? i + 1 : "—"}</td><th scope="row" class="left team-name">${r.name}</th>${keys
+              .map((k) => {
+                let v = metrics[k];
+                if (!r.j && k !== "J") v = null;
+                else if (
+                  state.statsMode !== "total" &&
+                  !["J", "AP", "3P%", "LL%"].includes(k)
+                )
+                  v = v / r.j;
+                return `<td>${fmt(v)}${v != null && ["AP", "3P%", "LL%"].includes(k) ? "%" : ""}</td>`;
+              })
+              .join("")}</tr>`;
+          })
+          .join("")}</tbody></table></div>`;
+      }
+      function overviewLegend(p) {
+        const pairs = [
+          ["Pos.", "Posição"],
+          ["J", "Jogos"],
+          ["V", "Vitórias"],
+          ["D", "Derrotas"],
+          ["Aprov.", "Aproveitamento"],
+          ["PP", "Pontos a favor"],
+          ["PC", "Pontos contra"],
+          ["SLD", "Saldo de pontos"],
+          ["PTS", "Pontos"],
+          ["2P", "Cestas de dois"],
+          ["3P", "Cestas de três"],
+          ["FC", "Faltas cometidas"],
+          ["FR", "Faltas recebidas"],
+          ["LLT", "Lances livres tentados"],
+          ["LLC", "Lances livres convertidos"],
+          ["LL%", "Aproveitamento de lances livres"],
+          ["T", "Faltas técnicas"],
+          ["U", "Faltas antidesportivas"],
+          ["GD", "Desqualificações"],
+        ];
+        if (p.seed % 3 === 2)
+          return expandedLegend([
+            ...pairs.filter(
+              ([k]) => !["2P", "3P", "FR", "T", "U", "GD"].includes(k),
+            ),
+            ...[
+              "fieldGoalsMade",
+              "fieldGoalsAttempted",
+              "fieldGoalPercentage",
+              "threePointersMade",
+              "threePointersAttempted",
+              "threePointPercentage",
+              "rebounds",
+              "assists",
+              "steals",
+              "blocks",
+              "turnovers",
+            ].map((k) => PLAYER_METRICS[k]),
+          ]);
+        return expandedLegend(pairs);
+      }
+
+      let state = {};
+      function readState() {
+        const q = new URLSearchParams(location.hash.slice(1));
+        const mode = q.get("perfil") === "disputa" ? "disputa" : "geral";
+        const p = selectedP(q.get("inscricao")) || PARTICIPATIONS[0];
+        const tabs =
+          mode === "geral"
+            ? ["visao-geral", "competicoes", "elencos", "jogos", "estatisticas"]
+            : ["visao-geral", "jogadores", "jogos"];
+        return {
+          mode,
+          pid: p.id,
+          tab: tabs.includes(q.get("aba")) ? q.get("aba") : "visao-geral",
+          year: YEARS.includes(Number(q.get("ano")))
+            ? Number(q.get("ano"))
+            : INITIAL_YEAR,
+          historyYear: q.get("anoHistorico") || "todos",
+          filterCompetition: q.get("competicao") || "",
+          filterCategory: q.get("categoria") || "",
+          filterGender: q.get("naipe") || "",
+          gameYear: q.get("anoJogos") || String(INITIAL_YEAR),
+          gameKind: q.get("tipoJogos") || "todos",
+          opponent: q.get("adversario") || "",
+          roster: q.get("elenco") || "",
+          rosterYear: q.get("anoElenco") || String(INITIAL_YEAR),
+          rosterSearch: q.get("buscaAtleta") || "",
+          statsYear: q.get("anoEstatisticas") || String(INITIAL_YEAR),
+          statsCategory: q.get("categoriaEstatisticas") || "",
+          statsGender: q.get("naipeEstatisticas") || "",
+          statsCompetition: q.get("competicaoEstatisticas") || "",
+          statsMode: q.get("valores") === "total" ? "total" : "media",
+          phase: q.get("fase") || "all",
+          honorCategory: q.get("categoriaConquistas") || "",
+          honorGender: q.get("naipeConquistas") || "",
+          game: q.get("jogo") || "",
+          athlete: q.get("atleta") || "",
+          playerColumns: q.has("colunasJogadores")
+            ? q.get("colunasJogadores")
+            : null,
+          playerPreset: q.get("colunas") || "todas",
+          playerMode: q.get("valoresJogadores") === "total" ? "total" : "media",
+          playerSort: q.get("ordemJogadores") || "points",
+          playerDirection: q.get("direcaoJogadores") === "asc" ? "asc" : "desc",
+          sort: q.get("ordem") || "ano",
+          direction: q.get("direcao") === "asc" ? "asc" : "desc",
+        };
+      }
+      const keys = {
+        playerColumns: "colunasJogadores",
+        playerPreset: "colunas",
+        playerMode: "valoresJogadores",
+        playerSort: "ordemJogadores",
+        playerDirection: "direcaoJogadores",
+        mode: "perfil",
+        pid: "inscricao",
+        tab: "aba",
+        year: "ano",
+        historyYear: "anoHistorico",
+        filterCompetition: "competicao",
+        filterCategory: "categoria",
+        filterGender: "naipe",
+        gameYear: "anoJogos",
+        gameKind: "tipoJogos",
+        opponent: "adversario",
+        roster: "elenco",
+        rosterYear: "anoElenco",
+        rosterSearch: "buscaAtleta",
+        statsYear: "anoEstatisticas",
+        statsCategory: "categoriaEstatisticas",
+        statsGender: "naipeEstatisticas",
+        statsCompetition: "competicaoEstatisticas",
+        statsMode: "valores",
+        phase: "fase",
+        honorCategory: "categoriaConquistas",
+        honorGender: "naipeConquistas",
+        game: "jogo",
+        athlete: "atleta",
+        sort: "ordem",
+        direction: "direcao",
+      };
+      function href(patch = {}) {
+        const next = { ...state, ...patch };
+        const q = new URLSearchParams();
+        for (const [key, param] of Object.entries(keys))
+          if (next[key] !== "" && next[key] != null) q.set(param, next[key]);
+        return "#" + q;
+      }
+      function navigate(patch, replace = false) {
+        const url = href(patch);
+        if (replace) {
+          window.history.replaceState(null, "", url);
+          render();
+        } else if (location.hash !== url) {
+          location.hash = url;
+        } else render();
+      }
+      function toDispute(p) {
+        return href({
+          mode: "disputa",
+          pid: p.id,
+          tab: "visao-geral",
+          phase: "all",
+          roster: "",
+          game: "",
+          athlete: "",
+        });
+      }
+      function status(p) {
+        return `<span class="status ${p.status}">${LABELS[p.status]}</span>`;
+      }
+      function options(values, value, allLabel) {
+        return (
+          (allLabel ? `<option value="">${allLabel}</option>` : "") +
+          values
+            .map((v) => {
+              const [val, label] = Array.isArray(v) ? v : [v, v];
+              return `<option value="${esc(val)}"${String(val) === String(value) ? " selected" : ""}>${esc(label)}</option>`;
+            })
+            .join("")
+        );
+      }
+      function select(label, key, values, value, allLabel, cls = "") {
+        return `<label class="field ${cls}"><span>${label}</span><select name="${keys[key]}" data-filter="${key}">${options(values, value, allLabel)}</select></label>`;
+      }
+      function yearControl() {
+        return `<label class="head-year">Ano <select name="ano" aria-label="Ano das campanhas e últimos jogos" data-filter="year">${options(YEARS, state.year)}</select></label>`;
+      }
+      function sequence(p) {
+        const gs = chronological(played(p)).slice(0, 5).reverse();
+        if (!gs.length) return '<span class="muted">—</span>';
+        return `<div class="recent-results">${gs
+          .map((g, i) => {
+            const matchup = g.home
+              ? `SB ${g.pf} x ${g.pa} ${g.abbr}`
+              : `${g.abbr} ${g.pa} x ${g.pf} SB`;
+            const tip = matchup + (g.date ? " - " + date(g.date) : "");
+            return `<button class="result ${g.won ? "win" : "loss"} ${i === gs.length - 1 ? "latest" : ""}" data-tooltip="${esc(tip)}" aria-label="${esc((g.won ? "Vitória" : "Derrota") + ": " + tip + (i === gs.length - 1 ? ", resultado mais recente" : ""))}"><span aria-hidden="true">${g.won ? "✓" : "×"}</span></button>`;
+          })
+          .join("")}</div>`;
+      }
+      function position(p) {
+        const current = disputeTeams(p).find((r) => r.name === TEAM)?.position;
+        return p.finalPosition
+          ? `<span class="position">${p.finalPosition}º lugar</span><span class="stage">Colocação final</span>`
+          : p.status === "cancelled"
+            ? '<span class="muted">—</span>'
+            : p.position
+              ? `<span class="position">${current}º</span><span class="stage">${esc(p.group)}</span>`
+              : p.stage
+                ? `<span class="position" style="font-size:13px">${esc(p.stage)}</span>`
+                : '<span class="muted">—</span>';
+      }
+      function campaignTable(ps) {
+        if (!ps.length) return empty("Nenhuma participação neste recorte.");
+        return `<div class="scroll" role="region" aria-label="Campanhas por disputa" tabindex="0"><table class="campaign-table"><thead><tr><th class="left">Disputa</th><th class="left">Situação</th><th class="center">Colocação / etapa</th>${["J", "V", "D", "Aprov.", "PP", "PC", "SLD"].map((m) => `<th>${m}</th>`).join("")}<th class="center">Últimos jogos</th></tr></thead><tbody>${ps
+          .map((p) => {
+            const c = campaign(p);
+            return `<tr data-participation="${p.id}"><td class="name-cell"><a href="${toDispute(p)}">${esc(p.competition)}</a><span class="cell-sub">${esc(miniContext(p))}${state.tab === "competicoes" ? " · " + p.year : ""}</span></td><td class="left">${status(p)}</td><td class="center">${position(p)}</td><td>${c.j}</td><td>${c.v}</td><td>${c.d}</td><td>${fmt(c.aprov)}${c.aprov == null ? "" : "%"}</td><td>${c.j ? fmt(c.pp) : "—"}</td><td>${c.j ? fmt(c.pc) : "—"}</td><td>${c.j ? fmt(c.sld) : "—"}</td><td>${sequence(p)}</td></tr>`;
+          })
+          .join("")}</tbody></table></div>`;
+      }
+      function empty(title, detail = "") {
+        return `<div class="empty"><strong>${title}</strong>${detail ? `<p>${detail}</p>` : ""}</div>`;
+      }
+      function gamesTable(gs, label = "Jogos") {
+        if (!gs.length)
+          return empty(
+            "Nenhum jogo encontrado.",
+            "Escolha outro ano ou ajuste os filtros.",
+          );
+        return `<div class="scroll" role="region" aria-label="${label}" tabindex="0"><table class="recent-table"><thead><tr><th scope="col">Data</th><th scope="col">${label === "Últimos jogos" ? "Últimos jogos" : "Confronto"}</th></tr></thead><tbody>${gs
+          .map((g) => {
+            const p = selectedP(g.pid);
+            return `<tr data-game="${g.id}"><td><span class="date-day">${date(g.date)}</span><span class="date-year">${g.time || "A definir"}</span></td><td><a href="${href({ game: g.id })}" class="match-link"><span class="matchline">${g.home ? `<span>${TEAM}</span><span class="matchscore">${fmt(g.pf)} × ${fmt(g.pa)}</span><span class="opp">${esc(g.opponent)}</span>` : `<span class="opp">${esc(g.opponent)}</span><span class="matchscore">${fmt(g.pa)} × ${fmt(g.pf)}</span><span>${TEAM}</span>`}</span><span class="match-context">${esc(p.competition)} · ${p.year} · ${p.category} · ${p.gender}${p.division ? " · " + p.division : ""}${!g.played ? " · Agendado" : ""}</span></a></td></tr>`;
+          })
+          .join("")}</tbody></table></div>`;
+      }
+      function legend(stats = false) {
+        return expandedLegend(
+          stats
+            ? [
+                ["J", "Jogos"],
+                ["PTS", "Pontos"],
+                ["2P", "Cestas de dois"],
+                ["3P", "Cestas de três"],
+                ["LL", "Lances livres"],
+                ["LL%", "Aproveitamento de lances livres"],
+                ["REB", "Rebotes"],
+                ["AST", "Assistências"],
+                ["FC", "Faltas cometidas"],
+              ]
+            : [
+                ["J", "Jogos"],
+                ["V", "Vitórias"],
+                ["D", "Derrotas"],
+                ["Aprov.", "Aproveitamento"],
+                ["PP", "Pontos a favor"],
+                ["PC", "Pontos contra"],
+                ["SLD", "Saldo de pontos"],
+              ],
+        );
+      }
+      function overview() {
+        const p = selectedP(state.pid);
+        if (state.mode === "disputa") return disputeOverview(p);
+        const ps = PARTICIPATIONS.filter((p) => p.year === state.year);
+        const recent = chronological(
+          GAMES.filter((g) => g.played && selectedP(g.pid).year === state.year),
+        ).slice(0, 5);
+        return `<section class="section"><div class="section-head"><div><h2>Campanhas</h2><p class="subtitle">${ps.length} disputas em ${state.year}</p></div>${yearControl()}</div>${campaignTable(ps)}</section><section class="section"><div class="section-head"><h2>Últimos jogos <span class="count">· ${state.year}</span></h2><a class="text-link" href="${href({ tab: "jogos", gameYear: String(state.year) })}">Ver todos ${icon("arrow", 15)}</a></div>${gamesTable(recent, "Últimos jogos")}</section>${legend()}`;
+      }
+      function collectiveTable(ps, { single = false } = {}) {
+        const metrics = [
+          "J",
+          "PTS",
+          "2P",
+          "3P",
+          "LL",
+          "LL%",
+          "REB",
+          "AST",
+          "FC",
+        ];
+        return `<div class="scroll" role="region" aria-label="Estatísticas coletivas" tabindex="0"><table><thead><tr>${single ? "" : '<th class="left">Participação</th>'}${metrics.map((m) => `<th>${m}</th>`).join("")}</tr></thead><tbody>${ps
+          .map((p) => {
+            let gs = played(p).filter(
+              (g) => state.phase === "all" || g.phase === state.phase,
+            );
+            const total = (key) => gs.reduce((n, g) => n + g[key], 0),
+              value = (key) =>
+                gs.length
+                  ? fmt(
+                      total(key) /
+                        (state.statsMode === "total" ? 1 : gs.length),
+                    )
+                  : "—";
+            const isSheet = p.seed % 3 !== 2;
+            return `<tr>${single ? "" : `<td class="name-cell"><a href="${toDispute(p)}">${esc(p.competition)}</a><span class="cell-sub">${p.year} · ${esc(miniContext(p))}</span></td>`}<td>${gs.length}</td><td>${value("pf")}</td><td>${value("two")}</td><td>${value("three")}</td><td>${value("free")}</td><td>${gs.length ? fmt((total("free") / total("fta")) * 100) + "%" : "—"}</td><td>${isSheet ? "—" : value("reb")}</td><td>${isSheet ? "—" : value("ast")}</td><td>${value("fc")}</td></tr>`;
+          })
+          .join("")}</tbody></table></div>`;
+      }
+      function valueControl() {
+        return `<div class="segments" role="group" aria-label="Valores estatísticos"><button data-mode="media" aria-pressed="${state.statsMode === "media"}">Por jogo</button><button data-mode="total" aria-pressed="${state.statsMode === "total"}">Totais</button></div>`;
+      }
+      function disputeOverview(p) {
+        return `<section class="section"><div class="section-head"><div><h2>Classificação</h2><p class="subtitle">${p.group || p.stage || "Classificação geral"}</p></div>${status(p)}</div>${fullStandings(p)}</section><section class="section"><div class="section-head"><h2>Estatísticas coletivas</h2>${valueControl()}</div><div class="tools">${select(
+          "Fase",
+          "phase",
+          [
+            ["all", "Todas"],
+            ["regular", "Classificatória"],
+            ["playoffs", "Eliminatórias"],
+          ],
+          state.phase,
+        )}</div>${fullCollectiveTable(p)}</section><section class="section"><div class="section-head"><h2>Últimos jogos</h2><a class="text-link" href="${href({ tab: "jogos" })}">Ver todos ${icon("arrow", 15)}</a></div>${gamesTable(chronological(played(p)).slice(0, 5), "Últimos jogos")}</section>${overviewLegend(p)}`;
+      }
+      const competitions = [
+        ...new Set(PARTICIPATIONS.map((p) => p.competition)),
+      ];
+      const categories = ["Sub-13", "Sub-15", "Sub-17", "Adulto"];
+      const genders = ["Masculino", "Feminino"];
+      function competitionHistory() {
+        const ps = PARTICIPATIONS.filter(
+          (p) =>
+            (state.historyYear === "todos" ||
+              String(p.year) === state.historyYear) &&
+            (!state.filterCompetition ||
+              p.competition === state.filterCompetition) &&
+            (!state.filterCategory || p.category === state.filterCategory) &&
+            (!state.filterGender || p.gender === state.filterGender),
+        ).sort(
+          (a, b) =>
+            b.year - a.year ||
+            a.competition.localeCompare(b.competition, "pt-BR"),
+        );
+        return `<div class="section-head"><h2>Participações em competições</h2><span class="count">${ps.length} participações</span></div><div class="tools">${select("Ano", "historyYear", [["todos", "Todos"], ...YEARS], state.historyYear)}${select("Competição", "filterCompetition", competitions, state.filterCompetition, "Todas", "wide")}${select("Categoria", "filterCategory", categories, state.filterCategory, "Todas")}${select("Naipe", "filterGender", genders, state.filterGender, "Todos")}</div>${campaignTable(ps)}${legend()}`;
+      }
+      function games() {
+        const ps =
+          state.mode === "disputa" ? [selectedP(state.pid)] : PARTICIPATIONS;
+        let gs = GAMES.filter(
+          (g) =>
+            ps.some((p) => p.id === g.pid) &&
+            (state.mode === "disputa" ||
+              state.gameYear === "todos" ||
+              String(selectedP(g.pid).year) === state.gameYear) &&
+            (state.mode === "disputa" ||
+              !state.filterCategory ||
+              selectedP(g.pid).category === state.filterCategory) &&
+            (state.mode === "disputa" ||
+              !state.filterGender ||
+              selectedP(g.pid).gender === state.filterGender) &&
+            (state.mode === "disputa" ||
+              !state.filterCompetition ||
+              selectedP(g.pid).competition === state.filterCompetition) &&
+            (!state.opponent ||
+              normalize(g.opponent).includes(normalize(state.opponent))) &&
+            (state.gameKind === "todos" ||
+              (state.gameKind === "resultados" ? g.played : !g.played)),
+        );
+        return `<div class="section-head"><h2>Jogos da equipe</h2><span class="count">${gs.length} jogos</span></div><div class="tools">${state.mode === "geral" ? select("Ano", "gameYear", [["todos", "Todos"], ...YEARS], state.gameYear) + select("Competição", "filterCompetition", competitions, state.filterCompetition, "Todas", "wide") + select("Categoria", "filterCategory", categories, state.filterCategory, "Todas") + select("Naipe", "filterGender", genders, state.filterGender, "Todos") : ""}${select(
+          "Exibir",
+          "gameKind",
+          [
+            ["todos", "Resultados e agenda"],
+            ["resultados", "Resultados"],
+            ["agenda", "Agenda"],
+          ],
+          state.gameKind,
+        )}<label class="field grow"><span>Adversário</span><input name="adversario" type="search" autocomplete="off" placeholder="Buscar adversário…" data-search="opponent" value="${esc(state.opponent)}"></label></div>${gamesTable(chronological(gs))}`;
+      }
+      function statistics() {
+        const ps = PARTICIPATIONS.filter(
+          (p) =>
+            (state.statsYear === "todos" ||
+              String(p.year) === state.statsYear) &&
+            (!state.statsCategory || p.category === state.statsCategory) &&
+            (!state.statsGender || p.gender === state.statsGender) &&
+            (!state.statsCompetition ||
+              p.competition === state.statsCompetition),
+        );
+        return `<div class="section-head"><h2>Estatísticas por participação</h2>${valueControl()}</div><div class="tools">${select("Ano", "statsYear", [["todos", "Todos"], ...YEARS], state.statsYear)}${select("Competição", "statsCompetition", competitions, state.statsCompetition, "Todas", "wide")}${select("Categoria", "statsCategory", categories, state.statsCategory, "Todas")}${select("Naipe", "statsGender", genders, state.statsGender, "Todos")}${select(
+          "Fase",
+          "phase",
+          [
+            ["all", "Todas"],
+            ["regular", "Classificatória"],
+            ["playoffs", "Eliminatórias"],
+          ],
+          state.phase,
+        )}</div>${ps.length ? collectiveTable(ps) : empty("Nenhuma participação neste recorte.")}${legend(true)}`;
+      }
+      const namesM = [
+        "Lucas Almeida",
+        "Pedro Henrique",
+        "Gabriel Santos",
+        "João Vitor",
+        "Rafael Costa",
+        "Miguel Oliveira",
+        "Davi Martins",
+        "Arthur Lima",
+      ];
+      const namesF = [
+        "Ana Luiza",
+        "Mariana Santos",
+        "Júlia Ferreira",
+        "Beatriz Costa",
+        "Laura Almeida",
+        "Isabela Lima",
+        "Sofia Martins",
+        "Clara Oliveira",
+      ];
+      function rosterPlayers(p) {
+        return completePlayers(p).filter(
+          (a) =>
+            !state.rosterSearch ||
+            normalize(a.name).includes(normalize(state.rosterSearch)),
+        );
+      }
+      function playerTable(p) {
+        if (!p.games) return empty("Nenhum participante publicado.");
+        const keys = visiblePlayerKeys(p);
+        const all = completePlayers(p).sort((a, b) => {
+          const av =
+              state.playerSort === "name"
+                ? a.name
+                : playerValue(a, state.playerSort),
+            bv =
+              state.playerSort === "name"
+                ? b.name
+                : playerValue(b, state.playerSort);
+          return (
+            (typeof av === "string"
+              ? av.localeCompare(bv, "pt-BR")
+              : (av ?? -Infinity) - (bv ?? -Infinity)) *
+              (state.playerDirection === "asc" ? 1 : -1) || a.id - b.id
+          );
+        });
+        let rank = 0,
+          last;
+        const ranked = all.map((a, i) => {
+          const value =
+            state.playerSort === "name"
+              ? null
+              : playerValue(a, state.playerSort);
+          if (value !== last) {
+            rank = i + 1;
+            last = value;
+          }
+          return { ...a, rank: value == null ? "—" : rank };
+        });
+        const rows = ranked.filter(
+          (a) =>
+            !state.rosterSearch ||
+            normalize(a.name).includes(normalize(state.rosterSearch)),
+        );
+        return rows.length
+          ? `<div class="scroll" role="region" aria-label="Estatísticas completas dos jogadores" tabindex="0"><table class="full-table player-full"><thead><tr><th scope="col">Pos.</th>${tableHeader("name", p.gender === "Feminino" ? "Jogadora" : "Jogador")}<th scope="col">#</th>${keys.map((k) => tableHeader(k, PLAYER_METRICS[k][0])).join("")}</tr></thead><tbody>${rows.map((a) => `<tr><td>${a.rank}</td><td class="left player-name"><a href="${href({ athlete: String(a.id) })}">${a.name}</a></td><td>${a.jersey}</td>${keys.map((k) => `<td>${fmt(playerValue(a, k))}${playerValue(a, k) != null && percentKeys.has(k) ? "%" : ""}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`
+          : empty("Nenhum jogador encontrado.");
+      }
+      function roster() {
+        const ps = PARTICIPATIONS.filter(
+          (p) => String(p.year) === state.rosterYear,
+        );
+        let p = selectedP(state.roster) || ps[0];
+        const contextual = state.mode === "disputa";
+        if (contextual) p = selectedP(state.pid);
+        return `<div class="section-head"><h2>${contextual ? "Jogadores na disputa" : "Elencos por participação"}</h2>${contextual ? "" : select("Ano", "rosterYear", YEARS, state.rosterYear)}</div>${contextual ? `${playerControls(p)}${playerTable(p)}` : `<div class="roster-layout ${state.roster ? "selected" : ""}"><nav class="roster-list" aria-label="Participações para consultar jogadores">${ps.map((r) => `<a class="roster-item ${r.id === p.id ? "active" : ""}" ${r.id === p.id ? 'aria-current="true"' : ""} href="${href({ roster: r.id, rosterSearch: "" })}"><strong>${r.competition}</strong><small>${r.category} · ${r.gender}</small><small>${r.division ? r.division + " · " : ""}${r.games ? "Participantes publicados" : "Sem participantes"}</small></a>`).join("")}</nav><section class="roster-body"><a class="text-link mobile-roster-back" href="${href({ roster: "" })}">${icon("back", 15)} Voltar às participações</a><h3>${p.competition}</h3><p class="roster-note">${context(p)} · Participantes publicados</p>${playerControls(p)}${playerTable(p)}<div class="link-footer"><a class="text-link" href="${toDispute(p)}">Ver equipe na disputa ${icon("arrow", 15)}</a></div></section></div>`}${metricsLegend(visiblePlayerKeys(p))}`;
+      }
+      function honors() {
+        const contextual = state.mode === "disputa",
+          p = selectedP(state.pid);
+        const cat = contextual ? p.category : state.honorCategory,
+          gender = contextual ? p.gender : state.honorGender;
+        const awards = PARTICIPATIONS.filter(
+          (a) =>
+            a.finalPosition &&
+            a.finalPosition <= 3 &&
+            (!cat || a.category === cat) &&
+            (!gender || a.gender === gender),
+        );
+        return `<aside class="honors" aria-labelledby="honors-title"><div class="honors-title">${icon("trophy", 20)}<h2 id="honors-title">Conquistas</h2></div>${contextual ? `<div class="honors-context">${p.category} · ${p.gender}<small>Histórico em todas as competições</small></div>` : `<div class="tools">${select("Categoria", "honorCategory", categories, state.honorCategory, "Todas")}${select("Naipe", "honorGender", genders, state.honorGender, "Todos")}</div>`}${
+          awards.length
+            ? [1, 2, 3]
+                .map((pos, idx) => {
+                  const items = awards
+                    .filter((a) => a.finalPosition === pos)
+                    .sort((a, b) => b.year - a.year);
+                  if (!items.length) return "";
+                  const comps = [...new Set(items.map((a) => a.competition))];
+                  return `<section class="award-section ${idx === 0 ? "first" : ""}"><div class="medal ${["", "gold", "silver", "bronze"][pos]}">${icon(pos === 1 ? "trophy" : "medal", 21)}</div><div class="award"><h3 class="award-label">${["", "Campeão", "Vice-campeão", "3º lugar"][pos]}<span class="award-total">${items.length}×</span></h3>${comps
+                    .map((c) => {
+                      const editions = items.filter((a) => a.competition === c);
+                      return `<details><summary>${c} <span class="number">(${editions.length > 1 ? editions.length + "×" : editions[0].year})</span></summary><ul>${editions.map((a) => `<li><a href="${toDispute(a)}">${a.year} · ${a.category} · ${a.gender}${a.division ? " · " + a.division : ""}</a></li>`).join("")}</ul></details>`;
+                    })
+                    .join("")}</div></section>`;
+                })
+                .join("")
+            : empty("Nenhum pódio neste recorte.")
+        }<div class="award-footer">${awards.length} ${awards.length === 1 ? "conquista" : "conquistas"}${contextual ? " neste recorte" : " no histórico"}</div></aside>`;
+      }
+      function render() {
+        const focus = document.activeElement?.dataset.filter;
+        const focusedTab = document.activeElement?.dataset.tab;
+        const focusedSort = document.activeElement?.dataset.playersort;
+        state = readState();
+        const p = selectedP(state.pid),
+          contextual = state.mode === "disputa";
+        const tabs = contextual
+          ? [
+              ["visao-geral", "Visão geral"],
+              ["jogadores", "Jogadores"],
+              ["jogos", "Jogos"],
+            ]
+          : [
+              ["visao-geral", "Visão geral"],
+              ["competicoes", "Competições"],
+              ["elencos", "Elencos"],
+              ["jogos", "Jogos"],
+              ["estatisticas", "Estatísticas"],
+            ];
+        const body =
+          state.tab === "visao-geral"
+            ? overview()
+            : state.tab === "competicoes"
+              ? competitionHistory()
+              : state.tab === "estatisticas"
+                ? statistics()
+                : state.tab === "jogos"
+                  ? games()
+                  : roster();
+        document.title =
+          TEAM +
+          (contextual
+            ? " · " + p.competition + " " + p.year
+            : " · Perfil da equipe");
+        document.querySelector("#main").innerHTML =
+          `<nav class="breadcrumb" aria-label="Localização"><a href="${href({ mode: "geral", tab: "visao-geral", game: "", athlete: "" })}">Equipes</a><span class="sep">/</span>${contextual ? `<a href="${href({ mode: "geral", tab: "visao-geral" })}">${TEAM}</a><span class="sep">/</span><span>${p.competition} ${p.year} · ${p.category}</span>` : `<span>${TEAM}</span>`}</nav><div class="layout"><header class="identity"><div class="identity-top">${crest}<div class="identity-name"><p class="eyebrow">${contextual ? "Equipe na disputa" : "Perfil da equipe"}</p><h1>${TEAM}</h1><p class="sub">Associação Atlética da Serra</p><div class="meta">${icon("pin", 13)} Serra, ES <span aria-hidden="true">·</span> <span class="scope-tag">${contextual ? `${p.category} · ${p.gender}` : "Todas as categorias"}</span></div></div></div>${contextual ? `<div class="context"><div class="context-label">${p.competition} · ${p.year}<small>${miniContext(p)}</small></div><a class="text-link" href="${href({ mode: "geral", tab: "visao-geral" })}">${icon("back", 14)} Ver perfil geral</a></div>` : ""}</header>${honors()}<div class="workspace"><div class="tabs" role="tablist" aria-label="Seções do perfil">${tabs.map(([id, label]) => `<button class="tab" id="tab-${id}" role="tab" aria-selected="${state.tab === id}" aria-controls="panel" tabindex="${state.tab === id ? 0 : -1}" data-tab="${id}">${label}</button>`).join("")}</div><div id="panel" class="panel" role="tabpanel" aria-labelledby="tab-${state.tab}" tabindex="0">${body}</div></div></div>`;
+        if (focus) document.querySelector(`[data-filter="${focus}"]`)?.focus();
+        if (focusedTab)
+          document.querySelector(`[data-tab="${state.tab}"]`)?.focus();
+        if (focusedSort)
+          document.querySelector(`[data-playersort="${focusedSort}"]`)?.focus();
+        document.getElementById("announcement").textContent =
+          `${contextual ? p.competition + " " + p.category : "Perfil geral"}. ${tabs.find((t) => t[0] === state.tab)[1]}.`;
+        document.getElementById("tooltip").hidden = true;
+        renderDialog();
+      }
+      function renderDialog() {
+        const dialog = document.getElementById("detail"),
+          g = GAMES.find((g) => g.id === state.game);
+        let content = "";
+        if (g) {
+          const p = selectedP(g.pid);
+          content = `<div class="dialog-head"><h2 id="dialog-title">${g.played ? "Resultado do jogo" : "Jogo agendado"}</h2><button data-close aria-label="Fechar detalhe">×</button></div><div class="dialog-body"><p class="dialog-caption">${p.competition} · ${context(p)}</p><div class="dialog-score"><strong>${g.home ? TEAM : g.opponent}</strong><div class="big-score">${g.home ? fmt(g.pf) + " × " + fmt(g.pa) : fmt(g.pa) + " × " + fmt(g.pf)}</div><strong>${g.home ? g.opponent : TEAM}</strong></div><p class="dialog-caption">${date(g.date, true)} · ${g.time} · ${g.venue}</p>${g.played ? `<div class="summary-strip" style="margin-top:22px"><div class="summary-stat"><dt>Resultado</dt><dd style="font-size:18px">${g.won ? "Vitória" : "Derrota"}</dd></div><div class="summary-stat"><dt>2P</dt><dd>${g.two}</dd></div><div class="summary-stat"><dt>3P</dt><dd>${g.three}</dd></div><div class="summary-stat"><dt>LL</dt><dd>${g.free}</dd></div></div>` : ""}<a class="text-link" href="${toDispute(p)}">Ver equipe nesta disputa ${icon("arrow", 15)}</a></div>`;
+        } else if (state.athlete !== "") {
+          const p =
+            selectedP(state.mode === "disputa" ? state.pid : state.roster) ||
+            PARTICIPATIONS.find((p) => String(p.year) === state.rosterYear);
+          const a = rosterPlayers(p).find(
+            (a) => String(a.id) === state.athlete,
+          );
+          if (a)
+            content = `<div class="dialog-head"><h2 id="dialog-title">${a.name}</h2><button data-close aria-label="Fechar detalhe">×</button></div><div class="dialog-body"><p>${TEAM} · #${a.jersey}</p><p class="muted" style="margin-top:5px">${context(p)} · ${p.competition}</p><dl class="summary-strip" style="margin-top:20px"><div class="summary-stat"><dt>Jogos</dt><dd>${a.games}</dd></div><div class="summary-stat"><dt>PTS / jogo</dt><dd>${fmt(a.points)}</dd></div></dl><p class="muted">Participação ilustrativa neste protótipo.</p></div>`;
+        }
+        if (content) {
+          if (dialog.innerHTML !== content) dialog.innerHTML = content;
+          if (!dialog.open) {
+            dialog.dataset.returnGame = g?.id || "";
+            dialog.showModal();
+          }
+        } else if (dialog.open) {
+          const returnGame = dialog.dataset.returnGame;
+          dialog.close();
+          if (returnGame)
+            document
+              .querySelector(`[data-game="${returnGame}"] .match-link`)
+              ?.focus();
+        }
+      }
+      document.addEventListener("change", (e) => {
+        const key = e.target.dataset.filter;
+        if (!key) return;
+        const patch = {
+          [key]: key === "year" ? Number(e.target.value) : e.target.value,
+        };
+        if (key === "rosterYear") {
+          patch.roster = "";
+          patch.rosterSearch = "";
+        }
+        navigate(patch);
+      });
+      let searchTimer;
+      document.addEventListener("input", (e) => {
+        const key = e.target.dataset.search;
+        if (!key) return;
+        const value = e.target.value,
+          start = e.target.selectionStart;
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          navigate({ [key]: value }, true);
+          const target = document.querySelector(`[data-search="${key}"]`);
+          target?.focus();
+          target?.setSelectionRange(start, start);
+        }, 180);
+      });
+      document.addEventListener("click", (e) => {
+        const tab = e.target.closest("[data-tab]");
+        if (tab) {
+          navigate({ tab: tab.dataset.tab, game: "", athlete: "" });
+          return;
+        }
+        const mode = e.target.closest("[data-mode]");
+        if (mode) {
+          navigate({ statsMode: mode.dataset.mode });
+          return;
+        }
+        if (e.target.closest("[data-close]")) {
+          navigate({ game: "", athlete: "" });
+          return;
+        }
+        const tip = e.target.closest("[data-tooltip]");
+        if (tip) {
+          showTip(tip);
+          return;
+        }
+        const a = e.target.closest('a[href^="#"]');
+        if (a && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+          if (a.getAttribute("href") === "#main") return;
+          document.querySelector("#tooltip").hidden = true;
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document.querySelector("#tooltip").hidden = true;
+        const tab = e.target.closest("[data-tab]");
+        if (!tab || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key))
+          return;
+        e.preventDefault();
+        const tabs = [...document.querySelectorAll("[data-tab]")],
+          i = tabs.indexOf(tab),
+          next =
+            e.key === "Home"
+              ? 0
+              : e.key === "End"
+                ? tabs.length - 1
+                : (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) %
+                  tabs.length;
+        const key = tabs[next].dataset.tab;
+        navigate({ tab: key });
+        setTimeout(
+          () => document.querySelector(`[data-tab="${key}"]`)?.focus(),
+          0,
+        );
+      });
+      function showTip(target) {
+        const box = document.querySelector("#tooltip");
+        box.textContent = target.dataset.tooltip;
+        box.hidden = false;
+        const r = target.getBoundingClientRect();
+        const width = box.getBoundingClientRect().width;
+        box.style.left =
+          Math.max(
+            10,
+            Math.min(
+              window.innerWidth - width - 10,
+              r.left + r.width / 2 - width / 2,
+            ),
+          ) + "px";
+        box.style.top =
+          (r.top > 65 ? r.top - box.offsetHeight - 8 : r.bottom + 8) + "px";
+      }
+      document.addEventListener("mouseover", (e) => {
+        const target = e.target.closest("[data-tooltip]");
+        if (target) showTip(target);
+      });
+      document.addEventListener("mouseout", (e) => {
+        if (e.target.closest("[data-tooltip]"))
+          document.querySelector("#tooltip").hidden = true;
+      });
+      document.addEventListener("focusin", (e) => {
+        if (e.target.matches("[data-tooltip]")) showTip(e.target);
+      });
+      document.addEventListener(
+        "focusout",
+        () => (document.querySelector("#tooltip").hidden = true),
+      );
+      window.addEventListener(
+        "scroll",
+        () => (document.querySelector("#tooltip").hidden = true),
+        { passive: true },
+      );
+      document.getElementById("detail").addEventListener("cancel", (e) => {
+        e.preventDefault();
+        navigate({ game: "", athlete: "" });
+      });
+
+      document.addEventListener("click", (event) => {
+        const mode = event.target.closest("[data-playermode]");
+        if (mode) {
+          navigate({ playerMode: mode.dataset.playermode });
+          return;
+        }
+        const preset = event.target.closest("[data-playerpreset]");
+        if (preset) {
+          navigate({
+            playerPreset: preset.dataset.playerpreset,
+            playerColumns: null,
+          });
+          return;
+        }
+        const sort = event.target.closest("[data-playersort]");
+        if (sort) {
+          navigate({
+            playerSort: sort.dataset.playersort,
+            playerDirection:
+              state.playerSort === sort.dataset.playersort &&
+              state.playerDirection === "desc"
+                ? "asc"
+                : "desc",
+          });
+          return;
+        }
+      });
+      document.addEventListener("change", (event) => {
+        const box = event.target.closest("[data-playercolumn]");
+        if (!box) return;
+        const p =
+          selectedP(state.mode === "disputa" ? state.pid : state.roster) ||
+          PARTICIPATIONS.find((p) => String(p.year) === state.rosterYear);
+        const current = visiblePlayerKeys(p),
+          next = box.checked
+            ? [...current, box.dataset.playercolumn]
+            : current.filter((k) => k !== box.dataset.playercolumn);
+        const open = document.querySelector(".column-picker")?.open;
+        navigate(
+          {
+            playerColumns: sourcePlayerKeys(p)
+              .filter((k) => next.includes(k))
+              .join(","),
+          },
+          true,
+        );
+        const picker = document.querySelector(".column-picker");
+        if (picker && open) {
+          picker.open = true;
+          picker
+            .querySelector(
+              '[data-playercolumn="' + box.dataset.playercolumn + '"]',
+            )
+            ?.focus();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          const picker = document.querySelector(".column-picker[open]");
+          if (picker) {
+            picker.open = false;
+            picker.querySelector("summary").focus();
+          }
+        }
+      });
+
+      window.addEventListener("hashchange", () => {
+        render();
+      });
+      render();
+    </script>
+  </body>
+</html>

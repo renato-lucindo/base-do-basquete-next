@@ -1,3 +1,4 @@
+import { SearchInput } from "../ui-system/query-controls";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAnchoredOptions } from "../competition/anchored-options";
 import { api, isSessionFailure } from "../competition/api";
@@ -177,7 +178,7 @@ export function GamePicker(props: Props) {
     >
       <label htmlFor={id}>{props.label}</label>
       <div className="game-picker-input">
-        <input
+        <SearchInput
           ref={input}
           id={id}
           name={props.accessibleLabel ?? props.label}

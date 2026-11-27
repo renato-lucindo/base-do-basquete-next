@@ -28,6 +28,7 @@
     "src/statistics/routes.ts",
     "src/server/worker.ts",
     "src/server/admin-worker.ts",
+    "src/server/public-preview-worker.ts",
     "src/server/public-read.ts",
     "src/competition/administration-route.ts",
     "src/achievements/routes.ts",

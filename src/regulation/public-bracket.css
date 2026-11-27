@@ -83,7 +83,7 @@
 }
 .public-standings.public-site.statistics-public .knockout-round-heading h2 {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
   line-height: 1.4;
   font-weight: 650;
   overflow-wrap: anywhere;
@@ -99,7 +99,7 @@
   background: #fff;
   color: #53657a;
   font: inherit;
-  font-size: 0.625rem;
+  font-size: calc(0.625rem + 0.125rem);
   line-height: 1.4;
 }
 .public-standings.public-site.statistics-public button.knockout-format {
@@ -145,7 +145,7 @@
   border: 0;
   border-bottom: 1px solid #dbe3ed;
   color: #53657a;
-  font-size: 0.5rem;
+  font-size: calc(0.5rem + 0.125rem);
   line-height: 1.25;
   font-weight: 400;
   text-align: center;
@@ -183,7 +183,7 @@
   text-align: left;
   overflow-wrap: anywhere;
   white-space: normal;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   font-weight: 450;
   color: #172b45;
 }
@@ -192,7 +192,7 @@
   .knockout-score {
   border-left: 1px solid #e8edf4;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
@@ -219,7 +219,7 @@
   margin: 0;
   padding: 0.375rem 0.625rem;
   border-top: 1px solid #dbe3ed;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
 }
 .knockout-connections {
   position: absolute;
@@ -262,17 +262,17 @@
     );
   }
   .public-standings.public-site.statistics-public .knockout-round-heading h2 {
-    font-size: 1rem;
+    font-size: calc(1rem + 0.125rem);
   }
   .public-standings.public-site.statistics-public .knockout-format {
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .public-standings.public-site.statistics-public
     .knockout-score-table
     thead
     th {
     height: 1.25rem;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem + 0.125rem);
   }
   .public-standings.public-site.statistics-public
     .knockout-score-table
@@ -283,12 +283,12 @@
   .public-standings.public-site.statistics-public
     .knockout-score-table
     .knockout-team {
-    font-size: 0.9375rem;
+    font-size: calc(0.9375rem + 0.125rem);
   }
   .public-standings.public-site.statistics-public
     .knockout-score-table
     .knockout-score {
-    font-size: 0.875rem;
+    font-size: calc(0.875rem + 0.125rem);
   }
   .public-standings.public-site.statistics-public .knockout-controls button {
     width: 2.75rem;

@@ -1,0 +1,56 @@
+{
+  "verifiedAt": "2026-11-26T01:10:27.449265+00:00",
+  "validatedSha": "7f18cae1a86cf617af962f5a2fc7ba55903e8c30",
+  "runtimeSource": "5bdb298246d557607f366f69b6faa6af956d7293",
+  "ci": {
+    "runId": 45731786815,
+    "conclusion": "success",
+    "unitTests": 859,
+    "chromiumTests": 927,
+    "webkitTests": 44,
+    "preexistingMobileSkips": 125,
+    "design": "success",
+    "validate": "success"
+  },
+  "runtimeCodeMatchesValidatedSha": true,
+  "httpSmoke": {
+    "health": 200,
+    "adminPrivate": 401,
+    "previewPrivate": 403,
+    "sha256AssetsCompared": 12,
+    "allAssetsMatch": true
+  },
+  "workers": {
+    "admin": {
+      "version": "fb9fb0eb-3d7d-4a1f-9347-177daf39ece3",
+      "deployment": "0110497b-0484-4f70-bf66-8d5ac142e368"
+    },
+    "preview": {
+      "version": "01a51499-d940-4e47-8438-09ca271cc88b",
+      "deployment": "e48fdb31-66d9-4b19-b0a0-dc10b5b5bfc0"
+    },
+    "admin-publicacao": {
+      "version": "3f2a6cf6-d1dc-4dec-91e6-db2c1f9132b4",
+      "deployment": "513f2d14-5bd5-4b0a-af28-b3e4c8b32425",
+      "preserved": true
+    }
+  },
+  "remoteTooltipChecks": [
+    {
+      "browser": "chromium",
+      "rows": 100,
+      "escapeAndRestoredFocus": true,
+      "tabReactivation": true,
+      "clickOrTapAfterQuery": true,
+      "source": "5bdb298246d557607f366f69b6faa6af956d7293"
+    },
+    {
+      "browser": "webkit",
+      "rows": 100,
+      "escapeAndRestoredFocus": true,
+      "tabReactivation": true,
+      "clickOrTapAfterQuery": true,
+      "source": "5bdb298246d557607f366f69b6faa6af956d7293"
+    }
+  ]
+}

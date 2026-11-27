@@ -1,0 +1,162 @@
+/* Query-only presentation. Data-entry forms retain their visible labels. */
+.bb-query-label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.bb-query-field {
+  min-width: 0;
+}
+.bb-query-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+.bb-query-search > svg {
+  position: absolute;
+  inset-inline-start: 0.625rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--bb-muted);
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.bb-query-search > input {
+  width: 100%;
+  min-width: 0;
+  padding-inline-start: 2.25rem !important;
+  box-sizing: border-box;
+}
+.bb-query-field > :is(select, input, .bb-query-search),
+.bb-query-field > .bb-query-search > input {
+  margin-block: 0;
+}
+
+.bb-query-layout {
+  min-width: 0;
+  max-width: 100%;
+}
+.bb-query-layout[data-query-measured]
+  :is(
+    .filters,
+    .catalog-filter-bar,
+    .table-toolbar,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .team-profile-section-head,
+    .team-profile-mode-toolbar,
+    .standings-controls,
+    .public-phase-navigation
+  ) {
+  box-sizing: border-box;
+  width: min(100%, var(--bb-query-width));
+  max-width: 100%;
+  margin-inline: 0;
+}
+.bb-query-layout .bb-query-layout {
+  --bb-query-width: 100%;
+  --bb-query-offset: 0px;
+}
+.bb-query-field > select {
+  max-width: 100%;
+}
+
+.bb-query-layout[data-query-measured][data-query-alignment="center"]
+  > :is(
+    .filters,
+    .catalog-filter-bar,
+    .table-toolbar,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .team-profile-section-head,
+    .team-profile-mode-toolbar
+  ) {
+  margin-inline: auto;
+}
+.bb-query-layout :is(.team-profile-toolbar, .team-list-filters) > label {
+  min-width: 0;
+}
+
+/* Query controls share the same44px reference height and16px type. */
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    #team-filter-toggle,
+    .column-picker > button
+  ) {
+  box-sizing: border-box;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  font-size: 1rem !important;
+  line-height: 1.25;
+  margin-block: 0;
+}
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  .segmented {
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  padding: 0.1875rem;
+  align-items: stretch;
+}
+.public-site.statistics-public
+  :is(
+    .filters,
+    .team-list-filters,
+    .team-profile-toolbar,
+    .table-toolbar,
+    .team-profile-mode-toolbar
+  )
+  .segmented
+  button {
+  box-sizing: border-box;
+  min-height: 2.375rem;
+  height: auto;
+  font-size: 1rem;
+  line-height: 1.25;
+  padding-block: 0.375rem;
+}
+.public-site.statistics-public .bb-query-search {
+  align-self: stretch;
+  min-height: 2.75rem;
+}
+.public-site.statistics-public .bb-query-search > input {
+  margin-block: 0 !important;
+  font-size: 1rem !important;
+}
+
+/* Shared query labels are explicit; data-entry forms are outside this rule. */
+.bb-query-field :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  font-size: 1rem;
+}
+
+.public-site.statistics-public .bb-query-search > svg {
+  top: 50%;
+  transform: translateY(-50%);
+}

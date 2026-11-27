@@ -1,8 +1,14 @@
 import worker from "./worker";
+import { originAliasRedirect } from "./origin-alias";
 export { SessionStore } from "../access/durable";
 
 export default {
-  async fetch(request: Request, env: Env & { BDB_SOURCE?: string }) {
+  async fetch(
+    request: Request,
+    env: Env & { BDB_SOURCE?: string; APP_ALIAS?: string },
+  ) {
+    const alias = originAliasRedirect(request, env);
+    if (alias) return alias;
     const url = new URL(request.url);
     if (
       url.origin === env.APP_ORIGIN &&

@@ -257,8 +257,8 @@ export function CompetitionWorkspace({
               <h2 ref={heading} tabIndex={-1}>
                 {competition.name}
               </h2>
-              <label className="competition-destination">
-                Disputa atual
+              <label className="competition-destination bb-query-field">
+                <span className="bb-query-label">Disputa atual</span>
                 <select
                   aria-label="Disputa atual"
                   value={selected}

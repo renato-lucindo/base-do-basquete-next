@@ -1,4 +1,9 @@
 import {
+  columnHasDecimal,
+  metricColumnStyle,
+} from "../../ui-system/metric-layout";
+import { metricSampleSize } from "./metric-layout";
+import {
   publicPlayerHistoryAccessibleName,
   publicPlayerHistoryName,
 } from "../../public-ui/player-name";
@@ -85,6 +90,26 @@ function SortHeader({
       direction={data.direction}
       onSort={() => onSort(metric)}
       metricKey={metric}
+      style={metricColumnStyle(
+        [...data.rows, ...data.compared].map((row) => ({
+          value: row.metrics[metric].value,
+          averageDivisor:
+            metric !== "points" &&
+            (STATISTICS_METRICS[metric].normalizable ||
+              ["minutes", "plusMinus"].includes(metric))
+              ? metricSampleSize(row, metric)
+              : undefined,
+          totalFactor:
+            data.mode === "per-game" &&
+            metric !== "points" &&
+            (STATISTICS_METRICS[metric].normalizable ||
+              ["minutes", "plusMinus"].includes(metric))
+              ? metricSampleSize(row, metric)
+              : 1,
+        })),
+        playerMetric(metric).label.includes("%"),
+        metric === "pointsShare" || metric === "pointsPerGame",
+      )}
     />
   );
 }
@@ -95,6 +120,7 @@ export function ScoresheetStatisticsTable({
   compare,
   onCompare,
   comparisonEnabled,
+  teamProfile = false,
 }: {
   data: StatisticsPage;
   showTeam: boolean;
@@ -102,7 +128,15 @@ export function ScoresheetStatisticsTable({
   compare: StatisticsQuery["compare"];
   onCompare: (id: string, focusId: string) => void;
   comparisonEnabled: boolean;
+  teamProfile?: boolean;
 }) {
+  const decimalColumns = new Set(
+    data.columns.filter((key) =>
+      columnHasDecimal(
+        [...data.rows, ...data.compared].map((row) => row.metrics[key].value),
+      ),
+    ),
+  );
   return (
     <div
       className="reference-explorer statistics-explorer"
@@ -111,7 +145,7 @@ export function ScoresheetStatisticsTable({
       <ScrollableTable label="Tabela estatística rolável">
         <table
           aria-label="Estatísticas dos atletas"
-          className="statistics-table statistics-table-scoresheet"
+          className={`statistics-table statistics-table-scoresheet${teamProfile ? " statistics-table-team-profile" : ""}`}
         >
           <caption className="sr-only">
             Estatísticas publicadas. Selecione um cabeçalho para ordenar.
@@ -176,28 +210,46 @@ export function ScoresheetStatisticsTable({
                     <a
                       className="player-name"
                       title={row.names.join(" / ")}
-                      aria-label={publicPlayerHistoryAccessibleName(
-                        row.names,
-                        row.nicknames,
-                      )}
+                      aria-label={
+                        teamProfile
+                          ? teamPlayerAccessibleName(row)
+                          : publicPlayerHistoryAccessibleName(
+                              row.names,
+                              row.nicknames,
+                            )
+                      }
                       href={publicDetailLink(
                         `/atleta.html#${row.personId}`,
                         data.disputeId,
                       )}
                     >
-                      {publicPlayerHistoryName(row.names, row.nicknames)}
+                      {teamProfile ? (
+                        <TeamPlayerName
+                          name={publicPlayerHistoryName(
+                            row.names,
+                            row.nicknames,
+                          )}
+                          jerseys={row.jerseys}
+                        />
+                      ) : (
+                        publicPlayerHistoryName(row.names, row.nicknames)
+                      )}
                     </a>{" "}
-                    <span
-                      className="player-jersey"
-                      aria-label={
-                        row.jerseys.length
-                          ? `Camisa ${row.jerseys.join(" / ")}`
-                          : "Camisa não informada"
-                      }
-                    >
-                      {row.jerseys.length ? `#${row.jerseys.join(" / ")}` : "—"}
-                    </span>
-                    {!showTeam && (
+                    {!teamProfile && (
+                      <span
+                        className="player-jersey"
+                        aria-label={
+                          row.jerseys.length
+                            ? `Camisa ${row.jerseys.join(" / ")}`
+                            : "Camisa não informada"
+                        }
+                      >
+                        {row.jerseys.length
+                          ? `#${row.jerseys.join(" / ")}`
+                          : "—"}
+                      </span>
+                    )}
+                    {!showTeam && !teamProfile && (
                       <span className="player-team-mobile">
                         {" "}
                         ·{" "}
@@ -233,8 +285,8 @@ export function ScoresheetStatisticsTable({
                     data-public-metric={key}
                     className={
                       data.sort === key
-                        ? "reference-sorted active-column"
-                        : undefined
+                        ? "bb-metric-value reference-sorted active-column"
+                        : "bb-metric-value"
                     }
                     data-leader={
                       data.leaders[key]?.some(
@@ -248,6 +300,7 @@ export function ScoresheetStatisticsTable({
                       metric={key}
                       mode={data.mode}
                       value={row.metrics[key]}
+                      forceDecimal={decimalColumns.has(key)}
                     />
                   </td>
                 ))}
@@ -277,4 +330,41 @@ export function StatisticsLegend({ columns }: { columns: StatisticsMetric[] }) {
       </dl>
     </section>
   );
+}
+
+function TeamPlayerName({
+  name,
+  jerseys,
+}: {
+  name: string;
+  jerseys: string[];
+}) {
+  if (!jerseys.length) return <>{name}</>;
+  const boundary = name.lastIndexOf(" ");
+  return (
+    <>
+      {boundary < 0 ? null : name.slice(0, boundary + 1)}
+      <span className="player-name-tail">
+        {name.slice(boundary + 1)}{" "}
+        <span
+          className="player-jersey"
+          aria-label={`Camisa ${jerseys.join(" / ")}`}
+        >
+          {jerseys.map((jersey) => `#${jersey}`).join(" / ")}
+        </span>
+      </span>
+    </>
+  );
+}
+
+function teamPlayerAccessibleName(row: StatisticsPage["rows"][number]) {
+  const display = publicPlayerHistoryName(row.names, row.nicknames);
+  const history = publicPlayerHistoryAccessibleName(row.names, row.nicknames);
+  const visible = [
+    display,
+    row.jerseys.map((jersey) => `#${jersey}`).join(" / "),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return history === display ? visible : `${visible}, ${history}`;
 }

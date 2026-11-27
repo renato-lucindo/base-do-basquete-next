@@ -298,8 +298,13 @@ body {
 
 .catalog-statistics.public-site.statistics-public
   .catalog-metrics
-  :is(th:not(:first-child), td:not([colspan])) {
+  td:not([colspan]) {
   text-align: right;
+}
+.catalog-statistics.public-site.statistics-public
+  .catalog-metrics
+  th.bb-metric-column {
+  text-align: center;
 }
 
 .catalog-statistics.public-site.statistics-public .catalog-metrics td[colspan] {
@@ -387,4 +392,28 @@ body {
   .catalog-field-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.catalog-profile-example.team-profile-page.public-site.statistics-public {
+  width: 100%;
+  margin: 0;
+  max-width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--bb-line);
+}
+.catalog-profile-example .public-dispute-status {
+  margin-block: 0.5rem 1rem;
+}
+.catalog-profile-example .public-dispute-breadcrumb ol {
+  padding: 0;
+}
+.catalog-profile-example .public-dispute-breadcrumb button {
+  font: inherit;
+  border: 0;
+  background: transparent;
+  color: var(--bb-blue);
+  min-height: 2.75rem;
+}
+.catalog-profile-example [role="tabpanel"] {
+  padding-block: 1rem;
 }

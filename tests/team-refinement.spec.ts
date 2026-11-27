@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { teamPublicFixture } from "./fixtures/team-public-browser";
-test("Equipes alinha Totais/Por jogo à direita em qualquer largura", async ({
+test("Equipes alinha Total/Por jogo à direita em qualquer largura", async ({
   page,
 }, info) => {
   const f = await teamPublicFixture(page);
@@ -12,23 +12,40 @@ test("Equipes alinha Totais/Por jogo à direita em qualquer largura", async ({
       page.getByRole("table", { name: "Estatísticas das equipes" }),
     ).toBeVisible();
     const group = page.locator(".team-list-segments");
-    const bar = (await group.boundingBox())!;
-    const scope = (await group
-      .getByRole("group", { name: "Escopo" })
-      .boundingBox())!;
-    const mode = (await group
-      .getByRole("group", { name: "Modo" })
-      .boundingBox())!;
-    expect(Math.abs(scope.x - bar.x)).toBeLessThan(1);
-    expect(Math.abs(mode.x + mode.width - bar.x - bar.width)).toBeLessThan(1);
-    if (width >= 390) {
-      expect(
-        Math.abs(scope.y + scope.height / 2 - mode.y - mode.height / 2),
-      ).toBeLessThan(1);
-      expect(mode.x - scope.x - scope.width).toBeGreaterThan(0);
-    } else if (mode.y > scope.y + 1) {
-      expect(mode.y).toBeGreaterThanOrEqual(scope.y + scope.height);
-    }
+    // A resize can settle between protocol calls. Read every rectangle in one
+    // browser task, then wait for the complete layout contract together.
+    await expect
+      .poll(() =>
+        group.evaluate((el, width) => {
+          const bar = el.getBoundingClientRect();
+          const scope = el
+            .querySelector('[aria-label="Escopo"]')!
+            .getBoundingClientRect();
+          const mode = el
+            .querySelector('[aria-label="Modo"]')!
+            .getBoundingClientRect();
+          return {
+            leftAligned: Math.abs(scope.left - bar.left) < 1,
+            rightAligned: Math.abs(mode.right - bar.right) < 1,
+            desktopRow:
+              width < 640 ||
+              (Math.abs(
+                scope.top + scope.height / 2 - mode.top - mode.height / 2,
+              ) < 1 &&
+                mode.left > scope.right),
+            wrappedRow:
+              width >= 640 ||
+              mode.top <= scope.top + 1 ||
+              mode.top >= scope.bottom,
+          };
+        }, width),
+      )
+      .toEqual({
+        leftAligned: true,
+        rightAligned: true,
+        desktopRow: true,
+        wrappedRow: true,
+      });
     await expect(group).toBeVisible();
     await expect(page.locator(".team-list-page .statistics-public")).toHaveCSS(
       "background-color",
@@ -59,21 +76,15 @@ test("Equipes abre completa, filtra sem tirar foco e mantém opções e retorno"
   await expect(
     page.getByRole("button", { name: /Próxima página de inscrições/ }),
   ).toHaveCount(0);
-  const search = page.getByRole("searchbox", {
-    name: "Buscar equipe ou inscrição",
-  });
-  await search.fill("inexistente");
   await expect(
-    page.getByText("Nenhuma inscrição neste recorte."),
-  ).toBeVisible();
-  await expect(search).toBeFocused();
+    page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
   await expect(page.getByRole("checkbox")).toHaveCount(26);
   await page
     .getByRole("button", { name: "Não selecionar nenhuma equipe" })
     .click();
   await page.keyboard.press("Escape");
-  await search.fill("");
   await expect(
     page.getByText("Nenhuma inscrição neste recorte."),
   ).toBeVisible();
@@ -232,7 +243,7 @@ test("Equipes: consulta explícita e retorno do perfil conservam seleção e rol
   const table = page.getByRole("table", { name: "Estatísticas das equipes" });
   await expect(table.locator("tbody tr")).toHaveCount(26);
   await expect(
-    page.getByRole("button", { name: "Totais", exact: true }),
+    page.getByRole("button", { name: "Total", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   const region = page.getByRole("region", {
     name: "Tabela de equipes",
@@ -247,13 +258,12 @@ test("Equipes: consulta explícita e retorno do perfil conservam seleção e rol
   await expect(
     page.getByRole("heading", { name: "Inscrição 20", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
   await expect(table.locator("tbody tr")).toHaveCount(26);
   await expect(
     page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
-  ).toHaveValue("Inscrição");
+  ).toHaveCount(0);
+  await expect(page).toHaveURL(/q=Inscri/);
   await expect(page).toHaveURL(/direction=desc/);
   await expect
     .poll(() => region.evaluate((el) => el.scrollLeft))
@@ -310,18 +320,12 @@ test("Equipes: seleção extensa usa referência local e consulta POST sem corta
   ).toBe(true);
   await page.reload();
   await expect(table.locator("tbody tr")).toHaveCount(999);
-  await page
-    .getByRole("searchbox", { name: "Buscar equipe ou inscrição" })
-    .fill("Inscrição 000");
-  await expect(table.locator("tbody tr")).toHaveCount(1);
   await table.getByRole("link", { name: "Inscrição 000", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Inscrição 000", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Voltar às equipes", exact: true })
-    .click();
-  await expect(table.locator("tbody tr")).toHaveCount(1);
+  await page.getByRole("link", { name: /Voltar às equipes$/ }).click();
+  await expect(table.locator("tbody tr")).toHaveCount(999);
   await expect(page).toHaveURL(/stateRef=/);
 });
 
@@ -348,19 +352,16 @@ test("Equipes: última resposta prevalece e máximos positivos preservam empates
       .evaluate((el) => getComputedStyle(el).fontWeight),
   ).toBe("400");
   f.state.delayNext = 700;
-  const search = page.getByRole("searchbox", {
-    name: "Buscar equipe ou inscrição",
-  });
-  await search.fill("Inscrição 01");
+  await page.getByRole("button", { name: "Fase regular", exact: true }).click();
   await expect
-    .poll(() => f.state.queries.some((q) => q.includes("01")))
+    .poll(() => f.state.queries.some((q) => q.includes("scope=regular")))
     .toBe(true);
-  await search.fill("Inscrição 24");
-  await expect(table.locator("tbody tr")).toHaveCount(1);
-  await expect(table).toContainText("Inscrição 24");
-  await expect(search).toBeFocused();
-  await page.getByRole("button", { name: "Totais", exact: true }).click();
-  await expect(table).toContainText("Inscrição 24");
+  await page.getByRole("button", { name: "Todos", exact: true }).click();
+  await expect(table.locator("tbody tr")).toHaveCount(26);
+  await page.getByRole("button", { name: "Total", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Total", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 
@@ -379,7 +380,7 @@ test("Equipes: armazenamento indisponível preserva consultas curtas e foco", as
   await page.goto(f.listUrl);
   const table = page.getByRole("table", { name: "Estatísticas das equipes" });
   await expect(table.locator("tbody tr")).toHaveCount(2);
-  const totals = page.getByRole("button", { name: "Totais", exact: true });
+  const totals = page.getByRole("button", { name: "Total", exact: true });
   await totals.focus();
   await page.keyboard.press("Enter");
   await expect(totals).toBeFocused();

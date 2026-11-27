@@ -107,17 +107,17 @@ test("axe: escolha e seções do detalhe da equipe", async ({ page }, info) => {
   ).toBeVisible();
   await scan(page, info, "team-summary");
   for (const [section, state] of [
-    ["Participantes", "participants"],
+    ["Jogadores", "participants"],
     ["Jogos", "games"],
   ]) {
-    const link = page
-      .getByRole("navigation", { name: "Seções da equipe" })
-      .getByRole("link", { name: section, exact: true });
+    const link = page.getByRole("tab", { name: section, exact: true });
     await link.focus();
     await page.keyboard.press("Enter");
+    await expect(link).toBeFocused();
+    await expect(link).toHaveAttribute("aria-selected", "true");
     await expect(
-      page.getByRole("heading", { name: section, exact: true }).locator(".."),
-    ).toBeFocused();
+      page.getByRole("tabpanel", { name: section, exact: true }),
+    ).toBeVisible();
     await scan(page, info, `team-${state}`);
   }
 });
@@ -140,6 +140,15 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   expect(
     await sort.evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
   ).toBeGreaterThanOrEqual(font * 2);
+  await expect(
+    page.getByRole("button", { name: "Limpar filtros", exact: true }),
+  ).toHaveCount(0);
+  const search = page.getByRole("searchbox", {
+    name: "Buscar atleta ou equipe",
+    exact: true,
+  });
+  await search.fill("Atleta");
+  await search.press("Enter");
   const searchAction = page
     .getByRole("button", { name: "Limpar filtros", exact: true })
     .first();
@@ -156,13 +165,13 @@ test("320px e texto200% preservam controles, foco e rolagem interna", async ({
   await page.goto(team.detailUrl + "&section=jogos");
   await expect(
     page.getByRole("heading", { name: "Jogos", exact: true }),
-  ).toBeVisible();
+  ).toHaveClass(/sr-only/);
   await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(320);
   const region = page.getByRole("region", {
-    name: "Tabela de jogos da inscrição",
+    name: "Jogos da equipe",
     exact: true,
   });
   await region.focus();

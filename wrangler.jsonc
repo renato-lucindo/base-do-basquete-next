@@ -4,9 +4,8 @@
   "main": "src/server/worker.ts",
   "compatibility_date": "2026-10-23",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  "workers_dev": false,
   "preview_urls": false,
-  "routes": [{ "pattern": "basedobasquete.com.br", "custom_domain": true }],
   "assets": {
     "directory": "./dist-foundation",
     "binding": "ASSETS",

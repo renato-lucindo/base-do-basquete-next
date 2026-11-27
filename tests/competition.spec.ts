@@ -4,6 +4,7 @@ import type {
 } from "../src/competition/administration-contract";
 import { test, expect, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
+import { scanAccessibility } from "./fixtures/accessibility";
 import type {
   DisputeListQuery,
   DisputeListRow,
@@ -340,6 +341,95 @@ async function draft(page: Page, pickOrganizer = true) {
   }
   return dialog;
 }
+
+test("filtros sem títulos mantêm nomes acessíveis e limpar preserva a ordenação", async ({
+  page,
+}, info) => {
+  const state = await fixture(page);
+  await page.goto("http://127.0.0.1:5174/foundation.html");
+  const dialog = await draft(page, false);
+  const name = dialog.getByLabel("Nome do campeonato");
+  await expect(name.locator("..")).not.toHaveClass(/bb-query-label/);
+  await expect(name).toBeVisible();
+  await dialog.getByLabel("Campeonato de teste").check();
+  await dialog.getByRole("button", { name: "Salvar", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  const clear = page.getByRole("button", {
+    name: "Limpar filtros",
+    exact: true,
+  });
+  await expect(clear).toHaveCount(0);
+  const table = page.getByRole("table", { name: "Disputas", exact: true });
+  await table.getByRole("button", { name: "Campeonato", exact: true }).click();
+  await expect.poll(() => state.queries.at(-1)?.sort).toBe("championship");
+  await expect(clear).toHaveCount(0);
+  const search = page.getByRole("searchbox", { name: "Buscar", exact: true });
+  await expect(search).toHaveAttribute("placeholder", "Nome ou categoria…");
+  await expect(page.locator(".dispute-search > .bb-query-label")).toHaveCSS(
+    "position",
+    "absolute",
+  );
+  await expect(
+    page.locator(".dispute-search .bb-query-search > svg"),
+  ).toBeVisible();
+  for (const [label, value] of [
+    ["Ano", "2026"],
+    ["Naipe", "feminino"],
+    ["Situação", "planned"],
+    ["Visibilidade", "test"],
+  ]) {
+    await page.getByLabel(label, { exact: true }).selectOption(value);
+    await expect(clear).toBeVisible();
+    await clear.click();
+    await expect(clear).toHaveCount(0);
+    await expect
+      .poll(() => state.queries.at(-1))
+      .toMatchObject({
+        sort: "championship",
+        direction: "asc",
+        offset: 0,
+        year: null,
+        gender: null,
+        status: null,
+        visibility: null,
+      });
+  }
+  await search.fill("inexistente");
+  await expect(clear).toBeVisible();
+  await clear.click();
+  await expect(search).toHaveValue("");
+  await expect(clear).toHaveCount(0);
+  for (const width of [320, 390, 639, 640, 1366, 1920]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true);
+    await expect(search).toBeVisible();
+  }
+  await page.addStyleTag({ content: "html { font-size: 200% !important; }" });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true);
+  await page.setViewportSize({
+    width: info.project.name === "desktop" ? 1366 : 390,
+    height: 1000,
+  });
+  await page.addStyleTag({ content: "html { font-size: 100% !important; }" });
+  await expect(
+    page.getByRole("status").filter({ hasText: "1 disputa" }),
+  ).toBeVisible();
+  await scanAccessibility(page, info, "consultas-admin");
+  const screenshot = info.outputPath("consulta.png");
+  await page.screenshot({ path: screenshot, fullPage: true });
+  await info.attach("consulta-administrativa", {
+    path: screenshot,
+    contentType: "image/png",
+  });
+});
 
 test("saves a reusable organizer in the championship dialog and presents its abbreviation", async ({
   page,
@@ -851,7 +941,7 @@ test("keeps multiple championship checkboxes and opens the selected dispute in G
   await dialog.getByRole("button", { name: "Cancelar", exact: true }).click();
   await page
     .locator("summary")
-    .filter({ hasText: /^Todos$/ })
+    .filter({ hasText: /^Todos os campeonatos$/ })
     .click();
   await page
     .getByRole("checkbox", { name: "Liga Regional", exact: true })

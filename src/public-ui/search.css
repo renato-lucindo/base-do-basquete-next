@@ -17,7 +17,7 @@
   box-shadow: 0 0.5rem 1.5rem #1720331a;
   padding: 0.625rem;
   color: #172033;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-search-types {
   display: flex;
@@ -50,7 +50,7 @@
   font-weight: 600;
 }
 .public-autocomplete p {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   line-height: 1.5;
   margin: 0.375rem 0;
   color: #526176;
@@ -61,7 +61,7 @@
   overscroll-behavior: contain;
 }
 .public-suggestion-heading {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem + 0.125rem);
   text-transform: uppercase;
   font-weight: 600;
   color: #526176;
@@ -88,7 +88,7 @@
 .public-suggestion-list small {
   display: block;
   color: #526176;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   font-weight: 400;
 }
 .public-search-all {
@@ -98,13 +98,13 @@
   margin-top: 0.375rem;
 }
 .public-search-results {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-search-results h2 {
   margin: 1rem 0 0.375rem;
 }
 .public-search-results h2 small {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   font-weight: 400;
   color: #526176;
 }
@@ -125,7 +125,7 @@
 }
 .public-search-entity-list small {
   display: block;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem + 0.125rem);
   color: #526176;
   font-weight: 400;
 }
@@ -156,7 +156,7 @@
 }
 .public-search-genders h3 {
   margin: 0.25rem 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem + 0.125rem);
 }
 .public-search-genders ul {
   margin: 0;
@@ -187,7 +187,7 @@
   .public-header.site-header .public-header-search .public-search-types button {
     min-height: 2.75rem;
     padding-inline: 0.375rem;
-    font-size: 0.8125rem;
+    font-size: calc(0.8125rem + 0.125rem);
   }
   .public-autocomplete {
     padding: 0.5rem;
@@ -245,7 +245,7 @@
   background: var(--public-blue-soft);
   border-left: 3px solid var(--public-blue);
   padding: 0.375rem 0.625rem;
-  font-size: 1.0625rem;
+  font-size: calc(1.0625rem + 0.125rem);
   color: var(--public-text);
 }
 .public-search-entity-list > li > a {

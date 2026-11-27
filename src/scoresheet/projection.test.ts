@@ -102,3 +102,18 @@ it("filters full history before pagination and retains original sequence and cou
   s.events.splice(0, 1);
   expect(projectSheet(s).actions.at(-1)?.annotation).toBe("1p (24)");
 });
+
+it("projects every overtime foul in blue without changing quarter colors", () => {
+  const sheet = initialState().sheet.present;
+  sheet.periods = 8;
+  const player = sheet.roster[0];
+  player.played = true;
+  sheet.events = [1, 3, 5, 6, 7].map((period) =>
+    event(player.side, player.jersey, "P", period),
+  );
+  expect(
+    projectSheet(sheet)
+      .players.find((p) => p.rosterEntryId === player.rosterEntryId)
+      ?.fouls.map((f) => f.color),
+  ).toEqual(["red", "red", "blue", "blue", "blue"]);
+});

@@ -4,7 +4,10 @@ import {
   publicSearchFixture,
   searchFixtureHits,
 } from "./fixtures/public-search";
-import { publicNavigationFixture } from "./fixtures/public-navigation";
+import {
+  publicNavigationFixture,
+  submitPublicSearch,
+} from "./fixtures/public-navigation";
 import {
   publicRegulationFixture,
   publicKnockoutFixture,
@@ -31,11 +34,17 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
   const table = page.getByRole("table", {
     name: "Classificação por resultados confirmados",
   });
+  await expect(
+    page.locator(".public-dispute-identity > .public-dispute-status"),
+  ).toHaveText("Em andamento");
   const winner = table.locator("tbody tr").filter({ hasText: "Lobos" });
-  await expect(winner.getByRole("cell").nth(4)).toHaveText("100%");
+  await expect(winner.getByRole("cell").nth(1)).toHaveText("5");
+  await expect(winner.getByRole("cell").nth(9)).toHaveText("1,14");
+  await expect(winner.getByRole("cell").nth(5)).toHaveText("100%");
   await expect(table.getByRole("columnheader")).toHaveText([
     "Pos.",
     "Equipe",
+    "PTS",
     "J",
     "V",
     "D",
@@ -43,6 +52,7 @@ test("aproveitamento de vitórias não se confunde com pontuação do campeonato
     "PP",
     "PC",
     "SLD",
+    "AVG",
     "Últimos jogos",
   ]);
   await page.screenshot({
@@ -101,9 +111,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await page
     .getByRole("combobox", { name: /Buscar competições/ })
     .fill(s.context.name);
-  await page
-    .getByRole("button", { name: "Buscar na base", exact: true })
-    .click();
+  await submitPublicSearch(page);
   await page
     .locator(
       `.public-search-entity a[href="/publico.html#${s.disputeId}?secao=classificacao"]`,
@@ -119,6 +127,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await expect(table.getByRole("columnheader")).toHaveText([
     "Pos.",
     "Equipe",
+    "PTS",
     "J",
     "V",
     "D",
@@ -126,10 +135,11 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
     "PP",
     "PC",
     "SLD",
+    "AVG",
     "Últimos jogos",
   ]);
   await expect(
-    table.getByRole("row").nth(1).getByRole("cell").nth(4),
+    table.getByRole("row").nth(1).getByRole("cell").nth(5),
   ).toHaveText("—");
   await expect(table.getByRole("link")).toHaveCount(0);
   for (const r of s.registrations)
@@ -141,7 +151,7 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
         .first(),
     ).toHaveText("—");
   await expect(
-    table.getByRole("row").nth(1).getByRole("cell").nth(1),
+    table.getByRole("row").nth(1).getByRole("cell").nth(2),
   ).toHaveText("0");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({
@@ -176,20 +186,25 @@ test("disputa confirmada sem resultados aparece no catálogo, tabela J=0, agenda
   await expect(participants.getByRole("listitem")).toHaveText(
     s.registrations.map((r) => r.name),
   );
-  const search = page.getByRole("searchbox", {
-    name: "Buscar equipe ou inscrição",
-  });
-  await search.fill("inexistente");
-  await expect(participants.getByRole("listitem")).toHaveCount(0);
-  await expect(search).toBeFocused();
+  await expect(
+    page.getByRole("searchbox", { name: "Buscar equipe ou inscrição" }),
+  ).toHaveCount(0);
   await page.getByRole("button", { name: /Equipe Todas as equipes/ }).click();
   await expect(page.getByRole("checkbox")).toHaveCount(s.registrations.length);
   await page
     .getByRole("button", { name: "Não selecionar nenhuma equipe" })
     .click();
   await page.keyboard.press("Escape");
-  await search.fill("");
   await expect(participants.getByRole("listitem")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Limpar filtros", exact: true })
+    .click();
+  await expect(participants.getByRole("listitem")).toHaveCount(
+    s.registrations.length,
+  );
+  await expect(
+    page.getByRole("button", { name: "Limpar filtros", exact: true }),
+  ).toHaveCount(0);
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 
@@ -215,7 +230,7 @@ test("correção publicada altera a tabela e fases mantêm confrontos em revisã
       .getByRole("row")
       .filter({ hasText: "Lobos" })
       .getByRole("cell")
-      .nth(5),
+      .nth(6),
   ).toHaveText("95");
   await page.getByRole("link", { name: "Eliminatórias", exact: true }).click();
   await expect(
