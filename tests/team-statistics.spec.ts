@@ -124,7 +124,7 @@ test("estatísticas completas separam homônimos, camisas 0/00 e DNP de zero", a
   });
   await expect(table.getByRole("row")).toHaveCount(7);
   await expect(
-    table.getByRole("cell", { name: "00", exact: true }),
+    table.locator(".player-jersey").filter({ hasText: /^#00$/ }),
   ).toHaveCount(1);
   const dnp = table.getByRole("row").filter({
     has: page.locator(`a[href^="/atleta.html"][href*="#${pubId(7)}?"]`),

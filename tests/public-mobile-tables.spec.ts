@@ -155,7 +155,7 @@ for (const width of [320, 375, 390, 430, 639, 640, 768, 1366]) {
                 ? "Bia"
                 : "Carla",
         ],
-        nicknames: [null],
+        nicknames: i === 2 ? ["CJ"] : [null],
         jerseys: i === 0 ? ["0"] : i === 1 ? [] : ["00"],
       }));
       await route.fulfill({ json: statisticsPageSchema.parse(data) });
@@ -176,6 +176,12 @@ for (const width of [320, 375, 390, 430, 639, 640, 768, 1366]) {
       table.locator("tbody tr").nth(1).locator(".player-jersey"),
     ).toHaveCount(0);
     await expect(table.locator("tbody tr").nth(2)).toContainText("#00");
+    await expect(table.locator(".player-name").first()).toHaveAccessibleName(
+      "Ana Maria de Souza Oliveira #0",
+    );
+    await expect(table.locator(".player-name").nth(2)).toHaveAccessibleName(
+      "CJ #00, CJ — nome completo: Carla",
+    );
     await expect(
       table.locator("tbody tr").first().locator(".player-team-mobile"),
     ).toHaveCount(0);

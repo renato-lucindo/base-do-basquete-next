@@ -210,7 +210,14 @@ export function ScoresheetStatisticsTable({
                     <a
                       className="player-name"
                       title={row.names.join(" / ")}
-                      aria-label={`${publicPlayerHistoryAccessibleName(row.names, row.nicknames)}${teamProfile && row.jerseys.length ? `, camisa ${row.jerseys.join(" / ")}` : ""}`}
+                      aria-label={
+                        teamProfile
+                          ? teamPlayerAccessibleName(row)
+                          : publicPlayerHistoryAccessibleName(
+                              row.names,
+                              row.nicknames,
+                            )
+                      }
                       href={publicDetailLink(
                         `/atleta.html#${row.personId}`,
                         data.disputeId,
@@ -338,7 +345,7 @@ function TeamPlayerName({
     <>
       {boundary < 0 ? null : name.slice(0, boundary + 1)}
       <span className="player-name-tail">
-        {name.slice(boundary + 1)}
+        {name.slice(boundary + 1)}{" "}
         <span
           className="player-jersey"
           aria-label={`Camisa ${jerseys.join(" / ")}`}
@@ -348,4 +355,16 @@ function TeamPlayerName({
       </span>
     </>
   );
+}
+
+function teamPlayerAccessibleName(row: StatisticsPage["rows"][number]) {
+  const display = publicPlayerHistoryName(row.names, row.nicknames);
+  const history = publicPlayerHistoryAccessibleName(row.names, row.nicknames);
+  const visible = [
+    display,
+    row.jerseys.map((jersey) => `#${jersey}`).join(" / "),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return history === display ? visible : `${visible}, ${history}`;
 }

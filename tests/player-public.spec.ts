@@ -277,7 +277,9 @@ test("recentes usam data e participação, sem reordenar por publicação de cor
   f.source.participations[0].fact.publishedAt = "2028-01-01T00:00:00Z";
   await page.goto(f.url);
   await expect(page.locator(".player-recent tbody tr")).toHaveCount(5);
-  await expect(page.locator(".player-recent tbody td:first-child")).toHaveText([
+  await expect(
+    page.locator(".player-recent tbody .player-game-date"),
+  ).toHaveText([
     "24/01/2026",
     "23/01/2026",
     "22/01/2026",

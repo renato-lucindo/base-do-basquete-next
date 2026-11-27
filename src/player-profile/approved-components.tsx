@@ -187,11 +187,15 @@ export function ProfileGames({
                     <ProfileMatchRow
                       metadata={
                         <>
-                          <span>{profileDate(g.game.date)}</span>
-                          <span className="player-game-points">
-                            {g.fact.played
-                              ? (g.fact.scoring?.points ?? "—")
-                              : "—"}{" "}
+                          <span className="player-game-date">
+                            {profileDate(g.game.date)}
+                          </span>
+                          <span>
+                            <span className="player-game-points">
+                              {g.fact.played
+                                ? (g.fact.scoring?.points ?? "—")
+                                : "—"}
+                            </span>{" "}
                             PTS
                           </span>
                         </>
@@ -213,7 +217,9 @@ export function ProfileGames({
                 </td>
               ) : (
                 <>
-                  <td>{profileDate(g.game.date)}</td>
+                  <td className="player-game-date">
+                    {profileDate(g.game.date)}
+                  </td>
                   <td>
                     <a className="player-game-link" href={gameHref(g)}>
                       <MatchTeams game={g} score={scores[scoreKey(g)]} />

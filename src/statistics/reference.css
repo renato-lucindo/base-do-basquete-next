@@ -2022,3 +2022,7 @@ body:has(:is(#statistics-content, #simple-statistics-content)),
   overflow-wrap: normal;
   word-break: normal;
 }
+
+.public-site.statistics-public .statistics-table-team-profile .player-jersey {
+  margin-left: 0;
+}
